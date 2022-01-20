@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/frontend",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "lib/index.js",
   "author": "0xterran",
   "license": "private",
@@ -21,6 +21,7 @@
     "@testing-library/react": "^12.0.0",
     "@types/jest": "^26.0.24",
     "@types/react": "^17.0.15",
+    "@types/react-dom": "^17.0.11",
     "babel-loader": "^8.2.2",
     "jest": "^27.0.6",
     "react": "^17.0.2",
