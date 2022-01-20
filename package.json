@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/frontend",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "lib/index.js",
   "author": "0xterran",
   "license": "private",
@@ -15,6 +15,7 @@
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-replace": "^3.0.1",
     "@storybook/addon-essentials": "^6.3.6",
     "@storybook/react": "^6.3.6",
     "@testing-library/jest-dom": "^5.14.1",
