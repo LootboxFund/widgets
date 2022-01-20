@@ -1,5 +1,5 @@
-import Counter from "./Counter";
+import Counter from './components/demo/Counter'
 
-export { Counter };
-export *  from "./api";
-export *  from "./injection";
+export { Counter }
+export * from './api/api'
+export * from './injection'

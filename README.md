@@ -12,7 +12,6 @@ $ yarn publish	# publish to npm
 
 ## Usage Locally
 
-
 Using npm libraries locally is easy using `$ yarn link`. You will need two repos, the library and the codebase you are working in. 
 
 ```bash
