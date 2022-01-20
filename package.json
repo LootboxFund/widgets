@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/widgets",
-  "version": "0.0.12",
+  "version": "0.0.21",
   "main": "lib/index.js",
   "author": "0xterran",
   "license": "private",
