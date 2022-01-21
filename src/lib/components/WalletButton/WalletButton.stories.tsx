@@ -1,16 +1,17 @@
 import React from 'react'
 import { ThemeProvider } from 'emotion-theming'
 import theme from '@rebass/preset'
-import Swap from '.'
+import WalletButton, { WalletButtonProps } from 'lib/components/WalletButton'
+
 
 export default {
-  title: 'Swap',
-  component: Swap,
+  title: 'WalletButton',
+  component: WalletButton,
 }
 
-const Template = () => (
+const Template = (args: WalletButtonProps) => (
 	<ThemeProvider theme={theme}>
-		<Swap />
+		<WalletButton {...args} />
 	</ThemeProvider>
 )
 
