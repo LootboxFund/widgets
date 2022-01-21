@@ -45,9 +45,11 @@
     "build": "rollup -c",
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "upload-cdn": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/upload-widgets.js"
   },
   "dependencies": {
+    "@google-cloud/storage": "^5.18.0",
     "@lingui/core": "^3.13.0",
     "@lingui/macro": "^3.13.0",
     "@lingui/react": "^3.13.0",
