@@ -53,7 +53,7 @@ const CrowdSale = ({ defaults }: CrowdSaleProps) => {
 	return (
 		<>
 			<Header logo title={<p>Swap</p>}>
-				<h1>Swap Here</h1>
+				<h1 style={{ color: "red" }}>Swap Here</h1>
 				<Wallet disabled={!account} />
 			</Header>
 			<div ref={setBoundary}>
