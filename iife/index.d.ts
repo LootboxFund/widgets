@@ -1,3 +1,3 @@
-import Counter from 'components/Demo/Counter';
+import Counter from 'widgets/Demo/Counter';
 export { Counter };
-export * from 'api/demo';
+export * from 'lib/api/demo';

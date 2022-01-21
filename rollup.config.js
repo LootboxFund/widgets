@@ -14,7 +14,7 @@ import nodePolyfills from 'rollup-plugin-node-polyfills';
  * 
  */
 const configUMD = {
-  input: ["src/injections/swap/index.tsx"],
+  input: ["src/injects/swap/index.ts"],
   output: {
     file: "iife/swap.js",
     format: "iife",
