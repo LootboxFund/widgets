@@ -1,0 +1,2 @@
+
+export { injectCounter } from './injection'

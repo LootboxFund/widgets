@@ -7,14 +7,23 @@
     "sourceMap": true,
     "allowJs": true,
     "moduleResolution": "node",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "noImplicitAny": true,
+    "noUnusedLocals": false,
     "strictNullChecks": true,
     "noUnusedParameters": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src",
+    "paths": {
+      "components/*": ["./components/*"],
+      "api/*": ["./api/*"],
+      "lib/*": ["./lib/*"],
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "lib"]
