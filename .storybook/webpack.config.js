@@ -15,9 +15,7 @@ module.exports = ({config}) => {
         "node_modules",
       ]
     },
-    loaders: [
-      ...config.loaders,
-      {test: /\.po$/, loader: 'json!po'}
-   ]
+    loader: {test: /\.po$/, loader: 'json!po'}
+   
   }
 }

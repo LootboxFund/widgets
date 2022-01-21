@@ -7,7 +7,7 @@ const storage = new Storage();
 
 let bucketName = "guildfx-exchange.appspot.com"
 
-const filename = "crowdsale.js"
+const filename = "swap.js"
 let filepath = `/Users/kangzeroo/Projects/GuildFX/widgets/iife/${filename}`
 
 // Testing out upload of file

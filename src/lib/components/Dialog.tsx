@@ -21,7 +21,10 @@ declare global {
 const Context = createContext({
   element: null as HTMLElement | null,
   active: false,
-  setActive: (active: boolean) => undefined as void,
+  setActive: (active: boolean) => {
+    console.log(active)
+    return undefined as void
+  },
 })
 
 interface ProviderProps {

@@ -33,9 +33,10 @@ const initialSettings: Settings = {
 }
 
 export const settingsAtom = atomWithReset(initialSettings)
-export const maxSlippageAtom = pickAtom(settingsAtom, 'maxSlippage', setCustomizable(MaxSlippage))
-export const transactionTtlAtom = pickAtom(settingsAtom, 'transactionTtl')
-export const mockTogglableAtom = pickAtom(settingsAtom, 'mockTogglable', setTogglable)
+
+// export const maxSlippageAtom = pickAtom(settingsAtom, 'maxSlippage', setCustomizable(MaxSlippage))
+// export const transactionTtlAtom = pickAtom(settingsAtom, 'transactionTtl')
+// export const mockTogglableAtom = pickAtom(settingsAtom, 'mockTogglable', setTogglable)
 
 export enum Field {
   INPUT = 'input',
@@ -68,11 +69,12 @@ export const stateAtom = atomWithImmer<State>({
   output: {},
 })
 
-export const swapAtom = pickAtom(stateAtom, 'swap')
+// export const swapAtom = pickAtom(stateAtom, 'swap')
 
 export const inputAtom = atom(
   (get) => get(stateAtom).input,
   (get, set, update: Input & { approved?: boolean }) => {
+    console.log(get)
     set(stateAtom, (state) => {
       state.activeInput = Field.INPUT
       state.input = update
@@ -84,6 +86,7 @@ export const inputAtom = atom(
 export const outputAtom = atom(
   (get) => get(stateAtom).output,
   (get, set, update: Input) => {
+    console.log(get)
     set(stateAtom, (state) => {
       state.activeInput = Field.OUTPUT
       state.output = update
@@ -103,7 +106,10 @@ export function useUpdateInputValue(inputAtom: WritableAtom<Input, Input>) {
 
 export function useUpdateInputToken(inputAtom: WritableAtom<Input, Input>) {
   return useUpdateAtom(
-    useMemo(() => atom(null, (get, set, token: Input['token']) => set(inputAtom, { token })), [inputAtom])
+    useMemo(() => atom(null, (get, set, token: Input['token']) => {
+      console.log(get)
+      set(inputAtom, { token })
+    }), [inputAtom])
   )
 }
 

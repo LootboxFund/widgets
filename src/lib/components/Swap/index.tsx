@@ -53,18 +53,21 @@ const CrowdSale = ({ defaults }: CrowdSaleProps) => {
 	return (
 		<>
 			<Header logo title={<p>Swap</p>}>
+				<h1>Swap Here</h1>
 				<Wallet disabled={!account} />
 			</Header>
 			<div ref={setBoundary}>
 			<BoundaryProvider value={boundary}>
-				<Input disabled={!active} />
+				{/* <Input disabled={!active} /> */}
 				<ReverseButton disabled={!active} />
-				<Output disabled={!active}>
-					{/* <Toolbar disabled={!active} /> */}
+				
+				{/* <Output disabled={!active}>
+					<Toolbar disabled={!active} />
 					<SwapButton />
-				</Output>
+				</Output> */}
 			</BoundaryProvider>
-      </div>
+      		</div>
+			<h1>Working?</h1>
 		</>
 	)
 }

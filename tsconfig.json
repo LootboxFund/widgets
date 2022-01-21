@@ -10,6 +10,8 @@
     "jsx": "react-jsx",
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "noUnusedLocals": false,
     "strictNullChecks": true,
