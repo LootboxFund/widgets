@@ -1,4 +1,4 @@
-var GuildFX_UI = (function (exports, React) {
+(function (React) {
             'use strict';
 
             function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -24245,11 +24245,7 @@ var GuildFX_UI = (function (exports, React) {
                 ReactDOM.render(jsxRuntime.exports.jsx(React__default['default'].StrictMode, { children: jsxRuntime.exports.jsx(Provider, Object.assign({ locale: DEFAULT_LOCALE }, { children: jsxRuntime.exports.jsx(ThemeProvider, Object.assign({ theme: defaultTheme }, { children: jsxRuntime.exports.jsx(CrowdSale, {}, void 0) }), void 0) }), void 0) }, void 0), targetInjectionPoint);
             };
 
-            exports.injectCrowdSale = injectCrowdSale;
+            (() => injectCrowdSale())();
 
-            Object.defineProperty(exports, '__esModule', { value: true });
-
-            return exports;
-
-}({}, React));
+}(React));
 //# sourceMappingURL=crowdsale.js.map

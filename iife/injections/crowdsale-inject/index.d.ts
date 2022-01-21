@@ -1,1 +1,1 @@
-export { injectCrowdSale } from './injection';
+export {};

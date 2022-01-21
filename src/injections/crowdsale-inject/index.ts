@@ -1,2 +1,0 @@
-
-export { injectCrowdSale } from './injection'

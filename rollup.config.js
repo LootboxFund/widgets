@@ -30,9 +30,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const configUMD = {
-  input: ["src/injections/crowdsale-inject/index.ts"],
+  input: ["src/injections/swap-inject/index.ts"],
   output: {
-    file: "iife/crowdsale.js",
+    file: "iife/swap.js",
     format: "iife",
     sourcemap: true,
     name: "GuildFX_UI",
