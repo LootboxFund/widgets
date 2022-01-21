@@ -2,6 +2,14 @@
 
 A template for building shareable libraries that can be used both NodeJS `import` or Browser `<script>` tags.
 
+## Storybook
+
+Views your modules locally in ESM format `import`.
+
+```bash
+$ yarn storybook
+```
+
 ## Building
 
 ```bash
@@ -34,6 +42,13 @@ $ yarn unlink "@guildfx/frontend" # unlink when you want to go back to prod vers
 
 You will be able to now use the imports locally, without changing any code or imports.
 Just be aware of local vs prod library imports when developing.
+
+You can also build to UMD/IIFE locally, after `$ yarn watch` open up `./sandbox.html`
+
+```html
+<!-- Import Locally from build file -->
+<script src="./iife/bundle.js" type="text/javascript"></script>
+```
 
 
 ## Usage in server
