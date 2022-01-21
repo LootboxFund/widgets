@@ -4207,7 +4207,7 @@
             function _objectWithoutProperties$c(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose$c(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
             function _objectWithoutPropertiesLoose$c(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-            var ArrowDown$2 = React.forwardRef(function (_ref, ref) {
+            var ArrowDown = React.forwardRef(function (_ref, ref) {
               var _ref$color = _ref.color,
                   color = _ref$color === void 0 ? 'currentColor' : _ref$color,
                   _ref$size = _ref.size,
@@ -4234,12 +4234,12 @@
                 points: "19 12 12 19 5 12"
               }));
             });
-            ArrowDown$2.propTypes = {
+            ArrowDown.propTypes = {
               color: PropTypes.string,
               size: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
             };
-            ArrowDown$2.displayName = 'ArrowDown';
-            var ArrowDownIcon = ArrowDown$2;
+            ArrowDown.displayName = 'ArrowDown';
+            var ArrowDownIcon = ArrowDown;
 
             function _extends$b() { _extends$b = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$b.apply(this, arguments); }
 
@@ -4285,7 +4285,7 @@
             function _objectWithoutProperties$a(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose$a(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 
             function _objectWithoutPropertiesLoose$a(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-            var ArrowUp$2 = React.forwardRef(function (_ref, ref) {
+            var ArrowUp = React.forwardRef(function (_ref, ref) {
               var _ref$color = _ref.color,
                   color = _ref$color === void 0 ? 'currentColor' : _ref$color,
                   _ref$size = _ref.size,
@@ -4312,12 +4312,12 @@
                 points: "5 12 12 5 19 12"
               }));
             });
-            ArrowUp$2.propTypes = {
+            ArrowUp.propTypes = {
               color: PropTypes.string,
               size: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
             };
-            ArrowUp$2.displayName = 'ArrowUp';
-            var ArrowUpIcon = ArrowUp$2;
+            ArrowUp.displayName = 'ArrowUp';
+            var ArrowUpIcon = ArrowUp;
 
             function _extends$9() { _extends$9 = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends$9.apply(this, arguments); }
 
@@ -4708,9 +4708,9 @@
   ${largeIconCss}
 `;
             icon(AlertTriangleIcon);
-            const ArrowDown$1 = icon(ArrowDownIcon);
+            icon(ArrowDownIcon);
             icon(ArrowRightIcon);
-            const ArrowUp$1 = icon(ArrowUpIcon);
+            icon(ArrowUpIcon);
             icon(CheckCircleIcon);
             icon(ChevronDownIcon);
             icon(ClockIcon);
@@ -5464,17 +5464,6 @@
 
             function useAtomValue(anAtom, scope) {
               return useAtom(anAtom, scope)[0];
-            }
-
-            function atomWithReset(initialValue) {
-              const anAtom = atom(initialValue, (get, set, update) => {
-                if (update === RESET) {
-                  set(anAtom, initialValue);
-                } else {
-                  set(anAtom, typeof update === "function" ? update(get(anAtom)) : update);
-                }
-              });
-              return anAtom;
             }
 
             function atomWithDefault(getDefault) {
@@ -34098,159 +34087,6 @@
   }
 `;
 
-            function atomWithImmer(initialValue) {
-              const anAtom = atom(initialValue, (get, set, fn$1) => set(anAtom, fn(get(anAtom), typeof fn$1 === "function" ? fn$1 : () => fn$1)));
-              return anAtom;
-            }
-
-            const ETH = {
-                name: 'Ether',
-                symbol: 'ETH',
-                chainId: 1,
-                decimals: 18,
-                address: 'ETHER',
-                logoURI: 'https://raw.githubusercontent.com/GuildFX/interface/main/src/assets/images/ethereum-logo.png',
-            };
-
-            /** Max slippage, as a percentage. */
-            var MaxSlippage;
-            (function (MaxSlippage) {
-                MaxSlippage[MaxSlippage["P01"] = 0.1] = "P01";
-                MaxSlippage[MaxSlippage["P05"] = 0.5] = "P05";
-                // Members to satisfy CustomizableEnum; see setCustomizable
-                MaxSlippage[MaxSlippage["CUSTOM"] = -1] = "CUSTOM";
-                MaxSlippage[MaxSlippage["DEFAULT"] = 0.5] = "DEFAULT";
-            })(MaxSlippage || (MaxSlippage = {}));
-            const initialSettings = {
-                maxSlippage: { value: MaxSlippage.DEFAULT },
-                transactionTtl: undefined,
-                mockTogglable: true,
-            };
-            atomWithReset(initialSettings);
-            // export const maxSlippageAtom = pickAtom(settingsAtom, 'maxSlippage', setCustomizable(MaxSlippage))
-            // export const transactionTtlAtom = pickAtom(settingsAtom, 'transactionTtl')
-            // export const mockTogglableAtom = pickAtom(settingsAtom, 'mockTogglable', setTogglable)
-            var Field;
-            (function (Field) {
-                Field["INPUT"] = "input";
-                Field["OUTPUT"] = "output";
-            })(Field || (Field = {}));
-            const stateAtom = atomWithImmer({
-                activeInput: Field.INPUT,
-                input: { token: ETH },
-                output: {},
-            });
-            // export const swapAtom = pickAtom(stateAtom, 'swap')
-            atom((get) => get(stateAtom).input, (get, set, update) => {
-                console.log(get);
-                set(stateAtom, (state) => {
-                    state.activeInput = Field.INPUT;
-                    state.input = update;
-                    state.swap = undefined;
-                });
-            });
-            atom((get) => get(stateAtom).output, (get, set, update) => {
-                console.log(get);
-                set(stateAtom, (state) => {
-                    state.activeInput = Field.OUTPUT;
-                    state.output = update;
-                    state.swap = undefined;
-                });
-            });
-            atomWithImmer(null);
-
-            const BaseButton = styled.button `
-  background-color: transparent;
-  border: none;
-  border-radius: 0.5em;
-  color: currentColor;
-  cursor: pointer;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  margin: 0;
-  padding: 0;
-
-  :disabled {
-    cursor: initial;
-    filter: saturate(0) opacity(0.4);
-  }
-`;
-            var Button = styled(BaseButton) `
-  color: ${({ color = 'interactive', theme }) => color === 'interactive' && theme.onInteractive};
-
-  :enabled {
-    background-color: ${({ color = 'interactive', theme }) => theme[color]};
-  }
-
-  :enabled:hover {
-    background-color: ${({ color = 'interactive', theme }) => theme.onHover(theme[color])};
-  }
-
-  :disabled {
-    border: 1px solid ${({ theme }) => theme.outline};
-    color: ${({ theme }) => theme.secondary};
-    cursor: initial;
-  }
-`;
-            const transparentButton = (defaultColor) => styled(BaseButton) `
-  color: ${({ color = defaultColor, theme }) => theme[color]};
-
-  :enabled:hover {
-    color: ${({ color = defaultColor, theme }) => theme.onHover(theme[color])};
-  }
-`;
-            transparentButton('accent');
-            transparentButton('secondary');
-
-            const ReverseRow = styled(Row) `
-  left: 50%;
-  position: absolute;
-  top: 7.45em;
-  transform: translateX(-50%);
-  z-index: ${Layer.OVERLAY};
-`;
-            const ArrowUp = styled(ArrowUp$1) `
-  left: calc(50% - 0.37em);
-  position: absolute;
-  top: calc(50% - 0.82em);
-`;
-            const ArrowDown = styled(ArrowDown$1) `
-  bottom: calc(50% - 0.82em);
-  position: absolute;
-  right: calc(50% - 0.37em);
-`;
-            const Overlay = styled.div `
-  background-color: ${({ theme }) => theme.container};
-  border-radius: ${({ theme }) => theme.borderRadius}em;
-  padding: 0.25em;
-`;
-            const StyledReverseButton = styled(Button) `
-  border-radius: ${({ theme }) => theme.borderRadius * 0.75}em;
-  height: 2.5em;
-  position: relative;
-  width: 2.5em;
-
-  div {
-    transform: rotate(${({ turns }) => turns / 2}turn);
-    transition: transform 0.25s ease-in-out;
-    will-change: transform;
-  }
-`;
-            function ReverseButton({ disabled }) {
-                const [state, setState] = useAtom(stateAtom);
-                const [turns, setTurns] = React.useState(0);
-                const onClick = React.useCallback(() => {
-                    const { input, output } = state;
-                    setState((state) => {
-                        state.input = output;
-                        state.output = input;
-                    });
-                    setTurns((turns) => ++turns);
-                }, [state, setState]);
-                return (jsxRuntime.exports.jsx(ReverseRow, Object.assign({ justify: "center" }, { children: jsxRuntime.exports.jsx(Overlay, { children: jsxRuntime.exports.jsx(StyledReverseButton, Object.assign({ disabled: disabled, onClick: onClick, turns: turns }, { children: jsxRuntime.exports.jsxs("div", { children: [jsxRuntime.exports.jsx(ArrowUp, { strokeWidth: 3 }, void 0), jsxRuntime.exports.jsx(ArrowDown, { strokeWidth: 3 }, void 0)] }, void 0) }), void 0) }, void 0) }), void 0));
-            }
-
             const DEFAULT_INPUT = { address: 'ETH' };
             const DEFAULT_OUTPUT = {};
             function useSwapDefaults(defaults = {}) {
@@ -34267,9 +34103,8 @@
                 useTokenList(tokenList);
                 const [boundary, setBoundary] = React.useState(null);
                 const { active, account } = useActiveWeb3React();
-                console.log(`active: `, active);
-                console.log(`account: `, account);
-                return (jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs(Header, Object.assign({ logo: true, title: jsxRuntime.exports.jsx("p", { children: "Swap" }, void 0) }, { children: [jsxRuntime.exports.jsx("h1", { children: "Swap Here" }, void 0), jsxRuntime.exports.jsx(Wallet, { disabled: !account }, void 0)] }), void 0), jsxRuntime.exports.jsx("div", Object.assign({ ref: setBoundary }, { children: jsxRuntime.exports.jsx(BoundaryProvider, Object.assign({ value: boundary }, { children: jsxRuntime.exports.jsx(ReverseButton, { disabled: !active }, void 0) }), void 0) }), void 0), jsxRuntime.exports.jsx("h1", { children: "Working?" }, void 0)] }, void 0));
+                React.useState(0);
+                return (jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsx(Header, Object.assign({ logo: true, title: jsxRuntime.exports.jsx("p", { children: "Swap" }, void 0) }, { children: jsxRuntime.exports.jsx(Wallet, { disabled: !account }, void 0) }), void 0), jsxRuntime.exports.jsx("div", Object.assign({ ref: setBoundary }, { children: jsxRuntime.exports.jsx(BoundaryProvider, { value: boundary }, void 0) }), void 0)] }, void 0));
             };
 
             function _classCallCheck(instance, Constructor) {

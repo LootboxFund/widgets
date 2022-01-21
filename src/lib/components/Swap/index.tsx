@@ -48,18 +48,17 @@ const CrowdSale = ({ defaults }: CrowdSaleProps) => {
   	useTokenList(tokenList)
   	const [boundary, setBoundary] = useState<HTMLDivElement | null>(null)
 	const { active, account } = useActiveWeb3React()
-	console.log(`active: `, active)
-	console.log(`account: `, account)
+	const [inputValue, setInputValue] = useState(0)
+
 	return (
 		<>
 			<Header logo title={<p>Swap</p>}>
-				<h1 style={{ color: "red" }}>Swap Here</h1>
 				<Wallet disabled={!account} />
 			</Header>
 			<div ref={setBoundary}>
 			<BoundaryProvider value={boundary}>
 				{/* <Input disabled={!active} /> */}
-				<ReverseButton disabled={!active} />
+				{/* <ReverseButton disabled={!active} /> */}
 				
 				{/* <Output disabled={!active}>
 					<Toolbar disabled={!active} />
@@ -67,7 +66,6 @@ const CrowdSale = ({ defaults }: CrowdSaleProps) => {
 				</Output> */}
 			</BoundaryProvider>
       		</div>
-			<h1>Working?</h1>
 		</>
 	)
 }

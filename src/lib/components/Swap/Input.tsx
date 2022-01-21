@@ -36,7 +36,8 @@ export default function Input({ disabled }: InputProps) {
     <InputColumn gap={0.5} approved={input.approved !== false}>
       <Row>
         <ThemedText.Subhead2 color="secondary">
-          <Trans>Trading</Trans>
+          {/* <Trans>Trading</Trans> */}
+          <p>Trading</p>
         </ThemedText.Subhead2>
       </Row>
       <TokenInput
