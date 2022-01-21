@@ -1,3 +1,5 @@
 /// <reference types="react" />
-declare const CrowdSale: () => JSX.Element;
+export interface CrowdSaleProps {
+}
+declare const CrowdSale: (props: CrowdSaleProps) => JSX.Element;
 export default CrowdSale;

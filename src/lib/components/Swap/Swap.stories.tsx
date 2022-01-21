@@ -1,17 +1,16 @@
 import React from 'react'
 import { ThemeProvider } from 'emotion-theming'
 import theme from '@rebass/preset'
-import CrowdSale, { CrowdSaleProps } from './index'
-
+import Swap from '.'
 
 export default {
-  title: 'CrowdSale',
-  component: CrowdSale,
+  title: 'Swap',
+  component: Swap,
 }
 
-const Template = (args: CrowdSaleProps) => (
+const Template = () => (
 	<ThemeProvider theme={theme}>
-		<CrowdSale {...args} />
+		<Swap />
 	</ThemeProvider>
 )
 

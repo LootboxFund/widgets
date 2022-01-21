@@ -1,5 +1,5 @@
 Arguments: 
-  /opt/homebrew/Cellar/node/17.0.1/bin/node /opt/homebrew/bin/yarn add -D @types/rebass__presets
+  /opt/homebrew/Cellar/node/17.0.1/bin/node /opt/homebrew/bin/yarn add -D @types/valtio
 
 PATH: 
   /Users/kangzeroo/.local/share/solana/install/active_release/bin:/Users/kangzeroo/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/kangzeroo/Library/Android/sdk/emulator:/Users/kangzeroo/Library/Android/sdk/tools:/Users/kangzeroo/Library/Android/sdk/tools/bin:/Users/kangzeroo/Library/Android/sdk/platform-tools
@@ -14,7 +14,7 @@ Platform:
   darwin arm64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2frebass__presets: Not found
+  Error: https://registry.yarnpkg.com/@types%2fvaltio: Not found
       at Request.params.callback [as _callback] (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:67029:18)
       at Request.self.callback (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:140883:22)
       at Request.emit (node:events:390:28)
@@ -107,6 +107,7 @@ npm manifest:
       "rebass": "^4.0.7",
       "redux": "^4.1.2",
       "styled-components": "^5.3.3",
+      "valtio": "^1.2.9",
       "wcag-contrast": "^3.0.0",
       "wicg-inert": "^3.1.1",
       "widgets-web3-react/core": "npm:@web3-react/core@8.0.16-alpha.0",
@@ -10814,6 +10815,11 @@ Lockfile:
       forwarded "0.2.0"
       ipaddr.js "1.9.1"
   
+  proxy-compare@2.0.2:
+    version "2.0.2"
+    resolved "https://registry.yarnpkg.com/proxy-compare/-/proxy-compare-2.0.2.tgz#343e624d0ec399dfbe575f1d365d4fa042c9fc69"
+    integrity sha512-3qUXJBariEj3eO90M3Rgqq3+/P5Efl0t/dl9g/1uVzIQmO3M+ql4hvNH3mYdu8H+1zcKv07YvL55tsY74jmH1A==
+  
   prr@~0.0.0:
     version "0.0.0"
     resolved "https://registry.yarnpkg.com/prr/-/prr-0.0.0.tgz#1a84b85908325501411853d0081ee3fa86e2926a"
@@ -13208,6 +13214,13 @@ Lockfile:
     dependencies:
       spdx-correct "^3.0.0"
       spdx-expression-parse "^3.0.0"
+  
+  valtio@^1.2.9:
+    version "1.2.9"
+    resolved "https://registry.yarnpkg.com/valtio/-/valtio-1.2.9.tgz#acc0869b603806ed35b74d32aafeaf3064f76e36"
+    integrity sha512-S7FJTffcXNrgzEXGxMo9TvTtNXehrNSCoV9HjxcEVqsvHFORW+PbAhJU/HN27mUkPCDL9vX0QTgzbZF9eW5+Nw==
+    dependencies:
+      proxy-compare "2.0.2"
   
   varint@^5.0.2:
     version "5.0.2"

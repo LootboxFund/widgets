@@ -1,35 +1,29 @@
 import React from 'react'
 import { Label, Input } from '@rebass/forms'
 import styled from 'styled-components'
-import Button from "lib/components/Button"
+import SwapButton from "lib/components/Swap/SwapButton"
+import SwapInput from "lib/components/Swap/SwapInput"
+import SwapHeader from 'lib/components/Swap/SwapHeader'
 
 const $SwapContainer = styled.section`
 	width: 100%;
 	height: 100%;
-	border: 1px solid #ccc;
-	border-radius: 10px;
+	border: 0px solid transparent;
+	border-radius: 20px;
 	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
 `
 
 const Swap = () => {
 	return (
 		<$SwapContainer>
-			<h1>Swap</h1>
-			<Label htmlFor='inputAmount'>Input</Label>
-			<Input
-				id='inputAmount'
-				name='inputAmount'
-				type='number'
-				placeholder="0"
-			/>
-			<Label htmlFor='outputAmount'>Output</Label>
-			<Input
-				id='outputAmount'
-				name='outputAmount'
-				type='number'
-				placeholder="0"
-			/>
-			<Button onClick={() => console.log("hello")}><p>Swap</p></Button>
+			<SwapHeader />
+			<SwapInput />
+			<SwapInput selectedToken="BNB" />
+			<SwapButton onClick={() => console.log("hello")}></SwapButton>
 		</$SwapContainer>
 	)
 }

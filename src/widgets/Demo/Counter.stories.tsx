@@ -2,7 +2,7 @@ import React from 'react'
 import Counter, { CounterProps } from './Counter'
 
 export default {
-  title: 'Counter',
+  title: 'Demo',
   component: Counter,
 }
 
