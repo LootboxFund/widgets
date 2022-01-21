@@ -7,7 +7,7 @@ import styled, {
   ThemeProvider as StyledProvider,
   ThemeProviderComponent,
   useTheme as useStyled,
-} from 'styled-components/macro'
+} from 'styled-components'
 
 import { ComputedTheme } from './theme'
 

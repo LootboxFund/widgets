@@ -1,0 +1,1 @@
+export { injectCrowdSale } from './injection';
