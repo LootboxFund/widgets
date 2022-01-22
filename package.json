@@ -31,6 +31,7 @@
     "@types/rebass__forms": "^4.0.6",
     "@types/styled-components": "^5.1.20",
     "@types/wcag-contrast": "^3.0.0",
+    "@types/web3": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "babel-loader": "^8.2.2",
@@ -51,7 +52,7 @@
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
     "build-storybook": "build-storybook",
-    "upload-cdn": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/upload-widgets.js"
+    "deploy": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/upload-widgets.js"
   },
   "dependencies": {
     "@google-cloud/storage": "^5.18.0",
@@ -63,6 +64,7 @@
     "@uniswap/redux-multicall": "^1.1.0",
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/token-lists": "^1.0.0-beta.27",
+    "@web3-react/core": "^6.1.9",
     "cids": "^1.1.9",
     "emotion-theming": "^11.0.0",
     "jotai": "^1.5.3",

@@ -1,2 +1,6 @@
 /// <reference types="react" />
-export default function SwapButton(): JSX.Element;
+export interface SwapButtonProps {
+    onClick: () => void;
+}
+declare const SwapButton: (props: SwapButtonProps) => JSX.Element;
+export default SwapButton;
