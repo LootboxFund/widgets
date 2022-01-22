@@ -74,14 +74,13 @@ const SwapInput = (props: SwapInputProps) => {
 }
 
 const $SwapInput = styled.div<{}>`
-	flex: 1;
 	font-size: 1.5rem;
 	padding: 10px 10px 15px 10px;
 	background-color: ${`${COLORS.surpressedBackground}20`};
 	border: 0px solid transparent;
 	border-radius: 10px;
 	display: flex;
-	max-height: 70px;
+	max-height: 150px;
 `
 
 

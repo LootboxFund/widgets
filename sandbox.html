@@ -2,11 +2,19 @@
 <html>
 	<head>
 		<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+		<style>
+			.demo {
+				width: 600px;
+				height: 800px;
+			}
+		</style>
 	</head>
 	<body>
 		<h1>Local HTML File</h1>
-		<div id="wallet-button"></div>
-		<div id="crowdsale"></div>
+		<div class="demo">
+			<div id="wallet-button"></div>
+			<div id="crowdsale"></div>
+		</div>
 		<!-- <script src="https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/bundle.js?alt=media" type="text/javascript"></script> -->
 		<script src="./iife/bundle.js"></script>
 	</body>

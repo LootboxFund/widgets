@@ -2020,14 +2020,13 @@
                                     jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.dangerFontColor}80`, backgroundColorHover: `${COLORS.dangerFontColor}`, color: COLORS.trustFontColor, onClick: selectToken, style: { height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }, children: "Select Token" }, void 0)] }, void 0) }, void 0));
             };
             const $SwapInput = styled.div `
-	flex: 1;
 	font-size: 1.5rem;
 	padding: 10px 10px 15px 10px;
 	background-color: ${`${COLORS.surpressedBackground}20`};
 	border: 0px solid transparent;
 	border-radius: 10px;
 	display: flex;
-	max-height: 70px;
+	max-height: 150px;
 `;
             const $FineText = styled.span `
 	font-size: 0.9rem;
