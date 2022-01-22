@@ -1,35 +1,35 @@
-import React from 'react'
-import { Label, Input } from '@rebass/forms'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import SwapButton from "lib/components/Swap/SwapButton"
-import SwapInput from "lib/components/Swap/SwapInput"
-import SwapHeader from 'lib/components/Swap/SwapHeader'
+import { stateOfSwap, SwapRoute } from './state'
+import Swap from './Swap'
 import { useSnapshot } from 'valtio'
-import { state } from 'lib/state/valtio'
+import TokenPicker from './TokenPicker'
+import ManageTokens from './ManageTokens'
+import AddToken from './AddToken'
+import { initializeTokenList } from 'lib/hooks/useTokenList'
 
-const $SwapContainer = styled.section`
-	width: 100%;
-	height: 100%;
-	border: 0px solid transparent;
-	border-radius: 20px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-`
+export interface SwapWidgetProps {
+	initialRoute?: SwapRoute
+}
+const SwapWidget = (props: SwapWidgetProps) => {
+	const snap = useSnapshot(stateOfSwap)
+	useEffect(() => {
+		initializeTokenList()
+		if (props.initialRoute) {
+			stateOfSwap.route = props.initialRoute
+		}
+	},[])
 
-const Swap = () => {
-	const snap = useSnapshot(state)
+	if (stateOfSwap.route === '/search' ) {
+		return <TokenPicker />
+	} else if (stateOfSwap.route === '/customs') {
+		return <ManageTokens />
+	} else if (stateOfSwap.route === '/add') {
+		return <AddToken />
+	}
 	return (
-		<$SwapContainer>
-			<SwapHeader />
-			<SwapInput />
-			<SwapInput selectedToken="BNB" />
-			<SwapButton onClick={() => ++state.count}></SwapButton>
-			<span>{snap.count}</span>
-		</$SwapContainer>
+		<Swap />
 	)
 }
 
-export default Swap
+export default SwapWidget;
