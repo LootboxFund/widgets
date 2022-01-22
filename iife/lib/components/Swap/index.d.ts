@@ -1,3 +1,7 @@
 /// <reference types="react" />
-declare const Swap: () => JSX.Element;
-export default Swap;
+import { SwapRoute } from './state';
+export interface SwapWidgetProps {
+    initialRoute?: SwapRoute;
+}
+declare const SwapWidget: (props: SwapWidgetProps) => JSX.Element;
+export default SwapWidget;
