@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import SwapButton from "lib/components/Swap/SwapButton"
 import SwapInput from "lib/components/Swap/SwapInput"
 import SwapHeader from 'lib/components/Swap/SwapHeader'
+import { useSnapshot } from 'valtio'
+import { state } from 'lib/state/valtio'
 
 const $SwapContainer = styled.section`
 	width: 100%;
@@ -18,12 +20,14 @@ const $SwapContainer = styled.section`
 `
 
 const Swap = () => {
+	const snap = useSnapshot(state)
 	return (
 		<$SwapContainer>
 			<SwapHeader />
 			<SwapInput />
 			<SwapInput selectedToken="BNB" />
-			<SwapButton onClick={() => console.log("hello")}></SwapButton>
+			<SwapButton onClick={() => ++state.count}></SwapButton>
+			<span>{snap.count}</span>
 		</$SwapContainer>
 	)
 }
