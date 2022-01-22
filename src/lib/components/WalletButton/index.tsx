@@ -19,6 +19,7 @@ const WalletButton = (props: WalletButtonProps) => {
 		console.log(web3.version)
 		console.log(web3.eth.accounts)
 		++state.count
+		console.log(snap.count)
 	}
 
 	return (
@@ -33,7 +34,6 @@ const WalletButton = (props: WalletButtonProps) => {
 				>
 				Connect Wallet
 			</$Button>
-			<span>{snap.count}</span>
 		</$WalletButton>
 	)
 }

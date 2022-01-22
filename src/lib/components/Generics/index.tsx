@@ -39,3 +39,18 @@ export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5, flex?: number
       props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }
 `;
+
+export const $CardViewport = styled.div<{}>`
+  width: 600px;
+  height: 600px;
+`
+
+export const $ScrollContainer = styled.div<{ height?: string }>`
+  overflow-y: scroll;
+  ${(props) => props.height ? `height: ${props.height}` : 'height: 80%'};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 10px;
+`

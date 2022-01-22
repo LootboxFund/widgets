@@ -1,7 +1,7 @@
 
 export const COLORS = {
-	warningFontColor: '#FFCE56',
-	warningBackground: '#FFCE56',
+	warningFontColor: '#FFFFFF',
+	warningBackground: '#F9A400',
 
 	dangerFontColor: '#FF0000',
 	dangerBackground: '#F8CDCD',

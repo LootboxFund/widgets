@@ -68,6 +68,7 @@
     "cids": "^1.1.9",
     "emotion-theming": "^11.0.0",
     "jotai": "^1.5.3",
+    "micromodal": "^0.4.10",
     "multicodec": "^3.2.1",
     "multihashes": "^4.0.3",
     "node-vibrant": "^3.2.1-alpha.1",

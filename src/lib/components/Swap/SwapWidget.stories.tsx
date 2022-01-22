@@ -1,21 +1,22 @@
 import React from 'react'
 import { ThemeProvider } from 'emotion-theming'
 import theme from '@rebass/preset'
-import Swap from '.'
+import SwapWidget, { SwapWidgetProps } from './index'
 import { $CardViewport } from '../Generics'
 
+
 export default {
-  title: 'Swap',
-  component: Swap,
+  title: 'SwapWidget',
+  component: SwapWidget,
 }
 
-const Template = () => (
+const Demo = (args: SwapWidgetProps) => (
 	<$CardViewport>
 		<ThemeProvider theme={theme}>
-			<Swap />
+			<SwapWidget {...args} />
 		</ThemeProvider>
 	</$CardViewport>
 )
 
-export const Basic = Template.bind({})
+export const Basic = Demo.bind({})
 Basic.args = {}
