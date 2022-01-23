@@ -6,7 +6,7 @@ import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
 import { stateOfSwap, TokenPickerTarget } from './state'
 import { useSnapshot } from 'valtio'
-import { TokenData } from 'lib/hooks/useTokenList/tokenMap'
+import { TokenData } from 'lib/hooks/constants'
 
 export interface SwapInputProps {
 	selectedToken?: TokenData;
@@ -48,7 +48,7 @@ const SwapInput = (props: SwapInputProps) => {
 						backgroundColorHover={`${COLORS.surpressedBackground}50`}
 						color={COLORS.black}
 						onClick={selectToken}
-						disabled={props.tokenDisabled}
+						disabled={props.tokenDisabled && props.selectedToken ? true : false}
 						style={{ height: '30px', fontSize: '1rem', fontWeight: 'bold', padding: '5px 20px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}
 					>
 						<$CoinIcon src={props.selectedToken.logoURI}>
@@ -61,6 +61,7 @@ const SwapInput = (props: SwapInputProps) => {
 						backgroundColorHover={`${COLORS.dangerFontColor}`}
 						color={COLORS.trustFontColor}
 						onClick={selectToken}
+						disabled={props.tokenDisabled}
 						style={{ height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }}
 					>
 						

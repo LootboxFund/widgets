@@ -1,5 +1,5 @@
 import uriToHttp from 'lib/utils/uriToHttp'
-import { DEMO_CUSTOM_TOKEN_LIST, TokenData, tokenMap } from 'lib/hooks/useTokenList/tokenMap'
+import { DEMO_CUSTOM_TOKENS_BSC_MAINNET, TokenData, tokenMap } from 'lib/hooks/constants'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
@@ -98,7 +98,7 @@ export const removeCustomToken = (address: string, chainId: number) => {
 
 const saveInitialCustomTokens = () => {
   const customTokens: Record<string, TokenData[]> = {
-    [DEFAULT_CHAIN_ID]: DEMO_CUSTOM_TOKEN_LIST
+    [DEFAULT_CHAIN_ID]: DEMO_CUSTOM_TOKENS_BSC_MAINNET
   }
   localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
 }

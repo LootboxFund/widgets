@@ -1,5 +1,5 @@
 
-import { TokenData } from 'lib/hooks/useTokenList/tokenMap'
+import { TokenData } from 'lib/hooks/constants'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy, subscribe } from 'valtio'
 

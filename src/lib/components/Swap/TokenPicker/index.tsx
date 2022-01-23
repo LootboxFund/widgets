@@ -6,23 +6,52 @@ import { COLORS } from 'lib/theme'
 import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import RowToken from 'lib/components/Swap/TokenPicker/RowToken'
 import {useCustomTokenList, useTokenList} from 'lib/hooks/useTokenList'
-import { TokenData } from 'lib/hooks/useTokenList/tokenMap'
+import { TokenData } from 'lib/hooks/constants'
 import { $Horizontal, $ScrollContainer } from '../../Generics'
 import $Button from '../../Button'
 import { $BalanceText, $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
 import { stateOfSwap } from '../state'
 import { useSnapshot } from 'valtio'
+import { userState } from 'lib/state/userState'
+import { useWeb3 } from 'lib/hooks/useWeb3Api'
 
 export interface TokenPickerProps {}
 const TokenPicker = (props: TokenPickerProps) => {
 	console.log(props)
+
 	const snap = useSnapshot(stateOfSwap)
+	const snapUserState = useSnapshot(userState)
+
 	const tokenList = useTokenList()
 	const customTokenList = useCustomTokenList()
+	const web3 = useWeb3()
+
 	const [searchString, setSearchString] = useState("")
-	const selectToken = (token: TokenData) => {
+
+
+	const selectToken = async (token: TokenData) => {
 		console.log("selectToken")
 		console.log(snap)
+		console.log(token)
+		console.log(`
+			
+			${token.address}
+
+		`)
+		if (token.address === '0x0native') {
+			console.log('Get native token')
+			console.log(snapUserState.currentAccount)
+			// get native balance
+			if (snapUserState.currentAccount) {
+				let balance = await (await web3).eth.getBalance(snapUserState.currentAccount); //Will give value in.
+				// balance = (await web3).toDecimal(balance);
+				console.log(balance)
+				userState.displayedBalance = balance;
+			}
+		} else {
+			// get coin balance
+			userState.displayedBalance 
+		}
 		if (snap.targetToken !== null) {
 			stateOfSwap[snap.targetToken].data = token
 			stateOfSwap.route = '/swap'
