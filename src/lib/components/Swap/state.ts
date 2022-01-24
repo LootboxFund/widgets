@@ -51,10 +51,10 @@ const updateOutputTokenValues = () => {
   }
 }
 
-export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  const web3 = useWeb3()
-  const swapSnapshot = useSnapshot(stateOfSwap)
-}
+// export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
+//   const web3 = useWeb3()
+//   const swapSnapshot = useSnapshot(stateOfSwap)
+// }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
   const web3 = useWeb3()

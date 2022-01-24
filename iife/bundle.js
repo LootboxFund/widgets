@@ -715,6 +715,68 @@
 
             var ReactDOM = reactDom.exports;
 
+            /**
+             * Returns a Promise that resolves to the value of window.ethereum if it is
+             * set within the given timeout, or null.
+             * The Promise will not reject, but an error will be thrown if invalid options
+             * are provided.
+             *
+             * @param options - Options bag.
+             * @param options.mustBeMetaMask - Whether to only look for MetaMask providers.
+             * Default: false
+             * @param options.silent - Whether to silence console errors. Does not affect
+             * thrown errors. Default: false
+             * @param options.timeout - Milliseconds to wait for 'ethereum#initialized' to
+             * be dispatched. Default: 3000
+             * @returns A Promise that resolves with the Provider if it is detected within
+             * given timeout, otherwise null.
+             */
+            function detectEthereumProvider({ mustBeMetaMask = false, silent = false, timeout = 3000, } = {}) {
+                _validateInputs();
+                let handled = false;
+                return new Promise((resolve) => {
+                    if (window.ethereum) {
+                        handleEthereum();
+                    }
+                    else {
+                        window.addEventListener('ethereum#initialized', handleEthereum, { once: true });
+                        setTimeout(() => {
+                            handleEthereum();
+                        }, timeout);
+                    }
+                    function handleEthereum() {
+                        if (handled) {
+                            return;
+                        }
+                        handled = true;
+                        window.removeEventListener('ethereum#initialized', handleEthereum);
+                        const { ethereum } = window;
+                        if (ethereum && (!mustBeMetaMask || ethereum.isMetaMask)) {
+                            resolve(ethereum);
+                        }
+                        else {
+                            const message = mustBeMetaMask && ethereum
+                                ? 'Non-MetaMask window.ethereum detected.'
+                                : 'Unable to detect window.ethereum.';
+                            !silent && console.error('@metamask/detect-provider:', message);
+                            resolve(null);
+                        }
+                    }
+                });
+                function _validateInputs() {
+                    if (typeof mustBeMetaMask !== 'boolean') {
+                        throw new Error(`@metamask/detect-provider: Expected option 'mustBeMetaMask' to be a boolean.`);
+                    }
+                    if (typeof silent !== 'boolean') {
+                        throw new Error(`@metamask/detect-provider: Expected option 'silent' to be a boolean.`);
+                    }
+                    if (typeof timeout !== 'number') {
+                        throw new Error(`@metamask/detect-provider: Expected option 'timeout' to be a number.`);
+                    }
+                }
+            }
+            var dist = detectEthereumProvider;
+
             const e$2=Symbol(),t$1=Symbol(),r$2=Symbol(),n$2=Object.getPrototypeOf,o=new WeakMap,s=e=>e&&(o.has(e)?o.get(e):n$2(e)===Object.prototype||n$2(e)===Array.prototype),c$2=e=>"object"==typeof e&&null!==e,l$2=(n,o)=>{let s=!1;const c=(e,t)=>{if(!s){let r=e.a.get(n);r||(r=new Set,e.a.set(n,r)),r.add(t);}},l={f:o,get(e,t){return t===r$2?n:(c(this,t),i(e[t],this.a,this.c))},has(e,r){return r===t$1?(s=!0,this.a.delete(n),!0):(c(this,r),r in e)},ownKeys(t){return c(this,e$2),Reflect.ownKeys(t)}};return o&&(l.set=l.deleteProperty=()=>!1),l},i=(e,t,o)=>{if(!s(e))return e;const c=e[r$2]||e,i=(e=>Object.isFrozen(e)||Object.values(Object.getOwnPropertyDescriptors(e)).some(e=>!e.writable))(c);let u=o&&o.get(c);return u&&u.f===i||(u=l$2(c,i),u.p=new Proxy(i?(e=>{if(Array.isArray(e))return Array.from(e);const t=Object.getOwnPropertyDescriptors(e);return Object.values(t).forEach(e=>{e.configurable=!0;}),Object.create(n$2(e),t)})(c):c,u),o&&o.set(c,u)),u.a=t,u.c=o,u.p},u$1=(e,t)=>{const r=Reflect.ownKeys(e),n=Reflect.ownKeys(t);return r.length!==n.length||r.some((e,t)=>e!==n[t])},a=(t,r,n,o)=>{if(Object.is(t,r))return !1;if(!c$2(t)||!c$2(r))return !0;const s=n.get(t);if(!s)return !0;if(o){const e=o.get(t);if(e&&e.n===r)return e.g;o.set(t,{n:r,g:!1});}let l=null;for(const c of s){const s=c===e$2?u$1(t,r):a(t[c],r[c],n,o);if(!0!==s&&!1!==s||(l=s),l)break}return null===l&&(l=!0),o&&o.set(t,{n:r,g:l}),l},y$2=e=>s(e)&&e[r$2]||null,b$3=(e,t=!0)=>{o.set(e,t);},g$3=(e,t)=>{const r=[],n=(e,o)=>{const s=t.get(e);s?s.forEach(t=>{n(e[t],o?[...o,t]:[t]);}):o&&r.push(o);};return n(e),r};
 
             const VERSION = Symbol();
@@ -1046,17 +1108,360 @@
               return i(currSnapshot, affected, proxyCache);
             };
 
+            const initialUserState = {
+                accounts: [],
+                currentAccount: undefined,
+                currentNetworkIdHex: undefined,
+                currentNetworkIdDecimal: undefined,
+                currentNetworkName: undefined,
+                currentNetworkDisplayName: undefined,
+                currentNetworkLogo: undefined,
+            };
+            const userState = proxy(initialUserState);
+
+            const DEFAULT_CHAIN_ID_HEX = '0x38';
+            const BLOCKCHAINS = {
+                '0x38': {
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    chainName: 'Binance Smart Chain',
+                    displayName: 'BSC Mainnet',
+                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                    blockExplorerUrls: ['https://bscscan.com/'],
+                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                },
+                '0x61': {
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    chainName: 'Binance Smart Chain (Testnet)',
+                    displayName: 'BSC Testnet',
+                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+                    blockExplorerUrls: ['https://testnet.bscscan.com/'],
+                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                },
+            };
+            const BSC_MAINNET_FULL_TOKEN_LIST = [
+                {
+                    address: '0x0native',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                    name: 'Binance Smart Chain',
+                    symbol: 'BNB',
+                    usdPrice: 348,
+                    priceOracle: '0x0000000',
+                },
+                {
+                    address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                    name: 'Wrapped Ethereum',
+                    symbol: 'ETH',
+                    usdPrice: 2400,
+                    priceOracle: '0x0000000',
+                },
+                {
+                    address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+                    name: 'USD Coin',
+                    symbol: 'USDC',
+                    usdPrice: 1,
+                    priceOracle: '0x0000000',
+                },
+                {
+                    address: '0x55d398326f99059ff775485246999027b3197955',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    usdPrice: 0.997,
+                    priceOracle: '0x0000000',
+                },
+                {
+                    address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png',
+                    name: 'Dai',
+                    symbol: 'DAI',
+                    usdPrice: 0.997,
+                    priceOracle: '0x0000000',
+                },
+            ];
+            const DEMO_CUSTOM_TOKENS_BSC_MAINNET = [
+                {
+                    address: '0xba2ae424d960c26247dd6c32edc70b295c744c43',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
+                    name: 'Dogecoin',
+                    symbol: 'DOGE',
+                    usdPrice: 0.126,
+                    priceOracle: '0x0000000',
+                },
+                {
+                    address: '0x23396cf899ca06c4472205fc903bdb4de249d6fc',
+                    chainId: 56,
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7129.png',
+                    name: 'Terra USD',
+                    symbol: 'UST',
+                    usdPrice: 1.003,
+                    priceOracle: '0x0000000',
+                },
+            ];
+            const tokenMap = {
+                '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
+                '0x61': [],
+            };
+
+            const CUSTOM_TOKEN_STORAGE_KEY = "guildfx-custom-tokens";
+
+            const getCustomTokensList = (chainIdHex) => {
+                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
+                if (existingCustomTokens) {
+                    const customTokens = JSON.parse(existingCustomTokens);
+                    if (customTokens[chainIdHex] && customTokens[chainIdHex].length > 0) {
+                        return customTokens[chainIdHex];
+                    }
+                    return [];
+                }
+                return [];
+            };
+            const tokenListState = {
+                defaultTokenList: [],
+                customTokenList: [],
+            };
+            const stateOfTokenList = proxy(tokenListState);
+            const useTokenList = () => {
+                const snap = useSnapshot(stateOfTokenList);
+                return snap.defaultTokenList;
+            };
+            const useCustomTokenList = () => {
+                const snap = useSnapshot(stateOfTokenList);
+                return snap.customTokenList;
+            };
+            const addCustomToken = (data) => {
+                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
+                if (existingCustomTokens) {
+                    const customTokens = JSON.parse(existingCustomTokens);
+                    if (customTokens[data.chainId] && customTokens[data.chainId].length >= 0) {
+                        customTokens[data.chainId] = customTokens[data.chainId].filter((t) => t.address !== data.address).concat([data]);
+                    }
+                    else {
+                        customTokens[data.chainId] = [data];
+                    }
+                    stateOfTokenList.customTokenList = customTokens[data.chainId];
+                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
+                }
+                else {
+                    const customTokens = {
+                        [data.chainId]: [data],
+                    };
+                    stateOfTokenList.customTokenList = customTokens[data.chainId];
+                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
+                }
+            };
+            const removeCustomToken = (address, chainId) => {
+                console.log(`Removing custom token ${address} from chain ${chainId}`);
+                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
+                console.log(existingCustomTokens);
+                if (existingCustomTokens) {
+                    const customTokens = JSON.parse(existingCustomTokens);
+                    console.log(customTokens);
+                    console.log(customTokens[chainId]);
+                    if (customTokens[chainId]) {
+                        const updatedList = customTokens[chainId].filter((token) => token.address !== address);
+                        console.log(updatedList);
+                        console.log(address);
+                        const updatedTokens = {
+                            ...customTokens,
+                            [chainId]: updatedList,
+                        };
+                        console.log(updatedTokens);
+                        stateOfTokenList.customTokenList = updatedList;
+                        localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens));
+                    }
+                }
+            };
+            const saveInitialCustomTokens = () => {
+                const customTokens = {
+                    [DEFAULT_CHAIN_ID_HEX]: DEMO_CUSTOM_TOKENS_BSC_MAINNET,
+                };
+                localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
+            };
+            const initTokenList = (chainIdHex) => {
+                // remove in production
+                saveInitialCustomTokens();
+                const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX;
+                stateOfTokenList.defaultTokenList = tokenMap[chosenChainIdHex] || [];
+                stateOfTokenList.customTokenList = getCustomTokensList(chosenChainIdHex);
+            };
+
+            const useWeb3 = async () => {
+                return window.web3;
+            };
+            const useUserInfo = () => {
+                const requestAccounts = async () => {
+                    console.log(`request accounts...`);
+                    const web3 = await useWeb3();
+                    try {
+                        console.log(`requesitng metamask access`);
+                        await web3.eth.requestAccounts(async (err, accounts) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                console.log('--- accounts ---');
+                                console.log(accounts);
+                                const userAccounts = await web3.eth.getAccounts();
+                                userState.accounts = userAccounts;
+                                console.log(userAccounts);
+                            }
+                        });
+                        return {
+                            success: true,
+                            message: 'Successfully connected to wallet',
+                        };
+                    }
+                    catch (e) {
+                        console.log(e);
+                        return {
+                            success: false,
+                            message: 'Please install MetaMask',
+                        };
+                    }
+                };
+                const getNativeBalance = async () => {
+                    const web3 = await useWeb3();
+                    const nativeBalance = await web3.eth.getBalance(userState.accounts[0]);
+                    return nativeBalance;
+                };
+                return {
+                    requestAccounts,
+                    getNativeBalance,
+                };
+            };
+            const addCustomEVMChain = async (chainIdHex) => {
+                const chainInfo = BLOCKCHAINS[chainIdHex];
+                if (chainInfo) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: chainInfo.chainIdHex,
+                                    chainName: chainInfo.chainName,
+                                    nativeCurrency: chainInfo.nativeCurrency,
+                                    rpcUrls: chainInfo.rpcUrls,
+                                    blockExplorerUrls: chainInfo.blockExplorerUrls,
+                                },
+                            ],
+                        });
+                        updateStateToChain(chainInfo);
+                        return;
+                    }
+                    catch (e) {
+                        console.log(`Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`);
+                        return;
+                    }
+                }
+            };
+            const initDApp = async () => {
+                initWeb3OnWindow();
+                const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                const blockchain = BLOCKCHAINS[chainIdHex];
+                if (blockchain) {
+                    updateStateToChain(blockchain);
+                }
+                const userAccounts = await window.web3.eth.getAccounts();
+                userState.accounts = userAccounts;
+                userState.currentAccount = userAccounts[0];
+                initTokenList();
+                window.ethereum.on('chainChanged', async (chainIdHex) => {
+                    console.log(`
+      
+    ---- EVM Chain Changed!
+
+    `);
+                    const blockchain = BLOCKCHAINS[chainIdHex];
+                    if (blockchain) {
+                        updateStateToChain(blockchain);
+                    }
+                    else {
+                        clearStateToChain();
+                    }
+                });
+            };
+            const initWeb3OnWindow = async () => {
+                const provider = await dist();
+                console.log(`
+    
+  detecting... provider
+
+  `);
+                console.log(provider);
+                window.web3 = new window.Web3('https://bsc-dataseed.binance.org/');
+                if (provider) {
+                    console.log(`Found provider!`);
+                    window.web3 = new window.Web3(provider);
+                    console.log(`Set web3!`);
+                    const userAccounts = await window.web3.eth.getAccounts();
+                    console.log(`Set user accounts!`);
+                    userState.accounts = userAccounts;
+                }
+                else {
+                    console.log('Please install MetaMask!');
+                    throw Error('MetaMask not detected');
+                }
+            };
+            const updateStateToChain = (chainInfo) => {
+                userState.currentNetworkIdHex = chainInfo.chainIdHex;
+                userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal;
+                userState.currentNetworkName = chainInfo.chainName;
+                userState.currentNetworkDisplayName = chainInfo.displayName;
+                userState.currentNetworkLogo = chainInfo.currentNetworkLogo;
+                clearSwapState();
+                initTokenList(chainInfo.chainIdHex);
+            };
+            const clearStateToChain = () => {
+                userState.currentNetworkIdHex = undefined;
+                userState.currentNetworkIdDecimal = undefined;
+                userState.currentNetworkName = undefined;
+                userState.currentNetworkDisplayName = undefined;
+                userState.currentNetworkLogo = undefined;
+                clearSwapState();
+                initTokenList();
+            };
+            const clearSwapState = () => {
+                stateOfSwap.targetToken = null;
+                stateOfSwap.inputToken.data = undefined;
+                stateOfSwap.inputToken.displayedBalance = undefined;
+                stateOfSwap.inputToken.quantity = undefined;
+                stateOfSwap.outputToken.data = undefined;
+                stateOfSwap.outputToken.displayedBalance = undefined;
+                stateOfSwap.outputToken.quantity = undefined;
+            };
+
             const swapSnapshot = {
                 route: '/swap',
                 targetToken: null,
                 inputToken: {
                     data: undefined,
                     quantity: undefined,
+                    displayedBalance: undefined,
                 },
                 outputToken: {
                     data: undefined,
                     quantity: undefined,
-                }
+                    displayedBalance: undefined,
+                },
             };
             const stateOfSwap = proxy(swapSnapshot);
             subscribe(stateOfSwap.inputToken, () => {
@@ -1069,8 +1474,17 @@
                 if (stateOfSwap.outputToken.data && stateOfSwap.inputToken.data && stateOfSwap.inputToken.quantity !== undefined) {
                     const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || 1;
                     const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || 1;
-                    stateOfSwap.outputToken.quantity = stateOfSwap.inputToken.quantity * inputTokenPrice / outputTokenPrice;
+                    stateOfSwap.outputToken.quantity = (stateOfSwap.inputToken.quantity * inputTokenPrice) / outputTokenPrice;
                 }
+            };
+            // export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
+            //   const web3 = useWeb3()
+            //   const swapSnapshot = useSnapshot(stateOfSwap)
+            // }
+            const getUserBalanceOfNativeToken = async (userAddr) => {
+                const web3 = useWeb3();
+                const balanceAsString = await (await web3).eth.getBalance(userAddr);
+                return parseFloat(balanceAsString);
             };
 
             var reactIs$2 = {exports: {}};
@@ -1940,10 +2354,98 @@
                 white: '#FFFFFF',
             };
 
-            const SwapButton = (props) => {
-                {
-                    return (jsxRuntime.exports.jsx($Button, { onClick: props.onClick, backgroundColor: `${COLORS.dangerBackground}40`, backgroundColorHover: `${COLORS.dangerBackground}80`, color: `${COLORS.dangerFontColor}60`, colorHover: COLORS.dangerFontColor, style: { height: '100px', minHeight: '60px' }, children: "Connect Wallet" }, void 0));
+            const WalletButton = (props) => {
+                console.log(props);
+                const snapUserState = useSnapshot(userState);
+                const [status, setStatus] = r$4.useState('ready');
+                const { requestAccounts } = useUserInfo();
+                r$4.useEffect(() => {
+                    if (snapUserState.accounts.length > 0) {
+                        setStatus('success');
+                    }
+                }, [snapUserState.accounts.length]);
+                const connectWallet = async () => {
+                    console.log('Connecting to wallet...');
+                    setStatus('loading');
+                    const result = await requestAccounts();
+                    console.log(`
+      
+    -------- REQUEST ACCOUNTS
+
+    `);
+                    console.log(result);
+                    if (result.success) {
+                        userState.currentAccount = userState.accounts[0];
+                        const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                        const blockchain = BLOCKCHAINS[chainIdHex];
+                        if (blockchain) {
+                            updateStateToChain(blockchain);
+                        }
+                        setStatus('success');
+                    }
+                    else {
+                        setStatus('error');
+                    }
+                };
+                const openMetamaskInstallLink = () => {
+                    window.open('https://metamask.io/', '_blank');
+                    setStatus('ready');
+                };
+                if (status === 'loading') {
+                    return (jsxRuntime.exports.jsx($Button, { disabled: true, color: `${COLORS.warningBackground}`, backgroundColor: `${COLORS.warningBackground}80`, style: {
+                            minHeight: '50px',
+                            border: `1px solid ${COLORS.warningBackground}40`,
+                            fontWeight: 500,
+                            fontSize: '1.2rem',
+                        }, children: "Loading..." }, void 0));
                 }
+                else if (status === 'success') {
+                    return (jsxRuntime.exports.jsx($Button, { disabled: true, color: `${COLORS.trustFontColor}`, backgroundColor: `${COLORS.trustBackground}80`, style: {
+                            minHeight: '50px',
+                            border: `1px solid ${COLORS.trustFontColor}40`,
+                            fontWeight: 500,
+                            fontSize: '1.2rem',
+                        }, children: "Connected" }, void 0));
+                }
+                else if (status === 'error') {
+                    return (jsxRuntime.exports.jsx($Button, { onClick: () => openMetamaskInstallLink(), color: `${COLORS.warningFontColor}`, backgroundColor: `${COLORS.warningBackground}`, style: {
+                            minHeight: '50px',
+                            border: `1px solid ${COLORS.warningFontColor}40`,
+                            fontWeight: 500,
+                            fontSize: '1rem',
+                        }, children: "Please install MetaMask" }, void 0));
+                }
+                return (jsxRuntime.exports.jsx($Button, { onClick: connectWallet, color: `${COLORS.dangerFontColor}90`, colorHover: COLORS.dangerFontColor, backgroundColor: `${COLORS.dangerBackground}80`, backgroundColorHover: `${COLORS.dangerBackground}`, style: {
+                        minHeight: '50px',
+                        border: `1px solid ${COLORS.dangerFontColor}40`,
+                        fontWeight: 500,
+                        fontSize: '1.2rem',
+                    }, children: "Connect Wallet" }, void 0));
+            };
+            styled.div `
+  display: flex;
+  width: 200px;
+`;
+
+            const SwapButton = (props) => {
+                const snapUserState = useSnapshot(userState);
+                const snapSwapState = useSnapshot(stateOfSwap);
+                const isWalletConnected = snapUserState.accounts.length > 0;
+                console.log(snapUserState.accounts.length);
+                const validChain = snapUserState.currentNetworkIdHex &&
+                    Object.values(BLOCKCHAINS)
+                        .map((b) => b.chainIdHex)
+                        .includes(snapUserState.currentNetworkIdHex);
+                if (!isWalletConnected) {
+                    return jsxRuntime.exports.jsx(WalletButton, {}, void 0);
+                }
+                else if (isWalletConnected && (!snapSwapState.inputToken.data || !snapSwapState.outputToken.data)) {
+                    return (jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: validChain ? 'Select a Token' : 'Switch Network' }, void 0));
+                }
+                else if (snapSwapState.inputToken.quantity && snapSwapState.inputToken.quantity > 0) {
+                    return (jsxRuntime.exports.jsx($Button, { onClick: props.onClick, backgroundColor: `${COLORS.trustBackground}C0`, backgroundColorHover: `${COLORS.trustBackground}`, color: COLORS.trustFontColor, style: { minHeight: '60px', height: '100px' }, children: "PURCHASE" }, void 0));
+                }
+                return (jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: "Enter an amount" }, void 0));
             };
 
             const SPACING_VALS = [4, 8, 16, 24, 48];
@@ -1995,7 +2497,8 @@
 
             const SwapInput = (props) => {
                 const snap = useSnapshot(stateOfSwap);
-                const selectToken = () => {
+                const snapUserState = useSnapshot(userState);
+                const selectToken = async () => {
                     stateOfSwap.targetToken = props.targetToken;
                     stateOfSwap.route = '/search';
                 };
@@ -2003,7 +2506,7 @@
                     console.log(quantity);
                     if (props.targetToken) {
                         if (isNaN(quantity)) {
-                            console.log("not a number");
+                            console.log('not a number');
                             stateOfSwap[props.targetToken].quantity = 0;
                         }
                         else {
@@ -2011,232 +2514,269 @@
                         }
                     }
                 };
+                const validChain = snapUserState.currentNetworkIdHex &&
+                    Object.values(BLOCKCHAINS)
+                        .map((b) => b.chainIdHex)
+                        .includes(snapUserState.currentNetworkIdHex);
+                const renderSelectTokenButton = () => {
+                    if (validChain) {
+                        return (jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.dangerFontColor}80`, backgroundColorHover: `${COLORS.dangerFontColor}`, color: COLORS.trustFontColor, onClick: selectToken, disabled: props.tokenDisabled, style: { height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }, children: "Select Token" }, void 0));
+                    }
+                    return (jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.surpressedBackground}10`, color: COLORS.surpressedFontColor, disabled: true, style: { height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }, children: "Select Token" }, void 0));
+                };
+                const balance = props.targetToken && snap[props.targetToken].displayedBalance ? snap[props.targetToken].displayedBalance : 0;
                 const quantity = props.targetToken ? snap[props.targetToken].quantity : undefined;
                 const usdValue = props.targetToken && quantity ? (snap[props.targetToken].data?.usdPrice || 1) * quantity : quantity;
-                return (jsxRuntime.exports.jsx($SwapInput, { children: jsxRuntime.exports.jsxs($Horizontal, { flex: 1, children: [jsxRuntime.exports.jsxs($Vertical, { flex: 3, children: [jsxRuntime.exports.jsx($Input, { value: quantity, onChange: (e) => setQuantity(e.target.valueAsNumber), type: "number", placeholder: "0.00", disabled: props.quantityDisabled || !snap.inputToken.data }, void 0), usdValue ? jsxRuntime.exports.jsx($FineText, { children: `$${usdValue}` }, void 0) : null] }, void 0), props.selectedToken
-                                ?
-                                    jsxRuntime.exports.jsxs($Button, { backgroundColor: `${COLORS.white}10`, backgroundColorHover: `${COLORS.surpressedBackground}50`, color: COLORS.black, onClick: selectToken, disabled: props.tokenDisabled, style: { height: '30px', fontSize: '1rem', fontWeight: 'bold', padding: '5px 20px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }, children: [jsxRuntime.exports.jsx($CoinIcon, { src: props.selectedToken.logoURI }, void 0), props.selectedToken.symbol] }, void 0)
-                                :
-                                    jsxRuntime.exports.jsx($Button, { backgroundColor: `${COLORS.dangerFontColor}80`, backgroundColorHover: `${COLORS.dangerFontColor}`, color: COLORS.trustFontColor, onClick: selectToken, style: { height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }, children: "Select Token" }, void 0)] }, void 0) }, void 0));
+                return (jsxRuntime.exports.jsx($SwapInput, { children: jsxRuntime.exports.jsxs($Horizontal, { flex: 1, children: [jsxRuntime.exports.jsxs($Vertical, { flex: 3, children: [jsxRuntime.exports.jsx($Input, { value: quantity, onChange: (e) => setQuantity(e.target.valueAsNumber), type: "number", placeholder: "0.00", disabled: props.quantityDisabled || !snap.inputToken.data }, void 0), usdValue ? jsxRuntime.exports.jsx($FineText, { children: `$${usdValue}` }, void 0) : null] }, void 0), jsxRuntime.exports.jsxs($Vertical, { children: [props.selectedToken ? (jsxRuntime.exports.jsxs($Button, { backgroundColor: `${COLORS.white}10`, backgroundColorHover: `${COLORS.surpressedBackground}50`, color: COLORS.black, onClick: selectToken, disabled: props.tokenDisabled && props.selectedToken ? true : false, style: {
+                                            height: '30px',
+                                            fontSize: '1rem',
+                                            fontWeight: 'bold',
+                                            padding: '5px 20px',
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }, children: [jsxRuntime.exports.jsx($CoinIcon, { src: props.selectedToken.logoURI }, void 0), props.selectedToken.symbol] }, void 0)) : (renderSelectTokenButton()), jsxRuntime.exports.jsxs($BalanceText, { style: { flex: 1 }, children: [balance, " balance"] }, void 0)] }, void 0)] }, void 0) }, void 0));
             };
             const $SwapInput = styled.div `
-	font-size: 1.5rem;
-	padding: 10px 10px 15px 10px;
-	background-color: ${`${COLORS.surpressedBackground}20`};
-	border: 0px solid transparent;
-	border-radius: 10px;
-	display: flex;
-	max-height: 150px;
+  font-size: 1.5rem;
+  padding: 10px 10px 15px 10px;
+  background-color: ${`${COLORS.surpressedBackground}20`};
+  border: 0px solid transparent;
+  border-radius: 10px;
+  display: flex;
+  max-height: 150px;
 `;
             const $FineText = styled.span `
-	font-size: 0.9rem;
-	padding: 0px 0px 0px 10px;
-	font-weight: lighter;
-	font-family: sans-serif;
+  font-size: 0.9rem;
+  padding: 0px 0px 0px 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
 `;
             const $CoinIcon = styled.img `
-	width: 1.5rem;
-	height: 1.5rem;
-	margin-right: 10px;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 10px;
+`;
+            const $BalanceText = styled.span `
+  font-size: 0.8rem;
+  color: ${`${COLORS.surpressedFontColor}`};
+  text-align: right;
+  margin-right: 5px;
+  margin-top: 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
 `;
 
             const SwapHeader = (props) => {
                 console.log(props);
-                return (jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "BUY GUILDFX" }, void 0), jsxRuntime.exports.jsx($BalanceText, { style: { flex: 1, }, children: "Balance: 0" }, void 0), jsxRuntime.exports.jsx("span", { style: { padding: "0px 5px 0px 0px" }, children: "\u2699\uFE0F" }, void 0)] }, void 0));
+                const snapUserState = useSnapshot(userState);
+                const isWalletConnected = snapUserState.accounts.length > 0;
+                const validChain = snapUserState.currentNetworkIdHex &&
+                    Object.values(BLOCKCHAINS)
+                        .map((b) => b.chainIdHex)
+                        .includes(snapUserState.currentNetworkIdHex);
+                const switchChain = async () => {
+                    await addCustomEVMChain(DEFAULT_CHAIN_ID_HEX);
+                };
+                const renderSwitchNetworkButton = () => {
+                    if (isWalletConnected) {
+                        return (jsxRuntime.exports.jsx($Button, { onClick: switchChain, backgroundColor: `${COLORS.dangerFontColor}80`, backgroundColorHover: `${COLORS.dangerFontColor}`, color: COLORS.white, style: { marginRight: '10px', height: '20px', fontSize: '1rem', fontWeight: 'lighter' }, children: "Switch Network" }, void 0));
+                    }
+                    return;
+                };
+                return (jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "BUY GUILDFX" }, void 0), validChain ? (jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($NetworkText, { style: { flex: 2 }, children: [jsxRuntime.exports.jsx("b", { children: "Network:" }, void 0), " ", snapUserState.currentNetworkDisplayName] }, void 0), jsxRuntime.exports.jsx("span", { style: { padding: '0px 5px 0px 0px' }, children: "\u2699\uFE0F" }, void 0)] }, void 0)) : (renderSwitchNetworkButton())] }, void 0));
             };
             const $SwapHeaderTitle = styled.span `
-	flex: 3;
-	font-size: 1rem;
-	font-weight: bold;
-	padding: 0px 0px 0px 10px;
+  flex: 3;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0px 0px 0px 10px;
 `;
             const $SwapHeader = styled.div `
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	font-family: sans-serif;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-family: sans-serif;
 `;
-            const $BalanceText = styled.span `
-	font-size: 1rem;
-	color: ${`${COLORS.surpressedFontColor}`};
-	text-align: right;
-    margin-right: 20px;
-    font-weight: bold;
+            const $NetworkText = styled.span `
+  font-size: 1rem;
+  color: ${`${COLORS.surpressedFontColor}`};
+  text-align: right;
+  margin-right: 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
 `;
 
-            const CHAIN = {
-                BSC_TESTNET: {
-                    CHAIN_ID: 97
-                },
-                BSC_MAINNET: {
-                    CHAIN_ID: 56
-                }
-            };
-            const tokenMap = {
-                [CHAIN.BSC_MAINNET.CHAIN_ID]: [
-                    {
-                        address: "0x0000000",
-                        chainId: 56,
-                        decimals: 18,
-                        logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png",
-                        name: "Binance Smart Chain",
-                        symbol: "BNB",
-                        usdPrice: 348
-                    },
-                    {
-                        address: "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
-                        chainId: 56,
-                        decimals: 18,
-                        logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-                        name: "Wrapped Ethereum",
-                        symbol: "ETH",
-                        usdPrice: 2400
-                    },
-                    {
-                        address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
-                        chainId: 56,
-                        decimals: 18,
-                        logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                        name: "USD Coin",
-                        symbol: "USDC",
-                        usdPrice: 1
-                    },
-                    {
-                        address: "0x55d398326f99059ff775485246999027b3197955",
-                        chainId: 56,
-                        decimals: 18,
-                        logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
-                        name: "Tether",
-                        symbol: "USDT",
-                        usdPrice: 0.997
-                    }
-                ],
-                [CHAIN.BSC_TESTNET.CHAIN_ID]: [],
-            };
-            const DEMO_CUSTOM_TOKEN_LIST = [
-                {
-                    address: "0xba2ae424d960c26247dd6c32edc70b295c744c43",
-                    chainId: 56,
-                    decimals: 18,
-                    logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/74.png",
-                    name: "Dogecoin",
-                    symbol: "DOGE",
-                    usdPrice: 0.126
-                },
-                {
-                    address: "0x23396cf899ca06c4472205fc903bdb4de249d6fc",
-                    chainId: 56,
-                    decimals: 18,
-                    logoURI: "https://s2.coinmarketcap.com/static/img/coins/64x64/7129.png",
-                    name: "Terra USD",
-                    symbol: "UST",
-                    usdPrice: 1.003
-                }
+            var _format = "hh-sol-artifact-1";
+            var contractName = "AggregatorV3Interface";
+            var sourceName = "contracts/v0.7/interfaces/AggregatorV3Interface.sol";
+            var abi = [
+            	{
+            		inputs: [
+            		],
+            		name: "decimals",
+            		outputs: [
+            			{
+            				internalType: "uint8",
+            				name: "",
+            				type: "uint8"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "description",
+            		outputs: [
+            			{
+            				internalType: "string",
+            				name: "",
+            				type: "string"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "uint80",
+            				name: "_roundId",
+            				type: "uint80"
+            			}
+            		],
+            		name: "getRoundData",
+            		outputs: [
+            			{
+            				internalType: "uint80",
+            				name: "roundId",
+            				type: "uint80"
+            			},
+            			{
+            				internalType: "int256",
+            				name: "answer",
+            				type: "int256"
+            			},
+            			{
+            				internalType: "uint256",
+            				name: "startedAt",
+            				type: "uint256"
+            			},
+            			{
+            				internalType: "uint256",
+            				name: "updatedAt",
+            				type: "uint256"
+            			},
+            			{
+            				internalType: "uint80",
+            				name: "answeredInRound",
+            				type: "uint80"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "latestRoundData",
+            		outputs: [
+            			{
+            				internalType: "uint80",
+            				name: "roundId",
+            				type: "uint80"
+            			},
+            			{
+            				internalType: "int256",
+            				name: "answer",
+            				type: "int256"
+            			},
+            			{
+            				internalType: "uint256",
+            				name: "startedAt",
+            				type: "uint256"
+            			},
+            			{
+            				internalType: "uint256",
+            				name: "updatedAt",
+            				type: "uint256"
+            			},
+            			{
+            				internalType: "uint80",
+            				name: "answeredInRound",
+            				type: "uint80"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "version",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	}
             ];
+            var bytecode = "0x";
+            var deployedBytecode = "0x";
+            var linkReferences = {
+            };
+            var deployedLinkReferences = {
+            };
+            var AggregatorV3Interface = {
+            	_format: _format,
+            	contractName: contractName,
+            	sourceName: sourceName,
+            	abi: abi,
+            	bytecode: bytecode,
+            	deployedBytecode: deployedBytecode,
+            	linkReferences: linkReferences,
+            	deployedLinkReferences: deployedLinkReferences
+            };
 
-            const CUSTOM_TOKEN_STORAGE_KEY = "guildfx-custom-tokens";
-
-            proxy({ count: 0, text: 'hello' });
-            const DEFAULT_CHAIN_ID = 56;
-
-            const getCustomTokensList = (chainId) => {
-                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                if (existingCustomTokens) {
-                    const customTokens = JSON.parse(existingCustomTokens);
-                    if (customTokens[chainId] && customTokens[chainId].length > 0) {
-                        return customTokens[chainId];
-                    }
-                    return [];
-                }
-                return [];
-            };
-            const tokenListState = {
-                chainId: 56,
-                defaultTokenList: [],
-                customTokenList: []
-            };
-            const stateOfTokenList = proxy(tokenListState);
-            const initializeTokenList = (chainId) => {
-                // remove in production
-                saveInitialCustomTokens();
-                const chosenChainId = chainId || DEFAULT_CHAIN_ID;
-                stateOfTokenList.chainId = chosenChainId;
-                stateOfTokenList.defaultTokenList = tokenMap[chosenChainId] || [];
-                stateOfTokenList.customTokenList = getCustomTokensList(chosenChainId);
-            };
-            const useTokenList = () => {
-                const snap = useSnapshot(stateOfTokenList);
-                return snap.defaultTokenList;
-            };
-            const useCustomTokenList = () => {
-                const snap = useSnapshot(stateOfTokenList);
-                return snap.customTokenList;
-            };
-            const addCustomToken = (data) => {
-                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                if (existingCustomTokens) {
-                    const customTokens = JSON.parse(existingCustomTokens);
-                    if (customTokens[data.chainId] && customTokens[data.chainId].length >= 0) {
-                        customTokens[data.chainId] = customTokens[data.chainId].filter(t => t.address !== data.address).concat([data]);
-                    }
-                    else {
-                        customTokens[data.chainId] = [data];
-                    }
-                    stateOfTokenList.customTokenList = customTokens[data.chainId];
-                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
-                }
-                else {
-                    const customTokens = {
-                        [data.chainId]: [data]
-                    };
-                    stateOfTokenList.customTokenList = customTokens[data.chainId];
-                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
-                }
-            };
-            const removeCustomToken = (address, chainId) => {
-                console.log(`Removing custom token ${address} from chain ${chainId}`);
-                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                console.log(existingCustomTokens);
-                if (existingCustomTokens) {
-                    const customTokens = JSON.parse(existingCustomTokens);
-                    console.log(customTokens);
-                    console.log(customTokens[chainId]);
-                    if (customTokens[chainId]) {
-                        const updatedList = customTokens[chainId].filter(token => token.address !== address);
-                        console.log(updatedList);
-                        console.log(address);
-                        const updatedTokens = {
-                            ...customTokens,
-                            [chainId]: updatedList
-                        };
-                        console.log(updatedTokens);
-                        stateOfTokenList.customTokenList = updatedList;
-                        localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens));
-                    }
-                }
-            };
-            const saveInitialCustomTokens = () => {
-                const customTokens = {
-                    [DEFAULT_CHAIN_ID]: DEMO_CUSTOM_TOKEN_LIST
-                };
-                localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
+            const getPriceFeed = async (contractAddress) => {
+                const web3 = await useWeb3();
+                console.log('Trying price oracle...');
+                let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi, contractAddress);
+                const [currentUser, ...otherUserAddress] = await web3.eth.getAccounts();
+                console.log(contractInstance);
+                contractInstance.methods
+                    .latestRoundData()
+                    .call({ from: currentUser })
+                    .on('receipt', function (data) {
+                    console.log(data);
+                });
             };
 
             const $SwapContainer = styled.section `
-	width: 100%;
-	height: 100%;
-	border: 0px solid transparent;
-	border-radius: 20px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-	min-height: 600px;
+  width: 100%;
+  height: 100%;
+  border: 0px solid transparent;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  min-height: 600px;
 `;
             const Swap = (props) => {
                 const snap = useSnapshot(stateOfSwap);
-                const tokenList = useTokenList();
+                const snapUserState = useSnapshot(userState);
+                const isLoggedIn = snapUserState.accounts.length > 0;
                 r$4.useEffect(() => {
                     if (props.inputToken) {
                         stateOfSwap.inputToken.data = props.inputToken;
@@ -2244,11 +2784,13 @@
                     if (props.outputToken) {
                         stateOfSwap.outputToken.data = props.inputToken;
                     }
-                });
-                const clickSwap = () => {
-                    console.log(tokenList);
+                }, []);
+                const clickSwap = async () => {
+                    console.log('Getting price data...');
+                    await getPriceFeed('0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee');
+                    console.log('Success!');
                 };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsx(SwapHeader, {}, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken" }, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true }, void 0), jsxRuntime.exports.jsx(SwapButton, { onClick: clickSwap }, void 0)] }, void 0));
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsx(SwapHeader, {}, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken", tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true, tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(SwapButton, { onClick: clickSwap }, void 0)] }, void 0));
             };
 
             const RowToken = (props) => {
@@ -2257,121 +2799,158 @@
                     console.log(props.token.chainId);
                     removeCustomToken(props.token.address, props.token.chainId);
                 };
-                return (jsxRuntime.exports.jsxs($RowToken, { disabled: props.disabled, children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($CoinIcon, { src: props.token.logoURI, style: { width: '30px', height: '30px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { children: props.token.symbol }, void 0)] }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { children: props.token.name }, void 0), props.copyable || props.deleteable
-                            ?
-                                jsxRuntime.exports.jsxs("div", { children: [props.copyable && jsxRuntime.exports.jsx($CopyButton, { onClick: () => navigator.clipboard.writeText(props.token.address), children: "\uD83D\uDCD1" }, void 0), props.deleteable && jsxRuntime.exports.jsx($DeleteButton, { onClick: removeToken, children: "\uD83D\uDDD1" }, void 0)] }, void 0)
-                            :
-                                null] }, void 0));
+                return (jsxRuntime.exports.jsxs($RowToken, { disabled: props.disabled, children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($CoinIcon, { src: props.token.logoURI, style: { width: '30px', height: '30px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { children: props.token.symbol }, void 0)] }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { children: props.token.name }, void 0), props.copyable || props.deleteable ? (jsxRuntime.exports.jsxs("div", { children: [props.copyable && (jsxRuntime.exports.jsx($CopyButton, { onClick: () => navigator.clipboard.writeText(props.token.address), children: "\uD83D\uDCD1" }, void 0)), props.deleteable && jsxRuntime.exports.jsx($DeleteButton, { onClick: removeToken, children: "\uD83D\uDDD1" }, void 0)] }, void 0)) : null] }, void 0));
             };
             const $RowToken = styled.div `
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	flex: 1;
-	background-color: ${`${COLORS.black}04`};
-	padding: 20px;
-	border-radius: 10px;
-	max-height: 50px;
-	${props => props.disabled ? 'cursor: not-allowed' : 'cursor: pointer'};
-	${props => props.disabled ? 'background-color: rgba(0,0,0,0.1);' : 'background-color: rgba(0,0,0,0.03);'};
-	&:hover {
-		${props => props.disabled ? 'background-color: rgba(0,0,0,0.1);' : `background-color: ${`${COLORS.warningBackground}30`}`};
-	}
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  background-color: ${`${COLORS.black}04`};
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 50px;
+  ${(props) => (props.disabled ? 'cursor: not-allowed' : 'cursor: pointer')};
+  ${(props) => (props.disabled ? 'background-color: rgba(0,0,0,0.1);' : 'background-color: rgba(0,0,0,0.03);')};
+  &:hover {
+    ${(props) => props.disabled ? 'background-color: rgba(0,0,0,0.1);' : `background-color: ${`${COLORS.warningBackground}30`}`};
+  }
 `;
             const $BigCoinTicker = styled.span `
-	font-size: 1.5rem;
-	font-weight: bold;
-	font-family: sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: sans-serif;
 `;
             const $ThinCoinName = styled.span `
-	font-size: 1.2rem;
-	font-weight: 400;
-	font-family: sans-serif;
-	color: ${COLORS.surpressedFontColor};
+  font-size: 1.2rem;
+  font-weight: 400;
+  font-family: sans-serif;
+  color: ${COLORS.surpressedFontColor};
 `;
             const $CopyButton = styled.span `
-	border-radius: 10px;
-	padding: 10px;
-	margin: 0px 5px;
-	cursor: pointer;
-	text-align: center;
-	&:hover {
-		background-color: ${`${COLORS.surpressedBackground}30`};
-	}
+  border-radius: 10px;
+  padding: 10px;
+  margin: 0px 5px;
+  cursor: pointer;
+  text-align: center;
+  &:hover {
+    background-color: ${`${COLORS.surpressedBackground}30`};
+  }
 `;
             const $DeleteButton = styled.span `
-	border-radius: 10px;
-	padding: 10px;
-	margin: 0px 5px;
-	cursor: pointer;
-	text-align: center;
-	&:hover {
-		background-color: ${`${COLORS.surpressedBackground}30`};
-	}
+  border-radius: 10px;
+  padding: 10px;
+  margin: 0px 5px;
+  cursor: pointer;
+  text-align: center;
+  &:hover {
+    background-color: ${`${COLORS.surpressedBackground}30`};
+  }
 `;
 
             const TokenPicker = (props) => {
                 console.log(props);
+                const web3 = useWeb3();
                 const snap = useSnapshot(stateOfSwap);
+                const snapUserState = useSnapshot(userState);
+                const snapSwapState = useSnapshot(stateOfSwap);
                 const tokenList = useTokenList();
                 const customTokenList = useCustomTokenList();
-                const [searchString, setSearchString] = r$4.useState("");
-                const selectToken = (token) => {
-                    console.log("selectToken");
+                const [searchString, setSearchString] = r$4.useState('');
+                const selectToken = async (token) => {
+                    console.log('selectToken');
                     console.log(snap);
-                    if (snap.targetToken !== null) {
-                        stateOfSwap[snap.targetToken].data = token;
-                        stateOfSwap.route = '/swap';
+                    console.log(token);
+                    console.log(`
+			
+			${token.address}
+
+		`);
+                    let tokenBalance = 0;
+                    if (snapUserState.currentAccount && snapSwapState.targetToken && stateOfSwap[snapSwapState.targetToken]) {
+                        if (token.address === '0x0native') {
+                            console.log('Get native token');
+                            tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount);
+                        }
+                        if (snap.targetToken !== null) {
+                            stateOfSwap[snap.targetToken].data = token;
+                            console.log(`
+          
+        ---- tokenBalance
+
+        `);
+                            console.log(tokenBalance);
+                            const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether');
+                            console.log(balanceInEther);
+                            stateOfSwap[snapSwapState.targetToken].displayedBalance = balanceInEther;
+                            stateOfSwap.route = '/swap';
+                        }
                     }
                 };
                 const searchFilter = (token) => {
-                    return (token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
+                    return (token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
+                        token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
                 };
                 const currentToken = snap.targetToken !== null ? stateOfSwap[snap.targetToken].data : null;
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => stateOfSwap.route = '/swap', style: { padding: "0px 5px 0px 0px", cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: 'Search Tokens...', style: { fontWeight: 'lighter', border: `2px solid ${COLORS.warningBackground}30`, fontSize: '1.5rem', flex: 4 } }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => stateOfSwap.route = '/add', backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: { flex: 1, marginLeft: '10px', height: '70px', fontSize: '1.5rem', fontWeight: 800 }, children: "+ New" }, void 0)] }, void 0), jsxRuntime.exports.jsx($ScrollContainer, { children: tokenList.concat(customTokenList).filter(searchFilter).map(token => {
-                                        const disabled = [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) && (currentToken ? currentToken.address !== token.address : true);
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
+                                                fontWeight: 'lighter',
+                                                border: `2px solid ${COLORS.warningBackground}30`,
+                                                fontSize: '1.5rem',
+                                                flex: 4,
+                                            } }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => (stateOfSwap.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: { flex: 1, marginLeft: '10px', height: '70px', fontSize: '1.5rem', fontWeight: 800 }, children: "+ New" }, void 0)] }, void 0), jsxRuntime.exports.jsx($ScrollContainer, { children: tokenList
+                                        .concat(customTokenList)
+                                        .filter(searchFilter)
+                                        .map((token) => {
+                                        const disabled = [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
+                                            (currentToken ? currentToken.address !== token.address : true);
                                         return (jsxRuntime.exports.jsx("div", { onClick: () => !disabled && selectToken(token), children: jsxRuntime.exports.jsx(RowToken, { token: token, disabled: disabled }, void 0) }, token.symbol));
-                                    }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => stateOfSwap.route = '/customs', children: "Manage Token Lists" }, void 0)] }, void 0));
+                                    }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => (stateOfSwap.route = '/customs'), children: "Manage Token Lists" }, void 0)] }, void 0));
             };
             const $BlueLinkText = styled.span `
-	font-size: 1.1rem;
-	font-weight: 500;
-	font-family: sans-serif;
-	margin-top: 10px;
-	color: #073EFFC0;
-	text-align: center;
-	cursor: pointer;
-	&:hover {
-		text-decoration: underline;
-	}
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-family: sans-serif;
+  margin-top: 10px;
+  color: #073effc0;
+  text-align: center;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
             const ManageTokens = (props) => {
                 console.log(props);
                 const snap = useSnapshot(stateOfTokenList);
                 const customTokenList = snap.customTokenList;
-                const [searchString, setSearchString] = r$4.useState("");
+                const [searchString, setSearchString] = r$4.useState('');
                 const searchFilter = (token) => {
-                    return token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 || token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1;
+                    return (token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
+                        token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
                 };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "CUSTOM TOKENS" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => stateOfSwap.route = '/swap', style: { padding: "0px 5px 0px 0px", cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: 'Filter Custom Tokens...', style: { fontWeight: 'lighter', border: `2px solid ${COLORS.warningBackground}30`, fontSize: '1.5rem', flex: 4 } }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => stateOfSwap.route = '/add', backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: { flex: 1, marginLeft: '10px', minHeight: '70px', fontSize: '1.5rem', fontWeight: 800 }, children: "+ New" }, void 0)] }, void 0), customTokenList.filter(searchFilter).map(token => jsxRuntime.exports.jsx(RowToken, { token: token, copyable: true, deleteable: true }, token.symbol)), customTokenList.filter(searchFilter).length === 0 && jsxRuntime.exports.jsx($NoTokensPrompt, { children: "No Custom Tokens Added Yet" }, void 0)] }, void 0)] }, void 0));
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "CUSTOM TOKENS" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Filter Custom Tokens...", style: {
+                                                fontWeight: 'lighter',
+                                                border: `2px solid ${COLORS.warningBackground}30`,
+                                                fontSize: '1.5rem',
+                                                flex: 4,
+                                            } }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => (stateOfSwap.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: { flex: 1, marginLeft: '10px', minHeight: '70px', fontSize: '1.5rem', fontWeight: 800 }, children: "+ New" }, void 0)] }, void 0), customTokenList.filter(searchFilter).map((token) => (jsxRuntime.exports.jsx(RowToken, { token: token, copyable: true, deleteable: true }, token.symbol))), customTokenList.filter(searchFilter).length === 0 && (jsxRuntime.exports.jsx($NoTokensPrompt, { children: "No Custom Tokens Added Yet" }, void 0))] }, void 0)] }, void 0));
             };
             const $NoTokensPrompt = styled.div `
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	flex: 1;
-	font-size: 1.5rem;
-	font-weight: bold;
-	color: ${COLORS.surpressedFontColor}60;
-	font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: ${COLORS.surpressedFontColor}60;
+  font-family: sans-serif;
 `;
 
             const AddToken = (props) => {
                 console.log(props);
-                const [searchString, setSearchString] = r$4.useState("");
+                const [searchString, setSearchString] = r$4.useState('');
                 const addToken = () => {
                     addCustomToken({
                         address: '0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31',
@@ -2380,37 +2959,46 @@
                         symbol: 'VXL',
                         chainId: 56,
                         logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/15881.png',
-                        usdPrice: 0.1238
+                        usdPrice: 0.1238,
                     });
                     stateOfSwap.route = '/search';
                 };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "ADD TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => stateOfSwap.route = '/swap', style: { padding: "0px 5px 0px 0px", cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: 'Search Tokens...', style: { fontWeight: 'lighter', border: `2px solid ${COLORS.warningBackground}30`, fontSize: '1.5rem', flex: 4, maxHeight: '50px' } }, void 0), jsxRuntime.exports.jsxs($TokenPreviewCard, { children: [jsxRuntime.exports.jsx($CoinIcon, { src: "https://s2.coinmarketcap.com/static/img/coins/64x64/15881.png", style: { width: '50px', height: '50px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { children: "VXL" }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { children: "Voxel Network" }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { children: "0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => addToken(), backgroundColor: `${COLORS.dangerBackground}E0`, backgroundColorHover: `${COLORS.dangerBackground}`, color: `${COLORS.white}`, colorHover: COLORS.white, style: { height: '100px', minHeight: '60px', fontSize: '1.5rem' }, children: "Import Token" }, void 0)] }, void 0));
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "ADD TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Input, { value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
+                                fontWeight: 'lighter',
+                                border: `2px solid ${COLORS.warningBackground}30`,
+                                fontSize: '1.5rem',
+                                flex: 4,
+                                maxHeight: '50px',
+                            } }, void 0), jsxRuntime.exports.jsxs($TokenPreviewCard, { children: [jsxRuntime.exports.jsx($CoinIcon, { src: "https://s2.coinmarketcap.com/static/img/coins/64x64/15881.png", style: { width: '50px', height: '50px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { children: "VXL" }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { children: "Voxel Network" }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { children: "0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Button, { onClick: () => addToken(), backgroundColor: `${COLORS.dangerBackground}E0`, backgroundColorHover: `${COLORS.dangerBackground}`, color: `${COLORS.white}`, colorHover: COLORS.white, style: { height: '100px', minHeight: '60px', fontSize: '1.5rem' }, children: "Import Token" }, void 0)] }, void 0));
             };
             styled.span `
-	font-size: 1.1rem;
-	font-weight: 500;
-	font-family: sans-serif;
-	margin-top: 10px;
-	color: ${`${COLORS.surpressedFontColor}C0`};
-	flex: 1;
-	text-align: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  font-family: sans-serif;
+  margin-top: 10px;
+  color: ${`${COLORS.surpressedFontColor}C0`};
+  flex: 1;
+  text-align: center;
 `;
             const $TokenPreviewCard = styled.div `
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	background-color: ${`${COLORS.surpressedBackground}10`};
-	border-radius: 10px;
-	padding: 30px;
-	flex: 1;
-	gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: ${`${COLORS.surpressedBackground}10`};
+  border-radius: 10px;
+  padding: 30px;
+  flex: 1;
+  gap: 10px;
 `;
 
             const SwapWidget = (props) => {
                 useSnapshot(stateOfSwap);
                 r$4.useEffect(() => {
-                    initializeTokenList();
+                    window.onload = () => {
+                        console.log('page is fully loaded');
+                        initDApp();
+                    };
                     if (props.initialRoute) {
                         stateOfSwap.route = props.initialRoute;
                     }
@@ -2424,7 +3012,7 @@
                 else if (stateOfSwap.route === '/add') {
                     return jsxRuntime.exports.jsx(AddToken, {}, void 0);
                 }
-                return (jsxRuntime.exports.jsx(Swap, {}, void 0));
+                return jsxRuntime.exports.jsx(Swap, {}, void 0);
             };
 
             const inject = () => {

@@ -26,6 +26,12 @@ const WalletButton = (props: WalletButtonProps) => {
     console.log('Connecting to wallet...')
     setStatus('loading')
     const result = await requestAccounts()
+    console.log(`
+      
+    -------- REQUEST ACCOUNTS
+
+    `)
+    console.log(result)
     if (result.success) {
       userState.currentAccount = userState.accounts[0]
       const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })

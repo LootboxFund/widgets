@@ -15,7 +15,10 @@ export interface SwapWidgetProps {
 const SwapWidget = (props: SwapWidgetProps) => {
   const snap = useSnapshot(stateOfSwap)
   useEffect(() => {
-    initDApp()
+    window.onload = () => {
+      console.log('page is fully loaded')
+      initDApp()
+    }
     if (props.initialRoute) {
       stateOfSwap.route = props.initialRoute
     }
