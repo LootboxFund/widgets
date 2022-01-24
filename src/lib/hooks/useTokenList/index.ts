@@ -45,39 +45,43 @@ export const useCustomTokenList = () => {
 
 export const addCustomToken = (data: TokenData) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
+  console.log('-----> existingCustomTokens')
+  console.log(existingCustomTokens)
   if (existingCustomTokens) {
     const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
-    if (customTokens[data.chainId] && customTokens[data.chainId].length >= 0) {
-      customTokens[data.chainId] = customTokens[data.chainId].filter((t) => t.address !== data.address).concat([data])
+    if (customTokens[data.chainIdHex] && customTokens[data.chainIdHex].length >= 0) {
+      customTokens[data.chainIdHex] = customTokens[data.chainIdHex]
+        .filter((t) => t.address !== data.address)
+        .concat([data])
     } else {
-      customTokens[data.chainId] = [data]
+      customTokens[data.chainIdHex] = [data]
     }
-    stateOfTokenList.customTokenList = customTokens[data.chainId]
+    stateOfTokenList.customTokenList = customTokens[data.chainIdHex]
     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
   } else {
     const customTokens: Record<string, TokenData[]> = {
-      [data.chainId]: [data],
+      [data.chainIdHex]: [data],
     }
-    stateOfTokenList.customTokenList = customTokens[data.chainId]
+    stateOfTokenList.customTokenList = customTokens[data.chainIdHex]
     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
   }
 }
 
-export const removeCustomToken = (address: string, chainId: number) => {
-  console.log(`Removing custom token ${address} from chain ${chainId}`)
+export const removeCustomToken = (address: string, chainIdHex: string) => {
+  console.log(`Removing custom token ${address} from chain ${chainIdHex}`)
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
   console.log(existingCustomTokens)
   if (existingCustomTokens) {
     const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
     console.log(customTokens)
-    console.log(customTokens[chainId])
-    if (customTokens[chainId]) {
-      const updatedList = customTokens[chainId].filter((token) => token.address !== address)
+    console.log(customTokens[chainIdHex])
+    if (customTokens[chainIdHex]) {
+      const updatedList = customTokens[chainIdHex].filter((token) => token.address !== address)
       console.log(updatedList)
       console.log(address)
       const updatedTokens = {
         ...customTokens,
-        [chainId]: updatedList,
+        [chainIdHex]: updatedList,
       }
       console.log(updatedTokens)
       stateOfTokenList.customTokenList = updatedList

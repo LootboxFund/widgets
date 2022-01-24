@@ -6,11 +6,13 @@ import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface WalletButtonProps {}
 const WalletButton = (props: WalletButtonProps) => {
   console.log(props)
   const snapUserState = useSnapshot(userState)
+  const { screen } = useWindowSize()
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error'>('ready')
 
@@ -53,6 +55,7 @@ const WalletButton = (props: WalletButtonProps) => {
   if (status === 'loading') {
     return (
       <$Button
+        screen={screen}
         disabled
         color={`${COLORS.warningBackground}`}
         backgroundColor={`${COLORS.warningBackground}80`}
@@ -69,6 +72,7 @@ const WalletButton = (props: WalletButtonProps) => {
   } else if (status === 'success') {
     return (
       <$Button
+        screen={screen}
         disabled
         color={`${COLORS.trustFontColor}`}
         backgroundColor={`${COLORS.trustBackground}80`}
@@ -85,6 +89,7 @@ const WalletButton = (props: WalletButtonProps) => {
   } else if (status === 'error') {
     return (
       <$Button
+        screen={screen}
         onClick={() => openMetamaskInstallLink()}
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
@@ -101,6 +106,7 @@ const WalletButton = (props: WalletButtonProps) => {
   }
   return (
     <$Button
+      screen={screen}
       onClick={connectWallet}
       color={`${COLORS.dangerFontColor}90`}
       colorHover={COLORS.dangerFontColor}

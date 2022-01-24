@@ -11,7 +11,10 @@ export declare const $Vertical: import("styled-components").StyledComponent<"div
     spacing?: 1 | 2 | 3 | 4 | 5 | undefined;
     flex?: number | undefined;
 }, never>;
-export declare const $CardViewport: import("styled-components").StyledComponent<"div", any, {}, never>;
+export declare const $CardViewport: import("styled-components").StyledComponent<"div", any, {
+    width?: string | undefined;
+    height?: string | undefined;
+}, never>;
 export declare const $ScrollContainer: import("styled-components").StyledComponent<"div", any, {
     height?: string | undefined;
 }, never>;

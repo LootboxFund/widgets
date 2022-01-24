@@ -10,9 +10,10 @@ export declare const useTokenList: () => readonly {
     readonly decimals: number;
     readonly name: string;
     readonly symbol: string;
-    readonly chainId: number;
+    readonly chainIdHex: string;
+    readonly chainIdDecimal: string;
     readonly logoURI: string;
-    readonly usdPrice?: number | undefined;
+    readonly usdPrice?: string | undefined;
     readonly priceOracle?: string | undefined;
 }[];
 export declare const useCustomTokenList: () => readonly {
@@ -20,13 +21,14 @@ export declare const useCustomTokenList: () => readonly {
     readonly decimals: number;
     readonly name: string;
     readonly symbol: string;
-    readonly chainId: number;
+    readonly chainIdHex: string;
+    readonly chainIdDecimal: string;
     readonly logoURI: string;
-    readonly usdPrice?: number | undefined;
+    readonly usdPrice?: string | undefined;
     readonly priceOracle?: string | undefined;
 }[];
 export declare const addCustomToken: (data: TokenData) => void;
-export declare const removeCustomToken: (address: string, chainId: number) => void;
+export declare const removeCustomToken: (address: string, chainIdHex: string) => void;
 export declare const saveInitialCustomTokens: () => void;
 export declare const initTokenList: (chainIdHex?: string | undefined) => void;
 export {};

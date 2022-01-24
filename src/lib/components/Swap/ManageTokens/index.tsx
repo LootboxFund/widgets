@@ -12,17 +12,20 @@ import $Button from '../../Button'
 import { useSnapshot } from 'valtio'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
 import { stateOfSwap } from '../state'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface ManageTokensProps {}
 const ManageTokens = (props: ManageTokensProps) => {
   console.log(props)
   const snap = useSnapshot(stateOfTokenList)
+  const { screen } = useWindowSize()
   const customTokenList = snap.customTokenList
   const [searchString, setSearchString] = useState('')
   const searchFilter = (token: TokenData) => {
     return (
       token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
-      token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1
+      token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
+      token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1
     )
   }
   return (
@@ -36,22 +39,31 @@ const ManageTokens = (props: ManageTokensProps) => {
       <>
         <$Horizontal>
           <$Input
+            screen={screen}
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             placeholder="Filter Custom Tokens..."
             style={{
               fontWeight: 'lighter',
               border: `2px solid ${COLORS.warningBackground}30`,
-              fontSize: '1.5rem',
+              fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
               flex: 4,
             }}
           ></$Input>
           <$Button
+            screen={screen}
             onClick={() => (stateOfSwap.route = '/add')}
             backgroundColor={`${COLORS.warningBackground}E0`}
             color={COLORS.white}
             backgroundColorHover={`${COLORS.warningBackground}`}
-            style={{ flex: 1, marginLeft: '10px', minHeight: '70px', fontSize: '1.5rem', fontWeight: 800 }}
+            style={{
+              flex: 1,
+              marginLeft: '10px',
+              minHeight: screen === 'desktop' ? '70px' : '50px',
+              height: '70px',
+              fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
+              fontWeight: 800,
+            }}
           >
             + New
           </$Button>

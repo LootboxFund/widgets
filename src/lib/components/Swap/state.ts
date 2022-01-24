@@ -6,6 +6,7 @@ import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
+import BN from 'bignumber.js'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
@@ -14,12 +15,12 @@ export interface SwapState {
   targetToken: TokenPickerTarget
   inputToken: {
     data: TokenData | undefined
-    quantity: number | undefined
+    quantity: string | undefined
     displayedBalance: string | undefined
   }
   outputToken: {
     data: TokenData | undefined
-    quantity: number | undefined
+    quantity: string | undefined
     displayedBalance: string | undefined
   }
 }
@@ -63,16 +64,19 @@ const updateOutputTokenValues = async () => {
     stateOfSwap.outputToken.data.usdPrice = outputTokenPrice.toString()
   }
   if (stateOfSwap.outputToken.data && stateOfSwap.inputToken.data && stateOfSwap.inputToken.quantity !== undefined) {
-    const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || 1
-    const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || 1
-    stateOfSwap.outputToken.quantity = (stateOfSwap.inputToken.quantity * inputTokenPrice) / outputTokenPrice
+    const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || ''
+    const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || ''
+    stateOfSwap.outputToken.quantity = new BN(stateOfSwap.inputToken.quantity)
+      .multipliedBy(new BN(inputTokenPrice))
+      .dividedBy(new BN(outputTokenPrice))
+      .toString()
   }
 }
 
 export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
   const web3 = await useWeb3()
   const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr)
-  const balance = ERC20.methods.balanceOf(userAddr).call()
+  const balance = await ERC20.methods.balanceOf(userAddr).call()
   console.log(`
   
   --------- Balance = ${balance}

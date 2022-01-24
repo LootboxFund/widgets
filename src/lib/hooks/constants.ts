@@ -5,7 +5,8 @@ export type TokenData = {
   decimals: number
   name: string
   symbol: string
-  chainId: number
+  chainIdHex: string
+  chainIdDecimal: string
   logoURI: string
   usdPrice?: string
   priceOracle?: string
@@ -55,7 +56,8 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
   {
     address: '0x0native',
-    chainId: 56,
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
     name: 'Binance Smart Chain',
@@ -64,7 +66,8 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
   },
   {
     address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
-    chainId: 56,
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
     name: 'Wrapped Ethereum',
@@ -73,7 +76,8 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
   },
   {
     address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
-    chainId: 56,
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
     name: 'USD Coin',
@@ -82,7 +86,8 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
   },
   {
     address: '0x55d398326f99059ff775485246999027b3197955',
-    chainId: 56,
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
     name: 'Tether',
@@ -94,7 +99,8 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
 export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenData[] = [
   {
     address: '0xba2ae424d960c26247dd6c32edc70b295c744c43',
-    chainId: 56,
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
     name: 'Dogecoin',
