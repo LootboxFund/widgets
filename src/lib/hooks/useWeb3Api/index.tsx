@@ -10,7 +10,7 @@ import { initTokenList } from 'lib/hooks/useTokenList'
 import { stateOfSwap } from '../../components/Swap/state'
 
 export const useWeb3 = async () => {
-  return (window as any).web3
+  return window.web3
 }
 
 export const useUserInfo = () => {
@@ -83,14 +83,16 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
 export const initDApp = async () => {
   initWeb3OnWindow()
   const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
+  console.log(`chainIdHex = ${chainIdHex}`)
   const blockchain = BLOCKCHAINS[chainIdHex]
+  console.log(blockchain)
   if (blockchain) {
     updateStateToChain(blockchain)
   }
-  const userAccounts = await (window as any).web3.eth.getAccounts()
+  const userAccounts = await window.web3.eth.getAccounts()
+  console.log(userAccounts)
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
-  initTokenList()
   ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
     console.log(`
       
@@ -108,20 +110,22 @@ export const initDApp = async () => {
 
 const initWeb3OnWindow = async () => {
   const provider = await detectEthereumProvider()
+  // const provider = (window as any).ethereum
   console.log(`
     
   detecting... provider
 
   `)
   console.log(provider)
-  ;(window as any).web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
+  window.web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
   if (provider) {
     console.log(`Found provider!`)
     // From now on, this should always be true:
-    // provider === window.ethereum
-    ;(window as any).web3 = new (window as any).Web3(provider)
+    // provider === (window as any).ethereum
+    window.web3 = new (window as any).Web3(provider)
+    console.log(window.web3)
     console.log(`Set web3!`)
-    const userAccounts = await (window as any).web3.eth.getAccounts()
+    const userAccounts = await window.web3.eth.getAccounts()
     console.log(`Set user accounts!`)
     userState.accounts = userAccounts
   } else {
@@ -131,6 +135,7 @@ const initWeb3OnWindow = async () => {
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
+  console.log('Updating state to chain!')
   userState.currentNetworkIdHex = chainInfo.chainIdHex
   userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal
   userState.currentNetworkName = chainInfo.chainName

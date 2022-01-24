@@ -4,6 +4,7 @@ import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { userState } from 'lib/state/userState'
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe, useSnapshot } from 'valtio'
+import ERC20ABI from 'lib/abi/erc20.json'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
@@ -51,10 +52,18 @@ const updateOutputTokenValues = () => {
   }
 }
 
-// export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-//   const web3 = useWeb3()
-//   const swapSnapshot = useSnapshot(stateOfSwap)
-// }
+export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
+  const web3 = await useWeb3()
+  const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr)
+  const balance = ERC20.methods.balanceOf(userAddr).call()
+  console.log(`
+  
+  --------- Balance = ${balance}
+  
+  
+  `)
+  return balance
+}
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
   const web3 = useWeb3()

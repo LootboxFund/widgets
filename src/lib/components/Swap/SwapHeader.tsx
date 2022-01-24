@@ -4,9 +4,9 @@ import { COLORS } from 'lib/theme'
 import react from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
-import { $Horizontal } from '../Generics'
 import { BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
 import $Button from 'lib/components/Button'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
 
 export interface SwapHeaderProps {}
 const SwapHeader = (props: SwapHeaderProps) => {
@@ -42,13 +42,30 @@ const SwapHeader = (props: SwapHeaderProps) => {
     return
   }
 
+  const renderTinyAccount = () => {
+    if (snapUserState.currentAccount) {
+      const accountTruncated = `${snapUserState.currentAccount.slice(0, 4)}...${snapUserState.currentAccount.slice(
+        snapUserState.currentAccount.length - 5,
+        snapUserState.currentAccount.length
+      )}`
+      return `(${accountTruncated})`
+    }
+    return
+  }
+
   return (
     <$SwapHeader>
       <$SwapHeaderTitle>BUY GUILDFX</$SwapHeaderTitle>
       {validChain ? (
         <>
           <$NetworkText style={{ flex: 2 }}>
-            <b>Network:</b> {snapUserState.currentNetworkDisplayName}
+            <b>Network:</b> {snapUserState.currentNetworkDisplayName}{' '}
+            <span
+              onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
+              style={{ cursor: 'pointer' }}
+            >
+              {renderTinyAccount()}
+            </span>
           </$NetworkText>
           <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span>
         </>
@@ -74,13 +91,21 @@ export const $SwapHeader = styled.div<{}>`
 `
 
 export const $NetworkText = styled.span`
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: ${`${COLORS.surpressedFontColor}`};
   text-align: right;
   margin-right: 10px;
   font-weight: lighter;
   font-family: sans-serif;
-  text-decoration: underline;
+`
+
+export const $TinyAccount = styled.span`
+  font-size: 0.8rem;
+  color: ${`${COLORS.surpressedFontColor}`};
+  text-align: right;
+  margin-right: 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
   cursor: pointer;
 `
 
