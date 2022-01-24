@@ -1198,9 +1198,51 @@
                     priceOracle: '0x3ab0a0d137d4f946fbb19eecc6e92e64660231c8',
                 },
             ];
+            const BSC_TESTNET_FULL_TOKEN_LIST = [
+                {
+                    address: '0x0native',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                    name: 'Binance Smart Chain',
+                    symbol: 'tBNB',
+                    priceOracle: '____________',
+                },
+                {
+                    address: '0x535543240B14F8dc39CA62811528781d613F2A59',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                    name: 'Wrapped Ethereum',
+                    symbol: 'ETH',
+                    priceOracle: '________',
+                },
+                {
+                    address: '0x05Dc92E0C23eF3BBBe819FD8cF1AdC92b3487709',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+                    name: 'USD Circle',
+                    symbol: 'USDC',
+                    priceOracle: '________',
+                },
+                {
+                    address: '0xF6de6323f26EaD05c6199D91F88175629eadbC1f',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    priceOracle: '________',
+                },
+            ];
             const tokenMap = {
                 '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
-                '0x61': [],
+                '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
             };
 
             const CUSTOM_TOKEN_STORAGE_KEY = "guildfx-custom-tokens";
