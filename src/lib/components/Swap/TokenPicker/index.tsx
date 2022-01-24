@@ -14,6 +14,7 @@ import { getUserBalanceOfNativeToken, getUserBalanceOfToken, stateOfSwap } from 
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface TokenPickerProps {}
 const TokenPicker = (props: TokenPickerProps) => {
@@ -23,6 +24,7 @@ const TokenPicker = (props: TokenPickerProps) => {
   const snap = useSnapshot(stateOfSwap)
   const snapUserState = useSnapshot(userState)
   const snapSwapState = useSnapshot(stateOfSwap)
+  const { screen } = useWindowSize()
 
   const tokenList = useTokenList()
   const customTokenList = useCustomTokenList()
@@ -69,7 +71,8 @@ const TokenPicker = (props: TokenPickerProps) => {
   const searchFilter = (token: TokenData) => {
     return (
       token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
-      token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1
+      token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
+      token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1
     )
   }
   const currentToken = snap.targetToken !== null ? stateOfSwap[snap.targetToken].data : null
@@ -84,22 +87,31 @@ const TokenPicker = (props: TokenPickerProps) => {
       <>
         <$Horizontal>
           <$Input
+            screen={screen}
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             placeholder="Search Tokens..."
             style={{
               fontWeight: 'lighter',
               border: `2px solid ${COLORS.warningBackground}30`,
-              fontSize: '1.5rem',
+              fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
               flex: 4,
             }}
           ></$Input>
           <$Button
+            screen={screen}
             onClick={() => (stateOfSwap.route = '/add')}
             backgroundColor={`${COLORS.warningBackground}E0`}
             color={COLORS.white}
             backgroundColorHover={`${COLORS.warningBackground}`}
-            style={{ flex: 1, marginLeft: '10px', height: '70px', fontSize: '1.5rem', fontWeight: 800 }}
+            style={{
+              flex: 1,
+              marginLeft: '10px',
+              minHeight: screen === 'desktop' ? '70px' : '50px',
+              height: '70px',
+              fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
+              fontWeight: 800,
+            }}
           >
             + New
           </$Button>

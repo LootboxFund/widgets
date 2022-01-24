@@ -11,20 +11,24 @@ import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
 import { $BlueLinkText } from '../TokenPicker'
 import { stateOfSwap } from '../state'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { truncateAddress } from 'lib/api/helpers'
 
 export interface AddTokenProps {}
 const AddToken = (props: AddTokenProps) => {
+  const { screen } = useWindowSize()
   console.log(props)
   const [searchString, setSearchString] = useState('')
   const addToken = () => {
     addCustomToken({
-      address: '0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31',
+      address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
       decimals: 18,
-      name: 'Voxel Network',
-      symbol: 'VXL',
-      chainId: 56,
-      logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/15881.png',
-      usdPrice: 0.1238,
+      name: 'Pancake Swap',
+      symbol: 'CAKE',
+      chainIdHex: '0x38',
+      chainIdDecimal: '56',
+      logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
+      priceOracle: '0xb6064ed41d4f67e353768aa239ca86f4f73665a1',
     })
     stateOfSwap.route = '/search'
   }
@@ -38,29 +42,46 @@ const AddToken = (props: AddTokenProps) => {
       </$SwapHeader>
 
       <$Input
+        screen={screen}
         value={searchString}
         onChange={(e) => setSearchString(e.target.value)}
         placeholder="Search Tokens..."
         style={{
           fontWeight: 'lighter',
           border: `2px solid ${COLORS.warningBackground}30`,
-          fontSize: '1.5rem',
+          fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
           flex: 4,
           maxHeight: '50px',
+          maxWidth: screen === 'desktop' ? '100%' : '90%',
         }}
       ></$Input>
 
       <$TokenPreviewCard>
         <$CoinIcon
-          src="https://s2.coinmarketcap.com/static/img/coins/64x64/15881.png"
+          screen={screen}
+          src="https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png"
           style={{ width: '50px', height: '50px' }}
         ></$CoinIcon>
-        <$BigCoinTicker>VXL</$BigCoinTicker>
-        <$ThinCoinName>Voxel Network</$ThinCoinName>
-        <$BlueLinkText>0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31</$BlueLinkText>
+        <$BigCoinTicker screen={screen}>CAKE</$BigCoinTicker>
+        <$ThinCoinName screen={screen}>Pancake Swap</$ThinCoinName>
+        <$BlueLinkText onClick={() => navigator.clipboard.writeText('0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82')}>
+          {truncateAddress(
+            '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
+            screen === 'desktop'
+              ? {
+                  prefixLength: 10,
+                  suffixLength: 10,
+                }
+              : {
+                  prefixLength: 6,
+                  suffixLength: 8,
+                }
+          )}
+        </$BlueLinkText>
       </$TokenPreviewCard>
 
       <$Button
+        screen={screen}
         onClick={() => addToken()}
         backgroundColor={`${COLORS.dangerBackground}E0`}
         backgroundColorHover={`${COLORS.dangerBackground}`}

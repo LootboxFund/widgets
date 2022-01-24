@@ -7,6 +7,8 @@ import { TokenData } from 'lib/hooks/constants'
 import { stateOfSwap } from '../state'
 import { useSnapshot } from 'valtio'
 import { removeCustomToken } from 'lib/hooks/useTokenList'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { ScreenSize } from '../../../hooks/useScreenSize/index'
 
 export interface RowTokenProps {
   token: TokenData
@@ -16,39 +18,50 @@ export interface RowTokenProps {
 }
 const RowToken = (props: RowTokenProps) => {
   const snap = useSnapshot(stateOfSwap)
+  const { screen } = useWindowSize()
   const removeToken = () => {
-    console.log(props.token.chainId)
-    removeCustomToken(props.token.address, props.token.chainId)
+    console.log(props.token.chainIdHex)
+    removeCustomToken(props.token.address, props.token.chainIdHex)
   }
   return (
-    <$RowToken disabled={props.disabled}>
-      <$Horizontal>
-        <$CoinIcon src={props.token.logoURI} style={{ width: '30px', height: '30px' }}></$CoinIcon>
-        <$BigCoinTicker>{props.token.symbol}</$BigCoinTicker>
+    <$RowToken screen={screen} disabled={props.disabled}>
+      <$Horizontal verticalCenter>
+        <$CoinIcon
+          screen={screen}
+          src={props.token.logoURI}
+          style={{ width: screen === 'desktop' ? '30px' : '30px', height: screen === 'desktop' ? '30px' : '30px' }}
+        ></$CoinIcon>
+        <$BigCoinTicker screen={screen}>{props.token.symbol}</$BigCoinTicker>
       </$Horizontal>
-      <$ThinCoinName>{props.token.name}</$ThinCoinName>
+      <$ThinCoinName screen={screen}>{props.token.name}</$ThinCoinName>
       {props.copyable || props.deleteable ? (
         <div>
           {props.copyable && (
-            <$CopyButton onClick={() => navigator.clipboard.writeText(props.token.address)}>📑</$CopyButton>
+            <$CopyButton screen={screen} onClick={() => navigator.clipboard.writeText(props.token.address)}>
+              📑
+            </$CopyButton>
           )}
-          {props.deleteable && <$DeleteButton onClick={removeToken}>🗑</$DeleteButton>}
+          {props.deleteable && (
+            <$DeleteButton screen={screen} onClick={removeToken}>
+              🗑
+            </$DeleteButton>
+          )}
         </div>
       ) : null}
     </$RowToken>
   )
 }
 
-const $RowToken = styled.div<{ disabled?: boolean }>`
+const $RowToken = styled.div<{ disabled?: boolean; screen: ScreenSize }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   flex: 1;
   background-color: ${`${COLORS.black}04`};
-  padding: 20px;
+  padding: ${(props) => (props.screen === 'desktop' ? '20px' : '15px')};
   border-radius: 10px;
-  max-height: 50px;
+  max-height: ${(props) => (props.screen === 'desktop' ? '50px' : '40px')};
   ${(props) => (props.disabled ? 'cursor: not-allowed' : 'cursor: pointer')};
   ${(props) => (props.disabled ? 'background-color: rgba(0,0,0,0.1);' : 'background-color: rgba(0,0,0,0.03);')};
   &:hover {
@@ -57,22 +70,22 @@ const $RowToken = styled.div<{ disabled?: boolean }>`
   }
 `
 
-export const $BigCoinTicker = styled.span<{}>`
-  font-size: 1.5rem;
+export const $BigCoinTicker = styled.span<{ screen: ScreenSize }>`
+  font-size: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1rem')};
   font-weight: bold;
   font-family: sans-serif;
 `
 
-export const $ThinCoinName = styled.span<{}>`
-  font-size: 1.2rem;
+export const $ThinCoinName = styled.span<{ screen: ScreenSize }>`
+  font-size: ${(props) => (props.screen === 'desktop' ? '1.2rem' : '0.9rem')};
   font-weight: 400;
   font-family: sans-serif;
   color: ${COLORS.surpressedFontColor};
 `
 
-export const $CopyButton = styled.span<{}>`
+export const $CopyButton = styled.span<{ screen: ScreenSize }>`
   border-radius: 10px;
-  padding: 10px;
+  padding: ${(props) => (props.screen === 'desktop' ? '10px' : '5px')};
   margin: 0px 5px;
   cursor: pointer;
   text-align: center;
@@ -80,9 +93,9 @@ export const $CopyButton = styled.span<{}>`
     background-color: ${`${COLORS.surpressedBackground}30`};
   }
 `
-export const $DeleteButton = styled.span<{}>`
+export const $DeleteButton = styled.span<{ screen: ScreenSize }>`
   border-radius: 10px;
-  padding: 10px;
+  padding: ${(props) => (props.screen === 'desktop' ? '10px' : '5px')};
   margin: 0px 5px;
   cursor: pointer;
   text-align: center;

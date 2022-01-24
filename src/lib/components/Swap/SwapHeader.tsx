@@ -7,10 +7,13 @@ import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
 import $Button from 'lib/components/Button'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { truncateAddress } from 'lib/api/helpers'
 
 export interface SwapHeaderProps {}
 const SwapHeader = (props: SwapHeaderProps) => {
   console.log(props)
+  const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
 
   const isWalletConnected = snapUserState.accounts.length > 0
@@ -29,6 +32,7 @@ const SwapHeader = (props: SwapHeaderProps) => {
     if (isWalletConnected) {
       return (
         <$Button
+          screen={screen}
           onClick={switchChain}
           backgroundColor={`${COLORS.dangerFontColor}80`}
           backgroundColorHover={`${COLORS.dangerFontColor}`}
@@ -44,10 +48,7 @@ const SwapHeader = (props: SwapHeaderProps) => {
 
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
-      const accountTruncated = `${snapUserState.currentAccount.slice(0, 4)}...${snapUserState.currentAccount.slice(
-        snapUserState.currentAccount.length - 5,
-        snapUserState.currentAccount.length
-      )}`
+      const accountTruncated = truncateAddress(snapUserState.currentAccount)
       return `(${accountTruncated})`
     }
     return
@@ -67,7 +68,7 @@ const SwapHeader = (props: SwapHeaderProps) => {
               {renderTinyAccount()}
             </span>
           </$NetworkText>
-          <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span>
+          {/* <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span> */}
         </>
       ) : (
         renderSwitchNetworkButton()

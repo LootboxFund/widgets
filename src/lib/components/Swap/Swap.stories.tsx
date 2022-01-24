@@ -19,7 +19,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport>
+    <$CardViewport width="340px">
       <ThemeProvider theme={theme}>
         <Swap />
       </ThemeProvider>
