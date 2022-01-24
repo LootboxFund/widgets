@@ -39,7 +39,7 @@ const TokenPicker = (props: TokenPickerProps) => {
 
 		`)
     let tokenBalance = 0
-    if (snapUserState.currentAccount && snapSwapState.targetToken && stateOfSwap[snapSwapState.targetToken]) {
+    if (snapUserState.currentAccount && snapSwapState.targetToken && snapSwapState[snapSwapState.targetToken]) {
       if (token.address === '0x0native') {
         console.log('Get native token')
         tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount)
@@ -62,6 +62,9 @@ const TokenPicker = (props: TokenPickerProps) => {
         stateOfSwap.route = '/swap'
       }
     }
+    console.log('Failed fam')
+    console.log(snapUserState)
+    console.log(snapSwapState)
   }
   const searchFilter = (token: TokenData) => {
     return (

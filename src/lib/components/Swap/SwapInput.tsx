@@ -8,6 +8,7 @@ import { stateOfSwap, TokenPickerTarget } from './state'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, TokenData } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
+import BN from 'bignumber.js'
 
 export interface SwapInputProps {
   selectedToken?: TokenData
@@ -19,8 +20,11 @@ const SwapInput = (props: SwapInputProps) => {
   const snap = useSnapshot(stateOfSwap)
   const snapUserState = useSnapshot(userState)
   const selectToken = async () => {
+    console.log(`---> props.targetToken = ${props.targetToken}`)
     stateOfSwap.targetToken = props.targetToken
     stateOfSwap.route = '/search'
+    console.log('Settig the state of swap')
+    console.log(snap)
   }
   const setQuantity = (quantity: number) => {
     console.log(quantity)
@@ -70,7 +74,15 @@ const SwapInput = (props: SwapInputProps) => {
   const balance =
     props.targetToken && snap[props.targetToken].displayedBalance ? snap[props.targetToken].displayedBalance : 0
   const quantity = props.targetToken ? snap[props.targetToken].quantity : undefined
-  const usdValue = props.targetToken && quantity ? (snap[props.targetToken].data?.usdPrice || 1) * quantity : quantity
+  const usdUnitPrice =
+    props.targetToken &&
+    snap[props.targetToken] &&
+    snap[props.targetToken].data &&
+    snap[props.targetToken].data?.usdPrice
+  const usdValue =
+    props.targetToken && quantity && snap[props.targetToken] && usdUnitPrice
+      ? new BN(usdUnitPrice).multipliedBy(new BN(quantity))
+      : ''
   return (
     <$SwapInput>
       <$Horizontal flex={1}>
