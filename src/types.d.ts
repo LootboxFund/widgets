@@ -6,3 +6,5 @@ declare global {
     // ethereum: any
   }
 }
+
+declare module 'bignumber' {}

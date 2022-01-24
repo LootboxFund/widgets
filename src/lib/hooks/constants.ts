@@ -1,3 +1,5 @@
+import { BigNumber } from 'bignumber.js'
+
 export type TokenData = {
   address: string
   decimals: number
@@ -5,7 +7,7 @@ export type TokenData = {
   symbol: string
   chainId: number
   logoURI: string
-  usdPrice?: number
+  usdPrice?: string
   priceOracle?: string
 }
 
@@ -58,8 +60,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
     name: 'Binance Smart Chain',
     symbol: 'BNB',
-    usdPrice: 348,
-    priceOracle: '0x0000000',
+    priceOracle: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
   },
   {
     address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
@@ -68,8 +69,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
     name: 'Wrapped Ethereum',
     symbol: 'ETH',
-    usdPrice: 2400,
-    priceOracle: '0x0000000',
+    priceOracle: '0x9ef1b8c0e4f7dc8bf5719ea496883dc6401d5b2e',
   },
   {
     address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
@@ -78,8 +78,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
     name: 'USD Coin',
     symbol: 'USDC',
-    usdPrice: 1,
-    priceOracle: '0x0000000',
+    priceOracle: '0x51597f405303c4377e36123cbc172b13269ea163',
   },
   {
     address: '0x55d398326f99059ff775485246999027b3197955',
@@ -88,18 +87,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenData[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
     name: 'Tether',
     symbol: 'USDT',
-    usdPrice: 0.997,
-    priceOracle: '0x0000000',
-  },
-  {
-    address: '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3',
-    chainId: 56,
-    decimals: 18,
-    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png',
-    name: 'Dai',
-    symbol: 'DAI',
-    usdPrice: 0.997,
-    priceOracle: '0x0000000',
+    priceOracle: '0xb97ad0e74fa7d920791e90258a6e2085088b4320',
   },
 ]
 
@@ -111,18 +99,7 @@ export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenData[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
     name: 'Dogecoin',
     symbol: 'DOGE',
-    usdPrice: 0.126,
-    priceOracle: '0x0000000',
-  },
-  {
-    address: '0x23396cf899ca06c4472205fc903bdb4de249d6fc',
-    chainId: 56,
-    decimals: 18,
-    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7129.png',
-    name: 'Terra USD',
-    symbol: 'UST',
-    usdPrice: 1.003,
-    priceOracle: '0x0000000',
+    priceOracle: '0x3ab0a0d137d4f946fbb19eecc6e92e64660231c8',
   },
 ]
 

@@ -5,6 +5,7 @@ import { userState } from 'lib/state/userState'
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
+import { getPriceFeed } from 'lib/hooks/useContract'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
@@ -44,7 +45,23 @@ subscribe(stateOfSwap.inputToken, () => {
 subscribe(stateOfSwap.outputToken, () => {
   updateOutputTokenValues()
 })
-const updateOutputTokenValues = () => {
+const updateOutputTokenValues = async () => {
+  console.log('updateOutputTokenValues')
+  if (stateOfSwap.outputToken.data?.priceOracle && stateOfSwap.inputToken.data?.priceOracle) {
+    // get price of conversion rate and save to swapState
+    const [inputTokenPrice, outputTokenPrice] = await Promise.all([
+      getPriceFeed(stateOfSwap.inputToken.data.priceOracle),
+      getPriceFeed(stateOfSwap.outputToken.data.priceOracle),
+    ])
+    console.log(`
+    
+      inputToken = ${inputTokenPrice}
+      outputToken = ${outputTokenPrice}
+
+    `)
+    stateOfSwap.inputToken.data.usdPrice = inputTokenPrice.toString()
+    stateOfSwap.outputToken.data.usdPrice = outputTokenPrice.toString()
+  }
   if (stateOfSwap.outputToken.data && stateOfSwap.inputToken.data && stateOfSwap.inputToken.quantity !== undefined) {
     const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || 1
     const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || 1
