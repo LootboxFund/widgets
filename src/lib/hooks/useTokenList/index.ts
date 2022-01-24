@@ -1,104 +1,103 @@
 import uriToHttp from 'lib/utils/uriToHttp'
-import { DEMO_CUSTOM_TOKEN_LIST, TokenData, tokenMap } from 'lib/hooks/useTokenList/tokenMap'
+import {
+  ChainIDHex,
+  DEFAULT_CHAIN_ID_HEX,
+  DEMO_CUSTOM_TOKENS_BSC_MAINNET,
+  TokenData,
+  tokenMap,
+} from 'lib/hooks/constants'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
-import { DEFAULT_CHAIN_ID } from 'lib/state/valtio'
 
-
-export const getCustomTokensList = (chainId: number) => {
-	const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
-	if (existingCustomTokens) {
-		const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
-    if (customTokens[chainId] && customTokens[chainId].length > 0) {
-      return customTokens[chainId]
+export const getCustomTokensList = (chainIdHex: string) => {
+  const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
+  if (existingCustomTokens) {
+    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+    if (customTokens[chainIdHex] && customTokens[chainIdHex].length > 0) {
+      return customTokens[chainIdHex]
     }
-		return []
-	}
-	return []
+    return []
+  }
+  return []
 }
 
 interface TokenListState {
-  chainId: number
   defaultTokenList: TokenData[]
   customTokenList: TokenData[]
 }
 const tokenListState: TokenListState = {
-	chainId: 56,
   defaultTokenList: [],
-  customTokenList: []
+  customTokenList: [],
 }
 
 export const stateOfTokenList = proxy(tokenListState)
 
-export const initializeTokenList = (chainId?: number) => {
-
-  // remove in production
-  saveInitialCustomTokens()
-  
-  const chosenChainId = chainId || DEFAULT_CHAIN_ID
-  stateOfTokenList.chainId = chosenChainId;
-  stateOfTokenList.defaultTokenList = tokenMap[chosenChainId] || [];
-  stateOfTokenList.customTokenList = getCustomTokensList(chosenChainId);
-}
-
 export const useTokenList = () => {
-	const snap = useSnapshot(stateOfTokenList)
+  const snap = useSnapshot(stateOfTokenList)
   return snap.defaultTokenList
 }
 
 export const useCustomTokenList = () => {
-	const snap = useSnapshot(stateOfTokenList)
+  const snap = useSnapshot(stateOfTokenList)
   return snap.customTokenList
 }
 
-
 export const addCustomToken = (data: TokenData) => {
-	const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
-	if (existingCustomTokens) {
-		const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
-		if (customTokens[data.chainId] && customTokens[data.chainId].length >= 0) {
-			customTokens[data.chainId] = customTokens[data.chainId].filter(t => t.address !== data.address).concat([data])
-		} else {
-			customTokens[data.chainId] = [data]
-		}
-    stateOfTokenList.customTokenList = customTokens[data.chainId];
-		localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
-	} else {
-		const customTokens: Record<string, TokenData[]> = {
-			[data.chainId]: [data]
-		}
-    stateOfTokenList.customTokenList = customTokens[data.chainId];
-		localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
-	}
+  const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
+  if (existingCustomTokens) {
+    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+    if (customTokens[data.chainId] && customTokens[data.chainId].length >= 0) {
+      customTokens[data.chainId] = customTokens[data.chainId].filter((t) => t.address !== data.address).concat([data])
+    } else {
+      customTokens[data.chainId] = [data]
+    }
+    stateOfTokenList.customTokenList = customTokens[data.chainId]
+    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
+  } else {
+    const customTokens: Record<string, TokenData[]> = {
+      [data.chainId]: [data],
+    }
+    stateOfTokenList.customTokenList = customTokens[data.chainId]
+    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
+  }
 }
 
 export const removeCustomToken = (address: string, chainId: number) => {
   console.log(`Removing custom token ${address} from chain ${chainId}`)
-	const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
+  const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
   console.log(existingCustomTokens)
-	if (existingCustomTokens) {
-		const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+  if (existingCustomTokens) {
+    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
     console.log(customTokens)
     console.log(customTokens[chainId])
-		if (customTokens[chainId]) {
-      const updatedList = customTokens[chainId].filter(token => token.address !== address)
+    if (customTokens[chainId]) {
+      const updatedList = customTokens[chainId].filter((token) => token.address !== address)
       console.log(updatedList)
       console.log(address)
-			const updatedTokens = {
+      const updatedTokens = {
         ...customTokens,
-        [chainId]: updatedList
+        [chainId]: updatedList,
       }
       console.log(updatedTokens)
       stateOfTokenList.customTokenList = updatedList
-			localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens))
-		}
-	}
+      localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens))
+    }
+  }
 }
 
-const saveInitialCustomTokens = () => {
+export const saveInitialCustomTokens = () => {
   const customTokens: Record<string, TokenData[]> = {
-    [DEFAULT_CHAIN_ID]: DEMO_CUSTOM_TOKEN_LIST
+    [DEFAULT_CHAIN_ID_HEX]: DEMO_CUSTOM_TOKENS_BSC_MAINNET,
   }
   localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
+}
+
+export const initTokenList = (chainIdHex?: ChainIDHex) => {
+  // remove in production
+  saveInitialCustomTokens()
+
+  const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX
+  stateOfTokenList.defaultTokenList = tokenMap[chosenChainIdHex] || []
+  stateOfTokenList.customTokenList = getCustomTokensList(chosenChainIdHex)
 }
