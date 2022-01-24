@@ -120,6 +120,7 @@ const initWeb3OnWindow = async () => {
     // From now on, this should always be true:
     // provider === window.ethereum
     ;(window as any).web3 = new (window as any).Web3(provider)
+    console.log((window as any).web3)
     console.log(`Set web3!`)
     const userAccounts = await (window as any).web3.eth.getAccounts()
     console.log(`Set user accounts!`)

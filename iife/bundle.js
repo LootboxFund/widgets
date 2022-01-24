@@ -1411,6 +1411,7 @@
                 if (provider) {
                     console.log(`Found provider!`);
                     window.web3 = new window.Web3(provider);
+                    console.log(window.web3);
                     console.log(`Set web3!`);
                     const userAccounts = await window.web3.eth.getAccounts();
                     console.log(`Set user accounts!`);
