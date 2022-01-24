@@ -1376,14 +1376,16 @@
             const initDApp = async () => {
                 initWeb3OnWindow();
                 const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                console.log(`chainIdHex = ${chainIdHex}`);
                 const blockchain = BLOCKCHAINS[chainIdHex];
+                console.log(blockchain);
                 if (blockchain) {
                     updateStateToChain(blockchain);
                 }
                 const userAccounts = await window.web3.eth.getAccounts();
+                console.log(userAccounts);
                 userState.accounts = userAccounts;
                 userState.currentAccount = userAccounts[0];
-                initTokenList();
                 window.ethereum.on('chainChanged', async (chainIdHex) => {
                     console.log(`
       
@@ -1401,6 +1403,7 @@
             };
             const initWeb3OnWindow = async () => {
                 const provider = await dist();
+                // const provider = (window as any).ethereum
                 console.log(`
     
   detecting... provider
@@ -1410,6 +1413,8 @@
                 window.web3 = new window.Web3('https://bsc-dataseed.binance.org/');
                 if (provider) {
                     console.log(`Found provider!`);
+                    // From now on, this should always be true:
+                    // provider === (window as any).ethereum
                     window.web3 = new window.Web3(provider);
                     console.log(window.web3);
                     console.log(`Set web3!`);
@@ -1423,6 +1428,7 @@
                 }
             };
             const updateStateToChain = (chainInfo) => {
+                console.log('Updating state to chain!');
                 userState.currentNetworkIdHex = chainInfo.chainIdHex;
                 userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal;
                 userState.currentNetworkName = chainInfo.chainName;
@@ -1449,6 +1455,233 @@
                 stateOfSwap.outputToken.displayedBalance = undefined;
                 stateOfSwap.outputToken.quantity = undefined;
             };
+
+            var ERC20ABI = [
+            	{
+            		constant: true,
+            		inputs: [
+            		],
+            		name: "name",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "string"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		constant: false,
+            		inputs: [
+            			{
+            				name: "_spender",
+            				type: "address"
+            			},
+            			{
+            				name: "_value",
+            				type: "uint256"
+            			}
+            		],
+            		name: "approve",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		constant: true,
+            		inputs: [
+            		],
+            		name: "totalSupply",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		constant: false,
+            		inputs: [
+            			{
+            				name: "_from",
+            				type: "address"
+            			},
+            			{
+            				name: "_to",
+            				type: "address"
+            			},
+            			{
+            				name: "_value",
+            				type: "uint256"
+            			}
+            		],
+            		name: "transferFrom",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		constant: true,
+            		inputs: [
+            		],
+            		name: "decimals",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "uint8"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		constant: true,
+            		inputs: [
+            			{
+            				name: "_owner",
+            				type: "address"
+            			}
+            		],
+            		name: "balanceOf",
+            		outputs: [
+            			{
+            				name: "balance",
+            				type: "uint256"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		constant: true,
+            		inputs: [
+            		],
+            		name: "symbol",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "string"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		constant: false,
+            		inputs: [
+            			{
+            				name: "_to",
+            				type: "address"
+            			},
+            			{
+            				name: "_value",
+            				type: "uint256"
+            			}
+            		],
+            		name: "transfer",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		constant: true,
+            		inputs: [
+            			{
+            				name: "_owner",
+            				type: "address"
+            			},
+            			{
+            				name: "_spender",
+            				type: "address"
+            			}
+            		],
+            		name: "allowance",
+            		outputs: [
+            			{
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		payable: false,
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		payable: true,
+            		stateMutability: "payable",
+            		type: "fallback"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				name: "owner",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				name: "spender",
+            				type: "address"
+            			},
+            			{
+            				indexed: false,
+            				name: "value",
+            				type: "uint256"
+            			}
+            		],
+            		name: "Approval",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				name: "from",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				name: "to",
+            				type: "address"
+            			},
+            			{
+            				indexed: false,
+            				name: "value",
+            				type: "uint256"
+            			}
+            		],
+            		name: "Transfer",
+            		type: "event"
+            	}
+            ];
 
             const swapSnapshot = {
                 route: '/swap',
@@ -1478,10 +1711,18 @@
                     stateOfSwap.outputToken.quantity = (stateOfSwap.inputToken.quantity * inputTokenPrice) / outputTokenPrice;
                 }
             };
-            // export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-            //   const web3 = useWeb3()
-            //   const swapSnapshot = useSnapshot(stateOfSwap)
-            // }
+            const getUserBalanceOfToken = async (contractAddr, userAddr) => {
+                const web3 = await useWeb3();
+                const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr);
+                const balance = ERC20.methods.balanceOf(userAddr).call();
+                console.log(`
+  
+  --------- Balance = ${balance}
+  
+  
+  `);
+                return balance;
+            };
             const getUserBalanceOfNativeToken = async (userAddr) => {
                 const web3 = useWeb3();
                 const balanceAsString = await (await web3).eth.getBalance(userAddr);
@@ -2586,7 +2827,14 @@
                     }
                     return;
                 };
-                return (jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "BUY GUILDFX" }, void 0), validChain ? (jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($NetworkText, { style: { flex: 2 }, children: [jsxRuntime.exports.jsx("b", { children: "Network:" }, void 0), " ", snapUserState.currentNetworkDisplayName] }, void 0), jsxRuntime.exports.jsx("span", { style: { padding: '0px 5px 0px 0px' }, children: "\u2699\uFE0F" }, void 0)] }, void 0)) : (renderSwitchNetworkButton())] }, void 0));
+                const renderTinyAccount = () => {
+                    if (snapUserState.currentAccount) {
+                        const accountTruncated = `${snapUserState.currentAccount.slice(0, 4)}...${snapUserState.currentAccount.slice(snapUserState.currentAccount.length - 5, snapUserState.currentAccount.length)}`;
+                        return `(${accountTruncated})`;
+                    }
+                    return;
+                };
+                return (jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "BUY GUILDFX" }, void 0), validChain ? (jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($NetworkText, { style: { flex: 2 }, children: [jsxRuntime.exports.jsx("b", { children: "Network:" }, void 0), " ", snapUserState.currentNetworkDisplayName, ' ', jsxRuntime.exports.jsx("span", { onClick: () => navigator.clipboard.writeText(snapUserState.currentAccount || ''), style: { cursor: 'pointer' }, children: renderTinyAccount() }, void 0)] }, void 0), jsxRuntime.exports.jsx("span", { style: { padding: '0px 5px 0px 0px' }, children: "\u2699\uFE0F" }, void 0)] }, void 0)) : (renderSwitchNetworkButton())] }, void 0));
             };
             const $SwapHeaderTitle = styled.span `
   flex: 3;
@@ -2601,13 +2849,20 @@
   font-family: sans-serif;
 `;
             const $NetworkText = styled.span `
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: ${`${COLORS.surpressedFontColor}`};
   text-align: right;
   margin-right: 10px;
   font-weight: lighter;
   font-family: sans-serif;
-  text-decoration: underline;
+`;
+            styled.span `
+  font-size: 0.8rem;
+  color: ${`${COLORS.surpressedFontColor}`};
+  text-align: right;
+  margin-right: 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
   cursor: pointer;
 `;
 
@@ -2873,6 +3128,11 @@
                         if (token.address === '0x0native') {
                             console.log('Get native token');
                             tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount);
+                        }
+                        else {
+                            // get coin balance
+                            // userState.displayedBalance
+                            tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount);
                         }
                         if (snap.targetToken !== null) {
                             stateOfSwap[snap.targetToken].data = token;

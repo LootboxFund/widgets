@@ -10,7 +10,7 @@ import { TokenData } from 'lib/hooks/constants'
 import { $Horizontal, $ScrollContainer } from '../../Generics'
 import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
-import { getUserBalanceOfNativeToken, stateOfSwap } from '../state'
+import { getUserBalanceOfNativeToken, getUserBalanceOfToken, stateOfSwap } from '../state'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
@@ -46,7 +46,7 @@ const TokenPicker = (props: TokenPickerProps) => {
       } else {
         // get coin balance
         // userState.displayedBalance
-        // const balance = await getUserBalanceOfToken(token.address)
+        tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount)
       }
       if (snap.targetToken !== null) {
         stateOfSwap[snap.targetToken].data = token
