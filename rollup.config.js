@@ -16,7 +16,7 @@ import nodePolyfills from 'rollup-plugin-node-polyfills'
 const configUMD = {
   input: ['src/injects/combined/index.ts'],
   output: {
-    file: 'iife/bundle.js',
+    file: process.env.NODE_ENV === 'production' ? 'iife/bundle.production.js' : 'iife/bundle.js',
     format: 'iife',
     sourcemap: true,
     name: 'GuildFX_UI',
