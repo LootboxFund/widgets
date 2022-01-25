@@ -1398,7 +1398,6 @@
                 const userAccounts = await window.web3.eth.getAccounts();
                 userState.accounts = userAccounts;
                 userState.currentAccount = userAccounts[0];
-                console.log(`---> initDApp: ${userAccounts[0]}`);
                 window.ethereum.on('chainChanged', async (chainIdHex) => {
                     const blockchain = BLOCKCHAINS[chainIdHex];
                     if (blockchain) {
@@ -6063,8 +6062,6 @@
                     if (isDisabled)
                         return;
                     let tokenBalance = 0;
-                    console.log(snapUserState);
-                    console.log(snapSwapState);
                     if (snapUserState.currentAccount && snapSwapState.targetToken) {
                         if (token.address === '0x0native') {
                             tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount);
@@ -6104,18 +6101,6 @@
                                         .map((token) => {
                                         const disabled = [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
                                             (currentToken ? currentToken.address !== token.address : true);
-                                        console.log(`
-                
-              ---- LOGS ----
-              event: onClick <RowToken>
-              token: ${token.address}
-              disabled: ${disabled}
-              currentToken: ${currentToken?.address}
-              inputToken: ${snap.inputToken.data?.address}
-
-              `);
-                                        console.log(currentToken);
-                                        console.log(snap.inputToken);
                                         return (jsxRuntime.exports.jsx("div", { onClick: () => selectToken(token, disabled), children: jsxRuntime.exports.jsx(RowToken, { token: token, disabled: disabled }, void 0) }, token.symbol));
                                     }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => (swapState.route = '/customs'), children: "Manage Token Lists" }, void 0)] }, void 0));
             };

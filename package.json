@@ -52,7 +52,8 @@
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
     "build-storybook": "build-storybook",
-    "deploy": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/upload-widgets.js"
+    "deploy": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/upload-widgets.js",
+    "deploy:prod": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/GuildFX/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/upload-widgets.js"
   },
   "dependencies": {
     "@chainlink/abi": "^0.1.4",
