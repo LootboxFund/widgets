@@ -38,35 +38,28 @@ const swapSnapshot: SwapState = {
     displayedBalance: undefined,
   },
 }
-export const stateOfSwap = proxy(swapSnapshot)
+export const swapState = proxy(swapSnapshot)
 
-subscribe(stateOfSwap.inputToken, () => {
+subscribe(swapState.inputToken, () => {
   updateOutputTokenValues()
 })
-subscribe(stateOfSwap.outputToken, () => {
+subscribe(swapState.outputToken, () => {
   updateOutputTokenValues()
 })
 const updateOutputTokenValues = async () => {
-  console.log('updateOutputTokenValues')
-  if (stateOfSwap.outputToken.data?.priceOracle && stateOfSwap.inputToken.data?.priceOracle) {
+  if (swapState.outputToken.data?.priceOracle && swapState.inputToken.data?.priceOracle) {
     // get price of conversion rate and save to swapState
     const [inputTokenPrice, outputTokenPrice] = await Promise.all([
-      getPriceFeed(stateOfSwap.inputToken.data.priceOracle),
-      getPriceFeed(stateOfSwap.outputToken.data.priceOracle),
+      getPriceFeed(swapState.inputToken.data.priceOracle),
+      getPriceFeed(swapState.outputToken.data.priceOracle),
     ])
-    console.log(`
-    
-      inputToken = ${inputTokenPrice}
-      outputToken = ${outputTokenPrice}
-
-    `)
-    stateOfSwap.inputToken.data.usdPrice = inputTokenPrice.toString()
-    stateOfSwap.outputToken.data.usdPrice = outputTokenPrice.toString()
+    swapState.inputToken.data.usdPrice = inputTokenPrice.toString()
+    swapState.outputToken.data.usdPrice = outputTokenPrice.toString()
   }
-  if (stateOfSwap.outputToken.data && stateOfSwap.inputToken.data && stateOfSwap.inputToken.quantity !== undefined) {
-    const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || ''
-    const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || ''
-    stateOfSwap.outputToken.quantity = new BN(stateOfSwap.inputToken.quantity)
+  if (swapState.outputToken.data && swapState.inputToken.data && swapState.inputToken.quantity !== undefined) {
+    const inputTokenPrice = swapState.inputToken.data.usdPrice || ''
+    const outputTokenPrice = swapState.outputToken.data.usdPrice || ''
+    swapState.outputToken.quantity = new BN(swapState.inputToken.quantity)
       .multipliedBy(new BN(inputTokenPrice))
       .dividedBy(new BN(outputTokenPrice))
       .toString()
@@ -77,12 +70,6 @@ export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Add
   const web3 = await useWeb3()
   const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr)
   const balance = await ERC20.methods.balanceOf(userAddr).call()
-  console.log(`
-  
-  --------- Balance = ${balance}
-  
-  
-  `)
   return balance
 }
 

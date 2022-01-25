@@ -7,7 +7,7 @@ import SwapHeader from 'lib/components/Swap/SwapHeader'
 import { useSnapshot } from 'valtio'
 import { useTokenList } from 'lib/hooks/useTokenList'
 import { TokenData } from 'lib/hooks/constants'
-import { stateOfSwap } from './state'
+import { swapState } from './state'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
@@ -31,25 +31,19 @@ interface SwapProps {
   outputToken?: TokenData
 }
 const Swap = (props: SwapProps) => {
-  const snap = useSnapshot(stateOfSwap)
+  const snap = useSnapshot(swapState)
   const snapUserState = useSnapshot(userState)
 
   const isLoggedIn = snapUserState.accounts.length > 0
 
   useEffect(() => {
     if (props.inputToken) {
-      stateOfSwap.inputToken.data = props.inputToken
+      swapState.inputToken.data = props.inputToken
     }
     if (props.outputToken) {
-      stateOfSwap.outputToken.data = props.inputToken
+      swapState.outputToken.data = props.inputToken
     }
   }, [])
-
-  const clickSwap = async () => {
-    console.log('Getting price data...')
-    await getPriceFeed('0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee')
-    console.log('Success!')
-  }
 
   const inputPriceUSD = snap.inputToken.data?.usdPrice
   const outputPriceUSD = snap.outputToken.data?.usdPrice
@@ -72,7 +66,7 @@ const Swap = (props: SwapProps) => {
           {`1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`}
         </$CurrencyExchangeRate>
       ) : null}
-      <SwapButton onClick={clickSwap}></SwapButton>
+      <SwapButton></SwapButton>
     </$SwapContainer>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { stateOfSwap, SwapRoute } from './state'
+import { swapState, SwapRoute } from './state'
 import Swap from './Swap'
 import { useSnapshot } from 'valtio'
 import TokenPicker from './TokenPicker'
@@ -13,22 +13,21 @@ export interface SwapWidgetProps {
   initialRoute?: SwapRoute
 }
 const SwapWidget = (props: SwapWidgetProps) => {
-  const snap = useSnapshot(stateOfSwap)
+  const snap = useSnapshot(swapState)
   useEffect(() => {
     window.onload = () => {
-      console.log('page is fully loaded')
       initDApp()
     }
     if (props.initialRoute) {
-      stateOfSwap.route = props.initialRoute
+      swapState.route = props.initialRoute
     }
   }, [])
 
-  if (stateOfSwap.route === '/search') {
+  if (swapState.route === '/search') {
     return <TokenPicker />
-  } else if (stateOfSwap.route === '/customs') {
+  } else if (swapState.route === '/customs') {
     return <ManageTokens />
-  } else if (stateOfSwap.route === '/add') {
+  } else if (swapState.route === '/add') {
     return <AddToken />
   }
   return <Swap />

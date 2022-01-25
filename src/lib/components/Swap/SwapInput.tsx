@@ -4,7 +4,7 @@ import { COLORS } from 'lib/theme'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
-import { stateOfSwap, TokenPickerTarget } from './state'
+import { swapState, TokenPickerTarget } from './state'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, TokenData } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
@@ -20,24 +20,19 @@ export interface SwapInputProps {
   quantityDisabled?: boolean
 }
 const SwapInput = (props: SwapInputProps) => {
-  const snap = useSnapshot(stateOfSwap)
+  const snap = useSnapshot(swapState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const selectToken = async () => {
-    console.log(`---> props.targetToken = ${props.targetToken}`)
-    stateOfSwap.targetToken = props.targetToken
-    stateOfSwap.route = '/search'
-    console.log('Settig the state of swap')
-    console.log(snap)
+    swapState.targetToken = props.targetToken
+    swapState.route = '/search'
   }
   const setQuantity = (quantity: number) => {
-    console.log(quantity)
     if (props.targetToken) {
       if (isNaN(quantity)) {
-        console.log('not a number')
-        stateOfSwap[props.targetToken].quantity = '0'
+        swapState[props.targetToken].quantity = '0'
       } else {
-        stateOfSwap[props.targetToken].quantity = quantity.toString()
+        swapState[props.targetToken].quantity = quantity.toString()
       }
     }
   }

@@ -4,7 +4,7 @@ import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import { COLORS } from 'lib/theme'
 import { $Horizontal } from '../../Generics'
 import { TokenData } from 'lib/hooks/constants'
-import { stateOfSwap } from '../state'
+import { swapState } from '../state'
 import { useSnapshot } from 'valtio'
 import { removeCustomToken } from 'lib/hooks/useTokenList'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -17,10 +17,9 @@ export interface RowTokenProps {
   deleteable?: boolean
 }
 const RowToken = (props: RowTokenProps) => {
-  const snap = useSnapshot(stateOfSwap)
+  const snap = useSnapshot(swapState)
   const { screen } = useWindowSize()
   const removeToken = () => {
-    console.log(props.token.chainIdHex)
     removeCustomToken(props.token.address, props.token.chainIdHex)
   }
   return (

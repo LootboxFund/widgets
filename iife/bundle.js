@@ -1258,23 +1258,21 @@
                 }
                 return [];
             };
-            const tokenListState = {
+            const initialTokenListState = {
                 defaultTokenList: [],
                 customTokenList: [],
             };
-            const stateOfTokenList = proxy(tokenListState);
+            const tokenListState = proxy(initialTokenListState);
             const useTokenList = () => {
-                const snap = useSnapshot(stateOfTokenList);
+                const snap = useSnapshot(tokenListState);
                 return snap.defaultTokenList;
             };
             const useCustomTokenList = () => {
-                const snap = useSnapshot(stateOfTokenList);
+                const snap = useSnapshot(tokenListState);
                 return snap.customTokenList;
             };
             const addCustomToken = (data) => {
                 const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                console.log('-----> existingCustomTokens');
-                console.log(existingCustomTokens);
                 if (existingCustomTokens) {
                     const customTokens = JSON.parse(existingCustomTokens);
                     if (customTokens[data.chainIdHex] && customTokens[data.chainIdHex].length >= 0) {
@@ -1285,35 +1283,28 @@
                     else {
                         customTokens[data.chainIdHex] = [data];
                     }
-                    stateOfTokenList.customTokenList = customTokens[data.chainIdHex];
+                    tokenListState.customTokenList = customTokens[data.chainIdHex];
                     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
                 }
                 else {
                     const customTokens = {
                         [data.chainIdHex]: [data],
                     };
-                    stateOfTokenList.customTokenList = customTokens[data.chainIdHex];
+                    tokenListState.customTokenList = customTokens[data.chainIdHex];
                     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
                 }
             };
             const removeCustomToken = (address, chainIdHex) => {
-                console.log(`Removing custom token ${address} from chain ${chainIdHex}`);
                 const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                console.log(existingCustomTokens);
                 if (existingCustomTokens) {
                     const customTokens = JSON.parse(existingCustomTokens);
-                    console.log(customTokens);
-                    console.log(customTokens[chainIdHex]);
                     if (customTokens[chainIdHex]) {
                         const updatedList = customTokens[chainIdHex].filter((token) => token.address !== address);
-                        console.log(updatedList);
-                        console.log(address);
                         const updatedTokens = {
                             ...customTokens,
                             [chainIdHex]: updatedList,
                         };
-                        console.log(updatedTokens);
-                        stateOfTokenList.customTokenList = updatedList;
+                        tokenListState.customTokenList = updatedList;
                         localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens));
                     }
                 }
@@ -1328,8 +1319,8 @@
                 // remove in production
                 saveInitialCustomTokens();
                 const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX;
-                stateOfTokenList.defaultTokenList = tokenMap[chosenChainIdHex] || [];
-                stateOfTokenList.customTokenList = getCustomTokensList(chosenChainIdHex);
+                tokenListState.defaultTokenList = tokenMap[chosenChainIdHex] || [];
+                tokenListState.customTokenList = getCustomTokensList(chosenChainIdHex);
             };
 
             const useWeb3 = async () => {
@@ -1337,20 +1328,15 @@
             };
             const useUserInfo = () => {
                 const requestAccounts = async () => {
-                    console.log(`request accounts...`);
                     const web3 = await useWeb3();
                     try {
-                        console.log(`requesitng metamask access`);
                         await web3.eth.requestAccounts(async (err, accounts) => {
                             if (err) {
-                                console.log(err);
+                                console.error(err);
                             }
                             else {
-                                console.log('--- accounts ---');
-                                console.log(accounts);
                                 const userAccounts = await web3.eth.getAccounts();
                                 userState.accounts = userAccounts;
-                                console.log(userAccounts);
                             }
                         });
                         return {
@@ -1359,7 +1345,7 @@
                         };
                     }
                     catch (e) {
-                        console.log(e);
+                        console.error(e);
                         return {
                             success: false,
                             message: 'Please install MetaMask',
@@ -1396,7 +1382,8 @@
                         return;
                     }
                     catch (e) {
-                        console.log(`Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`);
+                        console.error(`Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`);
+                        console.error(e);
                         return;
                     }
                 }
@@ -1404,22 +1391,15 @@
             const initDApp = async () => {
                 initWeb3OnWindow();
                 const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
-                console.log(`chainIdHex = ${chainIdHex}`);
                 const blockchain = BLOCKCHAINS[chainIdHex];
-                console.log(blockchain);
                 if (blockchain) {
                     updateStateToChain(blockchain);
                 }
                 const userAccounts = await window.web3.eth.getAccounts();
-                console.log(userAccounts);
                 userState.accounts = userAccounts;
                 userState.currentAccount = userAccounts[0];
+                console.log(`---> initDApp: ${userAccounts[0]}`);
                 window.ethereum.on('chainChanged', async (chainIdHex) => {
-                    console.log(`
-      
-    ---- EVM Chain Changed!
-
-    `);
                     const blockchain = BLOCKCHAINS[chainIdHex];
                     if (blockchain) {
                         updateStateToChain(blockchain);
@@ -1432,31 +1412,18 @@
             const initWeb3OnWindow = async () => {
                 const provider = await dist();
                 // const provider = (window as any).ethereum
-                console.log(`
-    
-  detecting... provider
-
-  `);
-                console.log(provider);
                 window.web3 = new window.Web3('https://bsc-dataseed.binance.org/');
                 if (provider) {
-                    console.log(`Found provider!`);
-                    // From now on, this should always be true:
-                    // provider === (window as any).ethereum
                     window.web3 = new window.Web3(provider);
-                    console.log(window.web3);
-                    console.log(`Set web3!`);
                     const userAccounts = await window.web3.eth.getAccounts();
-                    console.log(`Set user accounts!`);
                     userState.accounts = userAccounts;
                 }
                 else {
-                    console.log('Please install MetaMask!');
+                    console.error('Please install MetaMask!');
                     throw Error('MetaMask not detected');
                 }
             };
             const updateStateToChain = (chainInfo) => {
-                console.log('Updating state to chain!');
                 userState.currentNetworkIdHex = chainInfo.chainIdHex;
                 userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal;
                 userState.currentNetworkName = chainInfo.chainName;
@@ -1475,13 +1442,13 @@
                 initTokenList();
             };
             const clearSwapState = () => {
-                stateOfSwap.targetToken = null;
-                stateOfSwap.inputToken.data = undefined;
-                stateOfSwap.inputToken.displayedBalance = undefined;
-                stateOfSwap.inputToken.quantity = undefined;
-                stateOfSwap.outputToken.data = undefined;
-                stateOfSwap.outputToken.displayedBalance = undefined;
-                stateOfSwap.outputToken.quantity = undefined;
+                swapState.targetToken = null;
+                swapState.inputToken.data = undefined;
+                swapState.inputToken.displayedBalance = undefined;
+                swapState.inputToken.quantity = undefined;
+                swapState.outputToken.data = undefined;
+                swapState.outputToken.displayedBalance = undefined;
+                swapState.outputToken.quantity = undefined;
             };
 
             var ERC20ABI = [
@@ -4756,18 +4723,10 @@
 
             const getPriceFeed = async (contractAddress) => {
                 const web3 = await useWeb3();
-                console.log('Trying price oracle...');
                 let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi, contractAddress);
                 const [currentUser, ...otherUserAddress] = await web3.eth.getAccounts();
-                console.log(contractInstance);
-                console.log(`---- contractInstance.methods.latestRoundData() ----`);
                 const data = await contractInstance.methods.latestRoundData().call({ from: currentUser });
-                // .on('receipt', function (data: any) {
-                //   console.log(data)
-                // })
-                console.log(data);
                 const priceIn8Decimals = new BN(data.answer).div(new BN(`100000000`)).decimalPlaces(4);
-                console.log(`priceIn8Decimals = ${priceIn8Decimals}`);
                 return priceIn8Decimals;
             };
 
@@ -4785,34 +4744,27 @@
                     displayedBalance: undefined,
                 },
             };
-            const stateOfSwap = proxy(swapSnapshot);
-            subscribe(stateOfSwap.inputToken, () => {
+            const swapState = proxy(swapSnapshot);
+            subscribe(swapState.inputToken, () => {
                 updateOutputTokenValues();
             });
-            subscribe(stateOfSwap.outputToken, () => {
+            subscribe(swapState.outputToken, () => {
                 updateOutputTokenValues();
             });
             const updateOutputTokenValues = async () => {
-                console.log('updateOutputTokenValues');
-                if (stateOfSwap.outputToken.data?.priceOracle && stateOfSwap.inputToken.data?.priceOracle) {
+                if (swapState.outputToken.data?.priceOracle && swapState.inputToken.data?.priceOracle) {
                     // get price of conversion rate and save to swapState
                     const [inputTokenPrice, outputTokenPrice] = await Promise.all([
-                        getPriceFeed(stateOfSwap.inputToken.data.priceOracle),
-                        getPriceFeed(stateOfSwap.outputToken.data.priceOracle),
+                        getPriceFeed(swapState.inputToken.data.priceOracle),
+                        getPriceFeed(swapState.outputToken.data.priceOracle),
                     ]);
-                    console.log(`
-    
-      inputToken = ${inputTokenPrice}
-      outputToken = ${outputTokenPrice}
-
-    `);
-                    stateOfSwap.inputToken.data.usdPrice = inputTokenPrice.toString();
-                    stateOfSwap.outputToken.data.usdPrice = outputTokenPrice.toString();
+                    swapState.inputToken.data.usdPrice = inputTokenPrice.toString();
+                    swapState.outputToken.data.usdPrice = outputTokenPrice.toString();
                 }
-                if (stateOfSwap.outputToken.data && stateOfSwap.inputToken.data && stateOfSwap.inputToken.quantity !== undefined) {
-                    const inputTokenPrice = stateOfSwap.inputToken.data.usdPrice || '';
-                    const outputTokenPrice = stateOfSwap.outputToken.data.usdPrice || '';
-                    stateOfSwap.outputToken.quantity = new BN(stateOfSwap.inputToken.quantity)
+                if (swapState.outputToken.data && swapState.inputToken.data && swapState.inputToken.quantity !== undefined) {
+                    const inputTokenPrice = swapState.inputToken.data.usdPrice || '';
+                    const outputTokenPrice = swapState.outputToken.data.usdPrice || '';
+                    swapState.outputToken.quantity = new BN(swapState.inputToken.quantity)
                         .multipliedBy(new BN(inputTokenPrice))
                         .dividedBy(new BN(outputTokenPrice))
                         .toString();
@@ -4822,12 +4774,6 @@
                 const web3 = await useWeb3();
                 const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr);
                 const balance = await ERC20.methods.balanceOf(userAddr).call();
-                console.log(`
-  
-  --------- Balance = ${balance}
-  
-  
-  `);
                 return balance;
             };
             const getUserBalanceOfNativeToken = async (userAddr) => {
@@ -5741,7 +5687,6 @@
             };
 
             const WalletButton = (props) => {
-                console.log(props);
                 const snapUserState = useSnapshot(userState);
                 const { screen } = useWindowSize();
                 const [status, setStatus] = r$4.useState('ready');
@@ -5752,17 +5697,11 @@
                     }
                 }, [snapUserState.accounts.length]);
                 const connectWallet = async () => {
-                    console.log('Connecting to wallet...');
                     setStatus('loading');
                     const result = await requestAccounts();
-                    console.log(`
-      
-    -------- REQUEST ACCOUNTS
-
-    `);
-                    console.log(result);
                     if (result.success) {
-                        userState.currentAccount = userState.accounts[0];
+                        const userAccounts = await window.web3.eth.getAccounts();
+                        userState.currentAccount = userAccounts[0];
                         const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
                         const blockchain = BLOCKCHAINS[chainIdHex];
                         if (blockchain) {
@@ -5816,10 +5755,9 @@
 
             const SwapButton = (props) => {
                 const snapUserState = useSnapshot(userState);
-                const snapSwapState = useSnapshot(stateOfSwap);
+                const snapSwapState = useSnapshot(swapState);
                 const { screen } = useWindowSize();
                 const isWalletConnected = snapUserState.accounts.length > 0;
-                console.log(snapUserState.accounts.length);
                 const validChain = snapUserState.currentNetworkIdHex &&
                     Object.values(BLOCKCHAINS)
                         .map((b) => b.chainIdHex)
@@ -5831,7 +5769,7 @@
                     return (jsxRuntime.exports.jsx($Button, { screen: screen, backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: validChain ? 'Select a Token' : 'Switch Network' }, void 0));
                 }
                 else if (snapSwapState.inputToken.quantity && parseFloat(snapSwapState.inputToken.quantity) > 0) {
-                    return (jsxRuntime.exports.jsx($Button, { screen: screen, onClick: props.onClick, backgroundColor: `${COLORS.trustBackground}C0`, backgroundColorHover: `${COLORS.trustBackground}`, color: COLORS.trustFontColor, style: { minHeight: '60px', height: '100px' }, children: "PURCHASE" }, void 0));
+                    return (jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => console.log('Making purchase'), backgroundColor: `${COLORS.trustBackground}C0`, backgroundColorHover: `${COLORS.trustBackground}`, color: COLORS.trustFontColor, style: { minHeight: '60px', height: '100px' }, children: "PURCHASE" }, void 0));
                 }
                 return (jsxRuntime.exports.jsx($Button, { screen: screen, backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: "Enter an amount" }, void 0));
             };
@@ -5885,25 +5823,20 @@
 `;
 
             const SwapInput = (props) => {
-                const snap = useSnapshot(stateOfSwap);
+                const snap = useSnapshot(swapState);
                 const snapUserState = useSnapshot(userState);
                 const { screen } = useWindowSize();
                 const selectToken = async () => {
-                    console.log(`---> props.targetToken = ${props.targetToken}`);
-                    stateOfSwap.targetToken = props.targetToken;
-                    stateOfSwap.route = '/search';
-                    console.log('Settig the state of swap');
-                    console.log(snap);
+                    swapState.targetToken = props.targetToken;
+                    swapState.route = '/search';
                 };
                 const setQuantity = (quantity) => {
-                    console.log(quantity);
                     if (props.targetToken) {
                         if (isNaN(quantity)) {
-                            console.log('not a number');
-                            stateOfSwap[props.targetToken].quantity = '0';
+                            swapState[props.targetToken].quantity = '0';
                         }
                         else {
-                            stateOfSwap[props.targetToken].quantity = quantity.toString();
+                            swapState[props.targetToken].quantity = quantity.toString();
                         }
                     }
                 };
@@ -5979,7 +5912,6 @@
             };
 
             const SwapHeader = (props) => {
-                console.log(props);
                 const { screen } = useWindowSize();
                 const snapUserState = useSnapshot(userState);
                 const isWalletConnected = snapUserState.accounts.length > 0;
@@ -6039,26 +5971,21 @@
   min-height: 600px;
 `;
             const Swap = (props) => {
-                const snap = useSnapshot(stateOfSwap);
+                const snap = useSnapshot(swapState);
                 const snapUserState = useSnapshot(userState);
                 const isLoggedIn = snapUserState.accounts.length > 0;
                 r$4.useEffect(() => {
                     if (props.inputToken) {
-                        stateOfSwap.inputToken.data = props.inputToken;
+                        swapState.inputToken.data = props.inputToken;
                     }
                     if (props.outputToken) {
-                        stateOfSwap.outputToken.data = props.inputToken;
+                        swapState.outputToken.data = props.inputToken;
                     }
                 }, []);
-                const clickSwap = async () => {
-                    console.log('Getting price data...');
-                    await getPriceFeed('0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee');
-                    console.log('Success!');
-                };
                 const inputPriceUSD = snap.inputToken.data?.usdPrice;
                 const outputPriceUSD = snap.outputToken.data?.usdPrice;
                 const outputQuantity = inputPriceUSD && outputPriceUSD ? new BN(inputPriceUSD).dividedBy(new BN(outputPriceUSD)).decimalPlaces(8) : 0;
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsx(SwapHeader, {}, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken", tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true, tokenDisabled: !isLoggedIn }, void 0), snap.inputToken.data && snap.outputToken.data ? (jsxRuntime.exports.jsxs($CurrencyExchangeRate, { children: [jsxRuntime.exports.jsx("span", { style: { marginRight: '10px' }, children: "\u2139\uFE0F" }, void 0), `1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`] }, void 0)) : null, jsxRuntime.exports.jsx(SwapButton, { onClick: clickSwap }, void 0)] }, void 0));
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsx(SwapHeader, {}, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken", tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true, tokenDisabled: !isLoggedIn }, void 0), snap.inputToken.data && snap.outputToken.data ? (jsxRuntime.exports.jsxs($CurrencyExchangeRate, { children: [jsxRuntime.exports.jsx("span", { style: { marginRight: '10px' }, children: "\u2139\uFE0F" }, void 0), `1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`] }, void 0)) : null, jsxRuntime.exports.jsx(SwapButton, {}, void 0)] }, void 0));
             };
             const $CurrencyExchangeRate = styled.span `
   font-size: 0.8rem;
@@ -6068,10 +5995,9 @@
 `;
 
             const RowToken = (props) => {
-                useSnapshot(stateOfSwap);
+                useSnapshot(swapState);
                 const { screen } = useWindowSize();
                 const removeToken = () => {
-                    console.log(props.token.chainIdHex);
                     removeCustomToken(props.token.address, props.token.chainIdHex);
                 };
                 return (jsxRuntime.exports.jsxs($RowToken, { screen: screen, disabled: props.disabled, children: [jsxRuntime.exports.jsxs($Horizontal, { verticalCenter: true, children: [jsxRuntime.exports.jsx($CoinIcon, { screen: screen, src: props.token.logoURI, style: { width: screen === 'desktop' ? '30px' : '30px', height: screen === 'desktop' ? '30px' : '30px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { screen: screen, children: props.token.symbol }, void 0)] }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { screen: screen, children: props.token.name }, void 0), props.copyable || props.deleteable ? (jsxRuntime.exports.jsxs("div", { children: [props.copyable && (jsxRuntime.exports.jsx($CopyButton, { screen: screen, onClick: () => navigator.clipboard.writeText(props.token.address), children: "\uD83D\uDCD1" }, void 0)), props.deleteable && (jsxRuntime.exports.jsx($DeleteButton, { screen: screen, onClick: removeToken, children: "\uD83D\uDDD1" }, void 0))] }, void 0)) : null] }, void 0));
@@ -6125,65 +6051,47 @@
 `;
 
             const TokenPicker = (props) => {
-                console.log(props);
                 const web3 = useWeb3();
-                const snap = useSnapshot(stateOfSwap);
+                const snap = useSnapshot(swapState);
                 const snapUserState = useSnapshot(userState);
-                const snapSwapState = useSnapshot(stateOfSwap);
+                const snapSwapState = useSnapshot(swapState);
                 const { screen } = useWindowSize();
                 const tokenList = useTokenList();
                 const customTokenList = useCustomTokenList();
                 const [searchString, setSearchString] = r$4.useState('');
-                const selectToken = async (token) => {
-                    console.log('selectToken');
-                    console.log(snap);
-                    console.log(token);
-                    console.log(`
-			
-			${token.address}
-
-		`);
+                const selectToken = async (token, isDisabled) => {
+                    if (isDisabled)
+                        return;
                     let tokenBalance = 0;
-                    if (snapUserState.currentAccount && snapSwapState.targetToken && snapSwapState[snapSwapState.targetToken]) {
+                    console.log(snapUserState);
+                    console.log(snapSwapState);
+                    if (snapUserState.currentAccount && snapSwapState.targetToken) {
                         if (token.address === '0x0native') {
-                            console.log('Get native token');
                             tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount);
                         }
                         else {
-                            // get coin balance
-                            // userState.displayedBalance
                             tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount);
                         }
                         if (snap.targetToken !== null) {
-                            stateOfSwap[snap.targetToken].data = token;
-                            console.log(`
-          
-        ---- tokenBalance
-
-        `);
-                            console.log(tokenBalance);
+                            swapState[snap.targetToken].data = token;
                             const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether');
-                            console.log(balanceInEther);
-                            stateOfSwap[snapSwapState.targetToken].displayedBalance = balanceInEther;
-                            stateOfSwap.route = '/swap';
+                            swapState[snapSwapState.targetToken].displayedBalance = balanceInEther;
+                            swapState.route = '/swap';
                         }
                     }
-                    console.log('Failed fam');
-                    console.log(snapUserState);
-                    console.log(snapSwapState);
                 };
                 const searchFilter = (token) => {
                     return (token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
                         token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
                         token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
                 };
-                const currentToken = snap.targetToken !== null ? stateOfSwap[snap.targetToken].data : null;
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
+                const currentToken = snap.targetToken !== null ? swapState[snap.targetToken].data : null;
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
                                                 fontWeight: 'lighter',
                                                 border: `2px solid ${COLORS.warningBackground}30`,
                                                 fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
                                                 flex: 4,
-                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (stateOfSwap.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
+                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (swapState.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
                                                 flex: 1,
                                                 marginLeft: '10px',
                                                 minHeight: screen === 'desktop' ? '70px' : '50px',
@@ -6196,8 +6104,20 @@
                                         .map((token) => {
                                         const disabled = [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
                                             (currentToken ? currentToken.address !== token.address : true);
-                                        return (jsxRuntime.exports.jsx("div", { onClick: () => !disabled && selectToken(token), children: jsxRuntime.exports.jsx(RowToken, { token: token, disabled: disabled }, void 0) }, token.symbol));
-                                    }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => (stateOfSwap.route = '/customs'), children: "Manage Token Lists" }, void 0)] }, void 0));
+                                        console.log(`
+                
+              ---- LOGS ----
+              event: onClick <RowToken>
+              token: ${token.address}
+              disabled: ${disabled}
+              currentToken: ${currentToken?.address}
+              inputToken: ${snap.inputToken.data?.address}
+
+              `);
+                                        console.log(currentToken);
+                                        console.log(snap.inputToken);
+                                        return (jsxRuntime.exports.jsx("div", { onClick: () => selectToken(token, disabled), children: jsxRuntime.exports.jsx(RowToken, { token: token, disabled: disabled }, void 0) }, token.symbol));
+                                    }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => (swapState.route = '/customs'), children: "Manage Token Lists" }, void 0)] }, void 0));
             };
             const $BlueLinkText = styled.span `
   font-size: 1.1rem;
@@ -6213,8 +6133,7 @@
 `;
 
             const ManageTokens = (props) => {
-                console.log(props);
-                const snap = useSnapshot(stateOfTokenList);
+                const snap = useSnapshot(tokenListState);
                 const { screen } = useWindowSize();
                 const customTokenList = snap.customTokenList;
                 const [searchString, setSearchString] = r$4.useState('');
@@ -6223,12 +6142,12 @@
                         token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
                         token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
                 };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "CUSTOM TOKENS" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Filter Custom Tokens...", style: {
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "CUSTOM TOKENS" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Filter Custom Tokens...", style: {
                                                 fontWeight: 'lighter',
                                                 border: `2px solid ${COLORS.warningBackground}30`,
                                                 fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
                                                 flex: 4,
-                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (stateOfSwap.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
+                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (swapState.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
                                                 flex: 1,
                                                 marginLeft: '10px',
                                                 minHeight: screen === 'desktop' ? '70px' : '50px',
@@ -6251,7 +6170,6 @@
 
             const AddToken = (props) => {
                 const { screen } = useWindowSize();
-                console.log(props);
                 const [searchString, setSearchString] = r$4.useState('');
                 const addToken = () => {
                     addCustomToken({
@@ -6264,9 +6182,9 @@
                         logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
                         priceOracle: '0xb6064ed41d4f67e353768aa239ca86f4f73665a1',
                     });
-                    stateOfSwap.route = '/search';
+                    swapState.route = '/search';
                 };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "ADD TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (stateOfSwap.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
+                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "ADD TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
                                 fontWeight: 'lighter',
                                 border: `2px solid ${COLORS.warningBackground}30`,
                                 fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
@@ -6305,23 +6223,22 @@
 `;
 
             const SwapWidget = (props) => {
-                useSnapshot(stateOfSwap);
+                useSnapshot(swapState);
                 r$4.useEffect(() => {
                     window.onload = () => {
-                        console.log('page is fully loaded');
                         initDApp();
                     };
                     if (props.initialRoute) {
-                        stateOfSwap.route = props.initialRoute;
+                        swapState.route = props.initialRoute;
                     }
                 }, []);
-                if (stateOfSwap.route === '/search') {
+                if (swapState.route === '/search') {
                     return jsxRuntime.exports.jsx(TokenPicker, {}, void 0);
                 }
-                else if (stateOfSwap.route === '/customs') {
+                else if (swapState.route === '/customs') {
                     return jsxRuntime.exports.jsx(ManageTokens, {}, void 0);
                 }
-                else if (stateOfSwap.route === '/add') {
+                else if (swapState.route === '/add') {
                     return jsxRuntime.exports.jsx(AddToken, {}, void 0);
                 }
                 return jsxRuntime.exports.jsx(Swap, {}, void 0);

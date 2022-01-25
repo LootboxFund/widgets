@@ -10,7 +10,7 @@ import { TokenData } from 'lib/hooks/constants'
 import { $Horizontal, $ScrollContainer } from '../../Generics'
 import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
-import { getUserBalanceOfNativeToken, getUserBalanceOfToken, stateOfSwap } from '../state'
+import { getUserBalanceOfNativeToken, getUserBalanceOfToken, swapState } from '../state'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
@@ -18,12 +18,10 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface TokenPickerProps {}
 const TokenPicker = (props: TokenPickerProps) => {
-  console.log(props)
-
   const web3 = useWeb3()
-  const snap = useSnapshot(stateOfSwap)
+  const snap = useSnapshot(swapState)
   const snapUserState = useSnapshot(userState)
-  const snapSwapState = useSnapshot(stateOfSwap)
+  const snapSwapState = useSnapshot(swapState)
   const { screen } = useWindowSize()
 
   const tokenList = useTokenList()
@@ -31,42 +29,22 @@ const TokenPicker = (props: TokenPickerProps) => {
 
   const [searchString, setSearchString] = useState('')
 
-  const selectToken = async (token: TokenData) => {
-    console.log('selectToken')
-    console.log(snap)
-    console.log(token)
-    console.log(`
-			
-			${token.address}
-
-		`)
+  const selectToken = async (token: TokenData, isDisabled: boolean) => {
+    if (isDisabled) return
     let tokenBalance = 0
-    if (snapUserState.currentAccount && snapSwapState.targetToken && snapSwapState[snapSwapState.targetToken]) {
+    if (snapUserState.currentAccount && snapSwapState.targetToken) {
       if (token.address === '0x0native') {
-        console.log('Get native token')
         tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount)
       } else {
-        // get coin balance
-        // userState.displayedBalance
         tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount)
       }
       if (snap.targetToken !== null) {
-        stateOfSwap[snap.targetToken].data = token
-        console.log(`
-          
-        ---- tokenBalance
-
-        `)
-        console.log(tokenBalance)
+        swapState[snap.targetToken].data = token
         const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether')
-        console.log(balanceInEther)
-        stateOfSwap[snapSwapState.targetToken].displayedBalance = balanceInEther
-        stateOfSwap.route = '/swap'
+        swapState[snapSwapState.targetToken].displayedBalance = balanceInEther
+        swapState.route = '/swap'
       }
     }
-    console.log('Failed fam')
-    console.log(snapUserState)
-    console.log(snapSwapState)
   }
   const searchFilter = (token: TokenData) => {
     return (
@@ -75,12 +53,12 @@ const TokenPicker = (props: TokenPickerProps) => {
       token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1
     )
   }
-  const currentToken = snap.targetToken !== null ? stateOfSwap[snap.targetToken].data : null
+  const currentToken = snap.targetToken !== null ? swapState[snap.targetToken].data : null
   return (
     <$SwapContainer>
       <$SwapHeader>
         <$SwapHeaderTitle>SELECT TOKEN</$SwapHeaderTitle>
-        <span onClick={() => (stateOfSwap.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
+        <span onClick={() => (swapState.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
           X
         </span>
       </$SwapHeader>
@@ -100,7 +78,7 @@ const TokenPicker = (props: TokenPickerProps) => {
           ></$Input>
           <$Button
             screen={screen}
-            onClick={() => (stateOfSwap.route = '/add')}
+            onClick={() => (swapState.route = '/add')}
             backgroundColor={`${COLORS.warningBackground}E0`}
             color={COLORS.white}
             backgroundColorHover={`${COLORS.warningBackground}`}
@@ -124,15 +102,16 @@ const TokenPicker = (props: TokenPickerProps) => {
               const disabled =
                 [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
                 (currentToken ? currentToken.address !== token.address : true)
+
               return (
-                <div key={token.symbol} onClick={() => !disabled && selectToken(token)}>
+                <div key={token.symbol} onClick={() => selectToken(token, disabled)}>
                   <RowToken token={token} disabled={disabled} />
                 </div>
               )
             })}
         </$ScrollContainer>
       </>
-      <$BlueLinkText onClick={() => (stateOfSwap.route = '/customs')}>Manage Token Lists</$BlueLinkText>
+      <$BlueLinkText onClick={() => (swapState.route = '/customs')}>Manage Token Lists</$BlueLinkText>
     </$SwapContainer>
   )
 }

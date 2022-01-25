@@ -5,19 +5,18 @@ import $Input from 'lib/components/Input'
 import { COLORS } from 'lib/theme'
 import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import RowToken from 'lib/components/Swap/TokenPicker/RowToken'
-import { stateOfTokenList, useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
+import { tokenListState, useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
 import { TokenData } from 'lib/hooks/constants'
 import { $Horizontal } from '../../Generics'
 import $Button from '../../Button'
 import { useSnapshot } from 'valtio'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
-import { stateOfSwap } from '../state'
+import { swapState } from '../state'
 import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface ManageTokensProps {}
 const ManageTokens = (props: ManageTokensProps) => {
-  console.log(props)
-  const snap = useSnapshot(stateOfTokenList)
+  const snap = useSnapshot(tokenListState)
   const { screen } = useWindowSize()
   const customTokenList = snap.customTokenList
   const [searchString, setSearchString] = useState('')
@@ -32,7 +31,7 @@ const ManageTokens = (props: ManageTokensProps) => {
     <$SwapContainer>
       <$SwapHeader>
         <$SwapHeaderTitle>CUSTOM TOKENS</$SwapHeaderTitle>
-        <span onClick={() => (stateOfSwap.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
+        <span onClick={() => (swapState.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
           X
         </span>
       </$SwapHeader>
@@ -52,7 +51,7 @@ const ManageTokens = (props: ManageTokensProps) => {
           ></$Input>
           <$Button
             screen={screen}
-            onClick={() => (stateOfSwap.route = '/add')}
+            onClick={() => (swapState.route = '/add')}
             backgroundColor={`${COLORS.warningBackground}E0`}
             color={COLORS.white}
             backgroundColorHover={`${COLORS.warningBackground}`}
