@@ -26,27 +26,25 @@ interface TokenListState {
   defaultTokenList: TokenData[]
   customTokenList: TokenData[]
 }
-const tokenListState: TokenListState = {
+const initialTokenListState: TokenListState = {
   defaultTokenList: [],
   customTokenList: [],
 }
 
-export const stateOfTokenList = proxy(tokenListState)
+export const tokenListState = proxy(initialTokenListState)
 
 export const useTokenList = () => {
-  const snap = useSnapshot(stateOfTokenList)
+  const snap = useSnapshot(tokenListState)
   return snap.defaultTokenList
 }
 
 export const useCustomTokenList = () => {
-  const snap = useSnapshot(stateOfTokenList)
+  const snap = useSnapshot(tokenListState)
   return snap.customTokenList
 }
 
 export const addCustomToken = (data: TokenData) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
-  console.log('-----> existingCustomTokens')
-  console.log(existingCustomTokens)
   if (existingCustomTokens) {
     const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
     if (customTokens[data.chainIdHex] && customTokens[data.chainIdHex].length >= 0) {
@@ -56,35 +54,29 @@ export const addCustomToken = (data: TokenData) => {
     } else {
       customTokens[data.chainIdHex] = [data]
     }
-    stateOfTokenList.customTokenList = customTokens[data.chainIdHex]
+    tokenListState.customTokenList = customTokens[data.chainIdHex]
     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
   } else {
     const customTokens: Record<string, TokenData[]> = {
       [data.chainIdHex]: [data],
     }
-    stateOfTokenList.customTokenList = customTokens[data.chainIdHex]
+    tokenListState.customTokenList = customTokens[data.chainIdHex]
     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
   }
 }
 
 export const removeCustomToken = (address: string, chainIdHex: string) => {
-  console.log(`Removing custom token ${address} from chain ${chainIdHex}`)
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
-  console.log(existingCustomTokens)
+
   if (existingCustomTokens) {
     const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
-    console.log(customTokens)
-    console.log(customTokens[chainIdHex])
     if (customTokens[chainIdHex]) {
       const updatedList = customTokens[chainIdHex].filter((token) => token.address !== address)
-      console.log(updatedList)
-      console.log(address)
       const updatedTokens = {
         ...customTokens,
         [chainIdHex]: updatedList,
       }
-      console.log(updatedTokens)
-      stateOfTokenList.customTokenList = updatedList
+      tokenListState.customTokenList = updatedList
       localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(updatedTokens))
     }
   }
@@ -102,6 +94,6 @@ export const initTokenList = (chainIdHex?: ChainIDHex) => {
   saveInitialCustomTokens()
 
   const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX
-  stateOfTokenList.defaultTokenList = tokenMap[chosenChainIdHex] || []
-  stateOfTokenList.customTokenList = getCustomTokensList(chosenChainIdHex)
+  tokenListState.defaultTokenList = tokenMap[chosenChainIdHex] || []
+  tokenListState.customTokenList = getCustomTokensList(chosenChainIdHex)
 }

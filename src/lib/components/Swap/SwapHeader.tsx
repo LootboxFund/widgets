@@ -12,7 +12,6 @@ import { truncateAddress } from 'lib/api/helpers'
 
 export interface SwapHeaderProps {}
 const SwapHeader = (props: SwapHeaderProps) => {
-  console.log(props)
   const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
 

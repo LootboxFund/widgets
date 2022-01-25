@@ -1,13 +1,9 @@
 import react from 'react'
-import styled from 'styled-components'
 import detectEthereumProvider from '@metamask/detect-provider'
-import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import { ChainInfo, ChainIDHex, BLOCKCHAINS } from '../constants'
-import { getCustomTokensList, saveInitialCustomTokens, stateOfTokenList } from '../useTokenList'
-import { tokenMap, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { stateOfSwap } from '../../components/Swap/state'
+import { swapState } from '../../components/Swap/state'
 
 export const useWeb3 = async () => {
   return window.web3
@@ -15,19 +11,14 @@ export const useWeb3 = async () => {
 
 export const useUserInfo = () => {
   const requestAccounts = async () => {
-    console.log(`request accounts...`)
     const web3 = await useWeb3()
     try {
-      console.log(`requesitng metamask access`)
       await web3.eth.requestAccounts(async (err: any, accounts: string[]) => {
         if (err) {
-          console.log(err)
+          console.error(err)
         } else {
-          console.log('--- accounts ---')
-          console.log(accounts)
           const userAccounts = await web3.eth.getAccounts()
           userState.accounts = userAccounts
-          console.log(userAccounts)
         }
       })
       return {
@@ -35,7 +26,7 @@ export const useUserInfo = () => {
         message: 'Successfully connected to wallet',
       }
     } catch (e) {
-      console.log(e)
+      console.error(e)
       return {
         success: false,
         message: 'Please install MetaMask',
@@ -72,9 +63,10 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
       updateStateToChain(chainInfo)
       return
     } catch (e) {
-      console.log(
+      console.error(
         `Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`
       )
+      console.error(e)
       return
     }
   }
@@ -83,22 +75,17 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
 export const initDApp = async () => {
   initWeb3OnWindow()
   const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
-  console.log(`chainIdHex = ${chainIdHex}`)
+
   const blockchain = BLOCKCHAINS[chainIdHex]
-  console.log(blockchain)
+
   if (blockchain) {
     updateStateToChain(blockchain)
   }
   const userAccounts = await window.web3.eth.getAccounts()
-  console.log(userAccounts)
+
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
   ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
-    console.log(`
-      
-    ---- EVM Chain Changed!
-
-    `)
     const blockchain = BLOCKCHAINS[chainIdHex]
     if (blockchain) {
       updateStateToChain(blockchain)
@@ -111,31 +98,18 @@ export const initDApp = async () => {
 const initWeb3OnWindow = async () => {
   const provider = await detectEthereumProvider()
   // const provider = (window as any).ethereum
-  console.log(`
-    
-  detecting... provider
-
-  `)
-  console.log(provider)
   window.web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
   if (provider) {
-    console.log(`Found provider!`)
-    // From now on, this should always be true:
-    // provider === (window as any).ethereum
     window.web3 = new (window as any).Web3(provider)
-    console.log(window.web3)
-    console.log(`Set web3!`)
     const userAccounts = await window.web3.eth.getAccounts()
-    console.log(`Set user accounts!`)
     userState.accounts = userAccounts
   } else {
-    console.log('Please install MetaMask!')
+    console.error('Please install MetaMask!')
     throw Error('MetaMask not detected')
   }
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
-  console.log('Updating state to chain!')
   userState.currentNetworkIdHex = chainInfo.chainIdHex
   userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal
   userState.currentNetworkName = chainInfo.chainName
@@ -156,11 +130,11 @@ export const clearStateToChain = () => {
 }
 
 export const clearSwapState = () => {
-  stateOfSwap.targetToken = null
-  stateOfSwap.inputToken.data = undefined
-  stateOfSwap.inputToken.displayedBalance = undefined
-  stateOfSwap.inputToken.quantity = undefined
-  stateOfSwap.outputToken.data = undefined
-  stateOfSwap.outputToken.displayedBalance = undefined
-  stateOfSwap.outputToken.quantity = undefined
+  swapState.targetToken = null
+  swapState.inputToken.data = undefined
+  swapState.inputToken.displayedBalance = undefined
+  swapState.inputToken.quantity = undefined
+  swapState.outputToken.data = undefined
+  swapState.outputToken.displayedBalance = undefined
+  swapState.outputToken.quantity = undefined
 }

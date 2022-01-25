@@ -10,14 +10,13 @@ import { $Horizontal } from '../../Generics'
 import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
 import { $BlueLinkText } from '../TokenPicker'
-import { stateOfSwap } from '../state'
+import { swapState } from '../state'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
 
 export interface AddTokenProps {}
 const AddToken = (props: AddTokenProps) => {
   const { screen } = useWindowSize()
-  console.log(props)
   const [searchString, setSearchString] = useState('')
   const addToken = () => {
     addCustomToken({
@@ -30,13 +29,13 @@ const AddToken = (props: AddTokenProps) => {
       logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
       priceOracle: '0xb6064ed41d4f67e353768aa239ca86f4f73665a1',
     })
-    stateOfSwap.route = '/search'
+    swapState.route = '/search'
   }
   return (
     <$SwapContainer>
       <$SwapHeader>
         <$SwapHeaderTitle>ADD TOKEN</$SwapHeaderTitle>
-        <span onClick={() => (stateOfSwap.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
+        <span onClick={() => (swapState.route = '/swap')} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
           X
         </span>
       </$SwapHeader>

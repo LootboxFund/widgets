@@ -10,7 +10,6 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface WalletButtonProps {}
 const WalletButton = (props: WalletButtonProps) => {
-  console.log(props)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
 
@@ -25,17 +24,11 @@ const WalletButton = (props: WalletButtonProps) => {
   }, [snapUserState.accounts.length])
 
   const connectWallet = async () => {
-    console.log('Connecting to wallet...')
     setStatus('loading')
     const result = await requestAccounts()
-    console.log(`
-      
-    -------- REQUEST ACCOUNTS
-
-    `)
-    console.log(result)
     if (result.success) {
-      userState.currentAccount = userState.accounts[0]
+      const userAccounts = await window.web3.eth.getAccounts()
+      userState.currentAccount = userAccounts[0]
       const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
       const blockchain = BLOCKCHAINS[chainIdHex]
       if (blockchain) {

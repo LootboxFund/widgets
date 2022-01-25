@@ -4,7 +4,7 @@ interface TokenListState {
     defaultTokenList: TokenData[];
     customTokenList: TokenData[];
 }
-export declare const stateOfTokenList: TokenListState;
+export declare const tokenListState: TokenListState;
 export declare const useTokenList: () => readonly {
     readonly address: string;
     readonly decimals: number;

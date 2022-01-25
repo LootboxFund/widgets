@@ -6,17 +6,14 @@ import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
-import { stateOfSwap } from './state'
+import { swapState } from './state'
 
-export interface SwapButtonProps {
-  onClick: () => void
-}
+export interface SwapButtonProps {}
 const SwapButton = (props: SwapButtonProps) => {
   const snapUserState = useSnapshot(userState)
-  const snapSwapState = useSnapshot(stateOfSwap)
+  const snapSwapState = useSnapshot(swapState)
   const { screen } = useWindowSize()
   const isWalletConnected = snapUserState.accounts.length > 0
-  console.log(snapUserState.accounts.length)
   const validChain =
     snapUserState.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
@@ -40,7 +37,7 @@ const SwapButton = (props: SwapButtonProps) => {
     return (
       <$Button
         screen={screen}
-        onClick={props.onClick}
+        onClick={() => console.log('Making purchase')}
         backgroundColor={`${COLORS.trustBackground}C0`}
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
