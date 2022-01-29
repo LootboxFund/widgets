@@ -4,4 +4,5 @@ storybook-static
 umd
 .env
 /env
-/iife/**/*.*
+/iife
+.DS_Store

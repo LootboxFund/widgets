@@ -2,9 +2,11 @@ import { BigNumber } from 'bignumber.js'
 import { Address } from 'lib/types/baseTypes'
 import { ChainIDHex, Url, ChainIDDecimal, TokenData } from '@guildfx/helpers'
 
+const semvar = '0.0.1-sandbox'
+
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
-  usdPrice: string
+  usdPrice?: string
 }
 
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
@@ -46,7 +48,7 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
   },
 }
 
-export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
+export const BSC_MAINNET_FULL_TOKEN_LIST: Omit<TokenDataFE, 'usdPrice'>[] = [
   {
     address: '0x0native',
     chainIdHex: '0x38',
@@ -89,7 +91,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   },
 ]
 
-export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenDataFE[] = [
+export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: Omit<TokenDataFE, 'usdPrice'>[] = [
   {
     address: '0xba2ae424d960c26247dd6c32edc70b295c744c43',
     chainIdHex: '0x38',
@@ -102,7 +104,7 @@ export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenDataFE[] = [
   },
 ]
 
-export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
+export const BSC_TESTNET_FULL_TOKEN_LIST: Omit<TokenDataFE, 'usdPrice'>[] = [
   {
     address: '0x0native',
     chainIdHex: '0x61',

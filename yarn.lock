@@ -1693,10 +1693,12 @@
     stream-events "^1.0.4"
     xdg-basedir "^4.0.0"
 
-"@guildfx/helpers@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@guildfx/helpers/-/helpers-0.0.4.tgz#de7af8b7ab7b6a1357686e95f15b1e70fe930e7a"
-  integrity sha512-yua/RezHeGk7idyrwrKIjzhtmrdl3MZZtKYstZkfhJoRWGOhhbfCxJkOQgchdM14zKFMySyyJNm4J7pTI9RaLg==
+"@guildfx/helpers@^0.0.13":
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/@guildfx/helpers/-/helpers-0.0.13.tgz#d9fde43cf19246c61e5c3c64661277572812a364"
+  integrity sha512-a75vZngrhThhy3FqSCN5g/AFjlBC3F757yyx3c/Ko84fcfuxiONY5w+plQTUc0irzeG4vM1m4M688kiLkWJBYg==
+  dependencies:
+    axios "^0.25.0"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -4539,6 +4541,13 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
+axios@^0.25.0:
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.25.0.tgz#349cfbb31331a9b4453190791760a8d35b093e0a"
+  integrity sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==
+  dependencies:
+    follow-redirects "^1.14.7"
+
 babel-jest@^27.4.6:
   version "27.4.6"
   resolved "https://registry.yarnpkg.com/babel-jest/-/babel-jest-27.4.6.tgz#4d024e69e241cdf4f396e453a07100f44f7ce314"
@@ -7181,6 +7190,11 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+follow-redirects@^1.14.7:
+  version "1.14.7"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
+  integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
 
 for-in@^1.0.2:
   version "1.0.2"
