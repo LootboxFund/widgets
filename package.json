@@ -58,6 +58,7 @@
   "dependencies": {
     "@chainlink/abi": "^0.1.4",
     "@google-cloud/storage": "^5.18.0",
+    "@guildfx/helpers": "^0.0.3",
     "@lingui/core": "^3.13.0",
     "@lingui/macro": "^3.13.0",
     "@lingui/react": "^3.13.0",

@@ -1,6 +1,8 @@
 import { BigNumber } from 'bignumber.js'
 import { Address } from 'lib/types/baseTypes'
+import { ChainIDHex } from '@guildfx/helpers'
 
+// update this to match backend types `TokenData`
 export type TokenData = {
   address: Address
   decimals: number
@@ -15,7 +17,6 @@ export type TokenData = {
 
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
-export type ChainIDHex = string
 export type Url = string
 export type ChainInfo = {
   chainIdHex: ChainIDHex
