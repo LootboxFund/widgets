@@ -5,7 +5,7 @@ const app = new express()
 
 const storage = new Storage()
 
-let bucketName = 'guildfx-exchange.appspot.com'
+const bucketName = 'guildfx-exchange.appspot.com'
 
 const filename = process.env.NODE_ENV === 'production' ? 'bundle.production.js' : 'bundle.js'
 let filepath = `/Users/kangzeroo/Projects/GuildFX/widgets/iife/${filename}`

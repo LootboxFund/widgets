@@ -1693,6 +1693,11 @@
     stream-events "^1.0.4"
     xdg-basedir "^4.0.0"
 
+"@guildfx/helpers@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@guildfx/helpers/-/helpers-0.0.4.tgz#de7af8b7ab7b6a1357686e95f15b1e70fe930e7a"
+  integrity sha512-yua/RezHeGk7idyrwrKIjzhtmrdl3MZZtKYstZkfhJoRWGOhhbfCxJkOQgchdM14zKFMySyyJNm4J7pTI9RaLg==
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"

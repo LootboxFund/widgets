@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import { COLORS } from 'lib/theme'
 import { $Horizontal } from '../../Generics'
-import { TokenData } from 'lib/hooks/constants'
+import { TokenDataFE } from 'lib/hooks/constants'
 import { swapState } from '../state'
 import { useSnapshot } from 'valtio'
 import { removeCustomToken } from 'lib/hooks/useTokenList'
@@ -11,7 +11,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { ScreenSize } from '../../../hooks/useScreenSize/index'
 
 export interface RowTokenProps {
-  token: TokenData
+  token: TokenDataFE
   disabled?: boolean
   copyable?: boolean
   deleteable?: boolean

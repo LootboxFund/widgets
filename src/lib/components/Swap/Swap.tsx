@@ -6,7 +6,7 @@ import SwapInput from 'lib/components/Swap/SwapInput'
 import SwapHeader from 'lib/components/Swap/SwapHeader'
 import { useSnapshot } from 'valtio'
 import { useTokenList } from 'lib/hooks/useTokenList'
-import { TokenData } from 'lib/hooks/constants'
+import { TokenDataFE } from 'lib/hooks/constants'
 import { swapState } from './state'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
@@ -27,8 +27,8 @@ export const $SwapContainer = styled.section`
 `
 
 interface SwapProps {
-  inputToken?: TokenData
-  outputToken?: TokenData
+  inputToken?: TokenDataFE
+  outputToken?: TokenDataFE
 }
 const Swap = (props: SwapProps) => {
   const snap = useSnapshot(swapState)

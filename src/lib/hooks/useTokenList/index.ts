@@ -3,7 +3,7 @@ import {
   ChainIDHex,
   DEFAULT_CHAIN_ID_HEX,
   DEMO_CUSTOM_TOKENS_BSC_MAINNET,
-  TokenData,
+  TokenDataFE,
   tokenMap,
 } from 'lib/hooks/constants'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
@@ -13,7 +13,7 @@ import { useSnapshot } from 'valtio'
 export const getCustomTokensList = (chainIdHex: string) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
   if (existingCustomTokens) {
-    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+    const customTokens: Record<string, TokenDataFE[]> = JSON.parse(existingCustomTokens)
     if (customTokens[chainIdHex] && customTokens[chainIdHex].length > 0) {
       return customTokens[chainIdHex]
     }
@@ -23,8 +23,8 @@ export const getCustomTokensList = (chainIdHex: string) => {
 }
 
 interface TokenListState {
-  defaultTokenList: TokenData[]
-  customTokenList: TokenData[]
+  defaultTokenList: TokenDataFE[]
+  customTokenList: TokenDataFE[]
 }
 const initialTokenListState: TokenListState = {
   defaultTokenList: [],
@@ -43,10 +43,10 @@ export const useCustomTokenList = () => {
   return snap.customTokenList
 }
 
-export const addCustomToken = (data: TokenData) => {
+export const addCustomToken = (data: TokenDataFE) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
   if (existingCustomTokens) {
-    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+    const customTokens: Record<string, TokenDataFE[]> = JSON.parse(existingCustomTokens)
     if (customTokens[data.chainIdHex] && customTokens[data.chainIdHex].length >= 0) {
       customTokens[data.chainIdHex] = customTokens[data.chainIdHex]
         .filter((t) => t.address !== data.address)
@@ -57,7 +57,7 @@ export const addCustomToken = (data: TokenData) => {
     tokenListState.customTokenList = customTokens[data.chainIdHex]
     localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
   } else {
-    const customTokens: Record<string, TokenData[]> = {
+    const customTokens: Record<string, TokenDataFE[]> = {
       [data.chainIdHex]: [data],
     }
     tokenListState.customTokenList = customTokens[data.chainIdHex]
@@ -69,7 +69,7 @@ export const removeCustomToken = (address: string, chainIdHex: string) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
 
   if (existingCustomTokens) {
-    const customTokens: Record<string, TokenData[]> = JSON.parse(existingCustomTokens)
+    const customTokens: Record<string, TokenDataFE[]> = JSON.parse(existingCustomTokens)
     if (customTokens[chainIdHex]) {
       const updatedList = customTokens[chainIdHex].filter((token) => token.address !== address)
       const updatedTokens = {
@@ -83,7 +83,7 @@ export const removeCustomToken = (address: string, chainIdHex: string) => {
 }
 
 export const saveInitialCustomTokens = () => {
-  const customTokens: Record<string, TokenData[]> = {
+  const customTokens: Record<string, TokenDataFE[]> = {
     [DEFAULT_CHAIN_ID_HEX]: DEMO_CUSTOM_TOKENS_BSC_MAINNET,
   }
   localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))

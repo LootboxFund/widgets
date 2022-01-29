@@ -1,4 +1,4 @@
-import { TokenData } from 'lib/hooks/constants'
+import { TokenDataFE } from 'lib/hooks/constants'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { userState } from 'lib/state/userState'
@@ -14,12 +14,12 @@ export interface SwapState {
   route: SwapRoute
   targetToken: TokenPickerTarget
   inputToken: {
-    data: TokenData | undefined
+    data: TokenDataFE | undefined
     quantity: string | undefined
     displayedBalance: string | undefined
   }
   outputToken: {
-    data: TokenData | undefined
+    data: TokenDataFE | undefined
     quantity: string | undefined
     displayedBalance: string | undefined
   }
