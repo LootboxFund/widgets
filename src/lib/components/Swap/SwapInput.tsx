@@ -6,7 +6,7 @@ import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
 import { swapState, TokenPickerTarget } from './state'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS, TokenData } from 'lib/hooks/constants'
+import { BLOCKCHAINS, TokenDataFE } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -14,7 +14,7 @@ import { screen } from '@testing-library/react'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 
 export interface SwapInputProps {
-  selectedToken?: TokenData
+  selectedToken?: TokenDataFE
   targetToken: TokenPickerTarget
   tokenDisabled?: boolean
   quantityDisabled?: boolean

@@ -1,4 +1,4 @@
-import { ChainIDHex, ChainInfo } from 'lib/hooks/constants'
+import { ChainInfo } from 'lib/hooks/constants'
 import { Address, URL } from 'lib/types/baseTypes'
 import { proxy } from 'valtio'
 

@@ -6,7 +6,7 @@ import { COLORS } from 'lib/theme'
 import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import RowToken from 'lib/components/Swap/TokenPicker/RowToken'
 import { tokenListState, useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
-import { TokenData } from 'lib/hooks/constants'
+import { TokenDataFE } from 'lib/hooks/constants'
 import { $Horizontal } from '../../Generics'
 import $Button from '../../Button'
 import { useSnapshot } from 'valtio'
@@ -20,7 +20,7 @@ const ManageTokens = (props: ManageTokensProps) => {
   const { screen } = useWindowSize()
   const customTokenList = snap.customTokenList
   const [searchString, setSearchString] = useState('')
-  const searchFilter = (token: TokenData) => {
+  const searchFilter = (token: TokenDataFE) => {
     return (
       token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
       token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
