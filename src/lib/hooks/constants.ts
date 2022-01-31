@@ -7,6 +7,11 @@ export interface TokenDataFE extends TokenData {
   usdPrice: string
 }
 
+interface IAddresses {
+  /** GuildFX Constants address (from deploy script "./scripts/deployGuildFactory.dev.ts") */
+  gfxConstants: string
+}
+
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
 export type ChainInfo = {
@@ -111,36 +116,46 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
     name: 'Binance Smart Chain',
     symbol: 'tBNB',
-    priceOracle: '____________',
+    priceOracle: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
   },
   {
-    address: '0x535543240B14F8dc39CA62811528781d613F2A59',
+    address: '0x7638f12cAf512BF4754B8166F5f26aC74BBFfFB5',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
     name: 'Wrapped Ethereum',
     symbol: 'ETH',
-    priceOracle: '________',
+    priceOracle: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7',
   },
   {
-    address: '0x05Dc92E0C23eF3BBBe819FD8cF1AdC92b3487709',
+    address: '0x8031b35155d97B6730154B68C046d2C69A4Afd4d',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
     name: 'USD Circle',
     symbol: 'USDC',
-    priceOracle: '________',
+    priceOracle: '0x90c069C4538adAc136E051052E14c1cD799C41B7',
   },
   {
-    address: '0xF6de6323f26EaD05c6199D91F88175629eadbC1f',
+    address: '0xBb6Da17FF643a0F92B326f58de4133d4416A131e',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
     logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
     name: 'Tether',
     symbol: 'USDT',
+    priceOracle: '0xEca2605f0BCF2BA5966372C99837b1F182d3D620',
+  },
+  {
+    address: '0x016D620466C75DeBA325F4202973197CF5DfEd3A',
+    chainIdHex: '0x61',
+    chainIdDecimal: '97',
+    decimals: 18,
+    logoURI: 'https://i.imgur.com/gG1fBg0.jpg',
+    name: 'Artemis',
+    symbol: 'ATMS',
     priceOracle: '________',
   },
 ]
@@ -160,4 +175,14 @@ export const DEMO_CUSTOM_TOKENS_BSC_TESTNET = [
 export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
   '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
+}
+
+export const addresses: Record<string, IAddresses> = {
+  // BSC MAINNET
+  // 56: {},
+  // BSC TESTNET 0x61 = 97
+  '0x61': {
+    // --- Contract addresses (from deploy scripts in backend) ---
+    gfxConstants: '0x3aeDdd9AE5681E78e1645685d5898d88C43B568c',
+  },
 }
