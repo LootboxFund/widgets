@@ -18,14 +18,17 @@ export interface SwapInputProps {
   targetToken: TokenPickerTarget
   tokenDisabled?: boolean
   quantityDisabled?: boolean
+  selectDisabled?: boolean
 }
 const SwapInput = (props: SwapInputProps) => {
   const snap = useSnapshot(swapState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const selectToken = async () => {
-    swapState.targetToken = props.targetToken
-    swapState.route = '/search'
+    if (!props.selectDisabled) {
+      swapState.targetToken = props.targetToken
+      swapState.route = '/search'
+    }
   }
   const setQuantity = (quantity: number) => {
     if (props.targetToken) {
