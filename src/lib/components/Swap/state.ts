@@ -22,6 +22,7 @@ export interface SwapState {
     data: TokenDataFE | undefined
     quantity: string | undefined
     displayedBalance: string | undefined
+    priceOverride: string | undefined // Override to store a price - fetching via price oracle not needed when this exists
   }
 }
 const swapSnapshot: SwapState = {
@@ -36,6 +37,7 @@ const swapSnapshot: SwapState = {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
+    priceOverride: undefined,
   },
 }
 export const swapState = proxy(swapSnapshot)
@@ -47,15 +49,22 @@ subscribe(swapState.outputToken, () => {
   updateOutputTokenValues()
 })
 const updateOutputTokenValues = async () => {
-  if (swapState.outputToken.data?.priceOracle && swapState.inputToken.data?.priceOracle) {
+  if (
+    swapState.outputToken.data &&
+    (swapState.outputToken.data?.priceOracle || swapState.outputToken.priceOverride) &&
+    swapState.inputToken.data?.priceOracle
+  ) {
     // get price of conversion rate and save to swapState
     const [inputTokenPrice, outputTokenPrice] = await Promise.all([
       getPriceFeed(swapState.inputToken.data.priceOracle),
-      getPriceFeed(swapState.outputToken.data.priceOracle),
+      swapState.outputToken.priceOverride
+        ? Promise.resolve(new BN(swapState.outputToken.priceOverride))
+        : getPriceFeed(swapState.outputToken.data.priceOracle),
     ])
     swapState.inputToken.data.usdPrice = inputTokenPrice.toString()
     swapState.outputToken.data.usdPrice = outputTokenPrice.toString()
   }
+
   if (swapState.outputToken.data && swapState.inputToken.data && swapState.inputToken.quantity !== undefined) {
     const inputTokenPrice = swapState.inputToken.data.usdPrice || ''
     const outputTokenPrice = swapState.outputToken.data.usdPrice || ''
