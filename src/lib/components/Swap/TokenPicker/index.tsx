@@ -15,8 +15,17 @@ import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { Address } from '@guildfx/helpers'
 
-export interface TokenPickerProps {}
+export interface TokenPickerProps {
+  /** If specified, locks the picker to only these addresses */
+  specificAddresses: Address[] | undefined
+}
+
+const arrayIsEmpty = (arr: any[] | undefined) => {
+  return !arr || arr.length === 0
+}
+
 const TokenPicker = (props: TokenPickerProps) => {
   const web3 = useWeb3()
   const snap = useSnapshot(swapState)
@@ -53,6 +62,17 @@ const TokenPicker = (props: TokenPickerProps) => {
       token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1
     )
   }
+  const filterSpecificAddresses = (token: TokenDataFE) => {
+    if (arrayIsEmpty(props.specificAddresses) || !props.specificAddresses) {
+      return true
+    } else {
+      return (
+        props.specificAddresses.map((address: string) => address.toLowerCase()).indexOf(token.address.toLowerCase()) >
+        -1
+      )
+    }
+  }
+
   const currentToken = snap.targetToken !== null ? swapState[snap.targetToken].data : null
   return (
     <$SwapContainer>
@@ -76,28 +96,31 @@ const TokenPicker = (props: TokenPickerProps) => {
               flex: 4,
             }}
           ></$Input>
-          <$Button
-            screen={screen}
-            onClick={() => (swapState.route = '/add')}
-            backgroundColor={`${COLORS.warningBackground}E0`}
-            color={COLORS.white}
-            backgroundColorHover={`${COLORS.warningBackground}`}
-            style={{
-              flex: 1,
-              marginLeft: '10px',
-              minHeight: screen === 'desktop' ? '70px' : '50px',
-              height: '70px',
-              fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-              fontWeight: 800,
-            }}
-          >
-            + New
-          </$Button>
+          {arrayIsEmpty(props.specificAddresses) && (
+            <$Button
+              screen={screen}
+              onClick={() => (swapState.route = '/add')}
+              backgroundColor={`${COLORS.warningBackground}E0`}
+              color={COLORS.white}
+              backgroundColorHover={`${COLORS.warningBackground}`}
+              style={{
+                flex: 1,
+                marginLeft: '10px',
+                minHeight: screen === 'desktop' ? '70px' : '50px',
+                height: '70px',
+                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
+                fontWeight: 800,
+              }}
+            >
+              + New
+            </$Button>
+          )}
         </$Horizontal>
         <$ScrollContainer>
           {tokenList
             .concat(customTokenList)
             .filter(searchFilter)
+            .filter(filterSpecificAddresses)
             .map((token) => {
               const disabled =
                 [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
