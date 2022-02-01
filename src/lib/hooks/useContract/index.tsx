@@ -2,6 +2,7 @@ import { Address } from 'lib/types/baseTypes'
 import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import { useWeb3 } from '../useWeb3Api'
+import ERC20ABI from 'lib/abi/erc20.json'
 import CrowdSaleABI from 'lib/abi/crowdSale.json'
 import GFXConstantsABI from 'lib/abi/gfxConstants.json'
 import { addresses, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
@@ -82,4 +83,11 @@ export const purchaseFromCrowdSale = async (
     }
   }
   return tx
+}
+
+export const getERC20Allowance = async (spender: Address, tokenAddress: Address): Promise<string> => {
+  const web3 = await useWeb3()
+  const [currentUser] = await web3.eth.getAccounts()
+  const token = new web3.eth.Contract(ERC20ABI, tokenAddress)
+  return token.methods.allowance(currentUser, spender).call()
 }
