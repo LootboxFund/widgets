@@ -5,8 +5,9 @@ import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
-import { purchaseFromCrowdSale, approveERC20Token } from 'lib/hooks/useContract'
+import { purchaseFromCrowdSale, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
+import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 
 export type CrowdSaleRoute = '/crowdSale' | '/search'
@@ -102,19 +103,29 @@ export const purchaseGuildToken = async () => {
   const tx = await purchaseFromCrowdSale(
     crowdSaleState.crowdSaleAddress,
     crowdSaleState.inputToken.data,
-    crowdSaleState.inputToken.quantity
+    parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
   )
+
+  return tx
 }
 
-export const approveGuildToken = async () => {
+export const approveStableCoinToken = async () => {
   if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
     return
   }
+
   const tx = await approveERC20Token(
     crowdSaleState.crowdSaleAddress,
     crowdSaleState.inputToken.data,
-    crowdSaleState.inputToken.quantity
+    parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
   )
+
+  crowdSaleState.inputToken.allowance = await getERC20Allowance(
+    crowdSaleState.crowdSaleAddress,
+    crowdSaleState.inputToken.data.address
+  )
+
+  return tx
 }
 
 export const fetchCrowdSaleData = async () => {

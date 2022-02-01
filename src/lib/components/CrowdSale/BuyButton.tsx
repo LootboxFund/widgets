@@ -6,7 +6,8 @@ import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
-import { crowdSaleState, purchaseGuildToken, approveGuildToken } from './state'
+import { crowdSaleState, purchaseGuildToken, approveStableCoinToken } from './state'
+import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 
 export interface BuyButtonProps {}
@@ -19,8 +20,9 @@ const BuyButton = (props: BuyButtonProps) => {
   const isInputAmountValid =
     snapCrowdSaleState.inputToken.quantity && parseFloat(snapCrowdSaleState.inputToken.quantity) > 0
   const allowance = new BN(snapCrowdSaleState.inputToken.allowance || '0')
-  const quantity = new BN(snapCrowdSaleState.inputToken.quantity || '0').multipliedBy(
-    new BN(10).pow(snapCrowdSaleState.outputToken.data?.decimals || 18)
+  const quantity = parseWei(
+    snapCrowdSaleState.inputToken.quantity || '0',
+    snapCrowdSaleState.outputToken.data?.decimals
   )
 
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
@@ -47,10 +49,10 @@ const BuyButton = (props: BuyButtonProps) => {
     return (
       <$Button
         screen={screen}
-        onClick={approveGuildToken}
+        onClick={approveStableCoinToken}
         backgroundColor={`${COLORS.warningBackground}`}
         color={`${COLORS.warningFontColor}`}
-        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+        style={{ minHeight: '60px', height: '100px' }}
       >
         Confirm Purchase
       </$Button>

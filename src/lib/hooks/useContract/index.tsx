@@ -98,6 +98,5 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
   const web3 = await useWeb3()
   const [currentUser, ..._] = await web3.eth.getAccounts()
   const token = new web3.eth.Contract(ERC20ABI, tokenData.address)
-  const amountInWei = new BN(quantity).multipliedBy(new BN(10).pow(tokenData.decimals))
-  return token.methods.approve(delegator, amountInWei.toString()).send({ from: currentUser })
+  return token.methods.approve(delegator, quantity).send({ from: currentUser })
 }
