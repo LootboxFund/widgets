@@ -30,6 +30,9 @@ export interface CrowdSaleState {
     displayedBalance: string | undefined
     allowance: string | undefined
   }
+  ui: {
+    isButtonLoading: boolean
+  }
 }
 const crowdSaleSnapshot: CrowdSaleState = {
   route: '/crowdSale',
@@ -48,6 +51,9 @@ const crowdSaleSnapshot: CrowdSaleState = {
     quantity: undefined,
     displayedBalance: undefined,
     allowance: undefined,
+  },
+  ui: {
+    isButtonLoading: false,
   },
 }
 export const crowdSaleState = proxy(crowdSaleSnapshot)
@@ -100,11 +106,20 @@ export const purchaseGuildToken = async () => {
   if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
     return
   }
-  const tx = await purchaseFromCrowdSale(
-    crowdSaleState.crowdSaleAddress,
-    crowdSaleState.inputToken.data,
-    parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
-  )
+
+  let tx = undefined
+  crowdSaleState.ui.isButtonLoading = true
+  try {
+    tx = await purchaseFromCrowdSale(
+      crowdSaleState.crowdSaleAddress,
+      crowdSaleState.inputToken.data,
+      parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
+    )
+  } catch (err) {
+    console.error(err)
+  } finally {
+    crowdSaleState.ui.isButtonLoading = false
+  }
 
   return tx
 }
@@ -113,17 +128,24 @@ export const approveStableCoinToken = async () => {
   if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
     return
   }
+  let tx = undefined
+  crowdSaleState.ui.isButtonLoading = true
+  try {
+    tx = await approveERC20Token(
+      crowdSaleState.crowdSaleAddress,
+      crowdSaleState.inputToken.data,
+      parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
+    )
 
-  const tx = await approveERC20Token(
-    crowdSaleState.crowdSaleAddress,
-    crowdSaleState.inputToken.data,
-    parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
-  )
-
-  crowdSaleState.inputToken.allowance = await getERC20Allowance(
-    crowdSaleState.crowdSaleAddress,
-    crowdSaleState.inputToken.data.address
-  )
+    crowdSaleState.inputToken.allowance = await getERC20Allowance(
+      crowdSaleState.crowdSaleAddress,
+      crowdSaleState.inputToken.data.address
+    )
+  } catch (err) {
+    console.error(err)
+  } finally {
+    crowdSaleState.ui.isButtonLoading = false
+  }
 
   return tx
 }

@@ -3,12 +3,14 @@ import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
+import { $Horizontal } from '../Generics'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { crowdSaleState, purchaseGuildToken, approveStableCoinToken } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
+import $Spinner from 'lib/components/Spinner'
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
@@ -32,6 +34,15 @@ const BuyButton = (props: BuyButtonProps) => {
       .map((b) => b.chainIdHex)
       .includes(snapUserState.currentNetworkIdHex)
 
+  const LoadingText = ({ text, color }: { text: string; color: string }) => {
+    return (
+      <$Horizontal justifyContent="center">
+        {snapCrowdSaleState.ui.isButtonLoading ? <$Spinner color={color}></$Spinner> : null}
+        {text}
+      </$Horizontal>
+    )
+  }
+
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>
   } else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.outputToken.data)) {
@@ -53,8 +64,9 @@ const BuyButton = (props: BuyButtonProps) => {
         backgroundColor={`${COLORS.warningBackground}`}
         color={`${COLORS.warningFontColor}`}
         style={{ minHeight: '60px', height: '100px' }}
+        disabled={snapCrowdSaleState.ui.isButtonLoading}
       >
-        Confirm Purchase
+        <LoadingText text="Confirm Purchase" color={COLORS.warningFontColor} />
       </$Button>
     )
   } else if (isInputAmountValid) {
@@ -66,8 +78,9 @@ const BuyButton = (props: BuyButtonProps) => {
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
         style={{ minHeight: '60px', height: '100px' }}
+        disabled={snapCrowdSaleState.ui.isButtonLoading}
       >
-        PURCHASE
+        <LoadingText text="PURCHASE" color={COLORS.trustFontColor} />
       </$Button>
     )
   }
