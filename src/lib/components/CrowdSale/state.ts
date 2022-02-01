@@ -1,10 +1,8 @@
 import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS } from 'lib/hooks/constants'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
-import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
-import { userState } from 'lib/state/userState'
 import { Address } from 'lib/types/baseTypes'
-import { proxy, subscribe, useSnapshot } from 'valtio'
+import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { purchaseFromCrowdSale, approveERC20Token } from 'lib/hooks/useContract'
@@ -18,6 +16,7 @@ export interface CrowdSaleState {
   targetToken: TokenPickerTarget
   crowdSaleAddress: Address | undefined
   stableCoins: Address[]
+  price: string | undefined
   inputToken: {
     data: TokenDataFE | undefined
     quantity: string | undefined
@@ -29,7 +28,6 @@ export interface CrowdSaleState {
     quantity: string | undefined
     displayedBalance: string | undefined
     allowance: string | undefined
-    priceOverride: string | undefined // Override to store a price - fetching via price oracle not needed when this exists
   }
 }
 const crowdSaleSnapshot: CrowdSaleState = {
@@ -37,6 +35,7 @@ const crowdSaleSnapshot: CrowdSaleState = {
   targetToken: null,
   crowdSaleAddress: BSC_TESTNET_CROWDSALE_ADDRESS,
   stableCoins: [],
+  price: undefined,
   inputToken: {
     data: undefined,
     quantity: undefined,
@@ -47,7 +46,6 @@ const crowdSaleSnapshot: CrowdSaleState = {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
-    priceOverride: undefined,
     allowance: undefined,
   },
 }
@@ -62,20 +60,12 @@ subscribe(crowdSaleState.outputToken, () => {
 })
 
 const updateOutputTokenValues = async () => {
-  if (
-    crowdSaleState.outputToken.data &&
-    (crowdSaleState.outputToken.data?.priceOracle || crowdSaleState.outputToken.priceOverride) &&
-    crowdSaleState.inputToken.data?.priceOracle
-  ) {
+  if (crowdSaleState.outputToken.data && crowdSaleState.price && crowdSaleState.inputToken.data?.priceOracle) {
     // get price of conversion rate and save to crowdSaleState
-    const [inputTokenPrice, outputTokenPrice] = await Promise.all([
-      getPriceFeed(crowdSaleState.inputToken.data.priceOracle),
-      crowdSaleState.outputToken.priceOverride
-        ? Promise.resolve(new BN(crowdSaleState.outputToken.priceOverride))
-        : getPriceFeed(crowdSaleState.outputToken.data.priceOracle),
-    ])
+    const inputTokenPrice = await getPriceFeed(crowdSaleState.outputToken.data.priceOracle)
+
     crowdSaleState.inputToken.data.usdPrice = inputTokenPrice.toString()
-    crowdSaleState.outputToken.data.usdPrice = outputTokenPrice.toString()
+    crowdSaleState.outputToken.data.usdPrice = crowdSaleState.price.toString()
   }
 
   if (
@@ -137,7 +127,7 @@ export const fetchCrowdSaleData = async () => {
   crowdSaleState.stableCoins = ['0x0native', ...stableCoins]
   crowdSaleState.outputToken.data = getTokenFromList(guildTokenAddress)
   const guildTokenPriceParsed = new BN(guildTokenPrice).div(new BN('100000000')).toString()
-  crowdSaleState.outputToken.priceOverride = guildTokenPriceParsed // Indicates that the swap logic will use this price instead of an oracle
+  crowdSaleState.price = guildTokenPriceParsed // Indicates that the swap logic will use this price instead of an oracle
 }
 
 const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined => {
