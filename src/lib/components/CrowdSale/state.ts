@@ -1,4 +1,4 @@
-import { TokenDataFE } from 'lib/hooks/constants'
+import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS } from 'lib/hooks/constants'
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe } from 'valtio'
 import { swapState, SwapState } from 'lib/components/Swap/state'
@@ -12,25 +12,26 @@ export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
 export interface CrowdSaleState extends Omit<SwapState, 'route'> {
   route: CrowdSaleRoute
   stableCoins: Address[]
-  crowdSaleAddress: Address
 }
+
 const crowdSaleSnapshot: CrowdSaleState = {
   route: '/crowdSale',
   targetToken: null,
+  tokenDelegator: BSC_TESTNET_CROWDSALE_ADDRESS,
   inputToken: {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
+    allowance: undefined,
   },
   outputToken: {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
+    allowance: undefined,
     priceOverride: undefined,
   },
   stableCoins: [],
-  // TODO: dynamically load this
-  crowdSaleAddress: '0x803c267a3bf44099b75ad4d244a1eddd98df13ba',
 }
 
 export const crowdSaleState = proxy(crowdSaleSnapshot)
@@ -41,6 +42,9 @@ subscribe(swapState.inputToken, () => {
 })
 subscribe(swapState.outputToken, () => {
   crowdSaleState.outputToken = swapState.outputToken
+})
+subscribe(crowdSaleState, () => {
+  swapState.tokenDelegator = crowdSaleState.tokenDelegator
 })
 
 // Re-route the route for the crowdsale specific logic
@@ -53,9 +57,10 @@ subscribe(swapState, () => {
 })
 
 export const fetchCrowdSaleData = async () => {
-  const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(
-    crowdSaleState.crowdSaleAddress
-  )
+  if (!crowdSaleState.tokenDelegator) {
+    return
+  }
+  const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(crowdSaleState.tokenDelegator)
   crowdSaleState.stableCoins = ['0x0native', ...stableCoins]
   swapState.outputToken.data = getTokenFromList(guildTokenAddress)
   const guildTokenPriceParsed = new BN(guildTokenPrice).div(new BN('100000000')).decimalPlaces(4).toString()
@@ -70,11 +75,11 @@ const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined
 }
 
 export const purchaseGuildToken = async () => {
-  if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity) {
+  if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.tokenDelegator) {
     return
   }
   const tx = await purchaseFromCrowdSale(
-    crowdSaleState.crowdSaleAddress,
+    crowdSaleState.tokenDelegator,
     crowdSaleState.inputToken.data,
     crowdSaleState.inputToken.quantity
   )

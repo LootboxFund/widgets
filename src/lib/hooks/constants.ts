@@ -14,6 +14,9 @@ interface IAddresses {
 
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
+// TODO: Dynamically load this
+export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x803c267a3bf44099b75ad4d244a1eddd98df13ba'
+
 export type ChainInfo = {
   chainIdHex: ChainIDHex
   chainIdDecimal: ChainIDDecimal

@@ -13,31 +13,37 @@ export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
 export interface SwapState {
   route: SwapRoute
   targetToken: TokenPickerTarget
+  tokenDelegator: Address | undefined
   inputToken: {
     data: TokenDataFE | undefined
     quantity: string | undefined
     displayedBalance: string | undefined
+    allowance: string | undefined
   }
   outputToken: {
     data: TokenDataFE | undefined
     quantity: string | undefined
     displayedBalance: string | undefined
+    allowance: string | undefined
     priceOverride: string | undefined // Override to store a price - fetching via price oracle not needed when this exists
   }
 }
 const swapSnapshot: SwapState = {
   route: '/swap',
   targetToken: null,
+  tokenDelegator: undefined,
   inputToken: {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
+    allowance: undefined,
   },
   outputToken: {
     data: undefined,
     quantity: undefined,
     displayedBalance: undefined,
     priceOverride: undefined,
+    allowance: undefined,
   },
 }
 export const swapState = proxy(swapSnapshot)

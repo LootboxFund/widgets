@@ -68,7 +68,7 @@ export const purchaseFromCrowdSale = async (
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
   let tx
   if ([BNB, TBNB].includes(stableCoinSymbol)) {
-    tx = await crowdSale.methods.buyInBNB(currentUser).call({ value: stableCoinAmount })
+    tx = await crowdSale.methods.buyInBNB(currentUser).send({ from: currentUser, value: stableCoinAmount })
   } else {
     if (stableCoinSymbol === ETH) {
       tx = await crowdSale.methods.buyInETH(stableCoinAmount).call()
@@ -85,7 +85,8 @@ export const purchaseFromCrowdSale = async (
   return tx
 }
 
-export const getERC20Allowance = async (spender: Address, tokenAddress: Address): Promise<string> => {
+export const getERC20Allowance = async (spender: Address | undefined, tokenAddress: Address): Promise<string> => {
+  if (!spender) return '0'
   const web3 = await useWeb3()
   const [currentUser] = await web3.eth.getAccounts()
   const token = new web3.eth.Contract(ERC20ABI, tokenAddress)

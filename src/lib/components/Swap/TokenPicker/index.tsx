@@ -16,6 +16,7 @@ import { userState } from 'lib/state/userState'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { Address } from '@guildfx/helpers'
+import { getERC20Allowance } from 'lib/hooks/useContract'
 
 export interface TokenPickerProps {
   /** If specified, locks the picker to only these addresses */
@@ -41,16 +42,21 @@ const TokenPicker = (props: TokenPickerProps) => {
   const selectToken = async (token: TokenDataFE, isDisabled: boolean) => {
     if (isDisabled) return
     let tokenBalance = 0
+    let tokenAllowance = '0'
     if (snapUserState.currentAccount && snapSwapState.targetToken) {
       if (token.address === '0x0native') {
         tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount)
       } else {
-        tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount)
+        ;[tokenBalance, tokenAllowance] = await Promise.all([
+          getUserBalanceOfToken(token.address, snapUserState.currentAccount),
+          getERC20Allowance(snap.tokenDelegator, token.address),
+        ])
       }
       if (snap.targetToken !== null) {
         swapState[snap.targetToken].data = token
         const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether')
         swapState[snapSwapState.targetToken].displayedBalance = balanceInEther
+        swapState[snapSwapState.targetToken].allowance = tokenAllowance
         swapState.route = '/swap'
       }
     }
