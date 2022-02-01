@@ -128,6 +128,15 @@ export const approveStableCoinToken = async () => {
   if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
     return
   }
+  if (crowdSaleState.inputToken.data.address === '0x0native') {
+    // Native tokens don't need approval
+    crowdSaleState.inputToken.allowance = parseWei(
+      crowdSaleState.inputToken.quantity,
+      crowdSaleState.inputToken.data.decimals
+    )
+    return
+  }
+
   let tx = undefined
   crowdSaleState.ui.isButtonLoading = true
   try {

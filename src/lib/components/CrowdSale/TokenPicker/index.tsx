@@ -40,24 +40,25 @@ const TokenPicker = (props: TokenPickerProps) => {
 
   const selectToken = async (token: TokenDataFE, isDisabled: boolean) => {
     if (isDisabled) return
-    let tokenBalance = 0
-    let tokenAllowance = '0'
     if (snapUserState.currentAccount && snap.targetToken) {
-      if (token.address === '0x0native') {
-        tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount)
-      } else {
-        ;[tokenBalance, tokenAllowance] = await Promise.all([
-          getUserBalanceOfToken(token.address, snapUserState.currentAccount),
-          getERC20Allowance(snap.crowdSaleAddress, token.address),
-        ])
-      }
+      const promise =
+        token.address === '0x0native'
+          ? Promise.all([getUserBalanceOfNativeToken(snapUserState.currentAccount), Promise.resolve('0')])
+          : Promise.all([
+              getUserBalanceOfToken(token.address, snapUserState.currentAccount),
+              getERC20Allowance(snap.crowdSaleAddress, token.address),
+            ])
+      promise.then(async ([tokenBalance, tokenAllowance]) => {
+        if (snap.targetToken !== null) {
+          const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether')
+          crowdSaleState[snap.targetToken].displayedBalance = balanceInEther
+          crowdSaleState[snap.targetToken].allowance = tokenAllowance
+        }
+      })
       if (snap.targetToken !== null) {
         crowdSaleState[snap.targetToken].data = token
-        const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether')
-        crowdSaleState[snap.targetToken].displayedBalance = balanceInEther
-        crowdSaleState[snap.targetToken].allowance = tokenAllowance
-        crowdSaleState.route = '/crowdSale'
       }
+      crowdSaleState.route = '/crowdSale'
     }
   }
   const searchFilter = (token: TokenDataFE) => {
