@@ -64,24 +64,29 @@ export const purchaseFromCrowdSale = async (
 ) => {
   const web3 = await useWeb3()
   const [currentUser, ..._] = await web3.eth.getAccounts()
-  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress)
+  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress, {
+    from: currentUser,
+    value: stableCoinAmount,
+    gas: '10000000', // Have to hardocode the gas limit for now...
+  })
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
-  let tx
+  let tx = undefined
   if ([BNB, TBNB].includes(stableCoinSymbol)) {
-    tx = await crowdSale.methods.buyInBNB(currentUser).send({ from: currentUser, value: stableCoinAmount })
+    tx = crowdSale.methods.buyInBNB(currentUser)
   } else {
     if (stableCoinSymbol === ETH) {
-      tx = await crowdSale.methods.buyInETH(stableCoinAmount).call()
+      tx = crowdSale.methods.buyInETH(stableCoinAmount)
     } else if (stableCoinSymbol === USDC) {
-      tx = await crowdSale.methods.buyInUSDC(stableCoinAmount).call()
+      tx = crowdSale.methods.buyInUSDC(stableCoinAmount)
     } else if (stableCoinSymbol === USDT) {
-      tx = await crowdSale.methods.buyInUSDT(stableCoinAmount).call()
+      tx = crowdSale.methods.buyInUSDT(stableCoinAmount)
     } else {
       // throw new Error(`${stableCoinSymbol} not supported!`)
       console.error(`${stableCoinSymbol} not supported!`)
       return
     }
   }
+  await tx.send()
   return tx
 }
 
