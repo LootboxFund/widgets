@@ -126,6 +126,7 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
+                ...(props.selectDisabled && { cursor: 'not-allowed' }),
               }}
             >
               <$CoinIcon screen={screen} src={props.selectedToken.logoURI}></$CoinIcon>
