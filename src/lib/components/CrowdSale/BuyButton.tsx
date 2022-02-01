@@ -13,13 +13,17 @@ export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
   const web3 = useWeb3()
   const snapUserState = useSnapshot(userState)
-  const snapSwapState = useSnapshot(crowdSaleState)
+  const snapCrowdSaleState = useSnapshot(crowdSaleState)
   const { screen } = useWindowSize()
   const isWalletConnected = snapUserState.accounts.length > 0
-  const isInputAmountValid = snapSwapState.inputToken.quantity && parseFloat(snapSwapState.inputToken.quantity) > 0
-  const allowance = new BN(snapSwapState.inputToken.allowance || '0')
-  const balance = new BN(snapSwapState.inputToken.quantity || '0')
-  const isAllowanceCovered = isInputAmountValid && allowance.gte(balance)
+  const isInputAmountValid =
+    snapCrowdSaleState.inputToken.quantity && parseFloat(snapCrowdSaleState.inputToken.quantity) > 0
+  const allowance = new BN(snapCrowdSaleState.inputToken.allowance || '0')
+  const quantity = new BN(snapCrowdSaleState.inputToken.quantity || '0').multipliedBy(
+    new BN(10).pow(snapCrowdSaleState.outputToken.data?.decimals || 18)
+  )
+
+  const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
   const validChain =
     snapUserState.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
@@ -28,7 +32,7 @@ const BuyButton = (props: BuyButtonProps) => {
 
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>
-  } else if (isWalletConnected && (!snapSwapState.inputToken.data || !snapSwapState.outputToken.data)) {
+  } else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.outputToken.data)) {
     return (
       <$Button
         screen={screen}
