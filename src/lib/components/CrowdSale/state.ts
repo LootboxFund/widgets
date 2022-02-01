@@ -11,7 +11,7 @@ export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
 export interface CrowdSaleState extends Omit<SwapState, 'route'> {
   route: CrowdSaleRoute
   stableCoins: Address[]
-  crowdSaleAddress: Address | undefined
+  crowdSaleAddress: Address
 }
 const crowdSaleSnapshot: CrowdSaleState = {
   route: '/crowdSale',
@@ -28,7 +28,8 @@ const crowdSaleSnapshot: CrowdSaleState = {
     priceOverride: undefined,
   },
   stableCoins: [],
-  crowdSaleAddress: undefined,
+  // TODO: dynamically load this
+  crowdSaleAddress: '0x803c267a3bf44099b75ad4d244a1eddd98df13ba',
 }
 
 // We basically override the Swap state from Swap component in order to use their logic
@@ -51,10 +52,11 @@ subscribe(swapState, () => {
   }
 })
 
-export const fetchCrowdSaleData = async (crowdSaleAddress: Address) => {
-  const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(crowdSaleAddress)
+export const fetchCrowdSaleData = async () => {
+  const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(
+    crowdSaleState.crowdSaleAddress
+  )
   crowdSaleState.stableCoins = ['0x0native', ...stableCoins]
-  crowdSaleState.crowdSaleAddress = crowdSaleAddress
   swapState.outputToken.data = getTokenFromList(guildTokenAddress)
   const guildTokenPriceParsed = new BN(guildTokenPrice).div(new BN('100000000')).decimalPlaces(4).toString()
   swapState.outputToken.priceOverride = guildTokenPriceParsed // Indicates that the swap logic will use this price instead of an oracle

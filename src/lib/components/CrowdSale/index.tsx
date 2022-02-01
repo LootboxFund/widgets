@@ -12,17 +12,13 @@ export interface CrowdSaleWidgetProps {
 const CrowdSaleWidget = (props: CrowdSaleWidgetProps) => {
   const snap = useSnapshot(crowdSaleState)
 
-  // TODO: dynamically load this
-  const crowdSaleAddress = '0x803c267a3bf44099b75ad4d244a1eddd98df13ba'
-
   useEffect(() => {
     window.onload = () => {
-      initDApp()
+      initDApp().then(() => fetchCrowdSaleData())
     }
     if (props.initialRoute) {
       crowdSaleState.route = props.initialRoute
     }
-    fetchCrowdSaleData(crowdSaleAddress)
   }, [])
 
   if (snap.route === '/search') {

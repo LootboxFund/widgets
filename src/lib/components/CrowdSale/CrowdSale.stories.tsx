@@ -5,6 +5,7 @@ import CrowdSale from '.'
 import { $CardViewport } from '../Generics'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
+import { fetchCrowdSaleData } from './state'
 import Web3 from 'web3'
 
 export default {
@@ -14,7 +15,7 @@ export default {
 
 const Template = () => {
   useEffect(() => {
-    initDApp()
+    initDApp().then(() => fetchCrowdSaleData())
     ;(window as any).Web3 = Web3
   }, [])
 
