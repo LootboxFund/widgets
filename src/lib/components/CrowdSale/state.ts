@@ -4,6 +4,7 @@ import { proxy, subscribe } from 'valtio'
 import { swapState, SwapState } from 'lib/components/Swap/state'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
+import { purchaseFromCrowdSale } from 'lib/hooks/useContract'
 import BN from 'bignumber.js'
 
 export type CrowdSaleRoute = '/crowdSale' | '/search'
@@ -32,7 +33,6 @@ const crowdSaleSnapshot: CrowdSaleState = {
   crowdSaleAddress: '0x803c267a3bf44099b75ad4d244a1eddd98df13ba',
 }
 
-// We basically override the Swap state from Swap component in order to use their logic
 export const crowdSaleState = proxy(crowdSaleSnapshot)
 
 // Keep this state in sync with Swap's state
@@ -67,4 +67,15 @@ const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined
     return undefined
   }
   return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase())
+}
+
+export const purchaseGuildToken = async () => {
+  if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity) {
+    return
+  }
+  const tx = await purchaseFromCrowdSale(
+    crowdSaleState.crowdSaleAddress,
+    crowdSaleState.inputToken.data,
+    crowdSaleState.inputToken.quantity
+  )
 }

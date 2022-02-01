@@ -7,6 +7,13 @@ import GFXConstantsABI from 'lib/abi/gfxConstants.json'
 import { addresses, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
+import { TokenData } from '@guildfx/helpers'
+
+const BNB = 'bnb'
+const TBNB = 'tbnb'
+const USDC = 'usdc'
+const ETH = 'eth'
+const USDT = 'usdt'
 
 interface CrowdSaleSeedData {
   guildTokenAddress: Address
@@ -25,11 +32,7 @@ export const getPriceFeed = async (contractAddress: Address) => {
 
 export const getCrowdSaleSeedData = async (crowdsaleAddress: Address): Promise<CrowdSaleSeedData> => {
   const web3 = await useWeb3()
-  const crowdSale = new web3.eth.Contract(
-    CrowdSaleABI,
-    // Can I use this "userState" here like this?
-    crowdsaleAddress
-  )
+  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdsaleAddress)
   const gfxConstants = new web3.eth.Contract(
     GFXConstantsABI,
     // Can I use this "userState" here like this?
@@ -51,4 +54,32 @@ export const getCrowdSaleSeedData = async (crowdsaleAddress: Address): Promise<C
     guildTokenPrice,
     stableCoins,
   }
+}
+
+export const purchaseFromCrowdSale = async (
+  crowdsaleAddress: Address,
+  stableCoinData: TokenData,
+  stableCoinAmount: string
+) => {
+  const web3 = await useWeb3()
+  const [currentUser, ..._] = await web3.eth.getAccounts()
+  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdsaleAddress)
+  const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
+  let tx
+  if ([BNB, TBNB].includes(stableCoinSymbol)) {
+    tx = await crowdSale.methods.buyInBNB(currentUser).call({ value: stableCoinAmount })
+  } else {
+    if (stableCoinSymbol === ETH) {
+      tx = await crowdSale.methods.buyInETH(stableCoinAmount).call()
+    } else if (stableCoinSymbol === USDC) {
+      tx = await crowdSale.methods.buyInUSDC(stableCoinAmount).call()
+    } else if (stableCoinSymbol === USDT) {
+      tx = await crowdSale.methods.buyInUSDT(stableCoinAmount).call()
+    } else {
+      // throw new Error(`${stableCoinSymbol} not supported!`)
+      console.error(`${stableCoinSymbol} not supported!`)
+      return
+    }
+  }
+  return tx
 }
