@@ -12,6 +12,7 @@ import { getPriceFeed } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import BN from 'bignumber.js'
+import CrowdSaleButton from './BuyButton'
 
 export const $SwapContainer = styled.section`
   width: 100%;
@@ -67,7 +68,7 @@ const CrowdSale = (props: SwapProps) => {
           {`1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`}
         </$CurrencyExchangeRate>
       ) : null}
-      <SwapButton></SwapButton>
+      <CrowdSaleButton></CrowdSaleButton>
     </$SwapContainer>
   )
 }
