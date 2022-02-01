@@ -31,9 +31,9 @@ export const getPriceFeed = async (contractAddress: Address) => {
   return priceIn8Decimals
 }
 
-export const getCrowdSaleSeedData = async (crowdsaleAddress: Address): Promise<CrowdSaleSeedData> => {
+export const getCrowdSaleSeedData = async (crowdSaleAddress: Address): Promise<CrowdSaleSeedData> => {
   const web3 = await useWeb3()
-  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdsaleAddress)
+  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress)
   const gfxConstants = new web3.eth.Contract(
     GFXConstantsABI,
     // Can I use this "userState" here like this?
@@ -58,13 +58,13 @@ export const getCrowdSaleSeedData = async (crowdsaleAddress: Address): Promise<C
 }
 
 export const purchaseFromCrowdSale = async (
-  crowdsaleAddress: Address,
+  crowdSaleAddress: Address,
   stableCoinData: TokenData,
   stableCoinAmount: string
 ) => {
   const web3 = await useWeb3()
   const [currentUser, ..._] = await web3.eth.getAccounts()
-  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdsaleAddress)
+  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress)
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
   let tx
   if ([BNB, TBNB].includes(stableCoinSymbol)) {

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { crowdSaleState, CrowdSaleRoute, fetchCrowdSaleData } from './state'
 import CrowdSale from './CrowdSale'
 import { useSnapshot } from 'valtio'
-import TokenPicker from 'lib/components/Swap/TokenPicker'
+import TokenPicker from './TokenPicker'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 
 export interface CrowdSaleWidgetProps {
