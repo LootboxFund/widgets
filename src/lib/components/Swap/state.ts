@@ -6,6 +6,7 @@ import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
+import { purchaseFromCrowdSale, approveERC20Token } from 'lib/hooks/useContract'
 import BN from 'bignumber.js'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
@@ -92,4 +93,22 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
   const web3 = useWeb3()
   const balanceAsString = await (await web3).eth.getBalance(userAddr)
   return parseFloat(balanceAsString)
+}
+
+export const purchaseGuildToken = async () => {
+  if (!swapState.inputToken.data || !swapState.inputToken.quantity || !swapState.tokenDelegator) {
+    return
+  }
+  const tx = await purchaseFromCrowdSale(
+    swapState.tokenDelegator,
+    swapState.inputToken.data,
+    swapState.inputToken.quantity
+  )
+}
+
+export const approveGuildToken = async () => {
+  if (!swapState.inputToken.data || !swapState.inputToken.quantity || !swapState.tokenDelegator) {
+    return
+  }
+  const tx = await approveERC20Token(swapState.tokenDelegator, swapState.inputToken.data, swapState.inputToken.quantity)
 }

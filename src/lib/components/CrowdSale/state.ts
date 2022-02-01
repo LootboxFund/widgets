@@ -4,7 +4,6 @@ import { proxy, subscribe } from 'valtio'
 import { swapState, SwapState } from 'lib/components/Swap/state'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
-import { purchaseFromCrowdSale } from 'lib/hooks/useContract'
 import BN from 'bignumber.js'
 
 export type CrowdSaleRoute = '/crowdSale' | '/search'
@@ -72,15 +71,4 @@ const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined
     return undefined
   }
   return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase())
-}
-
-export const purchaseGuildToken = async () => {
-  if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.tokenDelegator) {
-    return
-  }
-  const tx = await purchaseFromCrowdSale(
-    crowdSaleState.tokenDelegator,
-    crowdSaleState.inputToken.data,
-    crowdSaleState.inputToken.quantity
-  )
 }
