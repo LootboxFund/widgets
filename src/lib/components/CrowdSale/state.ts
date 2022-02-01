@@ -62,7 +62,7 @@ subscribe(crowdSaleState.outputToken, () => {
 const updateOutputTokenValues = async () => {
   if (crowdSaleState.outputToken.data && crowdSaleState.price && crowdSaleState.inputToken.data?.priceOracle) {
     // get price of conversion rate and save to crowdSaleState
-    const inputTokenPrice = await getPriceFeed(crowdSaleState.outputToken.data.priceOracle)
+    const inputTokenPrice = await getPriceFeed(crowdSaleState.inputToken.data.priceOracle)
 
     crowdSaleState.inputToken.data.usdPrice = inputTokenPrice.toString()
     crowdSaleState.outputToken.data.usdPrice = crowdSaleState.price.toString()
