@@ -4,7 +4,7 @@ import { ChainIDHex, Url, ChainIDDecimal, TokenData } from '@guildfx/helpers'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
-  usdPrice: string
+  usdPrice?: string
 }
 
 interface IAddresses {

@@ -1,7 +1,8 @@
 import react from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
-import { ChainInfo, ChainIDHex, BLOCKCHAINS } from '../constants'
+import { ChainInfo, BLOCKCHAINS } from '../constants'
+import { ChainIDHex } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from '../../components/Swap/state'
 
