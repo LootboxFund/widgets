@@ -17,13 +17,12 @@ const CrowdSaleWidget = (props: CrowdSaleWidgetProps) => {
 
   useEffect(() => {
     window.onload = () => {
-      initDApp().then(() => {
-        fetchCrowdSaleData(crowdSaleAddress)
-      })
+      initDApp()
     }
     if (props.initialRoute) {
       crowdSaleState.route = props.initialRoute
     }
+    fetchCrowdSaleData(crowdSaleAddress)
   }, [])
 
   if (snap.route === '/search') {

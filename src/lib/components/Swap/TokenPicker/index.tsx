@@ -19,7 +19,7 @@ import { Address } from '@guildfx/helpers'
 
 export interface TokenPickerProps {
   /** If specified, locks the picker to only these addresses */
-  specificAddresses: Address[] | undefined
+  specificAddresses?: Address[]
 }
 
 const arrayIsEmpty = (arr: any[] | undefined) => {
