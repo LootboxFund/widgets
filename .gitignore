@@ -4,4 +4,4 @@ storybook-static
 umd
 .env
 /env
-/iife/**/*.*
+/iife
