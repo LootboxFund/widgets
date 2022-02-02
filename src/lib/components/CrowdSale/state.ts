@@ -1,5 +1,5 @@
 import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS } from 'lib/hooks/constants'
-import { useWeb3 } from 'lib/hooks/useWeb3Api'
+import { addToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe } from 'valtio'
@@ -9,11 +9,12 @@ import { purchaseFromCrowdSale, approveERC20Token, getERC20Allowance } from 'lib
 import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
+import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)
 const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
 
-export type CrowdSaleRoute = '/crowdSale' | '/search'
+export type CrowdSaleRoute = '/crowdSale' | '/search' | '/complete'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
 export interface CrowdSaleState {
   route: CrowdSaleRoute
@@ -36,6 +37,10 @@ export interface CrowdSaleState {
   ui: {
     isButtonLoading: boolean
   }
+  lastTransaction: {
+    success: boolean
+    hash: string | undefined
+  }
 }
 const crowdSaleSnapshot: CrowdSaleState = {
   route: '/crowdSale',
@@ -57,6 +62,10 @@ const crowdSaleSnapshot: CrowdSaleState = {
   },
   ui: {
     isButtonLoading: false,
+  },
+  lastTransaction: {
+    success: false,
+    hash: undefined,
   },
 }
 export const crowdSaleState = proxy(crowdSaleSnapshot)
@@ -118,10 +127,14 @@ export const purchaseGuildToken = async () => {
       crowdSaleState.inputToken.data,
       parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
     )
+    crowdSaleState.lastTransaction.success = true
   } catch (err) {
     console.error(err)
+    crowdSaleState.lastTransaction.success = false
   } finally {
     crowdSaleState.ui.isButtonLoading = false
+    crowdSaleState.lastTransaction.hash = tx?.transactionHash
+    crowdSaleState.route = '/complete'
   }
 
   return tx
@@ -178,4 +191,10 @@ const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined
     return undefined
   }
   return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase())
+}
+
+export const addOutputTokenToWallet = async () => {
+  if (crowdSaleState.outputToken.data) {
+    await addToWallet(crowdSaleState.outputToken.data)
+  }
 }

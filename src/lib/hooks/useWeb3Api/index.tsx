@@ -2,7 +2,7 @@ import react from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
 import { ChainInfo, BLOCKCHAINS } from '../constants'
-import { ChainIDHex } from '@guildfx/helpers'
+import { ChainIDHex, TokenData } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from '../../components/Swap/state'
 
@@ -70,6 +70,27 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
       console.error(e)
       return
     }
+  }
+}
+
+export const addToWallet = async (token: TokenData) => {
+  try {
+    await (window as any).ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: token.address,
+          symbol: token.symbol,
+          decimals: token.decimals,
+          image: token.logoURI,
+        },
+      },
+    })
+    return
+  } catch (err) {
+    console.error(err)
+    return
   }
 }
 

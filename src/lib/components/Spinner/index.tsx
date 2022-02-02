@@ -1,6 +1,7 @@
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import react from 'react'
 import styled from 'styled-components'
+import { $Horizontal } from '../Generics'
 
 export const $Spinner = styled.div<{
   color?: string
@@ -24,4 +25,14 @@ export const $Spinner = styled.div<{
     }
   }
 `
+
+export const LoadingText = ({ loading, text, color }: { loading: boolean; text: string; color: string }) => {
+  return (
+    <$Horizontal justifyContent="center">
+      {loading ? <$Spinner color={color}></$Spinner> : null}
+      {text}
+    </$Horizontal>
+  )
+}
+
 export default $Spinner
