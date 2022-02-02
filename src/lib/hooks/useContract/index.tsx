@@ -66,7 +66,7 @@ export const purchaseFromCrowdSale = async (
   const [currentUser, ..._] = await web3.eth.getAccounts()
   const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress, {
     from: currentUser,
-    gas: '10000000', // Have to hardocode the gas limit for now...
+    gas: '1000000', // Have to hardocode the gas limit for now...
   })
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
   let tx = undefined
