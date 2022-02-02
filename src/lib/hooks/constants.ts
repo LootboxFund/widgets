@@ -15,7 +15,7 @@ interface IAddresses {
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
 // TODO: Dynamically load this
-export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x803c267a3bf44099b75ad4d244a1eddd98df13ba'
+export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x8CE3A983Bd495c640954D2d08b1e16B29fCE9524'
 
 export type ChainInfo = {
   chainIdHex: ChainIDHex
@@ -66,7 +66,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
   },
   {
-    address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+    address: '0x5Db52f14c8bB2771b716dbDC9B7e916d45Dd4751',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -76,7 +76,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x9ef1b8c0e4f7dc8bf5719ea496883dc6401d5b2e',
   },
   {
-    address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+    address: '0xAf5bf989F74cd19931C8556f34628c04C9221645',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -86,7 +86,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x51597f405303c4377e36123cbc172b13269ea163',
   },
   {
-    address: '0x55d398326f99059ff775485246999027b3197955',
+    address: '0xb90B90090f1812CcB0baDF445F6ae5621D77359a',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -152,7 +152,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0xEca2605f0BCF2BA5966372C99837b1F182d3D620',
   },
   {
-    address: '0x016D620466C75DeBA325F4202973197CF5DfEd3A',
+    address: '0xE15eA97a5d642Fdf130632152153aB95fBa7A850',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -186,6 +186,6 @@ export const addresses: Record<string, IAddresses> = {
   // BSC TESTNET 0x61 = 97
   '0x61': {
     // --- Contract addresses (from deploy scripts in backend) ---
-    gfxConstants: '0x3aeDdd9AE5681E78e1645685d5898d88C43B568c',
+    gfxConstants: '0x5523D8c92CE44f11b66607899415381eeBef1324',
   },
 }
