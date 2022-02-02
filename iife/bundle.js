@@ -719,7 +719,7 @@
 
             const DEFAULT_CHAIN_ID_HEX = '0x38';
             // TODO: Dynamically load this
-            const BSC_TESTNET_CROWDSALE_ADDRESS = '0x803c267a3bf44099b75ad4d244a1eddd98df13ba';
+            const BSC_TESTNET_CROWDSALE_ADDRESS = '0x5c635b6857d0e16acbebb6d1d36fdae177cf3e8e';
             const BLOCKCHAINS = {
                 '0x38': {
                     chainIdHex: '0x38',
@@ -808,7 +808,7 @@
                     priceOracle: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
                 },
                 {
-                    address: '0x7638f12cAf512BF4754B8166F5f26aC74BBFfFB5',
+                    address: '0x5Db52f14c8bB2771b716dbDC9B7e916d45Dd4751',
                     chainIdHex: '0x61',
                     chainIdDecimal: '97',
                     decimals: 18,
@@ -818,7 +818,7 @@
                     priceOracle: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7',
                 },
                 {
-                    address: '0x8031b35155d97B6730154B68C046d2C69A4Afd4d',
+                    address: '0xAf5bf989F74cd19931C8556f34628c04C9221645',
                     chainIdHex: '0x61',
                     chainIdDecimal: '97',
                     decimals: 18,
@@ -828,7 +828,7 @@
                     priceOracle: '0x90c069C4538adAc136E051052E14c1cD799C41B7',
                 },
                 {
-                    address: '0xBb6Da17FF643a0F92B326f58de4133d4416A131e',
+                    address: '0xb90B90090f1812CcB0baDF445F6ae5621D77359a',
                     chainIdHex: '0x61',
                     chainIdDecimal: '97',
                     decimals: 18,
@@ -838,7 +838,7 @@
                     priceOracle: '0xEca2605f0BCF2BA5966372C99837b1F182d3D620',
                 },
                 {
-                    address: '0x016D620466C75DeBA325F4202973197CF5DfEd3A',
+                    address: '0xE15eA97a5d642Fdf130632152153aB95fBa7A850',
                     chainIdHex: '0x61',
                     chainIdDecimal: '97',
                     decimals: 18,
@@ -858,7 +858,7 @@
                 // BSC TESTNET 0x61 = 97
                 '0x61': {
                     // --- Contract addresses (from deploy scripts in backend) ---
-                    gfxConstants: '0x3aeDdd9AE5681E78e1645685d5898d88C43B568c',
+                    gfxConstants: '0x5523D8c92CE44f11b66607899415381eeBef1324',
                 },
             };
 
@@ -1953,11 +1953,6 @@
             	},
             	{
             		inputs: [
-            			{
-            				internalType: "address payable",
-            				name: "_beneficiary",
-            				type: "address"
-            			}
             		],
             		name: "buyInBNB",
             		outputs: [
@@ -5902,23 +5897,22 @@
                 const [currentUser, ..._] = await web3.eth.getAccounts();
                 const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress, {
                     from: currentUser,
-                    value: stableCoinAmount,
-                    gas: '1000000', // Have to hardocode the gas limit for now...
+                    gas: '10000000', // Have to hardocode the gas limit for now...
                 });
                 const stableCoinSymbol = stableCoinData.symbol.toLowerCase();
                 let tx = undefined;
                 if ([BNB, TBNB].includes(stableCoinSymbol)) {
-                    tx = crowdSale.methods.buyInBNB(currentUser);
+                    tx = crowdSale.methods.buyInBNB().send({ value: stableCoinAmount });
                 }
                 else {
                     if (stableCoinSymbol === ETH) {
-                        tx = crowdSale.methods.buyInETH(stableCoinAmount);
+                        tx = crowdSale.methods.buyInETH(stableCoinAmount).send();
                     }
                     else if (stableCoinSymbol === USDC) {
-                        tx = crowdSale.methods.buyInUSDC(stableCoinAmount);
+                        tx = crowdSale.methods.buyInUSDC(stableCoinAmount).send();
                     }
                     else if (stableCoinSymbol === USDT) {
-                        tx = crowdSale.methods.buyInUSDT(stableCoinAmount);
+                        tx = crowdSale.methods.buyInUSDT(stableCoinAmount).send();
                     }
                     else {
                         // throw new Error(`${stableCoinSymbol} not supported!`)
@@ -5926,7 +5920,7 @@
                         return;
                     }
                 }
-                await tx.send();
+                await tx;
                 return tx;
             };
             const getERC20Allowance = async (spender, tokenAddress) => {
