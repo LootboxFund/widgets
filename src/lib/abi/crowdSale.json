@@ -259,13 +259,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "_beneficiary",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "buyInBNB",
     "outputs": [],
     "stateMutability": "payable",
