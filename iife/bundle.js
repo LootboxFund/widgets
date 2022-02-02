@@ -717,6 +717,151 @@
 
             var ReactDOM = reactDom.exports;
 
+            const DEFAULT_CHAIN_ID_HEX = '0x38';
+            // TODO: Dynamically load this
+            const BSC_TESTNET_CROWDSALE_ADDRESS = '0x803c267a3bf44099b75ad4d244a1eddd98df13ba';
+            const BLOCKCHAINS = {
+                '0x38': {
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    chainName: 'Binance Smart Chain',
+                    displayName: 'BSC Mainnet',
+                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                    blockExplorerUrls: ['https://bscscan.com/'],
+                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                },
+                '0x61': {
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    chainName: 'Binance Smart Chain (Testnet)',
+                    displayName: 'BSC Testnet',
+                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+                    blockExplorerUrls: ['https://testnet.bscscan.com/'],
+                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                },
+            };
+            const BSC_MAINNET_FULL_TOKEN_LIST = [
+                {
+                    address: '0x0native',
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                    name: 'Binance Smart Chain',
+                    symbol: 'BNB',
+                    priceOracle: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
+                },
+                {
+                    address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                    name: 'Wrapped Ethereum',
+                    symbol: 'ETH',
+                    priceOracle: '0x9ef1b8c0e4f7dc8bf5719ea496883dc6401d5b2e',
+                },
+                {
+                    address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+                    name: 'USD Coin',
+                    symbol: 'USDC',
+                    priceOracle: '0x51597f405303c4377e36123cbc172b13269ea163',
+                },
+                {
+                    address: '0x55d398326f99059ff775485246999027b3197955',
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    priceOracle: '0xb97ad0e74fa7d920791e90258a6e2085088b4320',
+                },
+            ];
+            const DEMO_CUSTOM_TOKENS_BSC_MAINNET = [
+                {
+                    address: '0xba2ae424d960c26247dd6c32edc70b295c744c43',
+                    chainIdHex: '0x38',
+                    chainIdDecimal: '56',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
+                    name: 'Dogecoin',
+                    symbol: 'DOGE',
+                    priceOracle: '0x3ab0a0d137d4f946fbb19eecc6e92e64660231c8',
+                },
+            ];
+            const BSC_TESTNET_FULL_TOKEN_LIST = [
+                {
+                    address: '0x0native',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
+                    name: 'Binance Smart Chain',
+                    symbol: 'tBNB',
+                    priceOracle: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
+                },
+                {
+                    address: '0x7638f12cAf512BF4754B8166F5f26aC74BBFfFB5',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
+                    name: 'Wrapped Ethereum',
+                    symbol: 'ETH',
+                    priceOracle: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7',
+                },
+                {
+                    address: '0x8031b35155d97B6730154B68C046d2C69A4Afd4d',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
+                    name: 'USD Circle',
+                    symbol: 'USDC',
+                    priceOracle: '0x90c069C4538adAc136E051052E14c1cD799C41B7',
+                },
+                {
+                    address: '0xBb6Da17FF643a0F92B326f58de4133d4416A131e',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    priceOracle: '0xEca2605f0BCF2BA5966372C99837b1F182d3D620',
+                },
+                {
+                    address: '0x016D620466C75DeBA325F4202973197CF5DfEd3A',
+                    chainIdHex: '0x61',
+                    chainIdDecimal: '97',
+                    decimals: 18,
+                    logoURI: 'https://i.imgur.com/gG1fBg0.jpg',
+                    name: 'Artemis',
+                    symbol: 'ATMS',
+                    priceOracle: '________',
+                },
+            ];
+            const tokenMap = {
+                '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
+                '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
+            };
+            const addresses = {
+                // BSC MAINNET
+                // 56: {},
+                // BSC TESTNET 0x61 = 97
+                '0x61': {
+                    // --- Contract addresses (from deploy scripts in backend) ---
+                    gfxConstants: '0x3aeDdd9AE5681E78e1645685d5898d88C43B568c',
+                },
+            };
+
             /**
              * Returns a Promise that resolves to the value of window.ethereum if it is
              * set within the given timeout, or null.
@@ -1121,130 +1266,6 @@
             };
             const userState = proxy(initialUserState);
 
-            const DEFAULT_CHAIN_ID_HEX = '0x38';
-            const BLOCKCHAINS = {
-                '0x38': {
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    chainName: 'Binance Smart Chain',
-                    displayName: 'BSC Mainnet',
-                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                    rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                    blockExplorerUrls: ['https://bscscan.com/'],
-                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
-                },
-                '0x61': {
-                    chainIdHex: '0x61',
-                    chainIdDecimal: '97',
-                    chainName: 'Binance Smart Chain (Testnet)',
-                    displayName: 'BSC Testnet',
-                    nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-                    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
-                    blockExplorerUrls: ['https://testnet.bscscan.com/'],
-                    currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
-                },
-            };
-            const BSC_MAINNET_FULL_TOKEN_LIST = [
-                {
-                    address: '0x0native',
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
-                    name: 'Binance Smart Chain',
-                    symbol: 'BNB',
-                    priceOracle: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
-                },
-                {
-                    address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-                    name: 'Wrapped Ethereum',
-                    symbol: 'ETH',
-                    priceOracle: '0x9ef1b8c0e4f7dc8bf5719ea496883dc6401d5b2e',
-                },
-                {
-                    address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-                    name: 'USD Coin',
-                    symbol: 'USDC',
-                    priceOracle: '0x51597f405303c4377e36123cbc172b13269ea163',
-                },
-                {
-                    address: '0x55d398326f99059ff775485246999027b3197955',
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-                    name: 'Tether',
-                    symbol: 'USDT',
-                    priceOracle: '0xb97ad0e74fa7d920791e90258a6e2085088b4320',
-                },
-            ];
-            const DEMO_CUSTOM_TOKENS_BSC_MAINNET = [
-                {
-                    address: '0xba2ae424d960c26247dd6c32edc70b295c744c43',
-                    chainIdHex: '0x38',
-                    chainIdDecimal: '56',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/74.png',
-                    name: 'Dogecoin',
-                    symbol: 'DOGE',
-                    priceOracle: '0x3ab0a0d137d4f946fbb19eecc6e92e64660231c8',
-                },
-            ];
-            const BSC_TESTNET_FULL_TOKEN_LIST = [
-                {
-                    address: '0x0native',
-                    chainIdHex: '0x61',
-                    chainIdDecimal: '97',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
-                    name: 'Binance Smart Chain',
-                    symbol: 'tBNB',
-                    priceOracle: '____________',
-                },
-                {
-                    address: '0x535543240B14F8dc39CA62811528781d613F2A59',
-                    chainIdHex: '0x61',
-                    chainIdDecimal: '97',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-                    name: 'Wrapped Ethereum',
-                    symbol: 'ETH',
-                    priceOracle: '________',
-                },
-                {
-                    address: '0x05Dc92E0C23eF3BBBe819FD8cF1AdC92b3487709',
-                    chainIdHex: '0x61',
-                    chainIdDecimal: '97',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png',
-                    name: 'USD Circle',
-                    symbol: 'USDC',
-                    priceOracle: '________',
-                },
-                {
-                    address: '0xF6de6323f26EaD05c6199D91F88175629eadbC1f',
-                    chainIdHex: '0x61',
-                    chainIdDecimal: '97',
-                    decimals: 18,
-                    logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/825.png',
-                    name: 'Tether',
-                    symbol: 'USDT',
-                    priceOracle: '________',
-                },
-            ];
-            const tokenMap = {
-                '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
-                '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
-            };
-
             const CUSTOM_TOKEN_STORAGE_KEY = "guildfx-custom-tokens";
 
             const getCustomTokensList = (chainIdHex) => {
@@ -1270,29 +1291,6 @@
             const useCustomTokenList = () => {
                 const snap = useSnapshot(tokenListState);
                 return snap.customTokenList;
-            };
-            const addCustomToken = (data) => {
-                const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
-                if (existingCustomTokens) {
-                    const customTokens = JSON.parse(existingCustomTokens);
-                    if (customTokens[data.chainIdHex] && customTokens[data.chainIdHex].length >= 0) {
-                        customTokens[data.chainIdHex] = customTokens[data.chainIdHex]
-                            .filter((t) => t.address !== data.address)
-                            .concat([data]);
-                    }
-                    else {
-                        customTokens[data.chainIdHex] = [data];
-                    }
-                    tokenListState.customTokenList = customTokens[data.chainIdHex];
-                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
-                }
-                else {
-                    const customTokens = {
-                        [data.chainIdHex]: [data],
-                    };
-                    tokenListState.customTokenList = customTokens[data.chainIdHex];
-                    localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens));
-                }
             };
             const removeCustomToken = (address, chainIdHex) => {
                 const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY);
@@ -1321,133 +1319,6 @@
                 const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX;
                 tokenListState.defaultTokenList = tokenMap[chosenChainIdHex] || [];
                 tokenListState.customTokenList = getCustomTokensList(chosenChainIdHex);
-            };
-
-            const useWeb3 = async () => {
-                return window.web3;
-            };
-            const useUserInfo = () => {
-                const requestAccounts = async () => {
-                    const web3 = await useWeb3();
-                    try {
-                        await web3.eth.requestAccounts(async (err, accounts) => {
-                            if (err) {
-                                console.error(err);
-                            }
-                            else {
-                                const userAccounts = await web3.eth.getAccounts();
-                                userState.accounts = userAccounts;
-                            }
-                        });
-                        return {
-                            success: true,
-                            message: 'Successfully connected to wallet',
-                        };
-                    }
-                    catch (e) {
-                        console.error(e);
-                        return {
-                            success: false,
-                            message: 'Please install MetaMask',
-                        };
-                    }
-                };
-                const getNativeBalance = async () => {
-                    const web3 = await useWeb3();
-                    const nativeBalance = await web3.eth.getBalance(userState.accounts[0]);
-                    return nativeBalance;
-                };
-                return {
-                    requestAccounts,
-                    getNativeBalance,
-                };
-            };
-            const addCustomEVMChain = async (chainIdHex) => {
-                const chainInfo = BLOCKCHAINS[chainIdHex];
-                if (chainInfo) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [
-                                {
-                                    chainId: chainInfo.chainIdHex,
-                                    chainName: chainInfo.chainName,
-                                    nativeCurrency: chainInfo.nativeCurrency,
-                                    rpcUrls: chainInfo.rpcUrls,
-                                    blockExplorerUrls: chainInfo.blockExplorerUrls,
-                                },
-                            ],
-                        });
-                        updateStateToChain(chainInfo);
-                        return;
-                    }
-                    catch (e) {
-                        console.error(`Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`);
-                        console.error(e);
-                        return;
-                    }
-                }
-            };
-            const initDApp = async () => {
-                initWeb3OnWindow();
-                const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
-                const blockchain = BLOCKCHAINS[chainIdHex];
-                if (blockchain) {
-                    updateStateToChain(blockchain);
-                }
-                const userAccounts = await window.web3.eth.getAccounts();
-                userState.accounts = userAccounts;
-                userState.currentAccount = userAccounts[0];
-                window.ethereum.on('chainChanged', async (chainIdHex) => {
-                    const blockchain = BLOCKCHAINS[chainIdHex];
-                    if (blockchain) {
-                        updateStateToChain(blockchain);
-                    }
-                    else {
-                        clearStateToChain();
-                    }
-                });
-            };
-            const initWeb3OnWindow = async () => {
-                const provider = await dist();
-                // const provider = (window as any).ethereum
-                window.web3 = new window.Web3('https://bsc-dataseed.binance.org/');
-                if (provider) {
-                    window.web3 = new window.Web3(provider);
-                    const userAccounts = await window.web3.eth.getAccounts();
-                    userState.accounts = userAccounts;
-                }
-                else {
-                    console.error('Please install MetaMask!');
-                    throw Error('MetaMask not detected');
-                }
-            };
-            const updateStateToChain = (chainInfo) => {
-                userState.currentNetworkIdHex = chainInfo.chainIdHex;
-                userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal;
-                userState.currentNetworkName = chainInfo.chainName;
-                userState.currentNetworkDisplayName = chainInfo.displayName;
-                userState.currentNetworkLogo = chainInfo.currentNetworkLogo;
-                clearSwapState();
-                initTokenList(chainInfo.chainIdHex);
-            };
-            const clearStateToChain = () => {
-                userState.currentNetworkIdHex = undefined;
-                userState.currentNetworkIdDecimal = undefined;
-                userState.currentNetworkName = undefined;
-                userState.currentNetworkDisplayName = undefined;
-                userState.currentNetworkLogo = undefined;
-                clearSwapState();
-                initTokenList();
-            };
-            const clearSwapState = () => {
-                swapState.targetToken = null;
-                swapState.inputToken.data = undefined;
-                swapState.inputToken.displayedBalance = undefined;
-                swapState.inputToken.quantity = undefined;
-                swapState.outputToken.data = undefined;
-                swapState.outputToken.displayedBalance = undefined;
-                swapState.outputToken.quantity = undefined;
             };
 
             var ERC20ABI = [
@@ -1813,6 +1684,1277 @@
             	linkReferences: linkReferences,
             	deployedLinkReferences: deployedLinkReferences
             };
+
+            var CrowdSaleABI = [
+            	{
+            		inputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "constructor"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "previousAdmin",
+            				type: "address"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "newAdmin",
+            				type: "address"
+            			}
+            		],
+            		name: "AdminChanged",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "beacon",
+            				type: "address"
+            			}
+            		],
+            		name: "BeaconUpgraded",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "Paused",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "_buyer",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "_stablecoin",
+            				type: "address"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "uint256",
+            				name: "_stablecoinPaid",
+            				type: "uint256"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "uint256",
+            				name: "_guildReceived",
+            				type: "uint256"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "uint256",
+            				name: "_usdReceived",
+            				type: "uint256"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "uint256",
+            				name: "_priceInUSD",
+            				type: "uint256"
+            			}
+            		],
+            		name: "Purchase",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "previousAdminRole",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "newAdminRole",
+            				type: "bytes32"
+            			}
+            		],
+            		name: "RoleAdminChanged",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "sender",
+            				type: "address"
+            			}
+            		],
+            		name: "RoleGranted",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "sender",
+            				type: "address"
+            			}
+            		],
+            		name: "RoleRevoked",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "Unpaused",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "implementation",
+            				type: "address"
+            			}
+            		],
+            		name: "Upgraded",
+            		type: "event"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "CONSTANTS",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "DEFAULT_ADMIN_ROLE",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "GUILD",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "TREASURY",
+            		outputs: [
+            			{
+            				internalType: "address payable",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "amountRaisedInUSD",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address payable",
+            				name: "_beneficiary",
+            				type: "address"
+            			}
+            		],
+            		name: "buyInBNB",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "uint256",
+            				name: "_amount",
+            				type: "uint256"
+            			}
+            		],
+            		name: "buyInETH",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "uint256",
+            				name: "_amount",
+            				type: "uint256"
+            			}
+            		],
+            		name: "buyInUSDC",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "uint256",
+            				name: "_amount",
+            				type: "uint256"
+            			}
+            		],
+            		name: "buyInUSDT",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "currentPriceUSD",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "deploymentEndTime",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "deploymentStartTime",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "getBNBPrice",
+            		outputs: [
+            			{
+            				internalType: "int256",
+            				name: "",
+            				type: "int256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "getETHPrice",
+            		outputs: [
+            			{
+            				internalType: "int256",
+            				name: "",
+            				type: "int256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			}
+            		],
+            		name: "getRoleAdmin",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "getUSDCPrice",
+            		outputs: [
+            			{
+            				internalType: "int256",
+            				name: "",
+            				type: "int256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "getUSDTPrice",
+            		outputs: [
+            			{
+            				internalType: "int256",
+            				name: "",
+            				type: "int256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "grantRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "hasRole",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "_guildToken",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "_daoAddress",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "_developerAddress",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "_constantsAddress",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address payable",
+            				name: "_treasuryAddress",
+            				type: "address"
+            			},
+            			{
+            				internalType: "uint256",
+            				name: "_startingPriceInUSD",
+            				type: "uint256"
+            			}
+            		],
+            		name: "initialize",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "isRetired",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "pause",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "paused",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "renounceRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "revokeRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes4",
+            				name: "interfaceId",
+            				type: "bytes4"
+            			}
+            		],
+            		name: "supportsInterface",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "unpause",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "newImplementation",
+            				type: "address"
+            			}
+            		],
+            		name: "upgradeTo",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "newImplementation",
+            				type: "address"
+            			},
+            			{
+            				internalType: "bytes",
+            				name: "data",
+            				type: "bytes"
+            			}
+            		],
+            		name: "upgradeToAndCall",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	}
+            ];
+
+            var GFXConstantsABI = [
+            	{
+            		inputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "constructor"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "previousAdmin",
+            				type: "address"
+            			},
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "newAdmin",
+            				type: "address"
+            			}
+            		],
+            		name: "AdminChanged",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "beacon",
+            				type: "address"
+            			}
+            		],
+            		name: "BeaconUpgraded",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "Paused",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "previousAdminRole",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "newAdminRole",
+            				type: "bytes32"
+            			}
+            		],
+            		name: "RoleAdminChanged",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "sender",
+            				type: "address"
+            			}
+            		],
+            		name: "RoleGranted",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			},
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "sender",
+            				type: "address"
+            			}
+            		],
+            		name: "RoleRevoked",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: false,
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "Unpaused",
+            		type: "event"
+            	},
+            	{
+            		anonymous: false,
+            		inputs: [
+            			{
+            				indexed: true,
+            				internalType: "address",
+            				name: "implementation",
+            				type: "address"
+            			}
+            		],
+            		name: "Upgraded",
+            		type: "event"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "BNB_PRICE_FEED",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "DAO_ROLE",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "DEFAULT_ADMIN_ROLE",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "DEVELOPER_ROLE",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "ETH_ADDRESS",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "ETH_PRICE_FEED",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "GUILD_FX_MINTING_FEE",
+            		outputs: [
+            			{
+            				internalType: "uint256",
+            				name: "",
+            				type: "uint256"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "GUILD_FX_MINTING_FEE_DECIMALS",
+            		outputs: [
+            			{
+            				internalType: "uint8",
+            				name: "",
+            				type: "uint8"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "TREASURY",
+            		outputs: [
+            			{
+            				internalType: "address payable",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "USDC_ADDRESS",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "USDC_PRICE_FEED",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "USDT_ADDRESS",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "USDT_PRICE_FEED",
+            		outputs: [
+            			{
+            				internalType: "address",
+            				name: "",
+            				type: "address"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			}
+            		],
+            		name: "getRoleAdmin",
+            		outputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "",
+            				type: "bytes32"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "grantRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "hasRole",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "dao",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "developer",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address payable",
+            				name: "_treasury",
+            				type: "address"
+            			}
+            		],
+            		name: "initialize",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "pause",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "paused",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "renounceRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes32",
+            				name: "role",
+            				type: "bytes32"
+            			},
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "revokeRole",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "eth",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "usdc",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "usdt",
+            				type: "address"
+            			}
+            		],
+            		name: "setCrowdSaleStableCoins",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "bnbPriceFeed",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "ethPriceFeed",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "usdcPriceFeed",
+            				type: "address"
+            			},
+            			{
+            				internalType: "address",
+            				name: "usdtPriceFeed",
+            				type: "address"
+            			}
+            		],
+            		name: "setOraclePriceFeeds",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "bytes4",
+            				name: "interfaceId",
+            				type: "bytes4"
+            			}
+            		],
+            		name: "supportsInterface",
+            		outputs: [
+            			{
+            				internalType: "bool",
+            				name: "",
+            				type: "bool"
+            			}
+            		],
+            		stateMutability: "view",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "account",
+            				type: "address"
+            			}
+            		],
+            		name: "transferGuildFXDAOAdminPrivileges",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            		],
+            		name: "unpause",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "newImplementation",
+            				type: "address"
+            			}
+            		],
+            		name: "upgradeTo",
+            		outputs: [
+            		],
+            		stateMutability: "nonpayable",
+            		type: "function"
+            	},
+            	{
+            		inputs: [
+            			{
+            				internalType: "address",
+            				name: "newImplementation",
+            				type: "address"
+            			},
+            			{
+            				internalType: "bytes",
+            				name: "data",
+            				type: "bytes"
+            			}
+            		],
+            		name: "upgradeToAndCall",
+            		outputs: [
+            		],
+            		stateMutability: "payable",
+            		type: "function"
+            	}
+            ];
 
             var bignumber = {exports: {}};
 
@@ -4720,6 +5862,11 @@
 
             var BN = bignumber.exports;
 
+            const BNB = 'bnb';
+            const TBNB = 'tbnb';
+            const USDC = 'usdc';
+            const ETH = 'eth';
+            const USDT = 'usdt';
             const getPriceFeed = async (contractAddress) => {
                 const web3 = await useWeb3();
                 let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi, contractAddress);
@@ -4727,6 +5874,76 @@
                 const data = await contractInstance.methods.latestRoundData().call({ from: currentUser });
                 const priceIn8Decimals = new BN(data.answer).div(new BN(`100000000`)).decimalPlaces(4);
                 return priceIn8Decimals;
+            };
+            const getCrowdSaleSeedData = async (crowdSaleAddress) => {
+                const web3 = await useWeb3();
+                const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress);
+                const gfxConstants = new web3.eth.Contract(GFXConstantsABI, 
+                // Can I use this "userState" here like this?
+                addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX].gfxConstants);
+                const [guildTokenAddress, guildTokenPrice, ...stableCoins] = await Promise.all([
+                    // Load the guildTokenAddress
+                    crowdSale.methods.GUILD().call(),
+                    // Loads the current price for the guild token
+                    crowdSale.methods.currentPriceUSD().call(),
+                    // Gets stable coins from the gfxConstants
+                    gfxConstants.methods.ETH_ADDRESS().call(),
+                    gfxConstants.methods.USDC_ADDRESS().call(),
+                    gfxConstants.methods.USDT_ADDRESS().call(),
+                ]);
+                return {
+                    guildTokenAddress,
+                    guildTokenPrice,
+                    stableCoins,
+                };
+            };
+            const purchaseFromCrowdSale = async (crowdSaleAddress, stableCoinData, stableCoinAmount) => {
+                const web3 = await useWeb3();
+                const [currentUser, ..._] = await web3.eth.getAccounts();
+                const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress, {
+                    from: currentUser,
+                    value: stableCoinAmount,
+                    gas: '1000000', // Have to hardocode the gas limit for now...
+                });
+                const stableCoinSymbol = stableCoinData.symbol.toLowerCase();
+                let tx = undefined;
+                if ([BNB, TBNB].includes(stableCoinSymbol)) {
+                    tx = crowdSale.methods.buyInBNB(currentUser);
+                }
+                else {
+                    if (stableCoinSymbol === ETH) {
+                        tx = crowdSale.methods.buyInETH(stableCoinAmount);
+                    }
+                    else if (stableCoinSymbol === USDC) {
+                        tx = crowdSale.methods.buyInUSDC(stableCoinAmount);
+                    }
+                    else if (stableCoinSymbol === USDT) {
+                        tx = crowdSale.methods.buyInUSDT(stableCoinAmount);
+                    }
+                    else {
+                        // throw new Error(`${stableCoinSymbol} not supported!`)
+                        console.error(`${stableCoinSymbol} not supported!`);
+                        return;
+                    }
+                }
+                await tx.send();
+                return tx;
+            };
+            const getERC20Allowance = async (spender, tokenAddress) => {
+                if (!spender)
+                    return '0';
+                const web3 = await useWeb3();
+                const [currentUser] = await web3.eth.getAccounts();
+                const token = new web3.eth.Contract(ERC20ABI, tokenAddress);
+                return token.methods.allowance(currentUser, spender).call();
+            };
+            const approveERC20Token = async (delegator, tokenData, quantity) => {
+                if (!delegator)
+                    return;
+                const web3 = await useWeb3();
+                const [currentUser, ..._] = await web3.eth.getAccounts();
+                const token = new web3.eth.Contract(ERC20ABI, tokenData.address);
+                return token.methods.approve(delegator, quantity).send({ from: currentUser });
             };
 
             const swapSnapshot = {
@@ -4745,12 +5962,12 @@
             };
             const swapState = proxy(swapSnapshot);
             subscribe(swapState.inputToken, () => {
-                updateOutputTokenValues();
+                updateOutputTokenValues$1();
             });
             subscribe(swapState.outputToken, () => {
-                updateOutputTokenValues();
+                updateOutputTokenValues$1();
             });
-            const updateOutputTokenValues = async () => {
+            const updateOutputTokenValues$1 = async () => {
                 if (swapState.outputToken.data?.priceOracle && swapState.inputToken.data?.priceOracle) {
                     // get price of conversion rate and save to swapState
                     const [inputTokenPrice, outputTokenPrice] = await Promise.all([
@@ -4769,6 +5986,189 @@
                         .toString();
                 }
             };
+
+            const useWeb3 = async () => {
+                return window.web3;
+            };
+            const useUserInfo = () => {
+                const requestAccounts = async () => {
+                    const web3 = await useWeb3();
+                    try {
+                        await web3.eth.requestAccounts(async (err, accounts) => {
+                            if (err) {
+                                console.error(err);
+                            }
+                            else {
+                                const userAccounts = await web3.eth.getAccounts();
+                                userState.accounts = userAccounts;
+                            }
+                        });
+                        return {
+                            success: true,
+                            message: 'Successfully connected to wallet',
+                        };
+                    }
+                    catch (e) {
+                        console.error(e);
+                        return {
+                            success: false,
+                            message: 'Please install MetaMask',
+                        };
+                    }
+                };
+                const getNativeBalance = async () => {
+                    const web3 = await useWeb3();
+                    const nativeBalance = await web3.eth.getBalance(userState.accounts[0]);
+                    return nativeBalance;
+                };
+                return {
+                    requestAccounts,
+                    getNativeBalance,
+                };
+            };
+            const addCustomEVMChain = async (chainIdHex) => {
+                const chainInfo = BLOCKCHAINS[chainIdHex];
+                if (chainInfo) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: chainInfo.chainIdHex,
+                                    chainName: chainInfo.chainName,
+                                    nativeCurrency: chainInfo.nativeCurrency,
+                                    rpcUrls: chainInfo.rpcUrls,
+                                    blockExplorerUrls: chainInfo.blockExplorerUrls,
+                                },
+                            ],
+                        });
+                        updateStateToChain(chainInfo);
+                        return;
+                    }
+                    catch (e) {
+                        console.error(`Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`);
+                        console.error(e);
+                        return;
+                    }
+                }
+            };
+            const initDApp = async () => {
+                initWeb3OnWindow();
+                const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' });
+                const blockchain = BLOCKCHAINS[chainIdHex];
+                if (blockchain) {
+                    updateStateToChain(blockchain);
+                }
+                const userAccounts = await window.web3.eth.getAccounts();
+                userState.accounts = userAccounts;
+                userState.currentAccount = userAccounts[0];
+                window.ethereum.on('chainChanged', async (chainIdHex) => {
+                    const blockchain = BLOCKCHAINS[chainIdHex];
+                    if (blockchain) {
+                        updateStateToChain(blockchain);
+                    }
+                    else {
+                        clearStateToChain();
+                    }
+                });
+            };
+            const initWeb3OnWindow = async () => {
+                const provider = await dist();
+                // const provider = (window as any).ethereum
+                window.web3 = new window.Web3('https://bsc-dataseed.binance.org/');
+                if (provider) {
+                    window.web3 = new window.Web3(provider);
+                    const userAccounts = await window.web3.eth.getAccounts();
+                    userState.accounts = userAccounts;
+                }
+                else {
+                    console.error('Please install MetaMask!');
+                    throw Error('MetaMask not detected');
+                }
+            };
+            const updateStateToChain = (chainInfo) => {
+                userState.currentNetworkIdHex = chainInfo.chainIdHex;
+                userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal;
+                userState.currentNetworkName = chainInfo.chainName;
+                userState.currentNetworkDisplayName = chainInfo.displayName;
+                userState.currentNetworkLogo = chainInfo.currentNetworkLogo;
+                clearSwapState();
+                initTokenList(chainInfo.chainIdHex);
+            };
+            const clearStateToChain = () => {
+                userState.currentNetworkIdHex = undefined;
+                userState.currentNetworkIdDecimal = undefined;
+                userState.currentNetworkName = undefined;
+                userState.currentNetworkDisplayName = undefined;
+                userState.currentNetworkLogo = undefined;
+                clearSwapState();
+                initTokenList();
+            };
+            const clearSwapState = () => {
+                swapState.targetToken = null;
+                swapState.inputToken.data = undefined;
+                swapState.inputToken.displayedBalance = undefined;
+                swapState.inputToken.quantity = undefined;
+                swapState.outputToken.data = undefined;
+                swapState.outputToken.displayedBalance = undefined;
+                swapState.outputToken.quantity = undefined;
+            };
+
+            const DEFAULT_DECIMALS = 18;
+            const parseWei = (amount, decimals) => {
+                if (decimals == undefined) {
+                    decimals = DEFAULT_DECIMALS;
+                }
+                return new BN(amount).multipliedBy(new BN(10).pow(decimals)).toString();
+            };
+
+            const crowdSaleSnapshot = {
+                route: '/crowdSale',
+                targetToken: null,
+                crowdSaleAddress: BSC_TESTNET_CROWDSALE_ADDRESS,
+                stableCoins: [],
+                price: undefined,
+                inputToken: {
+                    data: undefined,
+                    quantity: undefined,
+                    displayedBalance: undefined,
+                    allowance: undefined,
+                },
+                outputToken: {
+                    data: undefined,
+                    quantity: undefined,
+                    displayedBalance: undefined,
+                    allowance: undefined,
+                },
+                ui: {
+                    isButtonLoading: false,
+                },
+            };
+            const crowdSaleState = proxy(crowdSaleSnapshot);
+            subscribe(crowdSaleState.inputToken, () => {
+                updateOutputTokenValues();
+            });
+            subscribe(crowdSaleState.outputToken, () => {
+                updateOutputTokenValues();
+            });
+            const updateOutputTokenValues = async () => {
+                if (crowdSaleState.outputToken.data && crowdSaleState.price && crowdSaleState.inputToken.data?.priceOracle) {
+                    // get price of conversion rate and save to crowdSaleState
+                    const inputTokenPrice = await getPriceFeed(crowdSaleState.inputToken.data.priceOracle);
+                    crowdSaleState.inputToken.data.usdPrice = inputTokenPrice.toString();
+                    crowdSaleState.outputToken.data.usdPrice = crowdSaleState.price.toString();
+                }
+                if (crowdSaleState.outputToken.data &&
+                    crowdSaleState.inputToken.data &&
+                    crowdSaleState.inputToken.quantity !== undefined) {
+                    const inputTokenPrice = crowdSaleState.inputToken.data.usdPrice || '';
+                    const outputTokenPrice = crowdSaleState.outputToken.data.usdPrice || '';
+                    crowdSaleState.outputToken.quantity = new BN(crowdSaleState.inputToken.quantity)
+                        .multipliedBy(new BN(inputTokenPrice))
+                        .dividedBy(new BN(outputTokenPrice))
+                        .toString();
+                }
+            };
             const getUserBalanceOfToken = async (contractAddr, userAddr) => {
                 const web3 = await useWeb3();
                 const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr);
@@ -4779,6 +6179,62 @@
                 const web3 = useWeb3();
                 const balanceAsString = await (await web3).eth.getBalance(userAddr);
                 return parseFloat(balanceAsString);
+            };
+            const purchaseGuildToken = async () => {
+                if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
+                    return;
+                }
+                let tx = undefined;
+                crowdSaleState.ui.isButtonLoading = true;
+                try {
+                    tx = await purchaseFromCrowdSale(crowdSaleState.crowdSaleAddress, crowdSaleState.inputToken.data, parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals));
+                }
+                catch (err) {
+                    console.error(err);
+                }
+                finally {
+                    crowdSaleState.ui.isButtonLoading = false;
+                }
+                return tx;
+            };
+            const approveStableCoinToken = async () => {
+                if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
+                    return;
+                }
+                if (crowdSaleState.inputToken.data.address === '0x0native') {
+                    // Native tokens don't need approval
+                    crowdSaleState.inputToken.allowance = parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals);
+                    return;
+                }
+                let tx = undefined;
+                crowdSaleState.ui.isButtonLoading = true;
+                try {
+                    tx = await approveERC20Token(crowdSaleState.crowdSaleAddress, crowdSaleState.inputToken.data, parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals));
+                    crowdSaleState.inputToken.allowance = await getERC20Allowance(crowdSaleState.crowdSaleAddress, crowdSaleState.inputToken.data.address);
+                }
+                catch (err) {
+                    console.error(err);
+                }
+                finally {
+                    crowdSaleState.ui.isButtonLoading = false;
+                }
+                return tx;
+            };
+            const fetchCrowdSaleData = async () => {
+                if (!crowdSaleState.crowdSaleAddress) {
+                    return;
+                }
+                const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(crowdSaleState.crowdSaleAddress);
+                crowdSaleState.stableCoins = ['0x0native', ...stableCoins];
+                crowdSaleState.outputToken.data = getTokenFromList(guildTokenAddress);
+                const guildTokenPriceParsed = new BN(guildTokenPrice).div(new BN('100000000')).toString();
+                crowdSaleState.price = guildTokenPriceParsed; // Indicates that the swap logic will use this price instead of an oracle
+            };
+            const getTokenFromList = (address) => {
+                if (!address) {
+                    return undefined;
+                }
+                return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase());
             };
 
             var reactIs$2 = {exports: {}};
@@ -5672,6 +7128,41 @@
                 return windowSize;
             }
 
+            const SPACING_VALS = [4, 8, 16, 24, 48];
+            const $Horizontal = styled.div `
+  display: flex;
+  ${(props) => props.flex && `flex: ${props.flex};`};
+  ${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`};
+  ${(props) => props.verticalCenter && 'align-items: center;'};
+  ${(props) => props.baseline && 'align-items: baseline;'};
+  ${(props) => props.wrap && 'flex-wrap: wrap;'};
+
+  & > *:not(:last-child) {
+    margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
+  }
+`;
+            const $Vertical = styled.div `
+  display: flex;
+  flex-direction: column;
+  ${(props) => props.flex && `flex: ${props.flex};`};
+  & > *:not(:last-child) {
+    margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
+  }
+`;
+            styled.div `
+  width: ${(props) => (props.width ? props.width : '300px')};
+  height: ${(props) => (props.width ? props.width : '600px')};
+`;
+            const $ScrollContainer = styled.div `
+  overflow-y: scroll;
+  ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 10px;
+`;
+
             const COLORS = {
                 warningFontColor: '#FFFFFF',
                 warningBackground: '#F9A400',
@@ -5752,61 +7243,58 @@
   width: 200px;
 `;
 
-            const SwapButton = (props) => {
+            const $Spinner = styled.div `
+  width: 16px;
+  height: 16px;
+  margin-right: 12px;
+  border: 4px solid transparent;
+  border-top-color: #ffffff;
+  border-top-color: ${(props) => (props.color ? props.color : '#ffffff')};
+  border-radius: 50%;
+  animation: button-loading-spinner 1s ease infinite;
+
+  @keyframes button-loading-spinner {
+    from {
+      transform: rotate(0turn);
+    }
+
+    to {
+      transform: rotate(1turn);
+    }
+  }
+`;
+
+            const BuyButton = (props) => {
+                useWeb3();
                 const snapUserState = useSnapshot(userState);
-                const snapSwapState = useSnapshot(swapState);
+                const snapCrowdSaleState = useSnapshot(crowdSaleState);
                 const { screen } = useWindowSize();
                 const isWalletConnected = snapUserState.accounts.length > 0;
+                const isInputAmountValid = snapCrowdSaleState.inputToken.quantity && parseFloat(snapCrowdSaleState.inputToken.quantity) > 0;
+                const allowance = new BN(snapCrowdSaleState.inputToken.allowance || '0');
+                const quantity = parseWei(snapCrowdSaleState.inputToken.quantity || '0', snapCrowdSaleState.outputToken.data?.decimals);
+                const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity);
                 const validChain = snapUserState.currentNetworkIdHex &&
                     Object.values(BLOCKCHAINS)
                         .map((b) => b.chainIdHex)
                         .includes(snapUserState.currentNetworkIdHex);
+                const LoadingText = ({ text, color }) => {
+                    return (jsxRuntime.exports.jsxs($Horizontal, { justifyContent: "center", children: [snapCrowdSaleState.ui.isButtonLoading ? jsxRuntime.exports.jsx($Spinner, { color: color }, void 0) : null, text] }, void 0));
+                };
                 if (!isWalletConnected) {
                     return jsxRuntime.exports.jsx(WalletButton, {}, void 0);
                 }
-                else if (isWalletConnected && (!snapSwapState.inputToken.data || !snapSwapState.outputToken.data)) {
+                else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.outputToken.data)) {
                     return (jsxRuntime.exports.jsx($Button, { screen: screen, backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: validChain ? 'Select a Token' : 'Switch Network' }, void 0));
                 }
-                else if (snapSwapState.inputToken.quantity && parseFloat(snapSwapState.inputToken.quantity) > 0) {
-                    return (jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => console.log('Making purchase'), backgroundColor: `${COLORS.trustBackground}C0`, backgroundColorHover: `${COLORS.trustBackground}`, color: COLORS.trustFontColor, style: { minHeight: '60px', height: '100px' }, children: "PURCHASE" }, void 0));
+                else if (isInputAmountValid && !isAllowanceCovered) {
+                    return (jsxRuntime.exports.jsx($Button, { screen: screen, onClick: approveStableCoinToken, backgroundColor: `${COLORS.warningBackground}`, color: `${COLORS.warningFontColor}`, style: { minHeight: '60px', height: '100px' }, disabled: snapCrowdSaleState.ui.isButtonLoading, children: jsxRuntime.exports.jsx(LoadingText, { text: "Confirm Purchase", color: COLORS.warningFontColor }, void 0) }, void 0));
+                }
+                else if (isInputAmountValid) {
+                    return (jsxRuntime.exports.jsx($Button, { screen: screen, onClick: purchaseGuildToken, backgroundColor: `${COLORS.trustBackground}C0`, backgroundColorHover: `${COLORS.trustBackground}`, color: COLORS.trustFontColor, style: { minHeight: '60px', height: '100px' }, disabled: snapCrowdSaleState.ui.isButtonLoading, children: jsxRuntime.exports.jsx(LoadingText, { text: "PURCHASE", color: COLORS.trustFontColor }, void 0) }, void 0));
                 }
                 return (jsxRuntime.exports.jsx($Button, { screen: screen, backgroundColor: `${COLORS.surpressedBackground}40`, color: `${COLORS.surpressedFontColor}80`, style: { fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }, children: "Enter an amount" }, void 0));
             };
-
-            const SPACING_VALS = [4, 8, 16, 24, 48];
-            const $Horizontal = styled.div `
-  display: flex;
-  ${(props) => props.flex && `flex: ${props.flex};`};
-  ${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`};
-  ${(props) => props.verticalCenter && 'align-items: center;'};
-  ${(props) => props.baseline && 'align-items: baseline;'};
-  ${(props) => props.wrap && 'flex-wrap: wrap;'};
-
-  & > *:not(:last-child) {
-    margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
-  }
-`;
-            const $Vertical = styled.div `
-  display: flex;
-  flex-direction: column;
-  ${(props) => props.flex && `flex: ${props.flex};`};
-  & > *:not(:last-child) {
-    margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
-  }
-`;
-            styled.div `
-  width: ${(props) => (props.width ? props.width : '300px')};
-  height: ${(props) => (props.width ? props.width : '600px')};
-`;
-            const $ScrollContainer = styled.div `
-  overflow-y: scroll;
-  ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 10px;
-`;
 
             const $Input = styled.input `
   flex: 1;
@@ -5821,21 +7309,23 @@
   width: 100%;
 `;
 
-            const SwapInput = (props) => {
-                const snap = useSnapshot(swapState);
+            const CrowdSaleInput = (props) => {
+                const snap = useSnapshot(crowdSaleState);
                 const snapUserState = useSnapshot(userState);
                 const { screen } = useWindowSize();
                 const selectToken = async () => {
-                    swapState.targetToken = props.targetToken;
-                    swapState.route = '/search';
+                    if (!props.selectDisabled) {
+                        crowdSaleState.targetToken = props.targetToken;
+                        crowdSaleState.route = '/search';
+                    }
                 };
                 const setQuantity = (quantity) => {
                     if (props.targetToken) {
                         if (isNaN(quantity)) {
-                            swapState[props.targetToken].quantity = '0';
+                            crowdSaleState[props.targetToken].quantity = '0';
                         }
                         else {
-                            swapState[props.targetToken].quantity = quantity.toString();
+                            crowdSaleState[props.targetToken].quantity = quantity.toString();
                         }
                     }
                 };
@@ -5863,7 +7353,7 @@
                 const usdValue = props.targetToken && quantity && snap[props.targetToken] && usdUnitPrice
                     ? new BN(usdUnitPrice).multipliedBy(new BN(quantity))
                     : '';
-                return (jsxRuntime.exports.jsx($SwapInput, { screen: screen, children: jsxRuntime.exports.jsxs($Horizontal, { flex: 1, children: [jsxRuntime.exports.jsxs($Vertical, { flex: screen === 'desktop' ? 3 : 2, children: [jsxRuntime.exports.jsx($Input, { value: quantity, onChange: (e) => setQuantity(e.target.valueAsNumber), type: "number", placeholder: "0.00", disabled: props.quantityDisabled || !snap.inputToken.data, screen: screen }, void 0), usdValue ? (jsxRuntime.exports.jsxs($FineText, { screen: screen, children: [`$${new BN(usdValue).decimalPlaces(6).toString()}`, " USD"] }, void 0)) : null] }, void 0), jsxRuntime.exports.jsxs($Vertical, { flex: 1, children: [props.selectedToken ? (jsxRuntime.exports.jsxs($Button, { backgroundColor: `${COLORS.white}10`, backgroundColorHover: `${COLORS.surpressedBackground}50`, color: COLORS.black, onClick: selectToken, disabled: props.tokenDisabled && props.selectedToken ? true : false, screen: screen, style: {
+                return (jsxRuntime.exports.jsx($CrowdSaleInput, { screen: screen, children: jsxRuntime.exports.jsxs($Horizontal, { flex: 1, children: [jsxRuntime.exports.jsxs($Vertical, { flex: screen === 'desktop' ? 3 : 2, children: [jsxRuntime.exports.jsx($Input, { value: quantity, onChange: (e) => setQuantity(e.target.valueAsNumber), type: "number", placeholder: "0.00", disabled: props.quantityDisabled || !snap.inputToken.data, screen: screen }, void 0), usdValue ? (jsxRuntime.exports.jsxs($FineText, { screen: screen, children: [`$${new BN(usdValue).decimalPlaces(6).toString()}`, " USD"] }, void 0)) : null] }, void 0), jsxRuntime.exports.jsxs($Vertical, { flex: 1, children: [props.selectedToken ? (jsxRuntime.exports.jsxs($Button, { backgroundColor: `${COLORS.white}10`, backgroundColorHover: `${COLORS.surpressedBackground}50`, color: COLORS.black, onClick: selectToken, disabled: props.tokenDisabled && props.selectedToken ? true : false, screen: screen, style: {
                                             height: '30px',
                                             fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
                                             fontWeight: 'bold',
@@ -5872,9 +7362,10 @@
                                             flexDirection: 'row',
                                             alignItems: 'center',
                                             justifyContent: 'center',
+                                            ...(props.selectDisabled && { cursor: 'not-allowed' }),
                                         }, children: [jsxRuntime.exports.jsx($CoinIcon, { screen: screen, src: props.selectedToken.logoURI }, void 0), props.selectedToken.symbol] }, void 0)) : (renderSelectTokenButton()), jsxRuntime.exports.jsxs($BalanceText, { screen: screen, style: { flex: 1 }, children: [balance, " balance"] }, void 0)] }, void 0)] }, void 0) }, void 0));
             };
-            const $SwapInput = styled.div `
+            const $CrowdSaleInput = styled.div `
   font-size: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.3rem')};
   padding: 10px 10px 15px 10px;
   background-color: ${`${COLORS.surpressedBackground}20`};
@@ -5910,7 +7401,7 @@
                 return `${address.slice(0, prefixLength)}...${address.slice(address.length - suffixLength, address.length)}`;
             };
 
-            const SwapHeader = (props) => {
+            const CrowdSaleHeader = (props) => {
                 const { screen } = useWindowSize();
                 const snapUserState = useSnapshot(userState);
                 const isWalletConnected = snapUserState.accounts.length > 0;
@@ -5934,15 +7425,15 @@
                     }
                     return;
                 };
-                return (jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "BUY GUILDFX" }, void 0), validChain ? (jsxRuntime.exports.jsx(jsxRuntime.exports.Fragment, { children: jsxRuntime.exports.jsxs($NetworkText, { style: { flex: 2 }, children: [jsxRuntime.exports.jsx("b", { children: "Network:" }, void 0), " ", snapUserState.currentNetworkDisplayName, ' ', jsxRuntime.exports.jsx("span", { onClick: () => navigator.clipboard.writeText(snapUserState.currentAccount || ''), style: { cursor: 'pointer' }, children: renderTinyAccount() }, void 0)] }, void 0) }, void 0)) : (renderSwitchNetworkButton())] }, void 0));
+                return (jsxRuntime.exports.jsxs($CrowdSaleHeader, { children: [jsxRuntime.exports.jsx($CrowdSaleHeaderTitle, { children: "BUY GUILDFX" }, void 0), validChain ? (jsxRuntime.exports.jsx(jsxRuntime.exports.Fragment, { children: jsxRuntime.exports.jsxs($NetworkText, { style: { flex: 2 }, children: [jsxRuntime.exports.jsx("b", { children: "Network:" }, void 0), " ", snapUserState.currentNetworkDisplayName, ' ', jsxRuntime.exports.jsx("span", { onClick: () => navigator.clipboard.writeText(snapUserState.currentAccount || ''), style: { cursor: 'pointer' }, children: renderTinyAccount() }, void 0)] }, void 0) }, void 0)) : (renderSwitchNetworkButton())] }, void 0));
             };
-            const $SwapHeaderTitle = styled.span `
+            const $CrowdSaleHeaderTitle = styled.span `
   flex: 3;
   font-size: 1rem;
   font-weight: bold;
   padding: 0px 0px 0px 10px;
 `;
-            const $SwapHeader = styled.div `
+            const $CrowdSaleHeader = styled.div `
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -5957,7 +7448,7 @@
   font-family: sans-serif;
 `;
 
-            const $SwapContainer = styled.section `
+            const $CrowdSaleContainer = styled.section `
   width: 100%;
   height: 100%;
   border: 0px solid transparent;
@@ -5969,22 +7460,22 @@
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   min-height: 600px;
 `;
-            const Swap = (props) => {
-                const snap = useSnapshot(swapState);
+            const CrowdSale = (props) => {
+                const snap = useSnapshot(crowdSaleState);
                 const snapUserState = useSnapshot(userState);
                 const isLoggedIn = snapUserState.accounts.length > 0;
                 r$4.useEffect(() => {
                     if (props.inputToken) {
-                        swapState.inputToken.data = props.inputToken;
+                        crowdSaleState.inputToken.data = props.inputToken;
                     }
                     if (props.outputToken) {
-                        swapState.outputToken.data = props.inputToken;
+                        crowdSaleState.outputToken.data = props.inputToken;
                     }
                 }, []);
                 const inputPriceUSD = snap.inputToken.data?.usdPrice;
                 const outputPriceUSD = snap.outputToken.data?.usdPrice;
                 const outputQuantity = inputPriceUSD && outputPriceUSD ? new BN(inputPriceUSD).dividedBy(new BN(outputPriceUSD)).decimalPlaces(8) : 0;
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsx(SwapHeader, {}, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken", tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(SwapInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true, tokenDisabled: !isLoggedIn }, void 0), snap.inputToken.data && snap.outputToken.data ? (jsxRuntime.exports.jsxs($CurrencyExchangeRate, { children: [jsxRuntime.exports.jsx("span", { style: { marginRight: '10px' }, children: "\u2139\uFE0F" }, void 0), `1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`] }, void 0)) : null, jsxRuntime.exports.jsx(SwapButton, {}, void 0)] }, void 0));
+                return (jsxRuntime.exports.jsxs($CrowdSaleContainer, { children: [jsxRuntime.exports.jsx(CrowdSaleHeader, {}, void 0), jsxRuntime.exports.jsx(CrowdSaleInput, { selectedToken: snap.inputToken.data, targetToken: "inputToken", tokenDisabled: !isLoggedIn }, void 0), jsxRuntime.exports.jsx(CrowdSaleInput, { selectedToken: snap.outputToken.data, targetToken: "outputToken", quantityDisabled: true, tokenDisabled: !isLoggedIn, selectDisabled: true }, void 0), snap.inputToken.data && snap.outputToken.data ? (jsxRuntime.exports.jsxs($CurrencyExchangeRate, { children: [jsxRuntime.exports.jsx("span", { style: { marginRight: '10px' }, children: "\u2139\uFE0F" }, void 0), `1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`] }, void 0)) : null, jsxRuntime.exports.jsx(BuyButton, {}, void 0)] }, void 0));
             };
             const $CurrencyExchangeRate = styled.span `
   font-size: 0.8rem;
@@ -5994,7 +7485,7 @@
 `;
 
             const RowToken = (props) => {
-                useSnapshot(swapState);
+                useSnapshot(crowdSaleState);
                 const { screen } = useWindowSize();
                 const removeToken = () => {
                     removeCustomToken(props.token.address, props.token.chainIdHex);
@@ -6049,11 +7540,13 @@
   }
 `;
 
+            const arrayIsEmpty = (arr) => {
+                return !arr || arr.length === 0;
+            };
             const TokenPicker = (props) => {
                 const web3 = useWeb3();
-                const snap = useSnapshot(swapState);
+                const snap = useSnapshot(crowdSaleState);
                 const snapUserState = useSnapshot(userState);
-                const snapSwapState = useSnapshot(swapState);
                 const { screen } = useWindowSize();
                 const tokenList = useTokenList();
                 const customTokenList = useCustomTokenList();
@@ -6061,20 +7554,24 @@
                 const selectToken = async (token, isDisabled) => {
                     if (isDisabled)
                         return;
-                    let tokenBalance = 0;
-                    if (snapUserState.currentAccount && snapSwapState.targetToken) {
-                        if (token.address === '0x0native') {
-                            tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount);
-                        }
-                        else {
-                            tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount);
-                        }
+                    if (snapUserState.currentAccount && snap.targetToken) {
+                        const promise = token.address === '0x0native'
+                            ? Promise.all([getUserBalanceOfNativeToken(snapUserState.currentAccount), Promise.resolve('0')])
+                            : Promise.all([
+                                getUserBalanceOfToken(token.address, snapUserState.currentAccount),
+                                getERC20Allowance(snap.crowdSaleAddress, token.address),
+                            ]);
+                        promise.then(async ([tokenBalance, tokenAllowance]) => {
+                            if (snap.targetToken !== null) {
+                                const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether');
+                                crowdSaleState[snap.targetToken].displayedBalance = balanceInEther;
+                                crowdSaleState[snap.targetToken].allowance = tokenAllowance;
+                            }
+                        });
                         if (snap.targetToken !== null) {
-                            swapState[snap.targetToken].data = token;
-                            const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether');
-                            swapState[snapSwapState.targetToken].displayedBalance = balanceInEther;
-                            swapState.route = '/swap';
+                            crowdSaleState[snap.targetToken].data = token;
                         }
+                        crowdSaleState.route = '/crowdSale';
                     }
                 };
                 const searchFilter = (token) => {
@@ -6082,29 +7579,32 @@
                         token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
                         token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
                 };
-                const currentToken = snap.targetToken !== null ? swapState[snap.targetToken].data : null;
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
-                                                fontWeight: 'lighter',
-                                                border: `2px solid ${COLORS.warningBackground}30`,
-                                                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-                                                flex: 4,
-                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (swapState.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
-                                                flex: 1,
-                                                marginLeft: '10px',
-                                                minHeight: screen === 'desktop' ? '70px' : '50px',
-                                                height: '70px',
-                                                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-                                                fontWeight: 800,
-                                            }, children: "+ New" }, void 0)] }, void 0), jsxRuntime.exports.jsx($ScrollContainer, { children: tokenList
+                const filterSpecificAddresses = (token) => {
+                    if (arrayIsEmpty(props.specificAddresses) || !props.specificAddresses) {
+                        return true;
+                    }
+                    else {
+                        return (props.specificAddresses.map((address) => address.toLowerCase()).indexOf(token.address.toLowerCase()) >
+                            -1);
+                    }
+                };
+                const currentToken = snap.targetToken !== null ? crowdSaleState[snap.targetToken].data : null;
+                return (jsxRuntime.exports.jsxs($CrowdSaleContainer, { children: [jsxRuntime.exports.jsxs($CrowdSaleHeader, { children: [jsxRuntime.exports.jsx($CrowdSaleHeaderTitle, { children: "SELECT TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (crowdSaleState.route = '/crowdSale'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsx($Horizontal, { children: jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
+                                            fontWeight: 'lighter',
+                                            border: `2px solid ${COLORS.warningBackground}30`,
+                                            fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
+                                            flex: 4,
+                                        } }, void 0) }, void 0), jsxRuntime.exports.jsx($ScrollContainer, { children: tokenList
                                         .concat(customTokenList)
                                         .filter(searchFilter)
+                                        .filter(filterSpecificAddresses)
                                         .map((token) => {
                                         const disabled = [snap.inputToken.data?.address, snap.outputToken.data?.address].includes(token.address) &&
                                             (currentToken ? currentToken.address !== token.address : true);
                                         return (jsxRuntime.exports.jsx("div", { onClick: () => selectToken(token, disabled), children: jsxRuntime.exports.jsx(RowToken, { token: token, disabled: disabled }, void 0) }, token.symbol));
-                                    }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => (swapState.route = '/customs'), children: "Manage Token Lists" }, void 0)] }, void 0));
+                                    }) }, void 0)] }, void 0)] }, void 0));
             };
-            const $BlueLinkText = styled.span `
+            styled.span `
   font-size: 1.1rem;
   font-weight: 500;
   font-family: sans-serif;
@@ -6117,121 +7617,25 @@
   }
 `;
 
-            const ManageTokens = (props) => {
-                const snap = useSnapshot(tokenListState);
-                const { screen } = useWindowSize();
-                const customTokenList = snap.customTokenList;
-                const [searchString, setSearchString] = r$4.useState('');
-                const searchFilter = (token) => {
-                    return (token.symbol.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
-                        token.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 ||
-                        token.address.toLowerCase().indexOf(searchString.toLowerCase()) > -1);
-                };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "CUSTOM TOKENS" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsxs(jsxRuntime.exports.Fragment, { children: [jsxRuntime.exports.jsxs($Horizontal, { children: [jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Filter Custom Tokens...", style: {
-                                                fontWeight: 'lighter',
-                                                border: `2px solid ${COLORS.warningBackground}30`,
-                                                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-                                                flex: 4,
-                                            } }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => (swapState.route = '/add'), backgroundColor: `${COLORS.warningBackground}E0`, color: COLORS.white, backgroundColorHover: `${COLORS.warningBackground}`, style: {
-                                                flex: 1,
-                                                marginLeft: '10px',
-                                                minHeight: screen === 'desktop' ? '70px' : '50px',
-                                                height: '70px',
-                                                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-                                                fontWeight: 800,
-                                            }, children: "+ New" }, void 0)] }, void 0), customTokenList.filter(searchFilter).map((token) => (jsxRuntime.exports.jsx(RowToken, { token: token, copyable: true, deleteable: true }, token.symbol))), customTokenList.filter(searchFilter).length === 0 && (jsxRuntime.exports.jsx($NoTokensPrompt, { children: "No Custom Tokens Added Yet" }, void 0))] }, void 0)] }, void 0));
-            };
-            const $NoTokensPrompt = styled.div `
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: ${COLORS.surpressedFontColor}60;
-  font-family: sans-serif;
-`;
-
-            const AddToken = (props) => {
-                const { screen } = useWindowSize();
-                const [searchString, setSearchString] = r$4.useState('');
-                const addToken = () => {
-                    addCustomToken({
-                        address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
-                        decimals: 18,
-                        name: 'Pancake Swap',
-                        symbol: 'CAKE',
-                        chainIdHex: '0x38',
-                        chainIdDecimal: '56',
-                        logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png',
-                        priceOracle: '0xb6064ed41d4f67e353768aa239ca86f4f73665a1',
-                    });
-                    swapState.route = '/search';
-                };
-                return (jsxRuntime.exports.jsxs($SwapContainer, { children: [jsxRuntime.exports.jsxs($SwapHeader, { children: [jsxRuntime.exports.jsx($SwapHeaderTitle, { children: "ADD TOKEN" }, void 0), jsxRuntime.exports.jsx("span", { onClick: () => (swapState.route = '/swap'), style: { padding: '0px 5px 0px 0px', cursor: 'pointer' }, children: "X" }, void 0)] }, void 0), jsxRuntime.exports.jsx($Input, { screen: screen, value: searchString, onChange: (e) => setSearchString(e.target.value), placeholder: "Search Tokens...", style: {
-                                fontWeight: 'lighter',
-                                border: `2px solid ${COLORS.warningBackground}30`,
-                                fontSize: screen === 'desktop' ? '1.5rem' : '1rem',
-                                flex: 4,
-                                maxHeight: '50px',
-                                maxWidth: screen === 'desktop' ? '100%' : '90%',
-                            } }, void 0), jsxRuntime.exports.jsxs($TokenPreviewCard, { children: [jsxRuntime.exports.jsx($CoinIcon, { screen: screen, src: "https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png", style: { width: '50px', height: '50px' } }, void 0), jsxRuntime.exports.jsx($BigCoinTicker, { screen: screen, children: "CAKE" }, void 0), jsxRuntime.exports.jsx($ThinCoinName, { screen: screen, children: "Pancake Swap" }, void 0), jsxRuntime.exports.jsx($BlueLinkText, { onClick: () => navigator.clipboard.writeText('0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82'), children: truncateAddress('0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82', screen === 'desktop'
-                                        ? {
-                                            prefixLength: 10,
-                                            suffixLength: 10,
-                                        }
-                                        : {
-                                            prefixLength: 6,
-                                            suffixLength: 8,
-                                        }) }, void 0)] }, void 0), jsxRuntime.exports.jsx($Button, { screen: screen, onClick: () => addToken(), backgroundColor: `${COLORS.dangerBackground}E0`, backgroundColorHover: `${COLORS.dangerBackground}`, color: `${COLORS.white}`, colorHover: COLORS.white, style: { height: '100px', minHeight: '60px', fontSize: '1.5rem' }, children: "Import Token" }, void 0)] }, void 0));
-            };
-            styled.span `
-  font-size: 1.1rem;
-  font-weight: 500;
-  font-family: sans-serif;
-  margin-top: 10px;
-  color: ${`${COLORS.surpressedFontColor}C0`};
-  flex: 1;
-  text-align: center;
-`;
-            const $TokenPreviewCard = styled.div `
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-color: ${`${COLORS.surpressedBackground}10`};
-  border-radius: 10px;
-  padding: 30px;
-  flex: 1;
-  gap: 10px;
-`;
-
-            const SwapWidget = (props) => {
-                useSnapshot(swapState);
+            const CrowdSaleWidget = (props) => {
+                const snap = useSnapshot(crowdSaleState);
                 r$4.useEffect(() => {
                     window.onload = () => {
-                        initDApp();
+                        initDApp().then(() => fetchCrowdSaleData());
                     };
                     if (props.initialRoute) {
-                        swapState.route = props.initialRoute;
+                        crowdSaleState.route = props.initialRoute;
                     }
                 }, []);
-                if (swapState.route === '/search') {
-                    return jsxRuntime.exports.jsx(TokenPicker, {}, void 0);
+                if (snap.route === '/search') {
+                    return jsxRuntime.exports.jsx(TokenPicker, { specificAddresses: [...snap.stableCoins] }, void 0);
                 }
-                else if (swapState.route === '/customs') {
-                    return jsxRuntime.exports.jsx(ManageTokens, {}, void 0);
-                }
-                else if (swapState.route === '/add') {
-                    return jsxRuntime.exports.jsx(AddToken, {}, void 0);
-                }
-                return jsxRuntime.exports.jsx(Swap, {}, void 0);
+                return jsxRuntime.exports.jsx(CrowdSale, {}, void 0);
             };
 
             const inject = () => {
                 const targetInjectionPoint = document.getElementById('crowdsale');
-                ReactDOM.render(jsxRuntime.exports.jsx(r__default["default"].StrictMode, { children: jsxRuntime.exports.jsx(SwapWidget, {}, void 0) }, void 0), targetInjectionPoint);
+                ReactDOM.render(jsxRuntime.exports.jsx(r__default["default"].StrictMode, { children: jsxRuntime.exports.jsx(CrowdSaleWidget, {}, void 0) }, void 0), targetInjectionPoint);
             };
 
             // import { inject as injectWalletButton } from '../button/injection'

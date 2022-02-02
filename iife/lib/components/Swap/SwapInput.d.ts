@@ -1,9 +1,9 @@
 /// <reference types="react" />
 import { TokenPickerTarget } from './state';
-import { TokenData } from 'lib/hooks/constants';
+import { TokenDataFE } from 'lib/hooks/constants';
 import { ScreenSize } from '../../hooks/useScreenSize/index';
 export interface SwapInputProps {
-    selectedToken?: TokenData;
+    selectedToken?: TokenDataFE;
     targetToken: TokenPickerTarget;
     tokenDisabled?: boolean;
     quantityDisabled?: boolean;
