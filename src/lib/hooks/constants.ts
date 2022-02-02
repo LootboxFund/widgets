@@ -66,7 +66,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
   },
   {
-    address: '0x5Db52f14c8bB2771b716dbDC9B7e916d45Dd4751',
+    address: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -76,7 +76,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x9ef1b8c0e4f7dc8bf5719ea496883dc6401d5b2e',
   },
   {
-    address: '0xAf5bf989F74cd19931C8556f34628c04C9221645',
+    address: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -86,7 +86,7 @@ export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x51597f405303c4377e36123cbc172b13269ea163',
   },
   {
-    address: '0xb90B90090f1812CcB0baDF445F6ae5621D77359a',
+    address: '0x55d398326f99059ff775485246999027b3197955',
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -122,7 +122,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
   },
   {
-    address: '0x7638f12cAf512BF4754B8166F5f26aC74BBFfFB5',
+    address: '0x5Db52f14c8bB2771b716dbDC9B7e916d45Dd4751',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -132,7 +132,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7',
   },
   {
-    address: '0x8031b35155d97B6730154B68C046d2C69A4Afd4d',
+    address: '0xAf5bf989F74cd19931C8556f34628c04C9221645',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -142,7 +142,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x90c069C4538adAc136E051052E14c1cD799C41B7',
   },
   {
-    address: '0xBb6Da17FF643a0F92B326f58de4133d4416A131e',
+    address: '0xb90B90090f1812CcB0baDF445F6ae5621D77359a',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
