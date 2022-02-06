@@ -5,15 +5,18 @@ const app = new express()
 
 const storage = new Storage()
 
+const semver = '0.1.0-demo'
 const bucketName = 'guildfx-exchange.appspot.com'
 
 const filename = process.env.NODE_ENV === 'production' ? 'bundle.production.js' : 'bundle.js'
-let filepath = `/Users/kangzeroo/Projects/GuildFX/widgets/iife/${filename}`
+const filepath = `widgets/${semver}/build/${filename}`
+let localFilePath = `/Users/kangzeroo/Projects/GuildFX/widgets/iife/${filename}`
 
 // Testing out upload of file
 const uploadFile = async () => {
   // Uploads a local file to the bucket
-  await storage.bucket(bucketName).upload(filepath, {
+  await storage.bucket(bucketName).upload(localFilePath, {
+    destination: filepath,
     // Support for HTTP requests made with `Accept-Encoding: gzip`
     gzip: true,
     // By setting the option `destination`, you can change the name of the
@@ -26,7 +29,7 @@ const uploadFile = async () => {
     },
   })
   console.log(`${filename} uploaded to ${bucketName}.`)
-  await storage.bucket(bucketName).file(filename).makePublic()
+  await storage.bucket(bucketName).file(filepath).makePublic()
   console.log(`${filename} made public`)
   process.exit()
 }
