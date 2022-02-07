@@ -15,7 +15,7 @@ interface IAddresses {
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
 // TODO: Dynamically load this
-export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x5c635b6857d0e16acbebb6d1d36fdae177cf3e8e'
+export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x7B8f9b6Daa03E39BC046CA06c72C8A81b8FcEceb'
 
 export type ChainInfo = {
   chainIdHex: ChainIDHex
@@ -122,7 +122,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
   },
   {
-    address: '0x5Db52f14c8bB2771b716dbDC9B7e916d45Dd4751',
+    address: '0x98a0BE5B6a1195DC7F189957847Fac179D1a93F9',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -132,7 +132,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7',
   },
   {
-    address: '0xAf5bf989F74cd19931C8556f34628c04C9221645',
+    address: '0xb224C63DAf1f6823900bf10dBA511ad0F646bF22',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -142,7 +142,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0x90c069C4538adAc136E051052E14c1cD799C41B7',
   },
   {
-    address: '0xb90B90090f1812CcB0baDF445F6ae5621D77359a',
+    address: '0x2E84416b422801ddf81049DE572C05167D640822',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -152,7 +152,7 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
     priceOracle: '0xEca2605f0BCF2BA5966372C99837b1F182d3D620',
   },
   {
-    address: '0xE15eA97a5d642Fdf130632152153aB95fBa7A850',
+    address: '0xf5dFf9D049b0BD219b82d38DeecdFaB0D30b85f6',
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,
@@ -186,6 +186,6 @@ export const addresses: Record<string, IAddresses> = {
   // BSC TESTNET 0x61 = 97
   '0x61': {
     // --- Contract addresses (from deploy scripts in backend) ---
-    gfxConstants: '0x5523D8c92CE44f11b66607899415381eeBef1324',
+    gfxConstants: '0x168083FDF252ccF2543fbAE6cA44b42E1214D0c1',
   },
 }
