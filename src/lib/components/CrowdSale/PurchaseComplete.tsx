@@ -32,7 +32,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         {snap.lastTransaction.success ? (
           <$CrowdSaleHeaderTitle>Success!</$CrowdSaleHeaderTitle>
         ) : (
-          <$CrowdSaleHeaderTitle>Transaction Failed!</$CrowdSaleHeaderTitle>
+          <$CrowdSaleHeaderTitle>❌ Transaction Failed!</$CrowdSaleHeaderTitle>
         )}
 
         <span onClick={goToCrowdSaleComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
