@@ -79,11 +79,7 @@ subscribe(crowdSaleState.inputToken, () => {
   }
 })
 
-subscribeKey(userState, 'currentNetworkIdHex', () => {
-  fetchCrowdSaleData().catch((err) => console.error(err))
-})
-
-subscribeKey(userState, 'currentAccount', () => {
+subscribe(userState, () => {
   fetchCrowdSaleData().catch((err) => console.error(err))
   if (crowdSaleState.inputToken.data) {
     loadTokenData(crowdSaleState.inputToken.data, 'inputToken').catch((err) => console.error(err))
