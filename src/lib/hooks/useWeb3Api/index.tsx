@@ -116,6 +116,10 @@ export const initDApp = async () => {
       clearStateToChain()
     }
   })
+  ;(window as any).ethereum.on('accountsChanged', async (accounts: ChainIDHex[]) => {
+    userState.accounts = accounts
+    userState.currentAccount = accounts[0]
+  })
 }
 
 const initWeb3OnWindow = async () => {
