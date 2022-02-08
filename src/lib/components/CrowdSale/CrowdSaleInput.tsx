@@ -12,6 +12,7 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { screen } from '@testing-library/react'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
+import { parseEth } from './helpers'
 
 export interface CrowdSaleInputProps {
   selectedToken?: TokenDataFE
@@ -82,7 +83,10 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   }
 
   const balance =
-    props.targetToken && snap[props.targetToken].displayedBalance ? snap[props.targetToken].displayedBalance : 0
+    props.targetToken && snap[props.targetToken] && snap[props.targetToken].balance
+      ? (snap[props.targetToken].balance as string)
+      : '0'
+
   const quantity = props.targetToken ? snap[props.targetToken].quantity : undefined
   const usdUnitPrice =
     props.targetToken &&
@@ -139,7 +143,7 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
             renderSelectTokenButton()
           )}
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {balance} balance
+            {parseEth(balance)} balance
           </$BalanceText>
         </$Vertical>
       </$Horizontal>

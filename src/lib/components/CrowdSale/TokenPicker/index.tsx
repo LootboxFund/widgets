@@ -11,7 +11,6 @@ import { $CrowdSaleHeader, $CrowdSaleHeaderTitle } from '../CrowdSaleHeader'
 import { getUserBalanceOfNativeToken, getUserBalanceOfToken, crowdSaleState } from '../state'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
-import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { Address } from '@guildfx/helpers'
 import { getERC20Allowance } from 'lib/hooks/useContract'
@@ -26,7 +25,6 @@ const arrayIsEmpty = (arr: any[] | undefined) => {
 }
 
 const TokenPicker = (props: TokenPickerProps) => {
-  const web3 = useWeb3()
   const snap = useSnapshot(crowdSaleState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -48,8 +46,7 @@ const TokenPicker = (props: TokenPickerProps) => {
             ])
       promise.then(async ([tokenBalance, tokenAllowance]) => {
         if (snap.targetToken !== null) {
-          const balanceInEther = (await web3).utils.fromWei(tokenBalance.toString(), 'ether')
-          crowdSaleState[snap.targetToken].displayedBalance = balanceInEther
+          crowdSaleState[snap.targetToken].balance = tokenBalance
           crowdSaleState[snap.targetToken].allowance = tokenAllowance
         }
       })

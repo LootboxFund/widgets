@@ -25,13 +25,13 @@ export interface CrowdSaleState {
   inputToken: {
     data: TokenDataFE | undefined
     quantity: string | undefined
-    displayedBalance: string | undefined
+    balance: string | undefined
     allowance: string | undefined
   }
   outputToken: {
     data: TokenDataFE | undefined
     quantity: string | undefined
-    displayedBalance: string | undefined
+    balance: string | undefined
     allowance: string | undefined
   }
   ui: {
@@ -51,13 +51,13 @@ const crowdSaleSnapshot: CrowdSaleState = {
   inputToken: {
     data: undefined,
     quantity: undefined,
-    displayedBalance: undefined,
+    balance: undefined,
     allowance: undefined,
   },
   outputToken: {
     data: undefined,
     quantity: undefined,
-    displayedBalance: undefined,
+    balance: undefined,
     allowance: undefined,
   },
   ui: {
