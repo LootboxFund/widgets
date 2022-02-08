@@ -6,5 +6,5 @@ export const parseWei = (amount: string, decimals: number | undefined): string =
   if (decimals == undefined) {
     decimals = DEFAULT_DECIMALS
   }
-  return new BN(amount).multipliedBy(new BN(10).pow(decimals)).toString()
+  return new BN(amount).multipliedBy(new BN(10).pow(decimals)).toFixed()
 }
