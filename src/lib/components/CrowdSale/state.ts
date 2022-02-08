@@ -87,7 +87,9 @@ const updateOutputTokenValues = async () => {
     crowdSaleState.outputToken.data.usdPrice = crowdSaleState.price.toString()
   }
 
-  if (
+  if (crowdSaleState.inputToken.quantity == undefined) {
+    crowdSaleState.outputToken.quantity = '0'
+  } else if (
     crowdSaleState.outputToken.data &&
     crowdSaleState.inputToken.data &&
     crowdSaleState.inputToken.quantity !== undefined

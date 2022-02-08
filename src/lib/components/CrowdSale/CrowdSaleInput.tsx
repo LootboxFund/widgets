@@ -20,6 +20,7 @@ export interface CrowdSaleInputProps {
   quantityDisabled?: boolean
   selectDisabled?: boolean
 }
+
 const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   const snap = useSnapshot(crowdSaleState)
   const snapUserState = useSnapshot(userState)
@@ -30,12 +31,12 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
       crowdSaleState.route = '/search'
     }
   }
-  const setQuantity = (quantity: number) => {
+  const setQuantity = (quantity: string) => {
     if (props.targetToken) {
-      if (isNaN(quantity)) {
-        crowdSaleState[props.targetToken].quantity = '0'
+      if (quantity.length === 0) {
+        crowdSaleState[props.targetToken].quantity = undefined
       } else {
-        crowdSaleState[props.targetToken].quantity = quantity.toString()
+        crowdSaleState[props.targetToken].quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
       }
     }
   }
@@ -97,12 +98,14 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <$Input
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.valueAsNumber)}
+            value={quantity || ''}
+            onChange={(e) => setQuantity(e.target.value)}
             type="number"
             placeholder="0.00"
             disabled={props.quantityDisabled || !snap.inputToken.data}
             screen={screen}
+            min={0}
+            step="any"
           ></$Input>
           {usdValue ? (
             <$FineText screen={screen}>{`$${new BN(usdValue).decimalPlaces(6).toString()}`} USD</$FineText>
