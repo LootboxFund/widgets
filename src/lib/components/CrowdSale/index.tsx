@@ -17,7 +17,7 @@ const CrowdSaleWidget = (props: CrowdSaleWidgetProps) => {
     window.onload = () => {
       initDApp()
         .then(() => fetchCrowdSaleData())
-        .catch((err) => console.log(err))
+        .catch((err) => console.error(err))
     }
     if (props.initialRoute) {
       crowdSaleState.route = props.initialRoute

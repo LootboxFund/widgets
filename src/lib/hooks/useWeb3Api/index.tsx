@@ -169,7 +169,9 @@ export const clearCrowdSaleState = () => {
   crowdSaleState.inputToken.data = undefined
   crowdSaleState.inputToken.balance = undefined
   crowdSaleState.inputToken.quantity = undefined
+  crowdSaleState.inputToken.allowance = undefined
   crowdSaleState.outputToken.data = undefined
   crowdSaleState.outputToken.balance = undefined
   crowdSaleState.outputToken.quantity = undefined
+  crowdSaleState.inputToken.allowance = undefined
 }

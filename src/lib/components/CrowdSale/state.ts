@@ -80,11 +80,7 @@ subscribe(crowdSaleState.outputToken, () => {
 })
 
 subscribe(userState, () => {
-  try {
-    fetchCrowdSaleData()
-  } catch (err) {
-    console.error(err)
-  }
+  fetchCrowdSaleData().catch((err) => console.error(err))
 })
 
 const updateOutputTokenValues = async () => {
