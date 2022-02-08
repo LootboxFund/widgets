@@ -10,6 +10,7 @@ import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
+import { userState } from 'lib/state/userState'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)
 const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
@@ -76,6 +77,14 @@ subscribe(crowdSaleState.inputToken, () => {
 
 subscribe(crowdSaleState.outputToken, () => {
   updateOutputTokenValues()
+})
+
+subscribe(userState, () => {
+  try {
+    fetchCrowdSaleData()
+  } catch (err) {
+    console.error(err)
+  }
 })
 
 const updateOutputTokenValues = async () => {
