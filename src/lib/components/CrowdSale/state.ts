@@ -119,7 +119,12 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
 }
 
 export const purchaseGuildToken = async () => {
-  if (!crowdSaleState.inputToken.data || !crowdSaleState.inputToken.quantity || !crowdSaleState.crowdSaleAddress) {
+  if (
+    !crowdSaleState.outputToken.data ||
+    !crowdSaleState.inputToken.data ||
+    !crowdSaleState.inputToken.quantity ||
+    !crowdSaleState.crowdSaleAddress
+  ) {
     return
   }
 
@@ -132,6 +137,10 @@ export const purchaseGuildToken = async () => {
     )
     crowdSaleState.lastTransaction.success = true
     crowdSaleState.lastTransaction.hash = tx?.transactionHash
+    Promise.all([
+      loadTokenData(crowdSaleState.inputToken.data, 'inputToken'),
+      loadTokenData(crowdSaleState.outputToken.data, 'outputToken'),
+    ]).catch((err) => console.error(err))
   } catch (err) {
     crowdSaleState.lastTransaction.success = false
     crowdSaleState.lastTransaction.hash = err?.receipt?.transactionHash
