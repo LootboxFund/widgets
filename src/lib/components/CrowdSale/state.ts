@@ -121,30 +121,29 @@ export const purchaseGuildToken = async () => {
     return
   }
 
-  let tx = undefined
   crowdSaleState.ui.isButtonLoading = true
   try {
-    tx = await purchaseFromCrowdSale(
+    const tx = await purchaseFromCrowdSale(
       crowdSaleState.crowdSaleAddress,
       crowdSaleState.inputToken.data,
       parseWei(crowdSaleState.inputToken.quantity, crowdSaleState.inputToken.data.decimals)
     )
     crowdSaleState.lastTransaction.success = true
+    crowdSaleState.lastTransaction.hash = tx?.transactionHash
   } catch (err) {
-    console.error(err)
     crowdSaleState.lastTransaction.success = false
+    crowdSaleState.lastTransaction.hash = err?.receipt?.transactionHash
     if (err?.code === 4001) {
       // Metamask, user denied signature
       return
     }
   } finally {
     crowdSaleState.ui.isButtonLoading = false
-    crowdSaleState.lastTransaction.hash = tx?.transactionHash
   }
 
   crowdSaleState.route = '/complete'
 
-  return tx
+  return
 }
 
 export const approveStableCoinToken = async () => {
