@@ -109,7 +109,6 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
             disabled={props.quantityDisabled || !snap.inputToken.data}
             screen={screen}
             min={0}
-            step="any"
           ></$Input>
           {usdValue ? (
             <$FineText screen={screen}>{`$${new BN(usdValue).decimalPlaces(6).toString()}`} USD</$FineText>

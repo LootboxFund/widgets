@@ -21,12 +21,14 @@ const BuyButton = (props: BuyButtonProps) => {
   const isInputAmountValid =
     snapCrowdSaleState.inputToken.quantity && parseFloat(snapCrowdSaleState.inputToken.quantity) > 0
   const allowance = new BN(snapCrowdSaleState.inputToken.allowance || '0')
+  const ballance = new BN(snapCrowdSaleState.inputToken.balance || '0')
   const quantity = parseWei(
     snapCrowdSaleState.inputToken.quantity || '0',
     snapCrowdSaleState.outputToken.data?.decimals
   )
 
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
+  const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
     snapUserState.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
@@ -44,6 +46,17 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
       >
         {validChain ? 'Select a Token' : 'Switch Network'}
+      </$Button>
+    )
+  } else if (isInsufficientFunds) {
+    return (
+      <$Button
+        screen={screen}
+        backgroundColor={`${COLORS.surpressedBackground}40`}
+        color={`${COLORS.surpressedFontColor}80`}
+        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+      >
+        Insufficient Funds
       </$Button>
     )
   } else if (isInputAmountValid && !isAllowanceCovered) {
