@@ -33,7 +33,7 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   }
   const setQuantity = (quantity: string) => {
     if (props.targetToken) {
-      if (quantity.length === 0) {
+      if (quantity?.length === 0) {
         crowdSaleState[props.targetToken].quantity = undefined
       } else {
         crowdSaleState[props.targetToken].quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
@@ -162,6 +162,7 @@ export const $FineText = styled.span<{ screen: ScreenSize }>`
   padding: 0px 0px 0px 10px;
   font-weight: lighter;
   font-family: sans-serif;
+  word-break: break-word;
 `
 
 export const $CoinIcon = styled.img<{ screen: ScreenSize }>`
