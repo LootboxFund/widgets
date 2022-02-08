@@ -133,11 +133,16 @@ export const purchaseGuildToken = async () => {
   } catch (err) {
     console.error(err)
     crowdSaleState.lastTransaction.success = false
+    if (err?.code === 4001) {
+      // Metamask, user denied signature
+      return
+    }
   } finally {
     crowdSaleState.ui.isButtonLoading = false
     crowdSaleState.lastTransaction.hash = tx?.transactionHash
-    crowdSaleState.route = '/complete'
   }
+
+  crowdSaleState.route = '/complete'
 
   return tx
 }
