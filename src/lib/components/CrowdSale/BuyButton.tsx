@@ -71,7 +71,7 @@ const BuyButton = (props: BuyButtonProps) => {
       >
         <LoadingText
           loading={snapCrowdSaleState.ui.isButtonLoading}
-          text="Confirm Purchase"
+          text="Approve Transaction"
           color={COLORS.warningFontColor}
         />
       </$Button>
