@@ -32,12 +32,16 @@ export const getPriceFeed = async (contractAddress: Address) => {
 }
 
 export const getCrowdSaleSeedData = async (crowdSaleAddress: Address): Promise<CrowdSaleSeedData> => {
+  const networkAddresses = addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
+  if (networkAddresses == undefined) {
+    throw new Error('Network not configured!')
+  }
   const web3 = await useWeb3()
   const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress)
   const gfxConstants = new web3.eth.Contract(
     GFXConstantsABI,
     // Can I use this "userState" here like this?
-    addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX].gfxConstants
+    networkAddresses.gfxConstants
   )
   const [guildTokenAddress, guildTokenPrice, ...stableCoins] = await Promise.all([
     // Load the guildTokenAddress

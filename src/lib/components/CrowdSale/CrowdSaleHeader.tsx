@@ -9,6 +9,7 @@ import $Button from 'lib/components/Button'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
+import { crowdSaleState } from './state'
 
 export interface CrowdSaleHeaderProps {}
 const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
@@ -55,7 +56,7 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
 
   return (
     <$CrowdSaleHeader>
-      <$CrowdSaleHeaderTitle>BUY GUILDFX</$CrowdSaleHeaderTitle>
+      <$CrowdSaleHeaderTitle>BUY {crowdSaleState.outputToken.data?.symbol || ''}</$CrowdSaleHeaderTitle>
       {validChain ? (
         <>
           <$NetworkText style={{ flex: 2 }}>

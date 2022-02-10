@@ -32,7 +32,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         {snap.lastTransaction.success ? (
           <$CrowdSaleHeaderTitle>Success!</$CrowdSaleHeaderTitle>
         ) : (
-          <$CrowdSaleHeaderTitle>Transaction Failed!</$CrowdSaleHeaderTitle>
+          <$CrowdSaleHeaderTitle>❌ Transaction Failed!</$CrowdSaleHeaderTitle>
         )}
 
         <span onClick={goToCrowdSaleComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
@@ -47,24 +47,32 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
           style={{ width: '50px', height: '50px' }}
         ></$CoinIcon>
         <$BigCoinTicker screen={screen}>{snap.outputToken.data?.symbol}</$BigCoinTicker>
-        <$ThinCoinName screen={screen}>{snap.outputToken.data?.name}</$ThinCoinName>
         <$BlueLinkLink href={getBscScanUrl()} target="_blank">
           View on BscScan
         </$BlueLinkLink>
+        <$Button
+          screen={screen}
+          onClick={addOutputTokenToWallet}
+          backgroundColor={`${COLORS.surpressedBackground}`}
+          backgroundColorHover={`${COLORS.surpressedBackground}ae`}
+          color={`${COLORS.white}`}
+          colorHover={COLORS.white}
+        >
+          Add to Wallet
+        </$Button>
       </$TokenPreviewCard>
 
       <$Button
         screen={screen}
-        onClick={addOutputTokenToWallet}
+        onClick={goToCrowdSaleComponent}
         backgroundColor={`${COLORS.warningBackground}`}
         backgroundColorHover={`${COLORS.warningBackground}ae`}
-        color={`${COLORS.white}`}
+        color={`${COLORS.warningFontColor}`}
         colorHover={COLORS.white}
         style={{ height: '100px', minHeight: '60px' }}
       >
-        Add to Wallet
+        Back
       </$Button>
-      <$SecondaryLinkText onClick={goToCrowdSaleComponent}>Back</$SecondaryLinkText>
     </$CrowdSaleContainer>
   )
 }
@@ -83,7 +91,7 @@ const $TokenPreviewCard = styled.div<{}>`
 
 export const $BlueLinkLink = styled.a<{}>`
   font-family: sans-serif;
-  margin-top: 10px;
+  margin: 10px 0px;
   color: #073effc0;
   text-align: center;
   cursor: pointer;

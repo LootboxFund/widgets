@@ -4,7 +4,8 @@ import { userState } from 'lib/state/userState'
 import { ChainInfo, BLOCKCHAINS } from '../constants'
 import { ChainIDHex, TokenData } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { swapState } from '../../components/Swap/state'
+import { swapState } from 'lib/components/Swap/state'
+import { crowdSaleState } from 'lib/components/CrowdSale/state'
 
 export const useWeb3 = async () => {
   return window.web3
@@ -115,6 +116,10 @@ export const initDApp = async () => {
       clearStateToChain()
     }
   })
+  ;(window as any).ethereum.on('accountsChanged', async (accounts: ChainIDHex[]) => {
+    userState.accounts = accounts
+    userState.currentAccount = accounts[0]
+  })
 }
 
 const initWeb3OnWindow = async () => {
@@ -138,6 +143,7 @@ export const updateStateToChain = (chainInfo: ChainInfo) => {
   userState.currentNetworkDisplayName = chainInfo.displayName
   userState.currentNetworkLogo = chainInfo.currentNetworkLogo
   clearSwapState()
+  clearCrowdSaleState()
   initTokenList(chainInfo.chainIdHex)
 }
 
@@ -148,6 +154,7 @@ export const clearStateToChain = () => {
   userState.currentNetworkDisplayName = undefined
   userState.currentNetworkLogo = undefined
   clearSwapState()
+  clearCrowdSaleState()
   initTokenList()
 }
 
@@ -159,4 +166,16 @@ export const clearSwapState = () => {
   swapState.outputToken.data = undefined
   swapState.outputToken.displayedBalance = undefined
   swapState.outputToken.quantity = undefined
+}
+
+export const clearCrowdSaleState = () => {
+  crowdSaleState.targetToken = null
+  crowdSaleState.inputToken.data = undefined
+  crowdSaleState.inputToken.balance = undefined
+  crowdSaleState.inputToken.quantity = undefined
+  crowdSaleState.inputToken.allowance = undefined
+  crowdSaleState.outputToken.data = undefined
+  crowdSaleState.outputToken.balance = undefined
+  crowdSaleState.outputToken.quantity = undefined
+  crowdSaleState.inputToken.allowance = undefined
 }

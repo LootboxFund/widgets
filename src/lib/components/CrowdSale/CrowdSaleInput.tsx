@@ -12,6 +12,7 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { screen } from '@testing-library/react'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
+import { parseEth } from './helpers'
 
 export interface CrowdSaleInputProps {
   selectedToken?: TokenDataFE
@@ -20,6 +21,7 @@ export interface CrowdSaleInputProps {
   quantityDisabled?: boolean
   selectDisabled?: boolean
 }
+
 const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   const snap = useSnapshot(crowdSaleState)
   const snapUserState = useSnapshot(userState)
@@ -30,12 +32,12 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
       crowdSaleState.route = '/search'
     }
   }
-  const setQuantity = (quantity: number) => {
+  const setQuantity = (quantity: string) => {
     if (props.targetToken) {
-      if (isNaN(quantity)) {
-        crowdSaleState[props.targetToken].quantity = '0'
+      if (quantity?.length === 0) {
+        crowdSaleState[props.targetToken].quantity = undefined
       } else {
-        crowdSaleState[props.targetToken].quantity = quantity.toString()
+        crowdSaleState[props.targetToken].quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
       }
     }
   }
@@ -81,7 +83,10 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   }
 
   const balance =
-    props.targetToken && snap[props.targetToken].displayedBalance ? snap[props.targetToken].displayedBalance : 0
+    props.targetToken && snap[props.targetToken] && snap[props.targetToken].balance
+      ? (snap[props.targetToken].balance as string)
+      : '0'
+
   const quantity = props.targetToken ? snap[props.targetToken].quantity : undefined
   const usdUnitPrice =
     props.targetToken &&
@@ -97,12 +102,13 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <$Input
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.valueAsNumber)}
+            value={quantity || ''}
+            onChange={(e) => setQuantity(e.target.value)}
             type="number"
             placeholder="0.00"
             disabled={props.quantityDisabled || !snap.inputToken.data}
             screen={screen}
+            min={0}
           ></$Input>
           {usdValue ? (
             <$FineText screen={screen}>{`$${new BN(usdValue).decimalPlaces(6).toString()}`} USD</$FineText>
@@ -136,7 +142,7 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
             renderSelectTokenButton()
           )}
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {balance} balance
+            {parseEth(balance)} balance
           </$BalanceText>
         </$Vertical>
       </$Horizontal>
@@ -159,6 +165,7 @@ export const $FineText = styled.span<{ screen: ScreenSize }>`
   padding: 0px 0px 0px 10px;
   font-weight: lighter;
   font-family: sans-serif;
+  word-break: break-word;
 `
 
 export const $CoinIcon = styled.img<{ screen: ScreenSize }>`

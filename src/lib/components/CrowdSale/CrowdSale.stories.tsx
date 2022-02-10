@@ -15,7 +15,9 @@ export default {
 
 const Template = () => {
   useEffect(() => {
-    initDApp().then(() => fetchCrowdSaleData())
+    initDApp()
+      .then(() => fetchCrowdSaleData())
+      .catch((err) => console.error(err))
     ;(window as any).Web3 = Web3
   }, [])
 
