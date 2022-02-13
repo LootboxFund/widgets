@@ -138,11 +138,11 @@ const initWeb3OnWindow = async () => {
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
-  userState.currentNetworkIdHex = chainInfo.chainIdHex
-  userState.currentNetworkIdDecimal = chainInfo.chainIdDecimal
-  userState.currentNetworkName = chainInfo.chainName
-  userState.currentNetworkDisplayName = chainInfo.displayName
-  userState.currentNetworkLogo = chainInfo.currentNetworkLogo
+  userState.network.currentNetworkIdHex = chainInfo.chainIdHex
+  userState.network.currentNetworkIdDecimal = chainInfo.chainIdDecimal
+  userState.network.currentNetworkName = chainInfo.chainName
+  userState.network.currentNetworkDisplayName = chainInfo.displayName
+  userState.network.currentNetworkLogo = chainInfo.currentNetworkLogo
   clearSwapState()
   clearCrowdSaleState()
   clearBuySharesState()
@@ -150,11 +150,11 @@ export const updateStateToChain = (chainInfo: ChainInfo) => {
 }
 
 export const clearStateToChain = () => {
-  userState.currentNetworkIdHex = undefined
-  userState.currentNetworkIdDecimal = undefined
-  userState.currentNetworkName = undefined
-  userState.currentNetworkDisplayName = undefined
-  userState.currentNetworkLogo = undefined
+  userState.network.currentNetworkIdHex = undefined
+  userState.network.currentNetworkIdDecimal = undefined
+  userState.network.currentNetworkName = undefined
+  userState.network.currentNetworkDisplayName = undefined
+  userState.network.currentNetworkLogo = undefined
   clearSwapState()
   clearCrowdSaleState()
   clearBuySharesState()

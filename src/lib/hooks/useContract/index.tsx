@@ -38,7 +38,7 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
 }
 
 export const getCrowdSaleSeedData = async (crowdSaleAddress: Address): Promise<CrowdSaleSeedData> => {
-  const networkAddresses = addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
+  const networkAddresses = addresses[userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
   if (networkAddresses == undefined) {
     throw new Error('Network not configured!')
   }
@@ -116,7 +116,7 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
-  const networkAddresses = addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
+  const networkAddresses = addresses[userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
   if (networkAddresses == undefined) {
     throw new Error('Network not configured!')
   }

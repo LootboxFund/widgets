@@ -30,10 +30,10 @@ const BuyButton = (props: BuyButtonProps) => {
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>

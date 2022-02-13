@@ -38,10 +38,10 @@ const TokenInput = (props: TokenInputProps) => {
   }
 
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   const renderSelectTokenButton = () => {
     if (validChain) {
