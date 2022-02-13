@@ -1,6 +1,4 @@
 import React from 'react'
-import { ThemeProvider } from 'emotion-theming'
-import theme from '@rebass/preset'
 import BuySharesWidget, { BuySharesWidgetProps } from './index'
 import { $CardViewport } from '../Generics'
 
@@ -11,9 +9,7 @@ export default {
 
 const Demo = (args: BuySharesWidgetProps) => (
   <$CardViewport>
-    <ThemeProvider theme={theme}>
-      <BuySharesWidget {...args} />
-    </ThemeProvider>
+    <BuySharesWidget {...args} />
   </$CardViewport>
 )
 
