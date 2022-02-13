@@ -75,12 +75,33 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
   }
 }
 
-export const addToWallet = async (token: TokenData) => {
+export const addERC20ToWallet = async (token: TokenData) => {
   try {
     await (window as any).ethereum.request({
       method: 'wallet_watchAsset',
       params: {
         type: 'ERC20',
+        options: {
+          address: token.address,
+          symbol: token.symbol,
+          decimals: token.decimals,
+          image: token.logoURI,
+        },
+      },
+    })
+    return
+  } catch (err) {
+    console.error(err)
+    return
+  }
+}
+
+export const addERC721ToWallet = async (token: TokenData) => {
+  try {
+    await (window as any).ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC721',
         options: {
           address: token.address,
           symbol: token.symbol,

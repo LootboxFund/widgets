@@ -5,8 +5,9 @@ import { COLORS } from 'lib/theme'
 // import { $CoinIcon } from 'lib/components/BuyShares/Input/Sh'
 // import { $BigCoinTicker, $ThinCoinName } from 'lib/components/BuyShares/TokenPicker/RowToken'
 import $Button from '../Button'
+import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
-import { buySharesState, addOutputTokenToWallet } from './state'
+import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
@@ -26,6 +27,14 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
     }
     return undefined
   }
+  const addToWallet = async () => {
+    // try {
+    //   await addERC721ToWallet(snap.)
+    // } catch (err) {
+    //   console.error(err)
+    // }
+  }
+  console.log(snap.lastTransaction)
   return (
     <$BuySharesContainer>
       <$BuySharesHeader>
@@ -52,7 +61,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         </$BlueLinkLink>
         <$Button
           screen={screen}
-          onClick={addOutputTokenToWallet}
+          onClick={addToWallet}
           backgroundColor={`${COLORS.surpressedBackground}`}
           backgroundColorHover={`${COLORS.surpressedBackground}ae`}
           color={`${COLORS.white}`}

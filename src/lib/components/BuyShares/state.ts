@@ -1,10 +1,9 @@
 import { TokenDataFE } from 'lib/hooks/constants'
-import { addToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
+import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { Address, ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
-import { getPriceFeedRaw, getLootboxData } from 'lib/hooks/useContract'
-// import { buySharesShares, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
+import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
@@ -33,6 +32,7 @@ export interface BuySharesState {
   lastTransaction: {
     success: boolean
     hash: string | undefined
+    errorMessage: string | undefined
   }
 }
 const buySharesSnapshot: BuySharesState = {
@@ -62,6 +62,7 @@ const buySharesSnapshot: BuySharesState = {
   lastTransaction: {
     success: false,
     hash: undefined,
+    errorMessage: undefined,
   },
 }
 export const buySharesState = proxy(buySharesSnapshot)
@@ -123,33 +124,36 @@ export const purchaseLootboxShare = async () => {
     return
   }
 
-  // buySharesState.ui.isButtonLoading = true
-  // try {
-  //   const tx = await buySharesShares(
-  //     buySharesState.lootbox.address,
-  //     buySharesState.inputToken.data,
-  //     parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
-  //   )
-  //   buySharesState.lastTransaction.success = true
-  //   buySharesState.lastTransaction.hash = tx?.transactionHash
-  //   Promise.all([
-  //     loadTokenData(buySharesState.inputToken.data, 'inputToken'),
-  //     loadTokenData(buySharesState.outputToken.data, 'outputToken'),
-  //   ]).catch((err) => console.error(err))
-  // } catch (err) {
-  //   buySharesState.lastTransaction.success = false
-  //   buySharesState.lastTransaction.hash = err?.receipt?.transactionHash
-  //   if (err?.code === 4001) {
-  //     // Metamask, user denied signature
-  //     return
-  //   }
-  // } finally {
-  //   buySharesState.ui.isButtonLoading = false
-  // }
+  buySharesState.ui.isButtonLoading = true
+  try {
+    console.log(
+      'purchasing...',
+      buySharesState.inputToken.quantity,
+      parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
+    )
+    const tx = await buyLootboxShares(
+      buySharesState.lootbox.data.address,
+      parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
+    )
+    console.log('done', tx)
+    buySharesState.lastTransaction.success = true
+    buySharesState.lastTransaction.hash = tx?.transactionHash
+    loadTokenData(buySharesState.inputToken.data).catch((err) => console.error(err))
+  } catch (err) {
+    console.error(err)
+    buySharesState.lastTransaction.success = false
+    buySharesState.lastTransaction.hash = err?.receipt?.transactionHash
+    if (err?.code === 4001) {
+      // Metamask, user denied signature
+      return
+    }
+  } finally {
+    buySharesState.ui.isButtonLoading = false
+  }
 
-  // buySharesState.route = '/complete'
+  buySharesState.route = '/complete'
 
-  // return
+  return
 }
 
 export const fetchLootboxData = async () => {
@@ -173,9 +177,9 @@ export const fetchLootboxData = async () => {
   }
 }
 
-export const addOutputTokenToWallet = async () => {
+export const addTicketToWallet = async () => {
   if (buySharesState.lootbox.data) {
-    // await addToWallet(buySharesState.lootbox.data)
+    await addERC20ToWallet(buySharesState.lootbox.data)
   }
 }
 
