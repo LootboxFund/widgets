@@ -1,11 +1,8 @@
-import react, { useState } from 'react'
+import react from 'react'
 import styled from 'styled-components'
 import { $BuySharesContainer } from 'lib/components/BuyShares/BuyShares'
 import { COLORS } from 'lib/theme'
-// import { $CoinIcon } from 'lib/components/BuyShares/Input/Sh'
-// import { $BigCoinTicker, $ThinCoinName } from 'lib/components/BuyShares/TokenPicker/RowToken'
 import $Button from '../Button'
-import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
 import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
@@ -29,7 +26,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   }
   const addToWallet = async () => {
     // try {
-    //   await addERC721ToWallet(snap.)
+    //   await addTicketToWallet(snap.)
     // } catch (err) {
     //   console.error(err)
     // }

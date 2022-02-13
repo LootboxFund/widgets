@@ -68,7 +68,6 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
               {renderTinyAccount()}
             </span>
           </$NetworkText>
-          {/* <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span> */}
         </>
       ) : (
         renderSwitchNetworkButton()

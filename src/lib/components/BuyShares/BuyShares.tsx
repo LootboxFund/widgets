@@ -54,13 +54,7 @@ const BuyShares = (props: BuySharesProps) => {
       <BuySharesHeader />
       <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
       <ShareOutput lootbox={snap.lootbox.data} quantityDisabled selectDisabled />
-      {/* {snap.inputToken.data && snap.outputToken.data ? (
-        <$CurrencyExchangeRate>
-          <span style={{ marginRight: '10px' }}>ℹ️</span>
-          {`1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`}
-        </$CurrencyExchangeRate>
-      ) : null} */}
-      <BuyButton></BuyButton>
+      <BuyButton />
     </$BuySharesContainer>
   )
 }
