@@ -20,14 +20,13 @@ const Template = () => {
     ;[lootboxAddress] = parseUrlParams(['fundraisers'])
     initDApp()
       .then(() => (lootboxAddress ? initializeLootbox(lootboxAddress) : undefined))
-      .then(() => loadTicketData(ticketID))
-      .catch((err) => console.error(err))
+      .then(() => (ticketID ? loadTicketData(ticketID) : undefined))
     ;(window as any).Web3 = Web3
   }, [])
 
   return (
     <$CardViewport width="340px">
-      <TicketCard lootboxAddress={lootboxAddress} ticketID={'0'} />
+      <TicketCard ticketID={ticketID} />
     </$CardViewport>
   )
 }

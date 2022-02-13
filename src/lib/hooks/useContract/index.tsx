@@ -153,6 +153,13 @@ export const getLootboxURI = async (lootboxAddress: Address) => {
   return { lootboxURI }
 }
 
+export const getLootboxTicketId = async (lootboxAddress: Address) => {
+  const web3 = await useWeb3()
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  const ticketId = await lootbox.methods.ticketIdCounter().call()
+  return ticketId
+}
+
 export const buyLootboxShares = async (lootboxAddress: Address, amountOfStablecoin: string) => {
   const web3 = await useWeb3()
   const [currentUser, ..._] = await web3.eth.getAccounts()
@@ -160,6 +167,5 @@ export const buyLootboxShares = async (lootboxAddress: Address, amountOfStableco
     from: currentUser,
     gas: '1000000', // Have to hardocode the gas limit for now...
   })
-  console.log('--purchasing', lootboxAddress, amountOfStablecoin)
   return await lootbox.methods.purchaseTicket().send({ value: amountOfStablecoin })
 }

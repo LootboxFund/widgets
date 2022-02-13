@@ -11,7 +11,6 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState)
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
-
   if (!ticket || !ticket.metadata?.backgroundImage || !ticket.metadata?.image || !ticket.metadata?.backgroundColor) {
     return <>LOADING</>
   }

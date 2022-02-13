@@ -7,7 +7,6 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { Address } from 'lib/types'
 
 export interface TicketCardWidgetProps {
-  lootboxAddress: Address | undefined
   ticketID: string | undefined
 }
 
@@ -16,8 +15,9 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
   useEffect(() => {
     window.onload = () => {
+      const [lootboxAddress] = parseUrlParams(['fundraisers'])
       initDApp()
-        .then(() => (props.lootboxAddress ? initializeLootbox(props.lootboxAddress) : undefined))
+        .then(() => (lootboxAddress ? initializeLootbox(lootboxAddress) : undefined))
         .then(() => (props.ticketID ? loadTicketData(props.ticketID) : undefined))
         .catch((err) => console.error(err))
     }

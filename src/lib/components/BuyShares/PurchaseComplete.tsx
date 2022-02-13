@@ -34,7 +34,6 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
     //   console.error(err)
     // }
   }
-  console.log(snap.lastTransaction)
   return (
     <$BuySharesContainer>
       <$BuySharesHeader>

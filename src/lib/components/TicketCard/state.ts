@@ -21,10 +21,16 @@ export const initializeLootbox = async (lootboxAddress: Address) => {
   const { lootboxURI } = await getLootboxURI(lootboxAddress)
   ticketCardState.lootboxURI = lootboxURI
   ticketCardState.lootboxAddress = lootboxAddress
+  return {
+    lootboxAddress,
+    lootboxURI,
+  }
 }
 
 export const loadTicketData = async (ticketID: string) => {
-  if (!ticketCardState?.lootboxURI || !ticketCardState?.lootboxAddress) {
+  // TODO: ADD URI
+  // if (!ticketCardState?.lootboxURI || !ticketCardState?.lootboxAddress) {
+  if (!ticketCardState?.lootboxAddress) {
     return
   }
   const metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)

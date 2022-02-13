@@ -32,9 +32,6 @@ export const readJSON = async <T>(file: string): Promise<T> => {
 export const readTicketMetadata = async (lootboxAddress: Address, ticketID: TicketID): Promise<ITicketMetadata> => {
   const defaultFilepath = defaultMetadataStorageUrl(lootboxAddress)
   const filepath = metadataStorageUrl(lootboxAddress, ticketID)
-  // check if filepath exists
-  //   const fileExists =
-  console.log('reading ticket metadata', filepath)
 
   const { name, description, image, backgroundColor, backgroundImage } = await readJSON(filepath)
 
