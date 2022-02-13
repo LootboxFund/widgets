@@ -122,14 +122,14 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   }
   const web3 = await useWeb3()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, depositIdCounter, shareDecimals] =
+  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
       lootbox.methods.name().call(),
       lootbox.methods.symbol().call(),
       lootbox.methods.sharePriceUSD().call(),
       lootbox.methods.sharesSoldCount().call(),
       lootbox.methods.sharesSoldMax().call(),
-      lootbox.methods.depositIdCounter().call(),
+      lootbox.methods.ticketIdCounter().call(),
       lootbox.methods.shareDecimals().call(),
     ])
 
@@ -139,7 +139,7 @@ export const getLootboxData = async (lootboxAddress: Address) => {
     sharePriceUSD,
     sharesSoldCount,
     sharesSoldMax,
-    depositIdCounter,
+    ticketIdCounter,
     shareDecimals,
   }
 }

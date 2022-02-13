@@ -23,6 +23,12 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
     }
   }, [])
 
+  useEffect(() => {
+    if (props.ticketID) {
+      loadTicketData(props.ticketID).catch((err) => console.error(err))
+    }
+  }, [props.ticketID])
+
   return <TicketCard ticketID={props.ticketID} />
 }
 

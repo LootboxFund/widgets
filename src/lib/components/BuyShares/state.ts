@@ -45,7 +45,7 @@ const buySharesSnapshot: BuySharesState = {
       sharePriceUSD: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
-      depositIdCounter: undefined,
+      ticketIdCounter: undefined,
       shareDecimals: undefined,
     },
     quantity: undefined,
@@ -162,7 +162,7 @@ export const fetchLootboxData = async () => {
   if (!lootboxAddress) {
     return
   }
-  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, depositIdCounter, shareDecimals } =
+  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
     await getLootboxData(lootboxAddress)
 
   buySharesState.lootbox.data = {
@@ -172,15 +172,15 @@ export const fetchLootboxData = async () => {
     sharePriceUSD: sharePriceUSD,
     sharesSoldCount: sharesSoldCount,
     sharesSoldMax: sharesSoldMax,
-    depositIdCounter: depositIdCounter,
+    ticketIdCounter: ticketIdCounter,
     shareDecimals: shareDecimals,
   }
 }
 
 export const addTicketToWallet = async () => {
-  if (buySharesState.lootbox.data) {
-    await addERC20ToWallet(buySharesState.lootbox.data)
-  }
+  // if (buySharesState.lootbox.data) {
+  //   await addERC20ToWallet(buySharesState.lootbox.data)
+  // }
 }
 
 export const loadTokenData = async (token: TokenDataFE) => {

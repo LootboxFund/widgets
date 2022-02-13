@@ -3,6 +3,7 @@ import BuyShares from '../BuyShares'
 import TicketCard from '../TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
+import { buySharesState } from 'lib/components/BuyShares/state'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -29,11 +30,16 @@ const $Col = styled.section<{ width: string }>`
 `
 
 const TicketMinter = () => {
+  const buySharesSnapshot = useSnapshot(buySharesState)
+
   return (
     <$TicketMinterContainer>
       <$Row>
         <BuyShares></BuyShares>
-        <TicketCard lootboxAddress="" ticketID="0"></TicketCard>
+        <TicketCard
+          lootboxAddress={buySharesSnapshot.lootbox.data?.address}
+          ticketID={buySharesSnapshot.lootbox.data?.ticketIdCounter}
+        ></TicketCard>
       </$Row>
     </$TicketMinterContainer>
   )

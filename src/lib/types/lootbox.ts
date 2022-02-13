@@ -18,7 +18,7 @@ export interface ILootbox {
   sharePriceUSD: string | undefined
   sharesSoldCount: string | undefined
   sharesSoldMax: string | undefined
-  depositIdCounter: string | undefined
+  ticketIdCounter: string | undefined
   shareDecimals: string | undefined
 }
 
