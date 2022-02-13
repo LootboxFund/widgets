@@ -5,9 +5,10 @@ import { ticketCardState, generateStateID } from './state'
 
 export interface TicketCardProps {
   ticketID: string | undefined
+  showPayoutEnabled?: boolean
 }
 
-const TicketCard = ({ ticketID }: TicketCardProps) => {
+const TicketCard = ({ ticketID, showPayoutEnabled = true }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState)
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
@@ -31,12 +32,10 @@ export const $TicketCardContainer = styled.section<{ backgroundImage?: string | 
   height: 100%;
   border: 0px solid transparent;
   border-radius: 20px;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  min-height: 512px;
   background: #f5f5f5;
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
   background-size: cover;
@@ -53,18 +52,18 @@ export const $TicketLogo = styled.div<{ backgroundImage?: string; backgroundShad
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
-  filter: drop-shadow(0px 0px 40px ${(props) => props.backgroundShadowColor || '#000'});
+  filter: drop-shadow(0px 0px 22px ${(props) => props.backgroundShadowColor || '#000'});
   background-size: cover;
 `
 
 export const $TicketTag = styled.section`
-  width: 100%;
+  width: 85%;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
-  margin: auto 0px 20px;
+  margin: auto auto 20px;
 `
 
 export const $TagText = styled.p`
