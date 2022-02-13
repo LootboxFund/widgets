@@ -1,4 +1,4 @@
-import { TokenDataFE, DEFAULT_LOOTBOX_ADDRESS } from 'lib/hooks/constants'
+import { TokenDataFE } from 'lib/hooks/constants'
 import { addToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { Address, ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
@@ -9,6 +9,7 @@ import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)
 const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
@@ -38,7 +39,7 @@ const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
   lootbox: {
     data: {
-      address: DEFAULT_LOOTBOX_ADDRESS,
+      address: undefined,
       name: undefined,
       symbol: undefined,
       sharePriceUSD: undefined,
@@ -153,20 +154,23 @@ export const purchaseLootboxShare = async () => {
 
 export const fetchLootboxData = async () => {
   buySharesState.inputToken.data = getTokenFromList('0x0native')
-
-  if (!buySharesState.lootbox?.data?.address) {
+  const [lootboxAddress] = parseUrlParams(['fundraisers'])
+  if (!lootboxAddress) {
     return
   }
   const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter, sharesDecimals } =
-    await getLootboxData(buySharesState.lootbox.data.address)
+    await getLootboxData(lootboxAddress)
 
-  buySharesState.lootbox.data.name = name
-  buySharesState.lootbox.data.symbol = symbol
-  buySharesState.lootbox.data.sharePriceUSD = sharePriceUSD
-  buySharesState.lootbox.data.sharesSoldCount = sharesSoldCount
-  buySharesState.lootbox.data.sharesSoldGoal = sharesSoldGoal
-  buySharesState.lootbox.data.depositIdCounter = depositIdCounter
-  buySharesState.lootbox.data.sharesDecimals = sharesDecimals
+  buySharesState.lootbox.data = {
+    address: lootboxAddress,
+    name: name,
+    symbol: symbol,
+    sharePriceUSD: sharePriceUSD,
+    sharesSoldCount: sharesSoldCount,
+    sharesSoldGoal: sharesSoldGoal,
+    depositIdCounter: depositIdCounter,
+    sharesDecimals: sharesDecimals,
+  }
 }
 
 export const addOutputTokenToWallet = async () => {

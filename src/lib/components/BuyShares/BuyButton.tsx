@@ -89,7 +89,7 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ minHeight: '60px', height: '100px' }}
         disabled={snapCrowdSaleState.ui.isButtonLoading}
       >
-        <LoadingText loading={snapCrowdSaleState.ui.isButtonLoading} text="PURCHASE" color={COLORS.trustFontColor} />
+        <LoadingText loading={snapCrowdSaleState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />
       </$Button>
     )
   }

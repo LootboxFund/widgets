@@ -1,7 +1,6 @@
 import react, { useState } from 'react'
 import { COLORS } from 'lib/theme'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
 import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'
@@ -9,7 +8,7 @@ import { BLOCKCHAINS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { $TokenInput, $FineText, $CoinIcon, $BalanceText } from './shared'
+import { $TokenInput, $FineText, $CoinIcon, $BalanceText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
 
 export interface ShareOutputProps {
@@ -54,23 +53,24 @@ const ShareOutput = (props: ShareOutputProps) => {
         </$Vertical>
         <$Vertical flex={1}>
           {props.lootbox ? (
-            <div
-              style={{
-                height: '30px',
-                fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
-                fontWeight: 'bold',
-                padding: screen === 'desktop' ? '5px 20px' : '5px 10px',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...(props.selectDisabled && { cursor: 'not-allowed' }),
-              }}
-            >
-              {props.lootbox.name}
-            </div>
+            // <div
+            //   style={{
+            //     height: '30px',
+            //     fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
+            //     fontWeight: 'bold',
+            //     padding: screen === 'desktop' ? '5px 20px' : '5px 10px',
+            //     display: 'flex',
+            //     flexDirection: 'row',
+            //     alignItems: 'center',
+            //     justifyContent: 'center',
+            //     ...(props.selectDisabled && { cursor: 'not-allowed' }),
+            //   }}
+            // >
+
+            // </div>
+            <$TokenSymbol screen={screen}>{props.lootbox.name}</$TokenSymbol>
           ) : (
-            <>Loading</>
+            <$TokenSymbol screen={screen}>loading...</$TokenSymbol>
           )}
           <$BalanceText screen={screen} style={{ flex: 1 }}>
             ${snap.lootbox.data?.sharePriceUSD} USD/Share

@@ -10,7 +10,7 @@ import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from '../helpers'
-import { $TokenInput, $FineText, $CoinIcon, $BalanceText } from './shared'
+import { $TokenInput, $FineText, $CoinIcon, $BalanceText, $TokenSymbol } from './shared'
 
 export interface TokenInputProps {
   selectedToken?: TokenDataFE
@@ -111,20 +111,9 @@ const TokenInput = (props: TokenInputProps) => {
               onClick={selectToken}
               disabled={props.tokenDisabled && props.selectedToken ? true : false}
               screen={screen}
-              style={{
-                height: '30px',
-                fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
-                fontWeight: 'bold',
-                padding: screen === 'desktop' ? '5px 20px' : '5px 10px',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                ...(props.selectDisabled && { cursor: 'not-allowed' }),
-              }}
             >
               <$CoinIcon screen={screen} src={props.selectedToken.logoURI}></$CoinIcon>
-              {props.selectedToken.symbol}
+              <$TokenSymbol screen={screen}> {props.selectedToken.symbol}</$TokenSymbol>
             </$Button>
           ) : (
             renderSelectTokenButton()

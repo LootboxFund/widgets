@@ -6,6 +6,7 @@ import { ChainIDHex, TokenData } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from 'lib/components/Swap/state'
 import { crowdSaleState } from 'lib/components/CrowdSale/state'
+import { buySharesState } from 'lib/components/BuyShares/state'
 
 export const useWeb3 = async () => {
   return window.web3
@@ -144,6 +145,7 @@ export const updateStateToChain = (chainInfo: ChainInfo) => {
   userState.currentNetworkLogo = chainInfo.currentNetworkLogo
   clearSwapState()
   clearCrowdSaleState()
+  clearBuySharesState()
   initTokenList(chainInfo.chainIdHex)
 }
 
@@ -155,6 +157,7 @@ export const clearStateToChain = () => {
   userState.currentNetworkLogo = undefined
   clearSwapState()
   clearCrowdSaleState()
+  clearBuySharesState()
   initTokenList()
 }
 
@@ -178,4 +181,13 @@ export const clearCrowdSaleState = () => {
   crowdSaleState.outputToken.balance = undefined
   crowdSaleState.outputToken.quantity = undefined
   crowdSaleState.inputToken.allowance = undefined
+}
+
+export const clearBuySharesState = () => {
+  buySharesState.inputToken.data = undefined
+  buySharesState.inputToken.balance = undefined
+  buySharesState.inputToken.quantity = undefined
+  buySharesState.inputToken.allowance = undefined
+  buySharesState.lootbox.data = undefined
+  buySharesState.lootbox.quantity = undefined
 }
