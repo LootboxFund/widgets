@@ -26,7 +26,7 @@ const Template = () => {
 
   return (
     <$CardViewport width="340px">
-      <TicketCard ticketID={ticketID} />
+      <TicketCard ticketID={ticketID} isRedeemEnabled={true} />
     </$CardViewport>
   )
 }

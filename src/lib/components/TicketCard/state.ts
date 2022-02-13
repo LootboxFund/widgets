@@ -3,7 +3,10 @@ import { proxy } from 'valtio'
 import { getLootboxURI } from 'lib/hooks/useContract'
 import { readTicketMetadata } from 'lib/api/storage'
 
+type TicketCardRoutes = '/payout' | '/card'
+
 export interface TicketCardState {
+  route: TicketCardRoutes
   lootboxAddress: Address | undefined
   lootboxURI: string | undefined
   tickets: {
@@ -11,7 +14,12 @@ export interface TicketCardState {
   }
 }
 
-const ticketCardSnapshot: TicketCardState = { lootboxAddress: undefined, tickets: {}, lootboxURI: undefined }
+const ticketCardSnapshot: TicketCardState = {
+  route: '/card',
+  lootboxAddress: undefined,
+  tickets: {},
+  lootboxURI: undefined,
+}
 
 export const ticketCardState = proxy(ticketCardSnapshot)
 

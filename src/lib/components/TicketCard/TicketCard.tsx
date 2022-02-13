@@ -5,10 +5,9 @@ import { ticketCardState, generateStateID } from './state'
 
 export interface TicketCardProps {
   ticketID: string | undefined
-  showPayoutEnabled?: boolean
 }
 
-const TicketCard = ({ ticketID, showPayoutEnabled = true }: TicketCardProps) => {
+const TicketCard = ({ ticketID }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState)
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
@@ -27,18 +26,26 @@ const TicketCard = ({ ticketID, showPayoutEnabled = true }: TicketCardProps) => 
   )
 }
 
-export const $TicketCardContainer = styled.section<{ backgroundImage?: string | undefined }>`
+const BASE_CONTAINER = `
   width: 100%;
   height: 100%;
-  border: 0px solid transparent;
-  border-radius: 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+`
+
+export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
+  ${BASE_CONTAINER}
+  border: 0px solid transparent;
+  border-radius: 20px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  background: #f5f5f5;
+  background: ${(props) => (props.backgroundColor ? props.backgroundColor : '#f5f5f5')};
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
   background-size: cover;
+`
+
+export const $TicketRedeemContainer = styled.section`
+  ${BASE_CONTAINER}
 `
 
 export const $TicketLogo = styled.div<{ backgroundImage?: string; backgroundShadowColor?: string }>`

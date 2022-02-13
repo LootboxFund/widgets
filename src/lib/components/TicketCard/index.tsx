@@ -1,13 +1,16 @@
 import react, { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import TicketCard from 'lib/components/TicketCard/TicketCard'
+import ViewPayout from 'lib/components/TicketCard/ViewPayout'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, initializeLootbox, loadTicketData } from './state'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { Address } from 'lib/types'
+import RedeemButton from 'lib/components/TicketCard/RedeemButton'
+import styled from 'styled-components'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
+  isRedeemEnabled?: boolean
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -29,7 +32,21 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
     }
   }, [props.ticketID])
 
-  return <TicketCard ticketID={props.ticketID} />
+  return (
+    <$RootContainer>
+      {snap.route === '/payout' ? <ViewPayout /> : <TicketCard ticketID={props.ticketID} />}
+      {props.isRedeemEnabled && <RedeemButton />}
+    </$RootContainer>
+  )
 }
+
+export const $RootContainer = styled.section`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 512px;
+`
 
 export default TicketCardWidget
