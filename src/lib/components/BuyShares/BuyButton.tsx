@@ -15,19 +15,23 @@ export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
   const web3 = useWeb3()
   const snapUserState = useSnapshot(userState)
-  const snapCrowdSaleState = useSnapshot(buySharesState)
+  const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
   const isWalletConnected = snapUserState.accounts.length > 0
   const isInputAmountValid =
-    snapCrowdSaleState.inputToken.quantity && parseFloat(snapCrowdSaleState.inputToken.quantity) > 0
-  const allowance = new BN(snapCrowdSaleState.inputToken.allowance || '0')
-  const ballance = new BN(snapCrowdSaleState.inputToken.balance || '0')
+    snapBuySharesState.inputToken.quantity && parseFloat(snapBuySharesState.inputToken.quantity) > 0
+  const ballance = new BN(snapBuySharesState.inputToken.balance || '0')
   const quantity = parseWei(
-    snapCrowdSaleState.inputToken.quantity || '0',
-    snapCrowdSaleState.lootbox.data?.shareDecimals || 18
+    snapBuySharesState.inputToken.quantity || '0',
+    snapBuySharesState.inputToken.data?.decimals || 18
   )
-
-  const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
+  const lootQuantity = parseWei(
+    snapBuySharesState.lootbox.quantity || '0',
+    snapBuySharesState.lootbox.data?.shareDecimals || 18
+  )
+  const withinMaxShares = new BN(lootQuantity)
+    .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
+    .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
     snapUserState.network.currentNetworkIdHex &&
@@ -35,9 +39,21 @@ const BuyButton = (props: BuyButtonProps) => {
       .map((b) => b.chainIdHex)
       .includes(snapUserState.network.currentNetworkIdHex)
 
+  const SuppressedButton = ({ txt }: { txt: string }) => {
+    return (
+      <$Button
+        screen={screen}
+        backgroundColor={`${COLORS.surpressedBackground}40`}
+        color={`${COLORS.surpressedFontColor}80`}
+        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+      >
+        {txt}
+      </$Button>
+    )
+  }
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>
-  } else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.lootbox.data)) {
+  } else if (isWalletConnected && (!snapBuySharesState.inputToken.data || !snapBuySharesState.lootbox.data)) {
     return (
       <$Button
         screen={screen}
@@ -49,36 +65,10 @@ const BuyButton = (props: BuyButtonProps) => {
       </$Button>
     )
   } else if (isInsufficientFunds) {
-    return (
-      <$Button
-        screen={screen}
-        backgroundColor={`${COLORS.surpressedBackground}40`}
-        color={`${COLORS.surpressedFontColor}80`}
-        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
-      >
-        Insufficient Funds
-      </$Button>
-    )
-  }
-  // else if (isInputAmountValid && !isAllowanceCovered) {
-  //   return (
-  //     <$Button
-  //       screen={screen}
-  //       onClick={approveStableCoinToken}
-  //       backgroundColor={`${COLORS.warningBackground}`}
-  //       color={`${COLORS.warningFontColor}`}
-  //       style={{ minHeight: '60px', height: '100px' }}
-  //       disabled={snapCrowdSaleState.ui.isButtonLoading}
-  //     >
-  //       <LoadingText
-  //         loading={snapCrowdSaleState.ui.isButtonLoading}
-  //         text="Approve Transaction"
-  //         color={COLORS.warningFontColor}
-  //       />
-  //     </$Button>
-  //   )
-  // }
-  else if (isInputAmountValid) {
+    return <SuppressedButton txt={'Insufficient Funds'}></SuppressedButton>
+  } else if (isInputAmountValid && !withinMaxShares) {
+    return <SuppressedButton txt={'Lootbox is Full'}></SuppressedButton>
+  } else if (isInputAmountValid) {
     return (
       <$Button
         screen={screen}
@@ -87,9 +77,9 @@ const BuyButton = (props: BuyButtonProps) => {
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
         style={{ minHeight: '60px', height: '100px' }}
-        disabled={snapCrowdSaleState.ui.isButtonLoading}
+        disabled={snapBuySharesState.ui.isButtonLoading}
       >
-        <LoadingText loading={snapCrowdSaleState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />
+        <LoadingText loading={snapBuySharesState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />
       </$Button>
     )
   }
