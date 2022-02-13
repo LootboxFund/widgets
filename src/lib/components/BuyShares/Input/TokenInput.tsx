@@ -1,11 +1,11 @@
-import react, { useState } from 'react'
+import react from 'react'
 import { COLORS } from 'lib/theme'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
 import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS, TokenDataFE } from 'lib/hooks/constants'
+import { BLOCKCHAINS, TokenDataFE, USD_DECIMALS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -80,9 +80,11 @@ const TokenInput = (props: TokenInputProps) => {
   const balance = snap.inputToken && snap.inputToken.balance ? (snap.inputToken.balance as string) : '0'
 
   const quantity = snap.inputToken.quantity
-  const usdUnitPrice = snap.inputToken && snap.inputToken.data && snap.inputToken.data?.usdPrice
   const usdValue =
-    quantity && snap.inputToken && usdUnitPrice ? new BN(usdUnitPrice).multipliedBy(new BN(quantity)) : ''
+    quantity && snap.inputToken?.data?.usdPrice
+      ? new BN(snap.inputToken.data.usdPrice).multipliedBy(new BN(quantity)).dividedBy(new BN(10).pow(USD_DECIMALS))
+      : '0'
+
   return (
     <$TokenInput screen={screen}>
       <$Horizontal flex={1}>

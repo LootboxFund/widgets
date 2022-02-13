@@ -9,17 +9,16 @@ import { BLOCKCHAINS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { parseEth } from '../helpers'
 import { $TokenInput, $FineText, $CoinIcon, $BalanceText } from './shared'
 import { ILootbox } from 'lib/types'
 
-export interface ShareInputProps {
+export interface ShareOutputProps {
   lootbox?: ILootbox
   quantityDisabled?: boolean
   selectDisabled?: boolean
 }
 
-const ShareInput = (props: ShareInputProps) => {
+const ShareOutput = (props: ShareOutputProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -37,44 +36,25 @@ const ShareInput = (props: ShareInputProps) => {
     }
   }
 
-  const validChain =
-    snapUserState.currentNetworkIdHex &&
-    Object.values(BLOCKCHAINS)
-      .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
-
-  const balance = snap.inputToken && snap.inputToken.balance ? (snap.inputToken.balance as string) : '0'
-
-  const quantity = snap.inputToken.quantity
-  const usdUnitPrice = snap.inputToken && snap.inputToken.data && snap.inputToken.data?.usdPrice
-  const usdValue =
-    quantity && snap.inputToken && usdUnitPrice ? new BN(usdUnitPrice).multipliedBy(new BN(quantity)) : ''
+  const sharesDecimals = snap.lootbox.data?.sharesDecimals
+  const quantity = snap.lootbox.quantity
+  const sharesSoldCount = snap.lootbox?.data?.sharesSoldCount
+  const quantityBN = quantity && sharesDecimals && new BN(quantity).multipliedBy(new BN(10).pow(sharesDecimals))
+  const totalShares = sharesSoldCount && quantityBN && new BN(sharesSoldCount).plus(quantityBN)
+  const percentageShares =
+    quantityBN && sharesSoldCount && sharesDecimals && totalShares && totalShares.gt(0)
+      ? quantityBN.dividedBy(totalShares).multipliedBy(100).toFixed(2)
+      : new BN(0)
   return (
     <$TokenInput screen={screen}>
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
-          <$Input
-            value={quantity || ''}
-            onChange={(e) => setQuantity(e.target.value)}
-            type="number"
-            placeholder="0.00"
-            disabled={props.quantityDisabled || !snap.inputToken.data}
-            screen={screen}
-            min={0}
-          ></$Input>
-          {usdValue ? (
-            <$FineText screen={screen}>{`Spend ${new BN(usdValue).decimalPlaces(2).toString()}`} USD</$FineText>
-          ) : null}
+          <$Input value={quantity} type="number" placeholder="0.00" screen={screen} min={0}></$Input>
+          <$FineText screen={screen}>{`Receive Shares (${percentageShares}%* of Earnings)`}</$FineText>
         </$Vertical>
         <$Vertical flex={1}>
           {props.lootbox ? (
-            <$Button
-              backgroundColor={`${COLORS.white}10`}
-              backgroundColorHover={`${COLORS.surpressedBackground}50`}
-              color={COLORS.black}
-              onClick={selectToken}
-              disabled={true}
-              screen={screen}
+            <div
               style={{
                 height: '30px',
                 fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
@@ -87,14 +67,13 @@ const ShareInput = (props: ShareInputProps) => {
                 ...(props.selectDisabled && { cursor: 'not-allowed' }),
               }}
             >
-              {/* <$CoinIcon screen={screen} src={props.lootbox.logoURI}></$CoinIcon> */}
-              {props.lootbox.symbol}
-            </$Button>
+              {props.lootbox.name}
+            </div>
           ) : (
             <>Loading</>
           )}
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {parseEth(balance)} balance
+            ${snap.lootbox.data?.sharePriceUSD} USD/Share
           </$BalanceText>
         </$Vertical>
       </$Horizontal>
@@ -102,4 +81,4 @@ const ShareInput = (props: ShareInputProps) => {
   )
 }
 
-export default ShareInput
+export default ShareOutput

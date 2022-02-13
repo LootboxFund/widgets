@@ -2,7 +2,7 @@ import BN from 'bignumber.js'
 
 const DEFAULT_DECIMALS = 18
 
-export const parseWei = (amount: string, decimals?: number | undefined): string => {
+export const parseWei = (amount: string, decimals?: number | string | undefined): string => {
   if (decimals == undefined) {
     decimals = DEFAULT_DECIMALS
   }

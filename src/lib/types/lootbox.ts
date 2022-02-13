@@ -8,5 +8,5 @@ export interface ILootbox {
   sharesSoldCount: string | undefined
   sharesSoldGoal: string | undefined
   depositIdCounter: string | undefined
-  sharesDecimals: number | undefined
+  sharesDecimals: string | undefined
 }

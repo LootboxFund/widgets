@@ -2,9 +2,8 @@ import { TokenDataFE, DEFAULT_LOOTBOX_ADDRESS } from 'lib/hooks/constants'
 import { addToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { Address, ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
-import { subscribeKey } from 'valtio/utils'
 import ERC20ABI from 'lib/abi/erc20.json'
-import { getPriceFeed, getLootboxData } from 'lib/hooks/useContract'
+import { getPriceFeedRaw, getLootboxData } from 'lib/hooks/useContract'
 // import { buySharesShares, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
@@ -68,7 +67,7 @@ export const buySharesState = proxy(buySharesSnapshot)
 
 subscribe(buySharesState.inputToken, () => {
   try {
-    updateOutputTokenValues()
+    updateLootboxQuantity()
   } catch (err) {
     console.error(err)
   }
@@ -81,7 +80,7 @@ subscribe(userState, () => {
   }
 })
 
-const updateOutputTokenValues = () => {
+const updateLootboxQuantity = () => {
   if (buySharesState.inputToken.quantity == undefined) {
     buySharesState.lootbox.quantity = '0'
   } else if (
@@ -158,9 +157,8 @@ export const fetchLootboxData = async () => {
   if (!buySharesState.lootbox?.data?.address) {
     return
   }
-  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter } = await getLootboxData(
-    buySharesState.lootbox.data.address
-  )
+  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter, sharesDecimals } =
+    await getLootboxData(buySharesState.lootbox.data.address)
 
   buySharesState.lootbox.data.name = name
   buySharesState.lootbox.data.symbol = symbol
@@ -168,8 +166,7 @@ export const fetchLootboxData = async () => {
   buySharesState.lootbox.data.sharesSoldCount = sharesSoldCount
   buySharesState.lootbox.data.sharesSoldGoal = sharesSoldGoal
   buySharesState.lootbox.data.depositIdCounter = depositIdCounter
-
-  console.log('lootboxdata', name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter)
+  buySharesState.lootbox.data.sharesDecimals = sharesDecimals
 }
 
 export const addOutputTokenToWallet = async () => {
@@ -197,8 +194,8 @@ export const loadTokenData = async (token: TokenDataFE) => {
 const loadPriceFeed = async () => {
   if (buySharesState.inputToken.data?.priceOracle) {
     // get price of conversion for the stable coin and save to buySharesState
-    const inputTokenPrice = await getPriceFeed(buySharesState.inputToken.data.priceOracle)
-    buySharesState.inputToken.data.usdPrice = inputTokenPrice.toString()
+    const inputTokenPrice = await getPriceFeedRaw(buySharesState.inputToken.data.priceOracle)
+    buySharesState.inputToken.data.usdPrice = inputTokenPrice
   }
 }
 

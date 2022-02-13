@@ -1,15 +1,12 @@
 import React, { useEffect } from 'react'
-import { Label, Input } from '@rebass/forms'
 import styled from 'styled-components'
 import BuyButton from 'lib/components/BuyShares/BuyButton'
 import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
-import ShareInput from 'lib/components/BuyShares/Input/ShareInput'
+import ShareOutput from 'lib/components/BuyShares/Input/ShareOutput'
 import BuySharesHeader from 'lib/components/BuyShares/Header'
 import { useSnapshot } from 'valtio'
-import { useTokenList } from 'lib/hooks/useTokenList'
 import { TokenDataFE } from 'lib/hooks/constants'
 import { buySharesState } from './state'
-import { getPriceFeed } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import BN from 'bignumber.js'
@@ -56,7 +53,7 @@ const BuyShares = (props: BuySharesProps) => {
     <$BuySharesContainer>
       <BuySharesHeader />
       <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
-      {/* <ShareInput selectedToken={snap.lootbox.data} quantityDisabled tokenDisabled={!isLoggedIn} selectDisabled /> */}
+      <ShareOutput lootbox={snap.lootbox.data} quantityDisabled selectDisabled />
       {/* {snap.inputToken.data && snap.outputToken.data ? (
         <$CurrencyExchangeRate>
           <span style={{ marginRight: '10px' }}>ℹ️</span>

@@ -3,7 +3,7 @@ import BuySharesWidget, { BuySharesWidgetProps } from './index'
 import { $CardViewport } from '../Generics'
 
 export default {
-  title: 'CrowdSaleWidget',
+  title: 'BuySharesWidget',
   component: BuySharesWidget,
 }
 

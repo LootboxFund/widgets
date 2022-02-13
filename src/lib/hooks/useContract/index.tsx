@@ -24,12 +24,17 @@ interface CrowdSaleSeedData {
 }
 
 export const getPriceFeed = async (contractAddress: Address) => {
+  const data = await getPriceFeedRaw(contractAddress)
+  const priceIn8Decimals = new BN(data).div(new BN(`100000000`)).decimalPlaces(4)
+  return priceIn8Decimals
+}
+
+export const getPriceFeedRaw = async (contractAddress: Address): Promise<string> => {
   const web3 = await useWeb3()
   let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
-  const [currentUser, ...otherUserAddress] = await web3.eth.getAccounts()
+  const [currentUser, ..._] = await web3.eth.getAccounts()
   const data = await contractInstance.methods.latestRoundData().call({ from: currentUser })
-  const priceIn8Decimals = new BN(data.answer).div(new BN(`100000000`)).decimalPlaces(4)
-  return priceIn8Decimals
+  return data.answer
 }
 
 export const getCrowdSaleSeedData = async (crowdSaleAddress: Address): Promise<CrowdSaleSeedData> => {
@@ -117,14 +122,18 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   }
   const web3 = await useWeb3()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter] = await Promise.all([
-    lootbox.methods.name().call(),
-    lootbox.methods.symbol().call(),
-    lootbox.methods.sharePriceUSD().call(),
-    lootbox.methods.sharesSoldCount().call(),
-    lootbox.methods.sharesSoldGoal().call(),
-    lootbox.methods.depositIdCounter().call(),
-  ])
+  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter, sharesDecimals] =
+    await Promise.all([
+      lootbox.methods.name().call(),
+      lootbox.methods.symbol().call(),
+      lootbox.methods.sharePriceUSD().call(),
+      lootbox.methods.sharesSoldCount().call(),
+      lootbox.methods.sharesSoldGoal().call(),
+      lootbox.methods.depositIdCounter().call(),
+      // TODO: add this in dynamically
+      // lootbox.methods.sharesDecimals().call(),
+      Promise.resolve('18'),
+    ])
 
   return {
     name,
@@ -133,5 +142,6 @@ export const getLootboxData = async (lootboxAddress: Address) => {
     sharesSoldCount,
     sharesSoldGoal,
     depositIdCounter,
+    sharesDecimals,
   }
 }
