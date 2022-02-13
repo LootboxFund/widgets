@@ -15,7 +15,7 @@ interface IAddresses {
 
 export const USD_DECIMALS = 8
 // TODO: DYNAMIC LOOTBOX_ADDRESS
-export const DEFAULT_LOOTBOX_ADDRESS = '0x24BFd26D8401fE54ec6b1f31Ab7FF277529402BA'
+export const DEFAULT_LOOTBOX_ADDRESS = '0x47B4D2b01F77CfDedeF2A641dBb56d13385fFe2c'
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 export const STORAGE_URL = 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com'
 
