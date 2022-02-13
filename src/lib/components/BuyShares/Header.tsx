@@ -1,18 +1,16 @@
+import react from 'react'
 import { addCustomEVMChain, useUserInfo, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
-import react from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
 import $Button from 'lib/components/Button'
-import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
-import { buySharesState } from './state'
 
-export interface CrowdSaleHeaderProps {}
-const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
+export interface BuySharesHeaderProps {}
+const BuySharesHeader = (props: BuySharesHeaderProps) => {
   const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
 
@@ -55,8 +53,8 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
   }
 
   return (
-    <$CrowdSaleHeader>
-      <$CrowdSaleHeaderTitle>BUY {buySharesState.outputToken.data?.symbol || ''}</$CrowdSaleHeaderTitle>
+    <$BuySharesHeader>
+      <$BuySharesHeaderTitle>🎁 BUY LOOTBOX SHARES</$BuySharesHeaderTitle>
       {validChain ? (
         <>
           <$NetworkText style={{ flex: 2 }}>
@@ -73,18 +71,18 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
       ) : (
         renderSwitchNetworkButton()
       )}
-    </$CrowdSaleHeader>
+    </$BuySharesHeader>
   )
 }
 
-export const $CrowdSaleHeaderTitle = styled.span<{}>`
+export const $BuySharesHeaderTitle = styled.span<{}>`
   flex: 3;
   font-size: 1rem;
   font-weight: bold;
   padding: 0px 0px 0px 10px;
 `
 
-export const $CrowdSaleHeader = styled.div<{}>`
+export const $BuySharesHeader = styled.div<{}>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -100,4 +98,4 @@ export const $NetworkText = styled.span`
   font-family: sans-serif;
 `
 
-export default CrowdSaleHeader
+export default BuySharesHeader

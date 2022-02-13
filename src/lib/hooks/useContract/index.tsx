@@ -3,6 +3,7 @@ import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import { useWeb3 } from '../useWeb3Api'
 import ERC20ABI from 'lib/abi/erc20.json'
+import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/crowdSale.json'
 import GFXConstantsABI from 'lib/abi/gfxConstants.json'
 import { addresses, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
@@ -107,4 +108,30 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
   const [currentUser, ..._] = await web3.eth.getAccounts()
   const token = new web3.eth.Contract(ERC20ABI, tokenData.address)
   return token.methods.approve(delegator, quantity).send({ from: currentUser })
+}
+
+export const getLootboxData = async (lootboxAddress: Address) => {
+  const networkAddresses = addresses[userState.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
+  if (networkAddresses == undefined) {
+    throw new Error('Network not configured!')
+  }
+  const web3 = await useWeb3()
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter] = await Promise.all([
+    lootbox.methods.name().call(),
+    lootbox.methods.symbol().call(),
+    lootbox.methods.sharePriceUSD().call(),
+    lootbox.methods.sharesSoldCount().call(),
+    lootbox.methods.sharesSoldGoal().call(),
+    lootbox.methods.depositIdCounter().call(),
+  ])
+
+  return {
+    name,
+    symbol,
+    sharePriceUSD,
+    sharesSoldCount,
+    sharesSoldGoal,
+    depositIdCounter,
+  }
 }

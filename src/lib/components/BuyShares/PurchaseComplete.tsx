@@ -1,11 +1,11 @@
 import react, { useState } from 'react'
 import styled from 'styled-components'
-import { $CrowdSaleContainer } from 'lib/components/CrowdSale/CrowdSale'
+import { $BuySharesContainer } from 'lib/components/BuyShares/BuyShares'
 import { COLORS } from 'lib/theme'
-import { $CoinIcon } from 'lib/components/CrowdSale/CrowdSaleInput'
-import { $BigCoinTicker, $ThinCoinName } from 'lib/components/CrowdSale/TokenPicker/RowToken'
+// import { $CoinIcon } from 'lib/components/BuyShares/Input/Sh'
+// import { $BigCoinTicker, $ThinCoinName } from 'lib/components/BuyShares/TokenPicker/RowToken'
 import $Button from '../Button'
-import { $CrowdSaleHeader, $CrowdSaleHeaderTitle } from './Header'
+import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
 import { buySharesState, addOutputTokenToWallet } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -17,7 +17,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
-  const goToCrowdSaleComponent = () => (buySharesState.route = '/buyShares')
+  const goToBuySharesComponent = () => (buySharesState.route = '/buyShares')
   const getBscScanUrl = () => {
     if (snapUserState.currentNetworkIdHex && BLOCKCHAINS[snapUserState.currentNetworkIdHex]) {
       return `${BLOCKCHAINS[snapUserState.currentNetworkIdHex].blockExplorerUrls[0]}${
@@ -27,26 +27,26 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
     return undefined
   }
   return (
-    <$CrowdSaleContainer>
-      <$CrowdSaleHeader>
+    <$BuySharesContainer>
+      <$BuySharesHeader>
         {snap.lastTransaction.success ? (
-          <$CrowdSaleHeaderTitle>Success!</$CrowdSaleHeaderTitle>
+          <$BuySharesHeaderTitle>Success!</$BuySharesHeaderTitle>
         ) : (
-          <$CrowdSaleHeaderTitle>❌ Transaction Failed!</$CrowdSaleHeaderTitle>
+          <$BuySharesHeaderTitle>❌ Transaction Failed!</$BuySharesHeaderTitle>
         )}
 
-        <span onClick={goToCrowdSaleComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
+        <span onClick={goToBuySharesComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
           X
         </span>
-      </$CrowdSaleHeader>
+      </$BuySharesHeader>
       <$TokenPreviewCard>
-        <$CoinIcon
+        {/* <$CoinIcon
           screen={screen}
           // src="https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png"
-          src={snap.outputToken.data?.logoURI}
+          src={snap.lootbox.data?.logoURI}
           style={{ width: '50px', height: '50px' }}
         ></$CoinIcon>
-        <$BigCoinTicker screen={screen}>{snap.outputToken.data?.symbol}</$BigCoinTicker>
+        <$BigCoinTicker screen={screen}>{snap.outputToken.data?.symbol}</$BigCoinTicker> */}
         <$BlueLinkLink href={getBscScanUrl()} target="_blank">
           View on BscScan
         </$BlueLinkLink>
@@ -64,7 +64,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
 
       <$Button
         screen={screen}
-        onClick={goToCrowdSaleComponent}
+        onClick={goToBuySharesComponent}
         backgroundColor={`${COLORS.warningBackground}`}
         backgroundColorHover={`${COLORS.warningBackground}ae`}
         color={`${COLORS.warningFontColor}`}
@@ -73,7 +73,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
       >
         Back
       </$Button>
-    </$CrowdSaleContainer>
+    </$BuySharesContainer>
   )
 }
 

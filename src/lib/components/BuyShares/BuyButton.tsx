@@ -24,7 +24,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const ballance = new BN(snapCrowdSaleState.inputToken.balance || '0')
   const quantity = parseWei(
     snapCrowdSaleState.inputToken.quantity || '0',
-    snapCrowdSaleState.outputToken.data?.decimals
+    snapCrowdSaleState.lootbox.data?.sharesDecimals || 18
   )
 
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
@@ -37,7 +37,7 @@ const BuyButton = (props: BuyButtonProps) => {
 
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>
-  } else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.outputToken.data)) {
+  } else if (isWalletConnected && (!snapCrowdSaleState.inputToken.data || !snapCrowdSaleState.lootbox.data)) {
     return (
       <$Button
         screen={screen}

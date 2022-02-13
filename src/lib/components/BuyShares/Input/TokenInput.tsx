@@ -1,28 +1,25 @@
 import react, { useState } from 'react'
-import styled, { css } from 'styled-components'
 import { COLORS } from 'lib/theme'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $Button } from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
-import { buySharesState, TokenPickerTarget } from './state'
+import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, TokenDataFE } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { screen } from '@testing-library/react'
-import { ScreenSize } from '../../hooks/useScreenSize/index'
-import { parseEth } from './helpers'
+import { parseEth } from '../helpers'
+import { $TokenInput, $FineText, $CoinIcon, $BalanceText } from './shared'
 
-export interface BuyLootboxInputProps {
+export interface TokenInputProps {
   selectedToken?: TokenDataFE
-  targetToken: TokenPickerTarget
   tokenDisabled?: boolean
   quantityDisabled?: boolean
   selectDisabled?: boolean
 }
 
-const BuyLootboxInput = (props: BuyLootboxInputProps) => {
+const TokenInput = (props: TokenInputProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -33,12 +30,10 @@ const BuyLootboxInput = (props: BuyLootboxInputProps) => {
     // }
   }
   const setQuantity = (quantity: string) => {
-    if (props.targetToken) {
-      if (quantity?.length === 0) {
-        buySharesState[props.targetToken].quantity = undefined
-      } else {
-        buySharesState[props.targetToken].quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
-      }
+    if (quantity?.length === 0) {
+      buySharesState.inputToken.quantity = undefined
+    } else {
+      buySharesState.inputToken.quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
     }
   }
 
@@ -82,23 +77,14 @@ const BuyLootboxInput = (props: BuyLootboxInputProps) => {
     )
   }
 
-  const balance =
-    props.targetToken && snap[props.targetToken] && snap[props.targetToken].balance
-      ? (snap[props.targetToken].balance as string)
-      : '0'
+  const balance = snap.inputToken && snap.inputToken.balance ? (snap.inputToken.balance as string) : '0'
 
-  const quantity = props.targetToken ? snap[props.targetToken].quantity : undefined
-  const usdUnitPrice =
-    props.targetToken &&
-    snap[props.targetToken] &&
-    snap[props.targetToken].data &&
-    snap[props.targetToken].data?.usdPrice
+  const quantity = snap.inputToken.quantity
+  const usdUnitPrice = snap.inputToken && snap.inputToken.data && snap.inputToken.data?.usdPrice
   const usdValue =
-    props.targetToken && quantity && snap[props.targetToken] && usdUnitPrice
-      ? new BN(usdUnitPrice).multipliedBy(new BN(quantity))
-      : ''
+    quantity && snap.inputToken && usdUnitPrice ? new BN(usdUnitPrice).multipliedBy(new BN(quantity)) : ''
   return (
-    <$BuyLootboxInput screen={screen}>
+    <$TokenInput screen={screen}>
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <$Input
@@ -111,7 +97,7 @@ const BuyLootboxInput = (props: BuyLootboxInputProps) => {
             min={0}
           ></$Input>
           {usdValue ? (
-            <$FineText screen={screen}>{`$${new BN(usdValue).decimalPlaces(6).toString()}`} USD</$FineText>
+            <$FineText screen={screen}>{`Spend ${new BN(usdValue).decimalPlaces(2).toString()}`} USD</$FineText>
           ) : null}
         </$Vertical>
         <$Vertical flex={1}>
@@ -146,42 +132,8 @@ const BuyLootboxInput = (props: BuyLootboxInputProps) => {
           </$BalanceText>
         </$Vertical>
       </$Horizontal>
-    </$BuyLootboxInput>
+    </$TokenInput>
   )
 }
 
-const $BuyLootboxInput = styled.div<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.3rem')};
-  padding: 10px 10px 15px 10px;
-  background-color: ${`${COLORS.surpressedBackground}20`};
-  border: 0px solid transparent;
-  border-radius: 10px;
-  display: flex;
-  max-height: 150px;
-`
-
-export const $FineText = styled.span<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '0.9rem' : '0.8rem')};
-  padding: 0px 0px 0px 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
-  word-break: break-word;
-`
-
-export const $CoinIcon = styled.img<{ screen: ScreenSize }>`
-  width: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.2rem')};
-  height: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.2rem')};
-  margin-right: ${(props) => (props.screen === 'desktop' ? '10px' : '5px')};
-`
-
-export const $BalanceText = styled.span<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '0.8rem' : '0.7rem')};
-  color: ${`${COLORS.surpressedFontColor}`};
-  text-align: right;
-  margin-right: 5px;
-  margin-top: 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
-`
-
-export default BuyLootboxInput
+export default TokenInput

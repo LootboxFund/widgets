@@ -12,6 +12,7 @@ interface IAddresses {
   gfxConstants: string
 }
 
+export const DEFAULT_LOOTBOX_ADDRESS = '0x4d591C0F91310730aB77c676d58FC1D1DbF2f17e'
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 
 // TODO: Dynamically load this

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { Label, Input } from '@rebass/forms'
 import styled from 'styled-components'
-import BuyButton from 'lib/components/CrowdSale/BuyButton'
-import CrowdSaleInput from 'lib/components/CrowdSale/CrowdSaleInput'
-import CrowdSaleHeader from 'lib/components/CrowdSale/CrowdSaleHeader'
+import BuyButton from 'lib/components/BuyShares/BuyButton'
+import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
+import ShareInput from 'lib/components/BuyShares/Input/ShareInput'
+import BuySharesHeader from 'lib/components/BuyShares/Header'
 import { useSnapshot } from 'valtio'
 import { useTokenList } from 'lib/hooks/useTokenList'
 import { TokenDataFE } from 'lib/hooks/constants'
@@ -12,8 +13,9 @@ import { getPriceFeed } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import BN from 'bignumber.js'
+import { ILootbox } from 'lib/types'
 
-export const $CrowdSaleContainer = styled.section`
+export const $BuySharesContainer = styled.section`
   width: 100%;
   height: 100%;
   border: 0px solid transparent;
@@ -26,11 +28,11 @@ export const $CrowdSaleContainer = styled.section`
   min-height: 600px;
 `
 
-interface CrowdSaleProps {
+interface BuySharesProps {
   inputToken?: TokenDataFE
-  outputToken?: TokenDataFE
+  lootbox?: ILootbox
 }
-const CrowdSale = (props: CrowdSaleProps) => {
+const BuyShares = (props: BuySharesProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
 
@@ -40,35 +42,29 @@ const CrowdSale = (props: CrowdSaleProps) => {
     if (props.inputToken) {
       buySharesState.inputToken.data = props.inputToken
     }
-    if (props.outputToken) {
-      buySharesState.outputToken.data = props.inputToken
+    if (props.lootbox) {
+      buySharesState.lootbox.data = props.lootbox
     }
   }, [])
 
   const inputPriceUSD = snap.inputToken.data?.usdPrice
-  const outputPriceUSD = snap.outputToken.data?.usdPrice
+  const outputPriceUSD = snap.lootbox.data?.sharePriceUSD
   const outputQuantity =
     inputPriceUSD && outputPriceUSD ? new BN(inputPriceUSD).dividedBy(new BN(outputPriceUSD)).decimalPlaces(8) : 0
 
   return (
-    <$CrowdSaleContainer>
-      <CrowdSaleHeader />
-      <CrowdSaleInput selectedToken={snap.inputToken.data} targetToken="inputToken" tokenDisabled={!isLoggedIn} />
-      <CrowdSaleInput
-        selectedToken={snap.outputToken.data}
-        targetToken="outputToken"
-        quantityDisabled
-        tokenDisabled={!isLoggedIn}
-        selectDisabled
-      />
-      {snap.inputToken.data && snap.outputToken.data ? (
+    <$BuySharesContainer>
+      <BuySharesHeader />
+      <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
+      {/* <ShareInput selectedToken={snap.lootbox.data} quantityDisabled tokenDisabled={!isLoggedIn} selectDisabled /> */}
+      {/* {snap.inputToken.data && snap.outputToken.data ? (
         <$CurrencyExchangeRate>
           <span style={{ marginRight: '10px' }}>ℹ️</span>
           {`1 ${snap.inputToken.data.symbol} = ${outputQuantity} ${snap.outputToken.data.symbol}`}
         </$CurrencyExchangeRate>
-      ) : null}
+      ) : null} */}
       <BuyButton></BuyButton>
-    </$CrowdSaleContainer>
+    </$BuySharesContainer>
   )
 }
 
@@ -79,4 +75,4 @@ export const $CurrencyExchangeRate = styled.span`
   color: ${COLORS.surpressedFontColor};
 `
 
-export default CrowdSale
+export default BuyShares
