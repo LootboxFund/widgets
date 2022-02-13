@@ -24,7 +24,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const ballance = new BN(snapCrowdSaleState.inputToken.balance || '0')
   const quantity = parseWei(
     snapCrowdSaleState.inputToken.quantity || '0',
-    snapCrowdSaleState.lootbox.data?.sharesDecimals || 18
+    snapCrowdSaleState.lootbox.data?.shareDecimals || 18
   )
 
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)

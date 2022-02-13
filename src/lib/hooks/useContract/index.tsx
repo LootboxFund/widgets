@@ -1,4 +1,4 @@
-import { Address, TicketID } from 'lib/types/baseTypes'
+import { Address } from 'lib/types/baseTypes'
 import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import { useWeb3 } from '../useWeb3Api'
@@ -122,17 +122,15 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   }
   const web3 = await useWeb3()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter, sharesDecimals] =
+  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, depositIdCounter, shareDecimals] =
     await Promise.all([
       lootbox.methods.name().call(),
       lootbox.methods.symbol().call(),
       lootbox.methods.sharePriceUSD().call(),
       lootbox.methods.sharesSoldCount().call(),
-      lootbox.methods.sharesSoldGoal().call(),
+      lootbox.methods.sharesSoldMax().call(),
       lootbox.methods.depositIdCounter().call(),
-      // TODO: add this in dynamically
-      // lootbox.methods.sharesDecimals().call(),
-      Promise.resolve('18'),
+      lootbox.methods.shareDecimals().call(),
     ])
 
   return {
@@ -140,9 +138,9 @@ export const getLootboxData = async (lootboxAddress: Address) => {
     symbol,
     sharePriceUSD,
     sharesSoldCount,
-    sharesSoldGoal,
+    sharesSoldMax,
     depositIdCounter,
-    sharesDecimals,
+    shareDecimals,
   }
 }
 

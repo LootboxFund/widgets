@@ -44,9 +44,9 @@ const buySharesSnapshot: BuySharesState = {
       symbol: undefined,
       sharePriceUSD: undefined,
       sharesSoldCount: undefined,
-      sharesSoldGoal: undefined,
+      sharesSoldMax: undefined,
       depositIdCounter: undefined,
-      sharesDecimals: undefined,
+      shareDecimals: undefined,
     },
     quantity: undefined,
   },
@@ -158,7 +158,7 @@ export const fetchLootboxData = async () => {
   if (!lootboxAddress) {
     return
   }
-  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldGoal, depositIdCounter, sharesDecimals } =
+  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, depositIdCounter, shareDecimals } =
     await getLootboxData(lootboxAddress)
 
   buySharesState.lootbox.data = {
@@ -167,9 +167,9 @@ export const fetchLootboxData = async () => {
     symbol: symbol,
     sharePriceUSD: sharePriceUSD,
     sharesSoldCount: sharesSoldCount,
-    sharesSoldGoal: sharesSoldGoal,
+    sharesSoldMax: sharesSoldMax,
     depositIdCounter: depositIdCounter,
-    sharesDecimals: sharesDecimals,
+    shareDecimals: shareDecimals,
   }
 }
 

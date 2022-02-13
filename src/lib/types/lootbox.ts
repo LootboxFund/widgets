@@ -17,9 +17,9 @@ export interface ILootbox {
   symbol: string | undefined
   sharePriceUSD: string | undefined
   sharesSoldCount: string | undefined
-  sharesSoldGoal: string | undefined
+  sharesSoldMax: string | undefined
   depositIdCounter: string | undefined
-  sharesDecimals: string | undefined
+  shareDecimals: string | undefined
 }
 
 export interface ITicket {
