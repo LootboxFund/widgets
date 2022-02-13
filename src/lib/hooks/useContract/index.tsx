@@ -1,4 +1,4 @@
-import { Address } from 'lib/types/baseTypes'
+import { Address, TicketID } from 'lib/types/baseTypes'
 import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import { useWeb3 } from '../useWeb3Api'
@@ -144,4 +144,13 @@ export const getLootboxData = async (lootboxAddress: Address) => {
     depositIdCounter,
     sharesDecimals,
   }
+}
+
+export const getLootboxURI = async (lootboxAddress: Address) => {
+  const web3 = await useWeb3()
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  // const lootboxURI = await  lootbox.URI()
+  // TODO: dynamically load this from lootbox contract
+  const lootboxURI = ''
+  return { lootboxURI }
 }
