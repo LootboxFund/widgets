@@ -1,5 +1,5 @@
-import { ILootbox, ITicket, Address } from 'lib/types'
-import { proxy, subscribe } from 'valtio'
+import { ITicket, Address } from 'lib/types'
+import { proxy } from 'valtio'
 import { getLootboxURI } from 'lib/hooks/useContract'
 import { readTicketMetadata } from 'lib/api/storage'
 
@@ -15,19 +15,20 @@ const ticketCardSnapshot: TicketCardState = { lootboxAddress: undefined, tickets
 
 export const ticketCardState = proxy(ticketCardSnapshot)
 
-export const generateStateID = (ticket: ITicket) => `${ticket.metadata.name}${ticket.id}`
+export const generateStateID = (lootboxAddress: Address, ticketID: string) => `${lootboxAddress}${ticketID}`
 
 export const initializeLootbox = async (lootboxAddress: Address) => {
   const { lootboxURI } = await getLootboxURI(lootboxAddress)
   ticketCardState.lootboxURI = lootboxURI
+  ticketCardState.lootboxAddress = lootboxAddress
 }
 
 export const loadTicketData = async (ticketID: string) => {
-  if (!ticketCardState?.lootboxURI) {
+  if (!ticketCardState?.lootboxURI || !ticketCardState?.lootboxAddress) {
     return
   }
-  const metadata = await readTicketMetadata(ticketCardState.lootboxURI)
-  const stateID = generateStateID({ id: ticketID, metadata })
+  const metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)
+  const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
   ticketCardState.tickets[stateID] = {
     id: ticketID,
     metadata,

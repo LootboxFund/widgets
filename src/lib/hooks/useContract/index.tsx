@@ -151,6 +151,6 @@ export const getLootboxURI = async (lootboxAddress: Address) => {
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
   // const lootboxURI = await  lootbox.URI()
   // TODO: dynamically load this from lootbox contract
-  const lootboxURI = ''
+  const lootboxURI = 'NOT_ENABLED_YET'
   return { lootboxURI }
 }
