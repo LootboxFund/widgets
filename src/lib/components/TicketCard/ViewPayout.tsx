@@ -90,7 +90,7 @@ export const $MinorHeading = styled.span`
   align-items: center;
 
   color: #000000;
-  padding: 0px 0px 10px 20px;
+  padding: 0px 0px 0px 20px;
 `
 
 const $XIcon = styled.span`
