@@ -64,14 +64,12 @@ export const loadTicketData = async (ticketID: string) => {
 }
 
 export const loadDividends = async (ticketID: string) => {
-  console.log('loading dividends', ticketCardState?.lootboxAddress)
   if (!ticketCardState?.lootboxAddress) {
     return
   }
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
   if (ticketCardState.tickets[stateID]) {
     const dividendFragments = await getTicketDividends(ticketCardState?.lootboxAddress, ticketID)
-    console.log('fetched fragments', dividendFragments)
     const dividends: IDividend[] = dividendFragments.map((fragment) => {
       const token = getTokenFromList(fragment.tokenAddress)
       const symbol = token ? token.symbol : ''
@@ -82,6 +80,6 @@ export const loadDividends = async (ticketID: string) => {
         isRedeemed: false, // TODO: hardcoded for now
       }
     })
-    console.log('dividends received', dividends)
+    ticketCardState.tickets[stateID].dividends = dividends
   }
 }

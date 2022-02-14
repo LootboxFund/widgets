@@ -37,7 +37,11 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
   return (
     <$RootContainer>
-      {ticket && ticket.route === '/payout' ? <ViewPayout /> : <TicketCard ticketID={props.ticketID} />}
+      {ticket && ticket.route === '/payout' ? (
+        <ViewPayout ticketID={props.ticketID} />
+      ) : (
+        <TicketCard ticketID={props.ticketID} />
+      )}
       {props.ticketID && props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
     </$RootContainer>
   )

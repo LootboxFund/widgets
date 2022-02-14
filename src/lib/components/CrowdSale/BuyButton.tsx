@@ -7,7 +7,7 @@ import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { crowdSaleState, purchaseGuildToken, approveStableCoinToken } from './state'
-import { parseWei } from './helpers'
+import { parseWei } from '../../utils/bnConversion'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Spinner'
 

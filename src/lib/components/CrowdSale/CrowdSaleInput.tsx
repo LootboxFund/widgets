@@ -12,7 +12,7 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { screen } from '@testing-library/react'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
-import { parseEth } from './helpers'
+import { parseEth } from '../../utils/bnConversion'
 
 export interface CrowdSaleInputProps {
   selectedToken?: TokenDataFE

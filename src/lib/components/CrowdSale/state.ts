@@ -8,7 +8,7 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { purchaseFromCrowdSale, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
-import { parseWei } from './helpers'
+import { parseWei } from '../../utils/bnConversion'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 
