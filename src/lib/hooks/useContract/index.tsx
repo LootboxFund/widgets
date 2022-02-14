@@ -181,7 +181,6 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
   try {
     const nativeTokenOwed = await lootbox.methods.viewOwedOfNativeTokenToTicket(ticketID).call()
-    console.log('Native token owed', nativeTokenOwed, ticketID) // ⁉️ nativeTokenOwed is ZERO?
     res.push({
       tokenAddress: '0x0native',
       tokenAmount: nativeTokenOwed,
@@ -192,11 +191,9 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
 
   try {
     const stablecoins: Address[] = (await lootbox.methods.viewDepositedTokens().call()).map(stripZeros)
-    console.log('***fetched stable coin address', stablecoins)
     const stablecoinsOwed = await Promise.allSettled(
       stablecoins.map((addr) => lootbox.methods.viewOwedErc20TokensToTicket(ticketID, addr).call())
     )
-    console.log('***fetched stable coins owed', stablecoinsOwed)
     for (let i = 0; i < stablecoins.length; i++) {
       const stablecoin = stablecoins[i]
       const owedAmount = stablecoinsOwed[i]
@@ -210,7 +207,6 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   } catch (err) {
     console.error(err)
   }
-  console.log('final frags', res)
   return res
 }
 
