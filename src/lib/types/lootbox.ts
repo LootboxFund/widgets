@@ -26,3 +26,10 @@ export interface ITicket {
   id: TicketID | undefined
   metadata: ITicketMetadata
 }
+
+export interface IDividend {
+  tokenAddress: Address
+  tokenAmount: string
+  tokenSymbol: string
+  isRedeemed: boolean
+}

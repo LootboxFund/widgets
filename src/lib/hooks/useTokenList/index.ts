@@ -4,6 +4,7 @@ import { ChainIDHex } from '@guildfx/helpers'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
+import { Address } from 'lib/types'
 
 export const getCustomTokensList = (chainIdHex: string) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)
@@ -91,4 +92,11 @@ export const initTokenList = (chainIdHex?: ChainIDHex) => {
   const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX
   tokenListState.defaultTokenList = tokenMap[chosenChainIdHex] || []
   tokenListState.customTokenList = getCustomTokensList(chosenChainIdHex)
+}
+
+export const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined => {
+  if (!address) {
+    return undefined
+  }
+  return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase())
 }

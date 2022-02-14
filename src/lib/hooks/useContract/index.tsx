@@ -1,4 +1,4 @@
-import { Address } from 'lib/types/baseTypes'
+import { Address, IDividend } from 'lib/types'
 import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import { useWeb3 } from '../useWeb3Api'
@@ -21,6 +21,11 @@ interface CrowdSaleSeedData {
   guildTokenAddress: Address
   guildTokenPrice: string
   stableCoins: Address[]
+}
+
+export interface IDividendFragment {
+  tokenAddress: Address
+  tokenAmount: Address
 }
 
 export const getPriceFeed = async (contractAddress: Address) => {
@@ -165,7 +170,52 @@ export const buyLootboxShares = async (lootboxAddress: Address, amountOfStableco
   const [currentUser, ..._] = await web3.eth.getAccounts()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress, {
     from: currentUser,
-    gas: '1000000', // Have to hardocode the gas limit for now...
+    gas: '1000000', // TODO: estimate gas price... Have to hardocode the gas limit for now...
   })
   return await lootbox.methods.purchaseTicket().send({ value: amountOfStablecoin })
+}
+
+export const getTicketDividends = async (lootboxAddress: Address, ticketID: string): Promise<IDividendFragment[]> => {
+  const res: IDividendFragment[] = []
+  const web3 = await useWeb3()
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  try {
+    const nativeTokenOwed = await lootbox.methods.viewOwedOfNativeTokenToTicket(ticketID).call()
+    console.log('Native token owed', nativeTokenOwed, ticketID) // ⁉️ nativeTokenOwed is ZERO?
+    res.push({
+      tokenAddress: '0x0native',
+      tokenAmount: nativeTokenOwed,
+    })
+  } catch (err) {
+    console.error(err)
+  }
+
+  try {
+    const stablecoins: Address[] = (await lootbox.methods.viewDepositedTokens().call()).map(stripZeros)
+    console.log('***fetched stable coin address', stablecoins)
+    const stablecoinsOwed = await Promise.allSettled(
+      stablecoins.map((addr) => lootbox.methods.viewOwedErc20TokensToTicket(ticketID, addr).call())
+    )
+    console.log('***fetched stable coins owed', stablecoinsOwed)
+    for (let i = 0; i < stablecoins.length; i++) {
+      const stablecoin = stablecoins[i]
+      const owedAmount = stablecoinsOwed[i]
+      if (owedAmount.status === 'fulfilled' && owedAmount.value) {
+        res.push({
+          tokenAddress: stablecoin,
+          tokenAmount: owedAmount.value,
+        })
+      }
+    }
+  } catch (err) {
+    console.error(err)
+  }
+  console.log('final frags', res)
+  return res
+}
+
+// Opposite of padAddressTo32Bytes
+export const stripZeros = (address: string) => {
+  const desiredHexLength = 40 // Not including "0x"
+  return `0x${address.slice(address.length - desiredHexLength)}`
 }
