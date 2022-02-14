@@ -5,17 +5,24 @@ import { readTicketMetadata } from 'lib/api/storage'
 
 type TicketCardRoutes = '/payout' | '/card'
 
-export interface TicketCardState {
+const DEFAULT_ROUTE: TicketCardRoutes = '/card'
+
+export interface ITicketFE {
   route: TicketCardRoutes
+  data: ITicket
+}
+
+export interface TicketCardState {
+  // route: TicketCardRoutes
   lootboxAddress: Address | undefined
   lootboxURI: string | undefined
   tickets: {
-    [key: string]: ITicket
+    [key: string]: ITicketFE
   }
 }
 
 const ticketCardSnapshot: TicketCardState = {
-  route: '/card',
+  // route: '/card',
   lootboxAddress: undefined,
   tickets: {},
   lootboxURI: undefined,
@@ -43,8 +50,12 @@ export const loadTicketData = async (ticketID: string) => {
   }
   const metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
-    id: ticketID,
-    metadata,
+    route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,
+    data: {
+      id: ticketID,
+      metadata,
+    },
   }
 }

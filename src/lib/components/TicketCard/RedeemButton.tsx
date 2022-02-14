@@ -9,10 +9,13 @@ import WalletButton from '../WalletButton'
 // import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Spinner'
-import { ticketCardState } from './state'
+import { ticketCardState, ITicketFE, generateStateID } from './state'
 
-export interface ViewPayoutButtonProps {}
-const ViewPayoutButton = (props: ViewPayoutButtonProps) => {
+export interface RedeemButtonProps {
+  ticketID: string
+}
+
+const RedeemButton = (props: RedeemButtonProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(ticketCardState)
 
@@ -74,10 +77,13 @@ const ViewPayoutButton = (props: ViewPayoutButtonProps) => {
   //   }
 
   const toggleRoute = () => {
-    if (snap.route === '/payout') {
-      ticketCardState.route = '/card'
-    } else if (snap.route === '/card') {
-      ticketCardState.route = '/payout'
+    const stateID = snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress, props.ticketID)
+    if (stateID && snap.tickets[stateID]) {
+      if (snap.tickets[stateID].route === '/payout') {
+        ticketCardState.tickets[stateID].route = '/card'
+      } else if (snap.tickets[stateID].route === '/card') {
+        ticketCardState.tickets[stateID].route = '/payout'
+      }
     }
   }
 
@@ -95,4 +101,4 @@ const ViewPayoutButton = (props: ViewPayoutButtonProps) => {
   )
 }
 
-export default ViewPayoutButton
+export default RedeemButton

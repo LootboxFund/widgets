@@ -7,6 +7,7 @@ import { ticketCardState, initializeLootbox, loadTicketData } from './state'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import RedeemButton from 'lib/components/TicketCard/RedeemButton'
 import styled from 'styled-components'
+import { generateStateID } from './state'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
@@ -15,6 +16,8 @@ export interface TicketCardWidgetProps {
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const snap = useSnapshot(ticketCardState)
+  const stateID = snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress, props.ticketID)
+  const ticket = stateID && snap.tickets[stateID]
 
   useEffect(() => {
     window.onload = () => {
@@ -34,8 +37,8 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
   return (
     <$RootContainer>
-      {snap.route === '/payout' ? <ViewPayout /> : <TicketCard ticketID={props.ticketID} />}
-      {props.isRedeemEnabled && <RedeemButton />}
+      {ticket && ticket.route === '/payout' ? <ViewPayout /> : <TicketCard ticketID={props.ticketID} />}
+      {props.ticketID && props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
     </$RootContainer>
   )
 }

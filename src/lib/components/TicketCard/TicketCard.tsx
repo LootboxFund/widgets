@@ -12,15 +12,15 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
   return (
-    <$TicketCardContainer backgroundImage={ticket?.metadata?.backgroundImage}>
+    <$TicketCardContainer backgroundImage={ticket?.data?.metadata?.backgroundImage}>
       <$TicketLogo
-        backgroundImage={ticket?.metadata?.image}
-        backgroundShadowColor={ticket?.metadata?.backgroundColor}
+        backgroundImage={ticket?.data?.metadata?.image}
+        backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
       ></$TicketLogo>
       <$TicketTag>
-        <$TagText>{ticket?.metadata?.name}</$TagText>
+        <$TagText>{ticket?.data?.metadata?.name}</$TagText>
         <$Divider />
-        <$TicketIDText>{ticket?.id ? `#${ticket.id}` : ''}</$TicketIDText>
+        <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
       </$TicketTag>
     </$TicketCardContainer>
   )
