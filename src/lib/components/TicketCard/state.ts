@@ -16,7 +16,6 @@ export interface ITicketFE {
 }
 
 export interface TicketCardState {
-  // route: TicketCardRoutes
   lootboxAddress: Address | undefined
   lootboxURI: string | undefined
   tickets: {

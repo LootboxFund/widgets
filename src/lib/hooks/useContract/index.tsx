@@ -28,6 +28,12 @@ export interface IDividendFragment {
   tokenAmount: Address
 }
 
+// Opposite of padAddressTo32Bytes
+export const stripZeros = (address: string) => {
+  const desiredHexLength = 40 // Not including "0x"
+  return `0x${address.slice(address.length - desiredHexLength)}`
+}
+
 export const getPriceFeed = async (contractAddress: Address) => {
   const data = await getPriceFeedRaw(contractAddress)
   const priceIn8Decimals = new BN(data).div(new BN(`100000000`)).decimalPlaces(4)
@@ -210,8 +216,10 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   return res
 }
 
-// Opposite of padAddressTo32Bytes
-export const stripZeros = (address: string) => {
-  const desiredHexLength = 40 // Not including "0x"
-  return `0x${address.slice(address.length - desiredHexLength)}`
+export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
+  const web3 = await useWeb3()
+  const [currentUser, ..._] = await web3.eth.getAccounts()
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  const userTickets = await lootbox.methods.viewAllTicketsOfHolder(currentUser).call()
+  return userTickets
 }
