@@ -27,7 +27,6 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
 }
 
 const BASE_CONTAINER = `
-  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -46,6 +45,7 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
 
 export const $TicketRedeemContainer = styled.section`
   ${BASE_CONTAINER}
+  padding: 20px 20px 0px;
 `
 
 export const $TicketLogo = styled.div<{ backgroundImage?: string; backgroundShadowColor?: string }>`

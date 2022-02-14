@@ -18,6 +18,8 @@ export interface RedeemButtonProps {
 const RedeemButton = (props: RedeemButtonProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(ticketCardState)
+  const stateID = props.ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, props.ticketID)
+  const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
 
   //     if (!isWalletConnected) {
   //     return <WalletButton></WalletButton>
@@ -87,18 +89,33 @@ const RedeemButton = (props: RedeemButtonProps) => {
     }
   }
 
-  return (
-    <$Button
-      screen={screen}
-      onClick={toggleRoute}
-      backgroundColor={`${COLORS.trustBackground}C0`}
-      backgroundColorHover={`${COLORS.trustBackground}`}
-      color={COLORS.trustFontColor}
-      style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
-    >
-      View Payout
-    </$Button>
-  )
+  if (ticket?.route === '/payout') {
+    return (
+      <$Button
+        screen={screen}
+        // onClick={toggleRoute}
+        backgroundColor={`${COLORS.trustBackground}C0`}
+        backgroundColorHover={`${COLORS.trustBackground}`}
+        color={COLORS.trustFontColor}
+        style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+      >
+        REDEEM
+      </$Button>
+    )
+  } else {
+    return (
+      <$Button
+        screen={screen}
+        onClick={toggleRoute}
+        backgroundColor={`${COLORS.trustBackground}C0`}
+        backgroundColorHover={`${COLORS.trustBackground}`}
+        color={COLORS.trustFontColor}
+        style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+      >
+        View Payout
+      </$Button>
+    )
+  }
 }
 
 export default RedeemButton
