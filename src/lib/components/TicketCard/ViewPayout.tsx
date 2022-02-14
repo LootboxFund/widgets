@@ -3,7 +3,8 @@ import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
 import { $TicketRedeemContainer } from './TicketCard'
-import { parseEth } from '../../utils/bnConversion'
+import { parseEth } from 'lib/utils/bnConversion'
+import { $Horizontal } from 'lib/components/Generics'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -17,9 +18,19 @@ const ViewPayout = (props: ViewPayoutProps) => {
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
   const title = activeDividends?.length ? 'COLLECT NEW DIVIDENDS' : 'NO NEW DIVIDENDS'
 
+  const sendToCardView = () => {
+    if (stateID && snap.tickets[stateID]) {
+      ticketCardState.tickets[stateID].route = '/card'
+    }
+  }
+
   return (
     <$TicketRedeemContainer>
-      <$MinorHeading>{title}</$MinorHeading>
+      <$Horizontal justifyContent="space-between">
+        <$MinorHeading>{title}</$MinorHeading>
+        <$XIcon onClick={() => sendToCardView()}>X</$XIcon>
+      </$Horizontal>
+
       {dividends &&
         dividends.map((dividend, idx) => {
           return (
@@ -80,6 +91,12 @@ export const $MinorHeading = styled.span`
 
   color: #000000;
   padding: 0px 0px 10px 20px;
+`
+
+const $XIcon = styled.span`
+  font-family: sans-serif;
+  padding: 0px 5px 0px 0px;
+  cursor: pointer;
 `
 
 export default ViewPayout
