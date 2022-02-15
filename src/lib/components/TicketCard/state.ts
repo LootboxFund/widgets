@@ -1,6 +1,5 @@
 import { ITicket, Address, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
-import { getLootboxURI } from 'lib/hooks/useContract'
 import { readTicketMetadata } from 'lib/api/storage'
 import { getTicketDividends } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
@@ -17,7 +16,6 @@ export interface ITicketFE {
 
 export interface TicketCardState {
   lootboxAddress: Address | undefined
-  lootboxURI: string | undefined
   tickets: {
     [key: string]: ITicketFE
   }
@@ -27,7 +25,6 @@ const ticketCardSnapshot: TicketCardState = {
   // route: '/card',
   lootboxAddress: undefined,
   tickets: {},
-  lootboxURI: undefined,
 }
 
 export const ticketCardState = proxy(ticketCardSnapshot)
@@ -35,12 +32,9 @@ export const ticketCardState = proxy(ticketCardSnapshot)
 export const generateStateID = (lootboxAddress: Address, ticketID: string) => `${lootboxAddress}${ticketID}`
 
 export const initializeLootbox = async (lootboxAddress: Address) => {
-  const { lootboxURI } = await getLootboxURI(lootboxAddress)
-  ticketCardState.lootboxURI = lootboxURI
   ticketCardState.lootboxAddress = lootboxAddress
   return {
     lootboxAddress,
-    lootboxURI,
   }
 }
 
