@@ -3,7 +3,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import TicketCard from 'lib/components/TicketCard/TicketCard'
 import ViewPayout from 'lib/components/TicketCard/ViewPayout'
 import { useSnapshot } from 'valtio'
-import { ticketCardState, initializeLootbox, loadTicketData } from './state'
+import { ticketCardState, loadTicketData } from './state'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import RedeemButton from 'lib/components/TicketCard/RedeemButton'
 import styled from 'styled-components'
@@ -22,10 +22,11 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   useEffect(() => {
     window.onload = () => {
       const [lootboxAddress] = parseUrlParams(['fundraisers'])
-      initDApp()
-        .then(() => (lootboxAddress ? initializeLootbox(lootboxAddress) : undefined))
-        .then(() => (props.ticketID ? loadTicketData(props.ticketID) : undefined))
-        .catch((err) => console.error(err))
+      ticketCardState.lootboxAddress = lootboxAddress
+      initDApp().catch((err) => console.error(err))
+      if (props.ticketID) {
+        loadTicketData(props.ticketID).catch((err) => console.error(err))
+      }
     }
   }, [])
 

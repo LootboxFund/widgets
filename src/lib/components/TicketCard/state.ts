@@ -31,13 +31,6 @@ export const ticketCardState = proxy(ticketCardSnapshot)
 
 export const generateStateID = (lootboxAddress: Address, ticketID: string) => `${lootboxAddress}${ticketID}`
 
-export const initializeLootbox = async (lootboxAddress: Address) => {
-  ticketCardState.lootboxAddress = lootboxAddress
-  return {
-    lootboxAddress,
-  }
-}
-
 export const loadTicketData = async (ticketID: string) => {
   if (!ticketCardState?.lootboxAddress) {
     return
