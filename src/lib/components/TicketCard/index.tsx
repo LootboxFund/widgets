@@ -20,12 +20,16 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const ticket = stateID && snap.tickets[stateID]
 
   useEffect(() => {
-    window.onload = () => {
+    window.onload = async () => {
       const [lootboxAddress] = parseUrlParams(['fundraisers'])
       ticketCardState.lootboxAddress = lootboxAddress
-      initDApp().catch((err) => console.error(err))
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error loading DApp in TicketCard', err)
+      }
       if (props.ticketID) {
-        loadTicketData(props.ticketID).catch((err) => console.error(err))
+        loadTicketData(props.ticketID).catch((err) => console.error('Error loading ticket data', err))
       }
     }
   }, [])

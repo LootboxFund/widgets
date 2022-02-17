@@ -118,7 +118,7 @@ export const addERC721ToWallet = async (token: TokenData) => {
 }
 
 export const initDApp = async () => {
-  initWeb3OnWindow()
+  await initWeb3OnWindow()
   const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
 
   const blockchain = BLOCKCHAINS[chainIdHex]

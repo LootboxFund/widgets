@@ -183,7 +183,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
       tokenAmount: nativeTokenOwed,
     })
   } catch (err) {
-    console.error(err)
+    console.error('Error fetching ticket native dividends', err)
   }
 
   try {
@@ -202,7 +202,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
       }
     }
   } catch (err) {
-    console.error(err)
+    console.error('Error fetching ticket stablecoin dividends', err)
   }
   return res
 }

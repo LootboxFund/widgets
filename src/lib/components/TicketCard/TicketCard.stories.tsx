@@ -18,11 +18,18 @@ const Template = () => {
   useEffect(() => {
     const [lootboxAddress] = parseUrlParams(['fundraisers'])
     ticketCardState.lootboxAddress = lootboxAddress
-    initDApp()
     ;(window as any).Web3 = Web3
-    if (ticketID) {
-      loadTicketData(ticketID).catch((err) => console.error(err))
+    const load = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp in TicketCard stories', err)
+      }
+      if (ticketID) {
+        await loadTicketData(ticketID)
+      }
     }
+    load().catch((err) => console.error('Error loading ticket data', err))
   }, [])
 
   return (

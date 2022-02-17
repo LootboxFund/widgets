@@ -1,10 +1,11 @@
-import react from 'react'
+import react, { useEffect } from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
 import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
+import { loadDividends } from './state'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -17,6 +18,12 @@ const ViewPayout = (props: ViewPayoutProps) => {
   const dividends = ticket && ticket.dividends
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
   const title = activeDividends?.length ? 'COLLECT NEW DIVIDENDS' : 'NO NEW DIVIDENDS'
+
+  useEffect(() => {
+    if (props.ticketID) {
+      loadDividends(props.ticketID).catch((err) => console.error('Error loading ticket dividends', err))
+    }
+  }, [props.ticketID])
 
   const sendToCardView = () => {
     if (stateID && snap.tickets[stateID]) {
