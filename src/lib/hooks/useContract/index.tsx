@@ -155,7 +155,7 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   }
 }
 
-export const getLootboxTicketId = async (lootboxAddress: Address) => {
+export const getLootboxTicketId = async (lootboxAddress: Address): Promise<string> => {
   const web3 = await useWeb3()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
   const ticketId = await lootbox.methods.ticketIdCounter().call()
