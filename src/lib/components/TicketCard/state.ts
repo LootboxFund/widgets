@@ -46,7 +46,6 @@ export const loadTicketData = async (ticketID: string) => {
       metadata,
     },
   }
-  await loadDividends(ticketID)
 }
 
 export const loadDividends = async (ticketID: string) => {
@@ -55,7 +54,7 @@ export const loadDividends = async (ticketID: string) => {
   }
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
   if (ticketCardState.tickets[stateID]) {
-    const dividendFragments = await getTicketDividends(ticketCardState?.lootboxAddress, ticketID)
+    const dividendFragments = await getTicketDividends(ticketCardState.lootboxAddress, ticketID)
     const dividends: IDividend[] = dividendFragments.map((fragment) => {
       const token = getTokenFromList(fragment.tokenAddress)
       const symbol = token ? token.symbol : ''
