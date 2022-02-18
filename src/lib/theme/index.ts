@@ -15,3 +15,23 @@ export const COLORS = {
 	black: '#000000',
 	white: '#FFFFFF',
 }
+
+export const TYPOGRAPHY = { 
+  fontFamily: {
+    branded: '"Fira Sans", sans-serif',
+    regular: '"Open Sans", sans-serif'
+  },
+  fontSize: {
+    xsmall: '0.6rem',
+    small: '0.8rem',
+    medium: '1rem',
+    large: '1.2rem',
+    xlarge: '1.4rem',
+  },
+  fontWeight: {
+    light: 300,
+    regular: 400,
+    medium: 500,
+    bold: 700,
+  }
+}

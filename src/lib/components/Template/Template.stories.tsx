@@ -1,6 +1,4 @@
 import React from 'react'
-import { ThemeProvider } from 'emotion-theming'
-import theme from '@rebass/preset'
 import Template, { TemplateProps } from 'lib/components/Template'
 
 
@@ -10,9 +8,7 @@ export default {
 }
 
 const Demo = (args: TemplateProps) => (
-	<ThemeProvider theme={theme}>
-		<Template {...args} />
-	</ThemeProvider>
+  <Template {...args} />
 )
 
 export const Basic = Demo.bind({})
