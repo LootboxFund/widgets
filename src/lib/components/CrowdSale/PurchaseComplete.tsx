@@ -19,8 +19,8 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const snapUserState = useSnapshot(userState)
   const goToCrowdSaleComponent = () => (crowdSaleState.route = '/crowdSale')
   const getBscScanUrl = () => {
-    if (snapUserState.currentNetworkIdHex && BLOCKCHAINS[snapUserState.currentNetworkIdHex]) {
-      return `${BLOCKCHAINS[snapUserState.currentNetworkIdHex].blockExplorerUrls[0]}${
+    if (snapUserState.network.currentNetworkIdHex && BLOCKCHAINS[snapUserState.network.currentNetworkIdHex]) {
+      return `${BLOCKCHAINS[snapUserState.network.currentNetworkIdHex].blockExplorerUrls[0]}${
         snap.lastTransaction.hash ? `tx/${snap.lastTransaction.hash}` : ''
       }`
     }

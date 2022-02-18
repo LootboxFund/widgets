@@ -20,10 +20,10 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
 
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   const switchChain = async () => {
     await addCustomEVMChain(DEFAULT_CHAIN_ID_HEX)
@@ -53,8 +53,15 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
       <$CrowdSaleHeaderTitle>BUY {crowdSaleState.outputToken.data?.symbol || ''}</$CrowdSaleHeaderTitle>
       {validChain ? (
         <>
-          <NetworkText />
-          {/* <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span> */}
+          <$NetworkText style={{ flex: 2 }}>
+            <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+            <span
+              onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
+              style={{ cursor: 'pointer' }}
+            >
+              {renderTinyAccount()}
+            </span>
+          </$NetworkText>
         </>
       ) : (
         renderSwitchNetworkButton()

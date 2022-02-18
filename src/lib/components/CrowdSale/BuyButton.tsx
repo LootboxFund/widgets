@@ -7,7 +7,7 @@ import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { crowdSaleState, purchaseGuildToken, approveStableCoinToken } from './state'
-import { parseWei } from './helpers'
+import { parseWei } from '../../utils/bnConversion'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Spinner'
 
@@ -30,10 +30,10 @@ const BuyButton = (props: BuyButtonProps) => {
   const isAllowanceCovered = isInputAmountValid && allowance.gte(quantity)
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>

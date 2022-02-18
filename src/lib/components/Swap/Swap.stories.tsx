@@ -1,6 +1,4 @@
 import React from 'react'
-import { ThemeProvider } from 'emotion-theming'
-import theme from '@rebass/preset'
 import Swap from '.'
 import { $CardViewport } from '../Generics'
 import { useEffect } from 'react'
@@ -20,9 +18,7 @@ const Template = () => {
 
   return (
     <$CardViewport width="340px">
-      <ThemeProvider theme={theme}>
-        <Swap />
-      </ThemeProvider>
+      <Swap />
     </$CardViewport>
   )
 }

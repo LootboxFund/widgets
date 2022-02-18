@@ -12,7 +12,7 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { screen } from '@testing-library/react'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
-import { parseEth } from './helpers'
+import { parseEth } from '../../utils/bnConversion'
 
 export interface CrowdSaleInputProps {
   selectedToken?: TokenDataFE
@@ -43,10 +43,10 @@ const CrowdSaleInput = (props: CrowdSaleInputProps) => {
   }
 
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   const renderSelectTokenButton = () => {
     if (validChain) {
