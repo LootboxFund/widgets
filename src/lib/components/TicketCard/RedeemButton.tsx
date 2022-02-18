@@ -1,15 +1,10 @@
 import { $Button } from 'lib/components/Button'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
-import { snapshot, useSnapshot } from 'valtio'
+import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
-// import { parseWei } from './helpers'
-import BN from 'bignumber.js'
-import { LoadingText } from 'lib/components/Spinner'
-import { ticketCardState, ITicketFE, generateStateID } from './state'
+import { ticketCardState, generateStateID } from './state'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
@@ -18,6 +13,9 @@ export interface RedeemButtonProps {
 const RedeemButton = (props: RedeemButtonProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(ticketCardState)
+  const snapUser = useSnapshot(userState)
+
+  const isWalletConnected = snapUser.accounts.length > 0
   const stateID = props.ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
 
@@ -103,18 +101,22 @@ const RedeemButton = (props: RedeemButtonProps) => {
       </$Button>
     )
   } else if (ticket?.route === '/payout') {
-    return (
-      <$Button
-        screen={screen}
-        // onClick={toggleRoute}
-        backgroundColor={`${COLORS.trustBackground}C0`}
-        backgroundColorHover={`${COLORS.trustBackground}`}
-        color={COLORS.trustFontColor}
-        style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
-      >
-        REDEEM
-      </$Button>
-    )
+    if (!isWalletConnected) {
+      return <WalletButton />
+    } else {
+      return (
+        <$Button
+          screen={screen}
+          // onClick={toggleRoute}
+          backgroundColor={`${COLORS.trustBackground}C0`}
+          backgroundColorHover={`${COLORS.trustBackground}`}
+          color={COLORS.trustFontColor}
+          style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+        >
+          REDEEM
+        </$Button>
+      )
+    }
   } else {
     return (
       <$Button
