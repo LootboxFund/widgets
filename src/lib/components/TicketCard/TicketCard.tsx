@@ -36,6 +36,36 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
   )
 }
 
+interface TicketCardCandyWrapperProps {
+  backgroundImage: string
+  logoImage: string
+  themeColor: string
+  name: string;
+}
+export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
+  return (
+    <$TicketCardContainer
+      backgroundImage={props.backgroundImage}
+      onClick={() => {
+        console.log('click')
+      }}
+    >
+      <$TicketLogo
+        backgroundImage={props.logoImage}
+        backgroundShadowColor={props.themeColor}
+      >
+      </$TicketLogo>
+      
+      <$TicketTag>
+        <$TagText>{props.name || "Lootbox Ticket"}</$TagText>
+        <$Divider />
+        <$TicketIDText>{`#0`}</$TicketIDText>
+      </$TicketTag>
+      
+    </$TicketCardContainer>
+  )
+}
+
 const BASE_CONTAINER = `
   height: 100%;
   display: flex;

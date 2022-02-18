@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import StepChooseReturns, { NetworkOption, StepChooseReturnsProps } from 'lib/components/CreateLootbox/StepChooseReturns'
+import StepChooseReturns, { StepChooseReturnsProps } from 'lib/components/CreateLootbox/StepChooseReturns'
 import { StepStage } from 'lib/components/StepCard'
 
 

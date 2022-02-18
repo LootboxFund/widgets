@@ -47,6 +47,13 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
     return
   }
 
+  const renderTinyAccount = () => {
+    if (snapUserState.currentAccount) {
+      const accountTruncated = truncateAddress(snapUserState.currentAccount)
+      return `(${accountTruncated})`
+    }
+    return
+  }
 
   return (
     <$CrowdSaleHeader>
@@ -84,5 +91,14 @@ export const $CrowdSaleHeader = styled.div<{}>`
   font-family: sans-serif;
 `
 
+
+export const $NetworkText = styled.span`
+  font-size: 0.8rem;
+  color: ${`${COLORS.surpressedFontColor}`};
+  text-align: right;
+  margin-right: 10px;
+  font-weight: lighter;
+  font-family: sans-serif;
+`
 
 export default CrowdSaleHeader

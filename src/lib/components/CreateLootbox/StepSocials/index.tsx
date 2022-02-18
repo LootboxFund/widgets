@@ -43,7 +43,7 @@ const StepSocials = (props: StepSocialsProps) => {
   
 	return (
 		<$StepSocials>
-      <StepCard primaryColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
         <$Vertical flex={1}>
           <$StepHeading>5. Contact Information</$StepHeading>
           <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
@@ -68,6 +68,8 @@ const StepSocials = (props: StepSocialsProps) => {
 
 const $StepSocials = styled.section<{}>`
   font-family: sans-serif;
+  width: 100%;
+  color: ${COLORS.black};
 `
 const $SocialGridInputs = styled.div`
   display: grid;

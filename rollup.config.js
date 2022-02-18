@@ -14,9 +14,9 @@ import nodePolyfills from 'rollup-plugin-node-polyfills'
  *
  */
 const configUMD = {
-  input: ['src/injects/combined/index.ts'],
+  input: ['src/injects/createlootbox/index.ts'],
   output: {
-    file: process.env.NODE_ENV === 'production' ? 'iife/bundle.production.js' : 'iife/bundle.js',
+    file: process.env.NODE_ENV === 'production' ? 'iife/bundle.createlootbox.production.js' : 'iife/bundle.createlootbox.js',
     format: 'iife',
     sourcemap: true,
     name: 'GuildFX_UI',

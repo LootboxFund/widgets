@@ -4,29 +4,30 @@ import {COLORS, TYPOGRAPHY} from 'lib/theme'
 
 export type StepStage = "not_yet" | "in_progress" | "may_proceed" | "completed"
 export interface StepCardProps {
-  primaryColor?: string;
+  themeColor?: string;
   stage: StepStage;
   children: React.ReactNode;
   customActionBar?: () => React.ReactNode;
   onNext: () => void;
 }
 const StepCard = (props: StepCardProps) => {
-  const primaryColor = props.primaryColor || COLORS.surpressedFontColor;
+  const themeColor = props.themeColor || COLORS.surpressedFontColor;
   const renderStepButton = () => {
     if (props.stage === "in_progress") {
       return (
         <$StepButton
-          backgroundColor={`${props.primaryColor}3A`}
-          borderColor={`${props.primaryColor}02`}
+          backgroundColor={`${props.themeColor}3A`}
+          borderColor={`${props.themeColor}02`}
         ></$StepButton>
       )
     }
     if (props.stage === "may_proceed") {
       return (
         <$StepButton
-          backgroundColor={`${props.primaryColor}`}
-          borderColor={`${props.primaryColor}`}
+          backgroundColor={`${props.themeColor}`}
+          borderColor={`${props.themeColor}`}
           clickable
+          onClick={props.onNext}
         >
         PROCEED TO NEXT
         </$StepButton>
@@ -35,9 +36,10 @@ const StepCard = (props: StepCardProps) => {
     if (props.stage === "completed") {
       return (
         <$StepButton
-          backgroundColor={`${props.primaryColor}`}
-          borderColor={`${props.primaryColor}`}
+          backgroundColor={`${props.themeColor}`}
+          borderColor={`${props.themeColor}`}
           clickable
+          onClick={props.onNext}
         >
         COMPLETED
         </$StepButton>
@@ -46,12 +48,12 @@ const StepCard = (props: StepCardProps) => {
     return (
       <$StepButton
         backgroundColor={`${COLORS.surpressedBackground}3A`}
-        borderColor={`${COLORS.surpressedBackground}3A`}
+        borderColor={`${COLORS.surpressedBackground}02`}
       ></$StepButton>
     )
   }
 	return (
-    <$StepCard primaryColor={primaryColor}>
+    <$StepCard themeColor={themeColor} stage={props.stage}>
       <div style={{ padding: '30px', display: 'flex' }}>
         {props.children}
       </div>
@@ -68,15 +70,16 @@ const StepCard = (props: StepCardProps) => {
 }
 
 const $StepCard = styled.div<{
-  primaryColor: string;
+  themeColor: string;
   boxShadow?: string;
+  stage?: StepStage;
 }>`
   height: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: ${props => `0px 3px 20px ${props.primaryColor}` || "0px 4px 4px rgba(0, 0, 0, 0.25)"};
-  border: ${props => `3px solid ${props.primaryColor}`};
+  box-shadow: ${props => props.stage === "in_progress" ? `0px 3px 20px ${props.themeColor}` : "0px 3px 20px rgba(0, 0, 0, 0.1)"};
+  border: ${props => props.stage === "may_proceed" || props.stage === "in_progress" ? `3px solid ${props.themeColor}` : "0px solid transparent"};
   border-radius: 20px;
 `
 
@@ -115,6 +118,7 @@ export const $StepSubheading = styled.span<{}>`
   font-weight: ${TYPOGRAPHY.fontWeight.light};
   color: ${COLORS.surpressedFontColor};
   width: 80%;
+  margin-bottom: 3px;
 `;
 
 export default StepCard;

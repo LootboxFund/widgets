@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import StepChooseFunding, { NetworkOption, StepChooseFundingProps } from 'lib/components/CreateLootbox/StepChooseFunding'
+import StepChooseFunding, { StepChooseFundingProps } from 'lib/components/CreateLootbox/StepChooseFunding'
 import { StepStage } from 'lib/components/StepCard'
 
 
