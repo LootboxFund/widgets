@@ -5,21 +5,28 @@ import { $Horizontal } from '../Generics'
 import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 
+const TICKET_PAGINATION = 4
+
 const UserTickets = () => {
   const snap = useSnapshot(userTicketState)
 
+  const tickets: (string | undefined)[] = [...snap.userTickets]
+  if (tickets.length < TICKET_PAGINATION) {
+    for (let i = 0; i < TICKET_PAGINATION - snap.userTickets.length; i++) {
+      tickets.push(undefined)
+    }
+  }
   return (
     <$Horizontal justifyContent="space-between" height="100%" spacing={3}>
-      {snap.userTickets &&
-        snap.userTickets.map((ticketID) => (
-          <$ParentCard>
-            <TicketCard
-              key={`${snap.lootboxAddress}-ticket-${ticketID}`}
-              ticketID={ticketID}
-              isRedeemEnabled={true}
-            ></TicketCard>
-          </$ParentCard>
-        ))}
+      {tickets.map((ticketID, idx) => (
+        <$ParentCard>
+          <TicketCard
+            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
+            ticketID={ticketID}
+            isRedeemEnabled={true}
+          ></TicketCard>
+        </$ParentCard>
+      ))}
     </$Horizontal>
   )
 }

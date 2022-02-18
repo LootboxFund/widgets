@@ -20,7 +20,7 @@ const defaultMetadataStorageUrl = (lootboxAddress: Address) =>
 export const readJSON = async <T>(file: string): Promise<T> => {
   // TODO: dynamically read json file in cloud storage
   const result: any = {
-    name: 'Artemis Guild Demo',
+    name: 'Artemis Guild',
     description: '',
     image: DEFAULT_TICKET_IMAGE,
     backgroundColor: DEFAULT_TICKET_BACKGROUND_COLOR,
