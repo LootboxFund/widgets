@@ -32,6 +32,11 @@ export interface StepChooseFundingProps {
 const StepChooseFunding = (props: StepChooseFundingProps) => {
   const { screen } = useWindowSize()
   const renderInputFundraisingTarget = () => {
+    const calculateInputWidth = () => {
+      const projectedWidth = props.fundraisingTarget.length * 20;
+      const width = projectedWidth > 200 ? 200 : projectedWidth;
+      return `${props.fundraisingTarget ? width : 50}px`
+    }
     return (
       <$Vertical>
         <$StepSubheading>Fundraising Target</$StepSubheading>
@@ -41,7 +46,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
               {
                 props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />
               }
-              <$Input type="number" value={props.fundraisingTarget} onChange={(e) => props.setFundraisingTarget(e.target.value)} placeholder="0.001" screen={screen} width={`${props.fundraisingTarget ? props.fundraisingTarget.length * 20 : 50}px`} />
+              <$Input type="number" value={props.fundraisingTarget} onChange={(e) => props.setFundraisingTarget(e.target.value)} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
@@ -57,7 +62,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
       <$Vertical>
         <$StepSubheading>Receiving Wallet</$StepSubheading>
         <$InputWrapper>
-          <$Input value={props.receivingWallet} placeholder="0xAutodetectYourWallet" screen={screen} fontWeight="200" onChange={(e) => props.setReceivingWallet(e.target.value)} />
+          <$Input value={props.receivingWallet} placeholder="0xAutodetectYourWallet" screen={'mobile'} fontWeight="200" onChange={(e) => props.setReceivingWallet(e.target.value)} />
         </$InputWrapper>
       </$Vertical>
     )

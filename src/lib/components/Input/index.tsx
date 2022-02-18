@@ -14,7 +14,7 @@ export const $Input = styled.input<{ screen: ScreenSize, width?: string, fontWei
   background-color: rgba(0, 0, 0, 0);
   font-family: sans-serif;
   width: ${props => props.width ? props.width : "100%" };
-  max-width: 100%;
+  max-width: ${props => props.width ? props.width : "100%" };
   -moz-appearance: textfield;
   ::-webkit-inner-spin-button {
     -webkit-appearance: none;

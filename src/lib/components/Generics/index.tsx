@@ -7,6 +7,7 @@ interface HorizontalProps {
   readonly spacing?: 1 | 2 | 3 | 4 | 5
   readonly wrap?: boolean
   readonly flex?: number
+  readonly alignItems?: 'flex-start' | 'center' | 'flex-end'
 }
 const SPACING_VALS = [4, 8, 16, 24, 48]
 
@@ -17,6 +18,7 @@ export const $Horizontal = styled.div<HorizontalProps>`
   ${(props) => props.verticalCenter && 'align-items: center;'};
   ${(props) => props.baseline && 'align-items: baseline;'};
   ${(props) => props.wrap && 'flex-wrap: wrap;'};
+  ${(props) => props.alignItems && `align-items: ${props.alignItems};`};
 
   & > *:not(:last-child) {
     margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
