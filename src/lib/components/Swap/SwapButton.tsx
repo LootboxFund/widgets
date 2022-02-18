@@ -15,10 +15,10 @@ const SwapButton = (props: SwapButtonProps) => {
   const { screen } = useWindowSize()
   const isWalletConnected = snapUserState.accounts.length > 0
   const validChain =
-    snapUserState.currentNetworkIdHex &&
+    snapUserState.network.currentNetworkIdHex &&
     Object.values(BLOCKCHAINS)
       .map((b) => b.chainIdHex)
-      .includes(snapUserState.currentNetworkIdHex)
+      .includes(snapUserState.network.currentNetworkIdHex)
 
   if (!isWalletConnected) {
     return <WalletButton></WalletButton>

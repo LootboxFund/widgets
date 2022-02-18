@@ -1,9 +1,6 @@
 import React from 'react'
-import { ThemeProvider } from 'emotion-theming'
-import theme from '@rebass/preset'
 import AddToken, { AddTokenProps } from 'lib/components/Swap/AddToken'
 import { $CardViewport } from 'lib/components/Generics'
-
 
 export default {
   title: 'AddToken',
@@ -11,11 +8,9 @@ export default {
 }
 
 const Demo = (args: AddTokenProps) => (
-	<$CardViewport>
-		<ThemeProvider theme={theme}>
-			<AddToken {...args} />
-		</ThemeProvider>
-	</$CardViewport>
+  <$CardViewport>
+    <AddToken {...args} />
+  </$CardViewport>
 )
 
 export const Basic = Demo.bind({})

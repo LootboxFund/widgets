@@ -1,5 +1,5 @@
 import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS } from 'lib/hooks/constants'
-import { addToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
+import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe } from 'valtio'
@@ -8,7 +8,7 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { purchaseFromCrowdSale, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
-import { parseWei } from './helpers'
+import { parseWei } from '../../utils/bnConversion'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 
@@ -215,7 +215,7 @@ const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined
 
 export const addOutputTokenToWallet = async () => {
   if (crowdSaleState.outputToken.data) {
-    await addToWallet(crowdSaleState.outputToken.data)
+    await addERC20ToWallet(crowdSaleState.outputToken.data)
   }
 }
 

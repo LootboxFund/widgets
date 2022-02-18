@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/widgets",
-  "version": "0.1.0-demo",
+  "version": "0.0.1-sandbox",
   "main": "lib/index.js",
   "browser": "lib/index.js",
   "author": "0xterran",
@@ -63,7 +63,6 @@
     "@lingui/macro": "^3.13.0",
     "@lingui/react": "^3.13.0",
     "@metamask/detect-provider": "^1.2.0",
-    "@rebass/preset": "^4.0.5",
     "@reduxjs/toolkit": "^1.7.1",
     "@uniswap/redux-multicall": "^1.1.0",
     "@uniswap/sdk-core": "^3.0.1",
@@ -71,7 +70,6 @@
     "@web3-react/core": "^6.1.9",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
-    "emotion-theming": "^11.0.0",
     "jotai": "^1.5.3",
     "micromodal": "^0.4.10",
     "multicodec": "^3.2.1",

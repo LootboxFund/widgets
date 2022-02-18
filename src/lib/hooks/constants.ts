@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { Address } from 'lib/types/baseTypes'
+import { version } from '../../../package.json'
 import { ChainIDHex, Url, ChainIDDecimal, TokenData } from '@guildfx/helpers'
 
 // update this to match backend types `TokenDataFE`
@@ -12,10 +13,20 @@ interface IAddresses {
   gfxConstants: string
 }
 
+export const USD_DECIMALS = 8
+// TODO: DYNAMIC LOOTBOX_ADDRESS
+export const DEFAULT_LOOTBOX_ADDRESS = '0x47B4D2b01F77CfDedeF2A641dBb56d13385fFe2c'
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
+export const STORAGE_URL = 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com'
+
+export const DEFAULT_TICKET_IMAGE = `${STORAGE_URL}/o/assets%2Fdefault-ticket-logo.png?alt=media`
+export const DEFAULT_TICKET_BACKGROUND = `${STORAGE_URL}/o/assets%2Fdefault-ticket-background.png?alt=media`
+export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 
 // TODO: Dynamically load this
 export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x7B8f9b6Daa03E39BC046CA06c72C8A81b8FcEceb'
+
+export const storageUrl = (chainID: ChainIDHex) => `${STORAGE_URL}/o/v/${version}/${chainID}`
 
 export type ChainInfo = {
   chainIdHex: ChainIDHex
