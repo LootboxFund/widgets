@@ -69,6 +69,7 @@ const StepSocials = (props: StepSocialsProps) => {
 const $StepSocials = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
+  color: ${COLORS.black};
 `
 const $SocialGridInputs = styled.div`
   display: grid;

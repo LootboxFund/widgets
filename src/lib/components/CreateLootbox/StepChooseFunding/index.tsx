@@ -25,7 +25,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     const calculateInputWidth = () => {
       const projectedWidth = props.fundraisingTarget.length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
-      return `${props.fundraisingTarget ? width : 70}px`
+      return `${props.fundraisingTarget ? width : 100}px`
     }
     return (
       <$Vertical>
@@ -90,6 +90,7 @@ const $InputWrapper = styled.div`
 const $StepChooseFunding = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
+  color: ${COLORS.black};
 `
 
 const $InputTranslationLight = styled.span`

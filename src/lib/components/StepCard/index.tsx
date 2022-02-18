@@ -48,7 +48,7 @@ const StepCard = (props: StepCardProps) => {
     return (
       <$StepButton
         backgroundColor={`${COLORS.surpressedBackground}3A`}
-        borderColor={`${COLORS.surpressedBackground}3A`}
+        borderColor={`${COLORS.surpressedBackground}02`}
       ></$StepButton>
     )
   }

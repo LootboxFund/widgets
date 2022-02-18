@@ -36,8 +36,7 @@ export interface StepTermsConditionsProps {
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const { screen } = useWindowSize()
-
-
+  console.log(`Conditions = ${props.stage}`)
 	return (
 		<$StepTermsConditions>
       <StepCard
@@ -89,6 +88,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
 const $StepTermsConditions = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
+  color: ${COLORS.black};
 `
 
 const $TermCheckbox = styled.input`

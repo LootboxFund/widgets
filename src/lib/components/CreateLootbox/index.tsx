@@ -54,8 +54,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     })
   }
   useEffect(() => {
+    console.log("Detected change in step 1")
+    const thisStep = "stepNetwork";
     if (network) {
-      const thisStep = "stepNetwork";
       setFundraisingTarget("")
       setStage({
         ...stage,
@@ -69,6 +70,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [fundraisingTarget, setFundraisingTarget] = useState<string>("");
   const [receivingWallet, setReceivingWallet] = useState<string>("");
   useEffect(() => {
+    console.log("Detected change in step 2")
     const thisStep = "stepFunding";
     if (fundraisingTarget && receivingWallet) {
       setStage({
@@ -76,7 +78,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? "may_proceed" : "in_progress"
       })
-    } else {
+    } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
         [thisStep]: "in_progress"
@@ -91,6 +93,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [returnTarget, setReturnTarget] = useState<number>();
   const [paybackDate, setPaybackDate] = useState<Date>();
   useEffect(() => {
+    console.log("Detected change in step 3")
     const thisStep = "stepReturns";
     if (returnTarget && paybackDate) {
       setStage({
@@ -98,7 +101,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkCustomizeStepDone() ? "may_proceed" : "in_progress"
       })
-    } else {
+    } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
         [thisStep]: "in_progress"
@@ -122,6 +125,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   useEffect(() => {
+    console.log("Detected change in step 4")
     const thisStep = "stepCustomize";
     if (ticketState.name && ticketState.symbol && ticketState.biography && ticketState.pricePerShare && ticketState.lootboxThemeColor && ticketState.logoUrl && ticketState.coverUrl) {
       setStage({
@@ -129,7 +133,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkSocialStateDone() ? "may_proceed" : "in_progress"
       })
-    } else {
+    } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
         [thisStep]: "in_progress"
@@ -156,6 +160,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSocialState({ ...socialState, [slug]: text })
   }
   useEffect(() => {
+    console.log("Detected change in step 5")
     const thisStep = "stepSocials";
     if (socialState.email) {
       setStage({
@@ -163,7 +168,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkTermsStepDone() ? "may_proceed" : "in_progress"
       })
-    } else {
+    } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
         [thisStep]: "in_progress"
@@ -184,13 +189,14 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTermsState({ ...termsState, [slug]: bool })
   }
   useEffect(() => {
+    console.log("Detected change in step 6")
     const thisStep = "stepTerms";
     if (termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet) {
       setStage({
         ...stage,
         [thisStep]: "may_proceed"
       })
-    } else {
+    } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
         [thisStep]: "in_progress"
@@ -271,6 +277,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         onNext={() => console.log("onNext")}
         onSubmit={() => console.log('onSubmit')}
       />
+      <$Spacer></$Spacer>
     </$CreateLootbox>
   )
 }

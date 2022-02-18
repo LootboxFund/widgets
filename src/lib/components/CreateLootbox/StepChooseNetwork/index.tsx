@@ -56,7 +56,7 @@ const StepChooseNetwork = (props: StepChooseNetworkProps) => {
   }
 	return (
 		<$StepChooseNetwork>
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.selectedNetwork ? props.stage : "not_yet"} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.selectedNetwork ? props.stage : "in_progress"} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={2}>
             <$StepHeading>1. Choose your Network</$StepHeading>
@@ -77,6 +77,7 @@ const StepChooseNetwork = (props: StepChooseNetworkProps) => {
 const $StepChooseNetwork = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
+  color: ${COLORS.black};
 `
 
 export const $NetworkIcon = styled.img<{ size?: 'small' | 'medium' | 'large' }>`

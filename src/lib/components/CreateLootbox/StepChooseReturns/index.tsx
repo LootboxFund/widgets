@@ -26,7 +26,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
     const calculateInputWidth = () => {
       const projectedWidth = ((props.returnTarget)?.toString() || "").length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
-      return `${props.returnTarget ? width : 40}px`
+      return `${props.returnTarget ? width : 100}px`
     }
     return (
       <$Horizontal alignItems='flex-end'>
@@ -100,6 +100,7 @@ const $InputWrapper = styled.div`
 const $StepChooseReturns = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
+  color: ${COLORS.black};
 `
 
 const $InputTranslationLight = styled.span`

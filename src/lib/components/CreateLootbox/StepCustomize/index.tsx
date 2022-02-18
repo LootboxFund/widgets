@@ -63,6 +63,8 @@ const StepCustomize = (props: StepCustomizeProps) => {
 
 const $StepCustomize = styled.section<{}>`
   font-family: sans-serif;
+  width: 100%;
+  color: ${COLORS.black};
 `
 
 const $CurrencySign = styled.span`
