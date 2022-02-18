@@ -63,7 +63,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   }
 	return (
 		<$StepChooseReturns>
-      <StepCard primaryColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>3. How will your reward your investors?</$StepHeading>
@@ -99,6 +99,7 @@ const $InputWrapper = styled.div`
 
 const $StepChooseReturns = styled.section<{}>`
   font-family: sans-serif;
+  width: 100%;
 `
 
 const $InputTranslationLight = styled.span`

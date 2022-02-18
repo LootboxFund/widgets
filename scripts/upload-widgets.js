@@ -8,7 +8,7 @@ const storage = new Storage()
 const semver = '0.1.0-demo'
 const bucketName = 'guildfx-exchange.appspot.com'
 
-const filename = process.env.NODE_ENV === 'production' ? 'bundle.production.js' : 'bundle.js'
+const filename = process.env.NODE_ENV === 'production' ? 'bundle.createlootbox.production.js' : 'bundle.createlootbox.js'
 const filepath = `widgets/${semver}/build/${filename}`
 let localFilePath = `/Users/kangzeroo/Projects/GuildFX/widgets/iife/${filename}`
 

@@ -59,7 +59,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
   }
 	return (
 		<$StepChooseFunding>
-      <StepCard primaryColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>2. How much money do you need?</$StepHeading>
@@ -89,6 +89,7 @@ const $InputWrapper = styled.div`
 
 const $StepChooseFunding = styled.section<{}>`
   font-family: sans-serif;
+  width: 100%;
 `
 
 const $InputTranslationLight = styled.span`

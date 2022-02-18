@@ -40,7 +40,15 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
 
 	return (
 		<$StepTermsConditions>
-      <StepCard customActionBar={() => <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={props.selectedNetwork?.themeColor} onSubmit={props.onSubmit} />} primaryColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard
+        customActionBar={
+          props.stage === "in_progress" || props.stage === "may_proceed"
+          ?
+          () => <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={props.selectedNetwork?.themeColor} onSubmit={props.onSubmit} />
+          :
+          undefined
+        }
+        themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
         <$Vertical flex={1}>
           <$StepHeading>{`6. Terms & Conditions`}</$StepHeading>
           <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
@@ -80,6 +88,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
 
 const $StepTermsConditions = styled.section<{}>`
   font-family: sans-serif;
+  width: 100%;
 `
 
 const $TermCheckbox = styled.input`

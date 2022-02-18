@@ -22,7 +22,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
   const { screen } = useWindowSize()
 	return (
 		<$StepCustomize>
-      <StepCard primaryColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
             <$StepHeading>4. Customize Ticket</$StepHeading>
