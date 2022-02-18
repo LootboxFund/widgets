@@ -3,10 +3,10 @@ import UserTickets from '.'
 import { $CardViewport } from '../Generics'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
-import { loadUserTickets } from './state'
+import { loadUserTickets, userTicketState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { initializeLootbox } from '../TicketCard/state'
+import { ticketCardState } from 'lib/components/TicketCard/state'
 
 export default {
   title: 'UserTickets',
@@ -18,15 +18,29 @@ const Template = () => {
 
   useEffect(() => {
     ;[lootboxAddress] = parseUrlParams(['fundraisers'])
-    initDApp()
-      .then(() => (lootboxAddress ? loadUserTickets(lootboxAddress) : undefined))
-      .then(() => (lootboxAddress ? initializeLootbox(lootboxAddress) : undefined))
-      .catch((err) => console.error(err))
     ;(window as any).Web3 = Web3
+    const load = async () => {
+      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+      if (lootboxAddress) {
+        userTicketState.lootboxAddress = lootboxAddress
+        ticketCardState.lootboxAddress = lootboxAddress
+        try {
+          await loadUserTickets()
+        } catch (err) {
+          console.error('Error loading user tickets', err)
+        }
+      }
+    }
+    load()
   }, [])
 
   return (
-    <$CardViewport width="340px">
+    <$CardViewport width="900px" height="300px">
       <UserTickets />
     </$CardViewport>
   )

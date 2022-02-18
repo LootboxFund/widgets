@@ -7,6 +7,7 @@ interface HorizontalProps {
   readonly spacing?: 1 | 2 | 3 | 4 | 5
   readonly wrap?: boolean
   readonly flex?: number
+  readonly height?: string
 }
 const SPACING_VALS = [4, 8, 16, 24, 48]
 
@@ -17,6 +18,7 @@ export const $Horizontal = styled.div<HorizontalProps>`
   ${(props) => props.verticalCenter && 'align-items: center;'};
   ${(props) => props.baseline && 'align-items: baseline;'};
   ${(props) => props.wrap && 'flex-wrap: wrap;'};
+  ${(props) => props.height && `height: ${props.height};`}
 
   & > *:not(:last-child) {
     margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
@@ -34,7 +36,7 @@ export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number
 
 export const $CardViewport = styled.div<{ width?: string; height?: string }>`
   width: ${(props) => (props.width ? props.width : '300px')};
-  height: ${(props) => (props.width ? props.width : '600px')};
+  height: ${(props) => (props.height ? props.height : '600px')};
 `
 
 export const $ScrollContainer = styled.div<{ height?: string }>`
