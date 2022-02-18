@@ -8,17 +8,7 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon } from '../StepChooseNetwork';
-
-export interface NetworkOption {
-  name: string;
-  icon: string;
-  symbol: string;
-  themeColor: string;
-  chainIdHex: ChainIDHex,
-  chainIdDecimal: ChainIDDecimal,
-  isAvailable: boolean;
-}
+import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
 
 export interface StepChooseFundingProps {
   stage: StepStage;
@@ -35,7 +25,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     const calculateInputWidth = () => {
       const projectedWidth = props.fundraisingTarget.length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
-      return `${props.fundraisingTarget ? width : 50}px`
+      return `${props.fundraisingTarget ? width : 70}px`
     }
     return (
       <$Vertical>
