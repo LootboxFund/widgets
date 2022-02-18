@@ -15,8 +15,8 @@ export interface StepCustomizeProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
-  ticketState: Record<string, string>;
-  updateTicketState: (slug: string, text: string) => void;
+  ticketState: Record<string, string | number>;
+  updateTicketState: (slug: string, value: string | number) => void;
 }
 const StepCustomize = (props: StepCustomizeProps) => {
   const { screen } = useWindowSize()
@@ -29,24 +29,28 @@ const StepCustomize = (props: StepCustomizeProps) => {
             <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
             <br /><br />
             <$StepSubheading>Lootbox Name</$StepSubheading>
-            <$InputMedium /><br />
+            <$InputMedium maxLength={25} onChange={(e) => props.updateTicketState('name', e.target.value)} value={props.ticketState.name} /><br />
             <$StepSubheading>Ticket Symbol</$StepSubheading>
-            <$InputMedium /><br />
+            <$InputMedium onChange={(e) => props.updateTicketState('symbol', e.target.value)} value={props.ticketState.symbol} /><br />
             <$StepSubheading>Biography</$StepSubheading>
-            <$TextAreaMedium rows={5} /><br />
+            <$TextAreaMedium onChange={(e) => props.updateTicketState('biography', e.target.value)} value={props.ticketState.biography} rows={5} /><br />
             <$StepSubheading>Price per Share</$StepSubheading>
-            <$InputMedium /><br />
+            <$Horizontal verticalCenter>
+              <$CurrencySign>$</$CurrencySign>
+              <$InputMedium type="number" onChange={(e) => props.updateTicketState('pricePerShare', e.target.valueAsNumber)} value={props.ticketState.pricePerShare} />
+            </$Horizontal>
+            <br />
           </$Vertical>
           <$Vertical flex={1}>
             <TicketCardCandyWrapper
-              backgroundImage="https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media"
-              logoImage="https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media"
-              themeColor="#B48AF7"
-              name="Artemis Guild"
+              backgroundImage={props.ticketState.coverUrl as string}
+              logoImage={props.ticketState.logoUrl as string}
+              themeColor={props.ticketState.lootboxThemeColor as string}
+              name={props.ticketState.name as string}
             />
             <br />
-            <$Horizontal>
-              <$InputColor value="#B48AF7" /><br />
+            <$Horizontal verticalCenter>
+              <$InputColor value={props.ticketState.lootboxThemeColor} /><br />
               <$UploadFileButton>Upload Logo</$UploadFileButton>
               <$UploadFileButton>Upload Cover</$UploadFileButton>
             </$Horizontal>
@@ -60,17 +64,11 @@ const StepCustomize = (props: StepCustomizeProps) => {
 const $StepCustomize = styled.section<{}>`
   font-family: sans-serif;
 `
-const $SocialGridInputs = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto; 
-  column-gap: 10px;
-  row-gap: 15px;
-`
 
-const $SocialLogo = styled.img`
-  width: 50px;
-  height: 50px;
+const $CurrencySign = styled.span`
+  font-size: 1.8rem;
+  color: ${COLORS.surpressedBackground};
+  line-height: 2rem;
   margin-right: 10px;
 `
 
@@ -78,8 +76,8 @@ export const $InputMedium = styled.input`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;
-  padding: 5px 20px;
-  font-size: 1rem;
+  padding: 5px 10px;
+  font-size: 1.5rem;
   margin-right: 20px;
   height: 40px;
 `
@@ -87,7 +85,7 @@ export const $TextAreaMedium = styled.textarea`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;
-  padding: 5px 20px;
+  padding: 20px 20px;
   font-size: 1rem;
   margin-right: 20px;
 `

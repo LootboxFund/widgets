@@ -57,7 +57,7 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
       </$TicketLogo>
       
       <$TicketTag>
-        <$TagText>{props.name}</$TagText>
+        <$TagText>{props.name || "Lootbox Ticket"}</$TagText>
         <$Divider />
         <$TicketIDText>{`#0`}</$TicketIDText>
       </$TicketTag>

@@ -115,6 +115,7 @@ export const $StepSubheading = styled.span<{}>`
   font-weight: ${TYPOGRAPHY.fontWeight.light};
   color: ${COLORS.surpressedFontColor};
   width: 80%;
+  margin-bottom: 3px;
 `;
 
 export default StepCard;
