@@ -13,7 +13,7 @@ export default {
 }
 
 const Template = () => {
-  const ticketID = '0'
+  const ticketID = undefined
 
   useEffect(() => {
     const [lootboxAddress] = parseUrlParams(['fundraisers'])

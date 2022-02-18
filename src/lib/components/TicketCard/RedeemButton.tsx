@@ -12,7 +12,7 @@ import { LoadingText } from 'lib/components/Spinner'
 import { ticketCardState, ITicketFE, generateStateID } from './state'
 
 export interface RedeemButtonProps {
-  ticketID: string
+  ticketID: string | undefined
 }
 
 const RedeemButton = (props: RedeemButtonProps) => {
@@ -89,7 +89,20 @@ const RedeemButton = (props: RedeemButtonProps) => {
     }
   }
 
-  if (ticket?.route === '/payout') {
+  if (!props.ticketID) {
+    return (
+      <$Button
+        disabled={true}
+        screen={screen}
+        backgroundColor={`${COLORS.surpressedBackground}15`}
+        backgroundColorHover={`${COLORS.surpressedBackground}`}
+        color={`${COLORS.surpressedFontColor}aa`}
+        style={{ minHeight: '60px', height: '100px' }}
+      >
+        REDEEM
+      </$Button>
+    )
+  } else if (ticket?.route === '/payout') {
     return (
       <$Button
         screen={screen}

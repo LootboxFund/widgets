@@ -1,4 +1,5 @@
 import react from 'react'
+import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
@@ -12,16 +13,25 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
   return (
-    <$TicketCardContainer backgroundImage={ticket?.data?.metadata?.backgroundImage}>
+    <$TicketCardContainer
+      backgroundImage={ticket?.data?.metadata?.backgroundImage}
+      onClick={() => {
+        console.log('click')
+      }}
+    >
       <$TicketLogo
         backgroundImage={ticket?.data?.metadata?.image}
         backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
-      ></$TicketLogo>
-      <$TicketTag>
-        <$TagText>{ticket?.data?.metadata?.name}</$TagText>
-        <$Divider />
-        <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
-      </$TicketTag>
+      >
+        {!ticket ? <$PlusSign>+</$PlusSign> : null}
+      </$TicketLogo>
+      {ticket ? (
+        <$TicketTag>
+          <$TagText>{ticket?.data?.metadata?.name}</$TagText>
+          <$Divider />
+          <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
+        </$TicketTag>
+      ) : null}
     </$TicketCardContainer>
   )
 }
@@ -41,6 +51,7 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   background: ${(props) => (props.backgroundColor ? props.backgroundColor : '#f5f5f5')};
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
   background-size: cover;
+  cursor: pointer;
 `
 
 export const $TicketRedeemContainer = styled.section`
@@ -51,16 +62,20 @@ export const $TicketRedeemContainer = styled.section`
 export const $TicketLogo = styled.div<{ backgroundImage?: string; backgroundShadowColor?: string }>`
   width: 100%;
   height: 100%;
-  max-width: ${(props) => (props.backgroundImage ? '256px' : '186px')};
-  max-height: ${(props) => (props.backgroundImage ? '256px' : '186px')};
+  max-width: ${(props) => (props.backgroundImage ? '256px' : '146px')};
+  max-height: ${(props) => (props.backgroundImage ? '256px' : '146px')};
   border: 0px solid transparent;
   border-radius: 50%;
   margin: auto auto 0px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.05);
-  ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
-  filter: drop-shadow(0px 0px 22px ${(props) => props.backgroundShadowColor || '#000'});
+  ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}
+  ${(props) => props.backgroundShadowColor && `filter: drop-shadow(0px 0px 22px ${props.backgroundShadowColor});`}
   background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
 `
 
 export const $TicketTag = styled.section`
@@ -103,6 +118,15 @@ const $Divider = styled.div`
   margin: 10px;
   border: 3px solid rgba(255, 255, 255, 0.33);
   transform: rotate(0deg);
+`
+
+const $PlusSign = styled.div`
+  font-family: open-sans;
+  font-weight: bold;
+  font-size: 84px;
+  line-height: 100px;
+  text-align: center;
+  color: ${COLORS.surpressedFontColor}aa;
 `
 
 export default TicketCard

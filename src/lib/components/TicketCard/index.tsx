@@ -47,7 +47,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       ) : (
         <TicketCard ticketID={props.ticketID} />
       )}
-      {props.ticketID && props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
+      {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
     </$RootContainer>
   )
 }
