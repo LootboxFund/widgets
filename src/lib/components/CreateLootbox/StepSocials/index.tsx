@@ -83,7 +83,7 @@ const $SocialLogo = styled.img`
   margin-right: 10px;
 `
 
-const $InputMedium = styled.input`
+export const $InputMedium = styled.input`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;

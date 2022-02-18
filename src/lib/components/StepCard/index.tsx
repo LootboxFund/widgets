@@ -7,6 +7,7 @@ export interface StepCardProps {
   primaryColor?: string;
   stage: StepStage;
   children: React.ReactNode;
+  customActionBar?: () => React.ReactNode;
   onNext: () => void;
 }
 const StepCard = (props: StepCardProps) => {
@@ -54,9 +55,14 @@ const StepCard = (props: StepCardProps) => {
       <div style={{ padding: '30px', display: 'flex' }}>
         {props.children}
       </div>
-      <div style={{ display: 'flex', flex: 1, padding: props.stage === "may_proceed" || props.stage === "completed" ? '0px' : '10px' }}>
+      {
+        props.customActionBar ? props.customActionBar() : (
+          <div style={{ display: 'flex', flex: 1, padding: props.stage === "may_proceed" || props.stage === "completed" ? '0px' : '10px' }}>
         {renderStepButton()}
       </div>
+        )
+      }
+      
 		</$StepCard>
 	)
 }
