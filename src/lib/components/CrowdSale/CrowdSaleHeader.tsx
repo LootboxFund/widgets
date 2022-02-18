@@ -10,6 +10,7 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
 import { crowdSaleState } from './state'
+import NetworkText from 'lib/components/NetworkText';
 
 export interface CrowdSaleHeaderProps {}
 const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
@@ -46,13 +47,6 @@ const CrowdSaleHeader = (props: CrowdSaleHeaderProps) => {
     return
   }
 
-  const renderTinyAccount = () => {
-    if (snapUserState.currentAccount) {
-      const accountTruncated = truncateAddress(snapUserState.currentAccount)
-      return `(${accountTruncated})`
-    }
-    return
-  }
 
   return (
     <$CrowdSaleHeader>
@@ -90,13 +84,5 @@ export const $CrowdSaleHeader = styled.div<{}>`
   font-family: sans-serif;
 `
 
-export const $NetworkText = styled.span`
-  font-size: 0.8rem;
-  color: ${`${COLORS.surpressedFontColor}`};
-  text-align: right;
-  margin-right: 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
-`
 
 export default CrowdSaleHeader
