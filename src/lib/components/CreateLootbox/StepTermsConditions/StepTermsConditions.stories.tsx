@@ -46,7 +46,7 @@ const Demo = (args: StepTermsConditionsProps) => {
   const createLootbox = async () => {
     console.log(`creating lootbox...`)
     const receivingWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
-    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
+    const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
     console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
