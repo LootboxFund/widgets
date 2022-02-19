@@ -17,14 +17,14 @@ const NetworkText = (props: NetworkTextProps) => {
   }
 	return (
     <$NetworkText style={{ flex: 2 }}>
-    <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
-    <span
-      onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
-      style={{ cursor: 'pointer' }}
-    >
-      {renderTinyAccount()}
-    </span>
-  </$NetworkText>
+      <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+      <span
+        onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
+        style={{ cursor: 'pointer' }}
+      >
+        {renderTinyAccount()}
+      </span>
+    </$NetworkText>
 	)
 }
 

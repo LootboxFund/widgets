@@ -29,21 +29,77 @@ const SOCIALS: SocialFragment[] = [
   { slug: 'web', name: 'Website', placeholder: 'www.website.com', icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media' }
 ]
 
-
+interface Errors {
+  twitter:  string;
+  email:  string;
+  instagram:  string;
+  tiktok:  string;
+  facebook:  string;
+  discord:  string;
+  youtube:  string;
+  snapchat:  string;
+  twitch:  string;
+  web: string;
+}
 export interface StepSocialsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
   socialState: Record<string, string>;
   updateSocialState: (slug: string, text: string) => void;
+  setValidity: (bool: boolean) => void;
 }
 const StepSocials = (props: StepSocialsProps) => {
   const { screen } = useWindowSize()
-
+  const initialErrors = {
+    twitter: '',
+    email: '',
+    instagram: '',
+    tiktok: '',
+    facebook: '',
+    discord: '',
+    youtube: '',
+    snapchat: '',
+    twitch: '',
+    web: ''
+  }
+  const [errors, setErrors] = useState(initialErrors)
   
+  const parseInput = (slug: string, value: string) => {
+    props.updateSocialState(slug, value)
+    if (slug === "email") {
+      if (value.length > 0 && !value.includes("@")) {
+        setErrors({
+          ...errors,
+          email: "Invalid email"
+        })
+        props.setValidity(false)
+      } else if (value.length === 0) {
+        setErrors({
+          ...errors,
+          email: 'Email is mandatory',
+        })
+      } else {
+        setErrors({
+          ...errors,
+          email: ""
+        })
+        props.setValidity(true)
+      }
+    } else if (!props.socialState.email) {
+      setErrors({
+        ...errors,
+        email: 'Email is mandatory',
+      })
+      props.setValidity(false)
+    } else {
+      props.setValidity(true)
+    }
+  }
+
 	return (
 		<$StepSocials>
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Vertical flex={1}>
           <$StepHeading>5. Contact Information</$StepHeading>
           <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
@@ -54,7 +110,7 @@ const StepSocials = (props: StepSocialsProps) => {
                 return (
                   <$Horizontal style={{ marginRight: "20px" }}>
                     <$SocialLogo src={social.icon} />
-                    <$InputMedium style={{ width: '100%' }} value={props.socialState[social.slug]} onChange={(e) => props.updateSocialState(social.slug, e.target.value)} placeholder={social.name}></$InputMedium>
+                    <$InputMedium style={{ width: '100%' }} value={props.socialState[social.slug]} onChange={(e) => parseInput(social.slug, e.target.value)} placeholder={social.name}></$InputMedium>
                   </$Horizontal>
                 )
               })

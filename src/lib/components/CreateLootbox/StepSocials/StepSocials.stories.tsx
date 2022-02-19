@@ -39,6 +39,7 @@ const Demo = (args: StepSocialsProps) => {
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepSocials
+        setValidity={(valid: boolean) => { }}
         socialState={socialState}
         updateSocialState={updateSocialState}
         selectedNetwork={network}

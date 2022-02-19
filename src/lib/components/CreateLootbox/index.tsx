@@ -2,7 +2,7 @@ import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Button'
 import { COLORS } from 'lib/theme'
-import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
+import { initDApp, updateStateToChain, useUserInfo, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
@@ -17,12 +17,23 @@ import StepCustomize from 'lib/components/CreateLootbox/StepCustomize';
 import StepSocials from 'lib/components/CreateLootbox/StepSocials';
 import StepTermsConditions from 'lib/components/CreateLootbox/StepTermsConditions';
 
+
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize();
+  const web3 = useWeb3()
   const isWalletConnected = snapUserState.accounts.length > 0;
+ 
+  useEffect(() => {
+    window.onload = () => {
+      initDApp()
+        .catch((err) => console.error(err))
+    }
+  }, [])
 
+  type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
+  
   // FORM: Step by Step Form
   const linkedListFormSteps: Record<FormStep,FormStep> = {
     stepNetwork: "stepFunding",
@@ -40,13 +51,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stepSocials: "not_yet",
     stepTerms: "not_yet",
   }
-  type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
   const [stage, setStage] = useState(INITIAL_FORM_STATE)
+  
+  
+  // VALIDITY: Validity of the forms
+  const INITIAL_VALIDITY: Record<FormStep, boolean> = {
+    stepNetwork: false,
+    stepFunding: false,
+    stepReturns: false,
+    stepCustomize: false,
+    stepSocials: false,
+    stepTerms: false,
+  }
+  const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
-    console.log("Selecting network: ", network)
     setNetwork(network)
     setStage({
       ...stage,
@@ -54,7 +75,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     })
   }
   useEffect(() => {
-    console.log("Detected change in step 1")
     const thisStep = "stepNetwork";
     if (network) {
       setFundraisingTarget("")
@@ -70,7 +90,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [fundraisingTarget, setFundraisingTarget] = useState<string>("");
   const [receivingWallet, setReceivingWallet] = useState<string>("");
   useEffect(() => {
-    console.log("Detected change in step 2")
     const thisStep = "stepFunding";
     if (fundraisingTarget && receivingWallet) {
       setStage({
@@ -91,9 +110,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 3: Choose Returns
   const [returnTarget, setReturnTarget] = useState<number>();
-  const [paybackDate, setPaybackDate] = useState<Date>();
+  const [paybackDate, setPaybackDate] = useState<string>();
   useEffect(() => {
-    console.log("Detected change in step 3")
     const thisStep = "stepReturns";
     if (returnTarget && paybackDate) {
       setStage({
@@ -125,7 +143,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   useEffect(() => {
-    console.log("Detected change in step 4")
     const thisStep = "stepCustomize";
     if (ticketState.name && ticketState.symbol && ticketState.biography && ticketState.pricePerShare && ticketState.lootboxThemeColor && ticketState.logoUrl && ticketState.coverUrl) {
       setStage({
@@ -160,7 +177,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSocialState({ ...socialState, [slug]: text })
   }
   useEffect(() => {
-    console.log("Detected change in step 5")
     const thisStep = "stepSocials";
     if (socialState.email) {
       setStage({
@@ -189,7 +205,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTermsState({ ...termsState, [slug]: bool })
   }
   useEffect(() => {
-    console.log("Detected change in step 6")
     const thisStep = "stepTerms";
     if (termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet) {
       setStage({
@@ -207,6 +222,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 7: Submit
   const checkAllConditionsMet = () => {
+    console.log('---- validity')
+    console.log(validity)
+    console.log('---- stage')
+    console.log(stage)
+    
+    const allValidationsPassed = Object.values(validity).every(condition => condition === true)
+
     const conditionsMet: boolean[] = [];
     stage.stepNetwork === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     stage.stepFunding === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
@@ -214,7 +236,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stage.stepCustomize === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     stage.stepSocials === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    return conditionsMet.every(condition => condition === true)
+    const allConditionsMet = conditionsMet.every(condition => condition === true)
+
+    return allValidationsPassed && allConditionsMet
   }
 
   // if (!isWalletConnected) {
@@ -227,6 +251,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         stage={stage.stepNetwork}
         onSelectNetwork={(network: NetworkOption) => selectNetwork(network, 'stepNetwork')}
         onNext={() => console.log("onNext")}
+        setValidity={(bool: boolean) => setValidity({...validity, stepNetwork: bool})}
       />
       <$Spacer></$Spacer>
       <StepChooseFunding
@@ -234,8 +259,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         fundraisingTarget={fundraisingTarget}
         setFundraisingTarget={(amount: string) => setFundraisingTarget(amount)}
         receivingWallet={receivingWallet}
-        setReceivingWallet={(addr: string) => setReceivingWallet(addr)}
+        setReceivingWallet={setReceivingWallet}
         stage={stage.stepFunding}
+        setValidity={(bool: boolean) => setValidity({...validity, stepFunding: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -244,8 +270,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         returnTarget={returnTarget}
         setReturnTarget={(amount: number) => setReturnTarget(amount)}
         paybackDate={paybackDate}
-        setPaybackDate={(date: Date | null) => date && setPaybackDate(date)}
+        setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}
+        setValidity={(bool: boolean) => setValidity({...validity, stepReturns: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -254,6 +281,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage.stepCustomize}
+        maxPricePerShare={10}
+        setValidity={(bool: boolean) => setValidity({...validity, stepCustomize: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -262,6 +291,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateSocialState={updateSocialState}
         selectedNetwork={network}
         stage={stage.stepSocials}
+        setValidity={(bool: boolean) => setValidity({...validity, stepSocials: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -274,6 +304,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         reputationWallet={reputationWallet}
         treasuryWallet={receivingWallet}
         updateTreasuryWallet={setReceivingWallet}
+        setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
         onNext={() => console.log("onNext")}
         onSubmit={() => console.log('onSubmit')}
       />

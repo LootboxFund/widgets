@@ -36,10 +36,12 @@ const Demo = (args: StepCustomizeProps) => {
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepCustomize
+        setValidity={(valid: boolean) => { }}
         ticketState={ticketState}
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage}
+        maxPricePerShare={10}
         onNext={() => console.log("onNext")}
       />
     </div>

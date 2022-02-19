@@ -1,4 +1,4 @@
-import react, { useState } from 'react'
+import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -9,23 +9,59 @@ import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { useWeb3 } from 'lib/hooks/useWeb3Api';
+import Web3Utils from 'web3-utils'
 
+interface Errors {
+  fundraisingTarget: string;
+  receivingWallet: string;
+}
 export interface StepChooseFundingProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   fundraisingTarget: string;
   setFundraisingTarget: (amount: string) => void;
   receivingWallet: string;
-  setReceivingWallet: (addr: string) => void
+  setReceivingWallet: (addr: string) => void;
+  setValidity: (bool: boolean) => void;
   onNext: () => void;
 }
 const StepChooseFunding = (props: StepChooseFundingProps) => {
   const { screen } = useWindowSize()
+  const initialErrors = {
+    fundraisingTarget: '',
+    receivingWallet: ''
+  }
+  const [errors, setErrors] = useState(initialErrors)
+  const validateFundraisingTarget = (fundraisingTarget: number) => fundraisingTarget > 0
+  const validateReceivingWallet = async (receivingWallet: string) => {
+    return window.web3.utils ? window.web3.utils.isAddress(receivingWallet) : Web3Utils.isAddress(receivingWallet) 
+  }
+
   const renderInputFundraisingTarget = () => {
     const calculateInputWidth = () => {
       const projectedWidth = props.fundraisingTarget.length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
       return `${props.fundraisingTarget ? width : 100}px`
+    }
+    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      props.setFundraisingTarget(e.target.value)
+      const validFundraise = validateFundraisingTarget(e.target.valueAsNumber)
+      const validReceiver = await validateReceivingWallet(props.receivingWallet)
+      if (validFundraise) {
+        setErrors({
+          ...errors,
+          fundraisingTarget: ''
+        })
+      } else if (validFundraise && validReceiver) {
+        props.setValidity(true)
+      } else {
+        setErrors({
+          ...errors,
+          fundraisingTarget: 'Cannot have a negative fundraising target'
+        })
+        props.setValidity(false)
+      }
     }
     return (
       <$Vertical>
@@ -36,7 +72,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
               {
                 props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />
               }
-              <$Input type="number" value={props.fundraisingTarget} onChange={(e) => props.setFundraisingTarget(e.target.value)} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
+              <$Input type="number" value={props.fundraisingTarget} min="0" onChange={parseInput} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
@@ -48,18 +84,41 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     )
   }
   const renderInputReceivingWallet = () => {
+    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      props.setReceivingWallet(e.target.value)
+      const validReceiver = await validateReceivingWallet(e.target.value)
+      const validFundraiser = validateFundraisingTarget(parseFloat(props.fundraisingTarget))
+      if (!validReceiver) {
+        setErrors({
+          ...errors,
+          receivingWallet: `Invalid Receiving Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`
+        })
+        props.setValidity(false)
+      } else if (validFundraiser && validReceiver) {
+        props.setValidity(true)
+        setErrors({
+          ...errors,
+          receivingWallet: ''
+        })
+      } else if (validReceiver) {
+        setErrors({
+          ...errors,
+          receivingWallet: ''
+        })
+      }
+    }
     return (
       <$Vertical>
         <$StepSubheading>Receiving Wallet</$StepSubheading>
         <$InputWrapper>
-          <$Input value={props.receivingWallet} placeholder="0xAutodetectYourWallet" screen={'mobile'} fontWeight="200" onChange={(e) => props.setReceivingWallet(e.target.value)} />
+          <$Input value={props.receivingWallet} placeholder="0xAutodetectYourWallet" screen={'mobile'} fontWeight="200" onChange={parseInput} />
         </$InputWrapper>
       </$Vertical>
     )
   }
 	return (
 		<$StepChooseFunding>
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>2. How much money do you need?</$StepHeading>

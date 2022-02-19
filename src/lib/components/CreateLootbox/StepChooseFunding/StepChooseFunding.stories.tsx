@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import StepChooseFunding, { StepChooseFundingProps } from 'lib/components/CreateLootbox/StepChooseFunding'
 import { StepStage } from 'lib/components/StepCard'
+import Web3 from 'web3'
 
 
 export default {
@@ -12,6 +13,9 @@ const Demo = (args: StepChooseFundingProps) => {
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [fundraisingTarget, setFundraisingTarget] = useState<string>("");
   const [receivingWallet, setReceivingWallet] = useState<string>("");
+  useEffect(() => {
+    (window as any).Web3 = Web3
+  }, [])
   useEffect(() => {
     if (fundraisingTarget && receivingWallet) {
       setStage("may_proceed")
@@ -29,6 +33,7 @@ const Demo = (args: StepChooseFundingProps) => {
         receivingWallet={receivingWallet}
         setReceivingWallet={(addr: string) => setReceivingWallet(addr)}
         stage={stage}
+        setValidity={(valid: boolean) => { }}
         onNext={() => console.log("onNext")}
       />
     </div>

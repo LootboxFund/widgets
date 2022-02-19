@@ -6,6 +6,7 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics';
 import NetworkText from 'lib/components/NetworkText';
 import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
+import { Address } from 'lib/types/baseTypes';
 
 export interface NetworkOption {
   name: string;
@@ -15,13 +16,32 @@ export interface NetworkOption {
   chainIdHex: ChainIDHex,
   chainIdDecimal: ChainIDDecimal,
   isAvailable: boolean;
+  priceFeed?: Address;
 }
 const NETWORK_OPTIONS: NetworkOption[] = [
-  { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media' },
-  { name: 'Polygon', symbol: 'MATIC', themeColor: '#8F5AE8', chainIdHex: 'b', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media' },
-  { name: 'Ethereum', symbol: 'ETH', themeColor: '#627EEA', chainIdHex: 'c', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH.png?alt=media' },
-  { name: 'Solana', symbol: 'SOL', themeColor: '#0BC695', chainIdHex: 'd', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FSOL.png?alt=media' },
-  { name: 'Fantom', symbol: 'FTM', themeColor: '#13B5EC', chainIdHex: 'e', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFANTOM.png?alt=media' },
+  {
+    name: 'Binance',
+    symbol: 'BNB',
+    themeColor: '#F0B90B',
+    chainIdHex: 'a',
+    chainIdDecimal: '',
+    isAvailable: true,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
+    priceFeed: '',
+  },
+  {
+    name: 'Polygon',
+    symbol: 'MATIC',
+    themeColor: '#8F5AE8',
+    chainIdHex: 'b',
+    chainIdDecimal: '',
+    isAvailable: true,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+    priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0',
+  },
+  { name: 'Ethereum', symbol: 'ETH', themeColor: '#627EEA', chainIdHex: 'c', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH.png?alt=media', priceFeed: '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419' },
+  { name: 'Solana', symbol: 'SOL', themeColor: '#0BC695', chainIdHex: 'd', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FSOL.png?alt=media', },
+  { name: 'Fantom', symbol: 'FTM', themeColor: '#13B5EC', chainIdHex: 'e', chainIdDecimal: '', isAvailable: false, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFANTOM.png?alt=media', priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc' },
 ]
 
 export interface StepChooseNetworkProps {
@@ -29,15 +49,21 @@ export interface StepChooseNetworkProps {
   onSelectNetwork: (network: NetworkOption) => void;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
+  setValidity: (bool: boolean) => void;
 }
 const StepChooseNetwork = (props: StepChooseNetworkProps) => {
   const renderNetworkOptions = () => {
-    
+    const selectNetwork = (isAvailable: boolean, network: NetworkOption) => {
+      if (isAvailable) {
+        props.onSelectNetwork(network)
+        props.setValidity(true)
+      }
+    }
     return (
       <$Vertical spacing={2}>
         {
           NETWORK_OPTIONS.map(network => (
-            <$NetworkOption isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex} themeColor={props.selectedNetwork?.themeColor} onClick={() => network.isAvailable && props.onSelectNetwork(network)} key={network.chainIdHex} isAvailable={network.isAvailable}>
+            <$NetworkOption isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex} themeColor={props.selectedNetwork?.themeColor} onClick={() => selectNetwork(network.isAvailable, network)} key={network.chainIdHex} isAvailable={network.isAvailable}>
               <$NetworkIcon src={network.icon} />
               {
                 network.isAvailable ?

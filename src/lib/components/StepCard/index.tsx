@@ -9,16 +9,31 @@ export interface StepCardProps {
   children: React.ReactNode;
   customActionBar?: () => React.ReactNode;
   onNext: () => void;
+  errors?: string[];
 }
 const StepCard = (props: StepCardProps) => {
+  console.log(props.errors)
+  const totalErrors = (props.errors || []).filter(e => e).length
   const themeColor = props.themeColor || COLORS.surpressedFontColor;
   const renderStepButton = () => {
+    if (totalErrors > 0) {
+      return (
+        <$StepButton
+          backgroundColor={`${props.themeColor}3A`}
+          borderColor={`${props.themeColor}02`}
+        >
+          <$StepError>{(props.errors || []).filter(e => e)[0]}</$StepError>
+        </$StepButton>
+      )
+    }
     if (props.stage === "in_progress") {
       return (
         <$StepButton
           backgroundColor={`${props.themeColor}3A`}
           borderColor={`${props.themeColor}02`}
-        ></$StepButton>
+        >
+          <$StepError>{(props.errors || []).filter(e => e)[0]}</$StepError>
+        </$StepButton>
       )
     }
     if (props.stage === "may_proceed") {
@@ -120,5 +135,12 @@ export const $StepSubheading = styled.span<{}>`
   width: 80%;
   margin-bottom: 3px;
 `;
+
+export const $StepError = styled.span<{}>`
+  font-size: ${TYPOGRAPHY.fontSize.medium}; 
+  line-height: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.medium};
+  color: ${COLORS.dangerFontColor};
+`
 
 export default StepCard;

@@ -15,8 +15,8 @@ const Demo = (args: StepTermsConditionsProps) => {
     agreeLiability: false,
     agreeVerify: false
   }
-  const reputationWallet = "0xReputationWallet"
-  const [treasuryWallet, setTreasuryWallet] = useState("0xTreasuryWallet")
+  const reputationWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
+  const [treasuryWallet, setTreasuryWallet] = useState("0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A")
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
   useEffect(() => {
@@ -34,6 +34,7 @@ const Demo = (args: StepTermsConditionsProps) => {
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepTermsConditions
+        setValidity={(valid: boolean) => { }}
         allConditionsMet={stage === "may_proceed"}
         termsState={termsState}
         updateTermsState={updateTermsState}

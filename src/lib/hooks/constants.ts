@@ -63,6 +63,26 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
     blockExplorerUrls: ['https://testnet.bscscan.com/'],
     currentNetworkLogo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png',
   },
+  '13881': {
+    chainIdHex: '13881',
+    chainIdDecimal: '80001',
+    chainName: 'Polygon Mumbai (Testnet)',
+    displayName: 'Mumbai',
+    nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
+    rpcUrls: ['https://rpc-mumbai.matic.today'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
+    currentNetworkLogo: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+  },
+  '89': {
+    chainIdHex: '89',
+    chainIdDecimal: '137',
+    chainName: 'Polygon (Mainnet)',
+    displayName: 'Polygon Mainnet',
+    nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
+    rpcUrls: ['https://polygon-rpc.com/'],
+    blockExplorerUrls: ['https://polygonscan.com/'],
+    currentNetworkLogo: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+  }
 }
 
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
