@@ -4,14 +4,11 @@ import { Address, ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
-import { tokenListState } from 'lib/hooks/useTokenList'
+import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-
-// const MAX_INT = new BN(2).pow(256).minus(1)
-const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -199,11 +196,4 @@ const loadPriceFeed = async () => {
     const inputTokenPrice = await getPriceFeedRaw(buySharesState.inputToken.data.priceOracle)
     buySharesState.inputToken.data.usdPrice = inputTokenPrice
   }
-}
-
-const getTokenFromList = (address: Address | undefined): TokenDataFE | undefined => {
-  if (!address) {
-    return undefined
-  }
-  return tokenListState?.defaultTokenList.find((tokenData) => tokenData.address.toLowerCase() === address.toLowerCase())
 }

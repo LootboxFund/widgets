@@ -1,7 +1,7 @@
 import react from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
-import { ChainInfo, BLOCKCHAINS } from '../constants'
+import { ChainInfo, BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../constants'
 import { ChainIDHex, TokenData } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from 'lib/components/Swap/state'
@@ -129,8 +129,15 @@ export const addERC721ToWallet = async (token: TokenData) => {
 }
 
 export const initDApp = async () => {
-  await initWeb3OnWindow()
-  const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
+  try {
+    await initWeb3OnWindow()
+  } catch (err) {
+    console.error('Error initializing Web3', err)
+  }
+
+  const chainIdHex = (window as any).ethereum
+    ? await (window as any).ethereum.request({ method: 'eth_chainId' })
+    : DEFAULT_CHAIN_ID_HEX
 
   const blockchain = BLOCKCHAINS[chainIdHex]
 
@@ -141,6 +148,9 @@ export const initDApp = async () => {
 
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
+  if (!window.ethereum) {
+    throw new Error('window.ethereum is not defined!')
+  }
   ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
     const blockchain = BLOCKCHAINS[chainIdHex]
     if (blockchain) {
@@ -158,7 +168,7 @@ export const initDApp = async () => {
 const initWeb3OnWindow = async () => {
   const provider = await detectEthereumProvider()
   // const provider = (window as any).ethereum
-  window.web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
+  window.web3 = new (window as any).Web3('https://data-seed-prebsc-1-s1.binance.org:8545/')
   if (provider) {
     window.web3 = new (window as any).Web3(provider)
     const userAccounts = await window.web3.eth.getAccounts()
