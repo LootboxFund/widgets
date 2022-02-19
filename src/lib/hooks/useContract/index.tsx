@@ -6,7 +6,7 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/crowdSale.json'
 import GFXConstantsABI from 'lib/abi/gfxConstants.json'
-import { addresses, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
+import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import { TokenData } from '@guildfx/helpers'
@@ -187,7 +187,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   for (let deposit of proratedDeposits) {
     if (deposit.nativeTokenAmount && deposit.nativeTokenAmount !== '0') {
       res.push({
-        tokenAddress: '0x0native',
+        tokenAddress: NATIVE_ADDRESS,
         tokenAmount: deposit.nativeTokenAmount,
         isRedeemed: deposit.redeemed,
       })

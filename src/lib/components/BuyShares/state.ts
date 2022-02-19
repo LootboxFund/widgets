@@ -1,4 +1,4 @@
-import { TokenDataFE } from 'lib/hooks/constants'
+import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { Address, ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
@@ -151,7 +151,7 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const fetchLootboxData = async () => {
-  buySharesState.inputToken.data = getTokenFromList('0x0native')
+  buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   const [lootboxAddress] = parseUrlParams(['fundraisers'])
   if (!lootboxAddress) {
     return
@@ -180,7 +180,7 @@ export const addTicketToWallet = async () => {
 export const loadTokenData = async (token: TokenDataFE) => {
   if (userState.currentAccount) {
     const promise =
-      token.address === '0x0native'
+      token.address === NATIVE_ADDRESS
         ? getUserBalanceOfNativeToken(userState.currentAccount)
         : getUserBalanceOfToken(token.address, userState.currentAccount)
 

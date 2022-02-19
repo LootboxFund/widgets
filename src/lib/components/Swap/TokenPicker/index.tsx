@@ -6,7 +6,7 @@ import { COLORS } from 'lib/theme'
 import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import RowToken from 'lib/components/Swap/TokenPicker/RowToken'
 import { useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
-import { TokenDataFE } from 'lib/hooks/constants'
+import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { $Horizontal, $ScrollContainer } from '../../Generics'
 import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
@@ -33,7 +33,7 @@ const TokenPicker = (props: TokenPickerProps) => {
     if (isDisabled) return
     let tokenBalance = 0
     if (snapUserState.currentAccount && snapSwapState.targetToken) {
-      if (token.address === '0x0native') {
+      if (token.address === NATIVE_ADDRESS) {
         tokenBalance = await getUserBalanceOfNativeToken(snapUserState.currentAccount)
       } else {
         tokenBalance = await getUserBalanceOfToken(token.address, snapUserState.currentAccount)

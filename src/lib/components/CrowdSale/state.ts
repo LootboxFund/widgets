@@ -1,4 +1,4 @@
-import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS } from 'lib/hooks/constants'
+import { TokenDataFE, BSC_TESTNET_CROWDSALE_ADDRESS, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
 import { getCrowdSaleSeedData } from 'lib/hooks/useContract'
 import { Address } from 'lib/types/baseTypes'
@@ -161,7 +161,7 @@ export const approveStableCoinToken = async () => {
   if (!crowdSaleState.inputToken.data || !crowdSaleState.crowdSaleAddress) {
     return
   }
-  if (crowdSaleState.inputToken.data.address === '0x0native') {
+  if (crowdSaleState.inputToken.data.address === NATIVE_ADDRESS) {
     // Native tokens don't need approval
     crowdSaleState.inputToken.allowance = MAX_INT
     return
@@ -197,7 +197,7 @@ export const fetchCrowdSaleData = async () => {
   const { guildTokenAddress, guildTokenPrice, stableCoins } = await getCrowdSaleSeedData(
     crowdSaleState.crowdSaleAddress
   )
-  crowdSaleState.stableCoins = ['0x0native', ...stableCoins]
+  crowdSaleState.stableCoins = [NATIVE_ADDRESS, ...stableCoins]
   const guildToken = getTokenFromList(guildTokenAddress)
   if (guildToken) {
     await loadTokenData(guildToken, 'outputToken')
@@ -222,7 +222,7 @@ export const addOutputTokenToWallet = async () => {
 export const loadTokenData = async (token: TokenDataFE, targetToken: TokenPickerTarget) => {
   if (userState.currentAccount) {
     const promise =
-      token.address === '0x0native'
+      token.address === NATIVE_ADDRESS
         ? Promise.all([getUserBalanceOfNativeToken(userState.currentAccount), Promise.resolve('0')])
         : Promise.all([
             getUserBalanceOfToken(token.address, userState.currentAccount),
