@@ -216,7 +216,9 @@ export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
   const web3 = await useWeb3()
   const [currentUser, ..._] = await web3.eth.getAccounts()
   if (!currentUser) {
-    throw new Error('Please login to metamask!')
+    // throw new Error('Please login to metamask!')
+    console.warn('User not logged in')
+    return []
   }
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
   const userTickets = await lootbox.methods.viewAllTicketsOfHolder(currentUser).call()
