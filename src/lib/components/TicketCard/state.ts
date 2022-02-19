@@ -1,8 +1,9 @@
 import { ITicket, Address, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
 import { readTicketMetadata } from 'lib/api/storage'
-import { getTicketDividends } from 'lib/hooks/useContract'
+import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
+import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -53,18 +54,41 @@ export const loadDividends = async (ticketID: string) => {
     return
   }
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
-  if (ticketCardState.tickets[stateID]) {
-    const dividendFragments = await getTicketDividends(ticketCardState.lootboxAddress, ticketID)
-    const dividends: IDividend[] = dividendFragments.map((fragment) => {
-      const token = getTokenFromList(fragment.tokenAddress)
-      const symbol = token ? token.symbol : ''
+  if (!ticketCardState.tickets[stateID]) {
+    await loadTicketData(ticketID)
+  }
+  const dividendFragments = await getTicketDividends(ticketCardState.lootboxAddress, ticketID)
+  const nativeToken = getTokenFromList(NATIVE_ADDRESS)
+  const dividends: IDividend[] = await Promise.all(
+    dividendFragments.map(async (fragment) => {
+      let symbol: string
+      if (fragment.tokenAddress === NATIVE_ADDRESS) {
+        symbol = nativeToken?.symbol || ''
+      } else {
+        try {
+          symbol = await getERC20Symbol(fragment.tokenAddress)
+        } catch (err) {
+          symbol = fragment.tokenAddress?.slice(0, 4) + '...' || ''
+        }
+      }
+
       return {
         tokenSymbol: symbol,
         tokenAmount: fragment.tokenAmount,
         tokenAddress: fragment.tokenAddress,
-        isRedeemed: false, // TODO: hardcoded for now
+        isRedeemed: fragment.isRedeemed,
       }
     })
-    ticketCardState.tickets[stateID].dividends = dividends
+  )
+  ticketCardState.tickets[stateID].dividends = dividends
+}
+
+export const redeemTicket = async (ticketID: string) => {
+  if (!ticketCardState?.lootboxAddress) {
+    return
   }
+
+  // const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  await withdrawEarningsFromLootbox(ticketID, ticketCardState.lootboxAddress)
+  await loadDividends(ticketID)
 }

@@ -19,12 +19,8 @@ const UserTickets = () => {
   return (
     <$Horizontal justifyContent="space-between" height="100%" spacing={3}>
       {tickets.map((ticketID, idx) => (
-        <$ParentCard>
-          <TicketCard
-            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
-            ticketID={ticketID}
-            isRedeemEnabled={true}
-          ></TicketCard>
+        <$ParentCard key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
+          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
         </$ParentCard>
       ))}
     </$Horizontal>

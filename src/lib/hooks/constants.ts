@@ -26,6 +26,8 @@ export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 // TODO: Dynamically load this
 export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x7B8f9b6Daa03E39BC046CA06c72C8A81b8FcEceb'
 
+export const NATIVE_ADDRESS: Address = '0x0native'
+
 export const storageUrl = (chainID: ChainIDHex) => `${STORAGE_URL}/o/v/${version}/${chainID}`
 
 export type ChainInfo = {
@@ -87,7 +89,7 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
 
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   {
-    address: '0x0native',
+    address: NATIVE_ADDRESS,
     chainIdHex: '0x38',
     chainIdDecimal: '56',
     decimals: 18,
@@ -143,7 +145,7 @@ export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenDataFE[] = [
 
 export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   {
-    address: '0x0native',
+    address: NATIVE_ADDRESS,
     chainIdHex: '0x61',
     chainIdDecimal: '97',
     decimals: 18,

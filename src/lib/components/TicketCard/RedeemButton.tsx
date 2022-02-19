@@ -1,10 +1,12 @@
+import react, { useState } from 'react'
 import { $Button } from 'lib/components/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
-import { ticketCardState, generateStateID } from './state'
+import { ticketCardState, generateStateID, redeemTicket } from './state'
+import { LoadingText } from 'lib/components/Spinner'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
@@ -14,6 +16,7 @@ const RedeemButton = (props: RedeemButtonProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(ticketCardState)
   const snapUser = useSnapshot(userState)
+  const [loading, setLoading] = useState(false)
 
   const isWalletConnected = snapUser.accounts.length > 0
   const stateID = props.ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, props.ticketID)
@@ -27,6 +30,19 @@ const RedeemButton = (props: RedeemButtonProps) => {
       } else if (snap.tickets[stateID].route === '/card') {
         ticketCardState.tickets[stateID].route = '/payout'
       }
+    }
+  }
+
+  const redeem = async () => {
+    if (!props.ticketID) {
+      return
+    }
+    setLoading(true)
+    try {
+      await redeemTicket(props.ticketID)
+    } catch (err) {
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -50,13 +66,14 @@ const RedeemButton = (props: RedeemButtonProps) => {
       return (
         <$Button
           screen={screen}
-          // onClick={toggleRoute}
+          onClick={redeem}
           backgroundColor={`${COLORS.trustBackground}C0`}
           backgroundColorHover={`${COLORS.trustBackground}`}
           color={COLORS.trustFontColor}
           style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+          disabled={loading}
         >
-          REDEEM
+          <LoadingText loading={loading} text="REDEEM" color={COLORS.trustFontColor} />
         </$Button>
       )
     }
