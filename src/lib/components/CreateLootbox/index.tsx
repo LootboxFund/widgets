@@ -29,7 +29,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
  
   useEffect(() => {
     window.onload = () => {
-      initDApp()
+      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
         .catch((err) => console.error(err))
     }
   }, [])
@@ -105,7 +105,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? "may_proceed" : "in_progress"
       })
-      setPaybackDate(defaultPaybackDate.toDateString())
+      // setPaybackDate(defaultPaybackDate.toDateString())
+      // setValidity({...validity, stepReturns: true})
     } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
@@ -246,10 +247,17 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     const allConditionsMet = conditionsMet.every(condition => condition === true)
 
+    console.log(`=== validity`)
+    console.log(validity)
+    console.log(`=== stage`)
+    console.log(stage)
+    console.log(`=== conditionsMet`)
+    console.log(conditionsMet)
+
     return allValidationsPassed && allConditionsMet
   }
   const createLootbox = () => {
-    // const ERC20 = new window.web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
+    // const ERC20 = new window.Web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
   }
 
 
