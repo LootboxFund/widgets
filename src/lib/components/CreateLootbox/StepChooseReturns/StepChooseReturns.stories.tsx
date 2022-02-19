@@ -11,7 +11,7 @@ export default {
 const Demo = (args: StepChooseReturnsProps) => {
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [returnTarget, setReturnTarget] = useState<number>();
-  const [paybackDate, setPaybackDate] = useState<Date>();
+  const [paybackDate, setPaybackDate] = useState<string>();
   useEffect(() => {
     if (returnTarget && paybackDate) {
       setStage("may_proceed")
@@ -23,11 +23,12 @@ const Demo = (args: StepChooseReturnsProps) => {
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepChooseReturns
+        setValidity={(valid: boolean) => { }}
         selectedNetwork={network}
         returnTarget={returnTarget}
         setReturnTarget={(amount: number) => setReturnTarget(amount)}
         paybackDate={paybackDate}
-        setPaybackDate={(date: Date | null) => date && setPaybackDate(date)}
+        setPaybackDate={(date: string) => date && setPaybackDate(date)}
         stage={stage}
         onNext={() => console.log("onNext")}
       />

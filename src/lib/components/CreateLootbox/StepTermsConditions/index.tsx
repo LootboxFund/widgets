@@ -1,4 +1,4 @@
-import react, { useState } from 'react'
+import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -9,6 +9,7 @@ import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import Web3Utils from 'web3-utils';
 
 export interface TermsFragment {
   slug: string;
@@ -35,21 +36,69 @@ export interface StepTermsConditionsProps {
   updateTreasuryWallet: (wallet: string) => void;
   allConditionsMet: boolean;
   onSubmit: () => void;
-  errors: Errors;
+  setValidity: (bool: boolean) => void;
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const { screen } = useWindowSize()
+  const initialErrors = {
+    treasuryWallet: ''
+  }
+  const [errors, setErrors] = useState(initialErrors)
+  const checkAddrValid = async (addr: string) => {
+    return Web3Utils.isAddress(addr)
+  }
+  useEffect(() => {
+    checkAddrValid(props.treasuryWallet).then(valid => { 
+      if (valid) {
+        props.setValidity(true)
+      } else if (props.treasuryWallet.length > 0) {
+        props.setValidity(false)
+        setErrors({
+          ...errors,
+          treasuryWallet: `Invalid Treasury Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`
+        })
+      }
+    })
+  }, [])
+  useEffect(() => {
+    const { agreeEthics, agreeLiability, agreeVerify } = props.termsState;
+    if (agreeEthics && agreeLiability && agreeVerify) {
+      props.setValidity(true)
+    }
+  }, [props.termsState])
+  const updateTreasury = async (treasuryAddress: string) => {
+    props.updateTreasuryWallet(treasuryAddress)
+    const validAddr = await checkAddrValid(treasuryAddress)
+    if (validAddr) {
+      props.setValidity(true)
+      setErrors({
+        ...errors,
+        treasuryWallet: ``
+      })
+    } else {
+      props.setValidity(false)
+      setErrors({
+        ...errors,
+        treasuryWallet: `Invalid Treasury Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`
+      })
+    }
+  }
+  const updateCheckbox = (slug: string, checked: any) => {
+    console.log(`checked ==== ${checked}`)
+    props.updateTermsState(slug, checked)
+  }
 	return (
 		<$StepTermsConditions>
       <StepCard
         customActionBar={
-          props.stage === "in_progress" || props.stage === "may_proceed"
+          (props.stage === "in_progress" || props.stage === "may_proceed") && Object.values(errors).filter(e => e).length === 0
           ?
           () => <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={props.selectedNetwork?.themeColor} onSubmit={props.onSubmit} />
           :
           undefined
         }
-        themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+        themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}
+        errors={Object.values(errors)}>
         <$Vertical flex={1}>
           <$StepHeading>{`6. Terms & Conditions`}</$StepHeading>
           <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
@@ -59,7 +108,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
             TERMS.map((term) => {
               return (
                 <div key={term.slug} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start', marginBottom: '10px' }}>
-                  <$TermCheckbox onClick={(e) => props.updateTermsState(term.slug, e.currentTarget.checked)} value={term.slug} type="checkbox"></$TermCheckbox>
+                  <$TermCheckbox onClick={(e) => updateCheckbox(term.slug, e.currentTarget.checked)} value={term.slug} type="checkbox"></$TermCheckbox>
                   <$TermOfService key={term.slug}>{term.text}</$TermOfService>
                 </div>
               )
@@ -77,7 +126,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
           <$Vertical>
             <$StepSubheading>Treasury Wallet (Receives Funds)</$StepSubheading>
             <$CopyableInput>
-              <$InputMedium onChange={(e) => props.updateTreasuryWallet(e.target.value)} value={props.treasuryWallet}></$InputMedium>
+              <$InputMedium onChange={(e) => updateTreasury(e.target.value)} value={props.treasuryWallet}></$InputMedium>
               <$CopyButton>📄</$CopyButton>
             </$CopyableInput>
           </$Vertical>

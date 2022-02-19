@@ -49,15 +49,21 @@ export interface StepChooseNetworkProps {
   onSelectNetwork: (network: NetworkOption) => void;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
+  setValidity: (bool: boolean) => void;
 }
 const StepChooseNetwork = (props: StepChooseNetworkProps) => {
   const renderNetworkOptions = () => {
-    
+    const selectNetwork = (isAvailable: boolean, network: NetworkOption) => {
+      if (isAvailable) {
+        props.onSelectNetwork(network)
+        props.setValidity(true)
+      }
+    }
     return (
       <$Vertical spacing={2}>
         {
           NETWORK_OPTIONS.map(network => (
-            <$NetworkOption isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex} themeColor={props.selectedNetwork?.themeColor} onClick={() => network.isAvailable && props.onSelectNetwork(network)} key={network.chainIdHex} isAvailable={network.isAvailable}>
+            <$NetworkOption isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex} themeColor={props.selectedNetwork?.themeColor} onClick={() => selectNetwork(network.isAvailable, network)} key={network.chainIdHex} isAvailable={network.isAvailable}>
               <$NetworkIcon src={network.icon} />
               {
                 network.isAvailable ?

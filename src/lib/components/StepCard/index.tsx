@@ -9,11 +9,11 @@ export interface StepCardProps {
   children: React.ReactNode;
   customActionBar?: () => React.ReactNode;
   onNext: () => void;
-  errors: string[];
+  errors?: string[];
 }
 const StepCard = (props: StepCardProps) => {
   console.log(props.errors)
-  const totalErrors = props.errors.filter(e => e).length
+  const totalErrors = (props.errors || []).filter(e => e).length
   const themeColor = props.themeColor || COLORS.surpressedFontColor;
   const renderStepButton = () => {
     if (totalErrors > 0) {
@@ -22,7 +22,7 @@ const StepCard = (props: StepCardProps) => {
           backgroundColor={`${props.themeColor}3A`}
           borderColor={`${props.themeColor}02`}
         >
-          <$StepError>{props.errors.filter(e => e)[0]}</$StepError>
+          <$StepError>{(props.errors || []).filter(e => e)[0]}</$StepError>
         </$StepButton>
       )
     }
@@ -32,7 +32,7 @@ const StepCard = (props: StepCardProps) => {
           backgroundColor={`${props.themeColor}3A`}
           borderColor={`${props.themeColor}02`}
         >
-          <$StepError>{props.errors.filter(e => e)[0]}</$StepError>
+          <$StepError>{(props.errors || []).filter(e => e)[0]}</$StepError>
         </$StepButton>
       )
     }

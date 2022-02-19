@@ -56,19 +56,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   
   // VALIDITY: Validity of the forms
   const INITIAL_VALIDITY: Record<FormStep, boolean> = {
-    stepNetwork: true,
-    stepFunding: true,
-    stepReturns: true,
-    stepCustomize: true,
-    stepSocials: true,
-    stepTerms: true,
+    stepNetwork: false,
+    stepFunding: false,
+    stepReturns: false,
+    stepCustomize: false,
+    stepSocials: false,
+    stepTerms: false,
   }
   const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
-    console.log("Selecting network: ", network)
     setNetwork(network)
     setStage({
       ...stage,
@@ -111,12 +110,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 3: Choose Returns
   const [returnTarget, setReturnTarget] = useState<number>();
-  const [paybackDate, setPaybackDate] = useState<Date>();
-  const stepReturnsErrorState = {
-    returnTarget: '',
-    paybackDate: ''
-  }
-  const [stepReturnsErrors, setStepReturnsErrors] = useState(stepReturnsErrorState)
+  const [paybackDate, setPaybackDate] = useState<string>();
   useEffect(() => {
     const thisStep = "stepReturns";
     if (returnTarget && paybackDate) {
@@ -144,16 +138,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     logoUrl: "https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media",
     coverUrl: "https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media",
   }
-  const stepCustomizeTicketErrorState = {
-    name: "",
-    symbol: '',
-    biography: '',
-    pricePerShare: "",
-    lootboxThemeColor: "",
-    logoUrl: "",
-    coverUrl: ""
-  }
-  const [stepCustomizeTicketErrors, setStepCustomizeTicketErrors] = useState(stepCustomizeTicketErrorState)
   const [ticketState, setTicketState] = useState(INITIAL_TICKET);
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
@@ -188,19 +172,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     twitch: '',
     web: ''
   }
-  const stepSocialsErrorState = {
-    twitter: '',
-    email: '',
-    instagram: '',
-    tiktok: '',
-    facebook: '',
-    discord: '',
-    youtube: '',
-    snapchat: '',
-    twitch: '',
-    web: ''
-  }
-  const [stepSocialsErrors, setStepSocialsErrors] = useState(stepSocialsErrorState)
   const [socialState, setSocialState] = useState(INITIAL_SOCIALS);
   const updateSocialState = (slug: string, text: string) => {
     setSocialState({ ...socialState, [slug]: text })
@@ -228,10 +199,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     agreeLiability: false,
     agreeVerify: false
   }
-  const stepTermsErrorState = {
-    treasuryWallet: ''
-  }
-  const [stepTermsErrors, setStepTermsErrors] = useState(stepTermsErrorState)
   const reputationWallet = "0xReputationWallet"
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
   const updateTermsState = (slug: string, bool: boolean) => {
@@ -255,6 +222,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 7: Submit
   const checkAllConditionsMet = () => {
+    console.log('---- validity')
+    console.log(validity)
+    console.log('---- stage')
+    console.log(stage)
+    
     const allValidationsPassed = Object.values(validity).every(condition => condition === true)
 
     const conditionsMet: boolean[] = [];
@@ -279,6 +251,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         stage={stage.stepNetwork}
         onSelectNetwork={(network: NetworkOption) => selectNetwork(network, 'stepNetwork')}
         onNext={() => console.log("onNext")}
+        setValidity={(bool: boolean) => setValidity({...validity, stepNetwork: bool})}
       />
       <$Spacer></$Spacer>
       <StepChooseFunding
@@ -297,9 +270,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         returnTarget={returnTarget}
         setReturnTarget={(amount: number) => setReturnTarget(amount)}
         paybackDate={paybackDate}
-        setPaybackDate={(date: Date | null) => date && setPaybackDate(date)}
+        setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}
-        errors={stepReturnsErrors}
+        setValidity={(bool: boolean) => setValidity({...validity, stepReturns: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -308,7 +281,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage.stepCustomize}
-        errors={stepCustomizeTicketErrors}
+        maxPricePerShare={10}
+        setValidity={(bool: boolean) => setValidity({...validity, stepCustomize: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -317,7 +291,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateSocialState={updateSocialState}
         selectedNetwork={network}
         stage={stage.stepSocials}
-        errors={stepSocialsErrors}
+        setValidity={(bool: boolean) => setValidity({...validity, stepSocials: bool})}
         onNext={() => console.log("onNext")}
       />
       <$Spacer></$Spacer>
@@ -330,9 +304,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         reputationWallet={reputationWallet}
         treasuryWallet={receivingWallet}
         updateTreasuryWallet={setReceivingWallet}
+        setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
         onNext={() => console.log("onNext")}
         onSubmit={() => console.log('onSubmit')}
-        errors={stepTermsErrors}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>

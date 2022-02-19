@@ -11,43 +11,119 @@ import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
 import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard';
 
-interface Errors {
-  name: string;
-  symbol: string;
-  biography: string;
-  pricePerShare: string;
-  lootboxThemeColor: string;
-  logoUrl: string;
-  coverUrl: string
-}
 export interface StepCustomizeProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
   ticketState: Record<string, string | number>;
+  maxPricePerShare: number;
   updateTicketState: (slug: string, value: string | number) => void;
-  errors: Errors
+  setValidity: (bool: boolean) => void;
 }
 const StepCustomize = (props: StepCustomizeProps) => {
   const { screen } = useWindowSize()
+  const initialErrors = {
+    name: "",
+    symbol: '',
+    biography: '',
+    pricePerShare: "",
+    lootboxThemeColor: "",
+    logoUrl: "",
+    coverUrl: ""
+  }
+  const [errors, setErrors] = useState(initialErrors)
+  const validateName = (name: string) => name.length > 0
+  const validateSymbol = (symbol: string) => symbol.length > 0
+  const validateBiography = (bio: string) => bio.length > 12
+  const validatePricePerShare = (price: number) => price > 0 && price <= props.maxPricePerShare
+  const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
+  const checkAllValidations = () => {
+    let valid = true;
+    if (!validateName(props.ticketState.name as string)) valid = false;
+    if (!validateSymbol(props.ticketState.symbol as string)) valid = false;
+    if (!validateBiography(props.ticketState.biography as string)) valid = false;
+    if (!validatePricePerShare(props.ticketState.pricePerShare as number)) valid = false;
+    if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false;
+    console.log(`
+        
+      ---- checkAllValidations ----
+      valid: ${valid}
+
+    `)
+    if (valid) {
+      setErrors({
+        ...errors,
+        name: "",
+        symbol: '',
+        biography: '',
+        pricePerShare: "",
+        lootboxThemeColor: "",
+      })
+      props.setValidity(true)
+    } else {
+      props.setValidity(false)
+    }
+    return valid
+  }
+  const parseInput = (slug: string, value: string | number) => {
+    props.updateTicketState(slug, value)
+    if (slug === 'name') {
+      setErrors({
+        ...errors,
+        name: validateName(value as string) ? "" : 'Name cannot be empty'
+      })
+      checkAllValidations()
+    }
+    if (slug === "symbol") {
+      setErrors({
+        ...errors,
+        symbol: validateSymbol(value as string) ? '' : 'Symbol cannot be empty'
+      })
+      checkAllValidations()
+    }
+    if (slug === "biography") {
+      setErrors({
+        ...errors,
+        biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters'
+      })
+      checkAllValidations()
+    }
+    if (slug === "pricePerShare") {
+      setErrors({
+        ...errors,
+        pricePerShare: validatePricePerShare(value as number) ? '' : `Price per share must be greater than zero and less than ${props.maxPricePerShare}`
+      })
+      checkAllValidations()
+    }
+    if (slug === "lootboxThemeColor") {
+      setErrors({
+        ...errors,
+        lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color'
+      })
+      checkAllValidations()
+    }
+    setTimeout(() => {
+      checkAllValidations()
+    }, 500)
+  }
 	return (
 		<$StepCustomize>
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
             <$StepHeading>4. Customize Ticket</$StepHeading>
             <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
             <br /><br />
             <$StepSubheading>Lootbox Name</$StepSubheading>
-            <$InputMedium maxLength={25} onChange={(e) => props.updateTicketState('name', e.target.value)} value={props.ticketState.name} /><br />
+            <$InputMedium maxLength={25} onChange={(e) => parseInput('name', e.target.value)} value={props.ticketState.name} /><br />
             <$StepSubheading>Ticket Symbol</$StepSubheading>
-            <$InputMedium onChange={(e) => props.updateTicketState('symbol', e.target.value)} value={props.ticketState.symbol} /><br />
+            <$InputMedium onChange={(e) => parseInput('symbol', e.target.value)} value={props.ticketState.symbol} /><br />
             <$StepSubheading>Biography</$StepSubheading>
-            <$TextAreaMedium onChange={(e) => props.updateTicketState('biography', e.target.value)} value={props.ticketState.biography} rows={5} /><br />
+            <$TextAreaMedium onChange={(e) => parseInput('biography', e.target.value)} value={props.ticketState.biography} rows={5} /><br />
             <$StepSubheading>Price per Share</$StepSubheading>
             <$Horizontal verticalCenter>
               <$CurrencySign>$</$CurrencySign>
-              <$InputMedium type="number" onChange={(e) => props.updateTicketState('pricePerShare', e.target.valueAsNumber)} value={props.ticketState.pricePerShare} />
+              <$InputMedium type="number" min="0" onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)} value={props.ticketState.pricePerShare} />
             </$Horizontal>
             <br />
           </$Vertical>
@@ -60,7 +136,10 @@ const StepCustomize = (props: StepCustomizeProps) => {
             />
             <br />
             <$Horizontal verticalCenter>
-              <$InputColor value={props.ticketState.lootboxThemeColor} /><br />
+              <$Horizontal verticalCenter>
+                <$ColorPreview color={props.ticketState.lootboxThemeColor as string} onClick={() => window.open("https://imagecolorpicker.com/", "_blank")} />
+                <$InputColor value={props.ticketState.lootboxThemeColor} onChange={(e) => parseInput("lootboxThemeColor", e.target.value)} /><br />
+              </$Horizontal>
               <$UploadFileButton>Upload Logo</$UploadFileButton>
               <$UploadFileButton>Upload Cover</$UploadFileButton>
             </$Horizontal>
@@ -108,7 +187,7 @@ export const $InputColor = styled.input`
   border-radius: 10px;
   padding: 5px;
   font-size: 1rem;
-  margin-right: 5px;
+  margin: 0px 5px;
   height: 40px;
   flex: 1;
   text-align: center;
@@ -123,6 +202,14 @@ export const $UploadFileButton = styled.button`
   height: 40px;
   flex: 1;
   margin: 5px;
+`
+
+export const $ColorPreview = styled.div<{ color: string }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: ${(props: { color: string }) => props.color};
 `
 
 export default StepCustomize;

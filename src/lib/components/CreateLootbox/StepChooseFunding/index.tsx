@@ -28,7 +28,6 @@ export interface StepChooseFundingProps {
 }
 const StepChooseFunding = (props: StepChooseFundingProps) => {
   const { screen } = useWindowSize()
-  const web3 = useWeb3()
   const initialErrors = {
     fundraisingTarget: '',
     receivingWallet: ''
@@ -73,7 +72,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
               {
                 props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />
               }
-              <$Input type="number" value={props.fundraisingTarget} onChange={parseInput} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
+              <$Input type="number" value={props.fundraisingTarget} min="0" onChange={parseInput} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>

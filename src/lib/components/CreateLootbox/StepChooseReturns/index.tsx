@@ -19,18 +19,52 @@ export interface StepChooseReturnsProps {
   selectedNetwork?: NetworkOption;
   returnTarget: number | undefined;
   setReturnTarget: (amount: number) => void;
-  paybackDate: Date | undefined;
-  setPaybackDate: (date: Date | null) => void;
-  errors: Errors;
+  paybackDate: string | undefined;
+  setPaybackDate: (date: string) => void;
+  setValidity: (bool: boolean) => void;
   onNext: () => void;
 }
 const StepChooseReturns = (props: StepChooseReturnsProps) => {
   const { screen } = useWindowSize()
+  const initialErrors = {
+    returnTarget: '',
+    paybackDate: ''
+  }
+  const [errors, setErrors] = useState(initialErrors)
+  const validateReturnTarget = (returnTarget: number | undefined) => returnTarget && returnTarget > 0
+  const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
+
   const renderTargetReturn = () => {
     const calculateInputWidth = () => {
       const projectedWidth = ((props.returnTarget)?.toString() || "").length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
       return `${props.returnTarget ? width : 100}px`
+    }
+    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      props.setReturnTarget(e.target.valueAsNumber)
+      const validReturn = validateReturnTarget(e.target.valueAsNumber)
+      const validPayback = validatePaybackPeriod(props.paybackDate)
+      console.log(`
+        
+      ---- parseInput (target return) ----
+      validReturn: ${validReturn}
+      validPayback: ${validPayback}
+
+      `)
+      if (validReturn) {
+        setErrors({
+          ...errors,
+          returnTarget: ''
+        })
+      } else if (validReturn && validPayback) {
+        props.setValidity(true)
+      } else {
+        setErrors({
+          ...errors,
+          returnTarget: 'Target return must be greater than zero'
+        })
+        props.setValidity(false)
+      }
     }
     return (
       <$Horizontal alignItems='flex-end'>
@@ -40,7 +74,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
           <$InputWrapper>
             <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
               <div style={{ flex: 9, width: 'auto', maxWidth: '200px', paddingLeft: '10px', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <$Input type="number" value={props.returnTarget} onChange={(e) => props.setReturnTarget(e.target.valueAsNumber)} placeholder="10" screen={screen} width={calculateInputWidth()} />
+                <$Input type="number" min="0" value={props.returnTarget} onChange={parseInput} placeholder="10" screen={screen} width={calculateInputWidth()} />
                 <$InputTranslationLight>%</$InputTranslationLight>
               </div>
               <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
@@ -53,13 +87,44 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
     )
   }
   const renderTargetPayback = () => {
+    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      props.setPaybackDate(e.target.value)
+      const validReturn = validateReturnTarget(props.returnTarget)
+      const validPayback = validatePaybackPeriod(e.target.value || undefined)
+      console.log(`
+        
+      ---- parseInput (target payback) ----
+      validReturn: ${validReturn}
+      validPayback: ${validPayback}
+
+      `)
+      if (validReturn && validPayback) {
+        setErrors({
+          ...errors,
+          paybackDate: '',
+          returnTarget: ''
+        })
+        props.setValidity(true)
+      } else if (validPayback) {
+        setErrors({
+          ...errors,
+          paybackDate: ''
+        })
+      } else if (!validPayback) {
+        setErrors({
+          ...errors,
+          paybackDate: 'Target payback date must be in the future'
+        })
+        props.setValidity(false)
+      }
+    }
     return (
       <$Horizontal alignItems='flex-end'>
         <$BigIcon>⏳</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <$StepSubheading>Payback in 34 Days</$StepSubheading>
           <$InputWrapper>
-            <$Input value={props.paybackDate?.getTime()} type="date" placeholder="March 16th 2022" screen={'mobile'} fontWeight="200" onChange={(e) => props.setPaybackDate(e.target.valueAsDate)} />
+            <$Input value={props.paybackDate} type="date" placeholder="March 16th 2022" screen={'mobile'} fontWeight="200" onChange={parseInput} />
           </$InputWrapper>
         </div>
       </$Horizontal>
@@ -67,7 +132,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   }
 	return (
 		<$StepChooseReturns>
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext}>
+      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>3. How will your reward your investors?</$StepHeading>
