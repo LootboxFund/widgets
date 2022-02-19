@@ -2,7 +2,7 @@ import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Button'
 import { COLORS } from 'lib/theme'
-import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
+import { updateStateToChain, useUserInfo, useWeb3Eth } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
@@ -12,6 +12,7 @@ import NetworkText from 'lib/components/NetworkText';
 export interface WalletStatusProps {}
 const WalletStatus = (props: WalletStatusProps) => {
   const snapUserState = useSnapshot(userState)
+  const web3Eth = useWeb3Eth()
   const { screen } = useWindowSize()
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
@@ -31,7 +32,7 @@ const WalletStatus = (props: WalletStatusProps) => {
     setStatus('loading')
     const result = await requestAccounts()
     if (result.success) {
-      const userAccounts = await window.Web3.eth.getAccounts()
+      const userAccounts = await web3Eth.getAccounts()
       userState.currentAccount = userAccounts[0]
       const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
       const blockchain = BLOCKCHAINS[chainIdHex]

@@ -2,7 +2,7 @@ import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Button'
 import { COLORS } from 'lib/theme'
-import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
@@ -24,6 +24,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize();
   const web3 = useWeb3()
+  const web3Eth = useWeb3Eth()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
  
@@ -257,7 +258,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return allValidationsPassed && allConditionsMet
   }
   const createLootbox = () => {
-    // const ERC20 = new window.Web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
+    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
+    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
+    lootbox.methods.createLootbox(
+      ticketState.name,
+      ticketState.symbol,
+      web3Utils.toBN("1000000"), // uint256 _maxSharesSold,
+      web3Utils.toWei(ticketState.pricePerShare.toString()), // uint256 _sharePriceUSD,
+      receivingWallet,
+      receivingWallet
+    );
   }
 
 
@@ -335,7 +345,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTreasuryWallet={setReceivingWallet}
         setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
         onNext={() => console.log("onNext")}
-        onSubmit={() => console.log('onSubmit')}
+        onSubmit={() => createLootbox()}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>

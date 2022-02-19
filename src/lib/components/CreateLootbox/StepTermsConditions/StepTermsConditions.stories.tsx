@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import StepTermsConditions, { StepTermsConditionsProps } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { StepStage } from 'lib/components/StepCard'
+import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json';
+import { useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api';
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio';
+import Web3 from 'web3';
 
 
 export default {
@@ -10,6 +15,9 @@ export default {
 
 
 const Demo = (args: StepTermsConditionsProps) => {
+  const snapUserState = useSnapshot(userState)
+  const web3Utils = useWeb3Utils()
+  const web3Eth = useWeb3Eth()
   const INITIAL_TERMS: Record<string, boolean> = {
     agreeEthics: false,
     agreeLiability: false,
@@ -19,6 +27,9 @@ const Demo = (args: StepTermsConditionsProps) => {
   const [treasuryWallet, setTreasuryWallet] = useState("0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A")
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
+  useEffect(() => {
+    (window as any).Web3 = Web3
+  }, [])
   useEffect(() => {
     if (termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && treasuryWallet) {
       setStage("may_proceed")
@@ -30,6 +41,31 @@ const Demo = (args: StepTermsConditionsProps) => {
 
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
+  }
+
+  const createLootbox = async () => {
+    console.log(`creating lootbox...`)
+    const receivingWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
+    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
+    console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
+    const lootbox = new web3Eth.Contract(
+      LOOTBOX_FACTORY_ABI,
+      LOOTBOX_FACTORY_ADDRESS,
+      { from: snapUserState.currentAccount, gas: '1000000' }
+    )
+    try {
+      const x = await lootbox.methods.createLootbox(
+        "name",
+        "symbol",
+        "5000000000000000000000", // uint256 _maxSharesSold,
+        "7000000", // uint256 _sharePriceUSD,
+        receivingWallet,
+        receivingWallet
+      ).send();
+      console.log(x)
+    } catch (e) {
+      console.log(e)
+    }
   }
   return (
     <div style={{ width: '760px', height: '600px' }}>
@@ -44,7 +80,7 @@ const Demo = (args: StepTermsConditionsProps) => {
         treasuryWallet={treasuryWallet}
         updateTreasuryWallet={setTreasuryWallet}
         onNext={() => console.log("onNext")}
-        onSubmit={() => console.log('onSubmit')}
+        onSubmit={() => createLootbox()}
       />
     </div>
   )

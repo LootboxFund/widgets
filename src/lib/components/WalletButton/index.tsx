@@ -28,7 +28,7 @@ const WalletButton = (props: WalletButtonProps) => {
     setStatus('loading')
     const result = await requestAccounts()
     if (result.success) {
-      const userAccounts = await window.Web3.eth.getAccounts()
+      const userAccounts = await window.web3.eth.getAccounts()
       userState.currentAccount = userAccounts[0]
       const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
       const blockchain = BLOCKCHAINS[chainIdHex]
