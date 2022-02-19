@@ -168,7 +168,7 @@ export const initDApp = async () => {
 const initWeb3OnWindow = async () => {
   const provider = await detectEthereumProvider()
   // const provider = (window as any).ethereum
-  window.web3 = new (window as any).Web3('https://data-seed-prebsc-1-s1.binance.org:8545/')
+  window.web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
   if (provider) {
     window.web3 = new (window as any).Web3(provider)
     const userAccounts = await window.web3.eth.getAccounts()
