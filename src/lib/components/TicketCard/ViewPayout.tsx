@@ -6,6 +6,8 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
+import { removeProperties } from '@guildfx/helpers'
+import { COLORS } from 'lib/theme'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -53,7 +55,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
 
 export const $DividendRow = styled.section<{ isActive: boolean }>`
   height: 56px;
-  background: #dff4ff;
+  background: ${(props) => (props.isActive ? `${COLORS.trustBackground}35` : `${COLORS.surpressedBackground}35`)};
   border-radius: 5px;
   display: flex;
   flex-direction: row;

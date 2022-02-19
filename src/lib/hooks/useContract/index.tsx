@@ -6,7 +6,7 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/crowdSale.json'
 import GFXConstantsABI from 'lib/abi/gfxConstants.json'
-import { addresses, DEFAULT_CHAIN_ID_HEX } from 'lib/hooks/constants'
+import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import { TokenData } from '@guildfx/helpers'
@@ -26,6 +26,7 @@ interface CrowdSaleSeedData {
 export interface IDividendFragment {
   tokenAddress: Address
   tokenAmount: Address
+  isRedeemed: boolean
 }
 
 // Opposite of padAddressTo32Bytes
@@ -118,6 +119,12 @@ export const getERC20Allowance = async (spender: Address | undefined, tokenAddre
   return token.methods.allowance(currentUser, spender).call()
 }
 
+export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => {
+  const web3 = await useWeb3()
+  const token = new web3.eth.Contract(ERC20ABI, tokenAddress)
+  return token.methods.symbol().call()
+}
+
 export const approveERC20Token = async (delegator: Address | undefined, tokenData: TokenData, quantity: string) => {
   if (!delegator) return
   const web3 = await useWeb3()
@@ -176,33 +183,22 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   const res: IDividendFragment[] = []
   const web3 = await useWeb3()
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  try {
-    const nativeTokenOwed = await lootbox.methods.viewOwedOfNativeTokenToTicket(ticketID).call()
-    res.push({
-      tokenAddress: '0x0native',
-      tokenAmount: nativeTokenOwed,
-    })
-  } catch (err) {
-    console.error('Error fetching ticket native dividends', err)
-  }
-
-  try {
-    const stablecoins: Address[] = (await lootbox.methods.viewDepositedTokens().call()).map(stripZeros)
-    const stablecoinsOwed = await Promise.allSettled(
-      stablecoins.map((addr) => lootbox.methods.viewOwedErc20TokensToTicket(ticketID, addr).call())
-    )
-    for (let i = 0; i < stablecoins.length; i++) {
-      const stablecoin = stablecoins[i]
-      const owedAmount = stablecoinsOwed[i]
-      if (owedAmount.status === 'fulfilled' && owedAmount.value) {
-        res.push({
-          tokenAddress: stablecoin,
-          tokenAmount: owedAmount.value,
-        })
-      }
+  const proratedDeposits = await lootbox.methods.viewProratedDepositsForTicket(ticketID).call()
+  for (let deposit of proratedDeposits) {
+    if (deposit.nativeTokenAmount && deposit.nativeTokenAmount !== '0') {
+      res.push({
+        tokenAddress: NATIVE_ADDRESS,
+        tokenAmount: deposit.nativeTokenAmount,
+        isRedeemed: deposit.redeemed,
+      })
     }
-  } catch (err) {
-    console.error('Error fetching ticket stablecoin dividends', err)
+    if (deposit.erc20TokenAmount && deposit.erc20TokenAmount !== '0') {
+      res.push({
+        tokenAddress: deposit.erc20Token,
+        tokenAmount: deposit.erc20TokenAmount,
+        isRedeemed: deposit.redeemed,
+      })
+    }
   }
   return res
 }
@@ -216,4 +212,18 @@ export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
   const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
   const userTickets = await lootbox.methods.viewAllTicketsOfHolder(currentUser).call()
   return userTickets
+}
+
+export const withdrawEarningsFromLootbox = async (ticketID: string, lootboxAddress: Address) => {
+  const web3 = await useWeb3()
+  const [currentUser, ..._] = await web3.eth.getAccounts()
+  if (!currentUser) {
+    throw new Error('Please login to metamask!')
+  }
+  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress, {
+    from: currentUser,
+    gas: '1000000', // TODO: estimate gas price... Have to hardocode the gas limit for now...
+  })
+  const res = await lootbox.methods.withdrawEarnings(ticketID).send()
+  return res
 }
