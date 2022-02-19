@@ -23,12 +23,7 @@ const TokenInput = (props: TokenInputProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
-  const selectToken = async () => {
-    // if (!props.selectDisabled) {
-    //   buySharesState.targetToken = props.targetToken
-    //   buySharesState.route = '/search'
-    // }
-  }
+
   const setQuantity = (quantity: string) => {
     if (quantity?.length === 0) {
       buySharesState.inputToken.quantity = undefined
@@ -37,44 +32,39 @@ const TokenInput = (props: TokenInputProps) => {
     }
   }
 
-  const validChain =
-    snapUserState.network.currentNetworkIdHex &&
-    Object.values(BLOCKCHAINS)
-      .map((b) => b.chainIdHex)
-      .includes(snapUserState.network.currentNetworkIdHex)
-
-  const renderSelectTokenButton = () => {
-    if (validChain) {
+  const Button = ({}) => {
+    if (props.selectedToken) {
       return (
         <$Button
-          backgroundColor={`${COLORS.dangerFontColor}80`}
-          backgroundColorHover={`${COLORS.dangerFontColor}`}
-          color={COLORS.trustFontColor}
-          onClick={selectToken}
-          disabled={props.tokenDisabled}
+          backgroundColor={`${COLORS.white}10`}
+          backgroundColorHover={`${COLORS.surpressedBackground}50`}
+          color={COLORS.black}
+          disabled={true}
           screen={screen}
-          style={{
-            height: '20px',
-            fontSize: screen === 'desktop' ? '1rem' : '0.9rem',
-            fontWeight: 'lighter',
-            padding: '5px 20px',
-          }}
+          style={{ display: 'flex' }}
+          justifyContent="center"
         >
-          Select Token
+          <$CoinIcon screen={screen} src={props.selectedToken.logoURI}></$CoinIcon>
+          <$TokenSymbol screen={screen}> {props.selectedToken.symbol}</$TokenSymbol>
+        </$Button>
+      )
+    } else {
+      return (
+        <$Button
+          backgroundColor={`${COLORS.white}10`}
+          backgroundColorHover={`${COLORS.surpressedBackground}50`}
+          color={COLORS.surpressedFontColor}
+          disabled={true}
+          screen={screen}
+          style={{ color: COLORS.surpressedFontColor }}
+          justifyContent="center"
+        >
+          <$TokenSymbol screen={screen} padding={'10px'}>
+            loading...
+          </$TokenSymbol>
         </$Button>
       )
     }
-    return (
-      <$Button
-        backgroundColor={`${COLORS.surpressedBackground}10`}
-        color={COLORS.surpressedFontColor}
-        disabled
-        screen={screen}
-        style={{ height: '20px', fontSize: '1rem', fontWeight: 'lighter', padding: '5px 20px' }}
-      >
-        Select Token
-      </$Button>
-    )
   }
 
   const balance = snap.inputToken && snap.inputToken.balance ? (snap.inputToken.balance as string) : '0'
@@ -103,21 +93,7 @@ const TokenInput = (props: TokenInputProps) => {
           ) : null}
         </$Vertical>
         <$Vertical flex={1}>
-          {props.selectedToken ? (
-            <$Button
-              backgroundColor={`${COLORS.white}10`}
-              backgroundColorHover={`${COLORS.surpressedBackground}50`}
-              color={COLORS.black}
-              onClick={selectToken}
-              disabled={props.tokenDisabled && props.selectedToken ? true : false}
-              screen={screen}
-            >
-              <$CoinIcon screen={screen} src={props.selectedToken.logoURI}></$CoinIcon>
-              <$TokenSymbol screen={screen}> {props.selectedToken.symbol}</$TokenSymbol>
-            </$Button>
-          ) : (
-            renderSelectTokenButton()
-          )}
+          <Button />
           <$BalanceText screen={screen} style={{ flex: 1 }}>
             {parseEth(balance)} balance
           </$BalanceText>

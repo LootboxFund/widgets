@@ -13,7 +13,7 @@ const TicketMinterWidget = () => {
       try {
         await initDApp()
       } catch (err) {
-        console.error(err)
+        console.error('Error initializing dapp', err)
       }
       if (lootboxAddress) {
         ticketCardState.lootboxAddress = lootboxAddress
@@ -22,11 +22,11 @@ const TicketMinterWidget = () => {
         try {
           ticketID = await getLootboxTicketId(lootboxAddress)
         } catch (err) {
-          console.error(err)
+          console.error('Error fetching ticket id', err)
           ticketID = '0'
         }
         ticketMinterState.ticketID = ticketID
-        loadTicketData(ticketID).catch((err) => console.error(err))
+        loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
       }
     }
   }, [])

@@ -1,15 +1,13 @@
 import react from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
-import { ChainInfo, BLOCKCHAINS } from '../constants'
+import { ChainInfo, BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../constants'
 import { ChainIDHex, TokenData } from '@guildfx/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from 'lib/components/Swap/state'
 import { crowdSaleState } from 'lib/components/CrowdSale/state'
-import { buySharesState } from 'lib/components/BuyShares/state'
-import Web3Utils from 'web3-utils';
-// import Web3Eth from 'web3-eth'
-const Web3Eth = require('web3-eth');
+import Web3Utils from 'web3-utils'
+import { Eth as Web3Eth } from 'web3-eth'
 
 export const useWeb3 = async () => {
   return window.web3
@@ -131,8 +129,15 @@ export const addERC721ToWallet = async (token: TokenData) => {
 }
 
 export const initDApp = async () => {
-  await initWeb3OnWindow()
-  const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
+  try {
+    await initWeb3OnWindow()
+  } catch (err) {
+    console.error('Error initializing Web3', err)
+  }
+
+  const chainIdHex = (window as any).ethereum
+    ? await (window as any).ethereum.request({ method: 'eth_chainId' })
+    : DEFAULT_CHAIN_ID_HEX
 
   const blockchain = BLOCKCHAINS[chainIdHex]
 
@@ -143,6 +148,9 @@ export const initDApp = async () => {
 
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
+  if (!window.ethereum) {
+    throw new Error('window.ethereum is not defined!')
+  }
   ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
     const blockchain = BLOCKCHAINS[chainIdHex]
     if (blockchain) {
@@ -181,7 +189,6 @@ export const updateStateToChain = (chainInfo: ChainInfo) => {
   userState.network.currentNetworkLogo = chainInfo.currentNetworkLogo
   clearSwapState()
   clearCrowdSaleState()
-  clearBuySharesState()
   initTokenList(chainInfo.chainIdHex)
 }
 
@@ -193,7 +200,6 @@ export const clearStateToChain = () => {
   userState.network.currentNetworkLogo = undefined
   clearSwapState()
   clearCrowdSaleState()
-  clearBuySharesState()
   initTokenList()
 }
 
@@ -217,13 +223,4 @@ export const clearCrowdSaleState = () => {
   crowdSaleState.outputToken.balance = undefined
   crowdSaleState.outputToken.quantity = undefined
   crowdSaleState.inputToken.allowance = undefined
-}
-
-export const clearBuySharesState = () => {
-  buySharesState.inputToken.data = undefined
-  buySharesState.inputToken.balance = undefined
-  buySharesState.inputToken.quantity = undefined
-  buySharesState.inputToken.allowance = undefined
-  buySharesState.lootbox.data = undefined
-  buySharesState.lootbox.quantity = undefined
 }

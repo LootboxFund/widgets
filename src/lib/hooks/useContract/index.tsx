@@ -10,7 +10,7 @@ import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/const
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import { TokenData } from '@guildfx/helpers'
-import { useWeb3Eth } from 'lib/hooks/useWeb3Api';
+import { useWeb3Eth } from 'lib/hooks/useWeb3Api'
 
 const BNB = 'bnb'
 const TBNB = 'tbnb'
@@ -142,7 +142,8 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
-  const networkAddresses = addresses[userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
+  const networkAddresses =
+    (userState.network?.currentNetworkIdHex && addresses[userState.network.currentNetworkIdHex]) || DEFAULT_CHAIN_ID_HEX
   if (networkAddresses == undefined) {
     throw new Error('Network not configured!')
   }
