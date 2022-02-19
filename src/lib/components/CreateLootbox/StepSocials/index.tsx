@@ -8,7 +8,8 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
+import { NetworkOption } from '../state';
 
 export interface SocialFragment {
   slug: string;

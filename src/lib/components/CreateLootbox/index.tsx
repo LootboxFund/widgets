@@ -28,9 +28,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0;
  
   useEffect(() => {
-    console.log(`---------------`)
-    console.log(window.web3)
-    console.log(web3Utils)
     window.onload = () => {
       initDApp()
         .catch((err) => console.error(err))
@@ -70,6 +67,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
+  // Prevent: Step 2 Warning used before declaration
+  const now = new Date();
+  const numberOfDaysToAdd = 30;
+  const defaultPaybackDate = new Date(now.setDate(now.getDate() + numberOfDaysToAdd));
+  const [paybackDate, setPaybackDate] = useState<string>();
+
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
@@ -91,7 +94,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }, [network])
 
   // STEP 2: Choose Funding
-  const [fundraisingTarget, setFundraisingTarget] = useState<BigNumber>(web3Utils.toWei(1, "ether"));
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei("1", "ether")));
   const [receivingWallet, setReceivingWallet] = useState<string>("");
   useEffect(() => {
     const thisStep = "stepFunding";
@@ -101,6 +104,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? "may_proceed" : "in_progress"
       })
+      setPaybackDate(defaultPaybackDate.toDateString())
     } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
@@ -114,7 +118,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 3: Choose Returns
   const [basisPoints, setBasisPoints] = useState(10);
-  const [paybackDate, setPaybackDate] = useState<string>();
   useEffect(() => {
     const thisStep = "stepReturns";
     if (basisPoints && paybackDate) {
@@ -226,10 +229,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 7: Submit
   const checkAllConditionsMet = () => {
-    console.log('---- validity')
-    console.log(validity)
-    console.log('---- stage')
-    console.log(stage)
     
     const allValidationsPassed = Object.values(validity).every(condition => condition === true)
 
@@ -248,6 +247,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     // const ERC20 = new window.web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
   }
 
+
   // if (!isWalletConnected) {
   //   return <WalletButton></WalletButton>
   // }
@@ -256,7 +256,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       <StepChooseNetwork
         selectedNetwork={network}
         stage={stage.stepNetwork}
-        onSelectNetwork={(network: NetworkOption) => selectNetwork(network, 'stepNetwork')}
+        onSelectNetwork={(network: NetworkOption) => {
+          console.log(network)
+          selectNetwork(network, 'stepNetwork')
+        }}
         onNext={() => console.log("onNext")}
         setValidity={(bool: boolean) => setValidity({...validity, stepNetwork: bool})}
       />
@@ -285,11 +288,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       />
       <$Spacer></$Spacer>
       <StepCustomize
+        fundraisingTarget={fundraisingTarget}
         ticketState={ticketState}
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage.stepCustomize}
-        maxPricePerShare={10}
         setValidity={(bool: boolean) => setValidity({...validity, stepCustomize: bool})}
         onNext={() => console.log("onNext")}
       />

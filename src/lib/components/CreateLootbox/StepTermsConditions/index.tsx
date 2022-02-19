@@ -87,7 +87,6 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
     }
   }
   const updateCheckbox = (slug: string, checked: any) => {
-    console.log(`checked ==== ${checked}`)
     props.updateTermsState(slug, checked)
   }
 	return (

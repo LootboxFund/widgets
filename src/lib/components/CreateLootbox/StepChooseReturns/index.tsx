@@ -17,7 +17,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 export interface StepChooseReturnsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
-  paybackDate: string;
+  paybackDate: string | undefined;
   setPaybackDate: (date: string) => void;
   setValidity: (bool: boolean) => void;
   fundraisingTarget: BigNumber;
@@ -38,21 +38,14 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
   useEffect(() => {
     getLatestPrice()
-  }, [])
+  }, [props.selectedNetwork])
   const getLatestPrice = async () => {
-    console.log(`----- props.selectedNetwork`)
-    console.log(props.selectedNetwork)
     if (props.selectedNetwork?.priceFeed) {
       const nativeTokenPrice = await getPriceFeed(props.selectedNetwork.priceFeed)
-      console.log(`----- nativeTokenPrice`)
-      console.log(nativeTokenPrice)
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
   const calculateEquivalentUSDPrice = (basisPoints?: number): BigNumber => {
-    // if (!props.basisPoints) return web3Utils.toBN(0)
-    console.log(`----- props.fundraisingTarget -----`)
-    console.log(props.fundraisingTarget)
     const price = nativeTokenPrice
       ?
       nativeTokenPrice.multipliedBy(
@@ -66,9 +59,6 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
     return price
   }
   const calculateEquivalentUSDPriceDiff = (basisPoints: number): BigNumber => {
-    // if (!props.basisPoints) return web3Utils.toBN(0)
-    console.log(`----- props.fundraisingTarget -----`)
-    console.log(props.fundraisingTarget)
     const price = nativeTokenPrice
       ?
       nativeTokenPrice.multipliedBy(
@@ -85,7 +75,8 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
     }
     return price
   }
-  const calculatePayoutDays = (datestring: string) => {
+  const calculatePayoutDays = (datestring: string | undefined) => {
+    if (!datestring) return 0
     // props.setPaybackDate
     // To set two dates to two variables
     var now = new Date();
@@ -151,13 +142,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
       props.setPaybackDate(e.target.value)
       const validReturn = validateReturnTarget(props.basisPoints)
       const validPayback = validatePaybackPeriod(e.target.value || undefined)
-      console.log(`
-        
-      ---- parseInput (target payback) ----
-      validReturn: ${validReturn}
-      validPayback: ${validPayback}
 
-      `)
       if (validReturn && validPayback) {
         setErrors({
           ...errors,

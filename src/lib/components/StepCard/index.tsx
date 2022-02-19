@@ -12,7 +12,6 @@ export interface StepCardProps {
   errors?: string[];
 }
 const StepCard = (props: StepCardProps) => {
-  console.log(props.errors)
   const totalErrors = (props.errors || []).filter(e => e).length
   const themeColor = props.themeColor || COLORS.surpressedFontColor;
   const renderStepButton = () => {

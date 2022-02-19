@@ -8,8 +8,8 @@ import { swapState } from 'lib/components/Swap/state'
 import { crowdSaleState } from 'lib/components/CrowdSale/state'
 import { buySharesState } from 'lib/components/BuyShares/state'
 import Web3Utils from 'web3-utils';
-// import Web3Eth from 'web3-eth'
-const Web3Eth = require('web3-eth');
+import Web3Eth from 'web3-eth'
+// const Web3Eth = require('web3-eth');
 
 export const useWeb3 = async () => {
   return window.web3
@@ -20,7 +20,7 @@ export const useWeb3Utils = () => {
 }
 
 export const useWeb3Eth = () => {
-  return window.web3.eth ? window.web3.eth : new Web3Eth('https://data-seed-prebsc-1-s1.binance.org:8545/')
+  return window.web3.eth ? window.web3.eth : new Web3Eth.Eth('https://data-seed-prebsc-1-s1.binance.org:8545/')
 }
 
 // export const _useWeb3 = () => window.web3

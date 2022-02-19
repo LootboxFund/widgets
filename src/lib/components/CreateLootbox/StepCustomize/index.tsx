@@ -8,20 +8,50 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
 import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard';
+import { NetworkOption } from '../state';
+import { BigNumber } from 'bignumber.js';
+import { getPriceFeed } from 'lib/hooks/useContract';
+import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 
 export interface StepCustomizeProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
+  fundraisingTarget: BigNumber;
   ticketState: Record<string, string | number>;
-  maxPricePerShare: number;
   updateTicketState: (slug: string, value: string | number) => void;
   setValidity: (bool: boolean) => void;
 }
 const StepCustomize = (props: StepCustomizeProps) => {
   const { screen } = useWindowSize()
+  const web3Utils = useWeb3Utils()
+  const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
+  useEffect(() => {
+    getLatestPrice()
+  }, [props.selectedNetwork])
+  const getLatestPrice = async () => {
+    if (props.selectedNetwork?.priceFeed) {
+      const nativeTokenPrice = await getPriceFeed(props.selectedNetwork.priceFeed)
+      setNativeTokenPrice(nativeTokenPrice)
+    }
+  }
+  const deriveMaxTicketPrice = (): number => {
+    const price = nativeTokenPrice
+      ?
+      nativeTokenPrice.multipliedBy(
+        props.fundraisingTarget
+      ).dividedBy(10 ** 18).toFixed(2)
+      :
+      web3Utils.toBN(0)
+    if (!price && isNaN(price)) {
+      return 0
+    }
+    return price
+  }
+  const maxPricePerShare = deriveMaxTicketPrice()
+  console.log(`maxPricePerShare = ${maxPricePerShare}`)
   const initialErrors = {
     name: "",
     symbol: '',
@@ -35,7 +65,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
   const validateName = (name: string) => name.length > 0
   const validateSymbol = (symbol: string) => symbol.length > 0
   const validateBiography = (bio: string) => bio.length > 12
-  const validatePricePerShare = (price: number) => price > 0 && price <= props.maxPricePerShare
+  const validatePricePerShare = (price: number) => price > 0 && price <= maxPricePerShare
   const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
   const checkAllValidations = () => {
     let valid = true;
@@ -44,12 +74,6 @@ const StepCustomize = (props: StepCustomizeProps) => {
     if (!validateBiography(props.ticketState.biography as string)) valid = false;
     if (!validatePricePerShare(props.ticketState.pricePerShare as number)) valid = false;
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false;
-    console.log(`
-        
-      ---- checkAllValidations ----
-      valid: ${valid}
-
-    `)
     if (valid) {
       setErrors({
         ...errors,
@@ -91,7 +115,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
     if (slug === "pricePerShare") {
       setErrors({
         ...errors,
-        pricePerShare: validatePricePerShare(value as number) ? '' : `Price per share must be greater than zero and less than ${props.maxPricePerShare}`
+        pricePerShare: validatePricePerShare(value as number) ? '' : `Price per share must be greater than zero and less than $${maxPricePerShare}`
       })
     }
     if (slug === "lootboxThemeColor") {
@@ -101,6 +125,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
       })
     }
   }
+  
 	return (
 		<$StepCustomize>
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>

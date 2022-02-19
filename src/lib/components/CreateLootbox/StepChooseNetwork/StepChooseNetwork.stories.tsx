@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import StepChooseNetwork, { NetworkOption, StepChooseNetworkProps } from 'lib/components/CreateLootbox/StepChooseNetwork'
+import StepChooseNetwork, { StepChooseNetworkProps } from 'lib/components/CreateLootbox/StepChooseNetwork'
 import { StepStage } from 'lib/components/StepCard'
+import { NetworkOption } from '../state'
 
 
 export default {
@@ -18,7 +19,7 @@ const Demo = (args: StepChooseNetworkProps) => {
   }
   return (
     <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseNetwork selectedNetwork={network} stage={stage} onSelectNetwork={selectNetwork} onNext={() => console.log("onNext")} />
+      <StepChooseNetwork selectedNetwork={network} stage={stage} onSelectNetwork={selectNetwork} onNext={() => console.log("onNext")} setValidity={(bool: boolean) => console.log(bool)} />
     </div>
   )
 }
