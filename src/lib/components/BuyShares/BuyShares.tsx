@@ -22,7 +22,7 @@ export const $BuySharesContainer = styled.section`
   flex-direction: column;
   gap: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  min-height: 600px;
+  box-sizing: border-box;
 `
 
 interface BuySharesProps {
@@ -44,16 +44,11 @@ const BuyShares = (props: BuySharesProps) => {
     }
   }, [])
 
-  const inputPriceUSD = snap.inputToken.data?.usdPrice
-  const outputPriceUSD = snap.lootbox.data?.sharePriceUSD
-  const outputQuantity =
-    inputPriceUSD && outputPriceUSD ? new BN(inputPriceUSD).dividedBy(new BN(outputPriceUSD)).decimalPlaces(8) : 0
-
   return (
     <$BuySharesContainer>
       <BuySharesHeader />
       <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
-      <ShareOutput lootbox={snap.lootbox.data} quantityDisabled selectDisabled />
+      <ShareOutput lootbox={snap.lootbox.data} />
       <BuyButton />
     </$BuySharesContainer>
   )

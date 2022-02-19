@@ -4,6 +4,7 @@ import TicketCard from '../TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -15,10 +16,11 @@ export const $TicketMinterContainer = styled.section`
   flex-direction: column;
   gap: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  min-height: 600px;
+  box-sizing: border-box;
 `
 
 const $Row = styled.section`
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -26,16 +28,25 @@ const $Row = styled.section`
 
 const $Col = styled.section<{ width: string }>`
   width: ${(props) => props.width};
-  display: flex;
+  height: 100%;
 `
 
 const TicketMinter = () => {
   const snap = useSnapshot(ticketMinterState)
+  const { screen } = useWindowSize()
+  const buyWidth = screen === 'desktop' ? '60%' : '100%'
+  const ticketWidth = screen === 'desktop' ? '40%' : '0%'
   return (
     <$TicketMinterContainer>
       <$Row>
-        <BuyShares></BuyShares>
-        <TicketCard ticketID={snap.ticketID}></TicketCard>
+        <$Col width={buyWidth}>
+          <BuyShares />
+        </$Col>
+        {screen === 'desktop' ? (
+          <$Col width={ticketWidth}>
+            <TicketCard ticketID={snap.ticketID} />
+          </$Col>
+        ) : null}
       </$Row>
     </$TicketMinterContainer>
   )

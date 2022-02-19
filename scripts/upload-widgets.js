@@ -6,7 +6,7 @@ const storage = new Storage()
 const bucketName = 'guildfx-exchange.appspot.com'
 
 // Testing out upload of file
-const uploadFile = async ({filename, semver, absPath}) => {
+const uploadFile = async ({ filename, semver, absPath }) => {
   // Uploads a local file to the bucket
   const filepath = `widgets/${semver}/build/${filename}`
   const localFilePath = `${absPath}${filename}`
@@ -30,20 +30,19 @@ const uploadFile = async ({filename, semver, absPath}) => {
 }
 
 const semver = '0.2.0-demo'
-const absPath = "/Users/kangzeroo/Projects/GuildFX/widgets/iife/"
+const absPath = '/Users/kangzeroo/Projects/GuildFX/widgets/iife/'
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
 const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
-const fileNames = [
-  CreateLootbox,
-  WalletStatus,
-]
+const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
+const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
+const fileNames = [CreateLootbox, WalletStatus, TicketMinter, UserTickets]
 
-fileNames.map(filename => {
+fileNames.map((filename) => {
   uploadFile({
-    filename, 
+    filename,
     semver,
-    absPath
+    absPath,
   })
 })
 

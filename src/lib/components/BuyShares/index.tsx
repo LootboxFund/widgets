@@ -13,10 +13,13 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
   const snap = useSnapshot(buySharesState)
 
   useEffect(() => {
-    window.onload = () => {
-      initDApp()
-        .then(() => fetchLootboxData())
-        .catch((err) => console.error(err))
+    window.onload = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp for BuyShares', err)
+      }
+      fetchLootboxData().catch((err) => console.error('Error fetching lootbox data', err))
     }
     if (props.initialRoute) {
       buySharesState.route = props.initialRoute
