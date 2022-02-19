@@ -2,7 +2,7 @@ export {}
 
 declare global {
   interface Window {
-    Web3: any
+    web3: any
     // ethereum: any
   }
 }
