@@ -39,7 +39,7 @@ const TokenInput = (props: TokenInputProps) => {
           backgroundColor={`${COLORS.white}10`}
           backgroundColorHover={`${COLORS.surpressedBackground}50`}
           color={COLORS.black}
-          disabled={props.tokenDisabled && props.selectedToken ? true : false}
+          disabled={true}
           screen={screen}
           style={{ display: 'flex' }}
           justifyContent="center"
@@ -54,7 +54,7 @@ const TokenInput = (props: TokenInputProps) => {
           backgroundColor={`${COLORS.white}10`}
           backgroundColorHover={`${COLORS.surpressedBackground}50`}
           color={COLORS.surpressedFontColor}
-          disabled={props.tokenDisabled && props.selectedToken ? true : false}
+          disabled={true}
           screen={screen}
           style={{ color: COLORS.surpressedFontColor }}
           justifyContent="center"
