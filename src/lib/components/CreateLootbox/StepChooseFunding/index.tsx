@@ -1,4 +1,4 @@
-import react, { useState } from 'react'
+import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -35,7 +35,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
   const [errors, setErrors] = useState(initialErrors)
   const validateFundraisingTarget = (fundraisingTarget: number) => fundraisingTarget > 0
   const validateReceivingWallet = async (receivingWallet: string) => {
-    return Web3Utils.isAddress(receivingWallet)
+    return window.web3.utils ? window.web3.utils.isAddress(receivingWallet) : Web3Utils.isAddress(receivingWallet) 
   }
 
   const renderInputFundraisingTarget = () => {

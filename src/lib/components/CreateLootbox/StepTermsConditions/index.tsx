@@ -45,7 +45,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
   }
   const [errors, setErrors] = useState(initialErrors)
   const checkAddrValid = async (addr: string) => {
-    return Web3Utils.isAddress(addr)
+    return window.web3.utils ? window.web3.utils.isAddress(addr) : Web3Utils.isAddress(addr) 
   }
   useEffect(() => {
     checkAddrValid(props.treasuryWallet).then(valid => { 

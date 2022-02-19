@@ -1,4 +1,4 @@
-import react, { useState } from 'react'
+import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -65,6 +65,9 @@ const StepCustomize = (props: StepCustomizeProps) => {
     }
     return valid
   }
+  useEffect(() => {
+    checkAllValidations()
+  }, [props.ticketState])
   const parseInput = (slug: string, value: string | number) => {
     props.updateTicketState(slug, value)
     if (slug === 'name') {
@@ -72,39 +75,31 @@ const StepCustomize = (props: StepCustomizeProps) => {
         ...errors,
         name: validateName(value as string) ? "" : 'Name cannot be empty'
       })
-      checkAllValidations()
     }
     if (slug === "symbol") {
       setErrors({
         ...errors,
         symbol: validateSymbol(value as string) ? '' : 'Symbol cannot be empty'
       })
-      checkAllValidations()
     }
     if (slug === "biography") {
       setErrors({
         ...errors,
         biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters'
       })
-      checkAllValidations()
     }
     if (slug === "pricePerShare") {
       setErrors({
         ...errors,
         pricePerShare: validatePricePerShare(value as number) ? '' : `Price per share must be greater than zero and less than ${props.maxPricePerShare}`
       })
-      checkAllValidations()
     }
     if (slug === "lootboxThemeColor") {
       setErrors({
         ...errors,
         lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color'
       })
-      checkAllValidations()
     }
-    setTimeout(() => {
-      checkAllValidations()
-    }, 500)
   }
 	return (
 		<$StepCustomize>
