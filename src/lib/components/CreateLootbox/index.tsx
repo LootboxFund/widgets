@@ -29,7 +29,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
  
   useEffect(() => {
     window.onload = () => {
-      initDApp()
+      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
         .catch((err) => console.error(err))
     }
   }, [])
@@ -249,7 +249,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return allValidationsPassed && allConditionsMet
   }
   const createLootbox = () => {
-    // const ERC20 = new window.web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
+    // const ERC20 = new window.Web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
   }
 
 

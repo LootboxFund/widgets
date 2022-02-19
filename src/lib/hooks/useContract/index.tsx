@@ -146,8 +146,8 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   if (networkAddresses == undefined) {
     throw new Error('Network not configured!')
   }
-  const web3 = await useWeb3()
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
+  const web3Eth = await useWeb3Eth()
+  const lootbox = new web3Eth.Contract(LootboxABI, lootboxAddress)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
       lootbox.methods.name().call(),

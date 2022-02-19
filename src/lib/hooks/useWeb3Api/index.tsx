@@ -8,22 +8,26 @@ import { swapState } from 'lib/components/Swap/state'
 import { crowdSaleState } from 'lib/components/CrowdSale/state'
 import { buySharesState } from 'lib/components/BuyShares/state'
 import Web3Utils from 'web3-utils';
-// import Web3Eth from 'web3-eth'
-const Web3Eth = require('web3-eth');
+import * as Web3 from 'web3';
+import { Eth } from 'web3-eth';
 
 export const useWeb3 = async () => {
-  return window.web3
+  return window.Web3
 }
 
 export const useWeb3Utils = () => {
-  return window.web3.util ? window.web3.utils : Web3Utils
+  return window.Web3.utils ? window.Web3.utils : Web3Utils
 }
 
 export const useWeb3Eth = () => {
-  return window.web3.eth ? window.web3.eth : new Web3Eth('https://data-seed-prebsc-1-s1.binance.org:8545/')
+  if (!window.Web3.eth) { 
+    const client: Eth = new (Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
+    return client
+  }
+  return window.Web3.eth
 }
 
-// export const _useWeb3 = () => window.web3
+// export const _useWeb3 = () => window.Web3
 
 export const useUserInfo = () => {
   const requestAccounts = async () => {
@@ -130,8 +134,8 @@ export const addERC721ToWallet = async (token: TokenData) => {
   }
 }
 
-export const initDApp = async () => {
-  await initWeb3OnWindow()
+export const initDApp = async (rpcUrl?: string) => {
+  await initWeb3OnWindow(rpcUrl)
   const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
 
   const blockchain = BLOCKCHAINS[chainIdHex]
@@ -139,7 +143,7 @@ export const initDApp = async () => {
   if (blockchain) {
     updateStateToChain(blockchain)
   }
-  const userAccounts = await window.web3.eth.getAccounts()
+  const userAccounts = await window.Web3.eth.getAccounts()
 
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
@@ -157,13 +161,13 @@ export const initDApp = async () => {
   })
 }
 
-const initWeb3OnWindow = async () => {
+const initWeb3OnWindow = async (rpcUrl?: string) => {
   const provider = await detectEthereumProvider()
   // const provider = (window as any).ethereum
-  window.web3 = new (window as any).Web3('https://bsc-dataseed.binance.org/')
+  window.Web3 = new (window as any).Web3(rpcUrl || 'https://bsc-dataseed.binance.org/')
   if (provider) {
-    window.web3 = new (window as any).Web3(provider)
-    const userAccounts = await window.web3.eth.getAccounts()
+    window.Web3 = new (window as any).Web3(provider)
+    const userAccounts = await window.Web3.eth.getAccounts()
     userState.accounts = userAccounts
   } else {
     console.error('Please install MetaMask!')
