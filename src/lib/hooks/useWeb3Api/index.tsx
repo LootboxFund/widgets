@@ -7,9 +7,8 @@ import { initTokenList } from 'lib/hooks/useTokenList'
 import { swapState } from 'lib/components/Swap/state'
 import { crowdSaleState } from 'lib/components/CrowdSale/state'
 import { buySharesState } from 'lib/components/BuyShares/state'
-import Web3Utils from 'web3-utils';
-// import Web3Eth from 'web3-eth'
-const Web3Eth = require('web3-eth');
+import Web3Utils from 'web3-utils'
+import { Eth as Web3Eth } from 'web3-eth'
 
 export const useWeb3 = async () => {
   return window.web3
