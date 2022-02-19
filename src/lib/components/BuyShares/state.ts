@@ -184,10 +184,11 @@ export const loadTokenData = async (token: TokenDataFE) => {
     promise.then(async (tokenBalance) => {
       buySharesState.inputToken.balance = tokenBalance
     })
-
-    buySharesState.inputToken.data = token
-    loadPriceFeed().catch((err) => console.error(err))
+  } else {
+    buySharesState.inputToken.balance = '0'
   }
+  buySharesState.inputToken.data = token
+  loadPriceFeed().catch((err) => console.error(err))
 }
 
 const loadPriceFeed = async () => {
