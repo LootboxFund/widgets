@@ -10,6 +10,7 @@ import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/const
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import { TokenData } from '@guildfx/helpers'
+import { useWeb3Eth } from 'lib/hooks/useWeb3Api';
 
 const BNB = 'bnb'
 const TBNB = 'tbnb'
@@ -42,10 +43,17 @@ export const getPriceFeed = async (contractAddress: Address) => {
 }
 
 export const getPriceFeedRaw = async (contractAddress: Address): Promise<string> => {
-  const web3 = await useWeb3()
-  let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
-  const [currentUser, ..._] = await web3.eth.getAccounts()
+  const web3Eth = useWeb3Eth()
+  const chainId = await web3Eth.getChainId()
+  console.log(chainId)
+  console.log(`contractAddress = ${contractAddress}`)
+  console.log(AggregatorV3Interface)
+  let contractInstance = new web3Eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
+  // let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
+  const [currentUser, ..._] = await web3Eth.getAccounts()
+  console.log(currentUser)
   const data = await contractInstance.methods.latestRoundData().call({ from: currentUser })
+  console.log(data)
   return data.answer
 }
 

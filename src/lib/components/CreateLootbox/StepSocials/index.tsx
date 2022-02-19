@@ -8,7 +8,8 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
+import { NetworkOption } from '../state';
 
 export interface SocialFragment {
   slug: string;
@@ -48,6 +49,7 @@ export interface StepSocialsProps {
   socialState: Record<string, string>;
   updateSocialState: (slug: string, text: string) => void;
   setValidity: (bool: boolean) => void;
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const StepSocials = (props: StepSocialsProps) => {
   const { screen } = useWindowSize()
@@ -99,6 +101,7 @@ const StepSocials = (props: StepSocialsProps) => {
 
 	return (
 		<$StepSocials>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Vertical flex={1}>
           <$StepHeading>5. Contact Information</$StepHeading>
