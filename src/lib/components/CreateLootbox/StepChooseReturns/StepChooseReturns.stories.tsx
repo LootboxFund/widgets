@@ -14,7 +14,10 @@ const Demo = (args: StepChooseReturnsProps) => {
   const web3Utils = useWeb3Utils()
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [returnTarget, setReturnTarget] = useState(30);
-  const [paybackDate, setPaybackDate] = useState<string>();
+  const now = new Date();
+  const numberOfDaysToAdd = 30;
+  const defaultPaybackDate = new Date(now.setDate(now.getDate() + numberOfDaysToAdd));
+  const [paybackDate, setPaybackDate] = useState<string>(defaultPaybackDate.toDateString());
   useEffect(() => {
     if (returnTarget && paybackDate) {
       setStage("may_proceed")

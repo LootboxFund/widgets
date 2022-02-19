@@ -17,7 +17,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 export interface StepChooseReturnsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
-  paybackDate: string | undefined;
+  paybackDate: string;
   setPaybackDate: (date: string) => void;
   setValidity: (bool: boolean) => void;
   fundraisingTarget: BigNumber;
@@ -84,6 +84,17 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
       return web3Utils.toBN(0)
     }
     return price
+  }
+  const calculatePayoutDays = (datestring: string) => {
+    // props.setPaybackDate
+    // To set two dates to two variables
+    var now = new Date();
+    const targetDate = new Date(datestring);
+    // To calculate the time difference of two dates
+    const Difference_In_Time = targetDate.getTime() - now.getTime();
+    // To calculate the no. of days between two dates
+    const Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+    return Difference_In_Days.toFixed(0)
   }
   const renderTargetReturn = () => {
     const calculateInputWidth = () => {
@@ -172,7 +183,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
         <$BigIcon>⏳</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <$Horizontal justifyContent='space-between' style={{ marginRight: "50px" }}>
-            <$StepSubheading>{`Payout in 34 Days`}</$StepSubheading>
+            <$StepSubheading>{`Payout in ${calculatePayoutDays(props.paybackDate)} Days`}</$StepSubheading>
             <$StepSubheading style={{ textAlign: "right"}}>{`$${calculateEquivalentUSDPrice(props.basisPoints)} Total`}</$StepSubheading>
           </$Horizontal>
           <$InputWrapper>
