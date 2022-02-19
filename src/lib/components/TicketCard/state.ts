@@ -23,7 +23,6 @@ export interface TicketCardState {
 }
 
 const ticketCardSnapshot: TicketCardState = {
-  // route: '/card',
   lootboxAddress: undefined,
   tickets: {},
 }
