@@ -1,5 +1,6 @@
 import react, { useState } from 'react'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import $Button from 'lib/components/Button'
 import { $Input } from 'lib/components/Input'
 import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'
@@ -8,6 +9,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { $TokenInput, $FineText, $BalanceText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
 import { USD_DECIMALS } from 'lib/hooks/constants'
+import { COLORS } from 'lib/theme'
 
 export interface ShareOutputProps {
   lootbox?: ILootbox
@@ -39,11 +41,19 @@ const ShareOutput = (props: ShareOutputProps) => {
           <$FineText screen={screen}>{`Receive Shares (${percentageShares}%* of Earnings)`}</$FineText>
         </$Vertical>
         <$Vertical flex={1}>
-          {props.lootbox ? (
-            <$TokenSymbol screen={screen}>{props.lootbox.name}</$TokenSymbol>
-          ) : (
-            <$TokenSymbol screen={screen}>loading...</$TokenSymbol>
-          )}
+          <$Button
+            backgroundColor={`${COLORS.white}10`}
+            backgroundColorHover={`${COLORS.surpressedBackground}50`}
+            color={props.lootbox?.name ? COLORS.black : COLORS.surpressedFontColor}
+            disabled={true}
+            screen={screen}
+            justifyContent="center"
+          >
+            <$TokenSymbol screen={screen} padding={'10px'}>
+              {props.lootbox?.name ? props.lootbox.name : 'loading...'}
+            </$TokenSymbol>
+          </$Button>
+
           <$BalanceText screen={screen} style={{ flex: 1 }}>
             {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD</$FineText> : ''}
           </$BalanceText>

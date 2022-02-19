@@ -36,12 +36,13 @@ export const $BalanceText = styled.span<{ screen: ScreenSize }>`
   font-family: sans-serif;
 `
 
-export const $TokenSymbol = styled.span<{ screen: ScreenSize }>`
+export const $TokenSymbol = styled.span<{ screen: ScreenSize; padding?: string }>`
   font-size: ${(props) => (props.screen === 'desktop' ? '1rem' : '0.9rem')};
   font-weight: bold;
-  display: inline;
+  display: block;
   font-family: sans-serif;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin: auto 0px;
 `

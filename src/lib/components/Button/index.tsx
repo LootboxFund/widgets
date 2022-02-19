@@ -9,11 +9,13 @@ export const $Button = styled.button<{
   backgroundColorHover?: string
   disabled?: boolean
   screen: ScreenSize
+  justifyContent?: string
 }>`
   padding: 10px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   flex: 1;
+  ${(props) => props.justifyContent && `justify-content: ${props.justifyContent}`};
   min-height: ${(props) => (props.screen === 'desktop' ? '40px' : '40px')};
   max-height: ${(props) => (props.screen === 'desktop' ? '50px' : '0.35px')};
   height: ${(props) => (props.screen === 'desktop' ? '40px' : '30px')};
