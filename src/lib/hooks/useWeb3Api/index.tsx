@@ -16,11 +16,11 @@ export const useWeb3 = async () => {
 }
 
 export const useWeb3Utils = () => {
-  return window.Web3.utils ? window.Web3.utils : Web3Utils
+  return window.Web3 && window.Web3.utils ? window.Web3.utils : Web3Utils
 }
 
 export const useWeb3Eth = () => {
-  if (!window.Web3.eth) { 
+  if (!window.Web3 || !window.Web3.eth) { 
     const client: Eth = new (Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
     return client
   }

@@ -105,7 +105,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "may_proceed",
         [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? "may_proceed" : "in_progress"
       })
-      setPaybackDate(defaultPaybackDate.toDateString())
+      // setPaybackDate(defaultPaybackDate.toDateString())
+      // setValidity({...validity, stepReturns: true})
     } else if (stage[thisStep] === "may_proceed") {
       setStage({
         ...stage,
@@ -245,6 +246,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stage.stepSocials === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     const allConditionsMet = conditionsMet.every(condition => condition === true)
+
+    console.log(`=== validity`)
+    console.log(validity)
+    console.log(`=== stage`)
+    console.log(stage)
+    console.log(`=== conditionsMet`)
+    console.log(conditionsMet)
 
     return allValidationsPassed && allConditionsMet
   }

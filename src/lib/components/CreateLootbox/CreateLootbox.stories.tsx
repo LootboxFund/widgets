@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CreateLootbox, { CreateLootboxProps } from 'lib/components/CreateLootbox'
+import Web3 from 'web3'
 
 
 export default {
@@ -7,9 +8,15 @@ export default {
   component: CreateLootbox,
 }
 
-const Template = (args: CreateLootboxProps) => (
-  <CreateLootbox {...args} />
-)
+const Template = (args: CreateLootboxProps) => {
+  useEffect(() => {
+    (window as any).Web3 = Web3
+  }, [])
+  return (
+    <CreateLootbox {...args} />
+  )
+}
+
 
 export const Basic = Template.bind({})
 Basic.args = {}
