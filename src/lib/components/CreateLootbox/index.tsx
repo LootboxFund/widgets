@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Button'
 import { COLORS } from 'lib/theme'
@@ -94,6 +94,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }, [network])
 
   // STEP 2: Choose Funding
+  const refStepFunding = useRef<HTMLDivElement | null>(null)
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei("1", "ether")));
   const [receivingWallet, setReceivingWallet] = useState<string>("");
   useEffect(() => {
@@ -117,6 +118,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   // STEP 3: Choose Returns
+  const refStepReturns = useRef<HTMLDivElement | null>(null)
   const [basisPoints, setBasisPoints] = useState(10);
   useEffect(() => {
     const thisStep = "stepReturns";
@@ -136,6 +138,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const checkReturnsStepDone = () => basisPoints && paybackDate
 
   // STEP 4: Customize Ticket
+  const refStepCustomize = useRef<HTMLDivElement | null>(null)
   const INITIAL_TICKET: Record<string, string | number> = {
     name: "",
     symbol: '',
@@ -167,6 +170,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const checkCustomizeStepDone = () => ticketState.name && ticketState.symbol && ticketState.biography && ticketState.pricePerShare && ticketState.lootboxThemeColor && ticketState.logoUrl && ticketState.coverUrl
 
   // STEP 5: Socials
+  const refStepSocials = useRef<HTMLDivElement | null>(null)
   const INITIAL_SOCIALS: Record<string, string> = {
     twitter: '',
     email: '',
@@ -201,6 +205,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const checkSocialStateDone = () => socialState.email
 
   // STEP 6: Terms & Conditions
+  const refStepTerms = useRef<HTMLDivElement | null>(null)
   const INITIAL_TERMS: Record<string, boolean> = {
     agreeEthics: false,
     agreeLiability: false,
@@ -260,11 +265,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           console.log(network)
           selectNetwork(network, 'stepNetwork')
         }}
-        onNext={() => console.log("onNext")}
+        onNext={() => refStepFunding.current?.scrollIntoView()}
         setValidity={(bool: boolean) => setValidity({...validity, stepNetwork: bool})}
       />
       <$Spacer></$Spacer>
       <StepChooseFunding
+        ref={refStepFunding}
         selectedNetwork={network}
         fundraisingTarget={fundraisingTarget}
         setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
@@ -272,10 +278,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setReceivingWallet={setReceivingWallet}
         stage={stage.stepFunding}
         setValidity={(bool: boolean) => setValidity({...validity, stepFunding: bool})}
-        onNext={() => console.log("onNext")}
+        onNext={() => refStepReturns.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
       <StepChooseReturns
+        ref={refStepReturns}
         selectedNetwork={network}
         fundraisingTarget={fundraisingTarget}
         basisPoints={basisPoints}
@@ -284,29 +291,32 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}
         setValidity={(bool: boolean) => setValidity({...validity, stepReturns: bool})}
-        onNext={() => console.log("onNext")}
+        onNext={() => refStepCustomize.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
       <StepCustomize
+        ref={refStepCustomize}
         fundraisingTarget={fundraisingTarget}
         ticketState={ticketState}
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage.stepCustomize}
         setValidity={(bool: boolean) => setValidity({...validity, stepCustomize: bool})}
-        onNext={() => console.log("onNext")}
+        onNext={() => refStepSocials.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
       <StepSocials
+        ref={refStepSocials}
         socialState={socialState}
         updateSocialState={updateSocialState}
         selectedNetwork={network}
         stage={stage.stepSocials}
         setValidity={(bool: boolean) => setValidity({...validity, stepSocials: bool})}
-        onNext={() => console.log("onNext")}
+        onNext={() => refStepTerms.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
       <StepTermsConditions
+        ref={refStepTerms}
         allConditionsMet={checkAllConditionsMet()}
         termsState={termsState}
         updateTermsState={updateTermsState}

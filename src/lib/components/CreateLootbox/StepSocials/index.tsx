@@ -49,6 +49,7 @@ export interface StepSocialsProps {
   socialState: Record<string, string>;
   updateSocialState: (slug: string, text: string) => void;
   setValidity: (bool: boolean) => void;
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const StepSocials = (props: StepSocialsProps) => {
   const { screen } = useWindowSize()
@@ -100,6 +101,7 @@ const StepSocials = (props: StepSocialsProps) => {
 
 	return (
 		<$StepSocials>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Vertical flex={1}>
           <$StepHeading>5. Contact Information</$StepHeading>

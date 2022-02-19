@@ -23,6 +23,7 @@ export interface StepChooseReturnsProps {
   fundraisingTarget: BigNumber;
   basisPoints: number;
   setBasisPoints: (basisPoints: number) => void;
+  ref?: React.RefObject<HTMLDivElement>;
   onNext: () => void;
 }
 const StepChooseReturns = (props: StepChooseReturnsProps) => {
@@ -180,6 +181,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   }
 	return (
 		<$StepChooseReturns>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>

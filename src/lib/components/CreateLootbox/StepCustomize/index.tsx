@@ -22,6 +22,7 @@ export interface StepCustomizeProps {
   fundraisingTarget: BigNumber;
   ticketState: Record<string, string | number>;
   updateTicketState: (slug: string, value: string | number) => void;
+  ref?: React.RefObject<HTMLDivElement>;
   setValidity: (bool: boolean) => void;
 }
 const StepCustomize = (props: StepCustomizeProps) => {
@@ -128,6 +129,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
   
 	return (
 		<$StepCustomize>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={1}>

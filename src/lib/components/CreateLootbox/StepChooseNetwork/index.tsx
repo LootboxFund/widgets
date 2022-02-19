@@ -14,6 +14,7 @@ export interface StepChooseNetworkProps {
   onSelectNetwork: (network: NetworkOption) => void;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
+  ref?: React.RefObject<HTMLDivElement>;
   setValidity: (bool: boolean) => void;
 }
 const StepChooseNetwork = (props: StepChooseNetworkProps) => {
@@ -51,6 +52,7 @@ const StepChooseNetwork = (props: StepChooseNetworkProps) => {
   }
 	return (
 		<$StepChooseNetwork>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.selectedNetwork ? props.stage : "in_progress"} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={2}>

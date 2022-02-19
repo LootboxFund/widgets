@@ -39,6 +39,7 @@ export interface StepTermsConditionsProps {
   allConditionsMet: boolean;
   onSubmit: () => void;
   setValidity: (bool: boolean) => void;
+  ref?: React.RefObject<HTMLDivElement>;
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const { screen } = useWindowSize()
@@ -91,6 +92,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
   }
 	return (
 		<$StepTermsConditions>
+      {props.ref && <div ref={props.ref}></div>}
       <StepCard
         customActionBar={
           (props.stage === "in_progress" || props.stage === "may_proceed") && Object.values(errors).filter(e => e).length === 0

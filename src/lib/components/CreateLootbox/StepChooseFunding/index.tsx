@@ -28,6 +28,7 @@ export interface StepChooseFundingProps {
   receivingWallet: string;
   setReceivingWallet: (addr: string) => void;
   setValidity: (bool: boolean) => void;
+  ref?: React.RefObject<HTMLDivElement>;
   onNext: () => void;
 }
 const StepChooseFunding = (props: StepChooseFundingProps) => {
@@ -90,6 +91,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     }
     return (
       <$Vertical>
+        {props.ref && <div ref={props.ref}></div>}
         <$StepSubheading>Fundraising Target</$StepSubheading>
         <$InputWrapper>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
