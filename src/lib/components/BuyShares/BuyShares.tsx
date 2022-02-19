@@ -44,16 +44,11 @@ const BuyShares = (props: BuySharesProps) => {
     }
   }, [])
 
-  const inputPriceUSD = snap.inputToken.data?.usdPrice
-  const outputPriceUSD = snap.lootbox.data?.sharePriceUSD
-  const outputQuantity =
-    inputPriceUSD && outputPriceUSD ? new BN(inputPriceUSD).dividedBy(new BN(outputPriceUSD)).decimalPlaces(8) : 0
-
   return (
     <$BuySharesContainer>
       <BuySharesHeader />
       <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
-      <ShareOutput lootbox={snap.lootbox.data} quantityDisabled selectDisabled />
+      <ShareOutput lootbox={snap.lootbox.data} />
       <BuyButton />
     </$BuySharesContainer>
   )

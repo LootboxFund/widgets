@@ -11,8 +11,6 @@ import { USD_DECIMALS } from 'lib/hooks/constants'
 
 export interface ShareOutputProps {
   lootbox?: ILootbox
-  quantityDisabled?: boolean
-  selectDisabled?: boolean
 }
 
 const ShareOutput = (props: ShareOutputProps) => {
