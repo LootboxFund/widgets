@@ -2,7 +2,7 @@ import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Button'
 import { COLORS } from 'lib/theme'
-import { initDApp, updateStateToChain, useUserInfo, useWeb3 } from 'lib/hooks/useWeb3Api'
+import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
@@ -10,22 +10,27 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import WalletButton from 'lib/components/WalletButton';
 import {StepStage} from 'lib/components/StepCard';
 import StepChooseFunding from 'lib/components/CreateLootbox/StepChooseFunding';
-import { NetworkOption } from './StepChooseNetwork'
 import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';
 import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns';
 import StepCustomize from 'lib/components/CreateLootbox/StepCustomize';
 import StepSocials from 'lib/components/CreateLootbox/StepSocials';
 import StepTermsConditions from 'lib/components/CreateLootbox/StepTermsConditions';
-
+import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
+import { NetworkOption } from './state'
+import { BigNumber } from 'bignumber.js';
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize();
   const web3 = useWeb3()
+  const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
  
   useEffect(() => {
+    console.log(`---------------`)
+    console.log(window.web3)
+    console.log(web3Utils)
     window.onload = () => {
       initDApp()
         .catch((err) => console.error(err))
@@ -77,7 +82,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     const thisStep = "stepNetwork";
     if (network) {
-      setFundraisingTarget("")
       setStage({
         ...stage,
         [thisStep]: "may_proceed",
@@ -87,7 +91,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }, [network])
 
   // STEP 2: Choose Funding
-  const [fundraisingTarget, setFundraisingTarget] = useState<string>("");
+  const [fundraisingTarget, setFundraisingTarget] = useState<BigNumber>(web3Utils.toWei(1, "ether"));
   const [receivingWallet, setReceivingWallet] = useState<string>("");
   useEffect(() => {
     const thisStep = "stepFunding";
@@ -109,11 +113,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   // STEP 3: Choose Returns
-  const [returnTarget, setReturnTarget] = useState<number>();
+  const [basisPoints, setBasisPoints] = useState(10);
   const [paybackDate, setPaybackDate] = useState<string>();
   useEffect(() => {
     const thisStep = "stepReturns";
-    if (returnTarget && paybackDate) {
+    if (basisPoints && paybackDate) {
       setStage({
         ...stage,
         [thisStep]: "may_proceed",
@@ -125,8 +129,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         [thisStep]: "in_progress"
       })
     }
-  }, [returnTarget, paybackDate])
-  const checkReturnsStepDone = () => returnTarget && paybackDate
+  }, [basisPoints, paybackDate])
+  const checkReturnsStepDone = () => basisPoints && paybackDate
 
   // STEP 4: Customize Ticket
   const INITIAL_TICKET: Record<string, string | number> = {
@@ -240,6 +244,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     return allValidationsPassed && allConditionsMet
   }
+  const createLootbox = () => {
+    // const ERC20 = new window.web3.eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
+  }
 
   // if (!isWalletConnected) {
   //   return <WalletButton></WalletButton>
@@ -257,7 +264,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       <StepChooseFunding
         selectedNetwork={network}
         fundraisingTarget={fundraisingTarget}
-        setFundraisingTarget={(amount: string) => setFundraisingTarget(amount)}
+        setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
         receivingWallet={receivingWallet}
         setReceivingWallet={setReceivingWallet}
         stage={stage.stepFunding}
@@ -267,8 +274,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       <$Spacer></$Spacer>
       <StepChooseReturns
         selectedNetwork={network}
-        returnTarget={returnTarget}
-        setReturnTarget={(amount: number) => setReturnTarget(amount)}
+        fundraisingTarget={fundraisingTarget}
+        basisPoints={basisPoints}
+        setBasisPoints={(basisPoints: number) => setBasisPoints(basisPoints)}
         paybackDate={paybackDate}
         setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}

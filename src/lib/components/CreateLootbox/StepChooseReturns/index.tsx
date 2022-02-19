@@ -1,56 +1,102 @@
-import react, { useState } from 'react'
+import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics';
 import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
+import { ChainIDHex, ChainIDDecimal, containsAlphanumeric } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
+import { getPriceFeed } from 'lib/hooks/useContract';
+import { BigNumber } from 'bignumber.js';
+import { NetworkOption } from '../state';
+import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 
-interface Errors {
-  returnTarget: string;
-  paybackDate: string;
-}
 export interface StepChooseReturnsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
-  returnTarget: number | undefined;
-  setReturnTarget: (amount: number) => void;
   paybackDate: string | undefined;
   setPaybackDate: (date: string) => void;
   setValidity: (bool: boolean) => void;
+  fundraisingTarget: BigNumber;
+  basisPoints: number;
+  setBasisPoints: (basisPoints: number) => void;
   onNext: () => void;
 }
 const StepChooseReturns = (props: StepChooseReturnsProps) => {
+  const web3Utils = useWeb3Utils()
   const { screen } = useWindowSize()
+  const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const initialErrors = {
     returnTarget: '',
     paybackDate: ''
   }
   const [errors, setErrors] = useState(initialErrors)
-  const validateReturnTarget = (returnTarget: number | undefined) => returnTarget && returnTarget > 0
+  const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
   const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
-
+  useEffect(() => {
+    getLatestPrice()
+  }, [])
+  const getLatestPrice = async () => {
+    console.log(`----- props.selectedNetwork`)
+    console.log(props.selectedNetwork)
+    if (props.selectedNetwork?.priceFeed) {
+      const nativeTokenPrice = await getPriceFeed(props.selectedNetwork.priceFeed)
+      console.log(`----- nativeTokenPrice`)
+      console.log(nativeTokenPrice)
+      setNativeTokenPrice(nativeTokenPrice)
+    }
+  }
+  const calculateEquivalentUSDPrice = (basisPoints?: number): BigNumber => {
+    // if (!props.basisPoints) return web3Utils.toBN(0)
+    console.log(`----- props.fundraisingTarget -----`)
+    console.log(props.fundraisingTarget)
+    const price = nativeTokenPrice
+      ?
+      nativeTokenPrice.multipliedBy(
+        props.fundraisingTarget
+      ).multipliedBy((100 + (basisPoints || 0)) / 100).dividedBy(10 ** 18).toFixed(2)
+      :
+      web3Utils.toBN(0)
+    if (!price && isNaN(price)) {
+      return web3Utils.toBN(0)
+    }
+    return price
+  }
+  const calculateEquivalentUSDPriceDiff = (basisPoints: number): BigNumber => {
+    // if (!props.basisPoints) return web3Utils.toBN(0)
+    console.log(`----- props.fundraisingTarget -----`)
+    console.log(props.fundraisingTarget)
+    const price = nativeTokenPrice
+      ?
+      nativeTokenPrice.multipliedBy(
+        props.fundraisingTarget
+      ).multipliedBy((100 + (basisPoints || 0)) / 100).minus(
+        nativeTokenPrice.multipliedBy(
+          props.fundraisingTarget
+        )
+      ).dividedBy(10 ** 18).toFixed(2)
+      :
+      web3Utils.toBN(0)
+    if (!price && isNaN(price)) {
+      return web3Utils.toBN(0)
+    }
+    return price
+  }
   const renderTargetReturn = () => {
     const calculateInputWidth = () => {
-      const projectedWidth = ((props.returnTarget)?.toString() || "").length * 20;
+      const projectedWidth = ((props.basisPoints)?.toString() || "").length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
-      return `${props.returnTarget ? width : 100}px`
+      return `${props.basisPoints ? width : 100}px`
     }
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      props.setReturnTarget(e.target.valueAsNumber)
-      const validReturn = validateReturnTarget(e.target.valueAsNumber)
+      const value = e.target.valueAsNumber
+      props.setBasisPoints(value)
+      const validReturn = validateReturnTarget(value)
       const validPayback = validatePaybackPeriod(props.paybackDate)
-      console.log(`
-        
-      ---- parseInput (target return) ----
-      validReturn: ${validReturn}
-      validPayback: ${validPayback}
-
-      `)
+      
       if (validReturn) {
         setErrors({
           ...errors,
@@ -70,15 +116,18 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
       <$Horizontal alignItems='flex-end'>
         <$BigIcon>🌓</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <$StepSubheading>Target Return on Investment</$StepSubheading>
+          <$Horizontal justifyContent='space-between' style={{ marginRight: "50px" }}>
+            <$StepSubheading>{`Target Return`}</$StepSubheading>
+            <$StepSubheading style={{ textAlign: "right"}}>{`USD $${calculateEquivalentUSDPrice()} Original`}</$StepSubheading>
+          </$Horizontal>
           <$InputWrapper>
             <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
               <div style={{ flex: 9, width: 'auto', maxWidth: '200px', paddingLeft: '10px', display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <$Input type="number" min="0" value={props.returnTarget} onChange={parseInput} placeholder="10" screen={screen} width={calculateInputWidth()} />
+                <$Input type="number" min="0" value={props.basisPoints} onChange={parseInput} placeholder="10" screen={screen} width={calculateInputWidth()} />
                 <$InputTranslationLight>%</$InputTranslationLight>
               </div>
               <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
-                <$InputTranslationHeavy>$10,000 USD</$InputTranslationHeavy>
+                <$InputTranslationHeavy>{`+$${calculateEquivalentUSDPriceDiff(props.basisPoints)} Profit`}</$InputTranslationHeavy>
               </div>
             </div>
           </$InputWrapper>
@@ -89,7 +138,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   const renderTargetPayback = () => {
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       props.setPaybackDate(e.target.value)
-      const validReturn = validateReturnTarget(props.returnTarget)
+      const validReturn = validateReturnTarget(props.basisPoints)
       const validPayback = validatePaybackPeriod(e.target.value || undefined)
       console.log(`
         
@@ -122,7 +171,10 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
       <$Horizontal alignItems='flex-end'>
         <$BigIcon>⏳</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <$StepSubheading>Payback in 34 Days</$StepSubheading>
+          <$Horizontal justifyContent='space-between' style={{ marginRight: "50px" }}>
+            <$StepSubheading>{`Payout in 34 Days`}</$StepSubheading>
+            <$StepSubheading style={{ textAlign: "right"}}>{`$${calculateEquivalentUSDPrice(props.basisPoints)} Total`}</$StepSubheading>
+          </$Horizontal>
           <$InputWrapper>
             <$Input value={props.paybackDate} type="date" placeholder="March 16th 2022" screen={'mobile'} fontWeight="200" onChange={parseInput} />
           </$InputWrapper>

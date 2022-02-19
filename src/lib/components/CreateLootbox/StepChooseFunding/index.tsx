@@ -8,9 +8,13 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
 import { useWeb3 } from 'lib/hooks/useWeb3Api';
 import Web3Utils from 'web3-utils'
+import { NetworkOption } from '../state';
+import { getPriceFeed } from 'lib/hooks/useContract';
+import BN, { BigNumber } from 'bignumber.js';
+import { useWeb3Utils } from '../../../hooks/useWeb3Api/index';
 
 interface Errors {
   fundraisingTarget: string;
@@ -19,34 +23,55 @@ interface Errors {
 export interface StepChooseFundingProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
-  fundraisingTarget: string;
-  setFundraisingTarget: (amount: string) => void;
+  fundraisingTarget: BigNumber;
+  setFundraisingTarget: (amount: BigNumber) => void;
   receivingWallet: string;
   setReceivingWallet: (addr: string) => void;
   setValidity: (bool: boolean) => void;
   onNext: () => void;
 }
 const StepChooseFunding = (props: StepChooseFundingProps) => {
+  const web3Utils = useWeb3Utils()
+  const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const { screen } = useWindowSize()
   const initialErrors = {
     fundraisingTarget: '',
     receivingWallet: ''
   }
   const [errors, setErrors] = useState(initialErrors)
-  const validateFundraisingTarget = (fundraisingTarget: number) => fundraisingTarget > 0
+  const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
+    return fundraisingTarget.gt(0)
+  }
   const validateReceivingWallet = async (receivingWallet: string) => {
-    return window.web3.utils ? window.web3.utils.isAddress(receivingWallet) : Web3Utils.isAddress(receivingWallet) 
+    return web3Utils.isAddress(receivingWallet) 
+  }
+
+  useEffect(() => {
+    getLatestPrice()
+  }, [])
+  const getLatestPrice = async () => {
+    
+    if (props.selectedNetwork?.priceFeed) {
+      const nativeTokenPrice = await getPriceFeed(props.selectedNetwork.priceFeed)
+      setNativeTokenPrice(nativeTokenPrice)
+    }
+  }
+  const calculateEquivalentUSDPrice = () => {
+    console.log(`----- nativeTokenPrice -----`)
+    console.log(nativeTokenPrice?.toString())
+    return nativeTokenPrice ? nativeTokenPrice.multipliedBy(props.fundraisingTarget).dividedBy(10 ** 18).toFixed(2) : 0
   }
 
   const renderInputFundraisingTarget = () => {
     const calculateInputWidth = () => {
-      const projectedWidth = props.fundraisingTarget.length * 20;
+      const projectedWidth = web3Utils.fromWei(props.fundraisingTarget || "0").toString().length * 20;
       const width = projectedWidth > 200 ? 200 : projectedWidth;
       return `${props.fundraisingTarget ? width : 100}px`
     }
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      props.setFundraisingTarget(e.target.value)
-      const validFundraise = validateFundraisingTarget(e.target.valueAsNumber)
+      const value = web3Utils.toBN(web3Utils.toWei(e.target.value || "0"))
+      props.setFundraisingTarget(value)
+      const validFundraise = validateFundraisingTarget(value)
       const validReceiver = await validateReceivingWallet(props.receivingWallet)
       if (validFundraise) {
         setErrors({
@@ -72,11 +97,11 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
               {
                 props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />
               }
-              <$Input type="number" value={props.fundraisingTarget} min="0" onChange={parseInput} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
+              <$Input type="number" value={web3Utils.fromWei(props.fundraisingTarget).toString()} min="0" onChange={parseInput} placeholder="0.01" screen={screen} width={calculateInputWidth()} />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
-              <$InputTranslationHeavy>$10,000 USD</$InputTranslationHeavy>
+              <$InputTranslationHeavy>{`$${calculateEquivalentUSDPrice()} USD`}</$InputTranslationHeavy>
             </div>
           </div>
         </$InputWrapper>
@@ -87,7 +112,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       props.setReceivingWallet(e.target.value)
       const validReceiver = await validateReceivingWallet(e.target.value)
-      const validFundraiser = validateFundraisingTarget(parseFloat(props.fundraisingTarget))
+      const validFundraiser = validateFundraisingTarget(props.fundraisingTarget)
       if (!validReceiver) {
         setErrors({
           ...errors,

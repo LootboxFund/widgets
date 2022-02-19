@@ -8,8 +8,10 @@ import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
+import { $NetworkIcon } from '../StepChooseNetwork';
 import Web3Utils from 'web3-utils';
+import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
+import { NetworkOption } from '../state';
 
 export interface TermsFragment {
   slug: string;
@@ -40,12 +42,13 @@ export interface StepTermsConditionsProps {
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const { screen } = useWindowSize()
+  const web3Utils = useWeb3Utils()
   const initialErrors = {
     treasuryWallet: ''
   }
   const [errors, setErrors] = useState(initialErrors)
   const checkAddrValid = async (addr: string) => {
-    return window.web3.utils ? window.web3.utils.isAddress(addr) : Web3Utils.isAddress(addr) 
+    return web3Utils.isAddress(addr) 
   }
   useEffect(() => {
     checkAddrValid(props.treasuryWallet).then(valid => { 
