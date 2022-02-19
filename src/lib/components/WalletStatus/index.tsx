@@ -9,8 +9,8 @@ import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText';
 
-export interface WalletButtonProps {}
-const WalletButton = (props: WalletButtonProps) => {
+export interface WalletStatusProps {}
+const WalletStatus = (props: WalletStatusProps) => {
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
 
@@ -21,6 +21,9 @@ const WalletButton = (props: WalletButtonProps) => {
   useEffect(() => {
     if (snapUserState.accounts.length > 0) {
       setStatus('success')
+      setTimeout(() => {
+        setStatus('network')
+      }, 1000)
     }
   }, [snapUserState.accounts.length])
 
@@ -122,9 +125,9 @@ const WalletButton = (props: WalletButtonProps) => {
   )
 }
 
-const $WalletButton = styled.div<{}>`
+const $WalletStatus = styled.div<{}>`
   display: flex;
   width: 200px;
 `
 
-export default WalletButton
+export default WalletStatus

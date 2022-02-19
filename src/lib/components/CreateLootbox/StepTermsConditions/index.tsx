@@ -21,7 +21,9 @@ const TERMS: TermsFragment[] = [
   { slug: 'agreeVerify', text: 'I have verified my Reputation address & Treasury wallet is correct' }
 ]
 
-
+interface Errors {
+  treasuryWallet: string;
+}
 export interface StepTermsConditionsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
@@ -33,10 +35,10 @@ export interface StepTermsConditionsProps {
   updateTreasuryWallet: (wallet: string) => void;
   allConditionsMet: boolean;
   onSubmit: () => void;
+  errors: Errors;
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const { screen } = useWindowSize()
-  console.log(`Conditions = ${props.stage}`)
 	return (
 		<$StepTermsConditions>
       <StepCard

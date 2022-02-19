@@ -29,12 +29,24 @@ const SOCIALS: SocialFragment[] = [
   { slug: 'web', name: 'Website', placeholder: 'www.website.com', icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media' }
 ]
 
-
+interface Errors {
+  twitter:  string;
+  email:  string;
+  instagram:  string;
+  tiktok:  string;
+  facebook:  string;
+  discord:  string;
+  youtube:  string;
+  snapchat:  string;
+  twitch:  string;
+  web: string;
+}
 export interface StepSocialsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
   socialState: Record<string, string>;
+  errors: Errors;
   updateSocialState: (slug: string, text: string) => void;
 }
 const StepSocials = (props: StepSocialsProps) => {

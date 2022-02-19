@@ -9,17 +9,17 @@ import replace from '@rollup/plugin-replace'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 /**
- * UMD build
+ * <CreateLootbox />
  *
  *
  */
-const configUMD = {
-  input: ['src/injects/createlootbox/index.ts'],
+const CreateLootbox = {
+  input: ['src/injects/CreateLootbox/index.ts'],
   output: {
-    file: process.env.NODE_ENV === 'production' ? 'iife/bundle.createlootbox.production.js' : 'iife/bundle.createlootbox.js',
+    file: process.env.NODE_ENV === 'production' ? 'iife/CreateLootbox.production.js' : 'iife/CreateLootbox.js',
     format: 'iife',
     sourcemap: true,
-    name: 'GuildFX_UI',
+    name: 'Lootbox',
     inlineDynamicImports: true,
     globals: {
       'react-dom': 'ReactDOM',
@@ -57,25 +57,51 @@ const configUMD = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  configUMD.plugins.push(terser()) // enable minification
+  CreateLootbox.plugins.push(terser()) // enable minification
 }
 
 /**
- * ESM build
+ * <WalletStatus />
  *
  *
  */
-const configESM = {
-  input: ['src/index.ts'],
+ const WalletStatus = {
+  input: ['src/injects/WalletStatus/index.ts'],
   output: {
-    dir: 'lib',
-    format: 'esm',
+    file: process.env.NODE_ENV === 'production' ? 'iife/WalletStatus.production.js' : 'iife/WalletStatus.js',
+    format: 'iife',
     sourcemap: true,
+    name: 'Lootbox',
+    inlineDynamicImports: true,
+    globals: {
+      'react-dom': 'ReactDOM',
+      'prop-types': 'PropTypes',
+      react: 'React',
+      callbackify: 'callbackify',
+      path: false,
+      fs: false,
+      os: false,
+      module: false,
+      util: false,
+      tty: false,
+      buffer: false,
+    },
   },
   plugins: [
+    commonjs({
+      // namedExports: {
+      // // This is needed because react/jsx-runtime exports jsx on the module export.
+      // // Without this mapping the transformed import import {jsx as _jsx} from 'react/jsx-runtime' will fail.
+      // 'react/jsx-runtime': ['jsx', 'jsxs'],
+      // },
+    }),
+    nodePolyfills(), // enable NodeJS polyfills
+    resolve({ preferBuiltins: true, browser: true }), // enable importing from node_modules
     typescript(), // enable TypeScript
-    commonjs(), // enable CommonJS modules
-    resolve(), // enable importing from node_modules
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      preventAssignment: true,
+    }),
     json(), // enable JSON
     globals(), // allows globals to be imported (process.env)
     builtins(), // allows builtins to be imported via require/import
@@ -83,7 +109,38 @@ const configESM = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  configESM.plugins.push(terser()) // enable minification
+  CreateLootbox.plugins.push(terser()) // enable minification
 }
 
-export default [configUMD, configESM]
+export default [CreateLootbox, WalletStatus]
+
+
+// --------------------------------------------------
+
+
+/**
+ * ESM build
+ *
+ *
+ */
+// const configESM = {
+//   input: ['src/index.ts'],
+//   output: {
+//     dir: 'lib',
+//     format: 'esm',
+//     sourcemap: true,
+//   },
+//   plugins: [
+//     typescript(), // enable TypeScript
+//     commonjs(), // enable CommonJS modules
+//     resolve(), // enable importing from node_modules
+//     json(), // enable JSON
+//     globals(), // allows globals to be imported (process.env)
+//     builtins(), // allows builtins to be imported via require/import
+//   ],
+//   external: ['react'],
+// }
+// if (process.env.NODE_ENV === 'production') {
+//   configESM.plugins.push(terser()) // enable minification
+// }
+

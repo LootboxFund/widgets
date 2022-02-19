@@ -10,7 +10,10 @@ import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
 
-
+interface Errors {
+  returnTarget: string;
+  paybackDate: string;
+}
 export interface StepChooseReturnsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
@@ -18,6 +21,7 @@ export interface StepChooseReturnsProps {
   setReturnTarget: (amount: number) => void;
   paybackDate: Date | undefined;
   setPaybackDate: (date: Date | null) => void;
+  errors: Errors;
   onNext: () => void;
 }
 const StepChooseReturns = (props: StepChooseReturnsProps) => {

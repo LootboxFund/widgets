@@ -11,12 +11,22 @@ import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon, NetworkOption } from '../StepChooseNetwork';
 import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard';
 
+interface Errors {
+  name: string;
+  symbol: string;
+  biography: string;
+  pricePerShare: string;
+  lootboxThemeColor: string;
+  logoUrl: string;
+  coverUrl: string
+}
 export interface StepCustomizeProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
   ticketState: Record<string, string | number>;
   updateTicketState: (slug: string, value: string | number) => void;
+  errors: Errors
 }
 const StepCustomize = (props: StepCustomizeProps) => {
   const { screen } = useWindowSize()

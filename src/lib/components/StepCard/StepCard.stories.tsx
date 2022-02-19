@@ -1,6 +1,4 @@
 import React from 'react'
-import { ThemeProvider } from 'emotion-theming'
-import theme from '@rebass/preset'
 import StepCard, { StepCardProps } from 'lib/components/StepCard'
 
 
@@ -14,7 +12,7 @@ export default {
 
 const Demo = (args: StepCardProps) => (
   <div style={{ width: '760px', height: '600px' }}>
-    <StepCard primaryColor='#F0B90B' stage={"completed"} onNext={() => console.log("onNext")}>
+    <StepCard themeColor='#F0B90B' stage={"completed"} onNext={() => console.log("onNext")} errors={[]}>
       <h1 style={{fontFamily: "sans-serif"}}>Hello World</h1>
     </StepCard>
   </div>
