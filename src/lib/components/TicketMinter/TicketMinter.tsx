@@ -15,10 +15,11 @@ export const $TicketMinterContainer = styled.section`
   flex-direction: column;
   gap: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  min-height: 600px;
+  box-sizing: border-box;
 `
 
 const $Row = styled.section`
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: row;
