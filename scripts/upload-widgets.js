@@ -30,7 +30,7 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const semver = '0.2.0-demo'
-const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/Users/kangzeroo/Projects/GuildFX/widgets/iife/'
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
 const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
