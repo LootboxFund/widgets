@@ -39,7 +39,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="100vw" height="550px">
+    <$CardViewport width="100vw" height="450px">
       <UserTickets />
     </$CardViewport>
   )

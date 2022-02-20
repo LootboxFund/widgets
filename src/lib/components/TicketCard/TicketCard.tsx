@@ -92,8 +92,8 @@ export const $TicketLogo = styled.div<{
 }>`
   width: ${(props) => (props.width ? props.width : '100%')};
   height: ${(props) => (props.height ? props.height : '100%')};
-  max-width: ${(props) => (props.backgroundImage ? '256px' : '146px')};
-  max-height: ${(props) => (props.backgroundImage ? '256px' : '146px')};
+  max-width: ${(props) => (props.backgroundImage ? '220px' : '100px')};
+  max-height: ${(props) => (props.backgroundImage ? '220px' : '100px')};
   border: 0px solid transparent;
   border-radius: 50%;
   margin: auto auto 0px;

@@ -18,7 +18,7 @@ const InteractWithLootbox = () => {
 }
 
 const $TicketContainer = styled.section<{}>`
-  height: 450px;
+  height: 400px;
 `
 
 const $MinterContainer = styled.section<{}>`

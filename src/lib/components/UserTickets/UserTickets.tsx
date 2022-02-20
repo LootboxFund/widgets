@@ -7,7 +7,7 @@ import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 
-const TICKET_PAGINATION = 4
+const TICKET_PAGINATION = 3
 
 const UserTickets = () => {
   const snap = useSnapshot(userTicketState)
@@ -51,11 +51,11 @@ const UserTickets = () => {
   const Wrapper = ({ children }: { children: JSX.Element[] }) => {
     if (isPaginated) {
       return (
-        <$Horizontal justifyContent="center" height="100%" spacing={3}>
+        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3}>
           <$IconWrapper onClick={decrementPage}>
             <$Icon size="56px">{'<'}</$Icon>
           </$IconWrapper>
-          <$Horizontal wrap overflow justifyContent="center" height="100%" spacing={3}>
+          <$Horizontal wrap overflow justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
           <$IconWrapper onClick={incrementPage}>
@@ -71,11 +71,13 @@ const UserTickets = () => {
   return (
     <Wrapper>
       {tickets.map((ticketID, idx) => (
-        <TicketCard
-          key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
-          ticketID={ticketID}
-          isRedeemEnabled={true}
-        ></TicketCard>
+        <$TicketWrapper>
+          <TicketCard
+            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
+            ticketID={ticketID}
+            isRedeemEnabled={true}
+          ></TicketCard>
+        </$TicketWrapper>
       ))}
     </Wrapper>
   )
@@ -88,6 +90,13 @@ const $IconWrapper = styled.div`
   background: rgba(0, 0, 0, 0.05);
   cursor: pointer;
   margin: auto 0px;
+`
+
+const $TicketWrapper = styled.div`
+  max-width: 260px;
+  min-width: 220px;
+  width: 100%;
+  height: 100%;
 `
 
 export default UserTickets
