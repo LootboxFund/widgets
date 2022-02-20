@@ -14,7 +14,7 @@ import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';
 import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns';
 import StepCustomize from 'lib/components/CreateLootbox/StepCustomize';
 import StepSocials from 'lib/components/CreateLootbox/StepSocials';
-import StepTermsConditions from 'lib/components/CreateLootbox/StepTermsConditions';
+import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions';
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js';
@@ -237,6 +237,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const checkTermsStepDone = () => termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet
 
   // STEP 7: Submit
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("unsubmitted")
   const checkAllConditionsMet = () => {
     
     const allValidationsPassed = Object.values(validity).every(condition => condition === true)
@@ -250,53 +251,15 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     const allConditionsMet = conditionsMet.every(condition => condition === true)
 
-    console.log(`=== validity`)
-    console.log(validity)
-    console.log(`=== stage`)
-    console.log(stage)
-    console.log(`=== conditionsMet`)
-    console.log(conditionsMet)
-
     return allValidationsPassed && allConditionsMet
   }
   const createLootbox = async () => {
-    console.log(`creating lootbox...`)
+    setSubmitStatus("in_progress")
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
-    console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
     const blockNum = await web3Eth.getBlockNumber()
-    // const pps = web3Utils.toBN(
-    //   ((ticketState.pricePerShare as number) * 100).toString()
-    // ).toString()
-    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")).div(new web3Utils.BN(100))
-    console.log(`At current block number ${blockNum} with price per share = ${pricePerShare}.`)
-    console.log(fundraisingTarget.toString())
-    // console.log(`pps = ${pps}`)
-    console.log(`pricePerShare = ${pricePerShare}`)
-    console.log(`
-      
-      typeof fundraisingTarget = ${typeof fundraisingTarget}
-      typeof pricePerShare = ${typeof pricePerShare}
-
-      pricePerShare = ${pricePerShare}
-
-      pricePerShare.toString() = ${pricePerShare.toString()}
-
-    `)
-    console.log(fundraisingTarget.div(pricePerShare))
-    console.log(fundraisingTarget.mul(pricePerShare))
-
-
-
-
-    // web3Utils.toWei(...).dividedBy is not a function
+    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")).div(new web3Utils.BN(100))    
     const maxSharesSold = fundraisingTarget.mul(new web3Utils.BN(10).pow(new web3Utils.BN(8))).div(pricePerShare).toString()
 
-
-
-
-
-
-    console.log(`Max shares sold = ${maxSharesSold}`)
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
       LOOTBOX_FACTORY_ADDRESS,
@@ -311,9 +274,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         receivingWallet,
         receivingWallet
       ).send();
-      console.log(`--- createLootbox ---`)
-      console.log(x)
-      console.log(`------`)
       let options = {
         filter: {
             value: [],
@@ -323,8 +283,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         from: snapUserState.currentAccount,
       };
       lootbox.events.LootboxCreated(options).on('data', (event: any) => {
-        console.log(`--- onData ---`)
-        console.log(event)
         const {
           issuer,
           lootbox,
@@ -333,21 +291,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           sharePriceUSD,
           treasury
         } = event.returnValues;
-        console.log(`
-        
-        issuer: ${issuer}
-        lootbox: ${lootbox}
-        lootboxName: ${lootboxName}
-        maxSharesSold: ${maxSharesSold}
-        sharePriceUSD: ${sharePriceUSD}
-        treasury: ${treasury}
-
-        ---------------
-
-        currentAcccount: ${snapUserState.currentAccount}
-        receivingWallet: ${receivingWallet}
-  
-        `)
         if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
           console.log(`
           
@@ -359,10 +302,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           ---------------
           
           `)
+          setSubmitStatus("success")
         }
        })
     } catch (e) {
       console.log(e)
+      setSubmitStatus("failure")
     }
   }
 
@@ -441,6 +386,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTreasuryWallet={setReceivingWallet}
         setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
         onNext={() => console.log("onNext")}
+        submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
       />
       <$Spacer></$Spacer>
