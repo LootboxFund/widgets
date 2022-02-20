@@ -32,7 +32,7 @@ const TicketMinterWidget = () => {
     }
   }, [])
 
-  return <TicketMinter></TicketMinter>
+  return <TicketMinter />
 }
 
 export default TicketMinterWidget
