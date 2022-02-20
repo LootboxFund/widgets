@@ -16,7 +16,7 @@ const Template = () => {
   const ticketID = '0'
 
   useEffect(() => {
-    const [lootboxAddress] = parseUrlParams(['fundraisers'])
+    const lootboxAddress = parseUrlParams('lootbox')
     ticketCardState.lootboxAddress = lootboxAddress
     ;(window as any).Web3 = Web3
     const load = async () => {

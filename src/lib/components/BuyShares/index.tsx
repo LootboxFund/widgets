@@ -4,6 +4,7 @@ import BuyShares from './BuyShares'
 import { useSnapshot } from 'valtio'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import PurchaseComplete from './PurchaseComplete'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 export interface BuySharesWidgetProps {
   initialRoute?: BuySharesRoute
@@ -14,12 +15,15 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
 
   useEffect(() => {
     window.onload = async () => {
+      const lootbox = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {
         console.error('Error initializing DApp for BuyShares', err)
       }
-      fetchLootboxData().catch((err) => console.error('Error fetching lootbox data', err))
+      if (lootbox) {
+        fetchLootboxData(lootbox).catch((err) => console.error('Error fetching lootbox data', err))
+      }
     }
     if (props.initialRoute) {
       buySharesState.route = props.initialRoute

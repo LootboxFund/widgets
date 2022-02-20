@@ -6,11 +6,10 @@ import ShareOutput from 'lib/components/BuyShares/Input/ShareOutput'
 import BuySharesHeader from 'lib/components/BuyShares/Header'
 import { useSnapshot } from 'valtio'
 import { TokenDataFE } from 'lib/hooks/constants'
-import { buySharesState } from './state'
+import { buySharesState, fetchLootboxData } from './state'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import BN from 'bignumber.js'
-import { ILootbox } from 'lib/types'
 
 export const $BuySharesContainer = styled.section`
   width: 100%;
@@ -25,24 +24,12 @@ export const $BuySharesContainer = styled.section`
   box-sizing: border-box;
 `
 
-interface BuySharesProps {
-  inputToken?: TokenDataFE
-  lootbox?: ILootbox
-}
+interface BuySharesProps {}
 const BuyShares = (props: BuySharesProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
 
   const isLoggedIn = snapUserState.accounts.length > 0
-
-  useEffect(() => {
-    if (props.inputToken) {
-      buySharesState.inputToken.data = props.inputToken
-    }
-    if (props.lootbox) {
-      buySharesState.lootbox.data = props.lootbox
-    }
-  }, [])
 
   return (
     <$BuySharesContainer>

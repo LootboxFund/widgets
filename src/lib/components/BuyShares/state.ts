@@ -73,7 +73,9 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  fetchLootboxData().catch((err) => console.error(err))
+  if (buySharesState.lootbox?.data?.address) {
+    fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
+  }
   if (buySharesState.inputToken.data) {
     loadTokenData(buySharesState.inputToken.data).catch((err) => console.error(err))
   }
@@ -147,9 +149,8 @@ export const purchaseLootboxShare = async () => {
   return
 }
 
-export const fetchLootboxData = async () => {
+export const fetchLootboxData = async (lootboxAddress: Address) => {
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
-  const [lootboxAddress] = parseUrlParams(['fundraisers'])
   if (!lootboxAddress) {
     return
   }

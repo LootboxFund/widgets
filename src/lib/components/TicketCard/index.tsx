@@ -21,7 +21,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
   useEffect(() => {
     window.onload = async () => {
-      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      const lootboxAddress = parseUrlParams('lootbox')
       ticketCardState.lootboxAddress = lootboxAddress
       try {
         await initDApp()

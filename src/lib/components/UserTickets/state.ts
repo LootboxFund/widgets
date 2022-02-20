@@ -20,7 +20,7 @@ const userTicketSnapshot: UserTicketsState = {
 export const userTicketState = proxy(userTicketSnapshot)
 
 subscribe(userState, () => {
-  loadUserTickets().catch((err) => console.error(err))
+  loadUserTickets().catch((err) => console.error('Could not load user tickets', err))
 })
 
 export const loadUserTickets = async () => {
