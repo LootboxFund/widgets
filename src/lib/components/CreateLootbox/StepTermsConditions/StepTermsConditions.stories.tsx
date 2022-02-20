@@ -53,6 +53,36 @@ const Demo = (args: StepTermsConditionsProps) => {
       LOOTBOX_FACTORY_ADDRESS,
       { from: snapUserState.currentAccount, gas: '1000000' }
     )
+    let options = {
+      filter: {
+          value: [],
+      },
+      fromBlock: 16904734,
+      topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+      from: snapUserState.currentAccount,
+    };
+    lootbox.events.LootboxCreated(options).on('data', (event: any) => {
+      console.log(`--- onData ---`)
+      console.log(event)
+      const {
+        issuer,
+        lootbox,
+        lootboxName,
+        maxSharesSold,
+        sharePriceUSD,
+        treasury
+      } = event.returnValues;
+      console.log(`
+      
+      issuer: ${issuer}
+      lootbox: ${lootbox}
+      lootboxName: ${lootboxName}
+      maxSharesSold: ${maxSharesSold}
+      sharePriceUSD: ${sharePriceUSD}
+      treasury: ${treasury}
+
+      `)
+     })
     try {
       const x = await lootbox.methods.createLootbox(
         "name",
@@ -62,7 +92,9 @@ const Demo = (args: StepTermsConditionsProps) => {
         receivingWallet,
         receivingWallet
       ).send();
+      console.log(`--- createLootbox ---`)
       console.log(x)
+      console.log(`------`)
     } catch (e) {
       console.log(e)
     }
