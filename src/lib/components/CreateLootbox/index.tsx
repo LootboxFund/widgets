@@ -267,25 +267,35 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     // const pps = web3Utils.toBN(
     //   ((ticketState.pricePerShare as number) * 100).toString()
     // ).toString()
-    const pricePerShare = await web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei").dividedBy("100")
+    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")).div(new web3Utils.BN(100))
     console.log(`At current block number ${blockNum} with price per share = ${pricePerShare}.`)
     console.log(fundraisingTarget.toString())
     // console.log(`pps = ${pps}`)
     console.log(`pricePerShare = ${pricePerShare}`)
-    console.log(fundraisingTarget.dividedBy(pricePerShare))
-    console.log(fundraisingTarget.multipliedBy(pricePerShare))
+    console.log(`
+      
+      typeof fundraisingTarget = ${typeof fundraisingTarget}
+      typeof pricePerShare = ${typeof pricePerShare}
+
+      pricePerShare = ${pricePerShare}
+
+      pricePerShare.toString() = ${pricePerShare.toString()}
+
+    `)
+    console.log(fundraisingTarget.div(pricePerShare))
+    console.log(fundraisingTarget.mul(pricePerShare))
 
 
 
 
     // web3Utils.toWei(...).dividedBy is not a function
-    const maxSharesSold = fundraisingTarget.multipliedBy(new BigNumber(10).pow(8)).dividedBy(pricePerShare).toString()
+    const maxSharesSold = fundraisingTarget.mul(new web3Utils.BN(10).pow(new web3Utils.BN(8))).div(pricePerShare).toString()
 
 
 
 
 
-    
+
     console.log(`Max shares sold = ${maxSharesSold}`)
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
