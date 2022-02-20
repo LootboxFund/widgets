@@ -23,7 +23,7 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
         backgroundImage={ticket?.data?.metadata?.image}
         backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
       >
-        {!ticket ? <$PlusSign>+</$PlusSign> : null}
+        {!ticket ? <$Icon>+</$Icon> : null}
       </$TicketLogo>
       {ticket ? (
         <$TicketTag>
@@ -40,7 +40,7 @@ interface TicketCardCandyWrapperProps {
   backgroundImage: string
   logoImage: string
   themeColor: string
-  name: string;
+  name: string
 }
 export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
   return (
@@ -50,18 +50,13 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
         console.log('click')
       }}
     >
-      <$TicketLogo
-        backgroundImage={props.logoImage}
-        backgroundShadowColor={props.themeColor}
-      >
-      </$TicketLogo>
-      
+      <$TicketLogo backgroundImage={props.logoImage} backgroundShadowColor={props.themeColor}></$TicketLogo>
+
       <$TicketTag>
-        <$TagText>{props.name || "Lootbox Ticket"}</$TagText>
+        <$TagText>{props.name || 'Lootbox Ticket'}</$TagText>
         <$Divider />
         <$TicketIDText>{`#0`}</$TicketIDText>
       </$TicketTag>
-      
     </$TicketCardContainer>
   )
 }
@@ -78,7 +73,7 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   border: 0px solid transparent;
   border-radius: 20px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  background: ${(props) => (props.backgroundColor ? props.backgroundColor : '#f5f5f5')};
+  background: ${(props) => (props.backgroundColor ? props.backgroundColor : `${COLORS.surpressedBackground}15`)};
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
   background-size: cover;
   cursor: pointer;
@@ -89,9 +84,14 @@ export const $TicketRedeemContainer = styled.section`
   padding: 20px 20px 0px;
 `
 
-export const $TicketLogo = styled.div<{ backgroundImage?: string; backgroundShadowColor?: string }>`
-  width: 100%;
-  height: 100%;
+export const $TicketLogo = styled.div<{
+  backgroundImage?: string
+  backgroundShadowColor?: string
+  width?: string
+  height?: string
+}>`
+  width: ${(props) => (props.width ? props.width : '100%')};
+  height: ${(props) => (props.height ? props.height : '100%')};
   max-width: ${(props) => (props.backgroundImage ? '256px' : '146px')};
   max-height: ${(props) => (props.backgroundImage ? '256px' : '146px')};
   border: 0px solid transparent;
@@ -150,10 +150,10 @@ const $Divider = styled.div`
   transform: rotate(0deg);
 `
 
-const $PlusSign = styled.div`
+export const $Icon = styled.div<{ size?: string }>`
   font-family: open-sans;
   font-weight: bold;
-  font-size: 84px;
+  font-size: ${(props) => props.size || '84px'};
   line-height: 100px;
   text-align: center;
   color: ${COLORS.surpressedFontColor}aa;

@@ -28,7 +28,12 @@ export const loadUserTickets = async () => {
     throw new Error('No lootbox initialized')
   }
 
-  userTicketState.userTickets = await fetchUserTicketsFromLootbox(userTicketState.lootboxAddress)
+  // userTicketState.userTickets = await fetchUserTicketsFromLootbox(userTicketState.lootboxAddress)
+
+  // DEV HACK
+  const tix = await fetchUserTicketsFromLootbox(userTicketState.lootboxAddress)
+  userTicketState.userTickets = [...tix, ...tix]
+
   for (const ticket of userTicketState.userTickets) {
     try {
       await loadTicketData(ticket)
