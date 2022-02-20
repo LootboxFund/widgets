@@ -30,17 +30,18 @@ export const onLoad = async (lootboxAddress: string) => {
 
 const InteractWithLootboxWidget = () => {
   useEffect(() => {
-    window.onload = async () => {
+    const load = async () => {
       const lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {
-        console.error('Error initializing dapp', err)
+        console.error('Error initializing DApp', err)
       }
       if (lootboxAddress) {
         onLoad(lootboxAddress)
       }
     }
+    load()
   }, [])
 
   return <InteractWithLootbox />
