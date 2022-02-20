@@ -7,7 +7,7 @@ import { $CoinIcon } from 'lib/components/Swap/SwapInput'
 import RowToken from 'lib/components/Swap/TokenPicker/RowToken'
 import { useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { $Horizontal, $ScrollContainer } from '../../Generics'
+import { $Horizontal, $ScrollVertical } from '../../Generics'
 import $Button from '../../Button'
 import { $SwapHeader, $SwapHeaderTitle } from '../SwapHeader'
 import { getUserBalanceOfNativeToken, getUserBalanceOfToken, swapState } from '../state'
@@ -94,7 +94,7 @@ const TokenPicker = (props: TokenPickerProps) => {
             + New
           </$Button>
         </$Horizontal>
-        <$ScrollContainer>
+        <$ScrollVertical>
           {tokenList
             .concat(customTokenList)
             .filter(searchFilter)
@@ -109,7 +109,7 @@ const TokenPicker = (props: TokenPickerProps) => {
                 </div>
               )
             })}
-        </$ScrollContainer>
+        </$ScrollVertical>
       </>
       <$BlueLinkText onClick={() => (swapState.route = '/customs')}>Manage Token Lists</$BlueLinkText>
     </$SwapContainer>

@@ -6,7 +6,7 @@ import { COLORS } from 'lib/theme'
 import RowToken from 'lib/components/CrowdSale/TokenPicker/RowToken'
 import { useCustomTokenList, useTokenList } from 'lib/hooks/useTokenList'
 import { TokenDataFE } from 'lib/hooks/constants'
-import { $Horizontal, $ScrollContainer } from '../../Generics'
+import { $Horizontal, $ScrollVertical } from '../../Generics'
 import { $CrowdSaleHeader, $CrowdSaleHeaderTitle } from '../CrowdSaleHeader'
 import { crowdSaleState, loadTokenData } from '../state'
 import { useSnapshot } from 'valtio'
@@ -88,7 +88,7 @@ const TokenPicker = (props: TokenPickerProps) => {
             }}
           ></$Input>
         </$Horizontal>
-        <$ScrollContainer>
+        <$ScrollVertical>
           {tokenList
             .concat(customTokenList)
             .filter(searchFilter)
@@ -104,7 +104,7 @@ const TokenPicker = (props: TokenPickerProps) => {
                 </div>
               )
             })}
-        </$ScrollContainer>
+        </$ScrollVertical>
       </>
     </$CrowdSaleContainer>
   )

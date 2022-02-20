@@ -43,7 +43,7 @@ export const $CardViewport = styled.div<{ width?: string; height?: string }>`
   height: ${(props) => (props.height ? props.height : '600px')};
 `
 
-export const $ScrollContainer = styled.div<{ height?: string }>`
+export const $ScrollVertical = styled.div<{ height?: string }>`
   overflow-y: scroll;
   ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
   display: flex;
