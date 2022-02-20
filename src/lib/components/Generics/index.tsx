@@ -52,3 +52,12 @@ export const $ScrollVertical = styled.div<{ height?: string }>`
   align-items: stretch;
   gap: 10px;
 `
+export const $ScrollHorizontal = styled.div<{ height?: string }>`
+  overflow-x: scroll;
+  ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: stretch;
+  gap: 10px;
+`
