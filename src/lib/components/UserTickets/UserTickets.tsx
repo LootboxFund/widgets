@@ -17,19 +17,16 @@ const UserTickets = () => {
     }
   }
   return (
-    <$Horizontal justifyContent="space-between" height="100%" spacing={3}>
+    <$Horizontal wrap overflow justifyContent="center" height="100%" spacing={3}>
       {tickets.map((ticketID, idx) => (
-        <$ParentCard key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
-          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
-        </$ParentCard>
+        <TicketCard
+          key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
+          ticketID={ticketID}
+          isRedeemEnabled={true}
+        ></TicketCard>
       ))}
     </$Horizontal>
   )
 }
-
-const $ParentCard = styled.div`
-  width: 100%;
-  height: 100%;
-`
 
 export default UserTickets

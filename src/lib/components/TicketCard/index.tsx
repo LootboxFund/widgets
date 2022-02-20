@@ -53,6 +53,9 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 }
 
 export const $RootContainer = styled.section`
+  min-width: 300px;
+  max-width: 450px;
+  flex: 1;
   width: 100%;
   height: 100%;
   display: flex;
