@@ -25,6 +25,10 @@ export const useWeb3Eth = () => {
   //   const client: Eth = new (Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
   //   return client
   // }
+  if (!window.web3 || !window.web3.eth) { 
+    const client: Eth = new ((window as any).Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
+    return client
+  }
   return window.web3.eth
 }
 

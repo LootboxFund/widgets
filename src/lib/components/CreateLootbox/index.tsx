@@ -21,20 +21,22 @@ import { BigNumber } from 'bignumber.js';
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
+ 
+  useEffect(() => {
+    window.onload = () => {
+      console.log("Initializing DApp...")
+      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
+        .catch((err) => console.error(err))
+    }
+  }, [])
+
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize();
   const web3 = useWeb3()
   const web3Eth = useWeb3Eth()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
- 
-  useEffect(() => {
-    window.onload = () => {
-      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
-        .catch((err) => console.error(err))
-    }
-  }, [])
-
+  
   type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
   
   // FORM: Step by Step Form
@@ -261,6 +263,30 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     console.log(`creating lootbox...`)
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
     console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
+    const blockNum = await web3Eth.getBlockNumber()
+    // const pps = web3Utils.toBN(
+    //   ((ticketState.pricePerShare as number) * 100).toString()
+    // ).toString()
+    const pricePerShare = await web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei").dividedBy("100")
+    console.log(`At current block number ${blockNum} with price per share = ${pricePerShare}.`)
+    console.log(fundraisingTarget.toString())
+    // console.log(`pps = ${pps}`)
+    console.log(`pricePerShare = ${pricePerShare}`)
+    console.log(fundraisingTarget.dividedBy(pricePerShare))
+    console.log(fundraisingTarget.multipliedBy(pricePerShare))
+
+
+
+
+    // web3Utils.toWei(...).dividedBy is not a function
+    const maxSharesSold = fundraisingTarget.multipliedBy(new BigNumber(10).pow(8)).dividedBy(pricePerShare).toString()
+
+
+
+
+
+    
+    console.log(`Max shares sold = ${maxSharesSold}`)
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
       LOOTBOX_FACTORY_ADDRESS,
@@ -268,10 +294,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     )
     try {
       const x = await lootbox.methods.createLootbox(
-        "name",
-        "symbol",
-        "5000000000000000000000", // uint256 _maxSharesSold,
-        "7000000", // uint256 _sharePriceUSD,
+        ticketState.name,
+        ticketState.symbol,
+        maxSharesSold, // uint256 _maxSharesSold,
+        pricePerShare, // uint256 _sharePriceUSD,
         receivingWallet,
         receivingWallet
       ).send();
@@ -282,7 +308,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         filter: {
             value: [],
         },
-        fromBlock: 16904734,
+        fromBlock: blockNum,
         topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
         from: snapUserState.currentAccount,
       };
