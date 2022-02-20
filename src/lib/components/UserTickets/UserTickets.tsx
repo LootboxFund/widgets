@@ -17,7 +17,7 @@ const UserTickets = () => {
 
   const ticketCopy: (string | undefined)[] = [...snap.userTickets]
 
-  if (ticketCopy.length > TICKET_PAGINATION) {
+  if (ticketCopy.length >= TICKET_PAGINATION) {
     ticketCopy.unshift(undefined) // Adds a placeholder at the front of list
   }
 
