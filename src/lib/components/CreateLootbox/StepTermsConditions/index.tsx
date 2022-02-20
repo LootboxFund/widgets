@@ -93,7 +93,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
     if (props.submitStatus === "failure") {
       return <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={COLORS.dangerFontColor} onSubmit={props.onSubmit} text="Failed, try again?" />
     } else if (props.submitStatus === "success") {
-      return <$CreateLootboxButton allConditionsMet={true} onClick={() => window.open("https://google.com")} themeColor={COLORS.successFontColor}>Success! View Lootbox</$CreateLootboxButton>
+      return <$CreateLootboxButton allConditionsMet={true} onClick={() => window.open("https://google.com")} themeColor={COLORS.successFontColor}>View Your Lootbox</$CreateLootboxButton>
     } else if (props.submitStatus === "in_progress") {
       return <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>...submitting</$CreateLootboxButton>
     }

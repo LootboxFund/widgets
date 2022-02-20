@@ -23,6 +23,8 @@ export const DEFAULT_TICKET_IMAGE = `${STORAGE_URL}/o/assets%2Fdefault-ticket-lo
 export const DEFAULT_TICKET_BACKGROUND = `${STORAGE_URL}/o/assets%2Fdefault-ticket-background.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 
+export const PIPEDREAM_TOKEN_URI_UPLOADER = "https://0c55008bef149a2a264d445b0582e29b.m.pipedream.net"
+
 // TODO: Dynamically load this
 export const BSC_TESTNET_CROWDSALE_ADDRESS = '0x7B8f9b6Daa03E39BC046CA06c72C8A81b8FcEceb'
 

@@ -5,6 +5,7 @@ import {
   DEFAULT_TICKET_IMAGE,
   DEFAULT_TICKET_BACKGROUND,
   DEFAULT_TICKET_BACKGROUND_COLOR,
+  PIPEDREAM_TOKEN_URI_UPLOADER,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 
@@ -36,4 +37,21 @@ export const readTicketMetadata = async (lootboxAddress: Address, ticketID: Tick
   const { name, description, image, backgroundColor, backgroundImage } = await readJSON(filepath)
 
   return { name, description, image, backgroundColor, backgroundImage }
+}
+
+export const createTokenURIData = async (inputs: ITicketMetadata) => {
+  console.log(`... createTokenURIData`)
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    'secret': 'mysecret'
+  });
+  const x = await fetch(PIPEDREAM_TOKEN_URI_UPLOADER, {
+    method: 'POST',
+    headers: headers,
+    mode: 'cors',
+    cache: 'default',
+    body: JSON.stringify(inputs)
+  })
+  console.log(x)
+  return x
 }
