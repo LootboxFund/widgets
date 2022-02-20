@@ -1,5 +1,9 @@
 
 export const COLORS = {
+
+  successFontColor: "#4CAF50",
+  successBackgroundColor: "#abffb2",
+
 	warningFontColor: '#FFFFFF',
 	warningBackground: '#F9A400',
 
