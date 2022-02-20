@@ -213,7 +213,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     agreeLiability: false,
     agreeVerify: false
   }
-  const reputationWallet = "0xReputationWallet"
+  const reputationWallet = snapUserState.currentAccount || ""
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
