@@ -4,12 +4,13 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ticketMinterState } from './state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
-import { loadTicketData, ticketCardState } from '../TicketCard/state'
+import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
+import { fetchLootboxData } from 'lib/components/BuyShares/state'
 
 const TicketMinterWidget = () => {
   useEffect(() => {
     window.onload = async () => {
-      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      const lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {
@@ -20,7 +21,7 @@ const TicketMinterWidget = () => {
         ticketMinterState.lootboxAddress = lootboxAddress
         let ticketID = undefined
         try {
-          ticketID = await getLootboxTicketId(lootboxAddress)
+          ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), fetchLootboxData(lootboxAddress)])
         } catch (err) {
           console.error('Error fetching ticket id', err)
           ticketID = '0'
@@ -31,7 +32,7 @@ const TicketMinterWidget = () => {
     }
   }, [])
 
-  return <TicketMinter></TicketMinter>
+  return <TicketMinter />
 }
 
 export default TicketMinterWidget

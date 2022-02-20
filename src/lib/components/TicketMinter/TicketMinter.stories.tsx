@@ -8,6 +8,7 @@ import TicketMinter from '.'
 import { ticketMinterState } from './state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
+import { fetchLootboxData } from 'lib/components/BuyShares/state'
 
 export default {
   title: 'TicketMinter',
@@ -17,7 +18,7 @@ export default {
 const Template = () => {
   useEffect(() => {
     const load = async () => {
-      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      const lootboxAddress = parseUrlParams('lootbox')
       ;(window as any).Web3 = Web3
       try {
         await initDApp()
@@ -29,9 +30,9 @@ const Template = () => {
         ticketMinterState.lootboxAddress = lootboxAddress
         let ticketID = undefined
         try {
-          ticketID = await getLootboxTicketId(lootboxAddress)
+          ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), fetchLootboxData(lootboxAddress)])
         } catch (err) {
-          console.error('Error loading lootbox ticket', err)
+          console.error('Error fetching ticket id', err)
           ticketID = '0'
         }
         ticketMinterState.ticketID = ticketID

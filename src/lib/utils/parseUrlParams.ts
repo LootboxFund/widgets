@@ -1,8 +1,11 @@
-import { DEFAULT_LOOTBOX_ADDRESS } from 'lib/hooks/constants'
-
-type ParamKeys = 'fundraisers'
-
-export default function (keys: ParamKeys[]): (string | undefined)[] {
-  // TODO: Dynamically load from keys passed in & url
-  return [DEFAULT_LOOTBOX_ADDRESS]
+const parseUrlParams = (name: string, url = window.location.href): string | undefined => {
+  console.log('searching', name, url)
+  name = name.replace(/[\[\]]/g, '\\$&')
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+    results = regex.exec(url)
+  if (!results) return undefined
+  if (!results[2]) return ''
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
+
+export default parseUrlParams

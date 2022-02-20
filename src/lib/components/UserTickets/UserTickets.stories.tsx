@@ -17,10 +17,9 @@ const Template = () => {
   let lootboxAddress: string | undefined
 
   useEffect(() => {
-    ;[lootboxAddress] = parseUrlParams(['fundraisers'])
     ;(window as any).Web3 = Web3
     const load = async () => {
-      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {
@@ -40,7 +39,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="1200px" height="550px">
+    <$CardViewport width="100vw" height="450px">
       <UserTickets />
     </$CardViewport>
   )

@@ -15,7 +15,7 @@ interface IAddresses {
 
 export const USD_DECIMALS = 8
 // TODO: DYNAMIC LOOTBOX_ADDRESS
-export const DEFAULT_LOOTBOX_ADDRESS = '0xeeb0ff2c65bbd583634611c4794a088bb8bb9b94'
+// export const DEFAULT_LOOTBOX_ADDRESS = '0xeeb0ff2c65bbd583634611c4794a088bb8bb9b94'
 export const DEFAULT_CHAIN_ID_HEX = '0x38'
 export const STORAGE_URL = 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com'
 
@@ -73,7 +73,8 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
     nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
     rpcUrls: ['https://rpc-mumbai.matic.today'],
     blockExplorerUrls: ['https://mumbai.polygonscan.com/'],
-    currentNetworkLogo: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+    currentNetworkLogo:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
   },
   '89': {
     chainIdHex: '89',
@@ -83,8 +84,9 @@ export const BLOCKCHAINS: Record<string, ChainInfo> = {
     nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
     rpcUrls: ['https://polygon-rpc.com/'],
     blockExplorerUrls: ['https://polygonscan.com/'],
-    currentNetworkLogo: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-  }
+    currentNetworkLogo:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+  },
 }
 
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [

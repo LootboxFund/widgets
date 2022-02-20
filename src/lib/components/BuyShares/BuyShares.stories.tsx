@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { fetchLootboxData } from './state'
 import Web3 from 'web3'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 export default {
   title: 'BuyShares',
@@ -12,6 +13,7 @@ export default {
 }
 
 const Template = () => {
+  const lootboxAddress = parseUrlParams('lootbox')
   useEffect(() => {
     ;(window as any).Web3 = Web3
     const load = async () => {
@@ -20,7 +22,9 @@ const Template = () => {
       } catch (err) {
         console.error('Error initializing DApp for BuyShares', err)
       }
-      fetchLootboxData().catch((err) => console.error('Error fetching lootbox data', err))
+      if (lootboxAddress) {
+        fetchLootboxData(lootboxAddress).catch((err) => console.error('Error fetching lootbox data', err))
+      }
     }
     load().catch((err) => console.error('Error loading buyShare widget', err))
   }, [])

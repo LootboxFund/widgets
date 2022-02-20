@@ -1,6 +1,6 @@
 import react from 'react'
-import BuyShares from '../BuyShares'
-import TicketCard from '../TicketCard'
+import BuyShares from 'lib/components/BuyShares'
+import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'

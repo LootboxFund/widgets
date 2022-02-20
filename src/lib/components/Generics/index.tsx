@@ -9,6 +9,8 @@ interface HorizontalProps {
   readonly flex?: number
   readonly alignItems?: 'flex-start' | 'center' | 'flex-end'
   readonly height?: string
+  readonly width?: string
+  readonly overflow?: boolean
 }
 const SPACING_VALS = [4, 8, 16, 24, 48]
 
@@ -21,6 +23,8 @@ export const $Horizontal = styled.div<HorizontalProps>`
   ${(props) => props.wrap && 'flex-wrap: wrap;'};
   ${(props) => props.alignItems && `align-items: ${props.alignItems};`};
   ${(props) => props.height && `height: ${props.height};`}
+  ${(props) => props.width && `width: ${props.width};`}
+  ${(props) => props.overflow && `overflow: hidden;`}
 
   & > *:not(:last-child) {
     margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
@@ -36,17 +40,27 @@ export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number
   }
 `
 
-export const $CardViewport = styled.div<{ width?: string; height?: string }>`
+export const $CardViewport = styled.div<{ width?: string; height?: string; maxWidth?: string }>`
   width: ${(props) => (props.width ? props.width : '300px')};
   height: ${(props) => (props.height ? props.height : '600px')};
+  ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
 `
 
-export const $ScrollContainer = styled.div<{ height?: string }>`
+export const $ScrollVertical = styled.div<{ height?: string }>`
   overflow-y: scroll;
   ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: stretch;
+  gap: 10px;
+`
+export const $ScrollHorizontal = styled.div<{ height?: string }>`
+  overflow-x: scroll;
+  ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
   align-items: stretch;
   gap: 10px;
 `

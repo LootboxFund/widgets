@@ -8,7 +8,7 @@ import { ticketCardState } from 'lib/components/TicketCard/state'
 const UserTicketsWidget = () => {
   useEffect(() => {
     window.onload = async () => {
-      const [lootboxAddress] = parseUrlParams(['fundraisers'])
+      const lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {

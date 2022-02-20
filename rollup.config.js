@@ -113,14 +113,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 /**
- * <UserTickets />
+ * <InteractWithLootbox />
  *
  *
  */
-const UserTickets = {
-  input: ['src/injects/UserTickets/index.ts'],
+const InteractWithLootbox = {
+  input: ['src/injects/InteractWithLootbox/index.ts'],
   output: {
-    file: process.env.NODE_ENV === 'production' ? 'iife/UserTickets.production.js' : 'iife/UserTickets.js',
+    file:
+      process.env.NODE_ENV === 'production' ? 'iife/InteractWithLootbox.production.js' : 'iife/InteractWithLootbox.js',
     format: 'iife',
     sourcemap: true,
     name: 'Lootbox',
@@ -161,62 +162,10 @@ const UserTickets = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  UserTickets.plugins.push(terser()) // enable minification
+  InteractWithLootbox.plugins.push(terser()) // enable minification
 }
 
-/**
- * <TicketMinter />
- *
- *
- */
-const TicketMinter = {
-  input: ['src/injects/TicketMinter/index.ts'],
-  output: {
-    file: process.env.NODE_ENV === 'production' ? 'iife/TicketMinter.production.js' : 'iife/TicketMinter.js',
-    format: 'iife',
-    sourcemap: true,
-    name: 'Lootbox',
-    inlineDynamicImports: true,
-    globals: {
-      'react-dom': 'ReactDOM',
-      'prop-types': 'PropTypes',
-      react: 'React',
-      callbackify: 'callbackify',
-      path: false,
-      fs: false,
-      os: false,
-      module: false,
-      util: false,
-      tty: false,
-      buffer: false,
-    },
-  },
-  plugins: [
-    commonjs({
-      // namedExports: {
-      // // This is needed because react/jsx-runtime exports jsx on the module export.
-      // // Without this mapping the transformed import import {jsx as _jsx} from 'react/jsx-runtime' will fail.
-      // 'react/jsx-runtime': ['jsx', 'jsxs'],
-      // },
-    }),
-    nodePolyfills(), // enable NodeJS polyfills
-    resolve({ preferBuiltins: true, browser: true }), // enable importing from node_modules
-    typescript(), // enable TypeScript
-    replace({
-      'process.env.NODE_ENV': JSON.stringify('production'),
-      preventAssignment: true,
-    }),
-    json(), // enable JSON
-    globals(), // allows globals to be imported (process.env)
-    builtins(), // allows builtins to be imported via require/import
-  ],
-  external: ['react'],
-}
-if (process.env.NODE_ENV === 'production') {
-  TicketMinter.plugins.push(terser()) // enable minification
-}
-
-export default [CreateLootbox, WalletStatus, UserTickets, TicketMinter]
+export default [CreateLootbox, WalletStatus, InteractWithLootbox]
 
 // --------------------------------------------------
 

@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { fetchLootboxData } from './state'
 import Web3 from 'web3'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 export default {
   title: 'BuySharesPurchaseComplete',
@@ -13,10 +14,19 @@ export default {
 
 const Template = () => {
   useEffect(() => {
-    initDApp()
-      .then(() => fetchLootboxData())
-      .catch((err) => console.error(err))
     ;(window as any).Web3 = Web3
+    const load = async () => {
+      const lootbox = parseUrlParams('lootbox')
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error(err)
+      }
+      if (lootbox) {
+        await fetchLootboxData(lootbox).catch((err) => console.error(err))
+      }
+    }
+    load()
   }, [])
 
   return (
