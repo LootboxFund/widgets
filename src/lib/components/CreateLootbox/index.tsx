@@ -257,17 +257,77 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     return allValidationsPassed && allConditionsMet
   }
-  const createLootbox = () => {
-    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
-    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
-    lootbox.methods.createLootbox(
-      ticketState.name,
-      ticketState.symbol,
-      web3Utils.toBN("1000000"), // uint256 _maxSharesSold,
-      web3Utils.toWei(ticketState.pricePerShare.toString()), // uint256 _sharePriceUSD,
-      receivingWallet,
-      receivingWallet
-    );
+  const createLootbox = async () => {
+    console.log(`creating lootbox...`)
+    const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
+    console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
+    const lootbox = new web3Eth.Contract(
+      LOOTBOX_FACTORY_ABI,
+      LOOTBOX_FACTORY_ADDRESS,
+      { from: snapUserState.currentAccount, gas: '1000000' }
+    )
+    try {
+      const x = await lootbox.methods.createLootbox(
+        "name",
+        "symbol",
+        "5000000000000000000000", // uint256 _maxSharesSold,
+        "7000000", // uint256 _sharePriceUSD,
+        receivingWallet,
+        receivingWallet
+      ).send();
+      console.log(`--- createLootbox ---`)
+      console.log(x)
+      console.log(`------`)
+      let options = {
+        filter: {
+            value: [],
+        },
+        fromBlock: 16904734,
+        topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+        from: snapUserState.currentAccount,
+      };
+      lootbox.events.LootboxCreated(options).on('data', (event: any) => {
+        console.log(`--- onData ---`)
+        console.log(event)
+        const {
+          issuer,
+          lootbox,
+          lootboxName,
+          maxSharesSold,
+          sharePriceUSD,
+          treasury
+        } = event.returnValues;
+        console.log(`
+        
+        issuer: ${issuer}
+        lootbox: ${lootbox}
+        lootboxName: ${lootboxName}
+        maxSharesSold: ${maxSharesSold}
+        sharePriceUSD: ${sharePriceUSD}
+        treasury: ${treasury}
+
+        ---------------
+
+        currentAcccount: ${snapUserState.currentAccount}
+        receivingWallet: ${receivingWallet}
+  
+        `)
+        if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
+          console.log(`
+          
+          ---- 🎉🎉🎉 ----
+          
+          Congratulations! You've created a lootbox!
+          Lootbox Address: ${lootbox}
+  
+          ---------------
+          
+          `)
+        }
+       })
+    } catch (e) {
+      console.log(e)
+    }
   }
 
 

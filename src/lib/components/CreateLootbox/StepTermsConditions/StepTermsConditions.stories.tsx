@@ -82,6 +82,18 @@ const Demo = (args: StepTermsConditionsProps) => {
       treasury: ${treasury}
 
       `)
+      if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
+        console.log(`
+        
+        ---- 🎉🎉🎉 ----
+        
+        Congratulations! You've created a lootbox!
+        Lootbox Address: ${lootbox}
+
+        ---------------
+        
+        `)
+      }
      })
     try {
       const x = await lootbox.methods.createLootbox(
