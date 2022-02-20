@@ -33,9 +33,9 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 const semver = '0.2.0-demo'
 const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
 
-const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
-const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
-const fileNames = [TicketMinter, UserTickets]
+const InteractWithLootbox =
+  process.env.NODE_ENV === 'production' ? 'InteractWithLootbox.production.js' : 'InteractWithLootbox.js'
+const fileNames = [InteractWithLootbox]
 
 fileNames.map((filename) => {
   uploadFile({
