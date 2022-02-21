@@ -19,6 +19,7 @@ import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js';
 import { createTokenURIData } from 'lib/api/storage'
+import { Address } from 'lib/types/baseTypes'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -37,6 +38,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const web3Eth = useWeb3Eth()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
+
+  const [lootboxAddress, setLootboxAddress] = useState<Address>("")
   
   type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
   
@@ -326,6 +329,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           ---------------
           
           `)
+          setLootboxAddress(lootbox)
           setSubmitStatus("success")
           const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
             .add(new web3Utils.BN("100")) // make it whole
@@ -334,6 +338,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             .div(new web3Utils.BN("10").pow(new web3Utils.BN("8")))
           console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
           createTokenURIData({
+            address: lootbox,
             name: lootboxName,
             description: ticketState.description as string,
             image: ticketState.logoUrl as string,
@@ -374,6 +379,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
   }
 
+  const goToLootboxAdminPage = () => {
+    return `https://lootbox-fund.webflow.io/demo/0-2-0-demo/fundraiser?lootbox=${lootboxAddress}`
+  }
 
   // if (!isWalletConnected) {
   //   return <WalletButton></WalletButton>
@@ -450,6 +458,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         onNext={() => console.log("onNext")}
         submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
+        goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>

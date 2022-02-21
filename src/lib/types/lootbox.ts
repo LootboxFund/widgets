@@ -4,6 +4,7 @@ import { Address, TicketID } from './baseTypes'
  * Metadata of tickets stored on the IPFS
  */
 export interface ITicketMetadata {
+  address: Address
   name: string | undefined
   description: string | undefined
   image: string | undefined

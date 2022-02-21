@@ -12,6 +12,7 @@ import { $NetworkIcon } from '../StepChooseNetwork';
 import Web3Utils from 'web3-utils';
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { NetworkOption } from '../state';
+import { Address } from 'lib/types/baseTypes';
 
 export interface TermsFragment {
   slug: string;
@@ -38,6 +39,7 @@ export interface StepTermsConditionsProps {
   onSubmit: () => void;
   setValidity: (bool: boolean) => void;
   submitStatus: SubmitStatus;
+  goToLootboxAdminPage: () => string;
   ref?: React.RefObject<HTMLDivElement>;
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
@@ -93,7 +95,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
     if (props.submitStatus === "failure") {
       return <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={COLORS.dangerFontColor} onSubmit={props.onSubmit} text="Failed, try again?" />
     } else if (props.submitStatus === "success") {
-      return <$CreateLootboxButton allConditionsMet={true} onClick={() => window.open("https://google.com")} themeColor={COLORS.successFontColor}>View Your Lootbox</$CreateLootboxButton>
+      return <$CreateLootboxButton allConditionsMet={true} onClick={() => window.open(props.goToLootboxAdminPage())} themeColor={COLORS.successFontColor}>View Your Lootbox</$CreateLootboxButton>
     } else if (props.submitStatus === "in_progress") {
       return <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>...submitting</$CreateLootboxButton>
     }
