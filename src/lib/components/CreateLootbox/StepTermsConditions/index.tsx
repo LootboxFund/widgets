@@ -12,6 +12,7 @@ import { $NetworkIcon } from '../StepChooseNetwork';
 import Web3Utils from 'web3-utils';
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { NetworkOption } from '../state';
+import { Address } from 'lib/types/baseTypes';
 
 export interface TermsFragment {
   slug: string;
@@ -24,9 +25,7 @@ const TERMS: TermsFragment[] = [
   { slug: 'agreeVerify', text: 'I have verified my Reputation address & Treasury wallet is correct' }
 ]
 
-interface Errors {
-  treasuryWallet: string;
-}
+export type SubmitStatus = "unsubmitted" | "in_progress" | "success" | "failure"
 export interface StepTermsConditionsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;
@@ -39,6 +38,8 @@ export interface StepTermsConditionsProps {
   allConditionsMet: boolean;
   onSubmit: () => void;
   setValidity: (bool: boolean) => void;
+  submitStatus: SubmitStatus;
+  goToLootboxAdminPage: () => string;
   ref?: React.RefObject<HTMLDivElement>;
 }
 const StepTermsConditions = (props: StepTermsConditionsProps) => {
@@ -90,6 +91,16 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
   const updateCheckbox = (slug: string, checked: any) => {
     props.updateTermsState(slug, checked)
   }
+  const renderActionBar = () => {
+    if (props.submitStatus === "failure") {
+      return <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={COLORS.dangerFontColor} onSubmit={props.onSubmit} text="Failed, try again?" />
+    } else if (props.submitStatus === "success") {
+      return <$CreateLootboxButton allConditionsMet={true} onClick={() => window.open(props.goToLootboxAdminPage())} themeColor={COLORS.successFontColor}>View Your Lootbox</$CreateLootboxButton>
+    } else if (props.submitStatus === "in_progress") {
+      return <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>...submitting</$CreateLootboxButton>
+    }
+    return <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={props.selectedNetwork?.themeColor} onSubmit={props.onSubmit} text="Create Lootbox" />
+  }
 	return (
 		<$StepTermsConditions>
       {props.ref && <div ref={props.ref}></div>}
@@ -97,7 +108,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
         customActionBar={
           (props.stage === "in_progress" || props.stage === "may_proceed") && Object.values(errors).filter(e => e).length === 0
           ?
-          () => <CreateLootboxButton allConditionsMet={props.allConditionsMet} themeColor={props.selectedNetwork?.themeColor} onSubmit={props.onSubmit} />
+          renderActionBar
           :
           undefined
         }
@@ -196,9 +207,10 @@ interface CreateLootboxButtonProps {
   allConditionsMet: boolean;
   themeColor?: string;
   onSubmit: () => void;
+  text: string;
 }
 export const CreateLootboxButton = (props: CreateLootboxButtonProps) => {
-  return <$CreateLootboxButton disabled={!props.allConditionsMet} allConditionsMet={props.allConditionsMet} onClick={props.onSubmit} themeColor={props.themeColor}>Create Lootbox</$CreateLootboxButton>
+  return <$CreateLootboxButton disabled={!props.allConditionsMet} allConditionsMet={props.allConditionsMet} onClick={props.onSubmit} themeColor={props.themeColor}>{ props.text}</$CreateLootboxButton>
 }
 
 const $CreateLootboxButton = styled.button<{ themeColor?: string, allConditionsMet: boolean }>`

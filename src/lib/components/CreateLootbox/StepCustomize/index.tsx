@@ -52,7 +52,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
     return price
   }
   const maxPricePerShare = deriveMaxTicketPrice()
-  console.log(`maxPricePerShare = ${maxPricePerShare}`)
+  
   const initialErrors = {
     name: "",
     symbol: '',

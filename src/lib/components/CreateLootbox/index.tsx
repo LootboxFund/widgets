@@ -14,27 +14,33 @@ import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';
 import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns';
 import StepCustomize from 'lib/components/CreateLootbox/StepCustomize';
 import StepSocials from 'lib/components/CreateLootbox/StepSocials';
-import StepTermsConditions from 'lib/components/CreateLootbox/StepTermsConditions';
+import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions';
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js';
+import { createTokenURIData } from 'lib/api/storage'
+import { Address } from 'lib/types/baseTypes'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
+ 
+  useEffect(() => {
+    window.onload = () => {
+      console.log("Initializing DApp...")
+      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
+        .catch((err) => console.error(err))
+    }
+  }, [])
+
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize();
   const web3 = useWeb3()
   const web3Eth = useWeb3Eth()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
- 
-  useEffect(() => {
-    window.onload = () => {
-      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
-        .catch((err) => console.error(err))
-    }
-  }, [])
 
+  const [lootboxAddress, setLootboxAddress] = useState<Address>("")
+  
   type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
   
   // FORM: Step by Step Form
@@ -213,7 +219,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     agreeLiability: false,
     agreeVerify: false
   }
-  const reputationWallet = "0xReputationWallet"
+  const reputationWallet = snapUserState.currentAccount || ""
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
@@ -235,6 +241,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const checkTermsStepDone = () => termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet
 
   // STEP 7: Submit
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("unsubmitted")
   const checkAllConditionsMet = () => {
     
     const allValidationsPassed = Object.values(validity).every(condition => condition === true)
@@ -248,28 +255,133 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
     const allConditionsMet = conditionsMet.every(condition => condition === true)
 
-    console.log(`=== validity`)
-    console.log(validity)
-    console.log(`=== stage`)
-    console.log(stage)
-    console.log(`=== conditionsMet`)
-    console.log(conditionsMet)
-
     return allValidationsPassed && allConditionsMet
   }
-  const createLootbox = () => {
-    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
-    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS)
-    lootbox.methods.createLootbox(
-      ticketState.name,
-      ticketState.symbol,
-      web3Utils.toBN("1000000"), // uint256 _maxSharesSold,
-      web3Utils.toWei(ticketState.pricePerShare.toString()), // uint256 _sharePriceUSD,
-      receivingWallet,
-      receivingWallet
-    );
+  const createLootbox = async () => {
+    setSubmitStatus("in_progress")
+    const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
+    const blockNum = await web3Eth.getBlockNumber()
+    const pricePerShare = new web3Utils.BN(
+      web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")
+    ).div(new web3Utils.BN("100"))    
+    const maxSharesSold = fundraisingTarget
+      .mul(
+        new web3Utils.BN("10").pow(new web3Utils.BN("8"))
+      )
+      .div(pricePerShare)
+      .mul(new web3Utils.BN("11"))
+      .div(new web3Utils.BN("10"))
+      .toString()
+
+    const lootbox = new web3Eth.Contract(
+      LOOTBOX_FACTORY_ABI,
+      LOOTBOX_FACTORY_ADDRESS,
+      { from: snapUserState.currentAccount, gas: '1000000' }
+    )
+    try {
+      console.log(`----> creating lootbox with info...`)
+      console.log(`
+      
+      ticketState.name = ${ticketState.name}
+      ticketState.symbol = ${ticketState.symbol}
+      maxSharesSold = ${maxSharesSold}
+      pricePerShare = ${pricePerShare}
+      receivingWallet = ${receivingWallet}
+      receivingWallet = ${receivingWallet}
+
+      fundraisingTarget = ${fundraisingTarget}
+
+      `)
+      const x = await lootbox.methods.createLootbox(
+        ticketState.name,
+        ticketState.symbol,
+        maxSharesSold, // uint256 _maxSharesSold,
+        pricePerShare, // uint256 _sharePriceUSD,
+        receivingWallet,
+        receivingWallet
+      ).send();
+      let options = {
+        filter: {
+            value: [],
+        },
+        fromBlock: blockNum,
+        topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+        from: snapUserState.currentAccount,
+      };
+      lootbox.events.LootboxCreated(options).on('data', (event: any) => {
+        const {
+          issuer,
+          lootbox,
+          lootboxName,
+          maxSharesSold,
+          sharePriceUSD,
+          treasury
+        } = event.returnValues;
+        
+        if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
+          console.log(`
+          
+          ---- 🎉🎉🎉 ----
+          
+          Congratulations! You've created a lootbox!
+          Lootbox Address: ${lootbox}
+  
+          ---------------
+          
+          `)
+          setLootboxAddress(lootbox)
+          setSubmitStatus("success")
+          const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
+            .add(new web3Utils.BN("100")) // make it whole
+            .mul(new web3Utils.BN("10").pow(new web3Utils.BN((8 - 6).toString())))
+            .mul(fundraisingTarget)
+            .div(new web3Utils.BN("10").pow(new web3Utils.BN("8")))
+          console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
+          createTokenURIData({
+            address: lootbox,
+            name: lootboxName,
+            description: ticketState.description as string,
+            image: ticketState.logoUrl as string,
+            backgroundColor: ticketState.lootboxThemeColor as string,
+            backgroundImage: ticketState.coverUrl as string,
+            lootbox: {
+              address: lootbox,
+              chainIdHex: "chainIdHex",
+              chainIdDecimal: "chainIdDecimal",
+              chainName: "chainName",
+              targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+              fundraisingTarget: fundraisingTarget,
+              basisPointsReturnTarget: basisPoints.toString(),
+              returnAmountTarget: basisPointsReturnTarget.toString(),
+              pricePerShare: pricePerShare.toString(),
+              lootboxThemeColor: ticketState.lootboxThemeColor as string,
+              transactionHash: event.transactionHash as string,
+              blockNumber: event.blockNumber
+            },
+            socials: {
+              twitter: socialState.twitter,
+              email: socialState.email,
+              instagram: socialState.instagram,
+              tiktok: socialState.tiktok,
+              facebook: socialState.facebook,
+              discord: socialState.discord,
+              youtube: socialState.youtube,
+              snapchat: socialState.snapchat,
+              twitch: socialState.twitch,
+              web: socialState.web,
+            }
+          })
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      setSubmitStatus("failure")
+    }
   }
 
+  const goToLootboxAdminPage = () => {
+    return `https://lootbox-fund.webflow.io/demo/0-2-0-demo/fundraiser?lootbox=${lootboxAddress}`
+  }
 
   // if (!isWalletConnected) {
   //   return <WalletButton></WalletButton>
@@ -280,7 +392,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         selectedNetwork={network}
         stage={stage.stepNetwork}
         onSelectNetwork={(network: NetworkOption) => {
-          console.log(network)
           selectNetwork(network, 'stepNetwork')
         }}
         onNext={() => refStepFunding.current?.scrollIntoView()}
@@ -345,7 +456,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTreasuryWallet={setReceivingWallet}
         setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
         onNext={() => console.log("onNext")}
+        submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
+        goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>

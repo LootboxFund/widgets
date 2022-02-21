@@ -34,9 +34,9 @@ const absPath = '/Users/kangzeroo/Projects/GuildFX/widgets/iife/'
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
 const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
-const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
-const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
-const fileNames = [CreateLootbox, WalletStatus, TicketMinter, UserTickets]
+// const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
+// const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
+const fileNames = [CreateLootbox, WalletStatus]
 
 fileNames.map((filename) => {
   uploadFile({

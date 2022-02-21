@@ -4,11 +4,38 @@ import { Address, TicketID } from './baseTypes'
  * Metadata of tickets stored on the IPFS
  */
 export interface ITicketMetadata {
+  address: Address
   name: string | undefined
   description: string | undefined
   image: string | undefined
   backgroundColor: string | undefined
   backgroundImage: string | undefined
+  lootbox?: {
+    address: Address
+    chainIdHex: string
+    chainIdDecimal: string
+    chainName: string
+    targetPaybackDate: Date
+    fundraisingTarget: string
+    basisPointsReturnTarget: string
+    returnAmountTarget: string
+    pricePerShare: string
+    lootboxThemeColor: string
+    transactionHash: string
+    blockNumber: string
+  },
+  socials?: {
+    twitter: string;
+    email: string;
+    instagram: string;
+    tiktok: string;
+    facebook: string;
+    discord: string;
+    youtube: string;
+    snapchat: string;
+    twitch: string;
+    web:string;
+  }
 }
 
 export interface ILootbox {

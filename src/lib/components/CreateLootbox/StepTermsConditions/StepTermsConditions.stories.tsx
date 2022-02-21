@@ -46,13 +46,55 @@ const Demo = (args: StepTermsConditionsProps) => {
   const createLootbox = async () => {
     console.log(`creating lootbox...`)
     const receivingWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
-    const LOOTBOX_FACTORY_ADDRESS = "0x390cf9617D4c7e07863F3482736D05FC1dC0406E"
+    const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
     console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
       LOOTBOX_FACTORY_ADDRESS,
       { from: snapUserState.currentAccount, gas: '1000000' }
     )
+    let options = {
+      filter: {
+          value: [],
+      },
+      fromBlock: 16904734,
+      topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+      from: snapUserState.currentAccount,
+    };
+    lootbox.events.LootboxCreated(options).on('data', (event: any) => {
+      console.log(`--- onData ---`)
+      console.log(event)
+      const {
+        issuer,
+        lootbox,
+        lootboxName,
+        maxSharesSold,
+        sharePriceUSD,
+        treasury
+      } = event.returnValues;
+      console.log(`
+      
+      issuer: ${issuer}
+      lootbox: ${lootbox}
+      lootboxName: ${lootboxName}
+      maxSharesSold: ${maxSharesSold}
+      sharePriceUSD: ${sharePriceUSD}
+      treasury: ${treasury}
+
+      `)
+      if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
+        console.log(`
+        
+        ---- 🎉🎉🎉 ----
+        
+        Congratulations! You've created a lootbox!
+        Lootbox Address: ${lootbox}
+
+        ---------------
+        
+        `)
+      }
+     })
     try {
       const x = await lootbox.methods.createLootbox(
         "name",
@@ -62,7 +104,9 @@ const Demo = (args: StepTermsConditionsProps) => {
         receivingWallet,
         receivingWallet
       ).send();
+      console.log(`--- createLootbox ---`)
       console.log(x)
+      console.log(`------`)
     } catch (e) {
       console.log(e)
     }
