@@ -258,14 +258,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSubmitStatus("in_progress")
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
     const blockNum = await web3Eth.getBlockNumber()
-    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")).div(new web3Utils.BN(100))    
+    const pricePerShare = new web3Utils.BN(
+      web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")
+    ).div(new web3Utils.BN("100"))    
     const maxSharesSold = fundraisingTarget
       .mul(
-        new web3Utils.BN(10).pow(new web3Utils.BN(8))
+        new web3Utils.BN("10").pow(new web3Utils.BN("8"))
       )
       .div(pricePerShare)
-      .mul(new web3Utils.BN(11))
-      .div(new web3Utils.BN(10))
+      .mul(new web3Utils.BN("11"))
+      .div(new web3Utils.BN("10"))
       .toString()
 
     const lootbox = new web3Eth.Contract(
@@ -274,6 +276,27 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       { from: snapUserState.currentAccount, gas: '1000000' }
     )
     try {
+      console.log(`----> creating lootbox with info...`)
+      console.log(`
+      
+      ticketState.name = ${ticketState.name}
+      ticketState.symbol = ${ticketState.symbol}
+      maxSharesSold = ${maxSharesSold}
+      pricePerShare = ${pricePerShare}
+      receivingWallet = ${receivingWallet}
+      receivingWallet = ${receivingWallet}
+
+      fundraisingTarget = ${fundraisingTarget}
+
+      `)
+      const x = await lootbox.methods.createLootbox(
+        ticketState.name,
+        ticketState.symbol,
+        maxSharesSold, // uint256 _maxSharesSold,
+        pricePerShare, // uint256 _sharePriceUSD,
+        receivingWallet,
+        receivingWallet
+      ).send();
       let options = {
         filter: {
             value: [],
@@ -291,7 +314,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           sharePriceUSD,
           treasury
         } = event.returnValues;
-        console.log(event)
+        
         if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
           console.log(`
           
@@ -304,55 +327,47 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           
           `)
           setSubmitStatus("success")
-          // const basisPointsReturnTarget = new web3Eth.BN(basisPoints.toString())
-          //   .add(new web3Eth.BN("100")) // make it whole
-          //   .mul(new web3Eth.BN("10").pow(new web3Eth.BN((8 - 6).toString())))
-          //   .mul(fundraisingTarget)
-          //   .div(new web3Eth.BN("10").pow(new web3Eth.BN("8")))
-          // console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
-          // createTokenURIData({
-          //   name: lootboxName,
-          //   description: ticketState.description as string,
-          //   image: ticketState.logoUrl as string,
-          //   backgroundColor: ticketState.lootboxThemeColor as string,
-          //   backgroundImage: ticketState.coverUrl as string,
-          //   lootbox: {
-          //     address: lootbox,
-          //     chainIdHex: "chainIdHex",
-          //     chainIdDecimal: "chainIdDecimal",
-          //     chainName: "chainName",
-          //     targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-          //     fundraisingTarget: fundraisingTarget,
-          //     basisPointsReturnTarget: basisPoints.toString(),
-          //     returnAmountTarget: basisPointsReturnTarget.toString(),
-          //     pricePerShare: pricePerShare.toString(),
-          //     lootboxThemeColor: ticketState.lootboxThemeColor as string,
-          //     transactionHash: event.transactionHash as string,
-          //     blockNumber: event.blockNumber
-          //   },
-          //   socials: {
-          //     twitter: socialState.twitter,
-          //     email: socialState.email,
-          //     instagram: socialState.instagram,
-          //     tiktok: socialState.tiktok,
-          //     facebook: socialState.facebook,
-          //     discord: socialState.discord,
-          //     youtube: socialState.youtube,
-          //     snapchat: socialState.snapchat,
-          //     twitch: socialState.twitch,
-          //     web: socialState.web,
-          //   }
-          // })
+          const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
+            .add(new web3Utils.BN("100")) // make it whole
+            .mul(new web3Utils.BN("10").pow(new web3Utils.BN((8 - 6).toString())))
+            .mul(fundraisingTarget)
+            .div(new web3Utils.BN("10").pow(new web3Utils.BN("8")))
+          console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
+          createTokenURIData({
+            name: lootboxName,
+            description: ticketState.description as string,
+            image: ticketState.logoUrl as string,
+            backgroundColor: ticketState.lootboxThemeColor as string,
+            backgroundImage: ticketState.coverUrl as string,
+            lootbox: {
+              address: lootbox,
+              chainIdHex: "chainIdHex",
+              chainIdDecimal: "chainIdDecimal",
+              chainName: "chainName",
+              targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+              fundraisingTarget: fundraisingTarget,
+              basisPointsReturnTarget: basisPoints.toString(),
+              returnAmountTarget: basisPointsReturnTarget.toString(),
+              pricePerShare: pricePerShare.toString(),
+              lootboxThemeColor: ticketState.lootboxThemeColor as string,
+              transactionHash: event.transactionHash as string,
+              blockNumber: event.blockNumber
+            },
+            socials: {
+              twitter: socialState.twitter,
+              email: socialState.email,
+              instagram: socialState.instagram,
+              tiktok: socialState.tiktok,
+              facebook: socialState.facebook,
+              discord: socialState.discord,
+              youtube: socialState.youtube,
+              snapchat: socialState.snapchat,
+              twitch: socialState.twitch,
+              web: socialState.web,
+            }
+          })
         }
-       })
-      const x = await lootbox.methods.createLootbox(
-        ticketState.name,
-        ticketState.symbol,
-        maxSharesSold, // uint256 _maxSharesSold,
-        pricePerShare, // uint256 _sharePriceUSD,
-        receivingWallet,
-        receivingWallet
-      ).send();
+      })
     } catch (e) {
       console.log(e)
       setSubmitStatus("failure")
@@ -369,7 +384,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         selectedNetwork={network}
         stage={stage.stepNetwork}
         onSelectNetwork={(network: NetworkOption) => {
-          console.log(network)
           selectNetwork(network, 'stepNetwork')
         }}
         onNext={() => refStepFunding.current?.scrollIntoView()}

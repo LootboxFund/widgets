@@ -51,15 +51,12 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     getLatestPrice()
   }, [props.selectedNetwork])
   const getLatestPrice = async () => {
-    console.log(`selectedNetwork: `)
-    console.log(props.selectedNetwork)
     if (props.selectedNetwork?.priceFeed) {
       const nativeTokenPrice = await getPriceFeed(props.selectedNetwork.priceFeed)
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
   const calculateEquivalentUSDPrice = () => {
-    console.log(nativeTokenPrice?.toString())
     return nativeTokenPrice ? nativeTokenPrice.multipliedBy(props.fundraisingTarget).dividedBy(10 ** 18).toFixed(2) : 0
   }
 
