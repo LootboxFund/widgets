@@ -7,7 +7,7 @@ import {
   PIPEDREAM_TOKEN_URI_UPLOADER,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
-import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address } from '@lootboxfund/helpers';
+import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers';
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
@@ -39,7 +39,7 @@ export const getLootboxURI = async ({
 }: {
     semvar: SemanticVersion
     chainIdHex: ChainIDHex
-    lootboxAddress: Address
+    lootboxAddress: ContractAddress
     bucket: string
 }) => {
   const filePath = `v/${semvar}/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`;
@@ -48,7 +48,7 @@ export const getLootboxURI = async ({
   return lootboxURI
 }
 
-export const readTicketMetadata = async (lootboxAddress: Address, ticketID: TicketID): Promise<ITicketMetadata> => {
+export const readTicketMetadata = async (lootboxAddress: ContractAddress, ticketID: TicketID): Promise<ITicketMetadata> => {
   const defaultFilepath = defaultMetadataStorageUrl(lootboxAddress)
   const filepath = metadataStorageUrl(lootboxAddress, ticketID)
 

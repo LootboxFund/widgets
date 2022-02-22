@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import StepChooseReturns, { StepChooseReturnsProps } from 'lib/components/CreateLootbox/StepChooseReturns'
-import { StepStage } from 'lib/components/StepCard'
-import { BigNumber } from 'bignumber.js';
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
+import { ContractAddress } from '@lootboxfund/helpers';
 
 
 export default {
@@ -25,7 +25,7 @@ const Demo = (args: StepChooseReturnsProps) => {
       setStage("in_progress")
     }
   }, [returnTarget, paybackDate])
-  const network = { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media', priceFeed: "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526" }
+  const network = { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media', priceFeed: "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526" as ContractAddress }
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepChooseReturns

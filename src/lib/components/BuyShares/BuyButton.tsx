@@ -1,4 +1,4 @@
-import { $Button } from 'lib/components/Button'
+import { $Button } from 'lib/components/Generics/Button'
 import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
@@ -9,7 +9,7 @@ import WalletButton from '../WalletButton'
 import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
-import { LoadingText } from 'lib/components/Spinner'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {

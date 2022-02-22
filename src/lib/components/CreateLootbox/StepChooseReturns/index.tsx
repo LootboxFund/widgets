@@ -1,14 +1,10 @@
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
-import { truncateAddress } from 'lib/api/helpers'
+import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal, containsAlphanumeric } from '@lootboxfund/helpers';
-import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import $Input from 'lib/components/Input';
+import { COLORS } from 'lib/theme';
+import $Input from 'lib/components/Generics/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon } from '../StepChooseNetwork';
 import { getPriceFeed } from 'lib/hooks/useContract';
 import { BigNumber } from 'bignumber.js';
 import { NetworkOption } from '../state';

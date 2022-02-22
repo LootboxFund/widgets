@@ -19,7 +19,7 @@ const NetworkText = (props: NetworkTextProps) => {
     <$NetworkText style={{ flex: 2 }}>
       <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
-        onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
+        onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount as string || '')}
         style={{ cursor: 'pointer' }}
       >
         {renderTinyAccount()}

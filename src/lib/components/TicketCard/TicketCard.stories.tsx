@@ -6,6 +6,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { loadTicketData, ticketCardState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export default {
   title: 'TicketCard',
@@ -16,7 +17,7 @@ const Template = () => {
   const ticketID = '0'
 
   useEffect(() => {
-    const lootboxAddress = parseUrlParams('lootbox')
+    const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
     ticketCardState.lootboxAddress = lootboxAddress
     ;(window as any).Web3 = Web3
     const load = async () => {

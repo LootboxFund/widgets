@@ -1,12 +1,9 @@
 import react from 'react'
 import styled from 'styled-components'
-import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
-import { truncateAddress } from 'lib/api/helpers'
+import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics';
 import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal } from '@lootboxfund/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import { Address } from 'lib/types/baseTypes';
 import { NetworkOption, NETWORK_OPTIONS } from '../state';
 
 export interface StepChooseNetworkProps {

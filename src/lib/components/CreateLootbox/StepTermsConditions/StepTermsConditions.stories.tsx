@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import StepTermsConditions, { StepTermsConditionsProps, SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { StepStage } from 'lib/components/StepCard'
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json';
-import { useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api';
+import { useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio';
 import Web3 from 'web3';
@@ -26,8 +26,8 @@ const Demo = (args: StepTermsConditionsProps) => {
     agreeVerify: false
   }
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("unsubmitted")
-  const reputationWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
-  const [treasuryWallet, setTreasuryWallet] = useState("0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A")
+  const reputationWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A" as Address
+  const [treasuryWallet, setTreasuryWallet] = useState("0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A" as Address)
   const [stage, setStage] = useState<StepStage>("in_progress")
   const [termsState, setTermsState] = useState(INITIAL_TERMS);
   useEffect(() => {
@@ -42,7 +42,7 @@ const Demo = (args: StepTermsConditionsProps) => {
   }, [termsState])
   const network = { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media' }
 
-  const [lootboxAddress, setLootboxAddress] = useState<Address>("")
+  const [lootboxAddress, setLootboxAddress] = useState<Address>()
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
   }

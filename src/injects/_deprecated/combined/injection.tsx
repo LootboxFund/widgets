@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import CrowdSale from 'lib/components/CrowdSale'
+import CrowdSale from 'lib/components/_deprecated/CrowdSale'
 
 export const inject = () => {
   const targetInjectionPoint = document.getElementById('crowdsale')

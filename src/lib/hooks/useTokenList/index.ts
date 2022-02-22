@@ -1,10 +1,9 @@
 import uriToHttp from 'lib/utils/uriToHttp'
 import { DEFAULT_CHAIN_ID_HEX, DEMO_CUSTOM_TOKENS_BSC_MAINNET, TokenDataFE, tokenMap } from 'lib/hooks/constants'
-import { ChainIDHex } from '@lootboxfund/helpers'
+import { ChainIDHex, Address } from '@lootboxfund/helpers';
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
-import { Address } from 'lib/types'
 
 export const getCustomTokensList = (chainIdHex: string) => {
   const existingCustomTokens = localStorage.getItem(CUSTOM_TOKEN_STORAGE_KEY)

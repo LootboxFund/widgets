@@ -1,6 +1,6 @@
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import $Button from 'lib/components/Button'
+import $Button from 'lib/components/Generics/Button'
 import { COLORS } from 'lib/theme'
 import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'

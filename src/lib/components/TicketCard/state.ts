@@ -1,9 +1,10 @@
-import { ITicket, Address, IDividend } from 'lib/types'
+import { ITicket, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
 import { readTicketMetadata } from 'lib/api/storage'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
+import { Address, ContractAddress } from '@lootboxfund/helpers';
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -16,7 +17,7 @@ export interface ITicketFE {
 }
 
 export interface TicketCardState {
-  lootboxAddress: Address | undefined
+  lootboxAddress: ContractAddress | undefined
   tickets: {
     [key: string]: ITicketFE
   }
@@ -29,7 +30,7 @@ const ticketCardSnapshot: TicketCardState = {
 
 export const ticketCardState = proxy(ticketCardSnapshot)
 
-export const generateStateID = (lootboxAddress: Address, ticketID: string) => `${lootboxAddress}${ticketID}`
+export const generateStateID = (lootboxAddress: ContractAddress, ticketID: string) => `${lootboxAddress}${ticketID}`
 
 export const loadTicketData = async (ticketID: string) => {
   if (!ticketCardState?.lootboxAddress) {

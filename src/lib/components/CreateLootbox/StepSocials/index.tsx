@@ -1,14 +1,9 @@
 import react, { useState } from 'react'
 import styled from 'styled-components'
-import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
-import { truncateAddress } from 'lib/api/helpers'
+import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal } from '@lootboxfund/helpers';
-import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import $Input from 'lib/components/Input';
+import { COLORS } from 'lib/theme';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon } from '../StepChooseNetwork';
 import { NetworkOption } from '../state';
 
 export interface SocialFragment {
@@ -30,18 +25,6 @@ const SOCIALS: SocialFragment[] = [
   { slug: 'web', name: 'Website', placeholder: 'www.website.com', icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media' }
 ]
 
-interface Errors {
-  twitter:  string;
-  email:  string;
-  instagram:  string;
-  tiktok:  string;
-  facebook:  string;
-  discord:  string;
-  youtube:  string;
-  snapchat:  string;
-  twitch:  string;
-  web: string;
-}
 export interface StepSocialsProps {
   stage: StepStage;
   selectedNetwork?: NetworkOption;

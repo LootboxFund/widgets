@@ -5,6 +5,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { $CardViewport } from '../Generics'
 import Web3 from 'web3'
 import { onLoad } from './'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export default {
   title: 'InteractWithLootbox',
@@ -12,12 +13,12 @@ export default {
 }
 
 const Template = () => {
-  let lootboxAddress: string | undefined
+  let lootboxAddress: ContractAddress | undefined
 
   useEffect(() => {
     ;(window as any).Web3 = Web3
     const load = async () => {
-      lootboxAddress = parseUrlParams('lootbox')
+      lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {
         await initDApp()
       } catch (err) {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import StepCustomize, { StepCustomizeProps } from 'lib/components/CreateLootbox/StepCustomize'
-import { StepStage } from 'lib/components/StepCard'
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
+import BN from 'bignumber.js';
 
 
 export default {
@@ -41,7 +42,7 @@ const Demo = (args: StepCustomizeProps) => {
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage}
-        maxPricePerShare={10}
+        fundraisingTarget={new BN("10000000000000000000")}
         onNext={() => console.log("onNext")}
       />
     </div>

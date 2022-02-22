@@ -1,19 +1,14 @@
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
-import { truncateAddress } from 'lib/api/helpers'
-import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal } from '@lootboxfund/helpers';
+import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import $Input from 'lib/components/Input';
+import $Input from 'lib/components/Generics/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
 import { $NetworkIcon } from '../StepChooseNetwork';
-import { useWeb3 } from 'lib/hooks/useWeb3Api';
-import Web3Utils from 'web3-utils'
 import { NetworkOption } from '../state';
 import { getPriceFeed } from 'lib/hooks/useContract';
-import BN, { BigNumber } from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { useWeb3Utils } from '../../../hooks/useWeb3Api/index';
 
 interface Errors {

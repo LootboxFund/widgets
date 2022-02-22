@@ -1,12 +1,12 @@
 import react, { useState } from 'react'
-import { $Button } from 'lib/components/Button'
+import { $Button } from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { ticketCardState, generateStateID, redeemTicket } from './state'
-import { LoadingText } from 'lib/components/Spinner'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined

@@ -4,8 +4,8 @@ import { userState } from 'lib/state/userState'
 import { ChainInfo, BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../constants'
 import { ChainIDHex, TokenData } from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { swapState } from 'lib/components/Swap/state'
-import { crowdSaleState } from 'lib/components/CrowdSale/state'
+import { swapState } from 'lib/components/_deprecated/Swap/state'
+import { crowdSaleState } from 'lib/components/_deprecated/CrowdSale/state'
 
 import { buySharesState } from 'lib/components/BuyShares/state'
 import Web3Utils from 'web3-utils';
@@ -214,15 +214,6 @@ export const clearStateToChain = () => {
   initTokenList()
 }
 
-export const clearSwapState = () => {
-  swapState.targetToken = null
-  swapState.inputToken.data = undefined
-  swapState.inputToken.displayedBalance = undefined
-  swapState.inputToken.quantity = undefined
-  swapState.outputToken.data = undefined
-  swapState.outputToken.displayedBalance = undefined
-  swapState.outputToken.quantity = undefined
-}
 
 export const clearCrowdSaleState = () => {
   crowdSaleState.targetToken = null
