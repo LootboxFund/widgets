@@ -8,6 +8,8 @@ import { useSnapshot } from 'valtio'
 import { buySharesState, fetchLootboxData } from './state'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
+import { TokenDataFE } from 'lib/hooks/constants'
+import { ILootbox } from 'lib/types'
 
 export const $BuySharesContainer = styled.section`
   width: 100%;
@@ -32,8 +34,8 @@ const BuyShares = (props: BuySharesProps) => {
   return (
     <$BuySharesContainer>
       <BuySharesHeader />
-      <TokenInput selectedToken={snap.inputToken.data} tokenDisabled={!isLoggedIn} />
-      <ShareOutput lootbox={snap.lootbox.data} />
+      <TokenInput selectedToken={snap.inputToken.data as TokenDataFE} tokenDisabled={!isLoggedIn} />
+      <ShareOutput lootbox={snap.lootbox.data as ILootbox} />
       <BuyButton />
     </$BuySharesContainer>
   )

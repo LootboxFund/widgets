@@ -3,6 +3,7 @@ import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface TicketCardProps {
   ticketID: string | undefined
@@ -11,7 +12,7 @@ export interface TicketCardProps {
 
 const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState)
-  const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
+  const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
   return (
     <$TicketCardContainer

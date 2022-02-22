@@ -1,3 +1,4 @@
+import { Address } from '@lootboxfund/helpers'
 import { truncateAddress } from 'lib/api/helpers'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
@@ -10,22 +11,22 @@ const NetworkText = (props: NetworkTextProps) => {
   const snapUserState = useSnapshot(userState)
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
-      const accountTruncated = truncateAddress(snapUserState.currentAccount)
+      const accountTruncated = truncateAddress(snapUserState.currentAccount as Address)
       return `(${accountTruncated})`
     }
     return
   }
-	return (
+  return (
     <$NetworkText style={{ flex: 2 }}>
       <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
-        onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount as string || '')}
+        onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as string) || '')}
         style={{ cursor: 'pointer' }}
       >
         {renderTinyAccount()}
       </span>
     </$NetworkText>
-	)
+  )
 }
 
 export const $NetworkText = styled.span`
@@ -37,4 +38,4 @@ export const $NetworkText = styled.span`
   font-family: sans-serif;
 `
 
-export default NetworkText;
+export default NetworkText

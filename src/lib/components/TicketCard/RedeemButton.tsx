@@ -7,6 +7,7 @@ import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { ticketCardState, generateStateID, redeemTicket } from './state'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
@@ -19,11 +20,13 @@ const RedeemButton = (props: RedeemButtonProps) => {
   const [loading, setLoading] = useState(false)
 
   const isWalletConnected = snapUser.accounts.length > 0
-  const stateID = props.ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, props.ticketID)
+  const stateID =
+    props.ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
 
   const toggleRoute = () => {
-    const stateID = snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress, props.ticketID)
+    const stateID =
+      snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
     if (stateID && snap.tickets[stateID]) {
       if (snap.tickets[stateID].route === '/payout') {
         ticketCardState.tickets[stateID].route = '/card'

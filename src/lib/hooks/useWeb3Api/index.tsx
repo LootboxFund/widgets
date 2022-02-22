@@ -4,9 +4,9 @@ import { userState } from 'lib/state/userState'
 import { DEFAULT_CHAIN_ID_HEX } from '../constants'
 import { Address, BLOCKCHAINS, ChainIDHex, chainIdHexToSlug, ChainInfo, TokenData } from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { crowdSaleState } from 'lib/components/_deprecated/CrowdSale/state'
-import Web3Utils from 'web3-utils';
-import { Eth } from 'web3-eth';
+import { crowdSaleState } from 'lib/state/crowdSale.state'
+import Web3Utils from 'web3-utils'
+import { Eth } from 'web3-eth'
 import { clearSwapState } from 'lib/state/swap.state'
 
 export const useWeb3 = async () => {
@@ -18,12 +18,12 @@ export const useWeb3Utils = () => {
 }
 
 export const useWeb3Eth = () => {
-  // if (!window.web3 || !window.web3.eth) { 
+  // if (!window.web3 || !window.web3.eth) {
   //   const client: Eth = new (Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
   //   return client
   // }
-  if (!window.web3 || !window.web3.eth) { 
-    const client: Eth = new ((window as any).Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
+  if (!window.web3 || !window.web3.eth) {
+    const client: Eth = new ((window as any).Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth
     return client
   }
   return window.web3.eth
@@ -165,7 +165,7 @@ export const initDApp = async (rpcUrl?: string) => {
   if (!window.ethereum) {
     throw new Error('window.ethereum is not defined!')
   }
-  ; (window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
+  ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
     const chainSlug = chainIdHexToSlug(chainIdHex)
     if (chainSlug) {
       const blockchain = BLOCKCHAINS[chainSlug]
@@ -196,7 +196,6 @@ const initWeb3OnWindow = async (rpcUrl?: string) => {
   }
 }
 
-
 export const updateStateToChain = (chainInfo: ChainInfo) => {
   console.log(`-----> chainInfo`)
   console.log(chainInfo)
@@ -220,7 +219,6 @@ export const clearStateToChain = () => {
   clearCrowdSaleState()
   initTokenList()
 }
-
 
 export const clearCrowdSaleState = () => {
   crowdSaleState.targetToken = null

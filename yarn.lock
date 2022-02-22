@@ -2075,10 +2075,10 @@
     axios "0.25.0"
     lodash "4.17.21"
 
-"@lootboxfund/helpers@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.13.tgz#57ffbe9d83815b567f416e4b525185e071079872"
-  integrity sha512-JuXCkvkRY3QkDSALFv+DKW+n9aB4oZxVd+wIhkfOx8msBcZmWeNmd3P901aUcwGb/OxfKQ1ibbvrp5Gb5391kA==
+"@lootboxfund/helpers@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.14.tgz#ab796e29d356a8a04b9ed1386db9e19269f94b71"
+  integrity sha512-gSW+gzmsiSKSQh7qpIzlJiliibHzpBBvMyqefgi+zrkp2qC8is44xXdd7OMeq6jPN9A1TIK/VwYpb3lm51OLvw==
   dependencies:
     axios "0.25.0"
     lodash "4.17.21"

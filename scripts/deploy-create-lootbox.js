@@ -2,18 +2,16 @@ const { Storage } = require('@google-cloud/storage')
 const express = require('express')
 const app = new express()
 const storage = new Storage()
-const { Manifest_v0_2_0_sandbox: Manifest } = require("@lootboxfund/manifest")
-export const manifest = Manifest.default
+const { Manifest_v0_2_0_sandbox: Manifest } = require('@lootboxfund/manifest')
+const manifest = Manifest.default
 
 /**
  * CONSTANTS
- * 
+ *
  */
 const bucketName = manifest.googleCloud.bucket.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/kangzeroo/Projects/GuildFX/widgets/iife/'
-
-
+const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 // Testing out upload of file
 const uploadFile = async ({ filename, semver, absPath }) => {

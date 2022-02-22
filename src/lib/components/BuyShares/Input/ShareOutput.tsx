@@ -1,6 +1,6 @@
 import react, { useState } from 'react'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import $Button from 'lib/components/Generics/Input'
+import $Button from 'lib/components/Generics/Button'
 import { $Input } from 'lib/components/Generics/Input'
 import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'

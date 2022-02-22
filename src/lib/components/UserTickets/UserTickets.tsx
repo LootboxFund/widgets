@@ -6,6 +6,7 @@ import TicketCard from 'lib/components/TicketCard'
 import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
+import { Address } from '@lootboxfund/helpers'
 
 const TICKET_PAGINATION = 3
 
@@ -18,7 +19,7 @@ const UserTickets = (props: Props) => {
   const [pageIdx, setPageIdx] = useState(0)
   const isPaginated = screen === 'desktop'
 
-  const ticketCopy: (string | undefined)[] = [...snap.userTickets].reverse()
+  const ticketCopy: (string | undefined)[] = [...snap.userTickets].reverse() as Address[]
 
   const tickets: (string | undefined)[] = isPaginated
     ? ticketCopy.slice(pageIdx, pageIdx + TICKET_PAGINATION)
