@@ -164,6 +164,7 @@ export const fetchLootboxData = async (lootboxAddress: Address) => {
     ticketIdCounter: ticketIdCounter,
     shareDecimals: shareDecimals,
   }
+  loadInputTokenData()
 }
 
 export const addTicketToWallet = async () => {
