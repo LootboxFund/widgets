@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -40,9 +40,8 @@ export interface StepTermsConditionsProps {
   setValidity: (bool: boolean) => void;
   submitStatus: SubmitStatus;
   goToLootboxAdminPage: () => string;
-  ref?: React.RefObject<HTMLDivElement>;
 }
-const StepTermsConditions = (props: StepTermsConditionsProps) => {
+const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const initialErrors = {
@@ -103,7 +102,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
   }
 	return (
 		<$StepTermsConditions>
-      {props.ref && <div ref={props.ref}></div>}
+      {ref && <div ref={ref}></div>}
       <StepCard
         customActionBar={
           (props.stage === "in_progress" || props.stage === "may_proceed") && Object.values(errors).filter(e => e).length === 0
@@ -149,7 +148,7 @@ const StepTermsConditions = (props: StepTermsConditionsProps) => {
       </StepCard>
 		</$StepTermsConditions>
 	)
-}
+})
 
 const $StepTermsConditions = styled.section<{}>`
   font-family: sans-serif;

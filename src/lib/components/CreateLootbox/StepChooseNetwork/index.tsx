@@ -1,4 +1,4 @@
-import react from 'react'
+import react, { forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -14,10 +14,9 @@ export interface StepChooseNetworkProps {
   onSelectNetwork: (network: NetworkOption) => void;
   selectedNetwork?: NetworkOption;
   onNext: () => void;
-  ref?: React.RefObject<HTMLDivElement>;
   setValidity: (bool: boolean) => void;
 }
-const StepChooseNetwork = (props: StepChooseNetworkProps) => {
+const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
   const renderNetworkOptions = () => {
     const selectNetwork = (isAvailable: boolean, network: NetworkOption) => {
       if (isAvailable) {
@@ -52,7 +51,7 @@ const StepChooseNetwork = (props: StepChooseNetworkProps) => {
   }
 	return (
 		<$StepChooseNetwork>
-      {props.ref && <div ref={props.ref}></div>}
+      {ref && <div ref={ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.selectedNetwork ? props.stage : "in_progress"} onNext={props.onNext}>
         <$Horizontal flex={1}>
           <$Vertical flex={2}>
@@ -69,7 +68,7 @@ const StepChooseNetwork = (props: StepChooseNetworkProps) => {
       </StepCard>
 		</$StepChooseNetwork>
 	)
-}
+})
 
 const $StepChooseNetwork = styled.section<{}>`
   font-family: sans-serif;

@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -23,10 +23,9 @@ export interface StepChooseReturnsProps {
   fundraisingTarget: BigNumber;
   basisPoints: number;
   setBasisPoints: (basisPoints: number) => void;
-  ref?: React.RefObject<HTMLDivElement>;
   onNext: () => void;
 }
-const StepChooseReturns = (props: StepChooseReturnsProps) => {
+const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.RefObject<HTMLDivElement>) => {
   const web3Utils = useWeb3Utils()
   const { screen } = useWindowSize()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
@@ -181,7 +180,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
   }
 	return (
 		<$StepChooseReturns>
-      {props.ref && <div ref={props.ref}></div>}
+      {ref && <div ref={ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
@@ -199,7 +198,7 @@ const StepChooseReturns = (props: StepChooseReturnsProps) => {
       </StepCard>
 		</$StepChooseReturns>
 	)
-}
+})
 
 const $BigIcon = styled.span`
   font-size: 2.2rem;
