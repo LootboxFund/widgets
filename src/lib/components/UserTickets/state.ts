@@ -1,7 +1,7 @@
 import { Address } from 'lib/types/baseTypes'
 import { proxy, subscribe } from 'valtio'
 import { fetchUserTicketsFromLootbox } from 'lib/hooks/useContract'
-import { loadTicketData } from 'lib/components/TicketCard/state'
+import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { userState } from 'lib/state/userState'
 import { buySharesState, loadInputTokenData, fetchLootboxData } from '../BuyShares/state'
 
@@ -33,6 +33,16 @@ subscribe(buySharesState.lastTransaction, () => {
     ])
   }
 })
+
+export const loadState = async (lootboxAddress: Address) => {
+  userTicketState.lootboxAddress = lootboxAddress
+  ticketCardState.lootboxAddress = lootboxAddress
+  try {
+    await loadUserTickets()
+  } catch (err) {
+    console.error('Error loading user tickets', err)
+  }
+}
 
 export const loadUserTickets = async () => {
   if (!userTicketState.lootboxAddress) {

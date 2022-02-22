@@ -2,12 +2,11 @@ import react, { useEffect } from 'react'
 import UserTickets from './UserTickets'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { loadUserTickets, userTicketState } from './state'
-import { ticketCardState } from 'lib/components/TicketCard/state'
+import { loadState } from './state'
 
 const UserTicketsWidget = () => {
   useEffect(() => {
-    window.onload = async () => {
+    const load = async () => {
       const lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
@@ -15,15 +14,10 @@ const UserTicketsWidget = () => {
         console.error('Error initializing DApp', err)
       }
       if (lootboxAddress) {
-        userTicketState.lootboxAddress = lootboxAddress
-        ticketCardState.lootboxAddress = lootboxAddress
-        try {
-          await loadUserTickets()
-        } catch (err) {
-          console.error('Error loading user tickets', err)
-        }
+        loadState(lootboxAddress)
       }
     }
+    load()
   }, [])
 
   return <UserTickets />
