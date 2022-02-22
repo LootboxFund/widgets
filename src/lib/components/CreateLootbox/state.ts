@@ -1,17 +1,5 @@
-// const inputTokenPrice = await getPriceFeed(crowdSaleState.inputToken.data.priceOracle)
 
-import { proxy } from 'valtio'
 import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@lootboxfund/helpers';
-
-// interface CreateLootboxState {
-//   nativeTokenPriceFeed: Address
-//   chainIdHex: ChainIDHex
-// }
-// const initialCreateLootboxState: CreateLootboxState = {
-//   nativeTokenPriceFeed: "0x0000000000000000000000000000000000000000",
-//   chainIdHex: "0x0000000000000000000000000000000000000000",
-// }
-// export const createLootboxState = proxy(initialCreateLootboxState)
 
 
 export interface NetworkOption {

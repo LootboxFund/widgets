@@ -66,7 +66,7 @@
     "@lingui/core": "^3.13.0",
     "@lingui/macro": "^3.13.0",
     "@lingui/react": "^3.13.0",
-    "@lootboxfund/helpers": "^0.0.12",
+    "@lootboxfund/helpers": "0.0.13",
     "@lootboxfund/manifest": "^0.2.23",
     "@metamask/detect-provider": "^1.2.0",
     "@reduxjs/toolkit": "^1.7.1",

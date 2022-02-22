@@ -8,7 +8,7 @@ import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
+import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
@@ -17,10 +17,14 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const snapUserState = useSnapshot(userState)
   const goToBuySharesComponent = () => (buySharesState.route = '/buyShares')
   const getBscScanUrl = () => {
-    if (snapUserState.network.currentNetworkIdHex && BLOCKCHAINS[snapUserState.network.currentNetworkIdHex]) {
-      return `${BLOCKCHAINS[snapUserState.network.currentNetworkIdHex].blockExplorerUrls[0]}${
-        snap.lastTransaction.hash ? `tx/${snap.lastTransaction.hash}` : ''
-      }`
+    if (snapUserState.network.currentNetworkIdHex) {
+      const chainSlug = chainIdHexToSlug(snapUserState.network.currentNetworkIdHex)
+      if (snapUserState.network.currentNetworkIdHex && chainSlug && BLOCKCHAINS[chainSlug]) {
+        return `${BLOCKCHAINS[chainSlug].blockExplorerUrls[0]}${
+          snap.lastTransaction.hash ? `tx/${snap.lastTransaction.hash}` : ''
+        }`
+      }
+      return undefined
     }
     return undefined
   }

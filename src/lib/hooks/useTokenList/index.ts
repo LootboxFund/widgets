@@ -1,4 +1,3 @@
-import uriToHttp from 'lib/utils/uriToHttp'
 import { DEFAULT_CHAIN_ID_HEX, DEMO_CUSTOM_TOKENS_BSC_MAINNET, TokenDataFE, tokenMap } from 'lib/hooks/constants'
 import { ChainIDHex, Address } from '@lootboxfund/helpers';
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'

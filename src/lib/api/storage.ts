@@ -4,10 +4,10 @@ import {
   DEFAULT_TICKET_IMAGE,
   DEFAULT_TICKET_BACKGROUND,
   DEFAULT_TICKET_BACKGROUND_COLOR,
-  PIPEDREAM_TOKEN_URI_UPLOADER,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers';
+import { manifest } from '../../manifest';
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
@@ -69,7 +69,7 @@ export const createTokenURIData = async (inputs: ITicketMetadata) => {
     'Content-Type': 'application/json',
     'secret': 'mysecret'
   });
-  const x = await fetch(PIPEDREAM_TOKEN_URI_UPLOADER, {
+  const x = await fetch(manifest.pipedream.sources.onLootboxURI.webhookEndpoint, {
     method: 'POST',
     headers: headers,
     mode: 'cors',

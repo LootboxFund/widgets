@@ -1,7 +1,5 @@
 import { TokenDataFE } from 'lib/hooks/constants'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
-import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
-import { userState } from 'lib/state/userState'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
@@ -79,3 +77,13 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
   return parseFloat(balanceAsString)
 }
 
+
+export const clearSwapState = () => {
+  swapState.targetToken = null
+  swapState.inputToken.data = undefined
+  swapState.inputToken.displayedBalance = undefined
+  swapState.inputToken.quantity = undefined
+  swapState.outputToken.data = undefined
+  swapState.outputToken.displayedBalance = undefined
+  swapState.outputToken.quantity = undefined
+}

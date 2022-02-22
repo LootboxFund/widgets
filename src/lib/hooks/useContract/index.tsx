@@ -4,9 +4,7 @@ import { useWeb3 } from '../useWeb3Api'
 import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/_deprecated/crowdSale.json'
-import GFXConstantsABI from 'lib/abi/_deprecated/gfxConstants.json'
-import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { userState } from 'lib/state/userState'
+import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
 import { TokenData, Address } from '@lootboxfund/helpers';
 import { useWeb3Eth } from 'lib/hooks/useWeb3Api'
@@ -54,36 +52,6 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
   const data = await contractInstance.methods.latestRoundData().call({ from: currentUser })
   console.log(data)
   return data.answer
-}
-
-export const getCrowdSaleSeedData = async (crowdSaleAddress: Address): Promise<CrowdSaleSeedData> => {
-  const networkAddresses = addresses[userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX]
-  if (networkAddresses == undefined) {
-    throw new Error('Network not configured!')
-  }
-  const web3 = await useWeb3()
-  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress)
-  const gfxConstants = new web3.eth.Contract(
-    GFXConstantsABI,
-    // Can I use this "userState" here like this?
-    networkAddresses.gfxConstants
-  )
-  const [guildTokenAddress, guildTokenPrice, ...stableCoins] = await Promise.all([
-    // Load the guildTokenAddress
-    crowdSale.methods.GUILD().call(),
-    // Loads the current price for the guild token
-    crowdSale.methods.currentPriceUSD().call(),
-    // Gets stable coins from the gfxConstants
-    gfxConstants.methods.ETH_ADDRESS().call(),
-    gfxConstants.methods.USDC_ADDRESS().call(),
-    gfxConstants.methods.USDT_ADDRESS().call(),
-  ])
-
-  return {
-    guildTokenAddress,
-    guildTokenPrice,
-    stableCoins,
-  }
 }
 
 export const purchaseFromCrowdSale = async (
@@ -141,11 +109,6 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
-  const networkAddresses =
-    (userState.network?.currentNetworkIdHex && addresses[userState.network.currentNetworkIdHex]) || DEFAULT_CHAIN_ID_HEX
-  if (networkAddresses == undefined) {
-    throw new Error('Network not configured!')
-  }
   const web3Eth = await useWeb3Eth()
   const lootbox = new web3Eth.Contract(LootboxABI, lootboxAddress)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =

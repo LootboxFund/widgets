@@ -1,13 +1,9 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import $Button from 'lib/components/Generics/Button'
-import { COLORS } from 'lib/theme'
 import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import WalletButton from 'lib/components/WalletButton';
 import {StepStage} from 'lib/components/CreateLootbox/StepCard';
 import StepChooseFunding from 'lib/components/CreateLootbox/StepChooseFunding';
 import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';

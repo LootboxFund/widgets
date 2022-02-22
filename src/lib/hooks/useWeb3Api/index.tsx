@@ -1,16 +1,13 @@
 import react from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
-import { ChainInfo, BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../constants'
-import { ChainIDHex, TokenData } from '@lootboxfund/helpers'
+import { DEFAULT_CHAIN_ID_HEX } from '../constants'
+import { Address, BLOCKCHAINS, ChainIDHex, chainIdHexToSlug, ChainInfo, TokenData } from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { swapState } from 'lib/components/_deprecated/Swap/state'
 import { crowdSaleState } from 'lib/components/_deprecated/CrowdSale/state'
-
-import { buySharesState } from 'lib/components/BuyShares/state'
 import Web3Utils from 'web3-utils';
-import * as Web3 from 'web3';
 import { Eth } from 'web3-eth';
+import { clearSwapState } from 'lib/state/swap.state'
 
 export const useWeb3 = async () => {
   return window.web3
@@ -70,31 +67,36 @@ export const useUserInfo = () => {
 }
 
 export const addCustomEVMChain = async (chainIdHex: string) => {
-  const chainInfo = BLOCKCHAINS[chainIdHex]
-  if (chainInfo) {
-    try {
-      await (window as any).ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            chainId: chainInfo.chainIdHex,
-            chainName: chainInfo.chainName,
-            nativeCurrency: chainInfo.nativeCurrency,
-            rpcUrls: chainInfo.rpcUrls,
-            blockExplorerUrls: chainInfo.blockExplorerUrls,
-          },
-        ],
-      })
-      updateStateToChain(chainInfo)
-      return
-    } catch (e) {
-      console.error(
-        `Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`
-      )
-      console.error(e)
-      return
+  const chainSlug = chainIdHexToSlug(chainIdHex)
+  if (chainSlug) {
+    const chainInfo = BLOCKCHAINS[chainSlug]
+    if (chainInfo) {
+      try {
+        await (window as any).ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: chainInfo.chainIdHex,
+              chainName: chainInfo.chainName,
+              nativeCurrency: chainInfo.nativeCurrency,
+              rpcUrls: chainInfo.rpcUrls,
+              blockExplorerUrls: chainInfo.blockExplorerUrls,
+            },
+          ],
+        })
+        updateStateToChain(chainInfo)
+        return
+      } catch (e) {
+        console.error(
+          `Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`
+        )
+        console.error(e)
+        return
+      }
     }
+    return
   }
+  return
 }
 
 export const addERC20ToWallet = async (token: TokenData) => {
@@ -149,28 +151,32 @@ export const initDApp = async (rpcUrl?: string) => {
   const chainIdHex = (window as any).ethereum
     ? await (window as any).ethereum.request({ method: 'eth_chainId' })
     : DEFAULT_CHAIN_ID_HEX
-
-  const blockchain = BLOCKCHAINS[chainIdHex]
-
-  if (blockchain) {
-    updateStateToChain(blockchain)
+  const chainSlug = chainIdHexToSlug(chainIdHex)
+  if (chainSlug) {
+    const blockchain = BLOCKCHAINS[chainSlug]
+    if (blockchain) {
+      updateStateToChain(blockchain)
+    }
   }
-  const userAccounts = await window.web3.eth.getAccounts()
+  const userAccounts = (await window.web3.eth.getAccounts()) as Address[]
 
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]
   if (!window.ethereum) {
     throw new Error('window.ethereum is not defined!')
   }
-  ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
-    const blockchain = BLOCKCHAINS[chainIdHex]
-    if (blockchain) {
-      updateStateToChain(blockchain)
-    } else {
-      clearStateToChain()
+  ; (window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
+    const chainSlug = chainIdHexToSlug(chainIdHex)
+    if (chainSlug) {
+      const blockchain = BLOCKCHAINS[chainSlug]
+      if (blockchain) {
+        updateStateToChain(blockchain)
+      } else {
+        clearStateToChain()
+      }
     }
   })
-  ;(window as any).ethereum.on('accountsChanged', async (accounts: ChainIDHex[]) => {
+  ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
     userState.accounts = accounts
     userState.currentAccount = accounts[0]
   })
@@ -189,6 +195,7 @@ const initWeb3OnWindow = async (rpcUrl?: string) => {
     throw Error('MetaMask not detected')
   }
 }
+
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
   console.log(`-----> chainInfo`)

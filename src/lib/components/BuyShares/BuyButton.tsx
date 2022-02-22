@@ -1,5 +1,4 @@
 import { $Button } from 'lib/components/Generics/Button'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useWeb3 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
@@ -10,6 +9,7 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { BLOCKCHAINS } from '@lootboxfund/helpers'
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
