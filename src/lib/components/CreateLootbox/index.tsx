@@ -272,6 +272,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
+    if (!nativeTokenPrice) {
+      console.error('No token price')
+      setSubmitStatus("failure")
+      return;
+    }
     setSubmitStatus("in_progress")
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
     const blockNum = await web3Eth.getBlockNumber()
@@ -280,7 +285,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     ).div(new web3Utils.BN("10"))    
     const maxSharesSold = fundraisingTarget
       .mul(
-        nativeTokenPrice
+        nativeTokenPrice.toString()
       )
       .div(pricePerShare)
       .mul(new web3Utils.BN("11"))
