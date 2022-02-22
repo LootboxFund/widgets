@@ -12,6 +12,7 @@ import { generateStateID } from './state'
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
   isRedeemEnabled?: boolean
+  onScrollToMint?: () => void
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -45,7 +46,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       {ticket && ticket.route === '/payout' ? (
         <ViewPayout ticketID={props.ticketID} />
       ) : (
-        <TicketCard ticketID={props.ticketID} />
+        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
     </$RootContainer>

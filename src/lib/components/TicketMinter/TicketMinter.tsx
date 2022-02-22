@@ -1,10 +1,11 @@
-import react from 'react'
+import react, { forwardRef } from 'react'
 import BuyShares from 'lib/components/BuyShares'
 import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import React from 'react'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -31,13 +32,14 @@ const $Col = styled.section<{ width: string }>`
   height: 100%;
 `
 
-const TicketMinter = () => {
+const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(ticketMinterState)
   const { screen } = useWindowSize()
   const buyWidth = screen === 'desktop' ? '60%' : '100%'
   const ticketWidth = screen === 'desktop' ? '40%' : '0%'
   return (
     <$TicketMinterContainer>
+      {ref && <div ref={ref} />}
       <$Row>
         <$Col width={buyWidth}>
           <BuyShares />
@@ -50,6 +52,6 @@ const TicketMinter = () => {
       </$Row>
     </$TicketMinterContainer>
   )
-}
+})
 
 export default TicketMinter

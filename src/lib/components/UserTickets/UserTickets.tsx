@@ -9,7 +9,10 @@ import styled from 'styled-components'
 
 const TICKET_PAGINATION = 3
 
-const UserTickets = () => {
+interface Props {
+  onScrollToMint?: () => void
+}
+const UserTickets = (props: Props) => {
   const snap = useSnapshot(userTicketState)
   const { screen } = useWindowSize()
   const [pageIdx, setPageIdx] = useState(0)
@@ -68,7 +71,7 @@ const UserTickets = () => {
     <Wrapper>
       {tickets.map((ticketID, idx) => (
         <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
-          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
+          <TicketCard ticketID={ticketID} isRedeemEnabled={true} onScrollToMint={props.onScrollToMint}></TicketCard>
         </$TicketWrapper>
       ))}
     </Wrapper>
