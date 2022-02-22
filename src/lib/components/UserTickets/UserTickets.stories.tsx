@@ -3,10 +3,9 @@ import UserTickets from '.'
 import { $CardViewport } from '../Generics'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
-import { loadUserTickets, userTicketState } from './state'
+import { loadState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ticketCardState } from 'lib/components/TicketCard/state'
 
 export default {
   title: 'UserTickets',
@@ -26,13 +25,7 @@ const Template = () => {
         console.error('Error initializing DApp', err)
       }
       if (lootboxAddress) {
-        userTicketState.lootboxAddress = lootboxAddress
-        ticketCardState.lootboxAddress = lootboxAddress
-        try {
-          await loadUserTickets()
-        } catch (err) {
-          console.error('Error loading user tickets', err)
-        }
+        loadState(lootboxAddress)
       }
     }
     load()

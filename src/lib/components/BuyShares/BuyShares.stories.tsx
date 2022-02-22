@@ -13,10 +13,10 @@ export default {
 }
 
 const Template = () => {
-  const lootboxAddress = parseUrlParams('lootbox')
   useEffect(() => {
     ;(window as any).Web3 = Web3
     const load = async () => {
+      const lootboxAddress = parseUrlParams('lootbox')
       try {
         await initDApp()
       } catch (err) {

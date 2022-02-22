@@ -5,10 +5,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import TicketMinter from '.'
-import { ticketMinterState } from './state'
-import { getLootboxTicketId } from 'lib/hooks/useContract'
-import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
-import { fetchLootboxData } from 'lib/components/BuyShares/state'
+import { loadState } from './state'
 
 export default {
   title: 'TicketMinter',
@@ -17,26 +14,16 @@ export default {
 
 const Template = () => {
   useEffect(() => {
+    ;(window as any).Web3 = Web3
     const load = async () => {
       const lootboxAddress = parseUrlParams('lootbox')
-      ;(window as any).Web3 = Web3
       try {
         await initDApp()
       } catch (err) {
         console.error('Error initializing dapp', err)
       }
       if (lootboxAddress) {
-        ticketCardState.lootboxAddress = lootboxAddress
-        ticketMinterState.lootboxAddress = lootboxAddress
-        let ticketID = undefined
-        try {
-          ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), fetchLootboxData(lootboxAddress)])
-        } catch (err) {
-          console.error('Error fetching ticket id', err)
-          ticketID = '0'
-        }
-        ticketMinterState.ticketID = ticketID
-        loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
+        loadState(lootboxAddress)
       }
     }
     load().catch((err) => console.error(err))

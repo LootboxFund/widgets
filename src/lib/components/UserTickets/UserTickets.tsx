@@ -15,11 +15,7 @@ const UserTickets = () => {
   const [pageIdx, setPageIdx] = useState(0)
   const isPaginated = screen === 'desktop'
 
-  const ticketCopy: (string | undefined)[] = [...snap.userTickets]
-
-  if (ticketCopy.length >= TICKET_PAGINATION) {
-    ticketCopy.unshift(undefined) // Adds a placeholder at the front of list
-  }
+  const ticketCopy: (string | undefined)[] = [...snap.userTickets].reverse()
 
   const tickets: (string | undefined)[] = isPaginated
     ? ticketCopy.slice(pageIdx, pageIdx + TICKET_PAGINATION)
@@ -51,14 +47,14 @@ const UserTickets = () => {
   const Wrapper = ({ children }: { children: JSX.Element[] }) => {
     if (isPaginated) {
       return (
-        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3}>
-          <$IconWrapper onClick={decrementPage}>
+        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative">
+          <$IconWrapper onClick={decrementPage} first>
             <$Icon size="56px">{'<'}</$Icon>
           </$IconWrapper>
-          <$Horizontal wrap overflow justifyContent="center" height="100%" width="100%" spacing={3}>
+          <$Horizontal flexWrap overflowHidden justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
-          <$IconWrapper onClick={incrementPage}>
+          <$IconWrapper onClick={incrementPage} last>
             <$Icon size="56px">{'>'}</$Icon>
           </$IconWrapper>
         </$Horizontal>
@@ -71,25 +67,24 @@ const UserTickets = () => {
   return (
     <Wrapper>
       {tickets.map((ticketID, idx) => (
-        <$TicketWrapper>
-          <TicketCard
-            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
-            ticketID={ticketID}
-            isRedeemEnabled={true}
-          ></TicketCard>
+        <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
+          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
         </$TicketWrapper>
       ))}
     </Wrapper>
   )
 }
 
-const $IconWrapper = styled.div`
+const $IconWrapper = styled.div<{ first?: boolean; last?: boolean }>`
   width: 100px;
   height: 100px;
   border-radius: 100%;
   background: rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  margin: auto 0px;
+  position: absolute;
+  ${(props) => props.first && `left: -35px;`}
+  ${(props) => props.last && `right: -35px;`}
+  top: 30%;
 `
 
 const $TicketWrapper = styled.div`

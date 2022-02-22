@@ -8,7 +8,6 @@ import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
-import parseUrlParams from 'lib/utils/parseUrlParams'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -76,9 +75,7 @@ subscribe(userState, () => {
   if (buySharesState.lootbox?.data?.address) {
     fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
   }
-  if (buySharesState.inputToken.data) {
-    loadTokenData(buySharesState.inputToken.data).catch((err) => console.error(err))
-  }
+  loadInputTokenData()
 })
 
 const updateLootboxQuantity = () => {
@@ -131,7 +128,7 @@ export const purchaseLootboxShare = async () => {
     )
     buySharesState.lastTransaction.success = true
     buySharesState.lastTransaction.hash = tx?.transactionHash
-    loadTokenData(buySharesState.inputToken.data).catch((err) => console.error(err))
+    loadInputTokenData()
   } catch (err) {
     console.error(err)
     buySharesState.lastTransaction.success = false
@@ -167,6 +164,7 @@ export const fetchLootboxData = async (lootboxAddress: Address) => {
     ticketIdCounter: ticketIdCounter,
     shareDecimals: shareDecimals,
   }
+  loadInputTokenData()
 }
 
 export const addTicketToWallet = async () => {
@@ -175,12 +173,16 @@ export const addTicketToWallet = async () => {
   // }
 }
 
-export const loadTokenData = async (token: TokenDataFE) => {
+export const loadInputTokenData = async () => {
+  if (!buySharesState.inputToken.data) {
+    console.error('Input token not defined!')
+    return
+  }
   if (userState.currentAccount) {
     const promise =
-      token.address === NATIVE_ADDRESS
+      buySharesState.inputToken.data.address === NATIVE_ADDRESS
         ? getUserBalanceOfNativeToken(userState.currentAccount)
-        : getUserBalanceOfToken(token.address, userState.currentAccount)
+        : getUserBalanceOfToken(buySharesState.inputToken.data.address, userState.currentAccount)
 
     promise.then(async (tokenBalance) => {
       buySharesState.inputToken.balance = tokenBalance
@@ -188,7 +190,6 @@ export const loadTokenData = async (token: TokenDataFE) => {
   } else {
     buySharesState.inputToken.balance = '0'
   }
-  buySharesState.inputToken.data = token
   loadPriceFeed().catch((err) => console.error(err))
 }
 
