@@ -263,7 +263,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const blockNum = await web3Eth.getBlockNumber()
     const pricePerShare = new web3Utils.BN(
       web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")
-    ).div(new web3Utils.BN("100"))    
+    ).div(new web3Utils.BN("10"))    
     const maxSharesSold = fundraisingTarget
       .mul(
         new web3Utils.BN("10").pow(new web3Utils.BN("8"))
