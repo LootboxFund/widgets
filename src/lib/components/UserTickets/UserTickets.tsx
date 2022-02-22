@@ -51,14 +51,14 @@ const UserTickets = () => {
   const Wrapper = ({ children }: { children: JSX.Element[] }) => {
     if (isPaginated) {
       return (
-        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3}>
-          <$IconWrapper onClick={decrementPage}>
+        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative">
+          <$IconWrapper onClick={decrementPage} start>
             <$Icon size="56px">{'<'}</$Icon>
           </$IconWrapper>
           <$Horizontal wrap overflow justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
-          <$IconWrapper onClick={incrementPage}>
+          <$IconWrapper onClick={incrementPage} end>
             <$Icon size="56px">{'>'}</$Icon>
           </$IconWrapper>
         </$Horizontal>
@@ -83,13 +83,16 @@ const UserTickets = () => {
   )
 }
 
-const $IconWrapper = styled.div`
+const $IconWrapper = styled.div<{ start?: boolean; end?: boolean }>`
   width: 100px;
   height: 100px;
   border-radius: 100%;
   background: rgba(0, 0, 0, 0.05);
   cursor: pointer;
-  margin: auto 0px;
+  position: absolute;
+  ${(props) => props.start && `left: -35px;`}
+  ${(props) => props.end && `right: -35px;`}
+  top: 30%;
 `
 
 const $TicketWrapper = styled.div`

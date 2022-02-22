@@ -11,6 +11,7 @@ interface HorizontalProps {
   readonly height?: string
   readonly width?: string
   readonly overflow?: boolean
+  readonly position?: 'absolute' | 'relative'
 }
 const SPACING_VALS = [4, 8, 16, 24, 48]
 
@@ -25,6 +26,8 @@ export const $Horizontal = styled.div<HorizontalProps>`
   ${(props) => props.height && `height: ${props.height};`}
   ${(props) => props.width && `width: ${props.width};`}
   ${(props) => props.overflow && `overflow: hidden;`}
+  ${(props) => props.position && `position: ${props.position};`}
+  
 
   & > *:not(:last-child) {
     margin-right: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
