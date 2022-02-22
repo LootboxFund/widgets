@@ -71,12 +71,8 @@ const UserTickets = () => {
   return (
     <Wrapper>
       {tickets.map((ticketID, idx) => (
-        <$TicketWrapper>
-          <TicketCard
-            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
-            ticketID={ticketID}
-            isRedeemEnabled={true}
-          ></TicketCard>
+        <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
+          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
         </$TicketWrapper>
       ))}
     </Wrapper>
