@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import StepTermsConditions, { StepTermsConditionsProps } from 'lib/components/CreateLootbox/StepTermsConditions'
+import StepTermsConditions, { StepTermsConditionsProps, SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { StepStage } from 'lib/components/StepCard'
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json';
 import { useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio';
 import Web3 from 'web3';
+import { Address } from '@guildfx/helpers';
+import { createTokenURIData } from 'lib/api/storage';
 
 
 export default {
@@ -23,6 +25,7 @@ const Demo = (args: StepTermsConditionsProps) => {
     agreeLiability: false,
     agreeVerify: false
   }
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("unsubmitted")
   const reputationWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
   const [treasuryWallet, setTreasuryWallet] = useState("0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A")
   const [stage, setStage] = useState<StepStage>("in_progress")
@@ -39,62 +42,23 @@ const Demo = (args: StepTermsConditionsProps) => {
   }, [termsState])
   const network = { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media' }
 
+  const [lootboxAddress, setLootboxAddress] = useState<Address>("")
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
   }
 
   const createLootbox = async () => {
-    console.log(`creating lootbox...`)
-    const receivingWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
+    setSubmitStatus("in_progress")
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
-    console.log(`snapUserState.currentAccount = ${snapUserState.currentAccount}`)
+    const blockNum = await web3Eth.getBlockNumber()
+    const fundraisingTarget = "10000000000000000000000"
+    const receivingWallet = "0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A"
+
     const lootbox = new web3Eth.Contract(
       LOOTBOX_FACTORY_ABI,
       LOOTBOX_FACTORY_ADDRESS,
       { from: snapUserState.currentAccount, gas: '1000000' }
     )
-    let options = {
-      filter: {
-          value: [],
-      },
-      fromBlock: 16904734,
-      topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
-      from: snapUserState.currentAccount,
-    };
-    lootbox.events.LootboxCreated(options).on('data', (event: any) => {
-      console.log(`--- onData ---`)
-      console.log(event)
-      const {
-        issuer,
-        lootbox,
-        lootboxName,
-        maxSharesSold,
-        sharePriceUSD,
-        treasury
-      } = event.returnValues;
-      console.log(`
-      
-      issuer: ${issuer}
-      lootbox: ${lootbox}
-      lootboxName: ${lootboxName}
-      maxSharesSold: ${maxSharesSold}
-      sharePriceUSD: ${sharePriceUSD}
-      treasury: ${treasury}
-
-      `)
-      if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
-        console.log(`
-        
-        ---- 🎉🎉🎉 ----
-        
-        Congratulations! You've created a lootbox!
-        Lootbox Address: ${lootbox}
-
-        ---------------
-        
-        `)
-      }
-     })
     try {
       const x = await lootbox.methods.createLootbox(
         "name",
@@ -107,6 +71,79 @@ const Demo = (args: StepTermsConditionsProps) => {
       console.log(`--- createLootbox ---`)
       console.log(x)
       console.log(`------`)
+      let options = {
+        filter: {
+            value: [],
+        },
+        fromBlock: blockNum,
+        topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+        from: snapUserState.currentAccount,
+      };
+      lootbox.events.LootboxCreated(options).on('data', (event: any) => {
+        const {
+          issuer,
+          lootbox,
+          lootboxName,
+          maxSharesSold,
+          sharePriceUSD,
+          treasury
+        } = event.returnValues;
+        
+        if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
+          console.log(`
+          
+          ---- 🎉🎉🎉 ----
+          
+          Congratulations! You've created a lootbox!
+          Lootbox Address: ${lootbox}
+  
+          ---------------
+          
+          `)
+          setLootboxAddress(lootbox)
+          setSubmitStatus("success")
+          const basisPointsReturnTarget = new web3Utils.BN("10")
+            .add(new web3Utils.BN("100")) // make it whole
+            .mul(new web3Utils.BN("10").pow(new web3Utils.BN((8 - 6).toString())))
+            .mul(fundraisingTarget)
+            .div(new web3Utils.BN("10").pow(new web3Utils.BN("8")))
+          console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
+          createTokenURIData({
+            address: lootbox,
+            name: lootboxName,
+            description: "description",
+            image: "logo.png",
+            backgroundColor: "#F0B90B",
+            backgroundImage: "background.png",
+            lootbox: {
+              address: lootbox,
+              chainIdHex: "chainIdHex",
+              chainIdDecimal: "chainIdDecimal",
+              chainName: "chainName",
+              targetPaybackDate: new Date(),
+              fundraisingTarget,
+              basisPointsReturnTarget: "10",
+              returnAmountTarget: basisPointsReturnTarget.toString(),
+              pricePerShare: "6000000",
+              lootboxThemeColor: "#000000",
+              transactionHash: event.transactionHash as string,
+              blockNumber: event.blockNumber
+            },
+            socials: {
+              twitter: "",
+              email: "",
+              instagram: "",
+              tiktok: "",
+              facebook: "",
+              discord: "",
+              youtube: "",
+              snapchat: "",
+              twitch: "",
+              web: "",
+            }
+          })
+        }
+      })
     } catch (e) {
       console.log(e)
     }
@@ -124,7 +161,9 @@ const Demo = (args: StepTermsConditionsProps) => {
         treasuryWallet={treasuryWallet}
         updateTreasuryWallet={setTreasuryWallet}
         onNext={() => console.log("onNext")}
+        submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
+        goToLootboxAdminPage={() => "goToLootboxAdminPage"}
       />
     </div>
   )
