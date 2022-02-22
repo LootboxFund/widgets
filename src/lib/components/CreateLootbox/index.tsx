@@ -108,7 +108,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   
   const getLatestPrice = async () => {
     if (network?.priceFeed) {
-        const nativeTokenPrice = await getPriceFeed(network.priceFeed)
+        const nativeTokenPriceEther = await getPriceFeed(network.priceFeed)
+        const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
         setNativeTokenPrice(nativeTokenPrice)
     }
   }
@@ -285,7 +286,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     ).div(new web3Utils.BN("10"))    
     const maxSharesSold = fundraisingTarget
       .mul(
-        nativeTokenPrice.toString()
+        new web3Utils.BN(nativeTokenPrice.toString())
       )
       .div(pricePerShare)
       .mul(new web3Utils.BN("11"))
@@ -309,6 +310,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       receivingWallet = ${receivingWallet}
 
       fundraisingTarget = ${fundraisingTarget}
+
+      nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
       const x = await lootbox.methods.createLootbox(
