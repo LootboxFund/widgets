@@ -4,7 +4,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { truncateAddress } from 'lib/api/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics';
 import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal, containsAlphanumeric } from '@guildfx/helpers';
+import { ChainIDHex, ChainIDDecimal, containsAlphanumeric } from '@lootboxfund/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
 import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';

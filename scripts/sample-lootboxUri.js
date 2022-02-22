@@ -1,6 +1,27 @@
-// $ npx tsc src/scripts/upload-lootboxUri.ts 
+/**
+ *  Run this script to give Pipedream sample data (source:onLootboxURI)
+ * 
+ *  $ node scripts/upload-lootboxUri.js
+ */
 
-import { createTokenURIData } from '../lib/api/storage'
+const PIPEDREAM_TOKEN_URI_UPLOADER = "_________________________"
+
+const createTokenURIData = async (inputs) => {
+  console.log(`... createTokenURIData`)
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    'secret': 'mysecret'
+  });
+  const x = await fetch(PIPEDREAM_TOKEN_URI_UPLOADER, {
+    method: 'POST',
+    headers: headers,
+    mode: 'cors',
+    cache: 'default',
+    body: JSON.stringify(inputs)
+  })
+  console.log(x)
+  return x
+}
 
 createTokenURIData({
   address: "0x00000000000000000000000",

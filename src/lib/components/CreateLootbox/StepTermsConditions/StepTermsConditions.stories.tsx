@@ -6,7 +6,7 @@ import { useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio';
 import Web3 from 'web3';
-import { Address } from '@guildfx/helpers';
+import { Address } from '@lootboxfund/helpers';
 import { createTokenURIData } from 'lib/api/storage';
 
 

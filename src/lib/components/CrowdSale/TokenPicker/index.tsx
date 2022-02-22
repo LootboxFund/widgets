@@ -12,7 +12,7 @@ import { crowdSaleState, loadTokenData } from '../state'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { Address } from '@guildfx/helpers'
+import { Address } from '@lootboxfund/helpers'
 
 export interface TokenPickerProps {
   /** If specified, locks the picker to only these addresses */

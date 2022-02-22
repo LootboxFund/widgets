@@ -2,7 +2,7 @@
 
 import { Address, URL } from 'lib/types/baseTypes'
 import { proxy } from 'valtio'
-import { ChainIDDecimal, ChainIDHex } from '@guildfx/helpers';
+import { ChainIDDecimal, ChainIDHex } from '@lootboxfund/helpers';
 
 // interface CreateLootboxState {
 //   nativeTokenPriceFeed: Address

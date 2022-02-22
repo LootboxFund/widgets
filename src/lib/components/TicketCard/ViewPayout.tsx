@@ -6,7 +6,7 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
-import { removeProperties } from '@guildfx/helpers'
+import { removeProperties } from '@lootboxfund/helpers'
 import { COLORS } from 'lib/theme'
 
 export interface ViewPayoutProps {

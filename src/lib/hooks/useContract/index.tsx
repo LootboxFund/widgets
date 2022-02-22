@@ -9,7 +9,7 @@ import GFXConstantsABI from 'lib/abi/gfxConstants.json'
 import { addresses, DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
-import { TokenData } from '@guildfx/helpers'
+import { TokenData } from '@lootboxfund/helpers'
 import { useWeb3Eth } from 'lib/hooks/useWeb3Api'
 
 const BNB = 'bnb'

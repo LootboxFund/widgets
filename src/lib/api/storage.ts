@@ -1,4 +1,3 @@
-import { ITicketMetadata, TicketID, Address } from 'lib/types'
 import {
   DEFAULT_CHAIN_ID_HEX,
   storageUrl,
@@ -8,7 +7,7 @@ import {
   PIPEDREAM_TOKEN_URI_UPLOADER,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
-import { SemanticVersion, ChainIDHex } from '@guildfx/helpers';
+import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address } from '@lootboxfund/helpers';
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
