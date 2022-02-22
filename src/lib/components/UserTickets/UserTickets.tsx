@@ -15,11 +15,7 @@ const UserTickets = () => {
   const [pageIdx, setPageIdx] = useState(0)
   const isPaginated = screen === 'desktop'
 
-  const ticketCopy: (string | undefined)[] = [...snap.userTickets]
-
-  if (ticketCopy.length >= TICKET_PAGINATION) {
-    ticketCopy.unshift(undefined) // Adds a placeholder at the front of list
-  }
+  const ticketCopy: (string | undefined)[] = [...snap.userTickets].reverse()
 
   const tickets: (string | undefined)[] = isPaginated
     ? ticketCopy.slice(pageIdx, pageIdx + TICKET_PAGINATION)
@@ -52,13 +48,13 @@ const UserTickets = () => {
     if (isPaginated) {
       return (
         <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative">
-          <$IconWrapper onClick={decrementPage} start>
+          <$IconWrapper onClick={decrementPage} first>
             <$Icon size="56px">{'<'}</$Icon>
           </$IconWrapper>
-          <$Horizontal wrap overflow justifyContent="center" height="100%" width="100%" spacing={3}>
+          <$Horizontal flexWrap overflowHidden justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
-          <$IconWrapper onClick={incrementPage} end>
+          <$IconWrapper onClick={incrementPage} last>
             <$Icon size="56px">{'>'}</$Icon>
           </$IconWrapper>
         </$Horizontal>
@@ -71,27 +67,23 @@ const UserTickets = () => {
   return (
     <Wrapper>
       {tickets.map((ticketID, idx) => (
-        <$TicketWrapper>
-          <TicketCard
-            key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}
-            ticketID={ticketID}
-            isRedeemEnabled={true}
-          ></TicketCard>
+        <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
+          <TicketCard ticketID={ticketID} isRedeemEnabled={true}></TicketCard>
         </$TicketWrapper>
       ))}
     </Wrapper>
   )
 }
 
-const $IconWrapper = styled.div<{ start?: boolean; end?: boolean }>`
+const $IconWrapper = styled.div<{ first?: boolean; last?: boolean }>`
   width: 100px;
   height: 100px;
   border-radius: 100%;
   background: rgba(0, 0, 0, 0.05);
   cursor: pointer;
   position: absolute;
-  ${(props) => props.start && `left: -35px;`}
-  ${(props) => props.end && `right: -35px;`}
+  ${(props) => props.first && `left: -35px;`}
+  ${(props) => props.last && `right: -35px;`}
   top: 30%;
 `
 

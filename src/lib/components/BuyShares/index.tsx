@@ -14,7 +14,7 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
   const snap = useSnapshot(buySharesState)
 
   useEffect(() => {
-    window.onload = async () => {
+    const load = async () => {
       const lootbox = parseUrlParams('lootbox')
       try {
         await initDApp()
@@ -25,6 +25,7 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
         fetchLootboxData(lootbox).catch((err) => console.error('Error fetching lootbox data', err))
       }
     }
+    load()
     if (props.initialRoute) {
       buySharesState.route = props.initialRoute
     }
