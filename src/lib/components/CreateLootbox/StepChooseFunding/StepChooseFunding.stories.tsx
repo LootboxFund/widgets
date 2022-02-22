@@ -3,9 +3,8 @@ import StepChooseFunding, { StepChooseFundingProps } from 'lib/components/Create
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import Web3 from 'web3'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
-import { BigNumber } from 'bignumber.js';
-import { ContractAddress } from '@lootboxfund/helpers';
-
+import { BigNumber } from 'bignumber.js'
+import { Address, ContractAddress } from '@lootboxfund/helpers'
 
 export default {
   title: 'CreateLootbox Step - Choose Funding',
@@ -14,20 +13,29 @@ export default {
 
 const Demo = (args: StepChooseFundingProps) => {
   const web3Utils = useWeb3Utils()
-  const [stage, setStage] = useState<StepStage>("in_progress")
-  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toWei("1", "ether"));
-  const [receivingWallet, setReceivingWallet] = useState<string>("");
+  const [stage, setStage] = useState<StepStage>('in_progress')
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toWei('1', 'ether'))
+  const [receivingWallet, setReceivingWallet] = useState<Address>('' as Address)
   useEffect(() => {
-    (window as any).Web3 = Web3
+    ;(window as any).Web3 = Web3
   }, [])
   useEffect(() => {
     if (fundraisingTarget && receivingWallet) {
-      setStage("may_proceed")
+      setStage('may_proceed')
     } else {
-      setStage("in_progress")
+      setStage('in_progress')
     }
   }, [fundraisingTarget, receivingWallet])
-  const network = { name: 'Binance', symbol: 'BNB', themeColor: '#F0B90B', chainIdHex: 'a', chainIdDecimal: '', isAvailable: true, icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media', priceFeed: "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526" as ContractAddress }
+  const network = {
+    name: 'Binance',
+    symbol: 'BNB',
+    themeColor: '#F0B90B',
+    chainIdHex: 'a',
+    chainIdDecimal: '',
+    isAvailable: true,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
+    priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
+  }
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <StepChooseFunding
@@ -35,10 +43,10 @@ const Demo = (args: StepChooseFundingProps) => {
         fundraisingTarget={fundraisingTarget}
         setFundraisingTarget={(amount: BigNumber) => setFundraisingTarget(amount)}
         receivingWallet={receivingWallet}
-        setReceivingWallet={(addr: string) => setReceivingWallet(addr)}
+        setReceivingWallet={(addr: Address) => setReceivingWallet(addr)}
         stage={stage}
-        setValidity={(valid: boolean) => { }}
-        onNext={() => console.log("onNext")}
+        setValidity={(valid: boolean) => {}}
+        onNext={() => console.log('onNext')}
       />
     </div>
   )

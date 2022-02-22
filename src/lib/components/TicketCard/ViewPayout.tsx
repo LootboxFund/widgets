@@ -6,7 +6,7 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
-import { removeProperties } from '@lootboxfund/helpers'
+import { ContractAddress, removeProperties } from '@lootboxfund/helpers'
 import { COLORS } from 'lib/theme'
 
 export interface ViewPayoutProps {
@@ -15,7 +15,8 @@ export interface ViewPayoutProps {
 
 const ViewPayout = (props: ViewPayoutProps) => {
   const snap = useSnapshot(ticketCardState)
-  const stateID = snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress, props.ticketID)
+  const stateID =
+    snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID] && snap.tickets[stateID]
   const dividends = ticket && ticket.dividends
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)

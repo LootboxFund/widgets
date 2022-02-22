@@ -4,63 +4,61 @@ import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Eth, useWeb3
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import {StepStage} from 'lib/components/CreateLootbox/StepCard';
-import StepChooseFunding from 'lib/components/CreateLootbox/StepChooseFunding';
-import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';
-import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns';
-import StepCustomize from 'lib/components/CreateLootbox/StepCustomize';
-import StepSocials from 'lib/components/CreateLootbox/StepSocials';
-import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions';
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
+import StepChooseFunding from 'lib/components/CreateLootbox/StepChooseFunding'
+import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork'
+import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns'
+import StepCustomize from 'lib/components/CreateLootbox/StepCustomize'
+import StepSocials from 'lib/components/CreateLootbox/StepSocials'
+import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption } from './state'
-import { BigNumber } from 'bignumber.js';
+import { BigNumber } from 'bignumber.js'
 import { createTokenURIData } from 'lib/api/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { Address, ContractAddress } from '@lootboxfund/helpers'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
- 
   useEffect(() => {
     window.onload = () => {
-      console.log("Initializing DApp...")
-      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/')
-        .catch((err) => console.error(err))
+      console.log('Initializing DApp...')
+      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/').catch((err) => console.error(err))
     }
   }, [])
 
   const snapUserState = useSnapshot(userState)
-  const { screen } = useWindowSize();
+  const { screen } = useWindowSize()
   const web3 = useWeb3()
   const web3Eth = useWeb3Eth()
   const web3Utils = useWeb3Utils()
-  const isWalletConnected = snapUserState.accounts.length > 0;
+  const isWalletConnected = snapUserState.accounts.length > 0
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
-  
-  type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
-  
+
+  type FormStep = 'stepNetwork' | 'stepFunding' | 'stepReturns' | 'stepCustomize' | 'stepSocials' | 'stepTerms'
+
   // FORM: Step by Step Form
-  const linkedListFormSteps: Record<FormStep,FormStep> = {
-    stepNetwork: "stepFunding",
-    stepFunding: "stepReturns",
-    stepReturns: "stepCustomize",
-    stepCustomize: "stepSocials",
-    stepSocials: "stepTerms",
-    stepTerms: "stepTerms"
+  const linkedListFormSteps: Record<FormStep, FormStep> = {
+    stepNetwork: 'stepFunding',
+    stepFunding: 'stepReturns',
+    stepReturns: 'stepCustomize',
+    stepCustomize: 'stepSocials',
+    stepSocials: 'stepTerms',
+    stepTerms: 'stepTerms',
   }
   const INITIAL_FORM_STATE: Record<FormStep, StepStage> = {
-    stepNetwork: "in_progress",
-    stepFunding: "not_yet",
-    stepReturns: "not_yet",
-    stepCustomize: "not_yet",
-    stepSocials: "not_yet",
-    stepTerms: "not_yet",
+    stepNetwork: 'in_progress',
+    stepFunding: 'not_yet',
+    stepReturns: 'not_yet',
+    stepCustomize: 'not_yet',
+    stepSocials: 'not_yet',
+    stepTerms: 'not_yet',
   }
   const [stage, setStage] = useState(INITIAL_FORM_STATE)
-  
-  
+
   // VALIDITY: Validity of the forms
   const INITIAL_VALIDITY: Record<FormStep, boolean> = {
     stepNetwork: false,
@@ -73,10 +71,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
   // Prevent: Step 2 Warning used before declaration
-  const now = new Date();
-  const numberOfDaysToAdd = 30;
-  const defaultPaybackDate = new Date(now.setDate(now.getDate() + numberOfDaysToAdd));
-  const [paybackDate, setPaybackDate] = useState<string>();
+  const now = new Date()
+  const numberOfDaysToAdd = 30
+  const defaultPaybackDate = new Date(now.setDate(now.getDate() + numberOfDaysToAdd))
+  const [paybackDate, setPaybackDate] = useState<string>()
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
@@ -84,16 +82,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setNetwork(network)
     setStage({
       ...stage,
-      [step]: "may_proceed"
+      [step]: 'may_proceed',
     })
   }
   useEffect(() => {
-    const thisStep = "stepNetwork";
+    const thisStep = 'stepNetwork'
     if (network) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed",
-        [linkedListFormSteps[thisStep]]: "in_progress"
+        [thisStep]: 'may_proceed',
+        [linkedListFormSteps[thisStep]]: 'in_progress',
       })
     }
   }, [network])
@@ -101,33 +99,33 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     getLatestPrice()
   }, [network])
-  
+
   const getLatestPrice = async () => {
     if (network?.priceFeed) {
-        const nativeTokenPriceEther = await getPriceFeed(network.priceFeed)
-        const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
-        setNativeTokenPrice(nativeTokenPrice)
+      const nativeTokenPriceEther = await getPriceFeed(network.priceFeed)
+      const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+      setNativeTokenPrice(nativeTokenPrice)
     }
   }
 
   // STEP 2: Choose Funding
   const refStepFunding = useRef<HTMLDivElement | null>(null)
-  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei("1", "ether")));
-  const [receivingWallet, setReceivingWallet] = useState<string>("");
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const [receivingWallet, setReceivingWallet] = useState<Address>('' as Address)
   useEffect(() => {
-    const thisStep = "stepFunding";
+    const thisStep = 'stepFunding'
     if (fundraisingTarget && receivingWallet) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed",
-        [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? "may_proceed" : "in_progress"
+        [thisStep]: 'may_proceed',
+        [linkedListFormSteps[thisStep]]: checkReturnsStepDone() ? 'may_proceed' : 'in_progress',
       })
       // setPaybackDate(defaultPaybackDate.toDateString())
       // setValidity({...validity, stepReturns: true})
-    } else if (stage[thisStep] === "may_proceed") {
+    } else if (stage[thisStep] === 'may_proceed') {
       setStage({
         ...stage,
-        [thisStep]: "in_progress"
+        [thisStep]: 'in_progress',
       })
     }
   }, [fundraisingTarget, receivingWallet])
@@ -137,19 +135,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 3: Choose Returns
   const refStepReturns = useRef<HTMLDivElement | null>(null)
-  const [basisPoints, setBasisPoints] = useState(10);
+  const [basisPoints, setBasisPoints] = useState(10)
   useEffect(() => {
-    const thisStep = "stepReturns";
+    const thisStep = 'stepReturns'
     if (basisPoints && paybackDate) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed",
-        [linkedListFormSteps[thisStep]]: checkCustomizeStepDone() ? "may_proceed" : "in_progress"
+        [thisStep]: 'may_proceed',
+        [linkedListFormSteps[thisStep]]: checkCustomizeStepDone() ? 'may_proceed' : 'in_progress',
       })
-    } else if (stage[thisStep] === "may_proceed") {
+    } else if (stage[thisStep] === 'may_proceed') {
       setStage({
         ...stage,
-        [thisStep]: "in_progress"
+        [thisStep]: 'in_progress',
       })
     }
   }, [basisPoints, paybackDate])
@@ -158,34 +156,51 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // STEP 4: Customize Ticket
   const refStepCustomize = useRef<HTMLDivElement | null>(null)
   const INITIAL_TICKET: Record<string, string | number> = {
-    name: "",
+    name: '',
     symbol: '',
     biography: '',
     pricePerShare: 0.05,
-    lootboxThemeColor: "#B48AF7",
-    logoUrl: "https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media",
-    coverUrl: "https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media",
+    lootboxThemeColor: '#B48AF7',
+    logoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media',
+    coverUrl:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
   }
-  const [ticketState, setTicketState] = useState(INITIAL_TICKET);
+  const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   useEffect(() => {
-    const thisStep = "stepCustomize";
-    if (ticketState.name && ticketState.symbol && ticketState.biography && ticketState.pricePerShare && ticketState.lootboxThemeColor && ticketState.logoUrl && ticketState.coverUrl) {
+    const thisStep = 'stepCustomize'
+    if (
+      ticketState.name &&
+      ticketState.symbol &&
+      ticketState.biography &&
+      ticketState.pricePerShare &&
+      ticketState.lootboxThemeColor &&
+      ticketState.logoUrl &&
+      ticketState.coverUrl
+    ) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed",
-        [linkedListFormSteps[thisStep]]: checkSocialStateDone() ? "may_proceed" : "in_progress"
+        [thisStep]: 'may_proceed',
+        [linkedListFormSteps[thisStep]]: checkSocialStateDone() ? 'may_proceed' : 'in_progress',
       })
-    } else if (stage[thisStep] === "may_proceed") {
+    } else if (stage[thisStep] === 'may_proceed') {
       setStage({
         ...stage,
-        [thisStep]: "in_progress"
+        [thisStep]: 'in_progress',
       })
     }
   }, [ticketState])
-  const checkCustomizeStepDone = () => ticketState.name && ticketState.symbol && ticketState.biography && ticketState.pricePerShare && ticketState.lootboxThemeColor && ticketState.logoUrl && ticketState.coverUrl
+  const checkCustomizeStepDone = () =>
+    ticketState.name &&
+    ticketState.symbol &&
+    ticketState.biography &&
+    ticketState.pricePerShare &&
+    ticketState.lootboxThemeColor &&
+    ticketState.logoUrl &&
+    ticketState.coverUrl
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
@@ -199,24 +214,24 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     youtube: '',
     snapchat: '',
     twitch: '',
-    web: ''
+    web: '',
   }
-  const [socialState, setSocialState] = useState(INITIAL_SOCIALS);
+  const [socialState, setSocialState] = useState(INITIAL_SOCIALS)
   const updateSocialState = (slug: string, text: string) => {
     setSocialState({ ...socialState, [slug]: text })
   }
   useEffect(() => {
-    const thisStep = "stepSocials";
+    const thisStep = 'stepSocials'
     if (socialState.email) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed",
-        [linkedListFormSteps[thisStep]]: checkTermsStepDone() ? "may_proceed" : "in_progress"
+        [thisStep]: 'may_proceed',
+        [linkedListFormSteps[thisStep]]: checkTermsStepDone() ? 'may_proceed' : 'in_progress',
       })
-    } else if (stage[thisStep] === "may_proceed") {
+    } else if (stage[thisStep] === 'may_proceed') {
       setStage({
         ...stage,
-        [thisStep]: "in_progress"
+        [thisStep]: 'in_progress',
       })
     }
   }, [socialState.email])
@@ -227,43 +242,43 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const INITIAL_TERMS: Record<string, boolean> = {
     agreeEthics: false,
     agreeLiability: false,
-    agreeVerify: false
+    agreeVerify: false,
   }
-  const reputationWallet = snapUserState.currentAccount || ""
-  const [termsState, setTermsState] = useState(INITIAL_TERMS);
+  const reputationWallet = (snapUserState.currentAccount || '') as Address
+  const [termsState, setTermsState] = useState(INITIAL_TERMS)
   const updateTermsState = (slug: string, bool: boolean) => {
     setTermsState({ ...termsState, [slug]: bool })
   }
   useEffect(() => {
-    const thisStep = "stepTerms";
+    const thisStep = 'stepTerms'
     if (termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet) {
       setStage({
         ...stage,
-        [thisStep]: "may_proceed"
+        [thisStep]: 'may_proceed',
       })
-    } else if (stage[thisStep] === "may_proceed") {
+    } else if (stage[thisStep] === 'may_proceed') {
       setStage({
         ...stage,
-        [thisStep]: "in_progress"
+        [thisStep]: 'in_progress',
       })
     }
   }, [termsState])
-  const checkTermsStepDone = () => termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet
+  const checkTermsStepDone = () =>
+    termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet
 
   // STEP 7: Submit
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("unsubmitted")
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const checkAllConditionsMet = () => {
-    
-    const allValidationsPassed = Object.values(validity).every(condition => condition === true)
+    const allValidationsPassed = Object.values(validity).every((condition) => condition === true)
 
-    const conditionsMet: boolean[] = [];
-    stage.stepNetwork === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    stage.stepFunding === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    stage.stepReturns === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    stage.stepCustomize === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    stage.stepSocials === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    stage.stepTerms === "may_proceed" ? conditionsMet.push(true) : conditionsMet.push(false)
-    const allConditionsMet = conditionsMet.every(condition => condition === true)
+    const conditionsMet: boolean[] = []
+    stage.stepNetwork === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    stage.stepFunding === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    stage.stepReturns === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    stage.stepCustomize === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    stage.stepSocials === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    stage.stepTerms === 'may_proceed' ? conditionsMet.push(true) : conditionsMet.push(false)
+    const allConditionsMet = conditionsMet.every((condition) => condition === true)
 
     return allValidationsPassed && allConditionsMet
   }
@@ -271,29 +286,26 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const createLootbox = async () => {
     if (!nativeTokenPrice) {
       console.error('No token price')
-      setSubmitStatus("failure")
-      return;
+      setSubmitStatus('failure')
+      return
     }
-    setSubmitStatus("in_progress")
-    const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
+    setSubmitStatus('in_progress')
+    const LOOTBOX_FACTORY_ADDRESS = '0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0'
     const blockNum = await web3Eth.getBlockNumber()
-    const pricePerShare = new web3Utils.BN(
-      web3Utils.toWei(ticketState.pricePerShare.toString(), "gwei")
-    ).div(new web3Utils.BN("10"))    
+    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
+      new web3Utils.BN('10')
+    )
     const maxSharesSold = fundraisingTarget
-      .mul(
-        new web3Utils.BN(nativeTokenPrice.toString())
-      )
+      .mul(new web3Utils.BN(nativeTokenPrice.toString()))
       .div(pricePerShare)
-      .mul(new web3Utils.BN("11"))
-      .div(new web3Utils.BN("10"))
+      .mul(new web3Utils.BN('11'))
+      .div(new web3Utils.BN('10'))
       .toString()
 
-    const lootbox = new web3Eth.Contract(
-      LOOTBOX_FACTORY_ABI,
-      LOOTBOX_FACTORY_ADDRESS,
-      { from: snapUserState.currentAccount, gas: '1000000' }
-    )
+    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS, {
+      from: snapUserState.currentAccount,
+      gas: '1000000',
+    })
     try {
       console.log(`----> creating lootbox with info...`)
       console.log(`
@@ -310,32 +322,27 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
-      const x = await lootbox.methods.createLootbox(
-        ticketState.name,
-        ticketState.symbol,
-        maxSharesSold, // uint256 _maxSharesSold,
-        pricePerShare, // uint256 _sharePriceUSD,
-        receivingWallet,
-        receivingWallet
-      ).send();
+      const x = await lootbox.methods
+        .createLootbox(
+          ticketState.name,
+          ticketState.symbol,
+          maxSharesSold, // uint256 _maxSharesSold,
+          pricePerShare, // uint256 _sharePriceUSD,
+          receivingWallet,
+          receivingWallet
+        )
+        .send()
       let options = {
         filter: {
-            value: [],
+          value: [],
         },
         fromBlock: blockNum,
-        topics: [web3Utils.sha3("LootboxCreated(string,address,address,address,uint256,uint256)")],
+        topics: [web3Utils.sha3('LootboxCreated(string,address,address,address,uint256,uint256)')],
         from: snapUserState.currentAccount,
-      };
+      }
       lootbox.events.LootboxCreated(options).on('data', (event: any) => {
-        const {
-          issuer,
-          lootbox,
-          lootboxName,
-          maxSharesSold,
-          sharePriceUSD,
-          treasury
-        } = event.returnValues;
-        
+        const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = event.returnValues
+
         if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
           console.log(`
           
@@ -348,12 +355,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           
           `)
           setLootboxAddress(lootbox)
-          setSubmitStatus("success")
+          setSubmitStatus('success')
           const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-            .add(new web3Utils.BN("100")) // make it whole
-            .mul(new web3Utils.BN("10").pow(new web3Utils.BN((8 - 6).toString())))
+            .add(new web3Utils.BN('100')) // make it whole
+            .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
             .mul(fundraisingTarget)
-            .div(new web3Utils.BN("10").pow(new web3Utils.BN("8")))
+            .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
           console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
           createTokenURIData({
             address: lootbox,
@@ -364,9 +371,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             backgroundImage: ticketState.coverUrl as string,
             lootbox: {
               address: lootbox,
-              chainIdHex: "chainIdHex",
-              chainIdDecimal: "chainIdDecimal",
-              chainName: "chainName",
+              chainIdHex: 'chainIdHex',
+              chainIdDecimal: 'chainIdDecimal',
+              chainName: 'chainName',
               targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
               fundraisingTarget: fundraisingTarget,
               basisPointsReturnTarget: basisPoints.toString(),
@@ -374,7 +381,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
               pricePerShare: pricePerShare.toString(),
               lootboxThemeColor: ticketState.lootboxThemeColor as string,
               transactionHash: event.transactionHash as string,
-              blockNumber: event.blockNumber
+              blockNumber: event.blockNumber,
             },
             socials: {
               twitter: socialState.twitter,
@@ -387,13 +394,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
               snapchat: socialState.snapchat,
               twitch: socialState.twitch,
               web: socialState.web,
-            }
+            },
           })
         }
       })
     } catch (e) {
       console.log(e)
-      setSubmitStatus("failure")
+      setSubmitStatus('failure')
     }
   }
 
@@ -413,7 +420,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           selectNetwork(network, 'stepNetwork')
         }}
         onNext={() => refStepFunding.current?.scrollIntoView()}
-        setValidity={(bool: boolean) => setValidity({...validity, stepNetwork: bool})}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
       />
       <$Spacer></$Spacer>
       <StepChooseFunding
@@ -424,7 +431,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         receivingWallet={receivingWallet}
         setReceivingWallet={setReceivingWallet}
         stage={stage.stepFunding}
-        setValidity={(bool: boolean) => setValidity({...validity, stepFunding: bool})}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
         onNext={() => refStepReturns.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
@@ -437,7 +444,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         paybackDate={paybackDate}
         setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}
-        setValidity={(bool: boolean) => setValidity({...validity, stepReturns: bool})}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepReturns: bool })}
         onNext={() => refStepCustomize.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
@@ -448,7 +455,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateTicketState={updateTicketState}
         selectedNetwork={network}
         stage={stage.stepCustomize}
-        setValidity={(bool: boolean) => setValidity({...validity, stepCustomize: bool})}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepCustomize: bool })}
         onNext={() => refStepSocials.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
@@ -458,7 +465,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         updateSocialState={updateSocialState}
         selectedNetwork={network}
         stage={stage.stepSocials}
-        setValidity={(bool: boolean) => setValidity({...validity, stepSocials: bool})}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepSocials: bool })}
         onNext={() => refStepTerms.current?.scrollIntoView()}
       />
       <$Spacer></$Spacer>
@@ -472,12 +479,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         reputationWallet={reputationWallet}
         treasuryWallet={receivingWallet}
         updateTreasuryWallet={setReceivingWallet}
-        setValidity={(bool: boolean) => setValidity({...validity, stepTerms: bool})}
-        onNext={() => console.log("onNext")}
+        setValidity={(bool: boolean) => setValidity({ ...validity, stepTerms: bool })}
+        onNext={() => console.log('onNext')}
         submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
         goToLootboxAdminPage={goToLootboxAdminPage}
       />
+      <$Vertical style={{ marginTop: '20px' }}>
+        {Object.keys(validity)
+          .filter((key: FormStep) => !validity[key])
+          .map((key: FormStep) => {
+            return <$Horizontal>{`⚠️ ${key} not completed`}</$Horizontal>
+          })}
+      </$Vertical>
       <$Spacer></$Spacer>
     </$CreateLootbox>
   )

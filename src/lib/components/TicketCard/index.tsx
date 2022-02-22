@@ -8,7 +8,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import RedeemButton from 'lib/components/TicketCard/RedeemButton'
 import styled from 'styled-components'
 import { generateStateID } from './state'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
@@ -18,7 +18,8 @@ export interface TicketCardWidgetProps {
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const snap = useSnapshot(ticketCardState)
-  const stateID = snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress, props.ticketID)
+  const stateID =
+    snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
 
   useEffect(() => {
