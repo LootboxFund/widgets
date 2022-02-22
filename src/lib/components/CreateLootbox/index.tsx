@@ -20,6 +20,7 @@ import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js';
 import { createTokenURIData } from 'lib/api/storage'
 import { Address } from 'lib/types/baseTypes'
+import { getPriceFeed } from 'lib/hooks/useContract'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -40,6 +41,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0;
 
   const [lootboxAddress, setLootboxAddress] = useState<Address>("")
+  const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   
   type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"
   
@@ -99,6 +101,17 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       })
     }
   }, [network])
+
+  useEffect(() => {
+    getLatestPrice()
+  }, [network])
+  
+  const getLatestPrice = async () => {
+    if (network?.priceFeed) {
+        const nativeTokenPrice = await getPriceFeed(network.priceFeed)
+        setNativeTokenPrice(nativeTokenPrice)
+    }
+  }
 
   // STEP 2: Choose Funding
   const refStepFunding = useRef<HTMLDivElement | null>(null)
@@ -257,6 +270,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     return allValidationsPassed && allConditionsMet
   }
+
   const createLootbox = async () => {
     setSubmitStatus("in_progress")
     const LOOTBOX_FACTORY_ADDRESS = "0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0"
@@ -266,7 +280,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     ).div(new web3Utils.BN("10"))    
     const maxSharesSold = fundraisingTarget
       .mul(
-        new web3Utils.BN("10").pow(new web3Utils.BN("8"))
+        nativeTokenPrice
       )
       .div(pricePerShare)
       .mul(new web3Utils.BN("11"))
