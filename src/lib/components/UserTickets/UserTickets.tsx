@@ -15,11 +15,7 @@ const UserTickets = () => {
   const [pageIdx, setPageIdx] = useState(0)
   const isPaginated = screen === 'desktop'
 
-  const ticketCopy: (string | undefined)[] = [...snap.userTickets]
-
-  if (ticketCopy.length >= TICKET_PAGINATION) {
-    ticketCopy.unshift(undefined) // Adds a placeholder at the front of list
-  }
+  const ticketCopy: (string | undefined)[] = [...snap.userTickets].reverse()
 
   const tickets: (string | undefined)[] = isPaginated
     ? ticketCopy.slice(pageIdx, pageIdx + TICKET_PAGINATION)
