@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import StepSocials, { StepSocialsProps } from 'lib/components/CreateLootbox/StepSocials'
-import { StepStage } from 'lib/components/StepCard'
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 
 
 export default {

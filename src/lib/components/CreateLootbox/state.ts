@@ -1,18 +1,5 @@
-// const inputTokenPrice = await getPriceFeed(crowdSaleState.inputToken.data.priceOracle)
 
-import { Address, URL } from 'lib/types/baseTypes'
-import { proxy } from 'valtio'
-import { ChainIDDecimal, ChainIDHex } from '@guildfx/helpers';
-
-// interface CreateLootboxState {
-//   nativeTokenPriceFeed: Address
-//   chainIdHex: ChainIDHex
-// }
-// const initialCreateLootboxState: CreateLootboxState = {
-//   nativeTokenPriceFeed: "0x0000000000000000000000000000000000000000",
-//   chainIdHex: "0x0000000000000000000000000000000000000000",
-// }
-// export const createLootboxState = proxy(initialCreateLootboxState)
+import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@lootboxfund/helpers';
 
 
 export interface NetworkOption {
@@ -46,7 +33,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     isAvailable: true,
     isTestnet: true,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-    priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526',
+    priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
   },
   {
     name: 'Polygon',
@@ -57,7 +44,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     isAvailable: true,
     isTestnet: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-    priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0',
+    priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as ContractAddress,
   },
   {
     name: 'Ethereum',
@@ -67,7 +54,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     chainIdDecimal: '',
     isAvailable: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH.png?alt=media',
-    priceFeed: '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419'
+    priceFeed: '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419' as ContractAddress,
   },
   {
     name: 'Solana',
@@ -86,6 +73,6 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     chainIdDecimal: '',
     isAvailable: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFANTOM.png?alt=media',
-    priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc'
+    priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc' as ContractAddress,
   },
 ]

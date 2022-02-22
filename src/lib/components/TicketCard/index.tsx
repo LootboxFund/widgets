@@ -8,6 +8,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import RedeemButton from 'lib/components/TicketCard/RedeemButton'
 import styled from 'styled-components'
 import { generateStateID } from './state'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
@@ -22,7 +23,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
   useEffect(() => {
     window.onload = async () => {
-      const lootboxAddress = parseUrlParams('lootbox')
+      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       ticketCardState.lootboxAddress = lootboxAddress
       try {
         await initDApp()

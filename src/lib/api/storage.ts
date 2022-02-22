@@ -1,14 +1,13 @@
-import { ITicketMetadata, TicketID, Address } from 'lib/types'
 import {
   DEFAULT_CHAIN_ID_HEX,
   storageUrl,
   DEFAULT_TICKET_IMAGE,
   DEFAULT_TICKET_BACKGROUND,
   DEFAULT_TICKET_BACKGROUND_COLOR,
-  PIPEDREAM_TOKEN_URI_UPLOADER,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
-import { SemanticVersion, ChainIDHex } from '@guildfx/helpers';
+import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers';
+import { manifest } from '../../manifest';
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
@@ -40,7 +39,7 @@ export const getLootboxURI = async ({
 }: {
     semvar: SemanticVersion
     chainIdHex: ChainIDHex
-    lootboxAddress: Address
+    lootboxAddress: ContractAddress
     bucket: string
 }) => {
   const filePath = `v/${semvar}/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`;
@@ -49,7 +48,7 @@ export const getLootboxURI = async ({
   return lootboxURI
 }
 
-export const readTicketMetadata = async (lootboxAddress: Address, ticketID: TicketID): Promise<ITicketMetadata> => {
+export const readTicketMetadata = async (lootboxAddress: ContractAddress, ticketID: TicketID): Promise<ITicketMetadata> => {
   const defaultFilepath = defaultMetadataStorageUrl(lootboxAddress)
   const filepath = metadataStorageUrl(lootboxAddress, ticketID)
 
@@ -70,7 +69,7 @@ export const createTokenURIData = async (inputs: ITicketMetadata) => {
     'Content-Type': 'application/json',
     'secret': 'mysecret'
   });
-  const x = await fetch(PIPEDREAM_TOKEN_URI_UPLOADER, {
+  const x = await fetch(manifest.pipedream.sources.onLootboxURI.webhookEndpoint, {
     method: 'POST',
     headers: headers,
     mode: 'cors',

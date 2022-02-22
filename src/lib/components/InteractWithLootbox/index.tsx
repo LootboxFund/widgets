@@ -7,8 +7,9 @@ import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { fetchLootboxData } from 'lib/components/BuyShares/state'
+import { ContractAddress } from '@lootboxfund/helpers';
 
-export const onLoad = async (lootboxAddress: string) => {
+export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
   ticketMinterState.lootboxAddress = lootboxAddress
   userTicketState.lootboxAddress = lootboxAddress
@@ -31,7 +32,7 @@ export const onLoad = async (lootboxAddress: string) => {
 const InteractWithLootboxWidget = () => {
   useEffect(() => {
     const load = async () => {
-      const lootboxAddress = parseUrlParams('lootbox')
+      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {
         await initDApp()
       } catch (err) {

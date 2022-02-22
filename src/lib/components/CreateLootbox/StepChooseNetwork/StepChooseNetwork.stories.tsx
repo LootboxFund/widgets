@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import StepChooseNetwork, { StepChooseNetworkProps } from 'lib/components/CreateLootbox/StepChooseNetwork'
-import { StepStage } from 'lib/components/StepCard'
+import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { NetworkOption } from '../state'
 
 

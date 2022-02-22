@@ -1,16 +1,15 @@
-import { ChainInfo } from 'lib/hooks/constants'
-import { Address, URL } from 'lib/types/baseTypes'
 import { proxy } from 'valtio'
+import { Address, Url, ChainIDHex, ChainIDDecimal } from '@lootboxfund/helpers';
 
 interface UserState {
-  accounts: string[]
+  accounts: Address[]
   currentAccount: Address | undefined
   network: {
-    currentNetworkIdHex: string | undefined
-    currentNetworkIdDecimal: string | undefined
+    currentNetworkIdHex: ChainIDHex | undefined
+    currentNetworkIdDecimal: ChainIDDecimal | undefined
     currentNetworkName: string | undefined
     currentNetworkDisplayName: string | undefined
-    currentNetworkLogo: URL | undefined
+    currentNetworkLogo: Url | undefined
   }
 }
 const initialUserState: UserState = {

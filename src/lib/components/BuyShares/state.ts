@@ -1,6 +1,6 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
-import { Address, ILootbox } from 'lib/types'
+import { useWeb3 } from 'lib/hooks/useWeb3Api'
+import { ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
@@ -8,6 +8,7 @@ import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
+import { Address } from '@lootboxfund/helpers';
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {

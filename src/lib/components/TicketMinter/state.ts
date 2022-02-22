@@ -1,12 +1,12 @@
-import { ITicket, Address } from 'lib/types'
 import { proxy } from 'valtio'
 import { subscribe } from 'valtio'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { fetchLootboxData } from 'lib/components/BuyShares/state'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export interface TicketMinterState {
-  lootboxAddress: Address | undefined
+  lootboxAddress: ContractAddress | undefined
   ticketID: string | undefined
 }
 
@@ -25,7 +25,7 @@ subscribe(ticketMinterState, async () => {
   }
 })
 
-export const loadState = async (lootboxAddress: Address) => {
+export const loadState = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
   ticketMinterState.lootboxAddress = lootboxAddress
   let ticketID = undefined

@@ -1,10 +1,10 @@
-import { Address, TicketID } from './baseTypes'
+import { Address, TicketID, ContractAddress } from '@lootboxfund/helpers';
 
 /**
  * Metadata of tickets stored on the IPFS
  */
 export interface ITicketMetadata {
-  address: Address
+  address: ContractAddress
   name: string | undefined
   description: string | undefined
   image: string | undefined

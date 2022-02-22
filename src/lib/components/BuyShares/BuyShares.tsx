@@ -5,11 +5,9 @@ import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
 import ShareOutput from 'lib/components/BuyShares/Input/ShareOutput'
 import BuySharesHeader from 'lib/components/BuyShares/Header'
 import { useSnapshot } from 'valtio'
-import { TokenDataFE } from 'lib/hooks/constants'
 import { buySharesState, fetchLootboxData } from './state'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
-import BN from 'bignumber.js'
 
 export const $BuySharesContainer = styled.section`
   width: 100%;

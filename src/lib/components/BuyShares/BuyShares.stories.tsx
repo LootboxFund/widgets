@@ -6,6 +6,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { fetchLootboxData } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export default {
   title: 'BuyShares',
@@ -16,7 +17,7 @@ const Template = () => {
   useEffect(() => {
     ;(window as any).Web3 = Web3
     const load = async () => {
-      const lootboxAddress = parseUrlParams('lootbox')
+      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {
         await initDApp()
       } catch (err) {

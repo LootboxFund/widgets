@@ -1,1 +1,1 @@
-export const CUSTOM_TOKEN_STORAGE_KEY = "guildfx-custom-tokens"
+export const CUSTOM_TOKEN_STORAGE_KEY = "lootbox-custom-tokens"

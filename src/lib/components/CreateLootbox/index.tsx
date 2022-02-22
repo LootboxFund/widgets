@@ -1,14 +1,10 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import $Button from 'lib/components/Button'
-import { COLORS } from 'lib/theme'
 import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import WalletButton from 'lib/components/WalletButton';
-import {StepStage} from 'lib/components/StepCard';
+import {StepStage} from 'lib/components/CreateLootbox/StepCard';
 import StepChooseFunding from 'lib/components/CreateLootbox/StepChooseFunding';
 import StepChooseNetwork from 'lib/components/CreateLootbox/StepChooseNetwork';
 import StepChooseReturns from 'lib/components/CreateLootbox/StepChooseReturns';
@@ -19,8 +15,8 @@ import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js';
 import { createTokenURIData } from 'lib/api/storage'
-import { Address } from 'lib/types/baseTypes'
 import { getPriceFeed } from 'lib/hooks/useContract'
+import { ContractAddress } from '@lootboxfund/helpers';
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -40,7 +36,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0;
 
-  const [lootboxAddress, setLootboxAddress] = useState<Address>("")
+  const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   
   type FormStep = "stepNetwork" | "stepFunding" | "stepReturns" | "stepCustomize" | "stepSocials" | "stepTerms"

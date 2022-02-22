@@ -1,18 +1,12 @@
 import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
-import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
-import { truncateAddress } from 'lib/api/helpers'
-import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import NetworkText from 'lib/components/NetworkText';
-import { ChainIDHex, ChainIDDecimal } from '@guildfx/helpers';
+import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
+import { $Vertical } from 'lib/components/Generics';
+import { Address } from '@lootboxfund/helpers';
 import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import $Input from 'lib/components/Input';
 import useWindowSize from 'lib/hooks/useScreenSize';
-import { $NetworkIcon } from '../StepChooseNetwork';
-import Web3Utils from 'web3-utils';
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
 import { NetworkOption } from '../state';
-import { Address } from 'lib/types/baseTypes';
 
 export interface TermsFragment {
   slug: string;
@@ -32,9 +26,9 @@ export interface StepTermsConditionsProps {
   onNext: () => void;
   termsState: Record<string, boolean>;
   updateTermsState: (slug: string, bool: boolean) => void;
-  treasuryWallet: string;
-  reputationWallet: string;
-  updateTreasuryWallet: (wallet: string) => void;
+  treasuryWallet: Address;
+  reputationWallet: Address;
+  updateTreasuryWallet: (wallet: Address) => void;
   allConditionsMet: boolean;
   onSubmit: () => void;
   setValidity: (bool: boolean) => void;
@@ -70,7 +64,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       props.setValidity(true)
     }
   }, [props.termsState])
-  const updateTreasury = async (treasuryAddress: string) => {
+  const updateTreasury = async (treasuryAddress: Address) => {
     props.updateTreasuryWallet(treasuryAddress)
     const validAddr = await checkAddrValid(treasuryAddress)
     if (validAddr) {
@@ -140,7 +134,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           <$Vertical>
             <$StepSubheading>Treasury Wallet (Receives Funds)</$StepSubheading>
             <$CopyableInput>
-              <$InputMedium onChange={(e) => updateTreasury(e.target.value)} value={props.treasuryWallet}></$InputMedium>
+              <$InputMedium onChange={(e) => updateTreasury(e.target.value as Address)} value={props.treasuryWallet}></$InputMedium>
               <$CopyButton>📄</$CopyButton>
             </$CopyableInput>
           </$Vertical>

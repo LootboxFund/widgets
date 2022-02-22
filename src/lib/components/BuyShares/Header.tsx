@@ -4,10 +4,11 @@ import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS, DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
-import $Button from 'lib/components/Button'
+import { DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
+import $Button from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
+import { BLOCKCHAINS } from '@lootboxfund/helpers'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {
@@ -60,7 +61,7 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
           <$NetworkText style={{ flex: 2 }}>
             <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
             <span
-              onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount || '')}
+              onClick={() => navigator.clipboard.writeText(snapUserState.currentAccount as string || '')}
               style={{ cursor: 'pointer' }}
             >
               {renderTinyAccount()}

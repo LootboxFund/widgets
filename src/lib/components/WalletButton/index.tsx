@@ -1,13 +1,13 @@
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import $Button from 'lib/components/Button'
+import $Button from 'lib/components/Generics/Button'
 import { COLORS } from 'lib/theme'
 import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText';
+import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
 
 export interface WalletButtonProps {}
 const WalletButton = (props: WalletButtonProps) => {
@@ -31,9 +31,12 @@ const WalletButton = (props: WalletButtonProps) => {
       const userAccounts = await window.web3.eth.getAccounts()
       userState.currentAccount = userAccounts[0]
       const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
-      const blockchain = BLOCKCHAINS[chainIdHex]
-      if (blockchain) {
-        updateStateToChain(blockchain)
+      const chainSlug = chainIdHexToSlug(chainIdHex)
+      if (chainSlug) {
+        const blockchain = BLOCKCHAINS[chainSlug]
+        if (blockchain) {
+          updateStateToChain(blockchain)
+        }
       }
       setStatus('success')
     } else {
