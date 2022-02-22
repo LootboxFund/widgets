@@ -1,4 +1,4 @@
-import react, { useState } from 'react'
+import react, { useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -49,9 +49,8 @@ export interface StepSocialsProps {
   socialState: Record<string, string>;
   updateSocialState: (slug: string, text: string) => void;
   setValidity: (bool: boolean) => void;
-  ref?: React.RefObject<HTMLDivElement>;
 }
-const StepSocials = (props: StepSocialsProps) => {
+const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const initialErrors = {
     twitter: '',
@@ -101,7 +100,7 @@ const StepSocials = (props: StepSocialsProps) => {
 
 	return (
 		<$StepSocials>
-      {props.ref && <div ref={props.ref}></div>}
+      {ref && <div ref={ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Vertical flex={1}>
           <$StepHeading>5. Contact Information</$StepHeading>
@@ -123,7 +122,7 @@ const StepSocials = (props: StepSocialsProps) => {
       </StepCard>
 		</$StepSocials>
 	)
-}
+})
 
 const $StepSocials = styled.section<{}>`
   font-family: sans-serif;

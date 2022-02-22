@@ -1,17 +1,22 @@
-import react from 'react'
+import react, { useRef } from 'react'
 import { $Vertical } from '../Generics'
 import TicketMinter from '../TicketMinter/TicketMinter'
 import UserTickets from '../UserTickets/UserTickets'
 import styled from 'styled-components'
 
 const InteractWithLootbox = () => {
+  const ref = useRef<HTMLDivElement | null>(null)
   return (
     <$Vertical spacing={5}>
       <$TicketContainer>
-        <UserTickets />
+        <UserTickets
+          onScrollToMint={() => {
+            ref.current?.scrollIntoView()
+          }}
+        />
       </$TicketContainer>
       <$MinterContainer>
-        <TicketMinter />
+        <TicketMinter ref={ref} />
       </$MinterContainer>
     </$Vertical>
   )

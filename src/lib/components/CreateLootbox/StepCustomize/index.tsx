@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -22,10 +22,9 @@ export interface StepCustomizeProps {
   fundraisingTarget: BigNumber;
   ticketState: Record<string, string | number>;
   updateTicketState: (slug: string, value: string | number) => void;
-  ref?: React.RefObject<HTMLDivElement>;
   setValidity: (bool: boolean) => void;
 }
-const StepCustomize = (props: StepCustomizeProps) => {
+const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
@@ -129,7 +128,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
   
 	return (
 		<$StepCustomize>
-      {props.ref && <div ref={props.ref}></div>}
+      {ref && <div ref={ref}></div>}
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
@@ -170,7 +169,7 @@ const StepCustomize = (props: StepCustomizeProps) => {
       </StepCard>
 		</$StepCustomize>
 	)
-}
+})
 
 const $StepCustomize = styled.section<{}>`
   font-family: sans-serif;

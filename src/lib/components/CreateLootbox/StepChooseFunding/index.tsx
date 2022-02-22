@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/StepCard'
 import { truncateAddress } from 'lib/api/helpers'
@@ -28,10 +28,9 @@ export interface StepChooseFundingProps {
   receivingWallet: string;
   setReceivingWallet: (addr: string) => void;
   setValidity: (bool: boolean) => void;
-  ref?: React.RefObject<HTMLDivElement>;
   onNext: () => void;
 }
-const StepChooseFunding = (props: StepChooseFundingProps) => {
+const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.RefObject<HTMLDivElement>) => {
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const { screen } = useWindowSize()
@@ -88,7 +87,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
     }
     return (
       <$Vertical>
-        {props.ref && <div ref={props.ref}></div>}
+        {ref && <div ref={ref}></div>}
         <$StepSubheading>Fundraising Target</$StepSubheading>
         <$InputWrapper>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -159,7 +158,7 @@ const StepChooseFunding = (props: StepChooseFundingProps) => {
       </StepCard>
 		</$StepChooseFunding>
 	)
-}
+})
 
 const $InputWrapper = styled.div`
   background-color: #F1F1F1;

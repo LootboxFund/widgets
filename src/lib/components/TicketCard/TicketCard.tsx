@@ -6,9 +6,10 @@ import { ticketCardState, generateStateID } from './state'
 
 export interface TicketCardProps {
   ticketID: string | undefined
+  onScrollToMint?: () => void
 }
 
-const TicketCard = ({ ticketID }: TicketCardProps) => {
+const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState)
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress, ticketID)
   const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
@@ -16,7 +17,7 @@ const TicketCard = ({ ticketID }: TicketCardProps) => {
     <$TicketCardContainer
       backgroundImage={ticket?.data?.metadata?.backgroundImage}
       onClick={() => {
-        console.log('click')
+        onScrollToMint && onScrollToMint()
       }}
     >
       <$TicketLogo
