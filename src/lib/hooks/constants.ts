@@ -1,4 +1,3 @@
-import { BigNumber } from 'bignumber.js'
 import { version } from '../../../package.json'
 import { ChainIDHex, Url, ChainIDDecimal, TokenData, Address } from '@lootboxfund/helpers'
 
