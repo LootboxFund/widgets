@@ -10,6 +10,7 @@ import { BigNumber } from 'bignumber.js'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import ReactTooltip from 'react-tooltip'
+import HelpIcon from 'lib/theme/icons/Help.icon'
 
 export interface StepCustomizeProps {
   stage: StepStage
@@ -134,30 +135,69 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       >
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
-            <$StepHeading>4. Customize Ticket</$StepHeading>
+            <$StepHeading>
+              <span>4. Customize Ticket</span>
+              <HelpIcon tipID="stepCustomize" />
+              <ReactTooltip id="stepCustomize" place="right" effect="solid">
+                _________
+              </ReactTooltip>
+            </$StepHeading>
             <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
             <br />
             <br />
-            <$StepSubheading>Lootbox Name</$StepSubheading>
+            <$StepSubheading>
+              <span>Lootbox Name</span>
+              <HelpIcon tipID="lootboxName" />
+              <ReactTooltip id="lootboxName" place="right" effect="solid">
+                The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that
+                you might have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce
+                confusion.
+              </ReactTooltip>
+            </$StepSubheading>
             <$InputMedium
-              maxLength={25}
+              maxLength={30}
               onChange={(e) => parseInput('name', e.target.value)}
               value={props.ticketState.name}
             />
             <br />
-            <$StepSubheading>Ticket Symbol</$StepSubheading>
-            <$InputMedium onChange={(e) => parseInput('symbol', e.target.value)} value={props.ticketState.symbol} />
+            <$StepSubheading>
+              <span>Ticket Symbol</span>
+              <HelpIcon tipID="ticketSymbol" />
+              <ReactTooltip id="ticketSymbol" place="right" effect="solid">
+                Set a shortname for your NFT Tickets to be displayed in Metamask. Max 9 characters.
+              </ReactTooltip>
+            </$StepSubheading>
+            <$InputMedium
+              onChange={(e) => parseInput('symbol', e.target.value)}
+              value={props.ticketState.symbol}
+              maxLength={9}
+            />
             <br />
-            <$StepSubheading>Biography</$StepSubheading>
+            <$StepSubheading>
+              <span>Biography</span>
+              <HelpIcon tipID="ticketBiography" />
+              <ReactTooltip id="ticketBiography" place="right" effect="solid">
+                Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for.
+              </ReactTooltip>
+            </$StepSubheading>
             <$TextAreaMedium
               onChange={(e) => parseInput('biography', e.target.value)}
               value={props.ticketState.biography}
               rows={6}
+              maxLength={500}
             />
             <br />
             <$Horizontal verticalCenter>
               <$Vertical>
-                <$StepSubheading>Price per Share</$StepSubheading>
+                <$StepSubheading>
+                  <span>Share Price</span>
+                  <HelpIcon tipID="pricePerShare" />
+                  <ReactTooltip id="pricePerShare" place="right" effect="solid">
+                    We recommend leaving this at the default value. When investors buy NFT tickets from your Lootbox,
+                    they specify many shares they want. The more shares owned in a ticket, the higher the % of Lootbox
+                    earnings they receive.
+                  </ReactTooltip>
+                </$StepSubheading>
                 <$Horizontal verticalCenter flex={1}>
                   <$CurrencySign>$</$CurrencySign>
                   <$InputMedium
@@ -171,7 +211,14 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 </$Horizontal>
               </$Vertical>
               <$Vertical>
-                <$StepSubheading>Theme Color</$StepSubheading>
+                <$StepSubheading>
+                  <span>Theme Color</span>
+                  <HelpIcon tipID="themeColor" />
+                  <ReactTooltip id="themeColor" place="right" effect="solid">
+                    Your Lootbox theme color is only used for visual effects. Use the default color if you don't want to
+                    customize it.
+                  </ReactTooltip>
+                </$StepSubheading>
                 <$Horizontal verticalCenter flex={1}>
                   <$InputColor
                     value={props.ticketState.lootboxThemeColor}
@@ -198,12 +245,13 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             <br />
             <$Horizontal verticalCenter></$Horizontal>
             <$Vertical>
-              <$StepSubheading data-tip data-for="logoImage">
-                Logo Image ℹ️
+              <$StepSubheading>
+                Logo Image
+                <HelpIcon tipID="logoImage" />
+                <ReactTooltip id="logoImage" place="right" effect="solid">
+                  Upload your logo to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+                </ReactTooltip>
               </$StepSubheading>
-              <ReactTooltip id="logoImage" place="top" effect="solid">
-                Upload your logo to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
-              </ReactTooltip>
               <$InputMedium
                 onChange={(e) => parseInput('logoUrl', e.target.value)}
                 value={props.ticketState.logoUrl}
@@ -211,12 +259,13 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               />
             </$Vertical>
             <$Vertical>
-              <$StepSubheading data-tip data-for="coverImage">
-                Cover Image
+              <$StepSubheading>
+                <span>Cover Image</span>
+                <HelpIcon tipID="coverImage" />
+                <ReactTooltip id="coverImage" place="right" effect="solid">
+                  Upload your cover image to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+                </ReactTooltip>
               </$StepSubheading>
-              <ReactTooltip id="coverImage" place="top" effect="solid">
-                Upload your cover image to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
-              </ReactTooltip>
               <$InputMedium
                 onChange={(e) => parseInput('coverUrl', e.target.value)}
                 value={props.ticketState.coverUrl}

@@ -496,6 +496,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
               </$Horizontal>
             )
           })}
+        {!reputationWallet ? (
+          <$Horizontal flex={1} justifyContent="flex-start" verticalCenter>
+            <span style={{ marginRight: '10px' }}>⚠️</span>
+            <span style={{ fontFamily: 'sans-serif' }}>{`Wallet not connected`}</span>
+          </$Horizontal>
+        ) : null}
       </$Vertical>
       <$Spacer></$Spacer>
     </$CreateLootbox>

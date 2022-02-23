@@ -11,6 +11,8 @@ import { getPriceFeed } from 'lib/hooks/useContract'
 import { BigNumber } from 'bignumber.js'
 import { useWeb3Utils } from '../../../hooks/useWeb3Api/index'
 import { Address } from '@lootboxfund/helpers'
+import HelpIcon from 'lib/theme/icons/Help.icon'
+import ReactTooltip from 'react-tooltip'
 
 interface Errors {
   fundraisingTarget: string
@@ -89,7 +91,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     return (
       <$Vertical>
         {ref && <div ref={ref}></div>}
-        <$StepSubheading>Fundraising Target</$StepSubheading>
+        <$StepSubheading>
+          Fundraising Target
+          <HelpIcon tipID="fundraisingTarget" />
+          <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
+            _________
+          </ReactTooltip>
+        </$StepSubheading>
         <$InputWrapper>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <div
@@ -150,7 +158,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     }
     return (
       <$Vertical>
-        <$StepSubheading>Receiving Wallet</$StepSubheading>
+        <$StepSubheading>
+          Receiving Wallet
+          <HelpIcon tipID="receivingWallet" />
+          <ReactTooltip id="receivingWallet" place="right" effect="solid">
+            _________
+          </ReactTooltip>
+        </$StepSubheading>
         <$InputWrapper>
           <$Input
             value={props.receivingWallet}
@@ -173,7 +187,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       >
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
-            <$StepHeading>2. How much money do you need?</$StepHeading>
+            <$StepHeading>
+              2. How much money do you need?
+              <HelpIcon tipID="stepFunding" />
+              <ReactTooltip id="stepFunding" place="right" effect="solid">
+                _________
+              </ReactTooltip>
+            </$StepHeading>
             <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
             <br />
             <br />

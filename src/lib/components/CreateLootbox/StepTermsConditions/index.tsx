@@ -7,6 +7,9 @@ import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { NetworkOption } from '../state'
+import ReactTooltip from 'react-tooltip'
+import HelpIcon from 'lib/theme/icons/Help.icon'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 export interface TermsFragment {
   slug: string
@@ -171,22 +174,34 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           <br />
           <br />
           <$Vertical>
-            <$StepSubheading>Reputation Address (Locked to Current User)</$StepSubheading>
+            <$StepSubheading>
+              Reputation Address (Locked to Current User)
+              <HelpIcon tipID="reputationWallet" />
+              <ReactTooltip id="reputationWallet" place="right" effect="solid">
+                _________
+              </ReactTooltip>
+            </$StepSubheading>
             <$CopyableInput>
               <$InputMedium disabled value={props.reputationWallet}></$InputMedium>
-              <$CopyButton>📄</$CopyButton>
+              <CopyIcon text={props.reputationWallet} />
             </$CopyableInput>
           </$Vertical>
           <br />
           <br />
           <$Vertical>
-            <$StepSubheading>Treasury Wallet (Receives Funds)</$StepSubheading>
+            <$StepSubheading>
+              Treasury Wallet (Receives Funds)
+              <HelpIcon tipID="treasuryWallet" />
+              <ReactTooltip id="treasuryWallet" place="right" effect="solid">
+                _________
+              </ReactTooltip>
+            </$StepSubheading>
             <$CopyableInput>
               <$InputMedium
                 onChange={(e) => updateTreasury(e.target.value as Address)}
                 value={props.treasuryWallet}
               ></$InputMedium>
-              <$CopyButton>📄</$CopyButton>
+              <CopyIcon text={props.treasuryWallet} />
             </$CopyableInput>
           </$Vertical>
         </$Vertical>
@@ -263,7 +278,7 @@ const $CopyButton = styled.button`
   padding: 0px;
   font-size: 2rem;
   margin: 0px;
-  cursor: pointer;
+  cursor: copy;
 `
 
 interface CreateLootboxButtonProps {
