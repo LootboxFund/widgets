@@ -489,7 +489,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         {Object.keys(validity)
           .filter((key: FormStep) => !validity[key])
           .map((key: FormStep) => {
-            return <$Horizontal>{`⚠️ ${key} not completed`}</$Horizontal>
+            return (
+              <$Horizontal flex={1} justifyContent="flex-start" verticalCenter>
+                <span style={{ marginRight: '10px' }}>⚠️</span>
+                <span style={{ fontFamily: 'sans-serif' }}>{`${key.replace('step', '')} not completed`}</span>
+              </$Horizontal>
+            )
           })}
       </$Vertical>
       <$Spacer></$Spacer>

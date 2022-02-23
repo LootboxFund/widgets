@@ -1,23 +1,23 @@
 import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
-import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import { COLORS } from 'lib/theme';
-import useWindowSize from 'lib/hooks/useScreenSize';
-import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard';
-import { NetworkOption } from '../state';
-import { BigNumber } from 'bignumber.js';
-import { getPriceFeed } from 'lib/hooks/useContract';
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import { COLORS } from 'lib/theme'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard'
+import { NetworkOption } from '../state'
+import { BigNumber } from 'bignumber.js'
+import { getPriceFeed } from 'lib/hooks/useContract'
+import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 
 export interface StepCustomizeProps {
-  stage: StepStage;
-  selectedNetwork?: NetworkOption;
-  onNext: () => void;
-  fundraisingTarget: BigNumber;
-  ticketState: Record<string, string | number>;
-  updateTicketState: (slug: string, value: string | number) => void;
-  setValidity: (bool: boolean) => void;
+  stage: StepStage
+  selectedNetwork?: NetworkOption
+  onNext: () => void
+  fundraisingTarget: BigNumber
+  ticketState: Record<string, string | number>
+  updateTicketState: (slug: string, value: string | number) => void
+  setValidity: (bool: boolean) => void
 }
 const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
@@ -34,27 +34,26 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   }
   const deriveMaxTicketPrice = (): number => {
     const price = nativeTokenPrice
-      ?
-      nativeTokenPrice.multipliedBy(
-        props.fundraisingTarget
-      ).dividedBy(10 ** 18).toFixed(2)
-      :
-      web3Utils.toBN(0)
+      ? nativeTokenPrice
+          .multipliedBy(props.fundraisingTarget)
+          .dividedBy(10 ** 18)
+          .toFixed(2)
+      : web3Utils.toBN(0)
     if (!price && isNaN(price)) {
       return 0
     }
     return price
   }
   const maxPricePerShare = deriveMaxTicketPrice()
-  
+
   const initialErrors = {
-    name: "",
+    name: '',
     symbol: '',
     biography: '',
-    pricePerShare: "",
-    lootboxThemeColor: "",
-    logoUrl: "",
-    coverUrl: ""
+    pricePerShare: '',
+    lootboxThemeColor: '',
+    logoUrl: '',
+    coverUrl: '',
   }
   const [errors, setErrors] = useState(initialErrors)
   const validateName = (name: string) => name.length > 0
@@ -63,20 +62,20 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   const validatePricePerShare = (price: number) => price > 0 && price <= maxPricePerShare
   const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
   const checkAllValidations = () => {
-    let valid = true;
-    if (!validateName(props.ticketState.name as string)) valid = false;
-    if (!validateSymbol(props.ticketState.symbol as string)) valid = false;
-    if (!validateBiography(props.ticketState.biography as string)) valid = false;
-    if (!validatePricePerShare(props.ticketState.pricePerShare as number)) valid = false;
-    if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false;
+    let valid = true
+    if (!validateName(props.ticketState.name as string)) valid = false
+    if (!validateSymbol(props.ticketState.symbol as string)) valid = false
+    if (!validateBiography(props.ticketState.biography as string)) valid = false
+    if (!validatePricePerShare(props.ticketState.pricePerShare as number)) valid = false
+    if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (valid) {
       setErrors({
         ...errors,
-        name: "",
+        name: '',
         symbol: '',
         biography: '',
-        pricePerShare: "",
-        lootboxThemeColor: "",
+        pricePerShare: '',
+        lootboxThemeColor: '',
       })
       props.setValidity(true)
     } else {
@@ -92,55 +91,100 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (slug === 'name') {
       setErrors({
         ...errors,
-        name: validateName(value as string) ? "" : 'Name cannot be empty'
+        name: validateName(value as string) ? '' : 'Name cannot be empty',
       })
     }
-    if (slug === "symbol") {
+    if (slug === 'symbol') {
       setErrors({
         ...errors,
-        symbol: validateSymbol(value as string) ? '' : 'Symbol cannot be empty'
+        symbol: validateSymbol(value as string) ? '' : 'Symbol cannot be empty',
       })
     }
-    if (slug === "biography") {
+    if (slug === 'biography') {
       setErrors({
         ...errors,
-        biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters'
+        biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters',
       })
     }
-    if (slug === "pricePerShare") {
+    if (slug === 'pricePerShare') {
       setErrors({
         ...errors,
-        pricePerShare: validatePricePerShare(value as number) ? '' : `Price per share must be greater than zero and less than $${maxPricePerShare}`
+        pricePerShare: validatePricePerShare(value as number)
+          ? ''
+          : `Price per share must be greater than zero and less than $${maxPricePerShare}`,
       })
     }
-    if (slug === "lootboxThemeColor") {
+    if (slug === 'lootboxThemeColor') {
       setErrors({
         ...errors,
-        lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color'
+        lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color',
       })
     }
   }
-  
-	return (
-		<$StepCustomize>
+
+  return (
+    <$StepCustomize>
       {ref && <div ref={ref}></div>}
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={props.onNext} errors={Object.values(errors)}>
+      <StepCard
+        themeColor={props.selectedNetwork?.themeColor}
+        stage={props.stage}
+        onNext={props.onNext}
+        errors={Object.values(errors)}
+      >
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
             <$StepHeading>4. Customize Ticket</$StepHeading>
             <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
-            <br /><br />
+            <br />
+            <br />
             <$StepSubheading>Lootbox Name</$StepSubheading>
-            <$InputMedium maxLength={25} onChange={(e) => parseInput('name', e.target.value)} value={props.ticketState.name} /><br />
+            <$InputMedium
+              maxLength={25}
+              onChange={(e) => parseInput('name', e.target.value)}
+              value={props.ticketState.name}
+            />
+            <br />
             <$StepSubheading>Ticket Symbol</$StepSubheading>
-            <$InputMedium onChange={(e) => parseInput('symbol', e.target.value)} value={props.ticketState.symbol} /><br />
+            <$InputMedium onChange={(e) => parseInput('symbol', e.target.value)} value={props.ticketState.symbol} />
+            <br />
             <$StepSubheading>Biography</$StepSubheading>
-            <$TextAreaMedium onChange={(e) => parseInput('biography', e.target.value)} value={props.ticketState.biography} rows={5} /><br />
-            <$StepSubheading>Price per Share</$StepSubheading>
+            <$TextAreaMedium
+              onChange={(e) => parseInput('biography', e.target.value)}
+              value={props.ticketState.biography}
+              rows={6}
+            />
+            <br />
             <$Horizontal verticalCenter>
-              <$CurrencySign>$</$CurrencySign>
-              <$InputMedium type="number" min="0" onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)} value={props.ticketState.pricePerShare} />
+              <$Vertical>
+                <$StepSubheading>Price per Share</$StepSubheading>
+                <$Horizontal verticalCenter flex={1}>
+                  <$CurrencySign>$</$CurrencySign>
+                  <$InputMedium
+                    type="number"
+                    min="0"
+                    onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)}
+                    value={props.ticketState.pricePerShare}
+                    onWheel={(e) => e.currentTarget.blur()}
+                    style={{ width: '100px' }}
+                  />
+                </$Horizontal>
+              </$Vertical>
+              <$Vertical>
+                <$StepSubheading>Theme Color</$StepSubheading>
+                <$Horizontal verticalCenter flex={1}>
+                  <$InputColor
+                    value={props.ticketState.lootboxThemeColor}
+                    onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
+                    style={{ width: '100px' }}
+                  />
+                  <$ColorPreview
+                    color={props.ticketState.lootboxThemeColor as string}
+                    onClick={() => window.open('https://imagecolorpicker.com/', '_blank')}
+                  />
+                </$Horizontal>
+              </$Vertical>
             </$Horizontal>
+
             <br />
           </$Vertical>
           <$Vertical flex={1}>
@@ -151,19 +195,28 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               name={props.ticketState.name as string}
             />
             <br />
-            <$Horizontal verticalCenter>
-              <$Horizontal verticalCenter>
-                <$ColorPreview color={props.ticketState.lootboxThemeColor as string} onClick={() => window.open("https://imagecolorpicker.com/", "_blank")} />
-                <$InputColor value={props.ticketState.lootboxThemeColor} onChange={(e) => parseInput("lootboxThemeColor", e.target.value)} /><br />
-              </$Horizontal>
-              <$UploadFileButton>Upload Logo</$UploadFileButton>
-              <$UploadFileButton>Upload Cover</$UploadFileButton>
-            </$Horizontal>
+            <$Horizontal verticalCenter></$Horizontal>
+            <$Vertical>
+              <$StepSubheading>Logo Image</$StepSubheading>
+              <$InputMedium
+                onChange={(e) => parseInput('logoUrl', e.target.value)}
+                value={props.ticketState.logoUrl}
+                style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
+              />
+            </$Vertical>
+            <$Vertical>
+              <$StepSubheading>Cover Image</$StepSubheading>
+              <$InputMedium
+                onChange={(e) => parseInput('coverUrl', e.target.value)}
+                value={props.ticketState.coverUrl}
+                style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
+              />
+            </$Vertical>
           </$Vertical>
         </$Horizontal>
       </StepCard>
-		</$StepCustomize>
-	)
+    </$StepCustomize>
+  )
 })
 
 const $StepCustomize = styled.section<{}>`
@@ -228,4 +281,4 @@ export const $ColorPreview = styled.div<{ color: string }>`
   background-color: ${(props: { color: string }) => props.color};
 `
 
-export default StepCustomize;
+export default StepCustomize
