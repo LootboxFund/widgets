@@ -7,6 +7,7 @@ import globals from 'rollup-plugin-node-globals'
 import builtins from 'rollup-plugin-node-builtins'
 import replace from '@rollup/plugin-replace'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
+import svg from 'rollup-plugin-svg'
 
 /**
  * <CreateLootbox />
@@ -50,6 +51,7 @@ const CreateLootbox = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       preventAssignment: true,
     }),
+    svg(),
     json(), // enable JSON
     globals(), // allows globals to be imported (process.env)
     builtins(), // allows builtins to be imported via require/import
@@ -102,6 +104,7 @@ const WalletStatus = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       preventAssignment: true,
     }),
+    svg(),
     json(), // enable JSON
     globals(), // allows globals to be imported (process.env)
     builtins(), // allows builtins to be imported via require/import
@@ -155,6 +158,7 @@ const InteractWithLootbox = {
       'process.env.NODE_ENV': JSON.stringify('production'),
       preventAssignment: true,
     }),
+    svg(),
     json(), // enable JSON
     globals(), // allows globals to be imported (process.env)
     builtins(), // allows builtins to be imported via require/import

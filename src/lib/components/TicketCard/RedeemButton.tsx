@@ -11,6 +11,7 @@ import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
+  isRedeemable: boolean
 }
 
 const RedeemButton = (props: RedeemButtonProps) => {
@@ -65,6 +66,19 @@ const RedeemButton = (props: RedeemButtonProps) => {
   } else if (ticket?.route === '/payout') {
     if (!isWalletConnected) {
       return <WalletButton />
+    } else if (!props.isRedeemable) {
+      return (
+        <$Button
+          screen={screen}
+          backgroundColor={`${COLORS.surpressedBackground}15`}
+          backgroundColorHover={`${COLORS.surpressedBackground}`}
+          color={`${COLORS.surpressedFontColor}aa`}
+          style={{ minHeight: '60px', height: '100px' }}
+          onClick={toggleRoute}
+        >
+          BACK
+        </$Button>
+      )
     } else {
       return (
         <$Button

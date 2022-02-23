@@ -7,6 +7,8 @@ import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 import { Address } from '@lootboxfund/helpers'
+import RightChevronIcon from 'lib/theme/icons/Right.icon'
+import LeftChevronIcon from 'lib/theme/icons/Left.icon'
 
 const TICKET_PAGINATION = 3
 
@@ -51,16 +53,12 @@ const UserTickets = (props: Props) => {
   const Wrapper = ({ children }: { children: JSX.Element[] }) => {
     if (isPaginated) {
       return (
-        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative">
-          <$IconWrapper onClick={decrementPage} first>
-            <$Icon size="56px">{'<'}</$Icon>
-          </$IconWrapper>
+        <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative" verticalCenter>
+          <LeftChevronIcon onClick={decrementPage} />
           <$Horizontal flexWrap overflowHidden justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
-          <$IconWrapper onClick={incrementPage} last>
-            <$Icon size="56px">{'>'}</$Icon>
-          </$IconWrapper>
+          <RightChevronIcon onClick={incrementPage} />
         </$Horizontal>
       )
     } else {
@@ -80,8 +78,8 @@ const UserTickets = (props: Props) => {
 }
 
 const $IconWrapper = styled.div<{ first?: boolean; last?: boolean }>`
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   border-radius: 100%;
   background: rgba(0, 0, 0, 0.05);
   cursor: pointer;

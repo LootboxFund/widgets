@@ -1,17 +1,20 @@
 import react, { forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
-import { $Horizontal, $Vertical } from 'lib/components/Generics';
-import NetworkText from 'lib/components/NetworkText';
-import { COLORS, TYPOGRAPHY } from 'lib/theme';
-import { NetworkOption, NETWORK_OPTIONS } from '../state';
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import NetworkText from 'lib/components/NetworkText'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
+import { NetworkOption, NETWORK_OPTIONS } from '../state'
+import WalletStatus from 'lib/components/WalletStatus'
+import HelpIcon from 'lib/theme/icons/Help.icon'
+import ReactTooltip from 'react-tooltip'
 
 export interface StepChooseNetworkProps {
-  stage: StepStage;
-  onSelectNetwork: (network: NetworkOption) => void;
-  selectedNetwork?: NetworkOption;
-  onNext: () => void;
-  setValidity: (bool: boolean) => void;
+  stage: StepStage
+  onSelectNetwork: (network: NetworkOption) => void
+  selectedNetwork?: NetworkOption
+  onNext: () => void
+  setValidity: (bool: boolean) => void
 }
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
   const renderNetworkOptions = () => {
@@ -23,48 +26,76 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
     }
     return (
       <$Vertical spacing={2}>
-        {
-          NETWORK_OPTIONS.map(network => (
-            <$NetworkOption isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex} themeColor={props.selectedNetwork?.themeColor} onClick={() => selectNetwork(network.isAvailable, network)} key={network.chainIdHex} isAvailable={network.isAvailable}>
-              <$NetworkIcon src={network.icon} />
-              {
-                network.isAvailable ?
-                  <$Horizontal flex={1} justifyContent='space-between'>
-                    <$NetworkName isAvailable={network.isAvailable} isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}>{network.name}</$NetworkName>
-                    <$ComingSoon isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}>{network.isTestnet && 'Testnet'}</$ComingSoon>
-                  </$Horizontal>
-                  :
-                  <$Horizontal flex={1} justifyContent='space-between'>
-                    <$NetworkName>{network.name}</$NetworkName>
-                    <$ComingSoon>Coming Soon</$ComingSoon>
-                  </$Horizontal>
-                  
-              }
-            </$NetworkOption>
-          ))
-        }
+        {NETWORK_OPTIONS.map((network) => (
+          <$NetworkOption
+            isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}
+            themeColor={props.selectedNetwork?.themeColor}
+            onClick={() => selectNetwork(network.isAvailable, network)}
+            key={network.chainIdHex}
+            isAvailable={network.isAvailable}
+          >
+            <$NetworkIcon src={network.icon} />
+            {network.isAvailable ? (
+              <$Horizontal flex={1} justifyContent="space-between">
+                <$NetworkName
+                  isAvailable={network.isAvailable}
+                  isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}
+                >
+                  {network.name}
+                </$NetworkName>
+                <$ComingSoon isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}>
+                  {network.isTestnet && 'Testnet'}
+                </$ComingSoon>
+              </$Horizontal>
+            ) : (
+              <$Horizontal flex={1} justifyContent="space-between">
+                <$NetworkName>{network.name}</$NetworkName>
+                <$ComingSoon>Coming Soon</$ComingSoon>
+              </$Horizontal>
+            )}
+          </$NetworkOption>
+        ))}
       </$Vertical>
     )
   }
-	return (
-		<$StepChooseNetwork>
+  return (
+    <$StepChooseNetwork>
       {ref && <div ref={ref}></div>}
-      <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.selectedNetwork ? props.stage : "in_progress"} onNext={props.onNext}>
+      <StepCard
+        themeColor={props.selectedNetwork?.themeColor}
+        stage={props.selectedNetwork ? props.stage : 'in_progress'}
+        onNext={props.onNext}
+      >
         <$Horizontal flex={1}>
           <$Vertical flex={2}>
-            <$StepHeading>1. Choose your Network</$StepHeading>
-            <$StepSubheading>Your Investors will buy tickets in the native token. Payouts can be made in any ERC20 token on that blockchain.</$StepSubheading>
-            <br/>
+            <$StepHeading>
+              1. Choose your Network
+              <HelpIcon tipID="stepNetwork" />
+              <ReactTooltip id="stepNetwork" place="right" effect="solid">
+                The network you choose should be the same blockchain as the game you intend to play. You may bridge
+                money across chains after funding, if needed.
+              </ReactTooltip>
+            </$StepHeading>
+            <$StepSubheading>
+              Your Investors will send you money in the native token. Profits can be shared as any ERC20 token on that
+              blockchain.
+            </$StepSubheading>
+            <br />
             {renderNetworkOptions()}
           </$Vertical>
           <$Vertical flex={1}>
-            <NetworkText />
-            <img style={{ width: '250px', marginTop: '50px' }} src={"https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media"} />
+            <WalletStatus />
+            <img
+              style={{ width: '250px', marginTop: '50px' }}
+              src={
+                'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media'
+              }
+            />
           </$Vertical>
         </$Horizontal>
       </StepCard>
-		</$StepChooseNetwork>
-	)
+    </$StepChooseNetwork>
+  )
 })
 
 const $StepChooseNetwork = styled.section<{}>`
@@ -74,11 +105,11 @@ const $StepChooseNetwork = styled.section<{}>`
 `
 
 export const $NetworkIcon = styled.img<{ size?: 'small' | 'medium' | 'large' }>`
-  width: ${props => props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px'};
-  height: ${props => props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px'};
+  width: ${(props) => (props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px')};
+  height: ${(props) => (props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px')};
 `
 
-const $NetworkOption = styled.button<{ isAvailable?: boolean, themeColor?: string, isSelected?: boolean; }>`
+const $NetworkOption = styled.button<{ isAvailable?: boolean; themeColor?: string; isSelected?: boolean }>`
   width: 300px;
   padding: 8px 10px;
   flex: 1;
@@ -87,23 +118,27 @@ const $NetworkOption = styled.button<{ isAvailable?: boolean, themeColor?: strin
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  border: 0.5px solid #CDCDCD;
-  ${props => props.isAvailable && 'cursor: pointer'};
-  ${props => props.themeColor && props.isSelected ? `background-color: ${props.themeColor}` : props.isAvailable && 'background-color: white'};
-  ${props => !props.isSelected && props.isAvailable && 'box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);'}
+  border: 0.5px solid #cdcdcd;
+  ${(props) => props.isAvailable && 'cursor: pointer'};
+  ${(props) =>
+    props.themeColor && props.isSelected
+      ? `background-color: ${props.themeColor}`
+      : props.isAvailable && 'background-color: white'};
+  ${(props) => !props.isSelected && props.isAvailable && 'box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);'}
 `
 
-const $NetworkName = styled.span<{ isAvailable?: boolean, isSelected?: boolean; }>`
+const $NetworkName = styled.span<{ isAvailable?: boolean; isSelected?: boolean }>`
   font-size: ${TYPOGRAPHY.fontSize.large};
-  ${props => props.isAvailable && 'text-transform: uppercase'};
-  ${props => props.isAvailable ? `font-weight: ${TYPOGRAPHY.fontWeight.bold}` : `font-weight: ${TYPOGRAPHY.fontWeight.light}`};
+  ${(props) => props.isAvailable && 'text-transform: uppercase'};
+  ${(props) =>
+    props.isAvailable ? `font-weight: ${TYPOGRAPHY.fontWeight.bold}` : `font-weight: ${TYPOGRAPHY.fontWeight.light}`};
   margin-left: 20px;
-  ${props => props.isSelected && 'color: white'};
+  ${(props) => props.isSelected && 'color: white'};
 `
 
 const $ComingSoon = styled.span<{ isSelected?: boolean }>`
   font-size: ${TYPOGRAPHY.fontSize.xsmall};
-  color: ${props => props.isSelected ? COLORS.white : COLORS.surpressedFontColor};
+  color: ${(props) => (props.isSelected ? COLORS.white : COLORS.surpressedFontColor)};
   text-transform: uppercase;
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   line-height: 0.6rem;
@@ -112,4 +147,4 @@ const $ComingSoon = styled.span<{ isSelected?: boolean }>`
   justify-content: flex-end;
 `
 
-export default StepChooseNetwork;
+export default StepChooseNetwork

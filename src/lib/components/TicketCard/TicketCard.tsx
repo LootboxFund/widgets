@@ -79,6 +79,7 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
   background-size: cover;
   cursor: pointer;
+  background-position: center;
 `
 
 export const $TicketRedeemContainer = styled.section`
@@ -104,6 +105,7 @@ export const $TicketLogo = styled.div<{
   ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}
   ${(props) => props.backgroundShadowColor && `filter: drop-shadow(0px 0px 22px ${props.backgroundShadowColor});`}
   background-size: cover;
+  background-position: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
