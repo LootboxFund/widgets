@@ -15,6 +15,12 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { truncateAddress } from 'lib/api/helpers'
 
+export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
+  return fundraisingTarget.gt(0)
+}
+export const validateReceivingWallet = async (receivingWallet: string, web3Utils: any) => {
+  return web3Utils.isAddress(receivingWallet)
+}
 export interface StepChooseFundingProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -34,12 +40,6 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     receivingWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
-  const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
-    return fundraisingTarget.gt(0)
-  }
-  const validateReceivingWallet = async (receivingWallet: string) => {
-    return web3Utils.isAddress(receivingWallet)
-  }
 
   useEffect(() => {
     getLatestPrice()
@@ -69,7 +69,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
       props.setFundraisingTarget(value)
       const validFundraise = validateFundraisingTarget(value)
-      const validReceiver = await validateReceivingWallet(props.receivingWallet)
+      const validReceiver = await validateReceivingWallet(props.receivingWallet, web3Utils)
       if (validFundraise) {
         setErrors({
           ...errors,
@@ -135,7 +135,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   const renderInputReceivingWallet = () => {
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       props.setReceivingWallet(e.target.value as Address)
-      const validReceiver = await validateReceivingWallet(e.target.value)
+      const validReceiver = await validateReceivingWallet(e.target.value, web3Utils)
       const validFundraiser = validateFundraisingTarget(props.fundraisingTarget)
       if (!validReceiver) {
         setErrors({
@@ -179,7 +179,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     )
   }
   return (
-    <$StepChooseFunding>
+    <$StepChooseFunding style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}
         stage={props.stage}
@@ -192,9 +192,8 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               2. How much money do you need?
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
-                We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in
-                the value of the native token. You will receive the money right away, regardless of whether you hit your
-                fundraising target.
+                We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching
+                videos on our YouTube channel teaching best practices on how to fundraise.
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>

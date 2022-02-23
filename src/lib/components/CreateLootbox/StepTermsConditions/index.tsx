@@ -56,9 +56,9 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
   }
   useEffect(() => {
     checkAddrValid(props.treasuryWallet).then((valid) => {
-      if (valid) {
+      if (valid && props.termsState.agreeVerify && props.termsState.agreeEthics && props.termsState.agreeLiability) {
         props.setValidity(true)
-      } else if (props.treasuryWallet.length > 0) {
+      } else if (!valid && props.treasuryWallet.length > 0) {
         props.setValidity(false)
         setErrors({
           ...errors,
@@ -130,7 +130,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     )
   }
   return (
-    <$StepTermsConditions>
+    <$StepTermsConditions style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         customActionBar={
@@ -205,15 +205,20 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           </$Vertical>
         </$Vertical>
       </StepCard>
-      {props.submitStatus === 'in_progress' && (
-        <$TwitterAlert>
-          If submission is taking too long, check our 👉
-          <a href="https://twitter.com/LootboxAlerts" target="_blank" style={{ marginLeft: '5px', marginRight: '5px' }}>
-            live Twitter feed
-          </a>{' '}
-          to find your newly created Lootbox. Takes ~3 mins.
-        </$TwitterAlert>
-      )}
+      {props.submitStatus === 'in_progress' ||
+        (props.submitStatus === 'success' && (
+          <$TwitterAlert>
+            If submission is taking too long, check our 👉
+            <a
+              href="https://twitter.com/LootboxAlerts"
+              target="_blank"
+              style={{ marginLeft: '5px', marginRight: '5px' }}
+            >
+              live Twitter feed
+            </a>{' '}
+            to find your newly created Lootbox. Takes ~3 mins.
+          </$TwitterAlert>
+        ))}
     </$StepTermsConditions>
   )
 })

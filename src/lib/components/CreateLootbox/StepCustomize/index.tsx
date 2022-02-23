@@ -11,7 +11,32 @@ import { getPriceFeed } from 'lib/hooks/useContract'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
+import { checkIfValidUrl } from 'lib/api/helpers'
 
+export const getMaxTicketPrice = (
+  nativeTokenPrice: BigNumber,
+  fundraisingTarget: BigNumber,
+  web3Utils: any
+): number => {
+  const price = nativeTokenPrice
+    ? nativeTokenPrice
+        .multipliedBy(fundraisingTarget)
+        .dividedBy(10 ** 18)
+        .toFixed(2)
+    : web3Utils.toBN(0)
+  if (!price && isNaN(price)) {
+    return 0
+  }
+  return price
+}
+
+export const validateName = (name: string) => name.length > 0
+export const validateSymbol = (symbol: string) => symbol.length > 0
+export const validateBiography = (bio: string) => bio.length > 12
+export const validatePricePerShare = (price: number, maxPricePerShare: number) => price > 0 && price <= maxPricePerShare
+export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
+export const validateLogo = (url: string) => url && checkIfValidUrl(url)
+export const validateCover = (url: string) => url && checkIfValidUrl(url)
 export interface StepCustomizeProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -34,20 +59,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
-  const deriveMaxTicketPrice = (): number => {
-    const price = nativeTokenPrice
-      ? nativeTokenPrice
-          .multipliedBy(props.fundraisingTarget)
-          .dividedBy(10 ** 18)
-          .toFixed(2)
-      : web3Utils.toBN(0)
-    if (!price && isNaN(price)) {
-      return 0
-    }
-    return price
-  }
-  const maxPricePerShare = deriveMaxTicketPrice()
-
+  const maxPricePerShare = nativeTokenPrice
+    ? getMaxTicketPrice(nativeTokenPrice, props.fundraisingTarget, web3Utils)
+    : 0
   const initialErrors = {
     name: '',
     symbol: '',
@@ -58,18 +72,15 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     coverUrl: '',
   }
   const [errors, setErrors] = useState(initialErrors)
-  const validateName = (name: string) => name.length > 0
-  const validateSymbol = (symbol: string) => symbol.length > 0
-  const validateBiography = (bio: string) => bio.length > 12
-  const validatePricePerShare = (price: number) => price > 0 && price <= maxPricePerShare
-  const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
-  const checkAllValidations = () => {
+  const checkAllTicketCustomizationValidations = () => {
     let valid = true
     if (!validateName(props.ticketState.name as string)) valid = false
     if (!validateSymbol(props.ticketState.symbol as string)) valid = false
     if (!validateBiography(props.ticketState.biography as string)) valid = false
-    if (!validatePricePerShare(props.ticketState.pricePerShare as number)) valid = false
+    if (!validatePricePerShare(props.ticketState.pricePerShare as number, maxPricePerShare)) valid = false
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
+    if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
+    if (!validateCover(props.ticketState.coverUrl as string)) valid = false
     if (valid) {
       setErrors({
         ...errors,
@@ -86,7 +97,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     return valid
   }
   useEffect(() => {
-    checkAllValidations()
+    checkAllTicketCustomizationValidations()
   }, [props.ticketState])
   const parseInput = (slug: string, value: string | number) => {
     props.updateTicketState(slug, value)
@@ -111,7 +122,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (slug === 'pricePerShare') {
       setErrors({
         ...errors,
-        pricePerShare: validatePricePerShare(value as number)
+        pricePerShare: validatePricePerShare(value as number, maxPricePerShare)
           ? ''
           : `Price per share must be greater than zero and less than $${maxPricePerShare}`,
       })
@@ -122,10 +133,22 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color',
       })
     }
+    if (slug === 'logoUrl') {
+      setErrors({
+        ...errors,
+        logoUrl: validateLogo(value as string) ? '' : 'Logo must be a valid URL',
+      })
+    }
+    if (slug === 'coverUrl') {
+      setErrors({
+        ...errors,
+        coverUrl: validateCover(value as string) ? '' : 'Cover image must be a valid URL',
+      })
+    }
   }
 
   return (
-    <$StepCustomize>
+    <$StepCustomize style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}

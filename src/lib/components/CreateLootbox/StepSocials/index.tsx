@@ -7,6 +7,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { NetworkOption } from '../state'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import { checkIfValidEmail } from 'lib/api/helpers'
 
 export interface SocialFragment {
   slug: string
@@ -16,33 +17,39 @@ export interface SocialFragment {
 }
 const SOCIALS: SocialFragment[] = [
   {
+    slug: 'email',
+    name: 'Email',
+    placeholder: 'Email',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
+  },
+  {
     slug: 'twitter',
     name: 'Twitter',
-    placeholder: 'Twitter handle',
+    placeholder: 'Twitter',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
   },
   {
-    slug: 'email',
-    name: 'Email',
-    placeholder: 'contact@you.com',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
+    slug: 'youtube',
+    name: 'YouTube',
+    placeholder: 'YouTube 1 min Intro Video',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
   },
   {
     slug: 'instagram',
     name: 'Instagram',
-    placeholder: 'Instagram username',
+    placeholder: 'Instagram',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
   },
   {
     slug: 'tiktok',
     name: 'Tiktok',
-    placeholder: 'Tiktok username',
+    placeholder: 'Tiktok',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftiktok.png?alt=media',
   },
   {
     slug: 'facebook',
     name: 'Facebook',
-    placeholder: 'Facebook page or account',
+    placeholder: 'Facebook',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
   },
   {
@@ -52,27 +59,21 @@ const SOCIALS: SocialFragment[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
   },
   {
-    slug: 'youtube',
-    name: 'YouTube',
-    placeholder: 'YouTube Video',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
-  },
-  {
     slug: 'snapchat',
     name: 'Snapchat',
-    placeholder: 'Snapchat username',
+    placeholder: 'Snapchat',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fsnapchat.png?alt=media',
   },
   {
     slug: 'twitch',
     name: 'Twitch',
-    placeholder: 'Twitch handle',
+    placeholder: 'Twitch',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
   },
   {
     slug: 'web',
     name: 'Website',
-    placeholder: 'www.website.com',
+    placeholder: 'Website',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
   },
 ]
@@ -104,7 +105,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
   const parseInput = (slug: string, value: string) => {
     props.updateSocialState(slug, value)
     if (slug === 'email') {
-      if (value.length > 0 && !value.includes('@')) {
+      if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
           email: 'Invalid email',
@@ -134,7 +135,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
   }
 
   return (
-    <$StepSocials>
+    <$StepSocials style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}
@@ -166,7 +167,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
                     style={{ width: '100%' }}
                     value={props.socialState[social.slug]}
                     onChange={(e) => parseInput(social.slug, e.target.value)}
-                    placeholder={social.name}
+                    placeholder={social.placeholder}
                   ></$InputMedium>
                 </$Horizontal>
               )

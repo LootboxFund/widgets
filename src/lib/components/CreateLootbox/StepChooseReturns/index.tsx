@@ -12,6 +12,8 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 
+export const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
+export const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
 export interface StepChooseReturnsProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -32,8 +34,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
     paybackDate: '',
   }
   const [errors, setErrors] = useState(initialErrors)
-  const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
-  const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
+
   useEffect(() => {
     getLatestPrice()
   }, [props.selectedNetwork])
@@ -231,7 +232,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
     )
   }
   return (
-    <$StepChooseReturns>
+    <$StepChooseReturns style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}

@@ -197,8 +197,6 @@ const initWeb3OnWindow = async (rpcUrl?: string) => {
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
-  console.log(`-----> chainInfo`)
-  console.log(chainInfo)
   userState.network.currentNetworkIdHex = chainInfo.chainIdHex
   userState.network.currentNetworkIdDecimal = chainInfo.chainIdDecimal
   userState.network.currentNetworkName = chainInfo.chainName
