@@ -146,9 +146,6 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       >
         <$Vertical flex={1}>
           <$StepHeading>{`6. Terms & Conditions`}</$StepHeading>
-          <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
-
-          <br />
           <br />
           {TERMS.map((term) => {
             return (
@@ -178,7 +175,8 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
               Reputation Address (Locked to Current User)
               <HelpIcon tipID="reputationWallet" />
               <ReactTooltip id="reputationWallet" place="right" effect="solid">
-                _________
+                Your wallet address has an on-chain reputation based on how consistently you pay back profits to
+                investors. A good reputation helps future fundraising, and even allows you to sponsor a friend.
               </ReactTooltip>
             </$StepSubheading>
             <$CopyableInput>
@@ -193,7 +191,8 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
               Treasury Wallet (Receives Funds)
               <HelpIcon tipID="treasuryWallet" />
               <ReactTooltip id="treasuryWallet" place="right" effect="solid">
-                _________
+                This wallet address is where the funds from your Lootbox will be deposited. Double check that this
+                address is correct.
               </ReactTooltip>
             </$StepSubheading>
             <$CopyableInput>

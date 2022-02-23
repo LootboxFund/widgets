@@ -72,11 +72,12 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
               1. Choose your Network
               <HelpIcon tipID="stepNetwork" />
               <ReactTooltip id="stepNetwork" place="right" effect="solid">
-                _________
+                The network you choose should be the same blockchain as the game you intend to play. You may bridge
+                money across chains after funding, if needed.
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Your Investors will buy tickets in the native token. Payouts can be made in any ERC20 token on that
+              Your Investors will send you money in the native token. Profits can be shared as any ERC20 token on that
               blockchain.
             </$StepSubheading>
             <br />

@@ -118,7 +118,10 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               Target Return
               <HelpIcon tipID="targetReturn" />
               <ReactTooltip id="targetReturn" place="right" effect="solid">
-                _________
+                This target is shown to investors but is not a guranteed return. You decide how much this is, based on
+                your knowlege of the oppourtunity you are pursuing. A 10% target return on 10 ETH investment means you
+                intend to reward investors 11 ETH. Typically your obligation to reward investors ends when you hit your
+                target return.
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading
@@ -205,7 +208,8 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               {`Payout in ${calculatePayoutDays(props.paybackDate)} Days`}
               <HelpIcon tipID="payoutDate" />
               <ReactTooltip id="payoutDate" place="right" effect="solid">
-                _________
+                This is shown to investors as an end date they should expect to receive their profits. You can reward
+                investors any time, this payout date is just an estimate. Be honest and realistic with your estimate.
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading
@@ -241,10 +245,13 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               3. How will your reward your investors?
               <HelpIcon tipID="stepReturns" />
               <ReactTooltip id="stepReturns" place="right" effect="solid">
-                _________
+                Treat your investors like your fans. The more you reward them, the more they will trust and support you.
               </ReactTooltip>
             </$StepHeading>
-            <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
+            <$StepSubheading>
+              Lootbox is not a loan. You decide when and how much you want to reward your investors. Good performance
+              improves your on-chain reputation, helping you fundraise more in the future.
+            </$StepSubheading>
             <br />
             <br />
             {renderTargetReturn()}

@@ -95,7 +95,10 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
           Fundraising Target
           <HelpIcon tipID="fundraisingTarget" />
           <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
-            _________
+            We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the
+            value of the native token. You will receive the money right away, regardless of whether you hit your
+            fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your fundraising
+            target.
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper>
@@ -162,7 +165,8 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
           Receiving Wallet
           <HelpIcon tipID="receivingWallet" />
           <ReactTooltip id="receivingWallet" place="right" effect="solid">
-            _________
+            This address will receive the money right away. We highly recommend you use a MultiSig wallet if you are a
+            team. Our YouTube channel has tutorials on how to set up a MultiSig.
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper>
@@ -191,10 +195,15 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               2. How much money do you need?
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
-                _________
+                We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in
+                the value of the native token. You will receive the money right away, regardless of whether you hit your
+                fundraising target.
               </ReactTooltip>
             </$StepHeading>
-            <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
+            <$StepSubheading>
+              We recommend you start with a small amount that is easy to deliver a profit on. You can make unlimited
+              Lootboxes for anything you want.
+            </$StepSubheading>
             <br />
             <br />
             {renderInputFundraisingTarget()}

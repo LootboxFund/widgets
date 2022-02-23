@@ -136,13 +136,16 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         <$Horizontal flex={1}>
           <$Vertical flex={1}>
             <$StepHeading>
-              <span>4. Customize Ticket</span>
+              <span>4. Customize NFT Ticket</span>
               <HelpIcon tipID="stepCustomize" />
               <ReactTooltip id="stepCustomize" place="right" effect="solid">
-                _________
+                Finally, an NFT that's actually useful 😂
               </ReactTooltip>
             </$StepHeading>
-            <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
+            <$StepSubheading>
+              Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you
+              deposit earnings back into the Lootbox.
+            </$StepSubheading>
             <br />
             <br />
             <$StepSubheading>
@@ -150,8 +153,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               <HelpIcon tipID="lootboxName" />
               <ReactTooltip id="lootboxName" place="right" effect="solid">
                 The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that
-                you might have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce
-                confusion.
+                you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to
+                reduce confusion.
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -195,7 +198,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   <ReactTooltip id="pricePerShare" place="right" effect="solid">
                     We recommend leaving this at the default value. When investors buy NFT tickets from your Lootbox,
                     they specify many shares they want. The more shares owned in a ticket, the higher the % of Lootbox
-                    earnings they receive.
+                    earnings they receive. It is possible to buy fractional shares. The only reason you may want to
+                    customize your share price is for psychological pricing.
                   </ReactTooltip>
                 </$StepSubheading>
                 <$Horizontal verticalCenter flex={1}>
@@ -249,7 +253,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 Logo Image
                 <HelpIcon tipID="logoImage" />
                 <ReactTooltip id="logoImage" place="right" effect="solid">
-                  Upload your logo to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Imgur for simplicity,
+                  or Pinata.cloud if you want to use Web3 IPFS. Remember to compress your images so that it loads
+                  faster.
                 </ReactTooltip>
               </$StepSubheading>
               <$InputMedium
@@ -263,7 +269,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <span>Cover Image</span>
                 <HelpIcon tipID="coverImage" />
                 <ReactTooltip id="coverImage" place="right" effect="solid">
-                  Upload your cover image to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+                  Upload your cover image to Imgur or Pinata and paste the URL here. We recommend Imgur for simplicity,
+                  or Pinata.cloud if you want to use Web3 IPFS. Remember to compress your images so that it loads
+                  faster.
                 </ReactTooltip>
               </$StepSubheading>
               <$InputMedium

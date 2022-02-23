@@ -147,10 +147,14 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
             5. Contact Information
             <HelpIcon tipID="stepSocials" />
             <ReactTooltip id="stepSocials" place="right" effect="solid">
-              _________
+              Having public profiles is important for building trust with investors.
             </ReactTooltip>
           </$StepHeading>
-          <$StepSubheading>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod.</$StepSubheading>
+          <$StepSubheading>
+            Email is mandatory. Twitter is important for easy public communication with your investors. We also highly
+            recommend you film a 1 minute self-introduction YouTube video and paste the link here (it helps build
+            trust).
+          </$StepSubheading>
           <br />
           <br />
           <$SocialGridInputs>
