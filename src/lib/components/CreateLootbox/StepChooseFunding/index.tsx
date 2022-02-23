@@ -13,11 +13,8 @@ import { useWeb3Utils } from '../../../hooks/useWeb3Api/index'
 import { Address } from '@lootboxfund/helpers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import { truncateAddress } from 'lib/api/helpers'
 
-interface Errors {
-  fundraisingTarget: string
-  receivingWallet: string
-}
 export interface StepChooseFundingProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -172,10 +169,10 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
         <$InputWrapper>
           <$Input
             value={props.receivingWallet}
-            placeholder="0xAutodetectYourWallet"
             screen={'mobile'}
             fontWeight="200"
             onChange={parseInput}
+            placeholder="Funds will arrive here"
           />
         </$InputWrapper>
       </$Vertical>

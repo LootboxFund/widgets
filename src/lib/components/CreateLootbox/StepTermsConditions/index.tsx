@@ -211,7 +211,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           <a href="https://twitter.com/LootboxAlerts" target="_blank" style={{ marginLeft: '5px', marginRight: '5px' }}>
             live Twitter feed
           </a>{' '}
-          to find your newly created Lootbox.
+          to find your newly created Lootbox. Takes ~3 mins.
         </$TwitterAlert>
       )}
     </$StepTermsConditions>

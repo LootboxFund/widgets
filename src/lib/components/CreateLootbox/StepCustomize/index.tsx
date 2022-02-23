@@ -231,7 +231,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   />
                   <$ColorPreview
                     color={props.ticketState.lootboxThemeColor as string}
-                    onClick={() => window.open('https://imagecolorpicker.com/', '_blank')}
+                    onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
                   />
                 </$Horizontal>
               </$Vertical>

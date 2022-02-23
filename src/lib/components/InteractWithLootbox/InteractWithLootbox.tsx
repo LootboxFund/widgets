@@ -8,6 +8,9 @@ const InteractWithLootbox = () => {
   const ref = useRef<HTMLDivElement | null>(null)
   return (
     <$Vertical spacing={5}>
+      <$MinterContainer>
+        <TicketMinter ref={ref} />
+      </$MinterContainer>
       <$TicketContainer>
         <UserTickets
           onScrollToMint={() => {
@@ -15,9 +18,6 @@ const InteractWithLootbox = () => {
           }}
         />
       </$TicketContainer>
-      <$MinterContainer>
-        <TicketMinter ref={ref} />
-      </$MinterContainer>
     </$Vertical>
   )
 }

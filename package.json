@@ -58,7 +58,7 @@
     "pipedream:sample:onLootboxUri": "node scripts/sample-lootboxUri.js",
     "deploy:prod": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-widgets.js",
     "deploy:terran": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-create-lootbox.js",
-    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js"
+    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js"
   },
   "dependencies": {
     "@chainlink/abi": "^0.1.4",

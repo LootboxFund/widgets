@@ -43,6 +43,10 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
     }
   }, [props.ticketID])
 
+  const dividends = ticket && ticket.dividends
+  const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
+  const isRedeemable = activeDividends && activeDividends.length > 0
+
   return (
     <$RootContainer>
       {ticket && ticket.route === '/payout' ? (
@@ -50,7 +54,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       ) : (
         <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} />
       )}
-      {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} />}
+      {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
     </$RootContainer>
   )
 }
