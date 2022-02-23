@@ -91,10 +91,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const reputationWallet = (snapUserState.currentAccount || '') as Address
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
 
-  console.log(validity)
-
   // STEP 1: Choose Network
-  const [network, setNetwork] = useState<NetworkOption>(NETWORK_OPTIONS[0])
+  const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
     setNetwork(network)
     if (network && reputationWallet) {
@@ -142,7 +140,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     reputationWallet.length > 0 &&
     stage.stepFunding !== 'may_proceed'
   ) {
-    console.log(`Yup, checkFundingStepDone() = ${checkFundingStepDone()} and stage.stepFunding = ${stage.stepFunding}`)
     setStage({
       ...stage,
       stepFunding: 'may_proceed',
