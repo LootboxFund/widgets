@@ -405,7 +405,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://lootbox-fund.webflow.io/demo/0-2-0-demo/fundraiser?lootbox=${lootboxAddress}`
+    return `https://lootbox.fund/demo/0-2-0-demo/fundraiser?lootbox=${lootboxAddress}`
   }
 
   // if (!isWalletConnected) {

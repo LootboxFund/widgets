@@ -9,6 +9,7 @@ import { NetworkOption } from '../state'
 import { BigNumber } from 'bignumber.js'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import ReactTooltip from 'react-tooltip'
 
 export interface StepCustomizeProps {
   stage: StepStage
@@ -197,7 +198,12 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             <br />
             <$Horizontal verticalCenter></$Horizontal>
             <$Vertical>
-              <$StepSubheading>Logo Image</$StepSubheading>
+              <$StepSubheading data-tip data-for="logoImage">
+                Logo Image ℹ️
+              </$StepSubheading>
+              <ReactTooltip id="logoImage" place="top" effect="solid">
+                Upload your logo to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+              </ReactTooltip>
               <$InputMedium
                 onChange={(e) => parseInput('logoUrl', e.target.value)}
                 value={props.ticketState.logoUrl}
@@ -205,7 +211,12 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               />
             </$Vertical>
             <$Vertical>
-              <$StepSubheading>Cover Image</$StepSubheading>
+              <$StepSubheading data-tip data-for="coverImage">
+                Cover Image
+              </$StepSubheading>
+              <ReactTooltip id="coverImage" place="top" effect="solid">
+                Upload your cover image to Imgur (web2) or Pinata.cloud (web3) and paste the URL here.
+              </ReactTooltip>
               <$InputMedium
                 onChange={(e) => parseInput('coverUrl', e.target.value)}
                 value={props.ticketState.coverUrl}

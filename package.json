@@ -85,6 +85,7 @@
     "popper-max-size-modifier": "^0.2.0",
     "react-feather": "^2.0.9",
     "react-redux": "^7.2.6",
+    "react-tooltip": "^4.2.21",
     "react-virtualized-auto-sizer": "^1.0.6",
     "react-window": "^1.8.6",
     "rebass": "^4.0.7",

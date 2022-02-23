@@ -1,17 +1,15 @@
-
-import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@lootboxfund/helpers';
-
+import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@lootboxfund/helpers'
 
 export interface NetworkOption {
-  name: string;
-  icon: string;
-  symbol: string;
-  themeColor: string;
-  chainIdHex: ChainIDHex,
-  chainIdDecimal: ChainIDDecimal,
-  isAvailable: boolean;
-  priceFeed?: Address;
-  isTestnet?: boolean;
+  name: string
+  icon: string
+  symbol: string
+  themeColor: string
+  chainIdHex: ChainIDHex
+  chainIdDecimal: ChainIDDecimal
+  isAvailable: boolean
+  priceFeed?: Address
+  isTestnet?: boolean
 }
 export const NETWORK_OPTIONS: NetworkOption[] = [
   // {
@@ -28,8 +26,8 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     name: 'Binance',
     symbol: 'BNB',
     themeColor: '#F0B90B',
-    chainIdHex: 'a',
-    chainIdDecimal: '',
+    chainIdHex: '0x61',
+    chainIdDecimal: '97',
     isAvailable: true,
     isTestnet: true,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
@@ -41,7 +39,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     themeColor: '#8F5AE8',
     chainIdHex: 'b',
     chainIdDecimal: '',
-    isAvailable: true,
+    isAvailable: false,
     isTestnet: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
     priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as ContractAddress,
