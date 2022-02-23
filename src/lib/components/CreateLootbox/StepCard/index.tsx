@@ -1,6 +1,7 @@
 import react from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
+import CheckIcon from 'lib/theme/icons/Check.icon'
 
 export type StepStage = 'not_yet' | 'in_progress' | 'may_proceed' | 'completed'
 export interface StepCardProps {
@@ -37,7 +38,7 @@ const StepCard = (props: StepCardProps) => {
           clickable
           onClick={props.onNext}
         >
-          PROCEED TO NEXT
+          <span style={{ fontSize: '1.2rem', marginRight: '5px' }}>✔</span> COMPLETED
         </$StepButton>
       )
     }
@@ -49,7 +50,7 @@ const StepCard = (props: StepCardProps) => {
           clickable
           onClick={props.onNext}
         >
-          COMPLETED
+          <CheckIcon width={20} /> COMPLETED
         </$StepButton>
       )
     }
@@ -115,7 +116,7 @@ const $StepButton = styled.button<{
   font-size: 1rem;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   padding-left: 40px;
   text-align: left;
 `
