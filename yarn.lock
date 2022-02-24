@@ -2083,10 +2083,10 @@
     axios "0.25.0"
     lodash "4.17.21"
 
-"@lootboxfund/manifest@^0.2.23":
-  version "0.2.23"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.23.tgz#5ba33dfac2043eb00588231a133b7a185ff63c3a"
-  integrity sha512-FUCdVWgtUlnqpextFrr92UG5owdrrPCFAnfKe6Xqi7YNR6i3wEly+aQ9Xe1vtQlQR6Q2BJ+uC1hP9LwFKj2MwQ==
+"@lootboxfund/manifest@0.2.30":
+  version "0.2.30"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.30.tgz#cf5d0a4ee594791b8ce12430d501cccc41b51032"
+  integrity sha512-Hyr1KOoGuyBnZf5hBrytMHKIwuUAbY4JGqeK80o67Acs+rpG44tej04jyOy8BbskWusH3zGRxNROJs851m85ZA==
   dependencies:
     "@lootboxfund/helpers" "0.0.12"
 
@@ -4603,6 +4603,13 @@ axios@0.25.0, axios@^0.25.0:
   integrity sha512-cD8FOb0tRH3uuEe6+evtAbgJtfxr7ly3fQjYcMcuPlgkwVS9xboaVIpcDV+cYQe+yGykgwZCs1pzjntcGa6l5g==
   dependencies:
     follow-redirects "^1.14.7"
+
+axios@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.26.0.tgz#9a318f1c69ec108f8cd5f3c3d390366635e13928"
+  integrity sha512-lKoGLMYtHvFrPVt3r+RBMp9nh34N0M8zEfCWqdWZx6phynIEhQqAdydpyBAAG211zlhX9Rgu08cOamy6XjE5Og==
+  dependencies:
+    follow-redirects "^1.14.8"
 
 babel-jest@^27.4.6:
   version "27.4.6"
@@ -7251,6 +7258,11 @@ follow-redirects@^1.14.7:
   version "1.14.7"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
   integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
+
+follow-redirects@^1.14.8:
+  version "1.14.9"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.9.tgz#dd4ea157de7bfaf9ea9b3fbd85aa16951f78d8d7"
+  integrity sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==
 
 for-in@^1.0.2:
   version "1.0.2"
