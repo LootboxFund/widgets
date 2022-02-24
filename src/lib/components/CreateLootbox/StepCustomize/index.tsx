@@ -99,7 +99,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   useEffect(() => {
     checkAllTicketCustomizationValidations()
   }, [props.ticketState])
-  const parseInput = (slug: string, value: string | number) => {
+  const parseInput = (slug: string, text: string | number) => {
+    const value = slug === 'symbol' ? (text as string).toUpperCase() : text
     props.updateTicketState(slug, value)
     if (slug === 'name') {
       setErrors({
@@ -276,9 +277,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 Logo Image
                 <HelpIcon tipID="logoImage" />
                 <ReactTooltip id="logoImage" place="right" effect="solid">
-                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Imgur for simplicity,
-                  or Pinata.cloud if you want to use Web3 IPFS. Remember to compress your images so that it loads
-                  faster.
+                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
+                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
+                  url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
               <$InputMedium
@@ -292,9 +293,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <span>Cover Image</span>
                 <HelpIcon tipID="coverImage" />
                 <ReactTooltip id="coverImage" place="right" effect="solid">
-                  Upload your cover image to Imgur or Pinata and paste the URL here. We recommend Imgur for simplicity,
-                  or Pinata.cloud if you want to use Web3 IPFS. Remember to compress your images so that it loads
-                  faster.
+                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
+                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
+                  url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
               <$InputMedium

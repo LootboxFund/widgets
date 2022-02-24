@@ -100,7 +100,7 @@ export const $TicketLogo = styled.div<{
   border: 0px solid transparent;
   border-radius: 50%;
   margin: auto auto 0px;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
   background: rgba(0, 0, 0, 0.05);
   ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}
   ${(props) => props.backgroundShadowColor && `filter: drop-shadow(0px 0px 22px ${props.backgroundShadowColor});`}
@@ -133,6 +133,7 @@ export const $TagText = styled.p`
   color: #ffffff;
   width: 100%;
   max-width: 50%;
+  padding: 5px;
 `
 export const $TicketIDText = styled.p`
   font-family: sans-serif;
