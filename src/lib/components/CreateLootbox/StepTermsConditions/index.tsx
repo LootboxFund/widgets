@@ -205,20 +205,15 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           </$Vertical>
         </$Vertical>
       </StepCard>
-      {props.submitStatus === 'in_progress' ||
-        (props.submitStatus === 'success' && (
-          <$TwitterAlert>
-            If submission is taking too long, check our 👉
-            <a
-              href="https://twitter.com/LootboxAlerts"
-              target="_blank"
-              style={{ marginLeft: '5px', marginRight: '5px' }}
-            >
-              live Twitter feed
-            </a>{' '}
-            to find your newly created Lootbox. Takes ~3 mins.
-          </$TwitterAlert>
-        ))}
+      {(props.submitStatus === 'in_progress' || props.submitStatus === 'success') && (
+        <$TwitterAlert>
+          If submission is taking too long, check our 👉
+          <a href="https://twitter.com/LootboxAlerts" target="_blank" style={{ marginLeft: '5px', marginRight: '5px' }}>
+            live Twitter feed
+          </a>{' '}
+          to find your newly created Lootbox. Takes ~3 mins.
+        </$TwitterAlert>
+      )}
     </$StepTermsConditions>
   )
 })

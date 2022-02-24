@@ -131,6 +131,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [receivingWallet, setReceivingWallet] = useState<Address | undefined>(
     (snapUserState.currentAccount || undefined) as Address
   )
+  if (snapUserState.currentAccount && receivingWallet === undefined) {
+    setReceivingWallet(snapUserState.currentAccount as Address)
+  }
   const checkFundingStepDone = () => {
     return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet, web3Utils)
   }
@@ -459,9 +462,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return `https://www.lootbox.fund/demo/0-2-0-demo/lootbox?lootbox=${lootboxAddress}`
   }
 
-  // if (!isWalletConnected) {
-  //   return <WalletButton></WalletButton>
-  // }
   return (
     <$CreateLootbox>
       <StepChooseNetwork

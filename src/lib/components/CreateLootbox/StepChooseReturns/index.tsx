@@ -151,6 +151,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
                   placeholder="10"
                   screen={screen}
                   width={calculateInputWidth()}
+                  onWheel={(e) => e.currentTarget.blur()}
                 />
                 <$InputTranslationLight>%</$InputTranslationLight>
               </div>
