@@ -8,6 +8,7 @@ import {
 import { userState } from 'lib/state/userState'
 import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
 import { manifest } from '../../manifest'
+import { encodeURISafe } from './helpers'
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
@@ -32,18 +33,20 @@ export const readJSON = async <T>(file: string): Promise<T> => {
 }
 
 export const getLootboxURI = async ({
-  semvar,
+  semver,
   chainIdHex,
   lootboxAddress,
   bucket,
 }: {
-  semvar: SemanticVersion
+  semver: SemanticVersion
   chainIdHex: ChainIDHex
   lootboxAddress: ContractAddress
   bucket: string
 }) => {
-  const filePath = `v/${semvar}/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`
-  const downloadablePath = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${filePath}?alt=media \n`
+  const filePath = `v/${semver}/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`
+  const downloadablePath = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURISafe(
+    filePath
+  )}?alt=media`
   const lootboxURI = await (await fetch(downloadablePath)).json()
   return lootboxURI
 }
@@ -52,16 +55,15 @@ export const readTicketMetadata = async (
   lootboxAddress: ContractAddress,
   ticketID: TicketID
 ): Promise<ITicketMetadata> => {
-  const defaultFilepath = defaultMetadataStorageUrl(lootboxAddress)
-  const filepath = metadataStorageUrl(lootboxAddress, ticketID)
-
-  const { address, name, description, image, backgroundColor, backgroundImage } = await readJSON(filepath)
-  // const { address, name, description, image, backgroundColor, backgroundImage } = await getLootboxURI({
-  //   lootboxAddress,
-  //   semvar: '0.2.0-sandbox',
-  //   chainIdHex: '0x61',
-  //   bucket: "guildfx-exchange.appspot.com",
-  // })
+  // const defaultFilepath = defaultMetadataStorageUrl(lootboxAddress)
+  // const filepath = metadataStorageUrl(lootboxAddress, ticketID)
+  // const { address, name, description, image, backgroundColor, backgroundImage } = await readJSON(filepath)
+  const { address, name, description, image, backgroundColor, backgroundImage } = await getLootboxURI({
+    lootboxAddress,
+    semver: manifest.googleCloud.semver,
+    chainIdHex: manifest.chain.chainIDHex,
+    bucket: manifest.googleCloud.bucket.id,
+  })
 
   return { address, name, description, image, backgroundColor, backgroundImage }
 }

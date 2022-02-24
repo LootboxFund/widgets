@@ -21,3 +21,6 @@ export const checkIfValidEmail = (text: string) => {
     )
   return matches && matches.length > 0
 }
+
+export const encodeURISafe = (stringFragment: string) =>
+  encodeURIComponent(stringFragment).replace(/'/g, '%27').replace(/"/g, '%22')

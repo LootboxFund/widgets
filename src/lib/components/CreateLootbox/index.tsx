@@ -31,9 +31,10 @@ import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
 import { createTokenURIData } from 'lib/api/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
-import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress } from '@lootboxfund/helpers'
+import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertHexToDecimal } from '@lootboxfund/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
+import { manifest } from '../../../manifest'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -344,7 +345,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       return
     }
     setSubmitStatus('in_progress')
-    const LOOTBOX_FACTORY_ADDRESS = '0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0'
+    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await web3Eth.getBlockNumber()
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
       new web3Utils.BN('10')
@@ -425,9 +426,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             backgroundImage: ticketState.coverUrl as string,
             lootbox: {
               address: lootbox,
-              chainIdHex: 'chainIdHex',
-              chainIdDecimal: 'chainIdDecimal',
-              chainName: 'chainName',
+              chainIdHex: manifest.chain.chainIDHex,
+              chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+              chainName: manifest.chain.chainName,
               targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
               fundraisingTarget: fundraisingTarget,
               basisPointsReturnTarget: basisPoints.toString(),
