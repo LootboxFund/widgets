@@ -5,7 +5,7 @@
  */
 
 const axios = require('axios').default
-const { Manifest_v0_2_0_demo: Manifest } = require('@lootboxfund/manifest')
+const { latest: Manifest } = require('@lootboxfund/manifest')
 const manifest = Manifest.default
 
 const PIPEDREAM_TOKEN_URI_UPLOADER =

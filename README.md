@@ -1,4 +1,4 @@
-# GuildFX Frontend
+# Lootbox Frontend
 
 A template for building shareable libraries that can be used both NodeJS `import` or Browser `<script>` tags.
 
@@ -20,19 +20,21 @@ $ yarn publish	# publish to npm
 
 ## Usage Locally
 
-Using npm libraries locally is easy using `$ yarn link`. You will need two repos, the library and the codebase you are working in. 
+Using npm libraries locally is easy using `$ yarn link`. You will need two repos, the library and the codebase you are working in.
 
 ```bash
 # terminal 1
 $ cd guildfx-frontend
 $ yarn watch # this will hot-reload
 ```
+
 ```bash
 # terminal 2
 $ cd guildfx-frontend
 $ yarn link # ready to use
 $ yarn unlink # when you want to stop
 ```
+
 ```bash
 # terminal 3
 $ cd my-app
@@ -50,13 +52,13 @@ You can also build to UMD/IIFE locally, after `$ yarn watch` open up `./sandbox.
 <script src="./iife/bundle.js" type="text/javascript"></script>
 ```
 
-
 ## Usage in server
+
 ```js
-import { Counter, mockFunction } from '@guildfx/frontend';
+import { Counter, mockFunction } from '@guildfx/frontend'
 const App = () => {
-	mockFunction();	// prints 'hello'
-	return <Counter />
+  mockFunction() // prints 'hello'
+  return <Counter />
 }
 ```
 
@@ -65,16 +67,16 @@ const App = () => {
 ```html
 <!-- index.html -->
 <head>
-	<!-- we need to import react first -->
-	<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+  <!-- we need to import react first -->
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
 </head>
 <body>
-	<!-- then import our components -->
-	<div id="react-target"></div>
-	<script src="https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/index.js?alt=media&token=ed98e790-1eab-4b7f-acc1-b06065975d69"></script>
-	<!-- <script>
+  <!-- then import our components -->
+  <div id="react-target"></div>
+  <script src="https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/index.js?alt=media&token=ed98e790-1eab-4b7f-acc1-b06065975d69"></script>
+  <!-- <script>
 		// injects a react component into the page at <div id="react-target">
-		GuildFX_UI.injectCounter()
+		Lootbox_UI.injectCounter()
 	</script> -->
 </body>
 ```
@@ -82,6 +84,7 @@ const App = () => {
 <details>
 
 # @vijayt/counter
+
 This is just a demo component, part of the boilerplate for putting together a project that publishes components to the NPM registry. Features of the boilerplate include: Compilation using Rollup and TypeScript, Unit / Functional testing using Jest and React Testing library, Visual testing using Storybook. There is a [tutorial](https://vijayt.com/post/boilerplate-for-publishing-components-with-a-storybook/) that explains how the project was put together.
 
 </details>
