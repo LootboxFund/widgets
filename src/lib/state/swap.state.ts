@@ -5,7 +5,9 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import BN from 'bignumber.js'
 import { Address } from '@lootboxfund/helpers'
-import { useProvider } from '../hooks/useWeb3Api/index'
+import { ethers as ethersObj } from 'ethers'
+
+import detectEthereumProvider from '@metamask/detect-provider'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
@@ -73,7 +75,9 @@ export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Add
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const [provider] = useProvider()
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask, 'any')
   if (!provider) {
     throw new Error('No provider')
   }

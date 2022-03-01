@@ -10,7 +10,6 @@ import { ethers as ethersClass } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
-import { useProvider } from '../../hooks/useWeb3Api/index'
 import detectEthereumProvider from '@metamask/detect-provider'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
