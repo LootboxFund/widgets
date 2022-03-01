@@ -1,6 +1,6 @@
 import { $Button } from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useWeb3 } from 'lib/hooks/useWeb3Api'
+import { useEthers } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { useSnapshot } from 'valtio'
@@ -13,7 +13,7 @@ import { BLOCKCHAINS } from '@lootboxfund/helpers'
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
-  const web3 = useWeb3()
+  const ethers = useEthers()
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()

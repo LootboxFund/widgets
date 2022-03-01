@@ -13,7 +13,12 @@ const bucketName = manifest.googleCloud.bucket.id || 'guildfx-exchange.appspot.c
 const semver = manifest.semver.id || '0.2.0-sandbox'
 const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
-// Testing out upload of file
+console.log(`
+
+  Uploading ${semver} to ${bucketName}
+
+`)
+
 const uploadFile = async ({ filename, semver, absPath }) => {
   // Uploads a local file to the bucket
   const filepath = `widgets/${semver}/build/${filename}`
@@ -38,10 +43,12 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
+const CreateLootboxMap =
+  process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js.map' : 'CreateLootbox.js.map'
 const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
 // const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
 // const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
-const fileNames = [CreateLootbox, WalletStatus]
+const fileNames = [CreateLootbox, CreateLootboxMap, WalletStatus]
 
 fileNames.map((filename) => {
   uploadFile({

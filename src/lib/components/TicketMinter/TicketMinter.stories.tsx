@@ -6,7 +6,7 @@ import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import TicketMinter from '.'
 import { loadState } from './state'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export default {
   title: 'TicketMinter',
@@ -15,7 +15,6 @@ export default {
 
 const Template = () => {
   useEffect(() => {
-    ;(window as any).Web3 = Web3
     const load = async () => {
       const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {

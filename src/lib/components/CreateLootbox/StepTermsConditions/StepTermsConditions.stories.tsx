@@ -5,11 +5,11 @@ import StepTermsConditions, {
 } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
-import { initDApp, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { initDApp, useEthers, useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import Web3 from 'web3'
-import { Address } from '@lootboxfund/helpers'
+import { Address, convertHexToDecimal } from '@lootboxfund/helpers'
 import { createTokenURIData } from 'lib/api/storage'
 
 export default {
@@ -20,12 +20,13 @@ export default {
 const Demo = (args: StepTermsConditionsProps) => {
   const snapUserState = useSnapshot(userState)
   const web3Utils = useWeb3Utils()
-  const web3Eth = useWeb3Eth()
+  const [provider, loading] = useProvider()
   const INITIAL_TERMS: Record<string, boolean> = {
     agreeEthics: false,
     agreeLiability: false,
     agreeVerify: false,
   }
+  const ethers = useEthers()
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const reputationWallet = '0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A' as Address
   const [treasuryWallet, setTreasuryWallet] = useState('0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A' as Address)
@@ -33,7 +34,6 @@ const Demo = (args: StepTermsConditionsProps) => {
   const [termsState, setTermsState] = useState(INITIAL_TERMS)
   useEffect(() => {
     initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/').catch((err) => console.error(err))
-    ;(window as any).Web3 = Web3
   }, [])
   useEffect(() => {
     if (termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && treasuryWallet) {
@@ -58,18 +58,19 @@ const Demo = (args: StepTermsConditionsProps) => {
   }
 
   const createLootbox = async () => {
+    if (!provider) {
+      throw new Error('No provider')
+    }
     setSubmitStatus('in_progress')
     const LOOTBOX_FACTORY_ADDRESS = '0x3CA4819532173db8D15eFCf0dd2C8CFB3F0ECDD0'
-    const blockNum = await web3Eth.getBlockNumber()
+    const blockNum = await provider.getBlockNumber()
     const fundraisingTarget = '10000000000000000000000'
     const receivingWallet = '0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A'
 
-    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS, {
-      from: snapUserState.currentAccount,
-      gas: '1000000',
-    })
+    const signer = await provider.getSigner()
+    const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
     try {
-      const x = await lootbox.methods
+      const x = await lootbox
         .createLootbox(
           'name',
           'symbol',

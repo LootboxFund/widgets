@@ -16,9 +16,7 @@ const Demo = (args: StepChooseFundingProps) => {
   const [stage, setStage] = useState<StepStage>('in_progress')
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toWei('1', 'ether'))
   const [receivingWallet, setReceivingWallet] = useState<Address>('' as Address)
-  useEffect(() => {
-    ;(window as any).Web3 = Web3
-  }, [])
+  useEffect(() => {}, [])
   useEffect(() => {
     if (fundraisingTarget && receivingWallet) {
       setStage('may_proceed')

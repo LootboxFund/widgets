@@ -1,13 +1,15 @@
 import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
-import { useWeb3 } from '../useWeb3Api'
 import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/_deprecated/crowdSale.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
-import { TokenData, Address } from '@lootboxfund/helpers'
-import { useWeb3Eth } from 'lib/hooks/useWeb3Api'
+import { TokenData, Address, convertDecimalToHex } from '@lootboxfund/helpers'
+import { useEthers } from 'lib/hooks/useWeb3Api'
+import { ethers } from 'ethers'
+import { useProvider } from '../useWeb3Api/index'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 const BNB = 'bnb'
 const TBNB = 'tbnb'
@@ -40,15 +42,17 @@ export const getPriceFeed = async (contractAddress: Address) => {
 }
 
 export const getPriceFeedRaw = async (contractAddress: Address): Promise<string> => {
-  const web3Eth = useWeb3Eth()
-  const chainId = await web3Eth.getChainId()
-
-  let contractInstance = new web3Eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
-  // let contractInstance = new web3.eth.Contract(AggregatorV3Interface.abi as AbiItem[], contractAddress)
-  const [currentUser, ..._] = await web3Eth.getAccounts()
-
-  const data = await contractInstance.methods.latestRoundData().call({ from: currentUser })
-
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethersObj.providers.Web3Provider(metamask, 'any')
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  console.log(`--- getPriceFeedRaw `, contractAddress)
+  console.log(ethersObj)
+  const signer = await provider.getSigner()
+  const contractInstance = new ethersObj.Contract(contractAddress, AggregatorV3Interface.abi, signer)
+  const data = await contractInstance.latestRoundData().call({ from: signer._address })
   return data.answer
 }
 
@@ -57,23 +61,24 @@ export const purchaseFromCrowdSale = async (
   stableCoinData: TokenData,
   stableCoinAmount: string
 ) => {
-  const web3 = await useWeb3()
-  const [currentUser, ..._] = await web3.eth.getAccounts()
-  const crowdSale = new web3.eth.Contract(CrowdSaleABI, crowdSaleAddress, {
-    from: currentUser,
-    gas: '1000000', // Have to hardocode the gas limit for now...
-  })
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const crowdSale = new ethersObj.Contract(crowdSaleAddress, CrowdSaleABI, signer)
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
   let tx = undefined
   if ([BNB, TBNB].includes(stableCoinSymbol)) {
-    tx = crowdSale.methods.buyInBNB().send({ value: stableCoinAmount })
+    tx = crowdSale.buyInBNB().send({ value: stableCoinAmount })
   } else {
     if (stableCoinSymbol === ETH) {
-      tx = crowdSale.methods.buyInETH(stableCoinAmount).send()
+      tx = crowdSale.buyInETH(stableCoinAmount).send()
     } else if (stableCoinSymbol === USDC) {
-      tx = crowdSale.methods.buyInUSDC(stableCoinAmount).send()
+      tx = crowdSale.buyInUSDC(stableCoinAmount).send()
     } else if (stableCoinSymbol === USDT) {
-      tx = crowdSale.methods.buyInUSDT(stableCoinAmount).send()
+      tx = crowdSale.buyInUSDT(stableCoinAmount).send()
     } else {
       // throw new Error(`${stableCoinSymbol} not supported!`)
       console.error(`${stableCoinSymbol} not supported!`)
@@ -86,38 +91,56 @@ export const purchaseFromCrowdSale = async (
 
 export const getERC20Allowance = async (spender: Address | undefined, tokenAddress: Address): Promise<string> => {
   if (!spender) return '0'
-  const web3 = await useWeb3()
-  const [currentUser] = await web3.eth.getAccounts()
-  const token = new web3.eth.Contract(ERC20ABI, tokenAddress)
-  return token.methods.allowance(currentUser, spender).call()
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const token = new ethersObj.Contract(tokenAddress, ERC20ABI, signer)
+  return token.allowance(signer._address, spender).call()
 }
 
 export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => {
-  const web3 = await useWeb3()
-  const token = new web3.eth.Contract(ERC20ABI, tokenAddress)
-  return token.methods.symbol().call()
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const token = new ethersObj.Contract(tokenAddress, ERC20ABI, signer)
+  return token.symbol().call()
 }
 
 export const approveERC20Token = async (delegator: Address | undefined, tokenData: TokenData, quantity: string) => {
   if (!delegator) return
-  const web3 = await useWeb3()
-  const [currentUser, ..._] = await web3.eth.getAccounts()
-  const token = new web3.eth.Contract(ERC20ABI, tokenData.address)
-  return token.methods.approve(delegator, quantity).send({ from: currentUser })
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const token = new ethersObj.Contract(tokenData.address, ERC20ABI, signer)
+  return token.approve(delegator, quantity).send({ from: signer._address })
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
-  const web3Eth = await useWeb3Eth()
-  const lootbox = new web3Eth.Contract(LootboxABI, lootboxAddress)
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
-      lootbox.methods.name().call(),
-      lootbox.methods.symbol().call(),
-      lootbox.methods.sharePriceUSD().call(),
-      lootbox.methods.sharesSoldCount().call(),
-      lootbox.methods.sharesSoldMax().call(),
-      lootbox.methods.ticketIdCounter().call(),
-      lootbox.methods.shareDecimals().call(),
+      lootbox.name().call(),
+      lootbox.symbol().call(),
+      lootbox.sharePriceUSD().call(),
+      lootbox.sharesSoldCount().call(),
+      lootbox.sharesSoldMax().call(),
+      lootbox.ticketIdCounter().call(),
+      lootbox.shareDecimals().call(),
     ])
 
   return {
@@ -132,27 +155,38 @@ export const getLootboxData = async (lootboxAddress: Address) => {
 }
 
 export const getLootboxTicketId = async (lootboxAddress: Address): Promise<string> => {
-  const web3 = await useWeb3()
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const ticketId = await lootbox.methods.ticketIdCounter().call()
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
+  const ticketId = await lootbox.ticketIdCounter().call()
   return ticketId
 }
 
 export const buyLootboxShares = async (lootboxAddress: Address, amountOfStablecoin: string) => {
-  const web3 = await useWeb3()
-  const [currentUser, ..._] = await web3.eth.getAccounts()
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress, {
-    from: currentUser,
-    gas: '1000000', // TODO: estimate gas price... Have to hardocode the gas limit for now...
-  })
-  return await lootbox.methods.purchaseTicket().send({ value: amountOfStablecoin })
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
+  return await lootbox.purchaseTicket().send({ value: amountOfStablecoin })
 }
 
 export const getTicketDividends = async (lootboxAddress: Address, ticketID: string): Promise<IDividendFragment[]> => {
   const res: IDividendFragment[] = []
-  const web3 = await useWeb3()
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const proratedDeposits = await lootbox.methods.viewProratedDepositsForTicket(ticketID).call()
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
+  const proratedDeposits = await lootbox.viewProratedDepositsForTicket(ticketID).call()
   for (let deposit of proratedDeposits) {
     if (deposit.nativeTokenAmount && deposit.nativeTokenAmount !== '0') {
       res.push({
@@ -173,28 +207,25 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
 }
 
 export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
-  const web3 = await useWeb3()
-  const [currentUser, ..._] = await web3.eth.getAccounts()
-  if (!currentUser) {
-    // throw new Error('Please login to metamask!')
-    console.warn('User not logged in')
-    return []
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
   }
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress)
-  const userTickets = await lootbox.methods.viewAllTicketsOfHolder(currentUser).call()
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
+  const userTickets = await lootbox.viewAllTicketsOfHolder(signer._address).call()
   return userTickets
 }
 
 export const withdrawEarningsFromLootbox = async (ticketID: string, lootboxAddress: Address) => {
-  const web3 = await useWeb3()
-  const [currentUser, ..._] = await web3.eth.getAccounts()
-  if (!currentUser) {
-    throw new Error('Please login to metamask!')
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
   }
-  const lootbox = new web3.eth.Contract(LootboxABI, lootboxAddress, {
-    from: currentUser,
-    gas: '1000000', // TODO: estimate gas price... Have to hardocode the gas limit for now...
-  })
-  const res = await lootbox.methods.withdrawEarnings(ticketID).send()
+  const signer = await provider.getSigner()
+  const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
+  const res = await lootbox.withdrawEarnings(ticketID).send()
   return res
 }

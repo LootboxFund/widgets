@@ -1,5 +1,5 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { useWeb3 } from 'lib/hooks/useWeb3Api'
+import { useEthers } from 'lib/hooks/useWeb3Api'
 import { ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
@@ -8,7 +8,8 @@ import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
-import { Address } from '@lootboxfund/helpers';
+import { Address } from '@lootboxfund/helpers'
+import { useProvider } from '../../hooks/useWeb3Api/index'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -99,16 +100,24 @@ const updateLootboxQuantity = () => {
 }
 
 export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  const web3 = await useWeb3()
-  const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr)
-  const balance = await ERC20.methods.balanceOf(userAddr).call()
+  const ethers = useEthers()
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const signer = await provider.getSigner()
+  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, signer)
+  const balance = await ERC20.balanceOf(userAddr).call()
   return balance
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const web3 = useWeb3()
-  const balanceAsString = await (await web3).eth.getBalance(userAddr)
-  return parseFloat(balanceAsString)
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const balanceAsString = await provider.getBalance(userAddr)
+  return balanceAsString.toNumber()
 }
 
 export const purchaseLootboxShare = async () => {

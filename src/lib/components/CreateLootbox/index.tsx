@@ -1,6 +1,6 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { initDApp, updateStateToChain, useUserInfo, useWeb3, useWeb3Eth, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { initDApp, updateStateToChain, useUserInfo, useEthers, useWeb3Utils, useProvider } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { subscribe, useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -31,7 +31,14 @@ import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
 import { createTokenURIData } from 'lib/api/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
-import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertHexToDecimal } from '@lootboxfund/helpers'
+import {
+  Address,
+  BLOCKCHAINS,
+  chainIdHexToSlug,
+  ContractAddress,
+  convertDecimalToHex,
+  convertHexToDecimal,
+} from '@lootboxfund/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'
@@ -39,16 +46,13 @@ import { manifest } from '../../../manifest'
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
-    window.onload = () => {
-      console.log('Initializing DApp...')
-      initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/').catch((err) => console.error(err))
-    }
+    console.log('Initializing DApp...')
+    initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/').catch((err) => console.error(err))
   }, [])
 
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
-  const web3 = useWeb3()
-  const web3Eth = useWeb3Eth()
+  const [provider, loading] = useProvider()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0
 
@@ -95,7 +99,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
+    console.log(`---- selecting network...`)
     setNetwork(network)
+    console.log(`---- set network... ${network.name}`)
+    console.log(`---- reputation wallet... ${reputationWallet}`)
     if (network && reputationWallet) {
       setStage({
         ...stage,
@@ -110,21 +117,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
-  if (!nativeTokenPrice) {
-    getLatestPrice()
-  }
   const checkNetworkStepDone = () => {
     return network && reputationWallet && reputationWallet.length > 0
-  }
-  if (checkNetworkStepDone() && stage.stepNetwork !== 'may_proceed') {
-    setStage({
-      ...stage,
-      stepNetwork: 'may_proceed',
-    })
-    setValidity({
-      ...validity,
-      stepNetwork: true,
-    })
   }
 
   // STEP 2: Choose Funding
@@ -132,57 +126,14 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [receivingWallet, setReceivingWallet] = useState<Address | undefined>(
     (snapUserState.currentAccount || undefined) as Address
   )
-  if (snapUserState.currentAccount && receivingWallet === undefined) {
-    setReceivingWallet(snapUserState.currentAccount as Address)
-  }
   const checkFundingStepDone = () => {
     return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet, web3Utils)
-  }
-  if (
-    checkNetworkStepDone() &&
-    checkFundingStepDone() &&
-    reputationWallet.length > 0 &&
-    stage.stepFunding !== 'may_proceed'
-  ) {
-    setStage({
-      ...stage,
-      stepFunding: 'may_proceed',
-    })
-    setValidity({
-      ...validity,
-      stepFunding: true,
-    })
-  } else if (stage.stepNetwork === 'may_proceed' && !checkFundingStepDone() && stage.stepFunding !== 'in_progress') {
-    setStage({
-      ...stage,
-      stepFunding: 'in_progress',
-    })
   }
 
   // STEP 3: Choose Returns
   const refStepReturns = useRef<HTMLDivElement | null>(null)
   const [basisPoints, setBasisPoints] = useState(10)
   const checkReturnsStepDone = () => validateReturnTarget(basisPoints) && validatePaybackPeriod(paybackDate)
-  if (
-    checkNetworkStepDone() &&
-    checkFundingStepDone() &&
-    checkReturnsStepDone() &&
-    stage.stepReturns !== 'may_proceed'
-  ) {
-    setStage({
-      ...stage,
-      stepReturns: 'may_proceed',
-    })
-    setValidity({
-      ...validity,
-      stepReturns: true,
-    })
-  } else if (stage.stepFunding === 'may_proceed' && !checkReturnsStepDone() && stage.stepReturns !== 'in_progress') {
-    setStage({
-      ...stage,
-      stepReturns: 'in_progress',
-    })
-  }
 
   // STEP 4: Customize Ticket
   const refStepCustomize = useRef<HTMLDivElement | null>(null)
@@ -210,27 +161,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     validateThemeColor(ticketState.lootboxThemeColor as string) &&
     validateLogo(ticketState.logoUrl as string) &&
     validateCover(ticketState.coverUrl as string)
-  if (
-    checkNetworkStepDone() &&
-    checkFundingStepDone() &&
-    checkReturnsStepDone() &&
-    checkCustomizeStepDone() &&
-    stage.stepCustomize !== 'may_proceed'
-  ) {
-    setStage({
-      ...stage,
-      stepCustomize: 'may_proceed',
-    })
-  } else if (
-    stage.stepReturns === 'may_proceed' &&
-    !checkCustomizeStepDone() &&
-    stage.stepCustomize !== 'in_progress'
-  ) {
-    setStage({
-      ...stage,
-      stepCustomize: 'in_progress',
-    })
-  }
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
@@ -251,24 +181,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSocialState({ ...socialState, [slug]: text })
   }
   const checkSocialStateDone = () => checkIfValidEmail(socialState.email)
-  if (
-    checkNetworkStepDone() &&
-    checkFundingStepDone() &&
-    checkReturnsStepDone() &&
-    checkCustomizeStepDone() &&
-    checkSocialStateDone() &&
-    stage.stepSocials !== 'may_proceed'
-  ) {
-    setStage({
-      ...stage,
-      stepSocials: 'may_proceed',
-    })
-  } else if (stage.stepCustomize === 'may_proceed' && !checkSocialStateDone() && stage.stepSocials !== 'in_progress') {
-    setStage({
-      ...stage,
-      stepSocials: 'in_progress',
-    })
-  }
 
   // STEP 6: Terms & Conditions
   const refStepTerms = useRef<HTMLDivElement | null>(null)
@@ -283,33 +195,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   const checkTermsStepDone = () =>
     termsState.agreeEthics && termsState.agreeLiability && termsState.agreeVerify && receivingWallet
-  if (
-    checkNetworkStepDone() &&
-    checkFundingStepDone() &&
-    checkReturnsStepDone() &&
-    checkCustomizeStepDone() &&
-    checkSocialStateDone() &&
-    checkTermsStepDone() &&
-    stage.stepTerms !== 'may_proceed'
-  ) {
-    setStage({
-      ...stage,
-      stepTerms: 'may_proceed',
-    })
-  } else if (stage.stepSocials === 'may_proceed' && !checkTermsStepDone() && stage.stepTerms !== 'in_progress') {
-    setStage({
-      ...stage,
-      stepTerms: 'in_progress',
-    })
-  }
 
   const { requestAccounts } = useUserInfo()
   const connectWallet = async () => {
     const result = await requestAccounts()
-    if (result.success) {
-      const userAccounts = await window.web3.eth.getAccounts()
-      userState.currentAccount = userAccounts[0]
-      const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
+    if (result.success && provider) {
+      const network = await provider.getNetwork()
+      const chainIdHex = convertDecimalToHex(network.chainId.toString())
       const chainSlug = chainIdHexToSlug(chainIdHex)
       if (chainSlug) {
         const blockchain = BLOCKCHAINS[chainSlug]
@@ -344,9 +236,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       setSubmitStatus('failure')
       return
     }
+    if (!provider) {
+      throw new Error('No provider')
+    }
     setSubmitStatus('in_progress')
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
-    const blockNum = await web3Eth.getBlockNumber()
+    const blockNum = await provider.getBlockNumber()
+    console.log(`BlockNum = ${blockNum}`)
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
       new web3Utils.BN('10')
     )
@@ -357,10 +253,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       .div(new web3Utils.BN('10'))
       .toString()
 
-    const lootbox = new web3Eth.Contract(LOOTBOX_FACTORY_ABI, LOOTBOX_FACTORY_ADDRESS, {
-      from: snapUserState.currentAccount,
-      gas: '1000000',
-    })
+    const ethers = useEthers()
+    const signer = await provider.getSigner()
+    const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
+
     try {
       console.log(`----> creating lootbox with info...`)
       console.log(`
@@ -377,7 +273,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
-      const x = await lootbox.methods
+      const x = await lootbox
         .createLootbox(
           ticketState.name,
           ticketState.symbol,
@@ -461,6 +357,121 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   const goToLootboxAdminPage = () => {
     return `https://www.lootbox.fund/demo/0-2-0-demo/lootbox?lootbox=${lootboxAddress}`
+  }
+
+  if (!nativeTokenPrice) {
+    getLatestPrice()
+  }
+  if (checkNetworkStepDone() && stage.stepNetwork !== 'may_proceed') {
+    setStage({
+      ...stage,
+      stepNetwork: 'may_proceed',
+    })
+    setValidity({
+      ...validity,
+      stepNetwork: true,
+    })
+  }
+  if (
+    checkNetworkStepDone() &&
+    checkFundingStepDone() &&
+    reputationWallet.length > 0 &&
+    stage.stepFunding !== 'may_proceed'
+  ) {
+    setStage({
+      ...stage,
+      stepFunding: 'may_proceed',
+    })
+    setValidity({
+      ...validity,
+      stepFunding: true,
+    })
+  } else if (stage.stepNetwork === 'may_proceed' && !checkFundingStepDone() && stage.stepFunding !== 'in_progress') {
+    setStage({
+      ...stage,
+      stepFunding: 'in_progress',
+    })
+  }
+  if (snapUserState.currentAccount && receivingWallet === undefined) {
+    setReceivingWallet(snapUserState.currentAccount as Address)
+  }
+  if (
+    checkNetworkStepDone() &&
+    checkFundingStepDone() &&
+    checkReturnsStepDone() &&
+    stage.stepReturns !== 'may_proceed'
+  ) {
+    setStage({
+      ...stage,
+      stepReturns: 'may_proceed',
+    })
+    setValidity({
+      ...validity,
+      stepReturns: true,
+    })
+  } else if (stage.stepFunding === 'may_proceed' && !checkReturnsStepDone() && stage.stepReturns !== 'in_progress') {
+    setStage({
+      ...stage,
+      stepReturns: 'in_progress',
+    })
+  }
+  if (
+    checkNetworkStepDone() &&
+    checkFundingStepDone() &&
+    checkReturnsStepDone() &&
+    checkCustomizeStepDone() &&
+    stage.stepCustomize !== 'may_proceed'
+  ) {
+    setStage({
+      ...stage,
+      stepCustomize: 'may_proceed',
+    })
+  } else if (
+    stage.stepReturns === 'may_proceed' &&
+    !checkCustomizeStepDone() &&
+    stage.stepCustomize !== 'in_progress'
+  ) {
+    setStage({
+      ...stage,
+      stepCustomize: 'in_progress',
+    })
+  }
+  if (
+    checkNetworkStepDone() &&
+    checkFundingStepDone() &&
+    checkReturnsStepDone() &&
+    checkCustomizeStepDone() &&
+    checkSocialStateDone() &&
+    stage.stepSocials !== 'may_proceed'
+  ) {
+    setStage({
+      ...stage,
+      stepSocials: 'may_proceed',
+    })
+  } else if (stage.stepCustomize === 'may_proceed' && !checkSocialStateDone() && stage.stepSocials !== 'in_progress') {
+    setStage({
+      ...stage,
+      stepSocials: 'in_progress',
+    })
+  }
+  if (
+    checkNetworkStepDone() &&
+    checkFundingStepDone() &&
+    checkReturnsStepDone() &&
+    checkCustomizeStepDone() &&
+    checkSocialStateDone() &&
+    checkTermsStepDone() &&
+    stage.stepTerms !== 'may_proceed'
+  ) {
+    setStage({
+      ...stage,
+      stepTerms: 'may_proceed',
+    })
+  } else if (stage.stepSocials === 'may_proceed' && !checkTermsStepDone() && stage.stepTerms !== 'in_progress') {
+    setStage({
+      ...stage,
+      stepTerms: 'in_progress',
+    })
   }
 
   return (
