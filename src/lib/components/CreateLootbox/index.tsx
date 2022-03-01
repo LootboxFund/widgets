@@ -47,7 +47,6 @@ import { decodeEVMLog } from 'lib/api/evm'
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
-    console.log('Initializing DApp...')
     initDApp().catch((err) => console.error(err))
   }, [])
 
@@ -100,10 +99,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = (network: NetworkOption, step: FormStep) => {
-    console.log(`---- selecting network...`)
     setNetwork(network)
-    console.log(`---- set network... ${network.name}`)
-    console.log(`---- reputation wallet... ${reputationWallet}`)
     if (network && reputationWallet) {
       setStage({
         ...stage,
@@ -241,7 +237,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       throw new Error('No provider')
     }
     setSubmitStatus('in_progress')
-    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
+    const LOOTBOX_FACTORY_ADDRESS = '0x2EF7614e1dC04baFc7A4803Ba44aC204d7BDa5F9' // manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
@@ -259,7 +255,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
 
     try {
-      console.log(`----> About to create lootbox with info...`)
       console.log(`
       
       ticketState.name = ${ticketState.name}
@@ -285,7 +280,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       const filter = {
         fromBlock: blockNum,
         address: lootbox.address,
-        topics: [web3Utils.sha3('LootboxCreated(string,address,address,address,uint256,uint256)')],
+        topics: [
+          ethers.utils.solidityKeccak256(
+            ['string'],
+            ['LootboxCreated(string,address,address,address,uint256,uint256)']
+          ),
+        ],
       }
       provider.on(filter, (log) => {
         if (log !== undefined) {
