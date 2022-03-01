@@ -24,6 +24,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
       <$TicketLogo
         backgroundImage={ticket?.data?.metadata?.image}
         backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+        size={!ticket? '100px': undefined}
       >
         {!ticket ? <$Icon>+</$Icon> : null}
       </$TicketLogo>
@@ -90,16 +91,11 @@ export const $TicketRedeemContainer = styled.section`
 export const $TicketLogo = styled.div<{
   backgroundImage?: string
   backgroundShadowColor?: string
-  width?: string
-  height?: string
+  size?: string
 }>`
-  width: ${(props) => (props.width ? props.width : '100%')};
-  height: ${(props) => (props.height ? props.height : '100%')};
-  max-width: ${(props) => (props.backgroundImage ? '220px' : '100px')};
-  max-height: ${(props) => (props.backgroundImage ? '220px' : '100px')};
+  ${(props) => props.size? `width: ${props.size};\nheight: ${props.size};`: `width: 75%;\npadding-top: 75%;`}
   border: 0px solid transparent;
   border-radius: 50%;
-  margin: auto auto 0px;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
   background: rgba(0, 0, 0, 0.05);
   ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}

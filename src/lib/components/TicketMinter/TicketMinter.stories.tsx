@@ -31,7 +31,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="1000px">
+    <$CardViewport width="900px" height="500px">
       <TicketMinter />
     </$CardViewport>
   )
