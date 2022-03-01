@@ -51,8 +51,9 @@ export const useProvider = (): useProviderReturnType => {
 export const useUserInfo = () => {
   const requestAccounts = async () => {
     console.log(`--- requesting accounts...`)
-    const [provider] = await useProvider()
-    console.log(`--- got ethers `, ethersObj)
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const metamask: any = await detectEthereumProvider()
+    const provider = new ethers.providers.Web3Provider(metamask, 'any')
     if (!provider) {
       return {
         success: false,
@@ -78,10 +79,9 @@ export const useUserInfo = () => {
     }
   }
   const getNativeBalance = async () => {
-    const [provider] = useProvider()
-    if (!provider) {
-      throw new Error('No provider')
-    }
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const metamask: any = await detectEthereumProvider()
+    const provider = new ethers.providers.Web3Provider(metamask, 'any')
     const nativeBalance = await provider.getBalance(userState.accounts[0])
     return nativeBalance
   }
@@ -92,7 +92,9 @@ export const useUserInfo = () => {
 }
 
 export const addCustomEVMChain = async (chainIdHex: string) => {
-  const [provider] = useProvider()
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask, 'any')
   const chainSlug = chainIdHexToSlug(chainIdHex)
   if (chainSlug && provider) {
     const chainInfo = BLOCKCHAINS[chainSlug]
@@ -124,10 +126,9 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
 
 export const addERC20ToWallet = async (token: TokenData) => {
   try {
-    const [provider] = useProvider()
-    if (!provider) {
-      throw new Error('No provider')
-    }
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const metamask: any = await detectEthereumProvider()
+    const provider = new ethers.providers.Web3Provider(metamask, 'any')
     await provider.send('wallet_watchAsset', [
       {
         type: 'ERC20',

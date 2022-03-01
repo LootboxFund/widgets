@@ -109,7 +109,7 @@ export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Add
   }
   const signer = await provider.getSigner()
   const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, signer)
-  const balance = await ERC20.connect(signer).balanceOf(userAddr).call()
+  const balance = await ERC20.connect(signer).balanceOf(userAddr)
   return balance
 }
 
