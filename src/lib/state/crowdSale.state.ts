@@ -109,7 +109,7 @@ const updateOutputTokenValues = () => {
 export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
   const ethers = useEthers()
   const ERC20 = new ethers.Contract(contractAddr, ERC20ABI)
-  const balance = await ERC20.balanceOf(userAddr).call()
+  const balance = await ERC20.balanceOf(userAddr)
   return balance
 }
 
