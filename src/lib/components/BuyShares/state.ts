@@ -144,6 +144,8 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.route = '/complete'
 
+  fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
+
   return
 }
 
