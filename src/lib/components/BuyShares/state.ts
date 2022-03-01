@@ -6,10 +6,12 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
+import { ethers as ethersClass } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -100,22 +102,22 @@ const updateLootboxQuantity = () => {
 }
 
 export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  const ethers = useEthers()
-  const [provider] = useProvider()
+  const ethers = window.ethers ? window.ethers : ethersClass
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask)
   if (!provider) {
     throw new Error('No provider')
   }
   const signer = await provider.getSigner()
   const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, signer)
-  const balance = await ERC20.balanceOf(userAddr).call()
+  const balance = await ERC20.connect(signer).balanceOf(userAddr).call()
   return balance
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const [provider] = useProvider()
-  if (!provider) {
-    throw new Error('No provider')
-  }
+  const ethers = window.ethers ? window.ethers : ethersClass
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask)
   const balanceAsString = await provider.getBalance(userAddr)
   return balanceAsString.toNumber()
 }
