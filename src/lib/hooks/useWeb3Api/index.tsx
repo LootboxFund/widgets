@@ -50,7 +50,6 @@ export const useProvider = (): useProviderReturnType => {
 
 export const useUserInfo = () => {
   const requestAccounts = async () => {
-    console.log(`--- requesting accounts...`)
     const ethers = window.ethers ? window.ethers : ethersObj
     const metamask: any = await detectEthereumProvider()
     const provider = new ethers.providers.Web3Provider(metamask, 'any')
@@ -63,7 +62,7 @@ export const useUserInfo = () => {
     try {
       await provider.send('eth_requestAccounts', [])
       const userAccounts = (await provider.listAccounts()) as Address[]
-      console.log(`Got user accounts `, userAccounts)
+
       userState.accounts = userAccounts
       userState.currentAccount = userAccounts[0] as Address
       return {
@@ -203,7 +202,6 @@ const initWeb3OnWindow = async (rpcUrl?: string) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask as any)
-  console.log(`------------ provider: `, provider)
   const userAccounts = await provider.send('eth_requestAccounts', [])
   userState.accounts = userAccounts
   userState.currentAccount = userAccounts[0]

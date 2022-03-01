@@ -21,6 +21,5 @@ export const decodeEVMLog = ({
     }),
     {}
   )
-  console.log(formattedData)
   return formattedData
 }

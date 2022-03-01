@@ -43,12 +43,10 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
-const CreateLootboxMap =
-  process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js.map' : 'CreateLootbox.js.map'
 const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
 // const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
 // const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
-const fileNames = [CreateLootbox, CreateLootboxMap, WalletStatus]
+const fileNames = [CreateLootbox, WalletStatus]
 
 fileNames.map((filename) => {
   uploadFile({
