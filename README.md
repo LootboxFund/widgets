@@ -1,5 +1,7 @@
 # Lootbox Frontend
 
+Current version: 0.2.0-demo
+
 A template for building shareable libraries that can be used both NodeJS `import` or Browser `<script>` tags.
 
 ## Storybook
