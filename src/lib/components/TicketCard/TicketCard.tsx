@@ -96,10 +96,9 @@ export const $TicketLogo = styled.div<{
   ${(props) => props.size? `width: ${props.size};\nheight: ${props.size};`: `width: 75%;\npadding-top: 75%;`}
   border: 0px solid transparent;
   border-radius: 50%;
-  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
   background: rgba(0, 0, 0, 0.05);
   ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}
-  ${(props) => props.backgroundShadowColor && `filter: drop-shadow(0px 0px 22px ${props.backgroundShadowColor});`}
+  box-shadow: ${(props) => props.backgroundShadowColor? `0px 0px 40px 10px ${props.backgroundShadowColor}`: `0px 10px 10px rgba(0, 0, 0, 0.2)`};
   background-size: cover;
   background-position: center;
   display: flex;
