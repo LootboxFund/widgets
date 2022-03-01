@@ -2,16 +2,18 @@ import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Generics/Button'
 import { COLORS } from 'lib/theme'
-import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
+import { updateStateToChain, useEthers, useUserInfo } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import NetworkText from 'lib/components/NetworkText';
-import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
+import NetworkText from 'lib/components/NetworkText'
+import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@lootboxfund/helpers'
+import { useProvider } from '../../hooks/useWeb3Api/index'
 
 export interface WalletButtonProps {}
 const WalletButton = (props: WalletButtonProps) => {
   const snapUserState = useSnapshot(userState)
+  const [provider] = useProvider()
   const { screen } = useWindowSize()
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
@@ -27,10 +29,9 @@ const WalletButton = (props: WalletButtonProps) => {
   const connectWallet = async () => {
     setStatus('loading')
     const result = await requestAccounts()
-    if (result.success) {
-      const userAccounts = await window.web3.eth.getAccounts()
-      userState.currentAccount = userAccounts[0]
-      const chainIdHex = await (window as any).ethereum.request({ method: 'eth_chainId' })
+    if (result.success && provider) {
+      const network = await provider.getNetwork()
+      const chainIdHex = convertDecimalToHex(network.chainId.toString())
       const chainSlug = chainIdHexToSlug(chainIdHex)
       if (chainSlug) {
         const blockchain = BLOCKCHAINS[chainSlug]
@@ -101,9 +102,7 @@ const WalletButton = (props: WalletButtonProps) => {
       </$Button>
     )
   } else if (status === 'network') {
-    return (
-      <NetworkText />
-    )
+    return <NetworkText />
   }
   return (
     <$Button

@@ -1,5 +1,5 @@
 import react from 'react'
-import { addCustomEVMChain, useUserInfo, useWeb3 } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import styled from 'styled-components'

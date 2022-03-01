@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import CreateLootbox, { CreateLootboxProps } from 'lib/components/CreateLootbox'
 import Web3 from 'web3'
-
+import { useHtmlEthers, useHtmlWeb3 } from 'lib/api/useHtmlScript'
 
 export default {
   title: 'Create Lootbox',
@@ -10,13 +10,10 @@ export default {
 
 const Template = (args: CreateLootboxProps) => {
   useEffect(() => {
-    (window as any).Web3 = Web3
+    useHtmlEthers()
   }, [])
-  return (
-    <CreateLootbox {...args} />
-  )
+  return <CreateLootbox {...args} />
 }
-
 
 export const Basic = Template.bind({})
 Basic.args = {}

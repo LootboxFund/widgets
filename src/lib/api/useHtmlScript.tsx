@@ -41,6 +41,24 @@ const useHtmlScript = ({
 
 export default useHtmlScript
 
+export const useHtmlEthers = () => {
+  return useHtmlScript({
+    src: 'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.4/ethers.umd.min.js',
+    integrity: 'sha512-xmbPx0riylir51GhTZCFd20yS7NYZNpfDTbEWBjDRzs+UaGb2RyjtASTVtF2ydQWp3xkso9j4sJj39PdSH8/EA==',
+    crossorigin: 'anonymous',
+    referrerpolicy: 'no-referrer',
+  })
+}
+
+export const useHtmlWeb3 = () => {
+  return useHtmlScript({
+    src: 'https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.0/web3.min.js',
+    integrity: 'sha512-C63V0mFzwl8KV2fRz0QJNKX0d9877urOLSUq5WUq8nUOhDl69hKdGr9mAvl57k47GNjqEMAtiufsvDnk7xs8+w==',
+    crossorigin: 'anonymous',
+    referrerpolicy: 'no-referrer',
+  })
+}
+
 export const useHtmlFirebaseStorage = () => {
   return useHtmlScript({
     src: 'https://cdnjs.cloudflare.com/ajax/libs/firebase/9.6.7/firebase-storage.min.js',

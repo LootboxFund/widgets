@@ -1,5 +1,5 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { addERC20ToWallet, useWeb3 } from 'lib/hooks/useWeb3Api'
+import { addERC20ToWallet, useEthers, useProvider } from 'lib/hooks/useWeb3Api'
 import { proxy, subscribe } from 'valtio'
 import { subscribeKey } from 'valtio/utils'
 import ERC20ABI from 'lib/abi/erc20.json'
@@ -105,16 +105,19 @@ const updateOutputTokenValues = () => {
 }
 
 export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  const web3 = await useWeb3()
-  const ERC20 = new web3.eth.Contract(ERC20ABI, contractAddr)
-  const balance = await ERC20.methods.balanceOf(userAddr).call()
+  const ethers = useEthers()
+  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI)
+  const balance = await ERC20.balanceOf(userAddr).call()
   return balance
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const web3 = useWeb3()
-  const balanceAsString = await (await web3).eth.getBalance(userAddr)
-  return parseFloat(balanceAsString)
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  const balanceAsString = await provider.getBalance(userAddr)
+  return balanceAsString.toNumber()
 }
 
 export const purchaseGuildToken = async () => {

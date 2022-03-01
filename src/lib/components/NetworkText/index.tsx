@@ -10,6 +10,7 @@ export interface NetworkTextProps {}
 const NetworkText = (props: NetworkTextProps) => {
   const snapUserState = useSnapshot(userState)
   const renderTinyAccount = () => {
+    console.log(`Current account: ${snapUserState.currentAccount}`)
     if (snapUserState.currentAccount) {
       const accountTruncated = truncateAddress(snapUserState.currentAccount as Address)
       return `(${accountTruncated})`

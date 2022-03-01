@@ -8,9 +8,7 @@ export default {
 }
 
 const Template = (args: WalletStatusProps) => {
-  useEffect(() => {
-    (window as any).Web3 = Web3
-  }, [])
+  useEffect(() => {}, [])
   return <WalletStatus {...args} />
 }
 

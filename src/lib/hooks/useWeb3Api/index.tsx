@@ -1,48 +1,70 @@
-import react from 'react'
+import react, { useEffect, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
 import { DEFAULT_CHAIN_ID_HEX } from '../constants'
-import { Address, BLOCKCHAINS, ChainIDHex, chainIdHexToSlug, ChainInfo, TokenData } from '@lootboxfund/helpers'
+import {
+  Address,
+  BLOCKCHAINS,
+  ChainIDHex,
+  chainIdHexToSlug,
+  ChainInfo,
+  convertDecimalToHex,
+  TokenData,
+} from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'
-import { Eth } from 'web3-eth'
 import { clearSwapState } from 'lib/state/swap.state'
-
-export const useWeb3 = async () => {
-  return window.web3
-}
+import { ethers } from 'ethers'
 
 export const useWeb3Utils = () => {
   return window.web3 && window.web3.utils ? window.web3.utils : Web3Utils
 }
 
-export const useWeb3Eth = () => {
-  // if (!window.web3 || !window.web3.eth) {
-  //   const client: Eth = new (Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth;
-  //   return client
-  // }
-  if (!window.web3 || !window.web3.eth) {
-    const client: Eth = new ((window as any).Web3 as any)('https://data-seed-prebsc-1-s1.binance.org:8545/').eth
-    return client
+export const useEthers = () => {
+  if (!window.ethers) {
+    return ethers
   }
-  return window.web3.eth
+  return window.ethers
 }
 
-// export const _useWeb3 = () => window.web3
+type useProviderReturnType = [provider: ethers.providers.Web3Provider | undefined, loading: boolean]
+export const useProvider = (): useProviderReturnType => {
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    setLoading(true)
+    loadProvider()
+  }, [])
+  const loadProvider = async () => {
+    const metamask: any = await detectEthereumProvider()
+    const prov = new ethersObj.providers.Web3Provider(metamask, 'any')
+    setProvider(prov)
+    setLoading(false)
+  }
+  return [provider, loading]
+}
+
+// export const _useWeb3 = () => window.ethers
 
 export const useUserInfo = () => {
   const requestAccounts = async () => {
-    const web3 = await useWeb3()
+    console.log(`--- requesting accounts...`)
+    const [provider] = await useProvider()
+    console.log(`--- got ethers `, ethers)
+    if (!provider) {
+      return {
+        success: false,
+        message: 'Provider not connected',
+      }
+    }
     try {
-      await web3.eth.requestAccounts(async (err: any, accounts: string[]) => {
-        if (err) {
-          console.error(err)
-        } else {
-          const userAccounts = await web3.eth.getAccounts()
-          userState.accounts = userAccounts
-        }
-      })
+      await provider.send('eth_requestAccounts', [])
+      const userAccounts = (await provider.listAccounts()) as Address[]
+      console.log(`Got user accounts `, userAccounts)
+      userState.accounts = userAccounts
+      userState.currentAccount = userAccounts[0] as Address
       return {
         success: true,
         message: 'Successfully connected to wallet',
@@ -56,8 +78,11 @@ export const useUserInfo = () => {
     }
   }
   const getNativeBalance = async () => {
-    const web3 = await useWeb3()
-    const nativeBalance = await web3.eth.getBalance(userState.accounts[0])
+    const [provider] = useProvider()
+    if (!provider) {
+      throw new Error('No provider')
+    }
+    const nativeBalance = await provider.getBalance(userState.accounts[0])
     return nativeBalance
   }
   return {
@@ -67,23 +92,21 @@ export const useUserInfo = () => {
 }
 
 export const addCustomEVMChain = async (chainIdHex: string) => {
+  const [provider] = useProvider()
   const chainSlug = chainIdHexToSlug(chainIdHex)
-  if (chainSlug) {
+  if (chainSlug && provider) {
     const chainInfo = BLOCKCHAINS[chainSlug]
-    if (chainInfo) {
+    if (chainInfo && provider) {
       try {
-        await (window as any).ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            {
-              chainId: chainInfo.chainIdHex,
-              chainName: chainInfo.chainName,
-              nativeCurrency: chainInfo.nativeCurrency,
-              rpcUrls: chainInfo.rpcUrls,
-              blockExplorerUrls: chainInfo.blockExplorerUrls,
-            },
-          ],
-        })
+        await provider.send('wallet_addEthereumChain', [
+          {
+            chainId: chainInfo.chainIdHex,
+            chainName: chainInfo.chainName,
+            nativeCurrency: chainInfo.nativeCurrency,
+            rpcUrls: chainInfo.rpcUrls,
+            blockExplorerUrls: chainInfo.blockExplorerUrls,
+          },
+        ])
         updateStateToChain(chainInfo)
         return
       } catch (e) {
@@ -101,9 +124,12 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
 
 export const addERC20ToWallet = async (token: TokenData) => {
   try {
-    await (window as any).ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
+    const [provider] = useProvider()
+    if (!provider) {
+      throw new Error('No provider')
+    }
+    await provider.send('wallet_watchAsset', [
+      {
         type: 'ERC20',
         options: {
           address: token.address,
@@ -112,7 +138,7 @@ export const addERC20ToWallet = async (token: TokenData) => {
           image: token.logoURI,
         },
       },
-    })
+    ])
     return
   } catch (err) {
     console.error(err)
@@ -121,10 +147,13 @@ export const addERC20ToWallet = async (token: TokenData) => {
 }
 
 export const addERC721ToWallet = async (token: TokenData) => {
+  const [provider] = useProvider()
+  if (!provider) {
+    throw new Error('No provider')
+  }
   try {
-    await (window as any).ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
+    await provider.send('wallet_watchAsset', [
+      {
         type: 'ERC721',
         options: {
           address: token.address,
@@ -133,7 +162,7 @@ export const addERC721ToWallet = async (token: TokenData) => {
           image: token.logoURI,
         },
       },
-    })
+    ])
     return
   } catch (err) {
     console.error(err)
@@ -147,25 +176,12 @@ export const initDApp = async (rpcUrl?: string) => {
   } catch (err) {
     console.error('Error initializing Web3', err)
   }
-
-  const chainIdHex = (window as any).ethereum
-    ? await (window as any).ethereum.request({ method: 'eth_chainId' })
-    : DEFAULT_CHAIN_ID_HEX
-  const chainSlug = chainIdHexToSlug(chainIdHex)
-  if (chainSlug) {
-    const blockchain = BLOCKCHAINS[chainSlug]
-    if (blockchain) {
-      updateStateToChain(blockchain)
-    }
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask, 'any')
+  if (!provider) {
+    throw new Error('No provider')
   }
-  const userAccounts = (await window.web3.eth.getAccounts()) as Address[]
-
-  userState.accounts = userAccounts
-  userState.currentAccount = userAccounts[0]
-  if (!window.ethereum) {
-    throw new Error('window.ethereum is not defined!')
-  }
-  ;(window as any).ethereum.on('chainChanged', async (chainIdHex: ChainIDHex) => {
+  provider.on('chainChanged', async (chainIdHex: ChainIDHex) => {
     const chainSlug = chainIdHexToSlug(chainIdHex)
     if (chainSlug) {
       const blockchain = BLOCKCHAINS[chainSlug]
@@ -176,23 +192,28 @@ export const initDApp = async (rpcUrl?: string) => {
       }
     }
   })
-  ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
+  provider.on('accountsChanged', async (accounts: Address[]) => {
     userState.accounts = accounts
-    userState.currentAccount = accounts[0]
+    // userState.currentAccount = accounts[0]
   })
 }
 
 const initWeb3OnWindow = async (rpcUrl?: string) => {
-  const provider = await detectEthereumProvider()
-  // const provider = (window as any).ethereum
-  window.web3 = new (window as any).Web3(rpcUrl || 'https://data-seed-prebsc-1-s1.binance.org:8545/')
-  if (provider) {
-    window.web3 = new (window as any).Web3(provider)
-    const userAccounts = await window.web3.eth.getAccounts()
-    userState.accounts = userAccounts
-  } else {
-    console.error('Please install MetaMask!')
-    throw Error('MetaMask not detected')
+  const ethersObj = window.ethers ? window.ethers : ethers
+  const metamask = await detectEthereumProvider()
+  const provider = new ethersObj.providers.Web3Provider(metamask as any)
+  console.log(`------------ provider: `, provider)
+  const userAccounts = await provider.send('eth_requestAccounts', [])
+  userState.accounts = userAccounts
+  userState.currentAccount = userAccounts[0]
+  const network = await provider.getNetwork()
+  const chainIdHex = convertDecimalToHex(network.chainId.toString())
+  const chainSlug = chainIdHexToSlug(chainIdHex)
+  if (chainSlug) {
+    const blockchain = BLOCKCHAINS[chainSlug]
+    if (blockchain) {
+      updateStateToChain(blockchain)
+    }
   }
 }
 
