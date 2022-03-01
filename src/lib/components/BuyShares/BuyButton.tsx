@@ -32,6 +32,9 @@ const BuyButton = (props: BuyButtonProps) => {
   const withinMaxShares = new BN(lootQuantity)
     .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
     .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
+
+  const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0').minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0').div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0')).toFixed(2)
+
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
     snapUserState.network.currentNetworkIdHex &&
@@ -67,7 +70,7 @@ const BuyButton = (props: BuyButtonProps) => {
   } else if (isInsufficientFunds) {
     return <SuppressedButton txt={'Insufficient Funds'}></SuppressedButton>
   } else if (isInputAmountValid && !withinMaxShares) {
-    return <SuppressedButton txt={'Lootbox is Full'}></SuppressedButton>
+    return <SuppressedButton txt={`Only ${sharesRemaining} Shares Available`}></SuppressedButton>
   } else if (isInputAmountValid) {
     return (
       <$Button
