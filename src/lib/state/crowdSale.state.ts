@@ -1,5 +1,5 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { addERC20ToWallet, useEthers, useProvider } from 'lib/hooks/useWeb3Api'
+import { addERC20ToWallet, useEthers } from 'lib/hooks/useWeb3Api'
 import { proxy, subscribe } from 'valtio'
 import { subscribeKey } from 'valtio/utils'
 import ERC20ABI from 'lib/abi/erc20.json'
@@ -7,9 +7,11 @@ import { getPriceFeed } from 'lib/hooks/useContract'
 import { purchaseFromCrowdSale, approveERC20Token, getERC20Allowance } from 'lib/hooks/useContract'
 import { tokenListState } from 'lib/hooks/useTokenList'
 import { parseWei } from '../utils/bnConversion'
+import { ethers as ethersObj } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)
 const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
@@ -112,7 +114,9 @@ export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Add
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const [provider] = useProvider()
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask, 'any')
   if (!provider) {
     throw new Error('No provider')
   }

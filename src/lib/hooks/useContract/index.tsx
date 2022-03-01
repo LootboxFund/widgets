@@ -50,14 +50,8 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
   }
   const signer = await provider.getSigner()
   const contractInstance = new ethersObj.Contract(contractAddress, AggregatorV3Interface.abi, signer)
-  console.log(`---- contractInstance `, contractInstance)
-  try {
-    const data = await contractInstance.latestRoundData()
-    return data.answer
-  } catch (e) {
-    console.log(e)
-  }
-  return ''
+  const data = await contractInstance.latestRoundData()
+  return data.answer.toString()
 }
 
 export const purchaseFromCrowdSale = async (

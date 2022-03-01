@@ -42,12 +42,13 @@ import {
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'
+import { decodeEVMLog } from 'lib/api/evm'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     console.log('Initializing DApp...')
-    initDApp('https://data-seed-prebsc-1-s1.binance.org:8545/').catch((err) => console.error(err))
+    initDApp().catch((err) => console.error(err))
   }, [])
 
   const snapUserState = useSnapshot(userState)
@@ -242,7 +243,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSubmitStatus('in_progress')
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
-    console.log(`BlockNum = ${blockNum}`)
+
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
       new web3Utils.BN('10')
     )
@@ -258,7 +259,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
 
     try {
-      console.log(`----> creating lootbox with info...`)
+      console.log(`----> About to create lootbox with info...`)
       console.log(`
       
       ticketState.name = ${ticketState.name}
@@ -273,81 +274,91 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
-      await lootbox
-        .connect(signer)
-        .createLootbox(
-          ticketState.name,
-          ticketState.symbol,
-          maxSharesSold, // uint256 _maxSharesSold,
-          pricePerShare, // uint256 _sharePriceUSD,
-          receivingWallet,
-          receivingWallet
-        )
-        .send()
-      let options = {
-        filter: {
-          value: [],
-        },
+      await lootbox.createLootbox(
+        ticketState.name,
+        ticketState.symbol,
+        maxSharesSold.toString(), // uint256 _maxSharesSold,
+        pricePerShare.toString(), // uint256 _sharePriceUSD,
+        receivingWallet,
+        receivingWallet
+      )
+      const filter = {
         fromBlock: blockNum,
+        address: lootbox.address,
         topics: [web3Utils.sha3('LootboxCreated(string,address,address,address,uint256,uint256)')],
-        from: snapUserState.currentAccount,
       }
-      lootbox.events.LootboxCreated(options).on('data', (event: any) => {
-        const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = event.returnValues
-
-        if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
-          console.log(`
-          
-          ---- 🎉🎉🎉 ----
-          
-          Congratulations! You've created a lootbox!
-          Lootbox Address: ${lootbox}
-  
-          ---------------
-          
-          `)
-          setLootboxAddress(lootbox)
-          setSubmitStatus('success')
-          const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-            .add(new web3Utils.BN('100')) // make it whole
-            .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-            .mul(fundraisingTarget)
-            .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
-
-          createTokenURIData({
-            address: lootbox,
-            name: lootboxName,
-            description: ticketState.description as string,
-            image: ticketState.logoUrl as string,
-            backgroundColor: ticketState.lootboxThemeColor as string,
-            backgroundImage: ticketState.coverUrl as string,
-            lootbox: {
-              address: lootbox,
-              chainIdHex: manifest.chain.chainIDHex,
-              chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-              chainName: manifest.chain.chainName,
-              targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-              fundraisingTarget: fundraisingTarget,
-              basisPointsReturnTarget: basisPoints.toString(),
-              returnAmountTarget: basisPointsReturnTarget.toString(),
-              pricePerShare: pricePerShare.toString(),
-              lootboxThemeColor: ticketState.lootboxThemeColor as string,
-              transactionHash: event.transactionHash as string,
-              blockNumber: event.blockNumber,
-            },
-            socials: {
-              twitter: socialState.twitter,
-              email: socialState.email,
-              instagram: socialState.instagram,
-              tiktok: socialState.tiktok,
-              facebook: socialState.facebook,
-              discord: socialState.discord,
-              youtube: socialState.youtube,
-              snapchat: socialState.snapchat,
-              twitch: socialState.twitch,
-              web: socialState.web,
-            },
+      provider.on(filter, (log) => {
+        if (log !== undefined) {
+          const decodedLog = decodeEVMLog({
+            eventName: 'LootboxCreated',
+            log: log,
+            abi: `
+            event LootboxCreated(
+              string lootboxName,
+              address indexed lootbox,
+              address indexed issuer,
+              address indexed treasury,
+              uint256 maxSharesSold,
+              uint256 sharePriceUSD
+            )`,
+            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD'],
           })
+          const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
+
+          if (issuer.toLowerCase() === snapUserState.currentAccount && treasury.toLowerCase() === receivingWallet) {
+            console.log(`
+            
+            ---- 🎉🎉🎉 ----
+            
+            Congratulations! You've created a lootbox!
+            Lootbox Address: ${lootbox}
+    
+            ---------------
+            
+            `)
+            setLootboxAddress(lootbox)
+            setSubmitStatus('success')
+            const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
+              .add(new web3Utils.BN('100')) // make it whole
+              .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
+              .mul(fundraisingTarget)
+              .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
+
+            createTokenURIData({
+              address: lootbox,
+              name: lootboxName,
+              description: ticketState.description as string,
+              image: ticketState.logoUrl as string,
+              backgroundColor: ticketState.lootboxThemeColor as string,
+              backgroundImage: ticketState.coverUrl as string,
+              lootbox: {
+                address: lootbox,
+                chainIdHex: manifest.chain.chainIDHex,
+                chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+                chainName: manifest.chain.chainName,
+                targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+                fundraisingTarget: fundraisingTarget,
+                basisPointsReturnTarget: basisPoints.toString(),
+                returnAmountTarget: basisPointsReturnTarget.toString(),
+                pricePerShare: pricePerShare.toString(),
+                lootboxThemeColor: ticketState.lootboxThemeColor as string,
+                transactionHash: log.transactionHash as string,
+                blockNumber: log.blockNumber,
+              },
+              socials: {
+                twitter: socialState.twitter,
+                email: socialState.email,
+                instagram: socialState.instagram,
+                tiktok: socialState.tiktok,
+                facebook: socialState.facebook,
+                discord: socialState.discord,
+                youtube: socialState.youtube,
+                snapchat: socialState.snapchat,
+                twitch: socialState.twitch,
+                web: socialState.web,
+              },
+            })
+          }
         }
       })
     } catch (e) {

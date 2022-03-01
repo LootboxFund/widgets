@@ -15,7 +15,7 @@ import { initTokenList } from 'lib/hooks/useTokenList'
 import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'
 import { clearSwapState } from 'lib/state/swap.state'
-import { ethers } from 'ethers'
+import { ethers as ethersObj } from 'ethers'
 
 export const useWeb3Utils = () => {
   return window.web3 && window.web3.utils ? window.web3.utils : Web3Utils
@@ -23,15 +23,15 @@ export const useWeb3Utils = () => {
 
 export const useEthers = () => {
   if (!window.ethers) {
-    return ethers
+    return ethersObj
   }
   return window.ethers
 }
 
-type useProviderReturnType = [provider: ethers.providers.Web3Provider | undefined, loading: boolean]
+type useProviderReturnType = [provider: ethersObj.providers.Web3Provider | undefined, loading: boolean]
 export const useProvider = (): useProviderReturnType => {
-  const ethersObj = window.ethers ? window.ethers : ethers
-  const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const [provider, setProvider] = useState<ethersObj.providers.Web3Provider>()
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     setLoading(true)
@@ -39,7 +39,7 @@ export const useProvider = (): useProviderReturnType => {
   }, [])
   const loadProvider = async () => {
     const metamask: any = await detectEthereumProvider()
-    const prov = new ethersObj.providers.Web3Provider(metamask, 'any')
+    const prov = new ethers.providers.Web3Provider(metamask, 'any')
     setProvider(prov)
     setLoading(false)
   }
@@ -52,7 +52,7 @@ export const useUserInfo = () => {
   const requestAccounts = async () => {
     console.log(`--- requesting accounts...`)
     const [provider] = await useProvider()
-    console.log(`--- got ethers `, ethers)
+    console.log(`--- got ethers `, ethersObj)
     if (!provider) {
       return {
         success: false,
@@ -147,10 +147,9 @@ export const addERC20ToWallet = async (token: TokenData) => {
 }
 
 export const addERC721ToWallet = async (token: TokenData) => {
-  const [provider] = useProvider()
-  if (!provider) {
-    throw new Error('No provider')
-  }
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const metamask: any = await detectEthereumProvider()
+  const provider = new ethers.providers.Web3Provider(metamask, 'any')
   try {
     await provider.send('wallet_watchAsset', [
       {
@@ -176,6 +175,7 @@ export const initDApp = async (rpcUrl?: string) => {
   } catch (err) {
     console.error('Error initializing Web3', err)
   }
+  const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
   if (!provider) {
@@ -199,9 +199,9 @@ export const initDApp = async (rpcUrl?: string) => {
 }
 
 const initWeb3OnWindow = async (rpcUrl?: string) => {
-  const ethersObj = window.ethers ? window.ethers : ethers
+  const ethers = window.ethers ? window.ethers : ethersObj
   const metamask = await detectEthereumProvider()
-  const provider = new ethersObj.providers.Web3Provider(metamask as any)
+  const provider = new ethers.providers.Web3Provider(metamask as any)
   console.log(`------------ provider: `, provider)
   const userAccounts = await provider.send('eth_requestAccounts', [])
   userState.accounts = userAccounts
