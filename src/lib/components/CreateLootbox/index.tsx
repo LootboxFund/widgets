@@ -273,7 +273,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
-      const x = await lootbox
+      await lootbox
+        .connect(signer)
         .createLootbox(
           ticketState.name,
           ticketState.symbol,

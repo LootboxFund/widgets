@@ -71,6 +71,7 @@ const Demo = (args: StepTermsConditionsProps) => {
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
     try {
       const x = await lootbox
+        .connect(signer)
         .createLootbox(
           'name',
           'symbol',

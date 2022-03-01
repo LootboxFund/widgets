@@ -48,12 +48,16 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
   if (!provider) {
     throw new Error('No provider')
   }
-  console.log(`--- getPriceFeedRaw `, contractAddress)
-  console.log(ethersObj)
   const signer = await provider.getSigner()
   const contractInstance = new ethersObj.Contract(contractAddress, AggregatorV3Interface.abi, signer)
-  const data = await contractInstance.latestRoundData().call({ from: signer._address })
-  return data.answer
+  console.log(`---- contractInstance `, contractInstance)
+  try {
+    const data = await contractInstance.latestRoundData()
+    return data.answer
+  } catch (e) {
+    console.log(e)
+  }
+  return ''
 }
 
 export const purchaseFromCrowdSale = async (
@@ -71,14 +75,14 @@ export const purchaseFromCrowdSale = async (
   const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
   let tx = undefined
   if ([BNB, TBNB].includes(stableCoinSymbol)) {
-    tx = crowdSale.buyInBNB().send({ value: stableCoinAmount })
+    tx = crowdSale.connect(signer).buyInBNB().send({ value: stableCoinAmount })
   } else {
     if (stableCoinSymbol === ETH) {
-      tx = crowdSale.buyInETH(stableCoinAmount).send()
+      tx = crowdSale.connect(signer).buyInETH(stableCoinAmount).send()
     } else if (stableCoinSymbol === USDC) {
-      tx = crowdSale.buyInUSDC(stableCoinAmount).send()
+      tx = crowdSale.connect(signer).buyInUSDC(stableCoinAmount).send()
     } else if (stableCoinSymbol === USDT) {
-      tx = crowdSale.buyInUSDT(stableCoinAmount).send()
+      tx = crowdSale.connect(signer).buyInUSDT(stableCoinAmount).send()
     } else {
       // throw new Error(`${stableCoinSymbol} not supported!`)
       console.error(`${stableCoinSymbol} not supported!`)
@@ -98,7 +102,7 @@ export const getERC20Allowance = async (spender: Address | undefined, tokenAddre
   }
   const signer = await provider.getSigner()
   const token = new ethersObj.Contract(tokenAddress, ERC20ABI, signer)
-  return token.allowance(signer._address, spender).call()
+  return token.connect(signer).allowance(signer._address, spender).call()
 }
 
 export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => {
@@ -109,7 +113,7 @@ export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => 
   }
   const signer = await provider.getSigner()
   const token = new ethersObj.Contract(tokenAddress, ERC20ABI, signer)
-  return token.symbol().call()
+  return token.connect(signer).symbol().call()
 }
 
 export const approveERC20Token = async (delegator: Address | undefined, tokenData: TokenData, quantity: string) => {
@@ -121,7 +125,7 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
   }
   const signer = await provider.getSigner()
   const token = new ethersObj.Contract(tokenData.address, ERC20ABI, signer)
-  return token.approve(delegator, quantity).send({ from: signer._address })
+  return token.connect(signer).approve(delegator, quantity).send({ from: signer._address })
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
@@ -134,13 +138,13 @@ export const getLootboxData = async (lootboxAddress: Address) => {
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
-      lootbox.name().call(),
-      lootbox.symbol().call(),
-      lootbox.sharePriceUSD().call(),
-      lootbox.sharesSoldCount().call(),
-      lootbox.sharesSoldMax().call(),
-      lootbox.ticketIdCounter().call(),
-      lootbox.shareDecimals().call(),
+      lootbox.connect(signer).name().call(),
+      lootbox.connect(signer).symbol().call(),
+      lootbox.connect(signer).sharePriceUSD().call(),
+      lootbox.connect(signer).sharesSoldCount().call(),
+      lootbox.connect(signer).sharesSoldMax().call(),
+      lootbox.connect(signer).ticketIdCounter().call(),
+      lootbox.connect(signer).shareDecimals().call(),
     ])
 
   return {
@@ -162,7 +166,7 @@ export const getLootboxTicketId = async (lootboxAddress: Address): Promise<strin
   }
   const signer = await provider.getSigner()
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
-  const ticketId = await lootbox.ticketIdCounter().call()
+  const ticketId = await lootbox.connect(signer).ticketIdCounter().call()
   return ticketId
 }
 
@@ -174,7 +178,7 @@ export const buyLootboxShares = async (lootboxAddress: Address, amountOfStableco
   }
   const signer = await provider.getSigner()
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
-  return await lootbox.purchaseTicket().send({ value: amountOfStablecoin })
+  return await lootbox.connect(signer).purchaseTicket().send({ value: amountOfStablecoin })
 }
 
 export const getTicketDividends = async (lootboxAddress: Address, ticketID: string): Promise<IDividendFragment[]> => {
@@ -186,7 +190,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   }
   const signer = await provider.getSigner()
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
-  const proratedDeposits = await lootbox.viewProratedDepositsForTicket(ticketID).call()
+  const proratedDeposits = await lootbox.connect(signer).viewProratedDepositsForTicket(ticketID).call()
   for (let deposit of proratedDeposits) {
     if (deposit.nativeTokenAmount && deposit.nativeTokenAmount !== '0') {
       res.push({
@@ -214,7 +218,7 @@ export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
   }
   const signer = await provider.getSigner()
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
-  const userTickets = await lootbox.viewAllTicketsOfHolder(signer._address).call()
+  const userTickets = await lootbox.connect(signer).viewAllTicketsOfHolder(signer._address).call()
   return userTickets
 }
 
@@ -226,6 +230,6 @@ export const withdrawEarningsFromLootbox = async (ticketID: string, lootboxAddre
   }
   const signer = await provider.getSigner()
   const lootbox = new ethersObj.Contract(lootboxAddress, LootboxABI, signer)
-  const res = await lootbox.withdrawEarnings(ticketID).send()
+  const res = await lootbox.connect(signer).withdrawEarnings(ticketID).send()
   return res
 }
