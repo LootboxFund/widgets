@@ -62,7 +62,7 @@ const UserTickets = (props: Props) => {
         </$Horizontal>
       )
     } else {
-      return <$ScrollHorizontal>{children}</$ScrollHorizontal>
+      return <$ScrollHorizontal height="100%">{children}</$ScrollHorizontal>
     }
   }
 
@@ -76,18 +76,6 @@ const UserTickets = (props: Props) => {
     </Wrapper>
   )
 }
-
-const $IconWrapper = styled.div<{ first?: boolean; last?: boolean }>`
-  width: 50px;
-  height: 50px;
-  border-radius: 100%;
-  background: rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  position: absolute;
-  ${(props) => props.first && `left: -35px;`}
-  ${(props) => props.last && `right: -35px;`}
-  top: 30%;
-`
 
 const $TicketWrapper = styled.div`
   max-width: 260px;

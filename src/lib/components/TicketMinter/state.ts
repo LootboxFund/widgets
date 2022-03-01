@@ -2,7 +2,7 @@ import { proxy } from 'valtio'
 import { subscribe } from 'valtio'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
-import { fetchLootboxData } from 'lib/components/BuyShares/state'
+import { fetchLootboxData, buySharesState } from 'lib/components/BuyShares/state'
 import { ContractAddress } from '@lootboxfund/helpers';
 
 export interface TicketMinterState {
@@ -14,7 +14,7 @@ const ticketMinterSnapshot: TicketMinterState = { lootboxAddress: undefined, tic
 
 export const ticketMinterState = proxy(ticketMinterSnapshot)
 
-subscribe(ticketMinterState, async () => {
+subscribe(buySharesState.lastTransaction, async () => {
   if (ticketMinterState.lootboxAddress) {
     try {
       const ticketId = await getLootboxTicketId(ticketMinterState.lootboxAddress)

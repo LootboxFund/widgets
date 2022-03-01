@@ -45,4 +45,8 @@ export const $TokenSymbol = styled.span<{ screen: ScreenSize; padding?: string }
   align-items: center;
   justify-content: center;
   margin: auto 0px;
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `

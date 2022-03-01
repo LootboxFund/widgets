@@ -18,6 +18,7 @@ const TicketMinterWidget = () => {
         loadState(lootboxAddress)
       }
     }
+    load()
   }, [])
 
   return <TicketMinter />

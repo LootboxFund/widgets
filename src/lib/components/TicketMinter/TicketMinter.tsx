@@ -18,6 +18,7 @@ export const $TicketMinterContainer = styled.section`
   gap: 10px;
   /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
   box-sizing: border-box; */
+  box-sizing: border-box;
 `
 
 const $Row = styled.section`
@@ -35,8 +36,8 @@ const $Col = styled.section<{ width: string }>`
 const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(ticketMinterState)
   const { screen } = useWindowSize()
-  const buyWidth = screen === 'desktop' ? '60%' : '100%'
-  const ticketWidth = screen === 'desktop' ? '40%' : '0%'
+  const buyWidth = screen === 'desktop' ? '65%' : '100%'
+  const ticketWidth = screen === 'desktop' ? '35%' : '0%'
   return (
     <$TicketMinterContainer>
       {ref && <div ref={ref} />}

@@ -32,6 +32,10 @@ const BuyButton = (props: BuyButtonProps) => {
   const withinMaxShares = new BN(lootQuantity)
     .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
     .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
+
+  const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0').minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0').div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0'))
+  const sharesRemainingFmt = sharesRemaining.toFixed(2).length > 8? sharesRemaining.toExponential(2): sharesRemaining.toFixed(2)
+
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
     snapUserState.network.currentNetworkIdHex &&
@@ -61,13 +65,13 @@ const BuyButton = (props: BuyButtonProps) => {
         color={`${COLORS.surpressedFontColor}80`}
         style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
       >
-        {validChain ? 'Select a Token' : 'Switch Network'}
+        {validChain ? 'Select a Token' : 'Switch network'}
       </$Button>
     )
   } else if (isInsufficientFunds) {
-    return <SuppressedButton txt={'Insufficient Funds'}></SuppressedButton>
+    return <SuppressedButton txt={'Insufficient funds'}></SuppressedButton>
   } else if (isInputAmountValid && !withinMaxShares) {
-    return <SuppressedButton txt={'Lootbox is Full'}></SuppressedButton>
+    return <SuppressedButton txt={`Max ${sharesRemainingFmt} shares left`}></SuppressedButton>
   } else if (isInputAmountValid) {
     return (
       <$Button
