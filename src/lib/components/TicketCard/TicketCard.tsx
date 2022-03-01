@@ -129,6 +129,7 @@ export const $TagText = styled.p`
   width: 100%;
   max-width: 50%;
   padding: 5px;
+  word-break: break-word;
 `
 export const $TicketIDText = styled.p`
   font-family: sans-serif;
