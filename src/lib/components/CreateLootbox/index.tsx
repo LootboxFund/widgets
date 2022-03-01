@@ -1,6 +1,14 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { initDApp, updateStateToChain, useUserInfo, useEthers, useWeb3Utils, useProvider } from 'lib/hooks/useWeb3Api'
+import {
+  initDApp,
+  updateStateToChain,
+  useUserInfo,
+  useEthers,
+  useWeb3Utils,
+  useProvider,
+  addCustomEVMChain,
+} from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { subscribe, useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -98,7 +106,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
-  const selectNetwork = (network: NetworkOption, step: FormStep) => {
+  const selectNetwork = async (network: NetworkOption, step: FormStep) => {
+    if (!provider) {
+      throw new Error('No provider')
+    }
+    await addCustomEVMChain(network.chainIdHex)
     setNetwork(network)
     if (network && reputationWallet) {
       setStage({
@@ -237,7 +249,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       throw new Error('No provider')
     }
     setSubmitStatus('in_progress')
-    const LOOTBOX_FACTORY_ADDRESS = '0x2EF7614e1dC04baFc7A4803Ba44aC204d7BDa5F9' // manifest.lootbox.contracts.LootboxFactory.address
+    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
