@@ -175,19 +175,15 @@ export const initDApp = async () => {
   } catch (err) {
     console.error('Error initializing Web3', err)
   }
-  console.log(`----- after web3 init`)
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
   if (!provider) {
     throw new Error('No provider')
   }
-  console.log(`----- listen chainChanged`)
   provider.on('network', async (newNetwork, oldNetwork) => {
     console.log(newNetwork)
-    console.log(oldNetwork)
-    console.log(`----- chain changed! ${'chainIdHex'}`)
-    const chainIdHex = convertDecimalToHex(newNetwork.chainId)
+    const chainIdHex = convertDecimalToHex(newNetwork.chainId.toString())
     const chainSlug = chainIdHexToSlug(chainIdHex)
     if (chainSlug) {
       const blockchain = BLOCKCHAINS[chainSlug]
@@ -198,7 +194,6 @@ export const initDApp = async () => {
       }
     }
   })
-  console.log(`----- listen accountsChanged`)
   ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
     console.log(`----- accounts changed!`)
     userState.accounts = accounts
@@ -214,14 +209,10 @@ const initWeb3OnWindow = async () => {
   // userState.accounts = userAccounts
   // userState.currentAccount = userAccounts[0]
   const network = await provider.getNetwork()
-  console.log(`network = ${network.name}`)
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
-  console.log(`chainIdDecimal = ${network.chainId.toString()}, chainIdHex = ${chainIdHex}`)
   const chainSlug = chainIdHexToSlug(chainIdHex)
-  console.log(`chainSlug = ${chainSlug}`)
   if (chainSlug) {
     const blockchain = BLOCKCHAINS[chainSlug]
-    console.log(blockchain)
     if (blockchain) {
       updateStateToChain(blockchain)
     }
@@ -235,8 +226,6 @@ export const updateStateToChain = (chainInfo: ChainInfo) => {
   userState.network.currentNetworkName = chainInfo.chainName
   userState.network.currentNetworkDisplayName = chainInfo.displayName
   userState.network.currentNetworkLogo = chainInfo.currentNetworkLogo
-  clearSwapState()
-  clearCrowdSaleState()
   initTokenList(chainInfo.chainIdHex)
 }
 
@@ -246,8 +235,6 @@ export const clearStateToChain = () => {
   userState.network.currentNetworkName = undefined
   userState.network.currentNetworkDisplayName = undefined
   userState.network.currentNetworkLogo = undefined
-  clearSwapState()
-  clearCrowdSaleState()
   initTokenList()
 }
 

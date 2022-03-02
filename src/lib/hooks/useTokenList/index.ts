@@ -1,5 +1,5 @@
 import { DEFAULT_CHAIN_ID_HEX, DEMO_CUSTOM_TOKENS_BSC_MAINNET, TokenDataFE, tokenMap } from 'lib/hooks/constants'
-import { ChainIDHex, Address } from '@lootboxfund/helpers';
+import { ChainIDHex, Address } from '@lootboxfund/helpers'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
@@ -76,16 +76,16 @@ export const removeCustomToken = (address: string, chainIdHex: string) => {
   }
 }
 
-export const saveInitialCustomTokens = () => {
-  const customTokens: Record<string, TokenDataFE[]> = {
-    [DEFAULT_CHAIN_ID_HEX]: DEMO_CUSTOM_TOKENS_BSC_MAINNET,
-  }
-  localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
-}
+// export const saveInitialCustomTokens = () => {
+//   const customTokens: Record<string, TokenDataFE[]> = {
+//     [DEFAULT_CHAIN_ID_HEX]: DEMO_CUSTOM_TOKENS_BSC_MAINNET,
+//   }
+//   localStorage.setItem(CUSTOM_TOKEN_STORAGE_KEY, JSON.stringify(customTokens))
+// }
 
 export const initTokenList = (chainIdHex?: ChainIDHex) => {
-  // remove in production
-  saveInitialCustomTokens()
+  // // remove in production
+  // saveInitialCustomTokens()
 
   const chosenChainIdHex = chainIdHex || DEFAULT_CHAIN_ID_HEX
   tokenListState.defaultTokenList = tokenMap[chosenChainIdHex] || []

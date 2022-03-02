@@ -1,14 +1,11 @@
-import { AbiItem } from 'web3-utils'
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/_deprecated/crowdSale.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
-import { TokenData, Address, convertDecimalToHex } from '@lootboxfund/helpers'
-import { useEthers } from 'lib/hooks/useWeb3Api'
+import { TokenData, Address } from '@lootboxfund/helpers'
 import { ethers as ethersObj } from 'ethers'
-import { useProvider } from '../useWeb3Api/index'
 import detectEthereumProvider from '@metamask/detect-provider'
 
 const BNB = 'bnb'
@@ -45,8 +42,7 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  const signer = await provider.getSigner()
-  const contractInstance = new ethers.Contract(contractAddress, AggregatorV3Interface.abi, signer)
+  const contractInstance = new ethers.Contract(contractAddress, AggregatorV3Interface.abi, provider)
   const data = await contractInstance.latestRoundData()
   return data.answer.toString()
 }
@@ -96,9 +92,8 @@ export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => 
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  const signer = await provider.getSigner()
-  const token = new ethers.Contract(tokenAddress, ERC20ABI, signer)
-  return token.connect(signer).symbol()
+  const token = new ethers.Contract(tokenAddress, ERC20ABI, provider)
+  return token.symbol().toString()
 }
 
 export const approveERC20Token = async (delegator: Address | undefined, tokenData: TokenData, quantity: string) => {
@@ -111,17 +106,20 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
   return token.connect(signer).approve(delegator, quantity).send({ from: signer._address })
 }
 
-export const getLootboxData = async (lootboxAddress: Address) => {
-  console.log(`>>> getLootboxData`)
+interface GetLootboxDataOutput {
+  name: string
+  symbol: string
+  sharePriceUSD: string
+  sharesSoldCount: string
+  sharesSoldMax: string
+  ticketIdCounter: string
+  shareDecimals: string
+}
+export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
-  console.log(`>>> metamask`, metamask)
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  console.log(`>>> provider`, provider)
-  const signer = await provider.getSigner()
-  console.log(`>>> signer`, signer)
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
-  console.log(`>>> lootbox`, lootbox)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
       lootbox.name(),
@@ -134,13 +132,13 @@ export const getLootboxData = async (lootboxAddress: Address) => {
     ])
 
   return {
-    name,
-    symbol,
-    sharePriceUSD,
-    sharesSoldCount,
-    sharesSoldMax,
-    ticketIdCounter,
-    shareDecimals,
+    name: name.toString(),
+    symbol: symbol.toString(),
+    sharePriceUSD: sharePriceUSD.toString(),
+    sharesSoldCount: sharesSoldCount.toString(),
+    sharesSoldMax: sharesSoldMax.toString(),
+    ticketIdCounter: ticketIdCounter.toString(),
+    shareDecimals: shareDecimals.toString(),
   }
 }
 
@@ -148,10 +146,9 @@ export const getLootboxTicketId = async (lootboxAddress: Address): Promise<strin
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  const signer = await provider.getSigner()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
-  const ticketId = await lootbox.connect(signer).ticketIdCounter()
-  return ticketId
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const ticketId = await lootbox.ticketIdCounter()
+  return ticketId.toString()
 }
 
 export const buyLootboxShares = async (lootboxAddress: Address, amountOfStablecoin: string) => {
