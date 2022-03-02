@@ -169,18 +169,31 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
 
   buySharesState.lootbox.address = lootboxAddress
 
-  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
-    await getLootboxData(lootboxAddress)
-
-  buySharesState.lootbox.data = {
-    address: lootboxAddress,
-    name: name,
-    symbol: symbol,
-    sharePriceUSD: sharePriceUSD,
-    sharesSoldCount: sharesSoldCount,
-    sharesSoldMax: sharesSoldMax,
-    ticketIdCounter: ticketIdCounter,
-    shareDecimals: shareDecimals,
+  try {
+    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
+      await getLootboxData(lootboxAddress)
+    buySharesState.lootbox.data = {
+      address: lootboxAddress,
+      name: name,
+      symbol: symbol,
+      sharePriceUSD: sharePriceUSD,
+      sharesSoldCount: sharesSoldCount,
+      sharesSoldMax: sharesSoldMax,
+      ticketIdCounter: ticketIdCounter,
+      shareDecimals: shareDecimals,
+    }
+  } catch (err) {
+    console.error('Error fetching lootbox data', err)
+    buySharesState.lootbox.data = {
+      address: undefined,
+      name: undefined,
+      symbol: undefined,
+      sharePriceUSD: undefined,
+      sharesSoldCount: undefined,
+      sharesSoldMax: undefined,
+      ticketIdCounter: undefined,
+      shareDecimals: undefined,
+    }
   }
 }
 
