@@ -78,8 +78,8 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  fetchLootboxData(buySharesState.lootbox?.address).catch((err) => console.error(err))
-  // loadInputTokenData()  called in fetchLootboxData
+  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
+  // loadInputTokenData()  called in initBuySharesState
 })
 
 const updateLootboxQuantity = () => {
@@ -154,33 +154,23 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.route = '/complete'
 
-  fetchLootboxData(buySharesState.lootbox.address).catch((err) => console.error(err))
+  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
 
   return
 }
 
-export const fetchLootboxData = async (lootboxAddress: Address | undefined) => {
-  console.log(`---- fetchLootboxData: ${lootboxAddress}`)
+export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   loadInputTokenData()
 
   if (!lootboxAddress) {
     return
   }
+
+  buySharesState.lootbox.address = lootboxAddress
+
   const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
     await getLootboxData(lootboxAddress)
-
-  console.log(`
-  
-  name              = ${name}
-  symbol            = ${symbol}
-  sharePriceUSD ${sharePriceUSD}
-  sharesSoldCount ${sharesSoldCount}
-  sharesSoldMax ${sharesSoldMax}
-  ticketIdCounter ${ticketIdCounter}
-  shareDecimals ${shareDecimals}
-  
-  `)
 
   buySharesState.lootbox.data = {
     address: lootboxAddress,

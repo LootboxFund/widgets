@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { buySharesState, BuySharesRoute, fetchLootboxData } from './state'
+import { buySharesState, BuySharesRoute, initBuySharesState } from './state'
 import BuyShares from './BuyShares'
 import { useSnapshot } from 'valtio'
 import { initDApp } from 'lib/hooks/useWeb3Api'
@@ -17,14 +17,13 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
   useEffect(() => {
     const load = async () => {
       const lootbox = parseUrlParams('lootbox') as ContractAddress
-      buySharesState.lootbox.address = lootbox ? lootbox : undefined
       try {
         await initDApp()
       } catch (err) {
         console.error('Error initializing DApp for BuyShares', err)
       }
       if (lootbox) {
-        fetchLootboxData(lootbox).catch((err) => console.error('Error fetching lootbox data', err))
+        initBuySharesState(lootbox).catch((err) => console.error('Error fetching lootbox data', err))
       }
     }
     load()

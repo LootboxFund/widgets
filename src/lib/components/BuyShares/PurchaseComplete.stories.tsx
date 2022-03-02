@@ -3,7 +3,7 @@ import PurchaseComplete from './PurchaseComplete'
 import { $CardViewport } from '../Generics'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
-import { fetchLootboxData } from './state'
+import { initBuySharesState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ContractAddress } from '@lootboxfund/helpers'
@@ -23,7 +23,7 @@ const Template = () => {
         console.error(err)
       }
       if (lootbox) {
-        await fetchLootboxData(lootbox).catch((err) => console.error(err))
+        await initBuySharesState(lootbox).catch((err) => console.error(err))
       }
     }
     load()
