@@ -112,20 +112,25 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
 }
 
 export const getLootboxData = async (lootboxAddress: Address) => {
+  console.log(`>>> getLootboxData`)
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
+  console.log(`>>> metamask`, metamask)
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
+  console.log(`>>> provider`, provider)
   const signer = await provider.getSigner()
+  console.log(`>>> signer`, signer)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
+  console.log(`>>> lootbox`, lootbox)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
-      lootbox.connect(signer).name(),
-      lootbox.connect(signer).symbol(),
-      lootbox.connect(signer).sharePriceUSD(),
-      lootbox.connect(signer).sharesSoldCount(),
-      lootbox.connect(signer).sharesSoldMax(),
-      lootbox.connect(signer).ticketIdCounter(),
-      lootbox.connect(signer).shareDecimals(),
+      lootbox.name(),
+      lootbox.symbol(),
+      lootbox.sharePriceUSD(),
+      lootbox.sharesSoldCount(),
+      lootbox.sharesSoldMax(),
+      lootbox.ticketIdCounter(),
+      lootbox.shareDecimals(),
     ])
 
   return {

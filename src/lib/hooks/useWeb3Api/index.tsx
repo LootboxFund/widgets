@@ -169,19 +169,25 @@ export const addERC721ToWallet = async (token: TokenData) => {
   }
 }
 
-export const initDApp = async (rpcUrl?: string) => {
+export const initDApp = async () => {
   try {
-    await initWeb3OnWindow(rpcUrl)
+    await initWeb3OnWindow()
   } catch (err) {
     console.error('Error initializing Web3', err)
   }
+  console.log(`----- after web3 init`)
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
   if (!provider) {
     throw new Error('No provider')
   }
-  provider.on('chainChanged', async (chainIdHex: ChainIDHex) => {
+  console.log(`----- listen chainChanged`)
+  provider.on('network', async (newNetwork, oldNetwork) => {
+    console.log(newNetwork)
+    console.log(oldNetwork)
+    console.log(`----- chain changed! ${'chainIdHex'}`)
+    const chainIdHex = convertDecimalToHex(newNetwork.chainId)
     const chainSlug = chainIdHexToSlug(chainIdHex)
     if (chainSlug) {
       const blockchain = BLOCKCHAINS[chainSlug]
@@ -192,28 +198,35 @@ export const initDApp = async (rpcUrl?: string) => {
       }
     }
   })
-  provider.on('accountsChanged', async (accounts: Address[]) => {
+  console.log(`----- listen accountsChanged`)
+  ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
+    console.log(`----- accounts changed!`)
     userState.accounts = accounts
     // userState.currentAccount = accounts[0]
   })
 }
 
-const initWeb3OnWindow = async (rpcUrl?: string) => {
+const initWeb3OnWindow = async () => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask as any)
-  const userAccounts = await provider.send('eth_requestAccounts', [])
-  userState.accounts = userAccounts
-  userState.currentAccount = userAccounts[0]
+  // const userAccounts = await provider.send('eth_requestAccounts', [])
+  // userState.accounts = userAccounts
+  // userState.currentAccount = userAccounts[0]
   const network = await provider.getNetwork()
+  console.log(`network = ${network.name}`)
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
+  console.log(`chainIdDecimal = ${network.chainId.toString()}, chainIdHex = ${chainIdHex}`)
   const chainSlug = chainIdHexToSlug(chainIdHex)
+  console.log(`chainSlug = ${chainSlug}`)
   if (chainSlug) {
     const blockchain = BLOCKCHAINS[chainSlug]
+    console.log(blockchain)
     if (blockchain) {
       updateStateToChain(blockchain)
     }
   }
+  return
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {

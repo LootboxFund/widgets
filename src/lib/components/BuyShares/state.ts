@@ -160,12 +160,25 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const fetchLootboxData = async (lootboxAddress: Address) => {
+  console.log(`---- fetchLootboxData: ${lootboxAddress}`)
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   if (!lootboxAddress) {
     return
   }
   const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
     await getLootboxData(lootboxAddress)
+
+  console.log(`
+  
+  name              = ${name}
+  symbol            = ${symbol}
+  sharePriceUSD ${sharePriceUSD}
+  sharesSoldCount ${sharesSoldCount}
+  sharesSoldMax ${sharesSoldMax}
+  ticketIdCounter ${ticketIdCounter}
+  shareDecimals ${shareDecimals}
+  
+  `)
 
   buySharesState.lootbox.data = {
     address: lootboxAddress,
