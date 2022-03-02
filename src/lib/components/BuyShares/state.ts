@@ -101,22 +101,19 @@ const updateLootboxQuantity = () => {
   }
 }
 
-export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  console.log('--- get user balance', contractAddr, userAddr)
+export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address): Promise<string> => {
   const ethers = window.ethers ? window.ethers : ethersClass
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask)
   if (!provider) {
     throw new Error('No provider')
   }
-  const signer = await provider.getSigner()
-  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, signer)
-  const balance = await ERC20.connect(signer).balanceOf(userAddr)
-  return balance
+  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, provider)
+  const balance = await ERC20.balanceOf(userAddr)
+  return balance.toString()
 }
 
 export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<string> => {
-  console.log('fetching balance')
   const ethers = window.ethers ? window.ethers : ethersClass
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask)
@@ -203,14 +200,10 @@ export const addTicketToWallet = async () => {
 }
 
 export const loadInputTokenData = async () => {
-  console.log('Loading new input token', buySharesState.inputToken.data)
   if (!buySharesState.inputToken.data) {
-    console.error('Input token not defined!')
     return
   }
-  console.log('user state', userState, userState.currentAccount)
   if (userState.currentAccount) {
-    console.log('loading...---...')
     const promise =
       buySharesState.inputToken.data.address === NATIVE_ADDRESS
         ? getUserBalanceOfNativeToken(userState.currentAccount)
