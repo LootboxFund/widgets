@@ -195,13 +195,12 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   return res
 }
 
-export const fetchUserTicketsFromLootbox = async (lootboxAddress: Address) => {
+export const fetchUserTicketsFromLootbox = async (userAddress: Address, lootboxAddress: Address) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  const signer = await provider.getSigner()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
-  const userTickets = await lootbox.connect(signer).viewAllTicketsOfHolder(signer._address)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const userTickets = await lootbox.viewAllTicketsOfHolder(userAddress)
   return userTickets
 }
 
