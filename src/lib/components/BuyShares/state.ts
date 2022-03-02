@@ -1,17 +1,18 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { useEthers } from 'lib/hooks/useWeb3Api'
 import { ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
-import ERC20ABI from 'lib/abi/erc20.json'
-import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
+import {
+  getPriceFeedRaw,
+  getLootboxData,
+  buyLootboxShares,
+  getUserBalanceOfToken,
+  getUserBalanceOfNativeToken,
+} from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
-import { ethers as ethersClass } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
-import detectEthereumProvider from '@metamask/detect-provider'
-import { addresses } from 'lib/hooks/_deprecated/constants'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -103,26 +104,6 @@ const updateLootboxQuantity = () => {
   }
 }
 
-export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address): Promise<string> => {
-  const ethers = window.ethers ? window.ethers : ethersClass
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask)
-  if (!provider) {
-    throw new Error('No provider')
-  }
-  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, provider)
-  const balance = await ERC20.balanceOf(userAddr)
-  return balance.toString()
-}
-
-export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<string> => {
-  const ethers = window.ethers ? window.ethers : ethersClass
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask)
-  const balance = await provider.getBalance(userAddr)
-  return balance.toString()
-}
-
 export const purchaseLootboxShare = async () => {
   if (
     !buySharesState.lootbox.data ||
@@ -164,6 +145,7 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
+  console.log('INIT BUY SHARES')
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   loadInputTokenData()
 

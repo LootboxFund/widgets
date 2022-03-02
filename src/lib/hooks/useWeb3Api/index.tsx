@@ -2,20 +2,14 @@ import react, { useEffect, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
 import { DEFAULT_CHAIN_ID_HEX } from '../constants'
-import {
-  Address,
-  BLOCKCHAINS,
-  ChainIDHex,
-  chainIdHexToSlug,
-  ChainInfo,
-  convertDecimalToHex,
-  TokenData,
-} from '@lootboxfund/helpers'
+import { Address, BLOCKCHAINS, chainIdHexToSlug, ChainInfo, convertDecimalToHex, TokenData } from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'
-import { clearSwapState } from 'lib/state/swap.state'
 import { ethers as ethersObj } from 'ethers'
+
+const DEFAULT_CHAIN_SLUG = chainIdHexToSlug(DEFAULT_CHAIN_ID_HEX)
+const DEFAULT_BLOCKCHAIN = DEFAULT_CHAIN_SLUG && BLOCKCHAINS[DEFAULT_CHAIN_SLUG]
 
 export const useWeb3Utils = () => {
   return window.web3 && window.web3.utils ? window.web3.utils : Web3Utils
@@ -91,9 +85,7 @@ export const useUserInfo = () => {
 }
 
 export const addCustomEVMChain = async (chainIdHex: string) => {
-  const ethers = window.ethers ? window.ethers : ethersObj
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask, 'any')
+  const { provider } = await getProvider()
   const chainSlug = chainIdHexToSlug(chainIdHex)
   if (chainSlug && provider) {
     const chainInfo = BLOCKCHAINS[chainSlug]
@@ -124,32 +116,30 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
 }
 
 export const addERC20ToWallet = async (token: TokenData) => {
-  try {
-    const ethers = window.ethers ? window.ethers : ethersObj
-    const metamask: any = await detectEthereumProvider()
-    const provider = new ethers.providers.Web3Provider(metamask, 'any')
-    await provider.send('wallet_watchAsset', [
-      {
-        type: 'ERC20',
-        options: {
-          address: token.address,
-          symbol: token.symbol,
-          decimals: token.decimals,
-          image: token.logoURI,
+  const { provider, metamask } = await getProvider()
+  if (metamask) {
+    try {
+      await provider.send('wallet_watchAsset', [
+        {
+          type: 'ERC20',
+          options: {
+            address: token.address,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            image: token.logoURI,
+          },
         },
-      },
-    ])
-    return
-  } catch (err) {
-    console.error(err)
-    return
+      ])
+      return
+    } catch (err) {
+      console.error(err)
+      return
+    }
   }
 }
 
 export const addERC721ToWallet = async (token: TokenData) => {
-  const ethers = window.ethers ? window.ethers : ethersObj
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask, 'any')
+  const { provider } = await getProvider()
   try {
     await provider.send('wallet_watchAsset', [
       {
@@ -169,42 +159,31 @@ export const addERC721ToWallet = async (token: TokenData) => {
   }
 }
 
-export const initDApp = async () => {
-  try {
-    await initWeb3OnWindow()
-  } catch (err) {
-    console.error('Error initializing Web3', err)
-  }
+interface ProviderOutput {
+  provider: ethersObj.providers.Web3Provider | ethersObj.providers.JsonRpcProvider
+  metamask: unknown
+}
+export const getProvider = async (): Promise<ProviderOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask, 'any')
-  if (!provider) {
-    throw new Error('No provider')
+  let metamask: unknown = undefined
+  try {
+    metamask = await detectEthereumProvider()
+  } catch (err) {
+    console.error(err)
   }
-  provider.on('network', async (newNetwork, oldNetwork) => {
-    console.log(newNetwork)
-    const chainIdHex = convertDecimalToHex(newNetwork.chainId.toString())
-    const chainSlug = chainIdHexToSlug(chainIdHex)
-    if (chainSlug) {
-      const blockchain = BLOCKCHAINS[chainSlug]
-      if (blockchain) {
-        updateStateToChain(blockchain)
-      } else {
-        clearStateToChain()
-      }
-    }
-  })
-  ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
-    console.log(`----- accounts changed!`)
-    userState.accounts = accounts
-    userState.currentAccount = accounts[0]
-  })
+  let provider: ethersObj.providers.Web3Provider | ethersObj.providers.JsonRpcProvider
+  if (metamask) {
+    provider = new ethers.providers.Web3Provider(metamask as any)
+  } else {
+    provider = new ethers.providers.JsonRpcProvider(
+      DEFAULT_BLOCKCHAIN?.rpcUrls[0] || 'https://bsc-dataseed.binance.org/'
+    )
+  }
+  return { provider, metamask }
 }
 
-const initWeb3OnWindow = async () => {
-  const ethers = window.ethers ? window.ethers : ethersObj
-  const metamask = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask as any)
+export const initDApp = async () => {
+  const { provider, metamask } = await getProvider()
   // const userAccounts = await provider.send('eth_requestAccounts', [])
   // userState.accounts = userAccounts
   // userState.currentAccount = userAccounts[0]
@@ -217,7 +196,27 @@ const initWeb3OnWindow = async () => {
       updateStateToChain(blockchain)
     }
   }
-  return
+
+  provider.on('network', async (newNetwork, oldNetwork) => {
+    const chainIdHex = convertDecimalToHex(newNetwork.chainId.toString())
+    const chainSlug = chainIdHexToSlug(chainIdHex)
+    if (chainSlug) {
+      const blockchain = BLOCKCHAINS[chainSlug]
+      if (blockchain) {
+        updateStateToChain(blockchain)
+      } else {
+        clearStateToChain()
+      }
+    }
+  })
+
+  if (metamask) {
+    ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
+      console.log(`----- accounts changed!`)
+      userState.accounts = accounts
+      userState.currentAccount = accounts[0]
+    })
+  }
 }
 
 export const updateStateToChain = (chainInfo: ChainInfo) => {
