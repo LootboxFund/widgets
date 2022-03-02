@@ -31,11 +31,36 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   }
   const bscScanUrl = getBscScanUrl()
 
+  const ViewOnBSCScan = () => (
+    <$BlueLinkLink href={bscScanUrl} target="_blank">
+      View on BscScan
+    </$BlueLinkLink>
+  )
+
   const ErrorSection = () => (
     <$Vertical>
       <$Sadge>🤕</$Sadge>
-      <$ErrorText>An Error Occured!</$ErrorText>
+      <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
+      {bscScanUrl && <ViewOnBSCScan />}
+    </$Vertical>
+  )
+
+  const SuccessSection = () => (
+    <$Vertical>
+      <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
+      <$Button
+        screen={screen}
+        onClick={addToWallet}
+        backgroundColor={`${COLORS.surpressedBackground}`}
+        backgroundColorHover={`${COLORS.surpressedBackground}ae`}
+        color={`${COLORS.white}`}
+        colorHover={COLORS.white}
+        style={{ fontSize: '1.3em' }}
+      >
+        Add to Wallet
+      </$Button>
+      {bscScanUrl && <ViewOnBSCScan />}
     </$Vertical>
   )
 
@@ -59,28 +84,8 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
           X
         </span>
       </$BuySharesHeader>
-      <$TokenPreviewCard>
-        {!snap.lastTransaction.success && <ErrorSection />}
 
-        {bscScanUrl && (
-          <$BlueLinkLink href={bscScanUrl} target="_blank">
-            View on BscScan
-          </$BlueLinkLink>
-        )}
-
-        {snap.lastTransaction.success && (
-          <$Button
-            screen={screen}
-            onClick={addToWallet}
-            backgroundColor={`${COLORS.surpressedBackground}`}
-            backgroundColorHover={`${COLORS.surpressedBackground}ae`}
-            color={`${COLORS.white}`}
-            colorHover={COLORS.white}
-          >
-            Add to Wallet
-          </$Button>
-        )}
-      </$TokenPreviewCard>
+      <$TokenPreviewCard>{!snap.lastTransaction.success ? <ErrorSection /> : <SuccessSection />}</$TokenPreviewCard>
 
       <$Button
         screen={screen}
@@ -119,6 +124,8 @@ export const $BlueLinkLink = styled.a<{}>`
   &:hover {
     text-decoration: underline;
   }
+  font-size: 1.1em;
+  font-weight: bold;
 `
 
 export const $ErrorText = styled.span<{}>`
@@ -126,6 +133,7 @@ export const $ErrorText = styled.span<{}>`
   margin: 10px 0px;
   color: ${COLORS.dangerFontColor};
   text-align: center;
+  font-size: 1.1em;
 `
 
 export const $Sadge = styled.span<{}>`
@@ -133,7 +141,7 @@ export const $Sadge = styled.span<{}>`
   margin: 10px 0px;
   color: ${COLORS.dangerFontColor};
   text-align: center;
-  font-size: 3rem;
+  font-size: 2.6em;
 `
 
 export const $SecondaryLinkText = styled.span<{}>`
