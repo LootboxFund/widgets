@@ -184,9 +184,11 @@ export const getProvider = async (): Promise<ProviderOutput> => {
 
 export const initDApp = async () => {
   const { provider, metamask } = await getProvider()
-  // const userAccounts = await provider.send('eth_requestAccounts', [])
-  // userState.accounts = userAccounts
-  // userState.currentAccount = userAccounts[0]
+  if (metamask) {
+    const userAccounts = await provider.send('eth_requestAccounts', [])
+    userState.accounts = userAccounts
+    userState.currentAccount = userAccounts[0]
+  }
   const network = await provider.getNetwork()
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
   const chainSlug = chainIdHexToSlug(chainIdHex)
@@ -212,7 +214,6 @@ export const initDApp = async () => {
 
   if (metamask) {
     ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
-      console.log(`----- accounts changed!`)
       userState.accounts = accounts
       userState.currentAccount = accounts[0]
     })
