@@ -133,12 +133,12 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.ui.isButtonLoading = true
   try {
-    const tx = await buyLootboxShares(
+    const transactionHash = await buyLootboxShares(
       buySharesState.lootbox.address,
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
     buySharesState.lastTransaction.success = true
-    buySharesState.lastTransaction.hash = tx?.transactionHash
+    buySharesState.lastTransaction.hash = transactionHash
     loadInputTokenData()
   } catch (err) {
     console.error(err)

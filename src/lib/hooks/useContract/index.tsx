@@ -151,13 +151,21 @@ export const getLootboxTicketId = async (lootboxAddress: Address): Promise<strin
   return ticketId.toString()
 }
 
-export const buyLootboxShares = async (lootboxAddress: Address, amountOfStablecoin: string) => {
+/**
+ * Buys lootbox shares
+ * @param lootboxAddress address of lootbox
+ * @param amountOfStablecoin amount of stable coin to buy
+ * @returns Promise resolving into transaction hash
+ */
+export const buyLootboxShares = async (lootboxAddress: Address, amountOfStablecoin: string): Promise<string> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const metamask: any = await detectEthereumProvider()
   const provider = new ethers.providers.Web3Provider(metamask, 'any')
   const signer = await provider.getSigner()
   const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
-  return await lootbox.connect(signer).purchaseTicket().send({ value: amountOfStablecoin })
+  const tx = await lootbox.connect(signer).purchaseTicket({ value: amountOfStablecoin })
+  await tx.wait()
+  return tx.hash
 }
 
 export const getTicketDividends = async (lootboxAddress: Address, ticketID: string): Promise<IDividendFragment[]> => {
