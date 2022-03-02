@@ -28,19 +28,24 @@ const WalletButton = (props: WalletButtonProps) => {
 
   const connectWallet = async () => {
     setStatus('loading')
-    const result = await requestAccounts()
-    if (result.success && provider) {
-      const network = await provider.getNetwork()
-      const chainIdHex = convertDecimalToHex(network.chainId.toString())
-      const chainSlug = chainIdHexToSlug(chainIdHex)
-      if (chainSlug) {
-        const blockchain = BLOCKCHAINS[chainSlug]
-        if (blockchain) {
-          updateStateToChain(blockchain)
+    try {
+      const result = await requestAccounts()
+      if (result.success && provider) {
+        const network = await provider.getNetwork()
+        const chainIdHex = convertDecimalToHex(network.chainId.toString())
+        const chainSlug = chainIdHexToSlug(chainIdHex)
+        if (chainSlug) {
+          const blockchain = BLOCKCHAINS[chainSlug]
+          if (blockchain) {
+            updateStateToChain(blockchain)
+          }
         }
+        setStatus('success')
+      } else {
+        setStatus('error')
       }
-      setStatus('success')
-    } else {
+    } catch (err) {
+      console.error(err)
       setStatus('error')
     }
   }

@@ -185,9 +185,13 @@ export const getProvider = async (): Promise<ProviderOutput> => {
 export const initDApp = async () => {
   const { provider, metamask } = await getProvider()
   if (metamask) {
-    const userAccounts = await provider.send('eth_requestAccounts', [])
-    userState.accounts = userAccounts
-    userState.currentAccount = userAccounts[0]
+    provider
+      .send('eth_requestAccounts', [])
+      .then((userAccounts) => {
+        userState.accounts = userAccounts
+        userState.currentAccount = userAccounts[0]
+      })
+      .catch((err) => console.error(err))
   }
   const network = await provider.getNetwork()
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
