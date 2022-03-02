@@ -202,7 +202,7 @@ export const initDApp = async () => {
   ;(window as any).ethereum.on('accountsChanged', async (accounts: Address[]) => {
     console.log(`----- accounts changed!`)
     userState.accounts = accounts
-    // userState.currentAccount = accounts[0]
+    userState.currentAccount = accounts[0]
   })
 }
 
