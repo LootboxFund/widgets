@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { $BuySharesContainer } from 'lib/components/BuyShares/BuyShares'
 import { COLORS } from 'lib/theme'
 import $Button from '../Generics/Button'
+import { $Vertical } from '../Generics'
 import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
 import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
@@ -16,18 +17,28 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const goToBuySharesComponent = () => (buySharesState.route = '/buyShares')
-  const getBscScanUrl = () => {
-    if (snapUserState.network.currentNetworkIdHex) {
+  const getBscScanUrl = (): string | undefined => {
+    if (!snap.lastTransaction.hash) {
+      return undefined
+    } else if (snapUserState.network.currentNetworkIdHex) {
       const chainSlug = chainIdHexToSlug(snapUserState.network.currentNetworkIdHex)
       if (snapUserState.network.currentNetworkIdHex && chainSlug && BLOCKCHAINS[chainSlug]) {
-        return `${BLOCKCHAINS[chainSlug].blockExplorerUrls[0]}${
-          snap.lastTransaction.hash ? `tx/${snap.lastTransaction.hash}` : ''
-        }`
+        return `${BLOCKCHAINS[chainSlug].blockExplorerUrls[0]}tx/${snap.lastTransaction.hash}`
       }
       return undefined
     }
     return undefined
   }
+  const bscScanUrl = getBscScanUrl()
+
+  const ErrorSection = () => (
+    <$Vertical>
+      <$Sadge>🤕</$Sadge>
+      <$ErrorText>An Error Occured!</$ErrorText>
+      {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
+    </$Vertical>
+  )
+
   const addToWallet = async () => {
     // try {
     //   await addTicketToWallet(snap.)
@@ -49,26 +60,26 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         </span>
       </$BuySharesHeader>
       <$TokenPreviewCard>
-        {/* <$CoinIcon
-          screen={screen}
-          // src="https://s2.coinmarketcap.com/static/img/coins/64x64/7186.png"
-          src={snap.lootbox.data?.logoURI}
-          style={{ width: '50px', height: '50px' }}
-        ></$CoinIcon>
-        <$BigCoinTicker screen={screen}>{snap.outputToken.data?.symbol}</$BigCoinTicker> */}
-        <$BlueLinkLink href={getBscScanUrl()} target="_blank">
-          View on BscScan
-        </$BlueLinkLink>
-        <$Button
-          screen={screen}
-          onClick={addToWallet}
-          backgroundColor={`${COLORS.surpressedBackground}`}
-          backgroundColorHover={`${COLORS.surpressedBackground}ae`}
-          color={`${COLORS.white}`}
-          colorHover={COLORS.white}
-        >
-          Add to Wallet
-        </$Button>
+        {!snap.lastTransaction.success && <ErrorSection />}
+
+        {bscScanUrl && (
+          <$BlueLinkLink href={bscScanUrl} target="_blank">
+            View on BscScan
+          </$BlueLinkLink>
+        )}
+
+        {snap.lastTransaction.success && (
+          <$Button
+            screen={screen}
+            onClick={addToWallet}
+            backgroundColor={`${COLORS.surpressedBackground}`}
+            backgroundColorHover={`${COLORS.surpressedBackground}ae`}
+            color={`${COLORS.white}`}
+            colorHover={COLORS.white}
+          >
+            Add to Wallet
+          </$Button>
+        )}
       </$TokenPreviewCard>
 
       <$Button
@@ -108,6 +119,21 @@ export const $BlueLinkLink = styled.a<{}>`
   &:hover {
     text-decoration: underline;
   }
+`
+
+export const $ErrorText = styled.span<{}>`
+  font-family: sans-serif;
+  margin: 10px 0px;
+  color: ${COLORS.dangerFontColor};
+  text-align: center;
+`
+
+export const $Sadge = styled.span<{}>`
+  font-family: sans-serif;
+  margin: 10px 0px;
+  color: ${COLORS.dangerFontColor};
+  text-align: center;
+  font-size: 3rem;
 `
 
 export const $SecondaryLinkText = styled.span<{}>`

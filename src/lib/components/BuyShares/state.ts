@@ -34,6 +34,7 @@ export interface BuySharesState {
     success: boolean
     hash: string | undefined
     errorMessage: string | undefined
+    failureMessage: string | undefined
   }
 }
 const buySharesSnapshot: BuySharesState = {
@@ -65,6 +66,7 @@ const buySharesSnapshot: BuySharesState = {
     success: false,
     hash: undefined,
     errorMessage: undefined,
+    failureMessage: undefined,
   },
 }
 export const buySharesState = proxy(buySharesSnapshot)
@@ -139,11 +141,13 @@ export const purchaseLootboxShare = async () => {
     )
     buySharesState.lastTransaction.success = true
     buySharesState.lastTransaction.hash = transactionHash
+    buySharesState.lastTransaction.failureMessage = undefined
     loadInputTokenData()
   } catch (err) {
     console.error(err)
     buySharesState.lastTransaction.success = false
     buySharesState.lastTransaction.hash = err?.receipt?.transactionHash
+    buySharesState.lastTransaction.failureMessage = err?.data?.message
     if (err?.code === 4001) {
       // Metamask, user denied signature
       return
