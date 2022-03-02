@@ -145,7 +145,6 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
-  console.log('INIT BUY SHARES')
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   loadInputTokenData()
 
@@ -190,7 +189,6 @@ export const addTicketToWallet = async () => {
 }
 
 export const loadInputTokenData = async () => {
-  console.log(' >>> loading input token', buySharesState.inputToken.data)
   if (!buySharesState.inputToken.data) {
     return
   }
