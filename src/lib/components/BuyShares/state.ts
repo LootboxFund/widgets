@@ -11,11 +11,13 @@ import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
 import detectEthereumProvider from '@metamask/detect-provider'
+import { addresses } from 'lib/hooks/_deprecated/constants'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
   route: BuySharesRoute
   lootbox: {
+    address: Address | undefined
     data: ILootbox | undefined
     quantity: string | undefined
   }
@@ -37,6 +39,7 @@ export interface BuySharesState {
 const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
   lootbox: {
+    address: undefined,
     data: {
       address: undefined,
       name: undefined,
@@ -75,11 +78,8 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  if (buySharesState.lootbox?.data?.address) {
-    console.log(' --- userstate change')
-    fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
-  }
-  loadInputTokenData()
+  fetchLootboxData(buySharesState.lootbox?.address).catch((err) => console.error(err))
+  // loadInputTokenData()  called in fetchLootboxData
 })
 
 const updateLootboxQuantity = () => {
@@ -126,7 +126,7 @@ export const purchaseLootboxShare = async () => {
     !buySharesState.lootbox.data ||
     !buySharesState.inputToken.data ||
     !buySharesState.inputToken.quantity ||
-    !buySharesState.lootbox?.data?.address
+    !buySharesState.lootbox?.address
   ) {
     return
   }
@@ -134,7 +134,7 @@ export const purchaseLootboxShare = async () => {
   buySharesState.ui.isButtonLoading = true
   try {
     const tx = await buyLootboxShares(
-      buySharesState.lootbox.data.address,
+      buySharesState.lootbox.address,
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
     buySharesState.lastTransaction.success = true
@@ -154,14 +154,16 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.route = '/complete'
 
-  fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
+  fetchLootboxData(buySharesState.lootbox.address).catch((err) => console.error(err))
 
   return
 }
 
-export const fetchLootboxData = async (lootboxAddress: Address) => {
+export const fetchLootboxData = async (lootboxAddress: Address | undefined) => {
   console.log(`---- fetchLootboxData: ${lootboxAddress}`)
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
+  loadInputTokenData()
+
   if (!lootboxAddress) {
     return
   }
@@ -190,7 +192,6 @@ export const fetchLootboxData = async (lootboxAddress: Address) => {
     ticketIdCounter: ticketIdCounter,
     shareDecimals: shareDecimals,
   }
-  loadInputTokenData()
 }
 
 export const addTicketToWallet = async () => {
@@ -200,6 +201,7 @@ export const addTicketToWallet = async () => {
 }
 
 export const loadInputTokenData = async () => {
+  console.log(' >>> loading input token', buySharesState.inputToken.data)
   if (!buySharesState.inputToken.data) {
     return
   }

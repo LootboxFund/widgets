@@ -5,7 +5,7 @@ import { useSnapshot } from 'valtio'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import PurchaseComplete from './PurchaseComplete'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface BuySharesWidgetProps {
   initialRoute?: BuySharesRoute
@@ -17,6 +17,7 @@ const BuySharesWidget = (props: BuySharesWidgetProps) => {
   useEffect(() => {
     const load = async () => {
       const lootbox = parseUrlParams('lootbox') as ContractAddress
+      buySharesState.lootbox.address = lootbox ? lootbox : undefined
       try {
         await initDApp()
       } catch (err) {
