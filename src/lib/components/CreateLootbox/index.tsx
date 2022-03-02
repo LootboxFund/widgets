@@ -46,18 +46,21 @@ import {
   ContractAddress,
   convertDecimalToHex,
   convertHexToDecimal,
+  Url,
 } from '@lootboxfund/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'
 import { decodeEVMLog } from 'lib/api/evm'
+import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
+import LootboxABI from 'lib/abi/lootbox.json'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     initDApp().catch((err) => console.error(err))
   }, [])
-
+  const [downloaded, setDownloaded] = useState(false)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const [provider, loading] = useProvider()
@@ -299,7 +302,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           ),
         ],
       }
-      provider.on(filter, (log) => {
+      provider.on(filter, async (log) => {
         if (log !== undefined) {
           const decodedLog = decodeEVMLog({
             eventName: 'LootboxCreated',
@@ -329,47 +332,66 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             
             `)
             setLootboxAddress(lootbox)
-            setSubmitStatus('success')
             const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
               .add(new web3Utils.BN('100')) // make it whole
               .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
               .mul(fundraisingTarget)
               .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
-            createTokenURIData({
-              address: lootbox,
-              name: lootboxName,
-              description: ticketState.description as string,
-              image: ticketState.logoUrl as string,
-              backgroundColor: ticketState.lootboxThemeColor as string,
-              backgroundImage: ticketState.coverUrl as string,
-              lootbox: {
-                address: lootbox,
+            const ticketID = '0x'
+            const numShares = ethers.utils.formatEther(maxSharesSold)
+            const [stampUrl] = await Promise.all([
+              await stampNewLootbox({
+                backgroundImage: ticketState.coverUrl as Url,
+                logoImage: ticketState.logoUrl as Url,
+                themeColor: ticketState.lootboxThemeColor as string,
+                name: lootboxName,
+                ticketID,
+                lootboxAddress: lootbox,
                 chainIdHex: manifest.chain.chainIDHex,
-                chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-                chainName: manifest.chain.chainName,
-                targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-                fundraisingTarget: fundraisingTarget,
-                basisPointsReturnTarget: basisPoints.toString(),
-                returnAmountTarget: basisPointsReturnTarget.toString(),
-                pricePerShare: pricePerShare.toString(),
-                lootboxThemeColor: ticketState.lootboxThemeColor as string,
-                transactionHash: log.transactionHash as string,
-                blockNumber: log.blockNumber,
-              },
-              socials: {
-                twitter: socialState.twitter,
-                email: socialState.email,
-                instagram: socialState.instagram,
-                tiktok: socialState.tiktok,
-                facebook: socialState.facebook,
-                discord: socialState.discord,
-                youtube: socialState.youtube,
-                snapchat: socialState.snapchat,
-                twitch: socialState.twitch,
-                web: socialState.web,
-              },
-            })
+                numShares,
+              }),
+              await createTokenURIData({
+                address: lootbox,
+                name: lootboxName,
+                description: ticketState.description as string,
+                image: ticketState.logoUrl as string,
+                backgroundColor: ticketState.lootboxThemeColor as string,
+                backgroundImage: ticketState.coverUrl as string,
+                lootbox: {
+                  address: lootbox,
+                  chainIdHex: manifest.chain.chainIDHex,
+                  chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+                  chainName: manifest.chain.chainName,
+                  targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+                  fundraisingTarget: fundraisingTarget,
+                  basisPointsReturnTarget: basisPoints.toString(),
+                  returnAmountTarget: basisPointsReturnTarget.toString(),
+                  pricePerShare: pricePerShare.toString(),
+                  lootboxThemeColor: ticketState.lootboxThemeColor as string,
+                  transactionHash: log.transactionHash as string,
+                  blockNumber: log.blockNumber,
+                },
+                socials: {
+                  twitter: socialState.twitter,
+                  email: socialState.email,
+                  instagram: socialState.instagram,
+                  tiktok: socialState.tiktok,
+                  facebook: socialState.facebook,
+                  discord: socialState.discord,
+                  youtube: socialState.youtube,
+                  snapchat: socialState.snapchat,
+                  twitch: socialState.twitch,
+                  web: socialState.web,
+                },
+              }),
+            ])
+            console.log(`Got stampUrl: ${stampUrl}`)
+            if (stampUrl && !downloaded) {
+              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+              setDownloaded(true)
+            }
+            setSubmitStatus('success')
           }
         }
       })

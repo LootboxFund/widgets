@@ -100,7 +100,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     checkAllTicketCustomizationValidations()
   }, [props.ticketState])
   const parseInput = (slug: string, text: string | number) => {
-    const value = slug === 'symbol' ? (text as string).toUpperCase() : text
+    const value = slug === 'symbol' ? (text as string).toUpperCase().replace(' ', '') : text
     props.updateTicketState(slug, value)
     if (slug === 'name') {
       setErrors({

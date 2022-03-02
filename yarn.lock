@@ -2092,20 +2092,20 @@
     "@babel/runtime" "^7.11.2"
     "@lingui/core" "^3.13.1"
 
-"@lootboxfund/helpers@0.0.15":
-  version "0.0.15"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.15.tgz#f3e96bad78e43a84448b401496bff1ff2602820f"
-  integrity sha512-Sm7pN8nRk1Ja7beln5DbpKluhoUXZLpURXU4sNLn3tNOCkwiSlsDSlAoajY9BXgh+lDUfEKNXMtJn66KMSnWig==
+"@lootboxfund/helpers@0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.20.tgz#ae3d2c869c0e7b0e50e48eac69e5e76f42f490fc"
+  integrity sha512-5ExsiJi9+27wQ4jzYz/9cZlEQ/CYSjfGwd/8kSgVS06Z+zli7VsyNms69VPrIfvRvUnkrokkOG+ssIL2+KhyMg==
   dependencies:
     axios "0.25.0"
     lodash "4.17.21"
 
-"@lootboxfund/manifest@0.2.34":
-  version "0.2.34"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.34.tgz#61aaa2a6ce2e5eddb3abd98301a4d0afd220b81d"
-  integrity sha512-QQA427+2uqGvqo485BGok1/5y9tTJRsvSDsExvtzaGZoJTstJsWDlekl70C9L+XzWjm8fRMcxuoqujFUMK/PCA==
+"@lootboxfund/manifest@0.2.37":
+  version "0.2.37"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.37.tgz#4c42907ec82573ef25038703c40390777827b808"
+  integrity sha512-TuLuMfzXuwHFFlNAeTcGOZye4/SkvNPPq7ASowLE86w9FH6lyZ2j+VuEBSS6ixW6b5k3cUt1hgB7+Qh3IFmRDQ==
   dependencies:
-    "@lootboxfund/helpers" "0.0.15"
+    "@lootboxfund/helpers" "0.0.20"
 
 "@mdx-js/loader@^1.6.22":
   version "1.6.22"
