@@ -2,8 +2,8 @@ import { proxy, subscribe } from 'valtio'
 import { fetchUserTicketsFromLootbox } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { userState } from 'lib/state/userState'
-import { buySharesState, loadInputTokenData, fetchLootboxData } from '../BuyShares/state'
-import { Address, ContractAddress } from '@lootboxfund/helpers';
+import { buySharesState, loadInputTokenData, initBuySharesState } from '../BuyShares/state'
+import { Address, ContractAddress } from '@lootboxfund/helpers'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)
 const MAX_INT = '115792089237316195423570985008687907853269984665640564039457584007913129639935' // Largest uint256 number
@@ -29,7 +29,7 @@ subscribe(buySharesState.lastTransaction, () => {
     Promise.all([
       loadUserTickets(),
       loadInputTokenData(),
-      userTicketState.lootboxAddress && fetchLootboxData(userTicketState.lootboxAddress),
+      userTicketState.lootboxAddress && initBuySharesState(userTicketState.lootboxAddress),
     ])
   }
 })
@@ -49,11 +49,14 @@ export const loadUserTickets = async () => {
     throw new Error('No lootbox initialized')
   }
 
-  userTicketState.userTickets = await fetchUserTicketsFromLootbox(userTicketState.lootboxAddress)
+  if (!userState.currentAccount) {
+    throw new Error('No user account')
+  }
 
-  // // DEV HACK
-  // const tix = await fetchUserTicketsFromLootbox(userTicketState.lootboxAddress)
-  // userTicketState.userTickets = [...tix, ...tix]
+  userTicketState.userTickets = await fetchUserTicketsFromLootbox(
+    userState.currentAccount,
+    userTicketState.lootboxAddress
+  )
 
   for (const ticket of userTicketState.userTickets) {
     try {

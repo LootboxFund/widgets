@@ -1,21 +1,24 @@
 import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { useEthers } from 'lib/hooks/useWeb3Api'
 import { ILootbox } from 'lib/types'
 import { proxy, subscribe } from 'valtio'
-import ERC20ABI from 'lib/abi/erc20.json'
-import { getPriceFeedRaw, getLootboxData, buyLootboxShares } from 'lib/hooks/useContract'
+import {
+  getPriceFeedRaw,
+  getLootboxData,
+  buyLootboxShares,
+  getUserBalanceOfToken,
+  getUserBalanceOfNativeToken,
+} from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
-import { ethers as ethersClass } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
 import { Address } from '@lootboxfund/helpers'
-import detectEthereumProvider from '@metamask/detect-provider'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
   route: BuySharesRoute
   lootbox: {
+    address: Address | undefined
     data: ILootbox | undefined
     quantity: string | undefined
   }
@@ -32,11 +35,13 @@ export interface BuySharesState {
     success: boolean
     hash: string | undefined
     errorMessage: string | undefined
+    failureMessage: string | undefined
   }
 }
 const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
   lootbox: {
+    address: undefined,
     data: {
       address: undefined,
       name: undefined,
@@ -62,6 +67,7 @@ const buySharesSnapshot: BuySharesState = {
     success: false,
     hash: undefined,
     errorMessage: undefined,
+    failureMessage: undefined,
   },
 }
 export const buySharesState = proxy(buySharesSnapshot)
@@ -75,10 +81,8 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  if (buySharesState.lootbox?.data?.address) {
-    fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
-  }
-  loadInputTokenData()
+  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
+  // loadInputTokenData()  called in initBuySharesState
 })
 
 const updateLootboxQuantity = () => {
@@ -100,50 +104,31 @@ const updateLootboxQuantity = () => {
   }
 }
 
-export const getUserBalanceOfToken = async (contractAddr: Address, userAddr: Address) => {
-  const ethers = window.ethers ? window.ethers : ethersClass
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask)
-  if (!provider) {
-    throw new Error('No provider')
-  }
-  const signer = await provider.getSigner()
-  const ERC20 = new ethers.Contract(contractAddr, ERC20ABI, signer)
-  const balance = await ERC20.connect(signer).balanceOf(userAddr)
-  return balance
-}
-
-export const getUserBalanceOfNativeToken = async (userAddr: Address) => {
-  const ethers = window.ethers ? window.ethers : ethersClass
-  const metamask: any = await detectEthereumProvider()
-  const provider = new ethers.providers.Web3Provider(metamask)
-  const balanceAsString = await provider.getBalance(userAddr)
-  return balanceAsString.toNumber()
-}
-
 export const purchaseLootboxShare = async () => {
   if (
     !buySharesState.lootbox.data ||
     !buySharesState.inputToken.data ||
     !buySharesState.inputToken.quantity ||
-    !buySharesState.lootbox?.data?.address
+    !buySharesState.lootbox?.address
   ) {
     return
   }
 
   buySharesState.ui.isButtonLoading = true
   try {
-    const tx = await buyLootboxShares(
-      buySharesState.lootbox.data.address,
+    const transactionHash = await buyLootboxShares(
+      buySharesState.lootbox.address,
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
     buySharesState.lastTransaction.success = true
-    buySharesState.lastTransaction.hash = tx?.transactionHash
+    buySharesState.lastTransaction.hash = transactionHash
+    buySharesState.lastTransaction.failureMessage = undefined
     loadInputTokenData()
   } catch (err) {
     console.error(err)
     buySharesState.lastTransaction.success = false
     buySharesState.lastTransaction.hash = err?.receipt?.transactionHash
+    buySharesState.lastTransaction.failureMessage = err?.data?.message
     if (err?.code === 4001) {
       // Metamask, user denied signature
       return
@@ -154,30 +139,47 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.route = '/complete'
 
-  fetchLootboxData(buySharesState.lootbox.data.address).catch((err) => console.error(err))
+  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
 
   return
 }
 
-export const fetchLootboxData = async (lootboxAddress: Address) => {
+export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
+  loadInputTokenData()
+
   if (!lootboxAddress) {
     return
   }
-  const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
-    await getLootboxData(lootboxAddress)
 
-  buySharesState.lootbox.data = {
-    address: lootboxAddress,
-    name: name,
-    symbol: symbol,
-    sharePriceUSD: sharePriceUSD,
-    sharesSoldCount: sharesSoldCount,
-    sharesSoldMax: sharesSoldMax,
-    ticketIdCounter: ticketIdCounter,
-    shareDecimals: shareDecimals,
+  buySharesState.lootbox.address = lootboxAddress
+
+  try {
+    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
+      await getLootboxData(lootboxAddress)
+    buySharesState.lootbox.data = {
+      address: lootboxAddress,
+      name: name,
+      symbol: symbol,
+      sharePriceUSD: sharePriceUSD,
+      sharesSoldCount: sharesSoldCount,
+      sharesSoldMax: sharesSoldMax,
+      ticketIdCounter: ticketIdCounter,
+      shareDecimals: shareDecimals,
+    }
+  } catch (err) {
+    console.error('Error fetching lootbox data', err)
+    buySharesState.lootbox.data = {
+      address: undefined,
+      name: undefined,
+      symbol: undefined,
+      sharePriceUSD: undefined,
+      sharesSoldCount: undefined,
+      sharesSoldMax: undefined,
+      ticketIdCounter: undefined,
+      shareDecimals: undefined,
+    }
   }
-  loadInputTokenData()
 }
 
 export const addTicketToWallet = async () => {
@@ -188,7 +190,6 @@ export const addTicketToWallet = async () => {
 
 export const loadInputTokenData = async () => {
   if (!buySharesState.inputToken.data) {
-    console.error('Input token not defined!')
     return
   }
   if (userState.currentAccount) {

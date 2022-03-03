@@ -2,8 +2,8 @@ import { proxy } from 'valtio'
 import { subscribe } from 'valtio'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
-import { fetchLootboxData, buySharesState } from 'lib/components/BuyShares/state'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { initBuySharesState, buySharesState } from 'lib/components/BuyShares/state'
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export interface TicketMinterState {
   lootboxAddress: ContractAddress | undefined
@@ -30,7 +30,7 @@ export const loadState = async (lootboxAddress: ContractAddress) => {
   ticketMinterState.lootboxAddress = lootboxAddress
   let ticketID = undefined
   try {
-    ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), fetchLootboxData(lootboxAddress)])
+    ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), initBuySharesState(lootboxAddress)])
   } catch (err) {
     console.error('Error fetching ticket id', err)
     ticketID = '0'

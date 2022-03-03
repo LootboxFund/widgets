@@ -1,17 +1,17 @@
 import { version } from '../../../package.json'
-import { ChainIDHex,TokenData, Address } from '@lootboxfund/helpers'
-import { STORAGE_URL } from '../../manifest';
+import { ChainIDHex, TokenData, Address } from '@lootboxfund/helpers'
+import { STORAGE_URL } from '../../manifest'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
   usdPrice?: string
 }
 export const USD_DECIMALS = 8
-export const DEFAULT_CHAIN_ID_HEX = '0x38'
+export const DEFAULT_CHAIN_ID_HEX = '0x61'
 export const DEFAULT_TICKET_IMAGE = `${STORAGE_URL}/o/assets%2Fdefault-ticket-logo.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND = `${STORAGE_URL}/o/assets%2Fdefault-ticket-background.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
-export const NATIVE_ADDRESS = '0x0native' as Address;
+export const NATIVE_ADDRESS = '0x0native' as Address
 export const storageUrl = (chainID: ChainIDHex) => `${STORAGE_URL}/o/v/${version}/${chainID}`
 
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
@@ -127,5 +127,5 @@ export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
   '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
   '13881': [],
-  '89': []
+  '89': [],
 }

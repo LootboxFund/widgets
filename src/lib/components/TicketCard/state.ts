@@ -4,7 +4,7 @@ import { readTicketMetadata } from 'lib/api/storage'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@lootboxfund/helpers'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -63,7 +63,7 @@ export const loadDividends = async (ticketID: string) => {
     dividendFragments.map(async (fragment) => {
       let symbol: string
       if (fragment.tokenAddress === NATIVE_ADDRESS) {
-        symbol = nativeToken?.symbol || ''
+        symbol = nativeToken?.symbol || NATIVE_ADDRESS
       } else {
         try {
           symbol = await getERC20Symbol(fragment.tokenAddress)
@@ -71,7 +71,6 @@ export const loadDividends = async (ticketID: string) => {
           symbol = fragment.tokenAddress?.slice(0, 4) + '...' || ''
         }
       }
-
       return {
         tokenSymbol: symbol,
         tokenAmount: fragment.tokenAmount,

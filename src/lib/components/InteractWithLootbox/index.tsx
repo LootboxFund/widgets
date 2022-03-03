@@ -6,8 +6,8 @@ import { ticketMinterState } from 'lib/components/TicketMinter/state'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
-import { fetchLootboxData } from 'lib/components/BuyShares/state'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { initBuySharesState } from 'lib/components/BuyShares/state'
+import { ContractAddress } from '@lootboxfund/helpers'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
@@ -18,7 +18,7 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
   try {
     ;[ticketID] = await Promise.all([
       getLootboxTicketId(lootboxAddress),
-      fetchLootboxData(lootboxAddress),
+      initBuySharesState(lootboxAddress),
       loadUserTickets(),
     ])
   } catch (err) {
