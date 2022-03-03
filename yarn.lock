@@ -2100,20 +2100,28 @@
     axios "0.25.0"
     lodash "4.17.21"
 
-"@lootboxfund/helpers@0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.23.tgz#4790d3210beb9ed6e682a4588c6532a8f2363123"
-  integrity sha512-yaznTZK4mI4fReO66qlUmO9+zSrEYPFsMXnaoYgL1CBIKCrRfz35fvgI74tkJZIk7Ds25J8nXR0rRG05XX2Zjw==
+"@lootboxfund/helpers@0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.25.tgz#3c6743da616f2d8ff5aaccf8584339b3cbcf78f0"
+  integrity sha512-o/GonTET0Uzk8+/g1AGxseK15uVIieFlSvc/scC38MM0Wu89p/0PSCluY24xyMHWDcZyeuYvpx0CEUMgISe+6g==
   dependencies:
+    "@lootboxfund/manifest" "0.2.38"
     axios "0.25.0"
     lodash "4.17.21"
 
-"@lootboxfund/manifest@0.2.37":
-  version "0.2.37"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.37.tgz#4c42907ec82573ef25038703c40390777827b808"
-  integrity sha512-TuLuMfzXuwHFFlNAeTcGOZye4/SkvNPPq7ASowLE86w9FH6lyZ2j+VuEBSS6ixW6b5k3cUt1hgB7+Qh3IFmRDQ==
+"@lootboxfund/manifest@0.2.38":
+  version "0.2.38"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.38.tgz#4753adbe4f46f00cf8e63e73cccf75a379e14b94"
+  integrity sha512-Ps2Ah0UKrq3H3aMLFNuFt4gLCvFXKuffngT7AeN/uJE1GqxM6CvOFAVA9v3nMWlIkVQpS/dP7mLcvoPs4J9ctw==
   dependencies:
     "@lootboxfund/helpers" "0.0.20"
+
+"@lootboxfund/manifest@0.2.43":
+  version "0.2.43"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.43.tgz#9cffb087a3860153c0144bee3b372a40a18de3aa"
+  integrity sha512-FHNSlM9wTVXtqHjOMWXYpAHuYqiswlDW/6baGxtpwni+qIBYVzO1u2YO+i3BLfRJbG8BGygHWFxHSvez9fJalg==
+  dependencies:
+    "@lootboxfund/helpers" "0.0.25"
 
 "@mdx-js/loader@^1.6.22":
   version "1.6.22"

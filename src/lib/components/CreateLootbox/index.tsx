@@ -414,7 +414,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-0-demo/lootbox?lootbox=${lootboxAddress}`
+    return `https://www.lootbox.fund/demo/0-2-3-demo/lootbox?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {
