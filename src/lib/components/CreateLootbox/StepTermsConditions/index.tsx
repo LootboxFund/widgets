@@ -5,9 +5,9 @@ import { $Vertical } from 'lib/components/Generics'
 import { Address } from '@lootboxfund/helpers'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { NetworkOption } from '../state'
 import ReactTooltip from 'react-tooltip'
+import { ethers as ethersObj } from 'ethers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 
@@ -46,13 +46,24 @@ export interface StepTermsConditionsProps {
 }
 const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
-  const web3Utils = useWeb3Utils()
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const initialErrors = {
     treasuryWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setTimeLeft(null)
+    }
+    if (!timeLeft) return
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeLeft])
   const checkAddrValid = async (addr: string) => {
-    return web3Utils.isAddress(addr)
+    const ethers = window.ethers ? window.ethers : ethersObj
+    return ethers.utils.isAddress(addr)
   }
   useEffect(() => {
     checkAddrValid(props.treasuryWallet).then((valid) => {
@@ -93,6 +104,10 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
   const updateCheckbox = (slug: string, checked: any) => {
     props.updateTermsState(slug, checked)
   }
+  const submitWithCountdown = () => {
+    setTimeLeft(60)
+    props.onSubmit()
+  }
   const renderActionBar = () => {
     if (props.submitStatus === 'failure') {
       return (
@@ -116,7 +131,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     } else if (props.submitStatus === 'in_progress') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
-          ...submitting
+          {`...submitting (${timeLeft})`}
         </$CreateLootboxButton>
       )
     }
@@ -124,7 +139,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       <CreateLootboxButton
         allConditionsMet={props.allConditionsMet}
         themeColor={props.selectedNetwork?.themeColor}
-        onSubmit={props.onSubmit}
+        onSubmit={() => submitWithCountdown()}
         text="Create Lootbox"
       />
     )
@@ -237,9 +252,7 @@ const $TwitterAlert = styled.span`
   font-size: 1rem;
   font-weight: 400;
   color: ${COLORS.surpressedFontColor};
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+  display: inline-block;
   margin-top: 20px;
 `
 

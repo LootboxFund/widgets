@@ -2,7 +2,15 @@ import react, { useEffect, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
 import { DEFAULT_CHAIN_ID_HEX } from '../constants'
-import { Address, BLOCKCHAINS, chainIdHexToSlug, ChainInfo, convertDecimalToHex, TokenData } from '@lootboxfund/helpers'
+import {
+  Address,
+  BLOCKCHAINS,
+  chainIdHexToSlug,
+  ChainInfo,
+  ChainSlugs,
+  convertDecimalToHex,
+  TokenData,
+} from '@lootboxfund/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'
@@ -184,15 +192,15 @@ export const getProvider = async (): Promise<ProviderOutput> => {
 
 export const initDApp = async () => {
   const { provider, metamask } = await getProvider()
-  if (metamask) {
-    provider
-      .send('eth_requestAccounts', [])
-      .then((userAccounts) => {
-        userState.accounts = userAccounts
-        userState.currentAccount = userAccounts[0]
-      })
-      .catch((err) => console.error(err))
-  }
+  // if (metamask) {
+  //   provider
+  //     .send('eth_requestAccounts', [])
+  //     .then((userAccounts) => {
+  //       userState.accounts = userAccounts
+  //       userState.currentAccount = userAccounts[0]
+  //     })
+  //     .catch((err) => console.error(err))
+  // }
   const network = await provider.getNetwork()
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
   const chainSlug = chainIdHexToSlug(chainIdHex)
@@ -203,23 +211,25 @@ export const initDApp = async () => {
     }
   }
 
-  provider.on('network', async (newNetwork, oldNetwork) => {
-    const chainIdHex = convertDecimalToHex(newNetwork.chainId.toString())
-    const chainSlug = chainIdHexToSlug(chainIdHex)
-    if (chainSlug) {
-      const blockchain = BLOCKCHAINS[chainSlug]
-      if (blockchain) {
-        updateStateToChain(blockchain)
-      } else {
-        clearStateToChain()
-      }
-    }
-  })
-
   if (metamask) {
     ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
       userState.accounts = accounts
       userState.currentAccount = accounts[0]
+    })
+    ;(metamask as any).on('networkChanged', async (networkId: string) => {
+      const chainIdHex = convertDecimalToHex(networkId)
+      const chainSlug = chainIdHexToSlug(chainIdHex)
+      if (chainSlug) {
+        const blockchain = BLOCKCHAINS[chainSlug]
+        if (blockchain) {
+          updateStateToChain(blockchain)
+        } else {
+          clearStateToChain()
+        }
+      } else {
+        const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
+        updateStateToChain(BLOCKCHAINS.UNKNOWN)
+      }
     })
   }
 }

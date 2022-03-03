@@ -157,7 +157,26 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         onNext={props.onNext}
         errors={Object.values(errors)}
       >
-        <$Horizontal flex={1}>
+        <div
+          style={
+            screen === 'mobile'
+              ? {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  paddingBottom: '20px',
+                  flex: 1,
+                  width: '100%',
+                }
+              : {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }
+          }
+        >
           <$Vertical flex={1}>
             <$StepHeading>
               <span>4. Customize NFT Ticket</span>
@@ -263,7 +282,10 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
 
             <br />
           </$Vertical>
-          <$Vertical flex={1}>
+          <$Vertical
+            flex={1}
+            style={screen === 'mobile' ? { width: '100%', flexDirection: 'column-reverse' } : { height: '100%' }}
+          >
             <TicketCardCandyWrapper
               backgroundImage={props.ticketState.coverUrl as string}
               logoImage={props.ticketState.logoUrl as string}
@@ -305,7 +327,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               />
             </$Vertical>
           </$Vertical>
-        </$Horizontal>
+        </div>
       </StepCard>
     </$StepCustomize>
   )

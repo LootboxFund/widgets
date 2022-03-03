@@ -58,7 +58,20 @@ import LootboxABI from 'lib/abi/lootbox.json'
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
-    initDApp().catch((err) => console.error(err))
+    if (window.ethereum) {
+      initDApp().catch((err) => console.log(err))
+    } else {
+      window.addEventListener('ethereum#initialized', initDApp, {
+        once: true,
+      })
+      setTimeout(() => {
+        if (!window.ethereum) {
+          alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
+        } else {
+          initDApp().catch((err) => console.log(err))
+        }
+      }, 3000) // 3 seconds
+    }
   }, [])
   const [downloaded, setDownloaded] = useState(false)
   const snapUserState = useSnapshot(userState)
@@ -110,9 +123,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
   const selectNetwork = async (network: NetworkOption, step: FormStep) => {
-    if (!provider) {
-      throw new Error('No provider')
-    }
     await addCustomEVMChain(network.chainIdHex)
     setNetwork(network)
     if (network && reputationWallet) {
@@ -292,6 +302,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         receivingWallet,
         receivingWallet
       )
+      console.log(`Submitted lootbox creation!`)
       const filter = {
         fromBlock: blockNum,
         address: lootbox.address,
@@ -319,8 +330,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD'],
           })
           const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
-
-          if (issuer.toLowerCase() === snapUserState.currentAccount && treasury.toLowerCase() === receivingWallet) {
+          const receiver = receivingWallet ? receivingWallet.toLowerCase() : ''
+          const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+          if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
             console.log(`
             
             ---- 🎉🎉🎉 ----
@@ -386,7 +398,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
                 },
               }),
             ])
-            console.log(`Got stampUrl: ${stampUrl}`)
+            console.log(`Stamp URL: ${stampUrl}`)
             if (stampUrl && !downloaded) {
               await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
               setDownloaded(true)

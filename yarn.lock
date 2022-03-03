@@ -2100,6 +2100,14 @@
     axios "0.25.0"
     lodash "4.17.21"
 
+"@lootboxfund/helpers@0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.23.tgz#4790d3210beb9ed6e682a4588c6532a8f2363123"
+  integrity sha512-yaznTZK4mI4fReO66qlUmO9+zSrEYPFsMXnaoYgL1CBIKCrRfz35fvgI74tkJZIk7Ds25J8nXR0rRG05XX2Zjw==
+  dependencies:
+    axios "0.25.0"
+    lodash "4.17.21"
+
 "@lootboxfund/manifest@0.2.37":
   version "0.2.37"
   resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.37.tgz#4c42907ec82573ef25038703c40390777827b808"

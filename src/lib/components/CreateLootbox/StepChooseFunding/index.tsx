@@ -4,7 +4,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import $Input from 'lib/components/Generics/Input'
-import useWindowSize from 'lib/hooks/useScreenSize'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { $NetworkIcon } from '../StepChooseNetwork'
 import { NetworkOption } from '../state'
 import { getPriceFeed } from 'lib/hooks/useContract'
@@ -13,13 +13,15 @@ import { useWeb3Utils } from '../../../hooks/useWeb3Api/index'
 import { Address } from '@lootboxfund/helpers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import { ethers as ethersObj } from 'ethers'
 import { truncateAddress } from 'lib/api/helpers'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
   return fundraisingTarget.gt(0)
 }
 export const validateReceivingWallet = async (receivingWallet: string, web3Utils: any) => {
-  return web3Utils.isAddress(receivingWallet)
+  const ethers = window.ethers ? window.ethers : ethersObj
+  return ethers.utils.isAddress(receivingWallet)
 }
 export interface StepChooseFundingProps {
   stage: StepStage
@@ -98,7 +100,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             target.
           </ReactTooltip>
         </$StepSubheading>
-        <$InputWrapper>
+        <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <div
               style={{
@@ -166,7 +168,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             team. Our YouTube channel has tutorials on how to set up a MultiSig.
           </ReactTooltip>
         </$StepSubheading>
-        <$InputWrapper>
+        <$InputWrapper screen={screen}>
           <$Input
             value={props.receivingWallet}
             screen={'mobile'}
@@ -206,27 +208,29 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             <br />
             {renderInputReceivingWallet()}
           </$Vertical>
-          <$Vertical flex={1}>
-            <img
-              style={{ width: '150px', marginTop: '50px' }}
-              src={
-                'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFundingScales.png?alt=media'
-              }
-            />
-          </$Vertical>
+          {screen !== 'mobile' && (
+            <$Vertical flex={1}>
+              <img
+                style={{ width: '150px', marginTop: '50px' }}
+                src={
+                  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFundingScales.png?alt=media'
+                }
+              />
+            </$Vertical>
+          )}
         </$Horizontal>
       </StepCard>
     </$StepChooseFunding>
   )
 })
 
-const $InputWrapper = styled.div`
+const $InputWrapper = styled.div<{ screen: ScreenSize }>`
   background-color: #f1f1f1;
   display: flex;
   padding: 5px 10px;
   border-radius: 10px;
   margin-top: 5px;
-  margin-right: 50px;
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
 `
 
 const $StepChooseFunding = styled.section<{}>`
