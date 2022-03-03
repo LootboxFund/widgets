@@ -6,9 +6,10 @@ import {
   DEFAULT_TICKET_BACKGROUND_COLOR,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
-import { SemanticVersion, ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
+import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
 import { manifest } from '../../manifest'
 import { encodeURISafe } from './helpers'
+import { SemanticVersion } from '@lootboxfund/manifest'
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
@@ -43,7 +44,7 @@ export const getLootboxURI = async ({
   lootboxAddress: ContractAddress
   bucket: string
 }) => {
-  const filePath = `v/${semver}/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`
+  const filePath = `v/${chainIdHex}/lootbox-uri/${lootboxAddress}.json`
   const downloadablePath = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURISafe(
     filePath
   )}?alt=media`
