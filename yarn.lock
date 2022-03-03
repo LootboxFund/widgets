@@ -2116,10 +2116,10 @@
   dependencies:
     "@lootboxfund/helpers" "0.0.20"
 
-"@lootboxfund/manifest@0.2.43":
-  version "0.2.43"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.43.tgz#9cffb087a3860153c0144bee3b372a40a18de3aa"
-  integrity sha512-FHNSlM9wTVXtqHjOMWXYpAHuYqiswlDW/6baGxtpwni+qIBYVzO1u2YO+i3BLfRJbG8BGygHWFxHSvez9fJalg==
+"@lootboxfund/manifest@0.2.44":
+  version "0.2.44"
+  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.44.tgz#06e6d1bfff980a52431fe2eb27d57aaf34b65be8"
+  integrity sha512-LJy/ZnyYVOMuQ2b5IJsZo7JOcvOyscxAmuQibQARwksuJEboB7bzU2vYoiaaHZyRITeCT4E6vRIv1LuKM3GUxg==
   dependencies:
     "@lootboxfund/helpers" "0.0.25"
 
