@@ -1,5 +1,4 @@
 const parseUrlParams = (name: string, url = window.location.href): string | undefined => {
-  console.log('searching', name, url)
   name = name.replace(/[\[\]]/g, '\\$&')
   var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
     results = regex.exec(url)

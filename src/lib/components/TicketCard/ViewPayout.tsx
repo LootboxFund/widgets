@@ -6,7 +6,7 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
-import { ContractAddress, removeProperties } from '@lootboxfund/helpers'
+import { ContractAddress } from '@lootboxfund/helpers'
 import { COLORS } from 'lib/theme'
 
 export interface ViewPayoutProps {
