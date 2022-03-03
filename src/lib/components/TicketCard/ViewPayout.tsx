@@ -8,6 +8,7 @@ import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
 import { ContractAddress } from '@lootboxfund/helpers'
 import { COLORS } from 'lib/theme'
+import { IDividend } from 'lib/types'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -18,7 +19,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID] && snap.tickets[stateID]
-  const dividends = ticket && ticket.dividends
+  const dividends = ticket && (ticket.dividends as IDividend[])
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
   const title = activeDividends?.length ? 'COLLECT NEW DIVIDENDS' : 'NO NEW DIVIDENDS'
 
@@ -34,6 +35,14 @@ const ViewPayout = (props: ViewPayoutProps) => {
     }
   }
 
+  const sortDividends = (a: IDividend, b: IDividend) => {
+    if (a.isRedeemed && b.isRedeemed) {
+      return 0
+    } else {
+      return a.isRedeemed ? 1 : -1
+    }
+  }
+
   return (
     <$TicketRedeemContainer>
       <$Horizontal justifyContent="space-between">
@@ -42,7 +51,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
       </$Horizontal>
 
       {dividends &&
-        dividends.map((dividend, idx) => {
+        [...dividends].sort(sortDividends).map((dividend, idx) => {
           return (
             <$DividendRow key={`${snap.lootboxAddress}-${props.ticketID}-${idx}`} isActive={!dividend.isRedeemed}>
               <$DividendOwed>{parseEth(dividend.tokenAmount)}</$DividendOwed>
