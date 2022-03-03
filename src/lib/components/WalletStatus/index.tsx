@@ -108,22 +108,24 @@ const WalletStatus = (props: WalletStatusProps) => {
     return <NetworkText />
   }
   return (
-    <$Button
-      screen={screen}
-      onClick={connectWallet}
-      color={`${COLORS.dangerFontColor}90`}
-      colorHover={COLORS.dangerFontColor}
-      backgroundColor={`${COLORS.dangerBackground}80`}
-      backgroundColorHover={`${COLORS.dangerBackground}`}
-      style={{
-        minHeight: '50px',
-        border: `1px solid ${COLORS.dangerFontColor}40`,
-        fontWeight: 500,
-        fontSize: '1.2rem',
-      }}
-    >
-      Connect Wallet
-    </$Button>
+    <div style={screen === 'mobile' ? { width: '200px', display: 'flex' } : {}}>
+      <$Button
+        screen={screen}
+        onClick={connectWallet}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
+        style={{
+          minHeight: '50px',
+          border: `1px solid ${COLORS.dangerFontColor}40`,
+          fontWeight: 500,
+          fontSize: '1.2rem',
+        }}
+      >
+        Connect Wallet
+      </$Button>
+    </div>
   )
 }
 

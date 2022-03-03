@@ -8,6 +8,7 @@ import { NetworkOption, NETWORK_OPTIONS } from '../state'
 import WalletStatus from 'lib/components/WalletStatus'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 
 export interface StepChooseNetworkProps {
   stage: StepStage
@@ -17,6 +18,7 @@ export interface StepChooseNetworkProps {
   setValidity: (bool: boolean) => void
 }
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
+  const { screen } = useWindowSize()
   const renderNetworkOptions = () => {
     const selectNetwork = (isAvailable: boolean, network: NetworkOption) => {
       if (isAvailable) {
@@ -66,7 +68,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
         stage={props.selectedNetwork ? props.stage : 'in_progress'}
         onNext={props.onNext}
       >
-        <$Horizontal flex={1}>
+        <$Wrapper screen={screen}>
           <$Vertical flex={2}>
             <$StepHeading>
               1. Choose your Network
@@ -84,15 +86,36 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
             {renderNetworkOptions()}
           </$Vertical>
           <$Vertical flex={1}>
-            <WalletStatus />
-            <img
-              style={{ width: '250px', marginTop: '50px' }}
-              src={
-                'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media'
+            <div
+              style={
+                screen === 'mobile'
+                  ? {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      paddingBottom: '20px',
+                      flex: 1,
+                      width: '100%',
+                    }
+                  : {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'flex-start',
+                      alignItems: 'flex-end',
+                    }
               }
-            />
+            >
+              <WalletStatus />
+              <img
+                style={{ width: '100%', maxWidth: '250px', marginTop: '50px' }}
+                src={
+                  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media'
+                }
+              />
+            </div>
           </$Vertical>
-        </$Horizontal>
+        </$Wrapper>
       </StepCard>
     </$StepChooseNetwork>
   )
@@ -107,6 +130,13 @@ const $StepChooseNetwork = styled.section<{}>`
 export const $NetworkIcon = styled.img<{ size?: 'small' | 'medium' | 'large' }>`
   width: ${(props) => (props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px')};
   height: ${(props) => (props.size === 'large' ? '60px' : props.size === 'medium' ? '40px' : '30px')};
+`
+
+export const $Wrapper = styled.div<{ screen: ScreenSize }>`
+  flex: 1;
+  display: flex;
+  flex-direction: ${(props) => (props.screen === 'mobile' ? 'column-reverse' : 'row')};
+  justify-content: space-between;
 `
 
 const $NetworkOption = styled.button<{ isAvailable?: boolean; themeColor?: string; isSelected?: boolean }>`

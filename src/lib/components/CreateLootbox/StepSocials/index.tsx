@@ -8,6 +8,7 @@ import { NetworkOption } from '../state'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { checkIfValidEmail } from 'lib/api/helpers'
+import { ScreenSize } from '../../../hooks/useScreenSize/index'
 
 export interface SocialFragment {
   slug: string
@@ -158,10 +159,10 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
           </$StepSubheading>
           <br />
           <br />
-          <$SocialGridInputs>
+          <$SocialGridInputs screen={screen}>
             {SOCIALS.map((social) => {
               return (
-                <$Horizontal style={{ marginRight: '20px' }}>
+                <$Horizontal style={screen === 'mobile' ? { marginBottom: '10px' } : { marginRight: '20px' }}>
                   <$SocialLogo src={social.icon} />
                   <$InputMedium
                     style={{ width: '100%' }}
@@ -184,12 +185,23 @@ const $StepSocials = styled.section<{}>`
   width: 100%;
   color: ${COLORS.black};
 `
-const $SocialGridInputs = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 10px;
-  row-gap: 15px;
+const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
+  ${({ screen }) => {
+    if (screen === 'mobile') {
+      return `
+        display: flex;
+        flex-direction: column;
+      `
+    } else {
+      return `
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 10px;
+        row-gap: 15px;
+      `
+    }
+  }}
 `
 
 const $SocialLogo = styled.img`

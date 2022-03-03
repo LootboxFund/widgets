@@ -32,10 +32,10 @@ function useWindowSize() {
     return () => window.removeEventListener('resize', handleResize)
   }, []) // Empty array ensures that effect is only run on mount
   const determineScreen = (width: number) => {
-    if (width <= 400) {
+    if (width <= 560) {
       return 'mobile'
     }
-    if (width > 400 && width < 1080) {
+    if (width > 560 && width < 1080) {
       return 'tablet'
     }
     return 'desktop'

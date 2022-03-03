@@ -4,7 +4,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
 import $Input from 'lib/components/Generics/Input'
-import useWindowSize from 'lib/hooks/useScreenSize'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { BigNumber } from 'bignumber.js'
 import { NetworkOption } from '../state'
@@ -129,7 +129,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
             >{`USD $${calculateEquivalentUSDPrice()} Original`}</$StepSubheading>
           </$Horizontal>
-          <$InputWrapper>
+          <$InputWrapper screen={screen}>
             <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
               <div
                 style={{
@@ -218,7 +218,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
             >{`$${calculateEquivalentUSDPrice(props.basisPoints)} Total`}</$StepSubheading>
           </$Horizontal>
-          <$InputWrapper>
+          <$InputWrapper screen={screen}>
             <$Input
               value={props.paybackDate}
               type="date"
@@ -260,14 +260,16 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
             <br />
             {renderTargetPayback()}
           </$Vertical>
-          <$Vertical flex={1}>
-            <img
-              style={{ width: '150px', marginTop: '50px' }}
-              src={
-                'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FReturnScales.png?alt=media'
-              }
-            />
-          </$Vertical>
+          {screen !== 'mobile' && (
+            <$Vertical flex={1}>
+              <img
+                style={{ width: '150px', marginTop: '50px' }}
+                src={
+                  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FReturnScales.png?alt=media'
+                }
+              />
+            </$Vertical>
+          )}
         </$Horizontal>
       </StepCard>
     </$StepChooseReturns>
@@ -280,13 +282,13 @@ const $BigIcon = styled.span`
   padding-right: 10px;
 `
 
-const $InputWrapper = styled.div`
+const $InputWrapper = styled.div<{ screen: ScreenSize }>`
   background-color: #f1f1f1;
   display: flex;
   padding: 5px 10px;
   border-radius: 10px;
   margin-top: 5px;
-  margin-right: 50px;
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
 `
 
 const $StepChooseReturns = styled.section<{}>`

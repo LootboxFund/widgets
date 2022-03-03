@@ -2,6 +2,7 @@ import react from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import CheckIcon from 'lib/theme/icons/Check.icon'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export type StepStage = 'not_yet' | 'in_progress' | 'may_proceed' | 'completed'
 export interface StepCardProps {
@@ -15,6 +16,7 @@ export interface StepCardProps {
 const StepCard = (props: StepCardProps) => {
   const totalErrors = (props.errors || []).filter((e) => e).length
   const themeColor = props.themeColor || COLORS.surpressedFontColor
+  const { screen } = useWindowSize()
   const renderStepButton = () => {
     if (totalErrors > 0) {
       return (
@@ -63,7 +65,9 @@ const StepCard = (props: StepCardProps) => {
   }
   return (
     <$StepCard themeColor={themeColor} stage={props.stage}>
-      <div style={{ padding: '30px', display: 'flex' }}>{props.children}</div>
+      <div style={screen === 'mobile' ? { padding: '15px', display: 'flex' } : { padding: '30px', display: 'flex' }}>
+        {props.children}
+      </div>
       {props.customActionBar ? (
         props.customActionBar()
       ) : (
