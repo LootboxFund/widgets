@@ -169,8 +169,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     biography: '',
     pricePerShare: 0.05,
     lootboxThemeColor: '#B48AF7',
+    /** @deprecated logoUrls are now from internal gbucket - use logoFile instead */
     logoUrl:
       'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media',
+    /** @deprecated logoUrls are now from internal gbucket - use coverFile instead*/
     coverUrl:
       'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
   }
@@ -385,9 +387,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
                 address: lootbox,
                 name: lootboxName,
                 description: ticketState.description as string,
-                image: ticketState.logoUrl as string,
+                // image: ticketState.logoUrl as string,
+                image: imagePublicPath,
                 backgroundColor: ticketState.lootboxThemeColor as string,
-                backgroundImage: ticketState.coverUrl as string,
+                // backgroundImage: ticketState.coverUrl as string,
+                backgroundImage: backgroundPublicPath,
                 lootbox: {
                   address: lootbox,
                   chainIdHex: manifest.chain.chainIDHex,
