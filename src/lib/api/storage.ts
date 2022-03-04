@@ -1,3 +1,5 @@
+import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
+import { SemanticVersion } from '@lootboxfund/manifest'
 import {
   DEFAULT_CHAIN_ID_HEX,
   storageUrl,
@@ -6,10 +8,8 @@ import {
   DEFAULT_TICKET_BACKGROUND_COLOR,
 } from 'lib/hooks/constants'
 import { userState } from 'lib/state/userState'
-import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
 import { manifest } from '../../manifest'
 import { encodeURISafe } from './helpers'
-import { SemanticVersion } from '@lootboxfund/manifest'
 
 const lootboxUrl = (lootboxAddress: Address) =>
   `${storageUrl(userState.network.currentNetworkIdHex || DEFAULT_CHAIN_ID_HEX)}/lootbox/${lootboxAddress}`
