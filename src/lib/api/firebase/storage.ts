@@ -19,7 +19,7 @@ const uploadImageToBucket = async (fileDestination: string, file: File) => {
   const storageRef = ref(storage, fileDestination)
 
   // 'file' comes from the Blob or File API
-  console.log(`uploading to ${fileDestination}`, file)
+  console.log(`uploading to ${fileDestination}`)
   return uploadBytes(storageRef, file)
 }
 

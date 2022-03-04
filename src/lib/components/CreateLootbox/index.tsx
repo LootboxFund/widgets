@@ -374,8 +374,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             const numShares = ethers.utils.formatEther(maxSharesSold)
             const [stampUrl] = await Promise.all([
               stampNewLootbox({
-                backgroundImage: ticketState.coverUrl as Url,
-                logoImage: ticketState.logoUrl as Url,
+                // backgroundImage: ticketState.coverUrl as Url,
+                // logoImage: ticketState.logoUrl as Url,
+                logoImage: imagePublicPath,
+                backgroundImage: backgroundPublicPath,
                 themeColor: ticketState.lootboxThemeColor as string,
                 name: lootboxName,
                 ticketID,

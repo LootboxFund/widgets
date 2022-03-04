@@ -44,7 +44,7 @@ export interface StepCustomizeProps {
   selectedNetwork?: NetworkOption
   onNext: () => void
   fundraisingTarget: BigNumber
-  ticketState: Record<string, string | number>
+  ticketState: Record<string, string | number> & { logoFile?: File; coverFile?: File }
   updateTicketState: (slug: string, value: string | number | File) => void
   setValidity: (bool: boolean) => void
 }
@@ -85,8 +85,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
     if (!validateCover(props.ticketState.coverUrl as string)) valid = false
-    if (!validateLogoFile(props.ticketState.logoFile as unknown as File)) valid = false
-    if (!validateCoverFile(props.ticketState.coverFile as unknown as File)) valid = false
     if (valid) {
       setErrors({
         ...errors,
