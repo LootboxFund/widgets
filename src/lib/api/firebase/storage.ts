@@ -1,9 +1,13 @@
 import { storage } from './app'
 import { ref, uploadBytes } from '@firebase/storage'
-import { v4 as uuidv4 } from 'uuid'
+import { UploadResult } from 'firebase/storage'
+import { STORAGE_URL } from 'manifest'
 
-const uniqueId = uuidv4()
-const LOOTBOX_ASSETS = `assets/lootbox/${uniqueId}`
+const LOOTBOX_ASSETS = `assets/lootbox`
+
+const constructPublicPath = (res: UploadResult) => {
+  return `${STORAGE_URL}/o/${res.metadata.fullPath.replaceAll('/', '%2F')}?alt=media`
+}
 
 /**
  * Save image to gbucket
@@ -19,18 +23,16 @@ const uploadImageToBucket = async (fileDestination: string, file: File) => {
   return uploadBytes(storageRef, file)
 }
 
-export const uploadLootboxLogo = async (file: File): Promise<string> => {
-  console.log('FILE', file)
+export const uploadLootboxLogo = async (folder: string, file: File): Promise<string> => {
   const extension = file?.name?.split('.').pop()
-  const fileDestination = `${LOOTBOX_ASSETS}/logo${extension ? '.' + extension : ''}`
-  // const res = await uploadImageToBucket(fileDestination, file)
-  // console.log('res', res)
-  return 'SKJDhfB'
+  const fileDestination = `${LOOTBOX_ASSETS}/${folder}/logo${extension ? '.' + extension : ''}`
+  const res = await uploadImageToBucket(fileDestination, file)
+  return constructPublicPath(res)
 }
 
-export const uploadLootboxBackground = async (file: File): Promise<string> => {
+export const uploadLootboxCover = async (folder: string, file: File): Promise<string> => {
   const extension = file?.name?.split('.').pop()
-  const fileDestination = `${LOOTBOX_ASSETS}/cover${extension ? '.' + extension : ''}`
+  const fileDestination = `${LOOTBOX_ASSETS}/${folder}/cover${extension ? '.' + extension : ''}`
   const res = await uploadImageToBucket(fileDestination, file)
-  return 'HEHEHEHE'
+  return constructPublicPath(res)
 }
