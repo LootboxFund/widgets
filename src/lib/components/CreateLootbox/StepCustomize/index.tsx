@@ -37,13 +37,15 @@ export const validatePricePerShare = (price: number, maxPricePerShare: number) =
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
+export const validateLogoFile = (file: File) => !!file
+export const validateCoverFile = (file: File) => !!file
 export interface StepCustomizeProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
   onNext: () => void
   fundraisingTarget: BigNumber
   ticketState: Record<string, string | number>
-  updateTicketState: (slug: string, value: string | number) => void
+  updateTicketState: (slug: string, value: string | number | File) => void
   setValidity: (bool: boolean) => void
 }
 const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObject<HTMLDivElement>) => {
@@ -70,6 +72,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     lootboxThemeColor: '',
     logoUrl: '',
     coverUrl: '',
+    logoFile: '',
+    coverFile: '',
   }
   const [errors, setErrors] = useState(initialErrors)
   const checkAllTicketCustomizationValidations = () => {
@@ -81,6 +85,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
     if (!validateCover(props.ticketState.coverUrl as string)) valid = false
+    if (!validateLogoFile(props.ticketState.logoFile as unknown as File)) valid = false
+    if (!validateCoverFile(props.ticketState.coverFile as unknown as File)) valid = false
     if (valid) {
       setErrors({
         ...errors,
@@ -145,6 +151,31 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         ...errors,
         coverUrl: validateCover(value as string) ? '' : 'Cover image must be a valid URL',
       })
+    }
+  }
+
+  const onImageInputChange = (
+    inputElementId: 'logo-uploader' | 'cover-uploader',
+    stateKey: 'logoFile' | 'coverFile'
+  ) => {
+    // @ts-ignore
+    const selectedFiles = document.getElementById(inputElementId)?.files
+    if (selectedFiles?.length) {
+      const file = selectedFiles[0]
+
+      if (stateKey === 'logoFile') {
+        setErrors({
+          ...errors,
+          logoFile: validateLogoFile(file) ? '' : 'Please upload a logo image',
+        })
+      } else if (stateKey === 'coverFile') {
+        setErrors({
+          ...errors,
+          coverFile: validateCoverFile(file) ? '' : 'Please upload a cover photo',
+        })
+      }
+
+      props.updateTicketState(stateKey, file)
     }
   }
 
@@ -304,12 +335,21 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
-              <$InputMedium
+              <form id="upload-logo">
+                <input
+                  type="file"
+                  id="logo-uploader"
+                  accept="image/*"
+                  onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
+                />
+              </form>
+              {/* <$InputMedium
                 onChange={(e) => parseInput('logoUrl', e.target.value)}
                 value={props.ticketState.logoUrl}
                 style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              />
+              /> */}
             </$Vertical>
+            <br />
             <$Vertical>
               <$StepSubheading>
                 <span>Cover Image</span>
@@ -320,11 +360,19 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
-              <$InputMedium
+              <form id="upload-cover">
+                <input
+                  type="file"
+                  id="cover-uploader"
+                  accept="image/*"
+                  onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
+                />
+              </form>
+              {/* <$InputMedium
                 onChange={(e) => parseInput('coverUrl', e.target.value)}
                 value={props.ticketState.coverUrl}
                 style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              />
+              /> */}
             </$Vertical>
           </$Vertical>
         </div>

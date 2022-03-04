@@ -27,6 +27,8 @@ import StepCustomize, {
   validateBiography,
   validateCover,
   validateLogo,
+  validateLogoFile,
+  validateCoverFile,
   validateName,
   validatePricePerShare,
   validateSymbol,
@@ -38,6 +40,7 @@ import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
 import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
 import { createTokenURIData } from 'lib/api/storage'
+import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import {
   Address,
@@ -54,6 +57,7 @@ import { manifest } from '../../../manifest'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LootboxABI from 'lib/abi/lootbox.json'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -159,7 +163,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 4: Customize Ticket
   const refStepCustomize = useRef<HTMLDivElement | null>(null)
-  const INITIAL_TICKET: Record<string, string | number> = {
+  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File } = {
     name: '',
     symbol: '',
     biography: '',
@@ -182,7 +186,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     validatePricePerShare(ticketState.pricePerShare as number, maxPricePerShare) &&
     validateThemeColor(ticketState.lootboxThemeColor as string) &&
     validateLogo(ticketState.logoUrl as string) &&
-    validateCover(ticketState.coverUrl as string)
+    validateCover(ticketState.coverUrl as string) &&
+    validateLogoFile(ticketState.logoFile as File) &&
+    validateCoverFile(ticketState.coverFile as File)
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
@@ -261,6 +267,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     if (!provider) {
       throw new Error('No provider')
     }
+    if (!ticketState.pricePerShare) {
+      throw new Error('Missing share price')
+    }
+    if (!(ticketState.coverFile && ticketState.logoFile)) {
+      throw new Error('Missing images')
+    }
+
     setSubmitStatus('in_progress')
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
@@ -278,8 +291,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const ethers = useEthers()
     const signer = await provider.getSigner()
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
-
+    const submissionId = uuidv4()
     try {
+      const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+        uploadLootboxLogo(submissionId, ticketState.logoFile),
+        uploadLootboxCover(submissionId, ticketState.coverFile),
+      ])
+
       console.log(`
       
       ticketState.name = ${ticketState.name}
@@ -353,7 +371,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             const ticketID = '0x'
             const numShares = ethers.utils.formatEther(maxSharesSold)
             const [stampUrl] = await Promise.all([
-              await stampNewLootbox({
+              stampNewLootbox({
                 backgroundImage: ticketState.coverUrl as Url,
                 logoImage: ticketState.logoUrl as Url,
                 themeColor: ticketState.lootboxThemeColor as string,
@@ -363,7 +381,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
                 chainIdHex: manifest.chain.chainIDHex,
                 numShares,
               }),
-              await createTokenURIData({
+              createTokenURIData({
                 address: lootbox,
                 name: lootboxName,
                 description: ticketState.description as string,
