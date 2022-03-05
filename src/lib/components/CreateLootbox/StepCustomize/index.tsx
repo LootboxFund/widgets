@@ -194,7 +194,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
 
       // Display the image in the UI
       // This updates the TicketCardCandyWrapper's logo and background
-      console.log('file', file)
       let elementId: string
       if (stateKey === 'logoFile') {
         elementId = 'ticket-candy-logo'
@@ -317,7 +316,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)}
                 value={props.ticketState.pricePerShare}
                 onWheel={(e) => e.currentTarget.blur()}
-                style={{ width: '100px' }}
+                style={{ width: '100%' }}
               />
             </$Horizontal>
 
@@ -336,7 +335,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             <br />
             <$Horizontal>
               <$Vertical>
-                <$InputColor
+                <$InputMedium
                   value={props.ticketState.lootboxThemeColor}
                   onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
                   style={{
@@ -350,14 +349,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   /> */}
                 <br />
                 <$Vertical>
-                  <$StepSubheading>
-                    Logo Image
-                    <HelpIcon tipID="logoImage" />
-                    <ReactTooltip id="logoImage" place="right" effect="solid">
-                      Upload your logo image. Please do not use massive images as it will slow down your Lootbox page
-                      load.
-                    </ReactTooltip>
-                  </$StepSubheading>
+                  <$InputImageLabel htmlFor="logo-uploader">
+                    {props.ticketState.logoFile ? '✅' : 'Upload'} Logo
+                  </$InputImageLabel>
                   <$InputImage
                     type="file"
                     id="logo-uploader"
@@ -372,14 +366,9 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 </$Vertical>
                 <br />
                 <$Vertical>
-                  <$StepSubheading>
-                    <span>Cover Image</span>
-                    <HelpIcon tipID="coverImage" />
-                    <ReactTooltip id="coverImage" place="right" effect="solid">
-                      Upload your cover image. Please do not use massive images as it will slow down your Lootbox page
-                      load.
-                    </ReactTooltip>
-                  </$StepSubheading>
+                  <$InputImageLabel htmlFor="cover-uploader">
+                    {props.ticketState.coverFile ? '✅' : 'Upload'} Cover
+                  </$InputImageLabel>
                   <$InputImage
                     type="file"
                     id="cover-uploader"
@@ -450,18 +439,22 @@ export const $InputColor = styled.input`
 `
 
 export const $InputImage = styled.input`
-  width: 100%;
+  display: none;
 `
 
-export const $UploadFileButton = styled.button`
+export const $InputImageLabel = styled.label`
   background-color: ${`${COLORS.surpressedBackground}1A`};
+  color: ${COLORS.surpressedFontColor};
   border: none;
   border-radius: 10px;
-  padding: 5px;
+  padding: 5px 10px;
   font-size: 1rem;
+  margin-right: 20px;
   height: 40px;
-  flex: 1;
-  margin: 5px;
+  line-height: 40px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
 `
 
 export const $ColorPreview = styled.div<{ color: string }>`
