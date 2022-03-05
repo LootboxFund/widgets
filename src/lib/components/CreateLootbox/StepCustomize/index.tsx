@@ -350,9 +350,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 Logo Image
                 <HelpIcon tipID="logoImage" />
                 <ReactTooltip id="logoImage" place="right" effect="solid">
-                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
-                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
-                  url). Please do not use massive images as it will slow down your Lootbox page load.
+                  Upload your logo image. Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
               <input
@@ -373,9 +371,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <span>Cover Image</span>
                 <HelpIcon tipID="coverImage" />
                 <ReactTooltip id="coverImage" place="right" effect="solid">
-                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
-                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
-                  url). Please do not use massive images as it will slow down your Lootbox page load.
+                  Upload your cover image. Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
               <input
