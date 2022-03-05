@@ -25,6 +25,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
         backgroundImage={ticket?.data?.metadata?.image}
         backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
         size={!ticket ? '100px' : undefined}
+        margin={ticket ? 'auto auto 0' : 'auto'}
       >
         {!ticket ? <$Icon>+</$Icon> : null}
       </$TicketLogo>
@@ -60,6 +61,7 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
         id="ticket-candy-logo"
         backgroundImage={props.logoImage}
         backgroundShadowColor={props.themeColor}
+        margin="auto auto 0"
       ></$TicketLogo>
 
       <$TicketTag>
@@ -99,6 +101,7 @@ export const $TicketLogo = styled.div<{
   backgroundImage?: string
   backgroundShadowColor?: string
   size?: string
+  margin?: string
 }>`
   ${(props) => (props.size ? `width: ${props.size};\nheight: ${props.size};` : `width: 75%;\npadding-top: 75%;`)}
   border: 0px solid transparent;
@@ -114,7 +117,7 @@ export const $TicketLogo = styled.div<{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: auto;
+  ${(props) => (props.margin && `margin: ${props.margin};`) || 'auto'}
 `
 
 export const $TicketTag = styled.section`
