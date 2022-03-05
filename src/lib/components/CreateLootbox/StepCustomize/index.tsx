@@ -61,7 +61,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     picker.onChange((color: string) => {
       setThemeColor(color)
     })
-  }, [setThemeColor])
+  }, [])
 
   useEffect(() => {
     if (themeColor !== props.ticketState.lootboxThemeColor) {
@@ -340,10 +340,13 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
                   style={{
                     width: '100px',
-                    border: props.ticketState.lootboxThemeColor ? `${props.ticketState.lootboxThemeColor} solid ` : '',
+                    border: props.ticketState.lootboxThemeColor
+                      ? `${props.ticketState.lootboxThemeColor} solid 2px `
+                      : '',
                   }}
                 />
                 {/* <$ColorPreview
+                
                     color={props.ticketState.lootboxThemeColor as string}
                     onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
                   /> */}
@@ -448,13 +451,14 @@ export const $InputImageLabel = styled.label`
   border: none;
   border-radius: 10px;
   padding: 5px 10px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin-right: 20px;
   height: 40px;
   line-height: 40px;
   font-weight: 500;
   text-align: center;
   cursor: pointer;
+  white-space: nowrap;
 `
 
 export const $ColorPreview = styled.div<{ color: string }>`
