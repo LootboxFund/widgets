@@ -53,18 +53,21 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
-  const [colorPicker, setColorPicker] = useState<ColorPicker | undefined>()
+  const [themeColor, setThemeColor] = useState('')
 
   useEffect(() => {
     const colorPickerElement = document.getElementById('color-picker')
     const picker = new ColorPicker({ el: colorPickerElement || undefined, color: props.ticketState.lootboxThemeColor })
     picker.onChange((color: string) => {
-      if (color !== props.ticketState.lootboxThemeColor) {
-        props.updateTicketState('lootboxThemeColor', color)
-      }
+      setThemeColor(color)
     })
-    setColorPicker(picker)
-  }, [])
+  }, [setThemeColor])
+
+  useEffect(() => {
+    if (themeColor !== props.ticketState.lootboxThemeColor) {
+      props.updateTicketState('lootboxThemeColor', themeColor)
+    }
+  }, [themeColor, props])
 
   useEffect(() => {
     getLatestPrice()
