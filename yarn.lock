@@ -3879,6 +3879,11 @@
   resolved "https://registry.yarnpkg.com/@types/html-minifier-terser/-/html-minifier-terser-5.1.2.tgz#693b316ad323ea97eed6b38ed1a3cc02b1672b57"
   integrity sha512-h4lTMgMJctJybDp8CQrxTUiiYmedihHWkjnF/8Pxseu2S6Nlfcy8kwboQ8yejh456rP2yWoEVm1sS/FVsfM48w==
 
+"@types/insert-css@^2.0.0":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/insert-css/-/insert-css-2.0.1.tgz#742574b45c0e90615e56bc83ac7976ee21a6b3fc"
+  integrity sha512-slUriXg8Y0JvpQoZlQ96bzzi86AU0DvtstKmGtBWpzJilFnpMUDbREi28Gpa+ZaIrTTCQUfvpDS7z7F1uwlYjQ==
+
 "@types/is-function@^1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/is-function/-/is-function-1.0.1.tgz#2d024eace950c836d9e3335a66b97960ae41d022"
@@ -8843,6 +8848,11 @@ inline-style-parser@0.1.1:
   resolved "https://registry.yarnpkg.com/inline-style-parser/-/inline-style-parser-0.1.1.tgz#ec8a3b429274e9c0a1f1c4ffa9453a7fef72cea1"
   integrity sha512-7NXolsK4CAS5+xvdj5OMMbI962hU/wvwoxk+LWR9Ek9bVtyuuYScDN6eS0rUm6TxApFpw7CX1o4uJzcd4AyD3Q==
 
+insert-css@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/insert-css/-/insert-css-2.0.0.tgz#eb5d1097b7542f4c79ea3060d3aee07d053880f4"
+  integrity sha1-610Ql7dUL0x56jBg067gfQU4gPQ=
+
 internal-slot@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/internal-slot/-/internal-slot-1.0.3.tgz#7347e307deeea2faac2ac6205d4bc7d34967f59c"
@@ -13211,6 +13221,14 @@ signal-exit@^3.0.0, signal-exit@^3.0.2, signal-exit@^3.0.3:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.6.tgz#24e630c4b0f03fea446a2bd299e62b4a6ca8d0af"
   integrity sha512-sDl4qMFpijcGw22U5w63KmD3cZJfBuFlVNbVMKje2keoKML7X2UzWbc4XrmEbDwg0NXJc3yv4/ox7b+JWb57kQ==
+
+simple-color-picker@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/simple-color-picker/-/simple-color-picker-1.0.5.tgz#07c70638c8246273c3c18d8a4bd366f2f72e1fd2"
+  integrity sha512-MUsSVfO/51zTrBA6nsmX5ABe/FXmhd6N+hie6EAWb6Ph4eydtQNRZ9hyb/HmLaG403YB/JAtpry70AaCd8AwBw==
+  dependencies:
+    "@types/insert-css" "^2.0.0"
+    insert-css "^2.0.0"
 
 simple-concat@^1.0.0:
   version "1.0.1"

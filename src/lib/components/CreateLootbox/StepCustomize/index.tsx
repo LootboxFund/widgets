@@ -1,5 +1,6 @@
 import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
+import ColorPicker from 'simple-color-picker'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
@@ -52,6 +53,28 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
+  const [colorPicker, setColorPicker] = useState<ColorPicker | undefined>()
+  // window?: Window;
+  // el?: HTMLElement | string;
+  // background?: string | number;
+  // widthUnits?: string;
+  // heightUnits?: string;
+  // width?: number;
+  // height?: number;
+  // color?: string | number;
+  useEffect(() => {
+    const colorPickerElement = document.getElementById('color-picker')
+    const picker = new ColorPicker({ el: colorPickerElement || undefined })
+    picker.onChange((color: string) => {
+      if (color !== props.ticketState.lootboxThemeColor) {
+        props.updateTicketState('lootboxThemeColor', color)
+      }
+    })
+    setColorPicker(picker)
+  }, [])
+
+  console.log('COLOR PICKER', colorPicker)
+
   useEffect(() => {
     getLatestPrice()
   }, [props.selectedNetwork])
@@ -317,17 +340,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                     customize it.
                   </ReactTooltip>
                 </$StepSubheading>
-                <$Horizontal verticalCenter flex={1}>
+                <$Vertical flex={1}>
+                  <div id="color-picker" />
                   <$InputColor
                     value={props.ticketState.lootboxThemeColor}
                     onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
                     style={{ width: '100px' }}
                   />
-                  <$ColorPreview
+                  {/* <$ColorPreview
                     color={props.ticketState.lootboxThemeColor as string}
                     onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
-                  />
-                </$Horizontal>
+                  /> */}
+                </$Vertical>
               </$Vertical>
             </$Horizontal>
 
