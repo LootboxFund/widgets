@@ -174,6 +174,28 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       }
 
       props.updateTicketState(stateKey, file)
+
+      // Display the image in the UI
+      // This updates the TicketCardCandyWrapper's logo and background
+      console.log('file', file)
+      let elementId: string
+      if (stateKey === 'logoFile') {
+        elementId = 'ticket-candy-logo'
+      } else {
+        elementId = 'ticket-candy-container'
+      }
+      const el = document.getElementById(elementId)
+
+      if (!el) {
+        console.error('Could not find element "ticket-candy-logo"')
+        return
+      }
+
+      var url = URL.createObjectURL(file)
+
+      el.style.backgroundImage = 'url(' + url + ')'
+
+      return
     }
   }
 
@@ -333,14 +355,12 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
-              <form id="upload-logo">
-                <input
-                  type="file"
-                  id="logo-uploader"
-                  accept="image/*"
-                  onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
-                />
-              </form>
+              <input
+                type="file"
+                id="logo-uploader"
+                accept="image/*"
+                onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
+              />
               {/* <$InputMedium
                 onChange={(e) => parseInput('logoUrl', e.target.value)}
                 value={props.ticketState.logoUrl}
@@ -358,14 +378,12 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   url). Please do not use massive images as it will slow down your Lootbox page load.
                 </ReactTooltip>
               </$StepSubheading>
-              <form id="upload-cover">
-                <input
-                  type="file"
-                  id="cover-uploader"
-                  accept="image/*"
-                  onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
-                />
-              </form>
+              <input
+                type="file"
+                id="cover-uploader"
+                accept="image/*"
+                onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
+              />
               {/* <$InputMedium
                 onChange={(e) => parseInput('coverUrl', e.target.value)}
                 value={props.ticketState.coverUrl}
