@@ -10,6 +10,7 @@ import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import { TokenDataFE } from 'lib/hooks/constants'
 import { ILootbox } from 'lib/types'
+import InfoText from './InfoText'
 
 export const $BuySharesContainer = styled.section`
   width: 100%;
@@ -37,6 +38,7 @@ const BuyShares = (props: BuySharesProps) => {
       <TokenInput selectedToken={snap.inputToken.data as TokenDataFE} tokenDisabled={!isLoggedIn} />
       <ShareOutput lootbox={snap.lootbox.data as ILootbox} />
       <BuyButton />
+      <InfoText />
     </$BuySharesContainer>
   )
 }
