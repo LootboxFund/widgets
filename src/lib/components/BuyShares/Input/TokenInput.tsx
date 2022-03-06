@@ -60,7 +60,7 @@ const TokenInput = (props: TokenInputProps) => {
           justifyContent="center"
         >
           <$TokenSymbol screen={screen} padding={'10px'}>
-            loading...
+            <$FineText screen={screen}>loading...</$FineText>
           </$TokenSymbol>
         </$Button>
       )

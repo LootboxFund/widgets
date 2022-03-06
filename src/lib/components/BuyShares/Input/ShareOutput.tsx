@@ -49,7 +49,7 @@ const ShareOutput = (props: ShareOutputProps) => {
             justifyContent="center"
           >
             <$TokenSymbol screen={screen} padding={'10px'}>
-              {props.lootbox?.name ? props.lootbox.name : 'loading...'}
+              {props.lootbox?.name ? props.lootbox.name : <$FineText screen={screen}>loading...</$FineText>}
             </$TokenSymbol>
           </$Button>
 
