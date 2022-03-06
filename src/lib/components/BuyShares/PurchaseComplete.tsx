@@ -66,7 +66,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
 
   const addToWallet = async () => {
     // try {
-    //   await addTicketToWallet(snap.)
+    //   await addTicketToWallet()
     // } catch (err) {
     //   console.error(err)
     // }

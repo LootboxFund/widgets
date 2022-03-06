@@ -1,6 +1,6 @@
-import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ILootbox } from 'lib/types'
+import { Address } from '@lootboxfund/helpers'
 import { proxy, subscribe } from 'valtio'
+import BN from 'bignumber.js'
 import {
   getPriceFeedRaw,
   getLootboxData,
@@ -8,11 +8,12 @@ import {
   getUserBalanceOfToken,
   getUserBalanceOfNativeToken,
 } from 'lib/hooks/useContract'
+import { ILootbox } from 'lib/types'
+import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
-import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
-import { Address } from '@lootboxfund/helpers'
+import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
@@ -183,9 +184,14 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
 }
 
 export const addTicketToWallet = async () => {
-  // if (buySharesState.lootbox.data) {
-  //   await addERC20ToWallet(buySharesState.lootbox.data)
-  // }
+  if (buySharesState.lootbox.data) {
+    await addERC721ToWallet({
+      address: buySharesState.lootbox.data.address as Address,
+      decimals: 1,
+      symbol: buySharesState.lootbox.data.symbol || 'Lootbox',
+      image: 'https://www.dictionary.com/e/wp-content/uploads/2018/06/pics-300x300.jpg',
+    })
+  }
 }
 
 export const loadInputTokenData = async () => {

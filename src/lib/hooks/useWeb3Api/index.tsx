@@ -146,7 +146,13 @@ export const addERC20ToWallet = async (token: TokenData) => {
   }
 }
 
-export const addERC721ToWallet = async (token: TokenData) => {
+interface Erc721Token {
+  address: Address
+  symbol: string
+  decimals: number
+  image: string
+}
+export const addERC721ToWallet = async (token: Erc721Token) => {
   const { provider } = await getProvider()
   try {
     await provider.send('wallet_watchAsset', [
@@ -156,7 +162,7 @@ export const addERC721ToWallet = async (token: TokenData) => {
           address: token.address,
           symbol: token.symbol,
           decimals: token.decimals,
-          image: token.logoURI,
+          image: token.image,
         },
       },
     ])
