@@ -95,7 +95,7 @@ const TokenInput = (props: TokenInputProps) => {
         <$Vertical flex={1}>
           <Button />
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {parseEth(balance)} balance
+            <$FineText screen={screen}>{parseEth(balance)} balance</$FineText>
           </$BalanceText>
         </$Vertical>
       </$Horizontal>
