@@ -10,6 +10,7 @@ import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
+import InfoText from './InfoText'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
@@ -49,7 +50,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const SuccessSection = () => (
     <$Vertical>
       <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
-      <$Button
+      {/* <$Button
         screen={screen}
         onClick={addToWallet}
         backgroundColor={`${COLORS.surpressedBackground}`}
@@ -59,20 +60,20 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         style={{ fontSize: '1.3em' }}
       >
         Add to Wallet
-      </$Button>
+      </$Button> */}
       {bscScanUrl && <ViewOnBSCScan />}
     </$Vertical>
   )
 
-  const addToWallet = async () => {
-    // try {
-    //   await addTicketToWallet()
-    // } catch (err) {
-    //   console.error(err)
-    // }
-  }
+  // const addToWallet = async () => {
+  //   // try {
+  //   //   await addTicketToWallet()
+  //   // } catch (err) {
+  //   //   console.error(err)
+  //   // }
+  // }
   return (
-    <$BuySharesContainer>
+    <$BuySharesContainer screen={screen}>
       <$BuySharesHeader>
         {snap.lastTransaction.success ? (
           <$BuySharesHeaderTitle>Success!</$BuySharesHeaderTitle>
@@ -98,6 +99,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
       >
         Back
       </$Button>
+      <InfoText />
     </$BuySharesContainer>
   )
 }

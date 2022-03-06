@@ -7,10 +7,8 @@ import styled from 'styled-components'
 const InteractWithLootbox = () => {
   const ref = useRef<HTMLDivElement | null>(null)
   return (
-    <$Vertical spacing={5}>
-      <$MinterContainer>
-        <TicketMinter ref={ref} />
-      </$MinterContainer>
+    <$Vertical spacing={2}>
+      <TicketMinter ref={ref} />
       <$TicketContainer>
         <UserTickets
           onScrollToMint={() => {
@@ -24,10 +22,6 @@ const InteractWithLootbox = () => {
 
 const $TicketContainer = styled.section<{}>`
   height: 400px;
-`
-
-const $MinterContainer = styled.section<{}>`
-  height: 512px;
 `
 
 export default InteractWithLootbox
