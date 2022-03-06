@@ -223,19 +223,20 @@ export const initDApp = async () => {
       userState.currentAccount = accounts[0]
     })
     ;(metamask as any).on('networkChanged', async (networkId: string) => {
-      const chainIdHex = convertDecimalToHex(networkId)
-      const chainSlug = chainIdHexToSlug(chainIdHex)
-      if (chainSlug) {
-        const blockchain = BLOCKCHAINS[chainSlug]
-        if (blockchain) {
-          updateStateToChain(blockchain)
-        } else {
-          clearStateToChain()
-        }
-      } else {
-        const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
-        updateStateToChain(BLOCKCHAINS.UNKNOWN)
-      }
+      // const chainIdHex = convertDecimalToHex(networkId)
+      // const chainSlug = chainIdHexToSlug(chainIdHex)
+      // if (chainSlug) {
+      //   const blockchain = BLOCKCHAINS[chainSlug]
+      //   if (blockchain) {
+      //     updateStateToChain(blockchain)
+      //   } else {
+      //     clearStateToChain()
+      //   }
+      // } else {
+      //   const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
+      //   updateStateToChain(BLOCKCHAINS.UNKNOWN)
+      // }
+      window.location.reload()
     })
   }
 }

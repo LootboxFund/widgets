@@ -18,7 +18,6 @@ const InfoText = () => {
     ? new BN(snap.lootbox.data?.sharesSoldMax).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
     : new BN(0)
 
-  if (quantityBN && sharesSoldMax && quantityBN?.gt(sharesSoldMax)) return <></>
   return (
     <$Text>
       * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as <$Bold>{quantityFMT} Shares</$Bold>{' '}
