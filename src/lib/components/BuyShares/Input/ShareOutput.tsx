@@ -54,7 +54,7 @@ const ShareOutput = (props: ShareOutputProps) => {
           </$Button>
 
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD</$FineText> : ''}
+            {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD/Share</$FineText> : ''}
           </$BalanceText>
         </$Vertical>
       </$Horizontal>
