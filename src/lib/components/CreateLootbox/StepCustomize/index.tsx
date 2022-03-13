@@ -33,7 +33,7 @@ export const getMaxTicketPrice = (
 
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
-export const validateBiography = (bio: string) => bio.length > 12
+export const validateBiography = (bio: string) => bio.length >= 12
 export const validatePricePerShare = (price: number, maxPricePerShare: number) => price > 0 && price <= maxPricePerShare
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
@@ -102,6 +102,21 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
     if (!validateCover(props.ticketState.coverUrl as string)) valid = false
+
+    if (valid) {
+      if (!validateLogoFile(props.ticketState.logoFile as File)) {
+        valid = false
+        setErrors({ ...errors, logoFile: 'Please upload a logo image' })
+      }
+      if (!validateCoverFile(props.ticketState.coverFile as File)) {
+        valid = false
+        setErrors({
+          ...errors,
+          coverFile: 'Please upload a cover photo',
+        })
+      }
+    }
+
     if (valid) {
       setErrors({
         ...errors,
@@ -110,6 +125,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         biography: '',
         pricePerShare: '',
         lootboxThemeColor: '',
+        logoFile: '',
+        coverFile: '',
       })
       props.setValidity(true)
     } else {
@@ -120,6 +137,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   useEffect(() => {
     checkAllTicketCustomizationValidations()
   }, [props.ticketState])
+
   const parseInput = (slug: string, text: string | number) => {
     const value = slug === 'symbol' ? (text as string).toUpperCase().replace(' ', '') : text
     props.updateTicketState(slug, value)
@@ -169,33 +187,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     }
   }
 
-  const onImageInputChange = (
-    inputElementId: 'logo-uploader' | 'cover-uploader',
-    stateKey: 'logoFile' | 'coverFile'
-  ) => {
+  const onImageInputChange = (inputElementId: 'logo-uploader' | 'cover-uploader', slug: 'logoFile' | 'coverFile') => {
     // @ts-ignore
     const selectedFiles = document.getElementById(inputElementId)?.files
     if (selectedFiles?.length) {
       const file = selectedFiles[0]
 
-      if (stateKey === 'logoFile') {
-        setErrors({
-          ...errors,
-          logoFile: validateLogoFile(file) ? '' : 'Please upload a logo image',
-        })
-      } else if (stateKey === 'coverFile') {
-        setErrors({
-          ...errors,
-          coverFile: validateCoverFile(file) ? '' : 'Please upload a cover photo',
-        })
-      }
-
-      props.updateTicketState(stateKey, file)
+      props.updateTicketState(slug, file)
 
       // Display the image in the UI
       // This updates the TicketCardCandyWrapper's logo and background
       let elementId: string
-      if (stateKey === 'logoFile') {
+      if (slug === 'logoFile') {
         elementId = 'ticket-candy-logo'
       } else {
         elementId = 'ticket-candy-container'
