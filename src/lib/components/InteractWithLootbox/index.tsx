@@ -8,6 +8,7 @@ import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/sta
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { initBuySharesState } from 'lib/components/BuyShares/state'
 import { ContractAddress } from '@lootboxfund/helpers'
+import { initLogging } from 'lib/api/logrocket'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
@@ -32,6 +33,7 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
 const InteractWithLootboxWidget = () => {
   useEffect(() => {
     const load = async () => {
+      initLogging()
       const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {
         await initDApp()

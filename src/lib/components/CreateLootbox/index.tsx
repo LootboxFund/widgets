@@ -1,4 +1,5 @@
 import react, { useEffect, useRef, useState } from 'react'
+import LogRocket from 'logrocket';
 import styled from 'styled-components'
 import {
   initDApp,
@@ -56,12 +57,13 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
-import LootboxABI from 'lib/abi/lootbox.json'
 import { v4 as uuidv4 } from 'uuid'
+import { initLogging } from 'lib/api/logrocket';
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
+    initLogging()
     if (window.ethereum) {
       initDApp().catch((err) => console.log(err))
     } else {
@@ -558,6 +560,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   return (
     <$CreateLootbox>
+      <button onClick={() => console.error("Error Occcured")}>Console Error</button>
+      <button onClick={() => {throw Error("We throwing ERR signs")}}>Throw Error</button>
+      <button onClick={() => LogRocket.captureException(new Error("We got a LogRocket captureException"))}>LogRocket.captureException</button>
+      <button onClick={() => LogRocket.captureMessage("We got a Message Captured")}>LogRocket.captureMessage</button>
       <StepChooseNetwork
         selectedNetwork={network}
         stage={stage.stepNetwork}
