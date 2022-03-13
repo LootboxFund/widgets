@@ -9,6 +9,8 @@ import replace from '@rollup/plugin-replace'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 import svg from 'rollup-plugin-svg'
 
+console.log(process.env.NODE_ENV)
+
 /**
  * <CreateLootbox />
  *
@@ -59,7 +61,7 @@ const CreateLootbox = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  CreateLootbox.plugins.push(terser()) // enable minification
+  CreateLootbox.plugins.unshift(terser()) // enable minification
 }
 
 /**
@@ -112,7 +114,7 @@ const WalletStatus = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  CreateLootbox.plugins.push(terser()) // enable minification
+  CreateLootbox.plugins.unshift(terser()) // enable minification
 }
 
 /**
@@ -166,7 +168,7 @@ const InteractWithLootbox = {
   external: ['react'],
 }
 if (process.env.NODE_ENV === 'production') {
-  InteractWithLootbox.plugins.push(terser()) // enable minification
+  InteractWithLootbox.plugins.unshift(terser()) // enable minification
 }
 
 export default [CreateLootbox, WalletStatus, InteractWithLootbox]
