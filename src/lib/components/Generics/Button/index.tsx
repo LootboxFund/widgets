@@ -20,6 +20,7 @@ export const $Button = styled.button<{
   max-height: ${(props) => (props.screen === 'desktop' ? '50px' : '0.35px')};
   height: ${(props) => (props.screen === 'desktop' ? '40px' : '30px')};
   font-size: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
+  line-height: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
   font-weight: 700;
   font-family: sans-serif;
   border: 0px solid transparent;
