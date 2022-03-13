@@ -30,6 +30,7 @@
     "@types/rebass": "^4.0.10",
     "@types/rebass__forms": "^4.0.6",
     "@types/styled-components": "^5.1.20",
+    "@types/uuid": "^8.3.4",
     "@types/wcag-contrast": "^3.0.0",
     "@types/web3": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
@@ -58,8 +59,8 @@
     "build-storybook": "build-storybook",
     "pipedream:sample:onLootboxUri": "node scripts/sample-lootboxUri.js",
     "deploy:prod": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-widgets.js",
-    "deploy:terran": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-create-lootbox.js",
-    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js"
+    "deploy:terran": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-create-lootbox.js",
+    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js"
   },
   "dependencies": {
     "@chainlink/abi": "^0.1.4",
@@ -79,6 +80,7 @@
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "ethers": "5.5.4",
+    "firebase": "^9.6.7",
     "jotai": "^1.5.3",
     "micromodal": "^0.4.10",
     "multicodec": "^3.2.1",
@@ -93,7 +95,9 @@
     "react-window": "^1.8.6",
     "rebass": "^4.0.7",
     "redux": "^4.1.2",
+    "simple-color-picker": "^1.0.5",
     "styled-components": "^5.3.3",
+    "uuid": "^8.3.2",
     "valtio": "^1.2.9",
     "wcag-contrast": "^3.0.0",
     "web3": "^1.7.0",

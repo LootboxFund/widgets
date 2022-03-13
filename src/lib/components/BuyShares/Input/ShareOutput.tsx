@@ -1,10 +1,10 @@
 import react, { useState } from 'react'
+import { useSnapshot } from 'valtio'
+import BN from 'bignumber.js'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import $Button from 'lib/components/Generics/Button'
 import { $Input } from 'lib/components/Generics/Input'
 import { buySharesState } from '../state'
-import { useSnapshot } from 'valtio'
-import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $TokenInput, $FineText, $BalanceText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
@@ -23,11 +23,10 @@ const ShareOutput = (props: ShareOutputProps) => {
   const quantity: string = snap.lootbox.quantity || '0'
   const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
-  const totalShares = sharesSoldMax && quantityBN && new BN(sharesSoldMax).plus(quantityBN)
   const percentageShares =
-    quantityBN && sharesSoldMax && shareDecimals && totalShares && totalShares.gt(0)
-      ? quantityBN.dividedBy(totalShares).multipliedBy(100).toFixed(2)
-      : new BN(0)
+    quantityBN && shareDecimals && sharesSoldMax
+      ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
+      : new BN(0).toString()
 
   const price = snap.lootbox.data?.sharePriceUSD
     ? new BN(snap.lootbox.data?.sharePriceUSD).div(new BN(10).pow(USD_DECIMALS))
@@ -50,12 +49,12 @@ const ShareOutput = (props: ShareOutputProps) => {
             justifyContent="center"
           >
             <$TokenSymbol screen={screen} padding={'10px'}>
-              {props.lootbox?.name ? props.lootbox.name : 'loading...'}
+              {props.lootbox?.name ? props.lootbox.name : <$FineText screen={screen}>loading...</$FineText>}
             </$TokenSymbol>
           </$Button>
 
           <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD</$FineText> : ''}
+            {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD/Share</$FineText> : ''}
           </$BalanceText>
         </$Vertical>
       </$Horizontal>

@@ -1,5 +1,6 @@
 import react, { useEffect, useState, forwardRef } from 'react'
 import styled from 'styled-components'
+import ColorPicker from 'simple-color-picker'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
@@ -37,19 +38,37 @@ export const validatePricePerShare = (price: number, maxPricePerShare: number) =
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
+export const validateLogoFile = (file: File) => !!file
+export const validateCoverFile = (file: File) => !!file
 export interface StepCustomizeProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
   onNext: () => void
   fundraisingTarget: BigNumber
-  ticketState: Record<string, string | number>
-  updateTicketState: (slug: string, value: string | number) => void
+  ticketState: Record<string, string | number> & { logoFile?: File; coverFile?: File }
+  updateTicketState: (slug: string, value: string | number | File) => void
   setValidity: (bool: boolean) => void
 }
 const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
+  const [themeColor, setThemeColor] = useState('')
+
+  useEffect(() => {
+    const colorPickerElement = document.getElementById('color-picker')
+    const picker = new ColorPicker({ el: colorPickerElement || undefined, color: props.ticketState.lootboxThemeColor })
+    picker.onChange((color: string) => {
+      setThemeColor(color)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (themeColor !== props.ticketState.lootboxThemeColor) {
+      props.updateTicketState('lootboxThemeColor', themeColor)
+    }
+  }, [themeColor, props])
+
   useEffect(() => {
     getLatestPrice()
   }, [props.selectedNetwork])
@@ -70,6 +89,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     lootboxThemeColor: '',
     logoUrl: '',
     coverUrl: '',
+    logoFile: '',
+    coverFile: '',
   }
   const [errors, setErrors] = useState(initialErrors)
   const checkAllTicketCustomizationValidations = () => {
@@ -148,6 +169,52 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     }
   }
 
+  const onImageInputChange = (
+    inputElementId: 'logo-uploader' | 'cover-uploader',
+    stateKey: 'logoFile' | 'coverFile'
+  ) => {
+    // @ts-ignore
+    const selectedFiles = document.getElementById(inputElementId)?.files
+    if (selectedFiles?.length) {
+      const file = selectedFiles[0]
+
+      if (stateKey === 'logoFile') {
+        setErrors({
+          ...errors,
+          logoFile: validateLogoFile(file) ? '' : 'Please upload a logo image',
+        })
+      } else if (stateKey === 'coverFile') {
+        setErrors({
+          ...errors,
+          coverFile: validateCoverFile(file) ? '' : 'Please upload a cover photo',
+        })
+      }
+
+      props.updateTicketState(stateKey, file)
+
+      // Display the image in the UI
+      // This updates the TicketCardCandyWrapper's logo and background
+      let elementId: string
+      if (stateKey === 'logoFile') {
+        elementId = 'ticket-candy-logo'
+      } else {
+        elementId = 'ticket-candy-container'
+      }
+      const el = document.getElementById(elementId)
+
+      if (!el) {
+        console.error('Could not find element "ticket-candy-logo"')
+        return
+      }
+
+      var url = URL.createObjectURL(file)
+
+      el.style.backgroundImage = 'url(' + url + ')'
+
+      return
+    }
+  }
+
   return (
     <$StepCustomize style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
@@ -164,7 +231,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-start',
-                  alignItems: 'center',
                   paddingBottom: '20px',
                   flex: 1,
                   width: '100%',
@@ -173,11 +239,10 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  alignItems: 'center',
                 }
           }
         >
-          <$Vertical flex={1}>
+          <$Vertical flex={screen === 'mobile' ? 1 : 0.55}>
             <$StepHeading>
               <span>4. Customize NFT Ticket</span>
               <HelpIcon tipID="stepCustomize" />
@@ -233,58 +298,33 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               maxLength={500}
             />
             <br />
-            <$Horizontal verticalCenter>
-              <$Vertical>
-                <$StepSubheading>
-                  <span>Share Price</span>
-                  <HelpIcon tipID="pricePerShare" />
-                  <ReactTooltip id="pricePerShare" place="right" effect="solid">
-                    We recommend leaving this at the default value. When investors buy NFT tickets from your Lootbox,
-                    they specify many shares they want. The more shares owned in a ticket, the higher the % of Lootbox
-                    earnings they receive. It is possible to buy fractional shares. The only reason you may want to
-                    customize your share price is for psychological pricing.
-                  </ReactTooltip>
-                </$StepSubheading>
-                <$Horizontal verticalCenter flex={1}>
-                  <$CurrencySign>$</$CurrencySign>
-                  <$InputMedium
-                    type="number"
-                    min="0"
-                    onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)}
-                    value={props.ticketState.pricePerShare}
-                    onWheel={(e) => e.currentTarget.blur()}
-                    style={{ width: '100px' }}
-                  />
-                </$Horizontal>
-              </$Vertical>
-              <$Vertical>
-                <$StepSubheading>
-                  <span>Theme Color</span>
-                  <HelpIcon tipID="themeColor" />
-                  <ReactTooltip id="themeColor" place="right" effect="solid">
-                    Your Lootbox theme color is only used for visual effects. Use the default color if you don't want to
-                    customize it.
-                  </ReactTooltip>
-                </$StepSubheading>
-                <$Horizontal verticalCenter flex={1}>
-                  <$InputColor
-                    value={props.ticketState.lootboxThemeColor}
-                    onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
-                    style={{ width: '100px' }}
-                  />
-                  <$ColorPreview
-                    color={props.ticketState.lootboxThemeColor as string}
-                    onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
-                  />
-                </$Horizontal>
-              </$Vertical>
+            <$StepSubheading>
+              <span>Share Price</span>
+              <HelpIcon tipID="pricePerShare" />
+              <ReactTooltip id="pricePerShare" place="right" effect="solid">
+                We recommend leaving this at the default value. When investors buy NFT tickets from your Lootbox, they
+                specify many shares they want. The more shares owned in a ticket, the higher the % of Lootbox earnings
+                they receive. It is possible to buy fractional shares. The only reason you may want to customize your
+                share price is for psychological pricing.
+              </ReactTooltip>
+            </$StepSubheading>
+            <$Horizontal verticalCenter flex={1}>
+              <$CurrencySign>$</$CurrencySign>
+              <$InputMedium
+                type="number"
+                min="0"
+                onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)}
+                value={props.ticketState.pricePerShare}
+                onWheel={(e) => e.currentTarget.blur()}
+                style={{ width: '100%' }}
+              />
             </$Horizontal>
 
             <br />
           </$Vertical>
           <$Vertical
-            flex={1}
-            style={screen === 'mobile' ? { width: '100%', flexDirection: 'column-reverse' } : { height: '100%' }}
+            flex={screen === 'mobile' ? 1 : 0.45}
+            style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}
           >
             <TicketCardCandyWrapper
               backgroundImage={props.ticketState.coverUrl as string}
@@ -293,39 +333,64 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               name={props.ticketState.name as string}
             />
             <br />
-            <$Horizontal verticalCenter></$Horizontal>
-            <$Vertical>
-              <$StepSubheading>
-                Logo Image
-                <HelpIcon tipID="logoImage" />
-                <ReactTooltip id="logoImage" place="right" effect="solid">
-                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
-                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
-                  url). Please do not use massive images as it will slow down your Lootbox page load.
-                </ReactTooltip>
-              </$StepSubheading>
-              <$InputMedium
+            <$Horizontal>
+              <$Vertical>
+                <$InputMedium
+                  value={props.ticketState.lootboxThemeColor}
+                  onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
+                  style={{
+                    width: '100px',
+                    border: props.ticketState.lootboxThemeColor
+                      ? `${props.ticketState.lootboxThemeColor} solid 2px `
+                      : '',
+                  }}
+                />
+                {/* <$ColorPreview
+                
+                    color={props.ticketState.lootboxThemeColor as string}
+                    onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
+                  /> */}
+                <br />
+                <$Vertical>
+                  <$InputImageLabel htmlFor="logo-uploader">
+                    {props.ticketState.logoFile ? '✅' : 'Upload'} Logo
+                  </$InputImageLabel>
+                  <$InputImage
+                    type="file"
+                    id="logo-uploader"
+                    accept="image/*"
+                    onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
+                  />
+                  {/* <$InputMedium
                 onChange={(e) => parseInput('logoUrl', e.target.value)}
                 value={props.ticketState.logoUrl}
                 style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              />
-            </$Vertical>
-            <$Vertical>
-              <$StepSubheading>
-                <span>Cover Image</span>
-                <HelpIcon tipID="coverImage" />
-                <ReactTooltip id="coverImage" place="right" effect="solid">
-                  Upload your logo image to Imgur or Pinata and paste the URL here. We recommend Pinata.cloud if you
-                  want to use Web3 IPFS, or Imgur for simplicity (be careful to copy image address url, not the page
-                  url). Please do not use massive images as it will slow down your Lootbox page load.
-                </ReactTooltip>
-              </$StepSubheading>
-              <$InputMedium
+              /> */}
+                </$Vertical>
+                <br />
+                <$Vertical>
+                  <$InputImageLabel htmlFor="cover-uploader">
+                    {props.ticketState.coverFile ? '✅' : 'Upload'} Cover
+                  </$InputImageLabel>
+                  <$InputImage
+                    type="file"
+                    id="cover-uploader"
+                    accept="image/*"
+                    onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
+                  />
+                  {/* <$InputMedium
                 onChange={(e) => parseInput('coverUrl', e.target.value)}
                 value={props.ticketState.coverUrl}
                 style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              />
-            </$Vertical>
+              /> */}
+                </$Vertical>
+              </$Vertical>
+              <$Vertical>
+                <$Vertical flex={1}>
+                  <div id="color-picker" />
+                </$Vertical>
+              </$Vertical>
+            </$Horizontal>
           </$Vertical>
         </div>
       </StepCard>
@@ -376,15 +441,24 @@ export const $InputColor = styled.input`
   text-align: center;
 `
 
-export const $UploadFileButton = styled.button`
+export const $InputImage = styled.input`
+  display: none;
+`
+
+export const $InputImageLabel = styled.label`
   background-color: ${`${COLORS.surpressedBackground}1A`};
+  color: ${COLORS.surpressedFontColor};
   border: none;
   border-radius: 10px;
-  padding: 5px;
-  font-size: 1rem;
+  padding: 5px 10px;
+  font-size: 1.1rem;
+  margin-right: 20px;
   height: 40px;
-  flex: 1;
-  margin: 5px;
+  line-height: 40px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
 `
 
 export const $ColorPreview = styled.div<{ color: string }>`

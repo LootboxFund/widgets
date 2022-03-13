@@ -18,13 +18,14 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
     <$TicketCardContainer
       backgroundImage={ticket?.data?.metadata?.backgroundImage}
       onClick={() => {
-        onScrollToMint && onScrollToMint()
+        !ticket && onScrollToMint && onScrollToMint()
       }}
     >
       <$TicketLogo
         backgroundImage={ticket?.data?.metadata?.image}
         backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
-        size={!ticket? '100px': undefined}
+        size={!ticket ? '100px' : undefined}
+        margin={ticket ? 'auto auto 0' : 'auto'}
       >
         {!ticket ? <$Icon>+</$Icon> : null}
       </$TicketLogo>
@@ -48,12 +49,20 @@ interface TicketCardCandyWrapperProps {
 export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
   return (
     <$TicketCardContainer
+      // id used to set background image in "components/CreateLootbox/StepCustomize/index.ts"
+      id="ticket-candy-container"
       backgroundImage={props.backgroundImage}
       onClick={() => {
         console.log('click')
       }}
     >
-      <$TicketLogo backgroundImage={props.logoImage} backgroundShadowColor={props.themeColor}></$TicketLogo>
+      <$TicketLogo
+        // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
+        id="ticket-candy-logo"
+        backgroundImage={props.logoImage}
+        backgroundShadowColor={props.themeColor}
+        margin="auto auto 0"
+      ></$TicketLogo>
 
       <$TicketTag>
         <$TagText>{props.name || 'Lootbox Ticket'}</$TagText>
@@ -92,19 +101,23 @@ export const $TicketLogo = styled.div<{
   backgroundImage?: string
   backgroundShadowColor?: string
   size?: string
+  margin?: string
 }>`
-  ${(props) => props.size? `width: ${props.size};\nheight: ${props.size};`: `width: 75%;\npadding-top: 75%;`}
+  ${(props) => (props.size ? `width: ${props.size};\nheight: ${props.size};` : `width: 75%;\npadding-top: 75%;`)}
   border: 0px solid transparent;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   ${(props) => props.backgroundImage && `background: url("${props.backgroundImage}");`}
-  box-shadow: ${(props) => props.backgroundShadowColor? `0px 0px 40px 10px ${props.backgroundShadowColor}`: `0px 10px 10px rgba(0, 0, 0, 0.2)`};
+  box-shadow: ${(props) =>
+    props.backgroundShadowColor
+      ? `0px 0px 40px 10px ${props.backgroundShadowColor}`
+      : `0px 10px 10px rgba(0, 0, 0, 0.2)`};
   background-size: cover;
   background-position: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: auto;
+  ${(props) => (props.margin && `margin: ${props.margin};`) || 'auto'}
 `
 
 export const $TicketTag = styled.section`

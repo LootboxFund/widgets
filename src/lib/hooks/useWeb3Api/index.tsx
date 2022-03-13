@@ -146,7 +146,13 @@ export const addERC20ToWallet = async (token: TokenData) => {
   }
 }
 
-export const addERC721ToWallet = async (token: TokenData) => {
+interface Erc721Token {
+  address: Address
+  symbol: string
+  decimals: number
+  image: string
+}
+export const addERC721ToWallet = async (token: Erc721Token) => {
   const { provider } = await getProvider()
   try {
     await provider.send('wallet_watchAsset', [
@@ -156,7 +162,7 @@ export const addERC721ToWallet = async (token: TokenData) => {
           address: token.address,
           symbol: token.symbol,
           decimals: token.decimals,
-          image: token.logoURI,
+          image: token.image,
         },
       },
     ])
@@ -217,19 +223,20 @@ export const initDApp = async () => {
       userState.currentAccount = accounts[0]
     })
     ;(metamask as any).on('networkChanged', async (networkId: string) => {
-      const chainIdHex = convertDecimalToHex(networkId)
-      const chainSlug = chainIdHexToSlug(chainIdHex)
-      if (chainSlug) {
-        const blockchain = BLOCKCHAINS[chainSlug]
-        if (blockchain) {
-          updateStateToChain(blockchain)
-        } else {
-          clearStateToChain()
-        }
-      } else {
-        const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
-        updateStateToChain(BLOCKCHAINS.UNKNOWN)
-      }
+      // const chainIdHex = convertDecimalToHex(networkId)
+      // const chainSlug = chainIdHexToSlug(chainIdHex)
+      // if (chainSlug) {
+      //   const blockchain = BLOCKCHAINS[chainSlug]
+      //   if (blockchain) {
+      //     updateStateToChain(blockchain)
+      //   } else {
+      //     clearStateToChain()
+      //   }
+      // } else {
+      //   const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
+      //   updateStateToChain(BLOCKCHAINS.UNKNOWN)
+      // }
+      window.location.reload()
     })
   }
 }
