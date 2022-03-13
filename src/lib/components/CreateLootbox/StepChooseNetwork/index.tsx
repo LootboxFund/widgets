@@ -1,14 +1,18 @@
-import react, { forwardRef } from 'react'
+import react, { forwardRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import NetworkText from 'lib/components/NetworkText'
+import { $Button } from 'lib/components/Generics/Button'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { NetworkOption, NETWORK_OPTIONS } from '../state'
 import WalletStatus from 'lib/components/WalletStatus'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import { useSnapshot } from 'valtio'
+import { getUserBalanceOfNativeToken } from 'lib/hooks/useContract'
+import { userState } from 'lib/state/userState'
+import { Address } from '@lootboxfund/helpers'
 
 export interface StepChooseNetworkProps {
   stage: StepStage
@@ -17,8 +21,37 @@ export interface StepChooseNetworkProps {
   onNext: () => void
   setValidity: (bool: boolean) => void
 }
+
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
+  const snapUserState = useSnapshot(userState)
+  const [errors, setErrors] = useState<string[] | undefined>(undefined)
+  const [hasNonZeroTokens, setHasNonZeroToken] = useState<boolean>(false)
+
+  useEffect(() => {
+    if (props.selectedNetwork && snapUserState.currentAccount) {
+      setErrors(['loading...'])
+      getUserBalanceOfNativeToken(snapUserState.currentAccount as Address)
+        .then((balance) => {
+          if (balance === '0') {
+            setHasNonZeroToken(true)
+            setErrors([
+              `You do not have any ${props?.selectedNetwork?.isTestnet ? 'testnet ' : ''}tokens! ${
+                props?.selectedNetwork?.faucetUrl ? 'Click the red button "Get Tokens" above ☝️' : ''
+              }`,
+            ])
+          } else {
+            setHasNonZeroToken(false)
+            setErrors(undefined)
+          }
+        })
+        .catch((err) => {
+          setHasNonZeroToken(false)
+          setErrors(undefined)
+        })
+    }
+  }, [props.selectedNetwork, snapUserState.currentAccount])
+
   const renderNetworkOptions = () => {
     const selectNetwork = (isAvailable: boolean, network: NetworkOption) => {
       if (isAvailable) {
@@ -67,6 +100,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
         themeColor={props.selectedNetwork?.themeColor}
         stage={props.selectedNetwork ? props.stage : 'in_progress'}
         onNext={props.onNext}
+        errors={errors}
       >
         <$Wrapper screen={screen}>
           <$Vertical flex={2}>
@@ -108,11 +142,34 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
             >
               <WalletStatus />
               <img
-                style={{ width: '100%', maxWidth: '250px', marginTop: '50px' }}
+                style={{ width: '100%', maxWidth: '250px', marginTop: '50px', marginBottom: '30px' }}
                 src={
                   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media'
                 }
               />
+              {hasNonZeroTokens && props?.selectedNetwork?.faucetUrl && (
+                <$Button
+                  screen="mobile"
+                  backgroundColorHover={`${COLORS.dangerBackground}75`}
+                  backgroundColor={`${COLORS.dangerBackground}`}
+                  color={`${COLORS.dangerFontColor}aa`}
+                  style={{
+                    minHeight: '50px',
+                    fontWeight: 600,
+                    fontSize: '1.2rem',
+                    alignSelf: 'center',
+                    padding: '0px 20px',
+                    width: '100%',
+                  }}
+                  onClick={() => {
+                    if (props?.selectedNetwork?.faucetUrl) {
+                      window.open(props.selectedNetwork.faucetUrl, '_blank')
+                    }
+                  }}
+                >
+                  Get Tokens
+                </$Button>
+              )}
             </div>
           </$Vertical>
         </$Wrapper>
