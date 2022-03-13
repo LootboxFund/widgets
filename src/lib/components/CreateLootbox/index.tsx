@@ -56,14 +56,16 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
-import LootboxABI from 'lib/abi/lootbox.json'
 import { v4 as uuidv4 } from 'uuid'
+import { initLogging } from 'lib/api/logrocket';
+import LogRocket from 'logrocket'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
+    initLogging()
     if (window.ethereum) {
-      initDApp().catch((err) => console.log(err))
+      initDApp().catch((err) => LogRocket.captureException(err))
     } else {
       window.addEventListener('ethereum#initialized', initDApp, {
         once: true,
@@ -72,7 +74,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         if (!window.ethereum) {
           alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
         } else {
-          initDApp().catch((err) => console.log(err))
+          initDApp().catch((err) => LogRocket.captureException(err))
         }
       }, 3000) // 3 seconds
     }
@@ -433,6 +435,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       })
     } catch (e) {
       console.log(e)
+      LogRocket.captureException(e)
       setSubmitStatus('failure')
     }
   }
