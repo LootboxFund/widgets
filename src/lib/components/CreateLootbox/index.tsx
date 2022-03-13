@@ -1,5 +1,4 @@
 import react, { useEffect, useRef, useState } from 'react'
-import LogRocket from 'logrocket';
 import styled from 'styled-components'
 import {
   initDApp,
@@ -560,10 +559,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   return (
     <$CreateLootbox>
-      <button onClick={() => console.error("Error Occcured")}>Console Error</button>
-      <button onClick={() => {throw Error("We throwing ERR signs")}}>Throw Error</button>
-      <button onClick={() => LogRocket.captureException(new Error("We got a LogRocket captureException"))}>LogRocket.captureException</button>
-      <button onClick={() => LogRocket.captureMessage("We got a Message Captured")}>LogRocket.captureMessage</button>
       <StepChooseNetwork
         selectedNetwork={network}
         stage={stage.stepNetwork}
