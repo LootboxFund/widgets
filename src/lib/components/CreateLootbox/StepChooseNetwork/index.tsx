@@ -30,7 +30,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
 
   useEffect(() => {
     if (props.selectedNetwork && snapUserState.currentAccount) {
-      setErrors(['loading...'])
+      setErrors([' '])
       getUserBalanceOfNativeToken(snapUserState.currentAccount as Address)
         .then((balance) => {
           if (balance === '0') {
