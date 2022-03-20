@@ -2803,37 +2803,6 @@
     "@babel/runtime" "^7.11.2"
     "@lingui/core" "^3.13.2"
 
-"@lootboxfund/helpers@0.0.20":
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.20.tgz#ae3d2c869c0e7b0e50e48eac69e5e76f42f490fc"
-  integrity sha512-5ExsiJi9+27wQ4jzYz/9cZlEQ/CYSjfGwd/8kSgVS06Z+zli7VsyNms69VPrIfvRvUnkrokkOG+ssIL2+KhyMg==
-  dependencies:
-    axios "0.25.0"
-    lodash "4.17.21"
-
-"@lootboxfund/helpers@0.0.25":
-  version "0.0.25"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/helpers/-/helpers-0.0.25.tgz#3c6743da616f2d8ff5aaccf8584339b3cbcf78f0"
-  integrity sha512-o/GonTET0Uzk8+/g1AGxseK15uVIieFlSvc/scC38MM0Wu89p/0PSCluY24xyMHWDcZyeuYvpx0CEUMgISe+6g==
-  dependencies:
-    "@lootboxfund/manifest" "0.2.38"
-    axios "0.25.0"
-    lodash "4.17.21"
-
-"@lootboxfund/manifest@0.2.38":
-  version "0.2.38"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.38.tgz#4753adbe4f46f00cf8e63e73cccf75a379e14b94"
-  integrity sha512-Ps2Ah0UKrq3H3aMLFNuFt4gLCvFXKuffngT7AeN/uJE1GqxM6CvOFAVA9v3nMWlIkVQpS/dP7mLcvoPs4J9ctw==
-  dependencies:
-    "@lootboxfund/helpers" "0.0.20"
-
-"@lootboxfund/manifest@0.2.44":
-  version "0.2.44"
-  resolved "https://registry.yarnpkg.com/@lootboxfund/manifest/-/manifest-0.2.44.tgz#06e6d1bfff980a52431fe2eb27d57aaf34b65be8"
-  integrity sha512-LJy/ZnyYVOMuQ2b5IJsZo7JOcvOyscxAmuQibQARwksuJEboB7bzU2vYoiaaHZyRITeCT4E6vRIv1LuKM3GUxg==
-  dependencies:
-    "@lootboxfund/helpers" "0.0.25"
-
 "@mdx-js/loader@^1.6.22":
   version "1.6.22"
   resolved "https://registry.yarnpkg.com/@mdx-js/loader/-/loader-1.6.22.tgz#d9e8fe7f8185ff13c9c8639c048b123e30d322c4"
