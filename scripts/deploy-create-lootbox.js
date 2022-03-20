@@ -4,14 +4,14 @@ const app = new express()
 const storage = new Storage()
 const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
- 
+
 /**
  * CONSTANTS
  *
  */
 const bucketName = manifest.googleCloud.bucket.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
+const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
 
 console.log(`
 
@@ -43,10 +43,10 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
-const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
+// const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
 // const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
 // const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
-const fileNames = [CreateLootbox, WalletStatus]
+const fileNames = [CreateLootbox]
 
 fileNames.map((filename) => {
   uploadFile({
