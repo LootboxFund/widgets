@@ -1,7 +1,6 @@
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
-import CrowdSaleABI from 'lib/abi/_deprecated/crowdSale.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
 import { TokenData, Address } from '@wormgraph/helpers'
@@ -38,36 +37,6 @@ export const getPriceFeedRaw = async (contractAddress: Address): Promise<string>
   const contractInstance = new ethers.Contract(contractAddress, AggregatorV3Interface.abi, provider)
   const data = await contractInstance.latestRoundData()
   return data.answer.toString()
-}
-
-export const purchaseFromCrowdSale = async (
-  crowdSaleAddress: Address,
-  stableCoinData: TokenData,
-  stableCoinAmount: string
-) => {
-  const ethers = window.ethers ? window.ethers : ethersObj
-  const { provider } = await getProvider()
-  const signer = await provider.getSigner()
-  const crowdSale = new ethers.Contract(crowdSaleAddress, CrowdSaleABI, signer)
-  const stableCoinSymbol = stableCoinData.symbol.toLowerCase()
-  let tx = undefined
-  if ([BNB, TBNB].includes(stableCoinSymbol)) {
-    tx = crowdSale.connect(signer).buyInBNB().send({ value: stableCoinAmount })
-  } else {
-    if (stableCoinSymbol === ETH) {
-      tx = crowdSale.connect(signer).buyInETH(stableCoinAmount).send()
-    } else if (stableCoinSymbol === USDC) {
-      tx = crowdSale.connect(signer).buyInUSDC(stableCoinAmount).send()
-    } else if (stableCoinSymbol === USDT) {
-      tx = crowdSale.connect(signer).buyInUSDT(stableCoinAmount).send()
-    } else {
-      // throw new Error(`${stableCoinSymbol} not supported!`)
-      console.error(`${stableCoinSymbol} not supported!`)
-      return
-    }
-  }
-  await tx
-  return tx
 }
 
 export const getERC20Allowance = async (spender: Address | undefined, tokenAddress: Address): Promise<string> => {
