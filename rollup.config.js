@@ -118,10 +118,7 @@ if (process.env.NODE_ENV === 'production') {
   InteractWithLootbox.plugins.unshift(terser()) // enable minification
 }
 
-export default [
-  CreateLootbox,
-  // InteractWithLootbox
-]
+export default [CreateLootbox, InteractWithLootbox]
 
 // --------------------------------------------------
 
