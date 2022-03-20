@@ -142,7 +142,6 @@ export const $TagText = styled.p<{ fontSize?: string }>`
   position: relative;
   color: #ffffff;
   width: 100%;
-  max-width: 50%;
   padding: 5px;
 `
 export const $TicketIDText = styled.p`
@@ -155,7 +154,6 @@ export const $TicketIDText = styled.p`
   position: relative;
   color: #ffffff;
   width: 100%;
-  max-width: 50%;
   margin: auto;
 `
 
