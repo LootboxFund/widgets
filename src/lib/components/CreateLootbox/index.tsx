@@ -57,7 +57,7 @@ import { manifest } from '../../../manifest'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import { v4 as uuidv4 } from 'uuid'
-import { initLogging } from 'lib/api/logrocket';
+import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 
 export interface CreateLootboxProps {}
@@ -170,7 +170,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     symbol: '',
     biography: '',
     pricePerShare: 0.05,
-    lootboxThemeColor: '#B48AF7',
+    lootboxThemeColor: '#000000',
     /** @deprecated logoUrls are now from internal gbucket - use logoFile instead */
     logoUrl:
       'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media',
@@ -441,7 +441,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-3-demo/lootbox?lootbox=${lootboxAddress}`
+    return `https://www.lootbox.fund/demo/0-2-5-demo/lootbox?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {
