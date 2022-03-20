@@ -128,28 +128,29 @@ export const $TicketTag = styled.section`
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
   margin: auto auto 20px;
+  padding-right: 10px;
+  padding-left: 10px;
 `
 
-export const $TagText = styled.p`
+export const $TagText = styled.p<{ fontSize?: string }>`
   font-family: sans-serif;
   font-style: normal;
   font-weight: 800;
-  font-size: 22px;
+  font-size: ${(props) => (props.fontSize ? props.fontSize : '1.2rem')};
   line-height: 30px;
-  text-align: right;
+  text-align: center;
   position: relative;
   color: #ffffff;
   width: 100%;
   max-width: 50%;
   padding: 5px;
-  word-break: break-word;
 `
 export const $TicketIDText = styled.p`
   font-family: sans-serif;
   font-style: normal;
   font-weight: 800;
-  font-size: 42px;
-  line-height: 42px;
+  font-size: 1.8rem;
+  line-height: 30px;
   text-align: center;
   position: relative;
   color: #ffffff;
