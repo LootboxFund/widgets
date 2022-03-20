@@ -10,7 +10,7 @@ import {
   ChainSlugs,
   convertDecimalToHex,
   TokenData,
-} from '@lootboxfund/helpers'
+} from '@wormgraph/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'

@@ -3,7 +3,7 @@ import UserTickets from './UserTickets'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { loadState } from './state'
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@wormgraph/helpers';
 
 const UserTicketsWidget = () => {
   useEffect(() => {

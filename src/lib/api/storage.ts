@@ -1,5 +1,5 @@
-import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@lootboxfund/helpers'
-import { SemanticVersion } from '@lootboxfund/manifest'
+import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@wormgraph/helpers'
+import { SemanticVersion } from '@wormgraph/manifest'
 import {
   DEFAULT_CHAIN_ID_HEX,
   storageUrl,

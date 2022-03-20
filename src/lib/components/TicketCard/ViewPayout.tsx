@@ -6,7 +6,7 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { COLORS } from 'lib/theme'
 import { IDividend } from 'lib/types'
 

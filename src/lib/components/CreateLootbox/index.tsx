@@ -50,7 +50,7 @@ import {
   convertDecimalToHex,
   convertHexToDecimal,
   Url,
-} from '@lootboxfund/helpers'
+} from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { manifest } from '../../../manifest'

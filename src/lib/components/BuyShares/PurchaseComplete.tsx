@@ -9,7 +9,7 @@ import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
+import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
 import InfoText from './InfoText'
 
 export interface PurchaseCompleteProps {}

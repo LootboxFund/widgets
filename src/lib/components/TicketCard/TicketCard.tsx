@@ -3,7 +3,7 @@ import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface TicketCardProps {
   ticketID: string | undefined

@@ -7,7 +7,7 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
-import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@lootboxfund/helpers'
+import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
 
 export interface WalletStatusProps {}

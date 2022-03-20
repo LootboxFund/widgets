@@ -1,4 +1,4 @@
-import { Address, TicketID, ContractAddress } from '@lootboxfund/helpers';
+import { Address, TicketID, ContractAddress } from '@wormgraph/helpers';
 
 /**
  * Metadata of tickets stored on the IPFS

@@ -6,7 +6,7 @@ import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import TicketMinter from '.'
 import { loadState } from './state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export default {
   title: 'TicketMinter',

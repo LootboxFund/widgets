@@ -1,5 +1,5 @@
 import { version } from '../../../package.json'
-import { ChainIDHex, TokenData, Address } from '@lootboxfund/helpers'
+import { ChainIDHex, TokenData, Address } from '@wormgraph/helpers'
 import { STORAGE_URL } from '../../manifest'
 
 // update this to match backend types `TokenDataFE`

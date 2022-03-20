@@ -9,7 +9,7 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { BLOCKCHAINS } from '@lootboxfund/helpers'
+import { BLOCKCHAINS } from '@wormgraph/helpers'
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {

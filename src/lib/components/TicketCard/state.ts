@@ -4,7 +4,7 @@ import { readTicketMetadata } from 'lib/api/storage'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 type TicketCardRoutes = '/payout' | '/card'
 

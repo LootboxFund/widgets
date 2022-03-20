@@ -2,9 +2,9 @@ const { Storage } = require('@google-cloud/storage')
 const express = require('express')
 const app = new express()
 const storage = new Storage()
-const { latest: Manifest } = require('@lootboxfund/manifest')
+const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
-
+ 
 /**
  * CONSTANTS
  *

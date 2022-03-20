@@ -5,7 +5,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { $CardViewport } from '../Generics'
 import Web3 from 'web3'
 import { onLoad } from './'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export default {
   title: 'InteractWithLootbox',

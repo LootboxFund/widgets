@@ -10,7 +10,7 @@ import { parseWei } from '../utils/bnConversion'
 import { ethers as ethersObj } from 'ethers'
 import BN from 'bignumber.js'
 import { userState } from 'lib/state/userState'
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 import detectEthereumProvider from '@metamask/detect-provider'
 
 // const MAX_INT = new BN(2).pow(256).minus(1)

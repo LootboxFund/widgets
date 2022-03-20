@@ -8,7 +8,7 @@ import { DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
 import $Button from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
-import { Address, BLOCKCHAINS } from '@lootboxfund/helpers'
+import { Address, BLOCKCHAINS } from '@wormgraph/helpers'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {

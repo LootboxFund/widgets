@@ -12,7 +12,7 @@ import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { getUserBalanceOfNativeToken } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 
 export interface StepChooseNetworkProps {
   stage: StepStage

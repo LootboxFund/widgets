@@ -61,13 +61,12 @@
     "pipedream:sample:onLootboxUri": "node scripts/sample-lootboxUri.js",
     "deploy:prod": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-widgets.js",
     "deploy:terran": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-create-lootbox.js",
-    "deploy:newton": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-interact-with-lootbox-widget.js",
+    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/kangzeroo/Projects/Lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh"
   },
   "dependencies": {
     "@chainlink/abi": "^0.1.4",
     "@google-cloud/storage": "^5.18.0",
-    "@guildfx/helpers": "^0.0.35",
     "@lingui/core": "^3.13.0",
     "@lingui/macro": "^3.13.0",
     "@lingui/react": "^3.13.0",
@@ -79,6 +78,8 @@
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
+    "@wormgraph/helpers": "^0.0.30",
+    "@wormgraph/manifest": "^0.2.59",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "ethers": "5.5.4",

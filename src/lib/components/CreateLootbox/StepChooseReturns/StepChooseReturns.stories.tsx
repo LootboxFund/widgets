@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import StepChooseReturns, { StepChooseReturnsProps } from 'lib/components/CreateLootbox/StepChooseReturns'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api';
-import { ContractAddress } from '@lootboxfund/helpers';
+import { ContractAddress } from '@wormgraph/helpers';
 
 
 export default {

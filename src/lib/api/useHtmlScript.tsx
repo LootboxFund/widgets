@@ -1,4 +1,4 @@
-import { Url } from '@lootboxfund/helpers'
+import { Url } from '@wormgraph/helpers'
 import { useEffect } from 'react'
 
 // used in storybook

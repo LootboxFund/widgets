@@ -6,7 +6,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { loadTicketData, ticketCardState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export default {
   title: 'TicketCard',

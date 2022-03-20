@@ -5,7 +5,7 @@ import { useSnapshot } from 'valtio'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import PurchaseComplete from './PurchaseComplete'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface BuySharesWidgetProps {
   initialRoute?: BuySharesRoute

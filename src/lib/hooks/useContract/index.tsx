@@ -4,7 +4,7 @@ import LootboxABI from 'lib/abi/lootbox.json'
 import CrowdSaleABI from 'lib/abi/_deprecated/crowdSale.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
-import { TokenData, Address } from '@lootboxfund/helpers'
+import { TokenData, Address } from '@wormgraph/helpers'
 import { ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
 
