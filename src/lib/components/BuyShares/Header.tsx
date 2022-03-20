@@ -61,7 +61,7 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
           <$NetworkText style={{ flex: 2 }}>
             <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
             <span
-              onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as string) || '')}
+              onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
               style={{ cursor: 'pointer' }}
             >
               {renderTinyAccount()}
