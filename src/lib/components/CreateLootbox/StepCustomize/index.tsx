@@ -356,7 +356,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="logo-uploader">
-                    {props.ticketState.logoFile ? '✅' : 'Upload'} Logo
+                    {props.ticketState.logoFile ? '✅' : '⚠️  Upload'} Logo
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
@@ -373,7 +373,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="cover-uploader">
-                    {props.ticketState.coverFile ? '✅' : 'Upload'} Cover
+                    {props.ticketState.coverFile ? '✅' : '⚠️  Upload'} Cover
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
