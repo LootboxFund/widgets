@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initBuySharesState, buySharesState } from './state'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export default {
   title: 'BuyShares',

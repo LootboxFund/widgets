@@ -1,4 +1,4 @@
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 import { truncateAddress } from 'lib/api/helpers'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
@@ -20,7 +20,7 @@ const NetworkText = (props: NetworkTextProps) => {
     <$NetworkText style={{ flex: 2 }}>
       <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
-        onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as string) || '')}
+        onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
         style={{ cursor: 'pointer' }}
       >
         {renderTinyAccount()}

@@ -3,7 +3,7 @@ import { subscribe } from 'valtio'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { initBuySharesState, buySharesState } from 'lib/components/BuyShares/state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface TicketMinterState {
   lootboxAddress: ContractAddress | undefined

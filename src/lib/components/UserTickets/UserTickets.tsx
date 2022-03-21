@@ -6,7 +6,7 @@ import TicketCard from 'lib/components/TicketCard'
 import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 import RightChevronIcon from 'lib/theme/icons/Right.icon'
 import LeftChevronIcon from 'lib/theme/icons/Left.icon'
 

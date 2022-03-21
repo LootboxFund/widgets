@@ -8,7 +8,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import RedeemButton from 'lib/components/TicketCard/RedeemButton'
 import styled from 'styled-components'
 import { generateStateID } from './state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined

@@ -4,7 +4,7 @@ import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import Web3 from 'web3'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { BigNumber } from 'bignumber.js'
-import { Address, ContractAddress } from '@lootboxfund/helpers'
+import { Address, ContractAddress } from '@wormgraph/helpers'
 
 export default {
   title: 'CreateLootbox Step - Choose Funding',

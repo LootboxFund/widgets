@@ -35,7 +35,7 @@ function useWindowSize() {
     if (width <= 560) {
       return 'mobile'
     }
-    if (width > 560 && width < 1080) {
+    if (width > 560 && width <= 768) {
       return 'tablet'
     }
     return 'desktop'

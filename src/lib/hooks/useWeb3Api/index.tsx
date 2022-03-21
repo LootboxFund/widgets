@@ -10,9 +10,8 @@ import {
   ChainSlugs,
   convertDecimalToHex,
   TokenData,
-} from '@lootboxfund/helpers'
+} from '@wormgraph/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
-import { crowdSaleState } from 'lib/state/crowdSale.state'
 import Web3Utils from 'web3-utils'
 import { ethers as ethersObj } from 'ethers'
 
@@ -257,16 +256,4 @@ export const clearStateToChain = () => {
   userState.network.currentNetworkDisplayName = undefined
   userState.network.currentNetworkLogo = undefined
   initTokenList()
-}
-
-export const clearCrowdSaleState = () => {
-  crowdSaleState.targetToken = null
-  crowdSaleState.inputToken.data = undefined
-  crowdSaleState.inputToken.balance = undefined
-  crowdSaleState.inputToken.quantity = undefined
-  crowdSaleState.inputToken.allowance = undefined
-  crowdSaleState.outputToken.data = undefined
-  crowdSaleState.outputToken.balance = undefined
-  crowdSaleState.outputToken.quantity = undefined
-  crowdSaleState.inputToken.allowance = undefined
 }

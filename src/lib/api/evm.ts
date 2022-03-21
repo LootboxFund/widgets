@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { ABIUtilRepresenation } from '@lootboxfund/helpers'
+import { ABIUtilRepresenation } from '@wormgraph/helpers'
 
 export const decodeEVMLog = ({
   eventName,

@@ -1,5 +1,5 @@
 import { DEFAULT_CHAIN_ID_HEX, DEMO_CUSTOM_TOKENS_BSC_MAINNET, TokenDataFE, tokenMap } from 'lib/hooks/constants'
-import { ChainIDHex, Address } from '@lootboxfund/helpers'
+import { ChainIDHex, Address } from '@wormgraph/helpers'
 import { CUSTOM_TOKEN_STORAGE_KEY } from 'lib/state/localStorage'
 import { proxy } from 'valtio'
 import { useSnapshot } from 'valtio'
@@ -29,12 +29,12 @@ export const tokenListState = proxy(initialTokenListState)
 
 export const useTokenList = () => {
   const snap = useSnapshot(tokenListState)
-  return snap.defaultTokenList
+  return snap.defaultTokenList as TokenDataFE[]
 }
 
 export const useCustomTokenList = () => {
   const snap = useSnapshot(tokenListState)
-  return snap.customTokenList
+  return snap.customTokenList as TokenDataFE[]
 }
 
 export const addCustomToken = (data: TokenDataFE) => {

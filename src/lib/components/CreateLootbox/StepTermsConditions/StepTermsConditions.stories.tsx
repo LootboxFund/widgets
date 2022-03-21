@@ -9,7 +9,7 @@ import { initDApp, useEthers, useProvider, useWeb3Utils } from 'lib/hooks/useWeb
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import Web3 from 'web3'
-import { Address, convertHexToDecimal } from '@lootboxfund/helpers'
+import { Address, convertHexToDecimal } from '@wormgraph/helpers'
 import { createTokenURIData } from 'lib/api/storage'
 
 export default {

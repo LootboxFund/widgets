@@ -3,7 +3,7 @@ import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface TicketCardProps {
   ticketID: string | undefined
@@ -21,14 +21,17 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
-      <$TicketLogo
-        backgroundImage={ticket?.data?.metadata?.image}
-        backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
-        size={!ticket ? '100px' : undefined}
-        margin={ticket ? 'auto auto 0' : 'auto'}
-      >
-        {!ticket ? <$Icon>+</$Icon> : null}
-      </$TicketLogo>
+      <$LogoContainer>
+        <$TicketLogo
+          backgroundImage={ticket?.data?.metadata?.image}
+          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+          size={!ticket ? '100px' : undefined}
+          // margin={ticket ? 'auto auto 0' : 'auto'}
+        >
+          {!ticket ? <$Icon>+</$Icon> : null}
+        </$TicketLogo>
+      </$LogoContainer>
+
       {ticket ? (
         <$TicketTag>
           <$TagText>{ticket?.data?.metadata?.name}</$TagText>
@@ -56,13 +59,15 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
         console.log('click')
       }}
     >
-      <$TicketLogo
-        // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
-        id="ticket-candy-logo"
-        backgroundImage={props.logoImage}
-        backgroundShadowColor={props.themeColor}
-        margin="auto auto 0"
-      ></$TicketLogo>
+      <$LogoContainer>
+        <$TicketLogo
+          // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
+          id="ticket-candy-logo"
+          backgroundImage={props.logoImage}
+          backgroundShadowColor={props.themeColor}
+          // margin="auto auto 0"
+        />
+      </$LogoContainer>
 
       <$TicketTag>
         <$TagText>{props.name || 'Lootbox Ticket'}</$TagText>
@@ -78,6 +83,12 @@ const BASE_CONTAINER = `
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 1.5rem;
+`
+
+const $LogoContainer = styled.div`
+  flex: 1;
+  padding: 2.2rem 2.2rem 1.5rem;
 `
 
 export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
@@ -103,7 +114,12 @@ export const $TicketLogo = styled.div<{
   size?: string
   margin?: string
 }>`
-  ${(props) => (props.size ? `width: ${props.size};\nheight: ${props.size};` : `width: 75%;\npadding-top: 75%;`)}
+  width: 100%;
+  padding-top: 100%;
+  ${(props) =>
+    props.size
+      ? `width: ${props.size};\nheight: ${props.size};padding-top: unset; margin-top: 30% !important;`
+      : `width: calc(min(100%, 220px));\npadding-top: calc(min(100%, 220px));`}
   border: 0px solid transparent;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
@@ -117,49 +133,49 @@ export const $TicketLogo = styled.div<{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  ${(props) => (props.margin && `margin: ${props.margin};`) || 'auto'}
+  ${(props) => (props.margin && `margin: ${props.margin};`) || 'margin: auto;'}
 `
 
 export const $TicketTag = styled.section`
-  width: 85%;
+  width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 10px;
-  margin: auto auto 20px;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
 `
 
 export const $TagText = styled.p`
   font-family: sans-serif;
   font-style: normal;
   font-weight: 800;
-  font-size: 22px;
-  line-height: 30px;
-  text-align: right;
+  font-size: 1.2rem;
+  line-height: 1.4rem;
+  text-align: center;
   position: relative;
   color: #ffffff;
   width: 100%;
-  max-width: 50%;
   padding: 5px;
-  word-break: break-word;
+  margin: auto;
 `
 export const $TicketIDText = styled.p`
   font-family: sans-serif;
   font-style: normal;
   font-weight: 800;
-  font-size: 42px;
-  line-height: 42px;
+  font-size: 1.8rem;
+  line-height: 2rem;
   text-align: center;
   position: relative;
   color: #ffffff;
   width: 100%;
-  max-width: 50%;
   margin: auto;
 `
 
 const $Divider = styled.div`
-  margin: 10px;
+  margin: 0px 10px;
   border: 3px solid rgba(255, 255, 255, 0.33);
   transform: rotate(0deg);
 `

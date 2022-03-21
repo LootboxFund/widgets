@@ -7,7 +7,7 @@ import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { ticketCardState, generateStateID, redeemTicket } from './state'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined

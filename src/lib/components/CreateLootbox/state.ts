@@ -1,4 +1,4 @@
-import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@lootboxfund/helpers'
+import { ChainIDDecimal, ChainIDHex, Address, ContractAddress } from '@wormgraph/helpers'
 
 export interface NetworkOption {
   name: string

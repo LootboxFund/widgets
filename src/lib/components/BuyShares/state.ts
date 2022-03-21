@@ -1,4 +1,4 @@
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 import { proxy, subscribe } from 'valtio'
 import BN from 'bignumber.js'
 import {

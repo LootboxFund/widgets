@@ -4,7 +4,7 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import BN from 'bignumber.js'
-import { Address } from '@lootboxfund/helpers'
+import { Address } from '@wormgraph/helpers'
 import { ethers as ethersObj } from 'ethers'
 
 import detectEthereumProvider from '@metamask/detect-provider'

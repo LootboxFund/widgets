@@ -9,7 +9,7 @@ import { buySharesState, addTicketToWallet } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
-import { BLOCKCHAINS, chainIdHexToSlug } from '@lootboxfund/helpers'
+import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
 import InfoText from './InfoText'
 
 export interface PurchaseCompleteProps {}
@@ -39,7 +39,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const ErrorSection = () => (
-    <$Vertical>
+    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
       <$Sadge>🤕</$Sadge>
       <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
@@ -48,7 +48,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const SuccessSection = () => (
-    <$Vertical>
+    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
       <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
       {/* <$Button
         screen={screen}

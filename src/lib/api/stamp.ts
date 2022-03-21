@@ -1,10 +1,10 @@
 import { manifest } from 'manifest'
-import { ChainIDHex, ContractAddress, Url } from '@lootboxfund/helpers'
+import { ChainIDHex, ContractAddress, Url } from '@wormgraph/helpers'
 
 export const downloadFile = async (fileName: string, fileSrc: Url) => {
   const image = await fetch(fileSrc)
-  const imageBlog = await image.blob()
-  const imageURL = URL.createObjectURL(imageBlog)
+  const imageBlob = await image.blob()
+  const imageURL = URL.createObjectURL(imageBlob)
 
   const link = document.createElement('a')
   link.href = imageURL

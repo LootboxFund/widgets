@@ -4,7 +4,7 @@ import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
-import useWindowSize from 'lib/hooks/useScreenSize'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import React from 'react'
 
 export const $TicketMinterContainer = styled.section`
@@ -37,17 +37,20 @@ const $TicketWrapper = styled.section<{ screen: string | undefined }>`
   padding-bottom: ${(props) => (props.screen === 'mobile' ? '30px' : '0px')};
 `
 
+const smallScreens: ScreenSize[] = ['mobile', 'tablet']
+
 const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(ticketMinterState)
   const { screen } = useWindowSize()
-  const buyWidth = screen === 'mobile' ? '100%' : '65%'
-  const ticketWidth = screen === 'mobile' ? '100%' : '35%'
+  const isMobile = smallScreens.indexOf(screen) >= 0
+  const buyWidth = isMobile ? '100%' : '65%'
+  const ticketWidth = isMobile ? '100%' : '35%'
   return (
     <$TicketMinterContainer>
       {ref && <div ref={ref} />}
       <$Row
         style={
-          screen === 'mobile'
+          isMobile
             ? {
                 flexDirection: 'column-reverse',
               }

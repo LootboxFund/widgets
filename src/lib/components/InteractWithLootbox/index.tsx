@@ -7,7 +7,7 @@ import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { initBuySharesState } from 'lib/components/BuyShares/state'
-import { ContractAddress } from '@lootboxfund/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
