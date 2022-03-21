@@ -59,8 +59,8 @@
     "build-storybook": "build-storybook",
     "pipedream:sample:onLootboxUri": "node scripts/sample-lootboxUri.js",
     "deploy:prod": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-widgets.js",
-    "deploy:terran": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-create-lootbox.js",
-    "deploy:newton": "NODE_ENV=production rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' NODE_ENV=production node scripts/deploy-interact-with-lootbox-widget.js",
+    "deploy:terran": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-create-lootbox.js",
+    "deploy:newton": "rollup -c && GOOGLE_APPLICATION_CREDENTIALS='/Users/starship420/repo/lootbox/widgets/env/guildfx-exchange-3485f15605c3.json' node scripts/deploy-interact-with-lootbox-widget.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh"
   },
   "dependencies": {
@@ -76,7 +76,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "^0.0.30",
-    "@wormgraph/manifest": "^0.2.60",
+    "@wormgraph/manifest": "^0.2.63",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "ethers": "5.5.4",
