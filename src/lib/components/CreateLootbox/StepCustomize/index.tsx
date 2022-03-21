@@ -51,6 +51,7 @@ export interface StepCustomizeProps {
 }
 const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
+  const isMobile = screen === 'mobile' || screen === 'tablet'
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const [themeColor, setThemeColor] = useState('')
@@ -229,7 +230,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       >
         <div
           style={
-            screen === 'mobile'
+            isMobile
               ? {
                   display: 'flex',
                   flexDirection: 'column',
@@ -245,7 +246,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 }
           }
         >
-          <$Vertical flex={screen === 'mobile' ? 1 : 0.55}>
+          <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
               <span>4. Customize NFT Ticket</span>
               <HelpIcon tipID="stepCustomize" />
@@ -325,10 +326,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
 
             <br />
           </$Vertical>
-          <$Vertical
-            flex={screen === 'mobile' ? 1 : 0.45}
-            style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}
-          >
+          <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
             <TicketCardCandyWrapper
               backgroundImage={props.ticketState.coverUrl as string}
               logoImage={props.ticketState.logoUrl as string}

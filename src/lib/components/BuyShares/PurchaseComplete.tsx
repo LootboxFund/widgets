@@ -39,7 +39,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const ErrorSection = () => (
-    <$Vertical>
+    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
       <$Sadge>🤕</$Sadge>
       <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
@@ -48,7 +48,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const SuccessSection = () => (
-    <$Vertical>
+    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
       <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
       {/* <$Button
         screen={screen}

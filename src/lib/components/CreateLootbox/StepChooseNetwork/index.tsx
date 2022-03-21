@@ -24,6 +24,7 @@ export interface StepChooseNetworkProps {
 
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
+  const isMobile = screen === 'tablet' || screen === 'mobile'
   const snapUserState = useSnapshot(userState)
   const [errors, setErrors] = useState<string[] | undefined>(undefined)
   const [hasNonZeroTokens, setHasNonZeroToken] = useState<boolean>(false)
@@ -122,7 +123,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
           <$Vertical flex={1}>
             <div
               style={
-                screen === 'mobile'
+                isMobile
                   ? {
                       display: 'flex',
                       flexDirection: 'column',
@@ -192,7 +193,7 @@ export const $NetworkIcon = styled.img<{ size?: 'small' | 'medium' | 'large' }>`
 export const $Wrapper = styled.div<{ screen: ScreenSize }>`
   flex: 1;
   display: flex;
-  flex-direction: ${(props) => (props.screen === 'mobile' ? 'column-reverse' : 'row')};
+  flex-direction: ${(props) => (props.screen === 'mobile' || props.screen === 'tablet' ? 'column-reverse' : 'row')};
   justify-content: space-between;
 `
 
