@@ -1,12 +1,12 @@
 import { storage } from './app'
 import { ref, uploadBytes } from '@firebase/storage'
 import { UploadResult } from 'firebase/storage'
-import { STORAGE_URL } from 'manifest'
+import { manifest } from '../../../manifest'
 
 const LOOTBOX_ASSETS = `assets/lootbox`
 
 const constructPublicPath = (res: UploadResult) => {
-  return `${STORAGE_URL}/o/${res.metadata.fullPath.replaceAll('/', '%2F')}?alt=media`
+  return `${manifest.storage.downloadUrl}/${res.metadata.fullPath.replaceAll('/', '%2F')}?alt=media`
 }
 
 /**
