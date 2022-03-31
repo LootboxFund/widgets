@@ -26,9 +26,10 @@ export const validateReceivingWallet = async (receivingWallet: string, web3Utils
 export interface StepChooseFundingProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
-  type: 'escrow' | 'instant'
+  type: 'escrow' | 'instant' | 'tournament'
   fundraisingTarget: BigNumber
   fundraisingLimit: BigNumber
+  setFundraisingLimit: (limit: BigNumber) => void
   setFundraisingTarget: (amount: BigNumber) => void
   receivingWallet: Address
   setReceivingWallet: (addr: Address) => void
@@ -45,6 +46,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     receivingWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
+  const [showMaxInput, setShowMaxInput] = useState(false)
 
   useEffect(() => {
     getLatestPrice()
@@ -94,14 +96,24 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       <$Vertical>
         {ref && <div ref={ref}></div>}
         <$StepSubheading>
-          Target Fundraising Amount
-          <HelpIcon tipID="fundraisingTarget" />
-          <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
-            We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the
-            value of the native token. You will receive the money right away, regardless of whether you hit your
-            fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your fundraising
-            target.
-          </ReactTooltip>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+            <div>
+              Target Fundraising Amount
+              <HelpIcon tipID="fundraisingTarget" />
+              <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
+                We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in
+                the value of the native token. You will receive the money right away, regardless of whether you hit your
+                fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your
+                fundraising target.
+              </ReactTooltip>
+            </div>
+            <span
+              onClick={() => setShowMaxInput(!showMaxInput)}
+              style={{ cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {showMaxInput ? `Hide` : `Show`} Max Limit
+            </span>
+          </div>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -147,7 +159,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     }
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
-      props.setFundraisingTarget(value)
+      props.setFundraisingLimit(value)
       const validFundraise = validateFundraisingTarget(value)
       const validReceiver = await validateReceivingWallet(props.receivingWallet, web3Utils)
       if (validFundraise) {
@@ -285,8 +297,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             <br />
             <br />
             {renderInputFundraisingTarget()}
-            <br />
-            {renderInputFundraisingLimit()}
+            {showMaxInput && (
+              <>
+                <br />
+                {renderInputFundraisingLimit()}
+              </>
+            )}
+
             <br />
             {renderInputReceivingWallet()}
           </$Vertical>

@@ -90,7 +90,7 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
     )
   }
   return (
-    <$StepChooseType>
+    <$StepChooseType style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}
@@ -150,7 +150,7 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
                     {getLootboxType(props.selectedType)?.helpText}
                   </ReactTooltip>
                 </$Horizontal>
-                <$StepSubheading>{getLootboxType(props.selectedType)?.bio}</$StepSubheading>
+                <$StepSubheading style={{ width: '100%' }}>{getLootboxType(props.selectedType)?.bio}</$StepSubheading>
                 <span style={{ display: 'inline', marginTop: '10px' }}>
                   <b style={{ color: COLORS.surpressedFontColor }}>Ideal for:</b>{' '}
                   <$StepSubheading>{getLootboxType(props.selectedType)?.idealFor}</$StepSubheading>
@@ -218,17 +218,6 @@ const $NetworkName = styled.span<{ isAvailable?: boolean; isSelected?: boolean }
     props.isAvailable ? `font-weight: ${TYPOGRAPHY.fontWeight.bold}` : `font-weight: ${TYPOGRAPHY.fontWeight.light}`};
   margin-left: 20px;
   ${(props) => props.isSelected && 'color: white'};
-`
-
-const $ComingSoon = styled.span<{ isSelected?: boolean }>`
-  font-size: ${TYPOGRAPHY.fontSize.xsmall};
-  color: ${(props) => (props.isSelected ? COLORS.white : COLORS.surpressedFontColor)};
-  text-transform: uppercase;
-  font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  line-height: 0.6rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
 `
 
 export default StepChooseType

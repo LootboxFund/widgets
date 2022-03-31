@@ -59,6 +59,7 @@ import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import { v4 as uuidv4 } from 'uuid'
 import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
+import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -89,10 +90,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
 
-  type FormStep = 'stepNetwork' | 'stepFunding' | 'stepReturns' | 'stepCustomize' | 'stepSocials' | 'stepTerms'
+  type FormStep =
+    | 'stepNetwork'
+    | 'stepType'
+    | 'stepFunding'
+    | 'stepReturns'
+    | 'stepCustomize'
+    | 'stepSocials'
+    | 'stepTerms'
 
   const INITIAL_FORM_STATE: Record<FormStep, StepStage> = {
     stepNetwork: 'in_progress',
+    stepType: 'not_yet',
     stepFunding: 'not_yet',
     stepReturns: 'not_yet',
     stepCustomize: 'not_yet',
@@ -104,6 +113,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // VALIDITY: Validity of the forms
   const INITIAL_VALIDITY: Record<FormStep, boolean> = {
     stepNetwork: false,
+    stepType: false,
     stepFunding: false,
     stepReturns: false,
     stepCustomize: false,
@@ -123,7 +133,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }-${defaultPaybackDate.getDate()}`
     // `${defaultPaybackDate.getFullYear()}-${defaultPaybackDate.getMonth() + 1}-${defaultPaybackDate.getDate()}`
   )
+  const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
+  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('2', 'ether')))
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
 
   // STEP 1: Choose Network
@@ -147,6 +159,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   const checkNetworkStepDone = () => {
     return network && reputationWallet && reputationWallet.length > 0
+  }
+
+  // STEP 2: Choose Type
+  const refStepType = useRef<HTMLDivElement | null>(null)
+  const checkTypeStepDone = () => {
+    return fundingType && fundingType.length > 0
   }
 
   // STEP 2: Choose Funding
@@ -479,8 +497,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       stepNetwork: true,
     })
   }
+  if (checkNetworkStepDone() && checkTypeStepDone() && stage.stepType !== 'may_proceed') {
+    setStage({
+      ...stage,
+      stepType: 'may_proceed',
+    })
+    setValidity({
+      ...validity,
+      stepType: true,
+    })
+  }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     reputationWallet.length > 0 &&
     stage.stepFunding !== 'may_proceed'
@@ -504,6 +533,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     stage.stepReturns !== 'may_proceed'
@@ -524,6 +554,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -545,6 +576,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -563,6 +595,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -593,10 +626,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
       />
       <$Spacer></$Spacer>
+      <StepChooseType
+        ref={refStepType}
+        selectedType={fundingType}
+        selectedNetwork={network}
+        stage={stage.stepType}
+        onSelectType={setFundingType}
+        onNext={() => console.log('onNext')}
+        setValidity={(bool: boolean) => console.log(bool)}
+      />
+      <$Spacer></$Spacer>
       <StepChooseFunding
         ref={refStepFunding}
+        type={fundingType}
         selectedNetwork={network}
+        fundraisingLimit={fundraisingLimit}
         fundraisingTarget={fundraisingTarget}
+        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
         setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
         receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
         setReceivingWallet={setReceivingWallet}

@@ -13,7 +13,7 @@ export default {
 
 const Demo = (args: StepChooseFundingProps) => {
   const web3Utils = useWeb3Utils()
-  const [fundType, setFundType] = useState<'escrow' | 'instant'>('escrow')
+  const [fundType, setFundType] = useState<'escrow' | 'instant' | 'tournament'>('escrow')
   const [stage, setStage] = useState<StepStage>('in_progress')
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toWei('1', 'ether'))
   const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toWei('2', 'ether'))
@@ -43,6 +43,7 @@ const Demo = (args: StepChooseFundingProps) => {
         type={fundType}
         fundraisingLimit={fundraisingLimit}
         fundraisingTarget={fundraisingTarget}
+        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
         setFundraisingTarget={(amount: BigNumber) => setFundraisingTarget(amount)}
         receivingWallet={receivingWallet}
         setReceivingWallet={(addr: Address) => setReceivingWallet(addr)}
