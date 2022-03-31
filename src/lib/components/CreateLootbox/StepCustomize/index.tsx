@@ -302,7 +302,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               maxLength={500}
             />
             <br />
-            <$StepSubheading>
+            {/* <$StepSubheading>
               <span>Share Price</span>
               <HelpIcon tipID="pricePerShare" />
               <ReactTooltip id="pricePerShare" place="right" effect="solid">
@@ -322,7 +322,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 onWheel={(e) => e.currentTarget.blur()}
                 style={{ width: '100%' }}
               />
-            </$Horizontal>
+            </$Horizontal> */}
 
             <br />
           </$Vertical>

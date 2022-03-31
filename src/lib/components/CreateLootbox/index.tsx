@@ -298,6 +298,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     setSubmitStatus('in_progress')
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
+    // const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
@@ -313,6 +314,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const ethers = useEthers()
     const signer = await provider.getSigner()
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
+    // const lootboxEscrow = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
     const submissionId = uuidv4()
     try {
       const [imagePublicPath, backgroundPublicPath] = await Promise.all([
