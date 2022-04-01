@@ -162,7 +162,10 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
           <$SocialGridInputs screen={screen}>
             {SOCIALS.map((social) => {
               return (
-                <$Horizontal style={screen === 'mobile' ? { marginBottom: '10px' } : { marginRight: '20px' }}>
+                <$Horizontal
+                  key={social.slug}
+                  style={screen === 'mobile' ? { marginBottom: '10px' } : { marginRight: '20px' }}
+                >
                   <$SocialLogo src={social.icon} />
                   <$InputMedium
                     style={{ width: '100%' }}

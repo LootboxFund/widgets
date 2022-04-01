@@ -4,13 +4,14 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
-import { Address, convertHexToDecimal } from '@wormgraph/helpers'
+import { Address, ContractAddress, convertHexToDecimal } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import { createTokenURIData } from 'lib/api/storage'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
+import { BigNumber } from 'bignumber.js'
 
 const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -29,24 +30,24 @@ const checkMobileBrowser = (): boolean => {
 }
 
 interface InstantLootboxArgs {
-  nativeTokenPrice: ethersObj.BigNumber
-  name: ''
-  symbol: ''
-  biography: ''
-  pricePerShare: 0.05
-  lootboxThemeColor: '#000000'
+  nativeTokenPrice: any
+  name: string
+  symbol: string
+  biography: string
+  lootboxThemeColor: string
   logoFile: File
   coverFile: File
-  fundraisingTarget: ethersObj.BigNumber
-  fundraisingTargetMax: ethersObj.BigNumber
+  fundraisingTarget: any
+  fundraisingTargetMax: any
   receivingWallet: Address
   currentAccount: Address
-  setLootboxAddress: (address: Address) => void
+  setLootboxAddress: (address: ContractAddress) => void
   basisPoints: number
   paybackDate: string
   downloaded: boolean
   setDownloaded: (downloaded: boolean) => void
 }
+const PRICE_PER_SHARE = 0.05
 interface LootboxSocials {
   twitter: string
   email: string
@@ -80,10 +81,10 @@ export const createInstantLootbox = async (
   }
 
   setSubmitStatus('in_progress')
-  const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory.address
+  const LOOTBOX_INSTANT_FACTORY_ADDRESS = '0xA8891B4A16d40f612c6a4dc36C45c9D2c1e351F2' as Address // manifest.lootbox.contracts.LootboxInstantFactory.address
   const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(args.pricePerShare.toString(), 'gwei')).div(
+  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
     new web3Utils.BN('10')
   )
   const maxSharesSold = args.fundraisingTargetMax
@@ -110,20 +111,20 @@ export const createInstantLootbox = async (
     maxSharesSold = ${maxSharesSold}
     pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
-    receivingWallet = ${args.receivingWallet}
+    affiliateWallet = ${args.receivingWallet}
 
     fundraisingTargetMax = ${args.fundraisingTargetMax}
 
     nativeTokenPrice = ${args.nativeTokenPrice.toString()}
 
     `)
+
     await lootboxInstant.createLootbox(
-      args.name,
-      args.symbol,
+      args.name, // string memory _lootboxName,
+      args.symbol, // string memory _lootboxSymbol,
       maxSharesSold.toString(), // uint256 _maxSharesSold,
-      pricePerShare.toString(), // uint256 _sharePriceUSD,
-      args.receivingWallet,
-      args.receivingWallet
+      args.receivingWallet, // address _treasury,
+      args.receivingWallet // address _affiliate
     )
     console.log(`Submitted lootbox creation!`)
     const filter = {
@@ -265,10 +266,10 @@ export const createEscrowLootbox = async (
   }
 
   setSubmitStatus('in_progress')
-  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory.address
+  const LOOTBOX_ESCROW_FACTORY_ADDRESS = '0x8F09827d21b3a4be56C1a374DDFd202a9D056256' // manifest.lootbox.contracts.LootboxEscrowFactory.address
   const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(args.pricePerShare.toString(), 'gwei')).div(
+  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
     new web3Utils.BN('10')
   )
   const targetSharesSold = args.fundraisingTarget

@@ -60,6 +60,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
+import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -214,7 +215,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
-  const INITIAL_SOCIALS: Record<string, string> = {
+  const INITIAL_SOCIALS: {
+    twitter: string
+    email: string
+    instagram: string
+    tiktok: string
+    facebook: string
+    discord: string
+    youtube: string
+    snapchat: string
+    twitch: string
+    web: string
+  } = {
     twitter: '',
     email: '',
     instagram: '',
@@ -280,195 +292,59 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return allValidationsPassed && allConditionsMet
   }
 
-  const createLootbox = () => {
-    // escrow or instant
+  const createLootbox = async () => {
+    const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    if (fundingType === 'instant') {
+      console.log(`Generating Instant Lootbox...`)
+      await createInstantLootbox(
+        provider,
+        setSubmitStatus,
+        {
+          nativeTokenPrice: nativeTokenPrice as BigNumber,
+          name: ticketState.name as string,
+          symbol: ticketState.symbol as string,
+          biography: ticketState.biography as string,
+          lootboxThemeColor: ticketState.lootboxThemeColor as string,
+          logoFile: ticketState.logoFile as File,
+          coverFile: ticketState.coverFile as File,
+          fundraisingTarget: fundraisingTarget as BigNumber,
+          fundraisingTargetMax: fundraisingLimit as BigNumber,
+          receivingWallet: receivingWallet as Address,
+          currentAccount: current as Address,
+          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+          basisPoints,
+          paybackDate: paybackDate,
+          downloaded,
+          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+        },
+        socialState
+      )
+    } else {
+      await createEscrowLootbox(
+        provider,
+        setSubmitStatus,
+        {
+          nativeTokenPrice: nativeTokenPrice as BigNumber,
+          name: ticketState.name as string,
+          symbol: ticketState.symbol as string,
+          biography: ticketState.biography as string,
+          lootboxThemeColor: ticketState.lootboxThemeColor as string,
+          logoFile: ticketState.logoFile as File,
+          coverFile: ticketState.coverFile as File,
+          fundraisingTarget: fundraisingTarget as BigNumber,
+          fundraisingTargetMax: fundraisingLimit as BigNumber,
+          receivingWallet: receivingWallet as Address,
+          currentAccount: current as Address,
+          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+          basisPoints,
+          paybackDate: paybackDate,
+          downloaded,
+          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+        },
+        socialState
+      )
+    }
   }
-
-  // const createLootbox = async () => {
-  //   if (!nativeTokenPrice) {
-  //     console.error('No token price')
-  //     setSubmitStatus('failure')
-  //     return
-  //   }
-  //   if (!provider) {
-  //     throw new Error('No provider')
-  //   }
-  //   if (!ticketState.pricePerShare) {
-  //     throw new Error('Missing share price')
-  //   }
-  //   if (!(ticketState.coverFile && ticketState.logoFile)) {
-  //     throw new Error('Missing images')
-  //   }
-
-  //   setSubmitStatus('in_progress')
-  //   const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory.address
-  //   const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory.address
-  //   const blockNum = await provider.getBlockNumber()
-
-  //   const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
-  //     new web3Utils.BN('10')
-  //   )
-  //   const maxSharesSold = fundraisingTarget
-  //     .mul(new web3Utils.BN(nativeTokenPrice.toString()))
-  //     .div(pricePerShare)
-  //     .mul(new web3Utils.BN('11'))
-  //     .div(new web3Utils.BN('10'))
-  //     .toString()
-
-  //   const ethers = useEthers()
-  //   const signer = await provider.getSigner()
-  //   const lootboxInstant = new ethers.Contract(LOOTBOX_INSTANT_FACTORY_ADDRESS, LOOTBOX_INSTANT_FACTORY_ABI, signer)
-  //   const lootboxEscrow = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
-  //   const submissionId = uuidv4()
-  //   try {
-  //     const [imagePublicPath, backgroundPublicPath] = await Promise.all([
-  //       uploadLootboxLogo(submissionId, ticketState.logoFile),
-  //       uploadLootboxCover(submissionId, ticketState.coverFile),
-  //     ])
-
-  //     console.log(`
-
-  //     ticketState.name = ${ticketState.name}
-  //     ticketState.symbol = ${ticketState.symbol}
-  //     maxSharesSold = ${maxSharesSold}
-  //     pricePerShare = ${pricePerShare}
-  //     receivingWallet = ${receivingWallet}
-  //     receivingWallet = ${receivingWallet}
-
-  //     fundraisingTarget = ${fundraisingTarget}
-
-  //     nativeTokenPrice = ${nativeTokenPrice.toString()}
-
-  //     `)
-  //     await lootbox.createLootbox(
-  //       ticketState.name,
-  //       ticketState.symbol,
-  //       maxSharesSold.toString(), // uint256 _maxSharesSold,
-  //       pricePerShare.toString(), // uint256 _sharePriceUSD,
-  //       receivingWallet,
-  //       receivingWallet
-  //     )
-  //     console.log(`Submitted lootbox creation!`)
-  //     const filter = {
-  //       fromBlock: blockNum,
-  //       address: lootbox.address,
-  //       topics: [
-  //         ethers.utils.solidityKeccak256(
-  //           ['string'],
-  //           ['LootboxCreated(string,address,address,address,uint256,uint256)']
-  //         ),
-  //       ],
-  //     }
-  //     provider.on(filter, async (log) => {
-  //       if (log !== undefined) {
-  //         const decodedLog = decodeEVMLog({
-  //           eventName: 'LootboxCreated',
-  //           log: log,
-  //           abi: `
-  //           event LootboxCreated(
-  //             string lootboxName,
-  //             address indexed lootbox,
-  //             address indexed issuer,
-  //             address indexed treasury,
-  //             uint256 maxSharesSold,
-  //             uint256 sharePriceUSD
-  //           )`,
-  //           keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD'],
-  //         })
-  //         const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
-  //         const receiver = receivingWallet ? receivingWallet.toLowerCase() : ''
-  //         const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
-  //         if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
-  //           console.log(`
-
-  //           ---- 🎉🎉🎉 ----
-
-  //           Congratulations! You've created a lootbox!
-  //           Lootbox Address: ${lootbox}
-
-  //           ---------------
-
-  //           `)
-  //           setLootboxAddress(lootbox)
-  //           const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-  //             .add(new web3Utils.BN('100')) // make it whole
-  //             .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-  //             .mul(fundraisingTarget)
-  //             .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
-
-  //           const ticketID = '0x'
-  //           const numShares = ethers.utils.formatEther(maxSharesSold)
-  //           try {
-  //             const [stampUrl] = await Promise.all([
-  //               stampNewLootbox({
-  //                 // backgroundImage: ticketState.coverUrl as Url,
-  //                 // logoImage: ticketState.logoUrl as Url,
-  //                 logoImage: imagePublicPath,
-  //                 backgroundImage: backgroundPublicPath,
-  //                 themeColor: ticketState.lootboxThemeColor as string,
-  //                 name: lootboxName,
-  //                 ticketID,
-  //                 lootboxAddress: lootbox,
-  //                 chainIdHex: manifest.chain.chainIDHex,
-  //                 numShares,
-  //               }),
-  //               createTokenURIData({
-  //                 address: lootbox,
-  //                 name: lootboxName,
-  //                 description: ticketState.biography as string,
-  //                 // image: ticketState.logoUrl as string,
-  //                 image: imagePublicPath,
-  //                 backgroundColor: ticketState.lootboxThemeColor as string,
-  //                 // backgroundImage: ticketState.coverUrl as string,
-  //                 backgroundImage: backgroundPublicPath,
-  //                 lootbox: {
-  //                   address: lootbox,
-  //                   chainIdHex: manifest.chain.chainIDHex,
-  //                   chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-  //                   chainName: manifest.chain.chainName,
-  //                   targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-  //                   fundraisingTarget: fundraisingTarget,
-  //                   basisPointsReturnTarget: basisPoints.toString(),
-  //                   returnAmountTarget: basisPointsReturnTarget.toString(),
-  //                   pricePerShare: pricePerShare.toString(),
-  //                   lootboxThemeColor: ticketState.lootboxThemeColor as string,
-  //                   transactionHash: log.transactionHash as string,
-  //                   blockNumber: log.blockNumber,
-  //                 },
-  //                 socials: {
-  //                   twitter: socialState.twitter,
-  //                   email: socialState.email,
-  //                   instagram: socialState.instagram,
-  //                   tiktok: socialState.tiktok,
-  //                   facebook: socialState.facebook,
-  //                   discord: socialState.discord,
-  //                   youtube: socialState.youtube,
-  //                   snapchat: socialState.snapchat,
-  //                   twitch: socialState.twitch,
-  //                   web: socialState.web,
-  //                 },
-  //               }),
-  //             ])
-  //             console.log(`Stamp URL: ${stampUrl}`)
-  //             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-  //             if (stampUrl && !downloaded && !checkMobileBrowser()) {
-  //               await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
-  //               setDownloaded(true)
-  //             }
-  //           } catch (err) {
-  //             LogRocket.captureException(err)
-  //           } finally {
-  //             setSubmitStatus('success')
-  //           }
-  //         }
-  //       }
-  //     })
-  //   } catch (e) {
-  //     console.log(e)
-  //     LogRocket.captureException(e)
-  //     setSubmitStatus('failure')
-  //   }
-  // }
 
   const goToLootboxAdminPage = () => {
     return `https://www.lootbox.fund/demo/0-2-5-demo/lootbox?lootbox=${lootboxAddress}`
