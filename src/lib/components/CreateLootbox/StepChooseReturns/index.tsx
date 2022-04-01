@@ -11,6 +11,7 @@ import { NetworkOption } from '../state'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import { LootboxType } from '../StepChooseType'
 
 export const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
 export const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
@@ -244,7 +245,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>
-              3. How will your reward your investors?
+              4. How will your reward your investors?
               <HelpIcon tipID="stepReturns" />
               <ReactTooltip id="stepReturns" place="right" effect="solid">
                 Treat your investors like your fans. The more you reward them, the more they will trust and support you.

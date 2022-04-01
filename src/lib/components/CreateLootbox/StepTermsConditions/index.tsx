@@ -160,7 +160,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         errors={Object.values(errors)}
       >
         <$Vertical flex={1}>
-          <$StepHeading>{`6. Terms & Conditions`}</$StepHeading>
+          <$StepHeading>{`7. Terms & Conditions`}</$StepHeading>
           <br />
           {TERMS.map((term) => {
             return (

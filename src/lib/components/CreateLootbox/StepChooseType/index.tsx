@@ -30,16 +30,17 @@ export const LOOTBOX_TYPE_OPTIONS = [
     emoji: '🎁',
     title: 'Escrow',
     bio: 'Use this if you have a target amount to fundraise. You can only access the money if you hit your target goal.',
-    idealFor: 'Most Gamers, asset purchases, Guilds.',
-    helpText: '',
+    idealFor: 'Most Gamers, Guilds & Asset Purchases',
+    helpText: 'An Escrow Lootbox is best when you need a minimum amount of funds ready before you start playing.',
   },
   {
     key: 'instant' as LootboxType,
     emoji: '🎉',
     title: 'Instant',
     bio: 'Use this if you want to instantly get the money and continue fundraising while you play.',
-    idealFor: 'Streamers, Dungeon Crawls, Limitless spending',
-    helpText: '',
+    idealFor: 'Streamers, Dungeon Crawls, Continous Spending',
+    helpText:
+      'An Instant Lootbox is best for when you do not know how much money you need, and the requirements may change as you play.',
   },
   {
     key: 'tournament' as LootboxType,
@@ -47,7 +48,8 @@ export const LOOTBOX_TYPE_OPTIONS = [
     title: 'Tournament',
     bio: 'Use this if you want to participate in an ESports Tournament with a set buy-in. Acts like Escrow.',
     idealFor: 'Casual & Competitive ESports',
-    helpText: '',
+    helpText:
+      'ESports Tournaments have set buy-in price, such as $10 per player. Use a Tournament Lootbox to fundraise your buy-in and share profits with your sponsors.',
   },
 ]
 
@@ -104,8 +106,8 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
               2. Choose Lootbox Type
               <HelpIcon tipID="stepNetwork" />
               <ReactTooltip id="stepNetwork" place="right" effect="solid">
-                The network you choose should be the same blockchain as the game you intend to play. You may bridge
-                money across chains after funding, if needed.
+                Choose a Lootbox type based on your use case. Read the descriptions of each type to find which is right
+                for you.
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>Use the default option “Escrow” if you don’t know which to pick.</$StepSubheading>

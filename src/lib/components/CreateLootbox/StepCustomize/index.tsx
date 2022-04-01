@@ -248,7 +248,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         >
           <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
-              <span>4. Customize NFT Ticket</span>
+              <span>5. Customize NFT Ticket</span>
               <HelpIcon tipID="stepCustomize" />
               <ReactTooltip id="stepCustomize" place="right" effect="solid">
                 Finally, an NFT that's actually useful 😂

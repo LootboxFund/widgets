@@ -253,7 +253,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     return (
       <$Vertical>
         <$StepSubheading>
-          Receiving Wallet
+          {props.type === 'tournament' ? `Tournament Wallet` : `Receiving Wallet`}
           <HelpIcon tipID="receivingWallet" />
           <ReactTooltip id="receivingWallet" place="right" effect="solid">
             This address will receive the money right away. We highly recommend you use a MultiSig wallet if you are a
@@ -283,7 +283,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>
-              2. How much money do you need?
+              3. How much money do you need?
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
                 We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching

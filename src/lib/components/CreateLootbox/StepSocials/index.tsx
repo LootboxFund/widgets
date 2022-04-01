@@ -146,7 +146,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       >
         <$Vertical flex={1}>
           <$StepHeading>
-            5. Contact Information
+            6. Contact Information
             <HelpIcon tipID="stepSocials" />
             <ReactTooltip id="stepSocials" place="right" effect="solid">
               Having public profiles is important for building trust with investors.
