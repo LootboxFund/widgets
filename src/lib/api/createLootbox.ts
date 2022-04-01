@@ -9,6 +9,8 @@ import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import { createTokenURIData } from 'lib/api/storage'
 import LogRocket from 'logrocket'
+import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
+import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 
 const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -35,6 +37,7 @@ interface InstantLootboxArgs {
   lootboxThemeColor: '#000000'
   logoFile: File
   coverFile: File
+  fundraisingTarget: ethersObj.BigNumber
   fundraisingTargetMax: ethersObj.BigNumber
   receivingWallet: Address
   currentAccount: Address
@@ -56,6 +59,7 @@ interface LootboxSocials {
   twitch: string
   web: string
 }
+
 export const createInstantLootbox = async (
   provider: ethersObj.providers.Web3Provider | undefined,
   setSubmitStatus: (status: SubmitStatus) => void,
@@ -77,7 +81,6 @@ export const createInstantLootbox = async (
 
   setSubmitStatus('in_progress')
   const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory.address
-  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory.address
   const blockNum = await provider.getBlockNumber()
 
   const pricePerShare = new web3Utils.BN(web3Utils.toWei(args.pricePerShare.toString(), 'gwei')).div(
@@ -154,8 +157,8 @@ export const createInstantLootbox = async (
           
           ---- 🎉🎉🎉 ----
           
-          Congratulations! You've created a lootbox!
-          Lootbox Address: ${lootbox}
+          Congratulations! You've created an Instant lootbox!
+          Instant Lootbox Address: ${lootbox}
   
           ---------------
           
@@ -198,7 +201,7 @@ export const createInstantLootbox = async (
                   chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
                   chainName: manifest.chain.chainName,
                   targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
-                  fundraisingTarget: args.fundraisingTargetMax.toString(),
+                  fundraisingTarget: args.fundraisingTarget.toString(),
                   fundraisingTargetMax: args.fundraisingTargetMax.toString(),
                   basisPointsReturnTarget: args.basisPoints.toString(),
                   returnAmountTarget: basisPointsReturnTarget.toString(),
@@ -241,4 +244,200 @@ export const createInstantLootbox = async (
     setSubmitStatus('failure')
   }
 }
-export const createEscrowLootbox = () => {}
+
+export const createEscrowLootbox = async (
+  provider: ethersObj.providers.Web3Provider | undefined,
+  setSubmitStatus: (status: SubmitStatus) => void,
+  args: InstantLootboxArgs,
+  socials: LootboxSocials
+) => {
+  const web3Utils = useWeb3Utils()
+  if (!args.nativeTokenPrice) {
+    console.error('No token price')
+    setSubmitStatus('failure')
+    return
+  }
+  if (!provider) {
+    throw new Error('No provider')
+  }
+  if (!(args.coverFile && args.logoFile)) {
+    throw new Error('Missing images')
+  }
+
+  setSubmitStatus('in_progress')
+  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory.address
+  const blockNum = await provider.getBlockNumber()
+
+  const pricePerShare = new web3Utils.BN(web3Utils.toWei(args.pricePerShare.toString(), 'gwei')).div(
+    new web3Utils.BN('10')
+  )
+  const targetSharesSold = args.fundraisingTarget
+    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+    .div(pricePerShare)
+    .mul(new web3Utils.BN('11'))
+    .div(new web3Utils.BN('10'))
+    .toString()
+  const maxSharesSold = args.fundraisingTargetMax
+    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+    .div(pricePerShare)
+    .mul(new web3Utils.BN('11'))
+    .div(new web3Utils.BN('10'))
+    .toString()
+
+  const ethers = ethersObj
+  const signer = await provider.getSigner()
+  const lootboxInstant = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
+  const submissionId = uuidv4()
+  try {
+    const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+      uploadLootboxLogo(submissionId, args.logoFile),
+      uploadLootboxCover(submissionId, args.coverFile),
+    ])
+
+    console.log(`
+    
+    ticketState.name = ${args.name}
+    ticketState.symbol = ${args.symbol}
+    targetSharesSold = ${targetSharesSold}
+    maxSharesSold = ${maxSharesSold}
+    pricePerShare = ${pricePerShare}
+    receivingWallet = ${args.receivingWallet}
+    affiliateWallet = ${args.receivingWallet}
+
+    fundraisingTarget = ${args.fundraisingTarget}
+    fundraisingTargetMax = ${args.fundraisingTargetMax}
+
+    nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+
+    `)
+    await lootboxInstant.createLootbox(
+      args.name, //     string memory _lootboxName,
+      args.symbol, //     string memory _lootboxSymbol,
+      targetSharesSold.toString(), // uint256 _targetSharesSold,
+      maxSharesSold.toString(), // uint256 _maxSharesSold,
+      args.receivingWallet, //     address _treasury,
+      args.receivingWallet //     address _affiliate
+    )
+    console.log(`Submitted escrow lootbox creation!`)
+    const filter = {
+      fromBlock: blockNum,
+      address: lootboxInstant.address,
+      topics: [
+        ethers.utils.solidityKeccak256(
+          ['string'],
+          ['LootboxCreated(string,address,address,address,uint256,uint256,uint256)']
+        ),
+      ],
+    }
+    provider.on(filter, async (log) => {
+      if (log !== undefined) {
+        const decodedLog = decodeEVMLog({
+          eventName: 'LootboxCreated',
+          log: log,
+          abi: `
+          event LootboxCreated(
+            string lootboxName,
+            address indexed lootbox,
+            address indexed issuer,
+            address indexed treasury,
+            uint256 targetSharesSold,
+            uint256 maxSharesSold,
+            uint256 sharePriceUSD
+          )`,
+          keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'targetSharesSold', 'maxSharesSold', 'sharePriceUSD'],
+        })
+        const { issuer, lootbox, lootboxName, targetSharesSold, maxSharesSold, treasury } = decodedLog as any
+        const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
+        const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
+        if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
+          console.log(`
+          
+          ---- 🎉🎉🎉 ----
+          
+          Congratulations! You've created an Escrow Lootbox!
+          Escrow Lootbox Address: ${lootbox}
+  
+          ---------------
+          
+          `)
+          args.setLootboxAddress(lootbox)
+          const basisPointsReturnTarget = new web3Utils.BN(args.basisPoints.toString())
+            .add(new web3Utils.BN('100')) // make it whole
+            .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
+            .mul(args.fundraisingTargetMax)
+            .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
+
+          const ticketID = '0x'
+          const numShares = ethers.utils.formatEther(maxSharesSold)
+          try {
+            const [stampUrl] = await Promise.all([
+              stampNewLootbox({
+                // backgroundImage: ticketState.coverUrl as Url,
+                // logoImage: ticketState.logoUrl as Url,
+                logoImage: imagePublicPath,
+                backgroundImage: backgroundPublicPath,
+                themeColor: args.lootboxThemeColor as string,
+                name: lootboxName,
+                ticketID,
+                lootboxAddress: lootbox,
+                chainIdHex: manifest.chain.chainIDHex,
+                numShares,
+              }),
+              createTokenURIData({
+                address: lootbox,
+                name: lootboxName,
+                description: args.biography as string,
+                // image: ticketState.logoUrl as string,
+                image: imagePublicPath,
+                backgroundColor: args.lootboxThemeColor as string,
+                // backgroundImage: ticketState.coverUrl as string,
+                backgroundImage: backgroundPublicPath,
+                lootbox: {
+                  address: lootbox,
+                  chainIdHex: manifest.chain.chainIDHex,
+                  chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+                  chainName: manifest.chain.chainName,
+                  targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
+                  fundraisingTarget: args.fundraisingTarget.toString(),
+                  fundraisingTargetMax: args.fundraisingTargetMax.toString(),
+                  basisPointsReturnTarget: args.basisPoints.toString(),
+                  returnAmountTarget: basisPointsReturnTarget.toString(),
+                  pricePerShare: pricePerShare.toString(),
+                  lootboxThemeColor: args.lootboxThemeColor as string,
+                  transactionHash: log.transactionHash as string,
+                  blockNumber: log.blockNumber,
+                },
+                socials: {
+                  twitter: socials.twitter,
+                  email: socials.email,
+                  instagram: socials.instagram,
+                  tiktok: socials.tiktok,
+                  facebook: socials.facebook,
+                  discord: socials.discord,
+                  youtube: socials.youtube,
+                  snapchat: socials.snapchat,
+                  twitch: socials.twitch,
+                  web: socials.web,
+                },
+              }),
+            ])
+            console.log(`Stamp URL: ${stampUrl}`)
+            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+              args.setDownloaded(true)
+            }
+          } catch (err) {
+            LogRocket.captureException(err)
+          } finally {
+            setSubmitStatus('success')
+          }
+        }
+      }
+    })
+  } catch (e) {
+    console.log(e)
+    LogRocket.captureException(e)
+    setSubmitStatus('failure')
+  }
+}
