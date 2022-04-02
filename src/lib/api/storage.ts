@@ -28,7 +28,7 @@ export const readTicketMetadata = async (
     lootboxAddress,
     semver: manifest.googleCloud.semver,
     chainIdHex: manifest.chain.chainIDHex,
-    bucket: manifest.storage.buckets.lootboxUri.id,
+    bucket: manifest.storage.buckets.data.id,
   })
 
   return { address, name, description, image, backgroundColor, backgroundImage }
