@@ -36,10 +36,9 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
+import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
-import { createTokenURIData } from 'lib/api/storage'
 import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import {
@@ -50,6 +49,7 @@ import {
   convertDecimalToHex,
   convertHexToDecimal,
   Url,
+  ITicketMetadata,
 } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
@@ -279,6 +279,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
 
     setSubmitStatus('in_progress')
+
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
@@ -296,11 +297,63 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const signer = await provider.getSigner()
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
     const submissionId = uuidv4()
+
     try {
       const [imagePublicPath, backgroundPublicPath] = await Promise.all([
         uploadLootboxLogo(submissionId, ticketState.logoFile),
         uploadLootboxCover(submissionId, ticketState.coverFile),
       ])
+
+      const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
+        .add(new web3Utils.BN('100')) // make it whole
+        .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
+        .mul(fundraisingTarget)
+        .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
+
+      /**
+       * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
+       * an event listener.
+       *
+       * Warning: we leave some fields empty (i.e. "address" or "transactionHash") because we don't have that data available yet
+       * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
+       * with the backend @cloudfns repo
+       */
+      const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
+        address: '' as ContractAddress, // This gets set in backend Pipedream
+        name: ticketState.name as string,
+        description: ticketState.description as string,
+        image: imagePublicPath,
+        backgroundColor: ticketState.lootboxThemeColor as string,
+        backgroundImage: backgroundPublicPath,
+        lootbox: {
+          address: '' as ContractAddress, // This gets set in backend Pipedream
+          transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+          blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+          factory: lootbox.address as ContractAddress,
+          chainIdHex: manifest.chain.chainIDHex,
+          chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+          chainName: manifest.chain.chainName,
+          targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+          fundraisingTarget: fundraisingTarget,
+          basisPointsReturnTarget: basisPoints.toString(),
+          returnAmountTarget: basisPointsReturnTarget.toString(),
+          pricePerShare: pricePerShare.toString(),
+          lootboxThemeColor: ticketState.lootboxThemeColor as string,
+          createdAt: new Date().valueOf(),
+        },
+        socials: {
+          twitter: socialState.twitter,
+          email: socialState.email,
+          instagram: socialState.instagram,
+          tiktok: socialState.tiktok,
+          facebook: socialState.facebook,
+          discord: socialState.discord,
+          youtube: socialState.youtube,
+          snapchat: socialState.snapchat,
+          twitch: socialState.twitch,
+          web: socialState.web,
+        },
+      }
 
       console.log(`
       
@@ -309,20 +362,20 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       maxSharesSold = ${maxSharesSold}
       pricePerShare = ${pricePerShare}
       receivingWallet = ${receivingWallet}
-      receivingWallet = ${receivingWallet}
 
       fundraisingTarget = ${fundraisingTarget}
 
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
+
       await lootbox.createLootbox(
         ticketState.name,
         ticketState.symbol,
         maxSharesSold.toString(), // uint256 _maxSharesSold,
-        pricePerShare.toString(), // uint256 _sharePriceUSD,
-        receivingWallet,
-        receivingWallet
+        receivingWallet, // Treasury
+        receivingWallet, // Affiliate
+        JSON.stringify(lootboxURI)
       )
       console.log(`Submitted lootbox creation!`)
       const filter = {
@@ -347,9 +400,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
               address indexed issuer,
               address indexed treasury,
               uint256 maxSharesSold,
-              uint256 sharePriceUSD
+              uint256 sharePriceUSD,
+              string _data
             )`,
-            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD'],
+            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
           })
           const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
           const receiver = receivingWallet ? receivingWallet.toLowerCase() : ''
@@ -366,65 +420,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             
             `)
             setLootboxAddress(lootbox)
-            const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-              .add(new web3Utils.BN('100')) // make it whole
-              .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-              .mul(fundraisingTarget)
-              .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
             const ticketID = '0x'
             const numShares = ethers.utils.formatEther(maxSharesSold)
             try {
-              const [stampUrl] = await Promise.all([
-                stampNewLootbox({
-                  // backgroundImage: ticketState.coverUrl as Url,
-                  // logoImage: ticketState.logoUrl as Url,
-                  logoImage: imagePublicPath,
-                  backgroundImage: backgroundPublicPath,
-                  themeColor: ticketState.lootboxThemeColor as string,
-                  name: lootboxName,
-                  ticketID,
-                  lootboxAddress: lootbox,
-                  chainIdHex: manifest.chain.chainIDHex,
-                  numShares,
-                }),
-                createTokenURIData({
-                  address: lootbox,
-                  name: lootboxName,
-                  description: ticketState.description as string,
-                  // image: ticketState.logoUrl as string,
-                  image: imagePublicPath,
-                  backgroundColor: ticketState.lootboxThemeColor as string,
-                  // backgroundImage: ticketState.coverUrl as string,
-                  backgroundImage: backgroundPublicPath,
-                  lootbox: {
-                    address: lootbox,
-                    chainIdHex: manifest.chain.chainIDHex,
-                    chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-                    chainName: manifest.chain.chainName,
-                    targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-                    fundraisingTarget: fundraisingTarget,
-                    basisPointsReturnTarget: basisPoints.toString(),
-                    returnAmountTarget: basisPointsReturnTarget.toString(),
-                    pricePerShare: pricePerShare.toString(),
-                    lootboxThemeColor: ticketState.lootboxThemeColor as string,
-                    transactionHash: log.transactionHash as string,
-                    blockNumber: log.blockNumber,
-                  },
-                  socials: {
-                    twitter: socialState.twitter,
-                    email: socialState.email,
-                    instagram: socialState.instagram,
-                    tiktok: socialState.tiktok,
-                    facebook: socialState.facebook,
-                    discord: socialState.discord,
-                    youtube: socialState.youtube,
-                    snapchat: socialState.snapchat,
-                    twitch: socialState.twitch,
-                    web: socialState.web,
-                  },
-                }),
-              ])
+              const stampUrl = await stampNewLootbox({
+                // backgroundImage: ticketState.coverUrl as Url,
+                // logoImage: ticketState.logoUrl as Url,
+                logoImage: imagePublicPath,
+                backgroundImage: backgroundPublicPath,
+                themeColor: ticketState.lootboxThemeColor as string,
+                name: lootboxName,
+                ticketID,
+                lootboxAddress: lootbox,
+                chainIdHex: manifest.chain.chainIDHex,
+                numShares,
+              })
+
               console.log(`Stamp URL: ${stampUrl}`)
               // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
               if (stampUrl && !downloaded && !checkMobileBrowser()) {
