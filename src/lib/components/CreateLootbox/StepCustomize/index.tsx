@@ -38,8 +38,10 @@ export const validatePricePerShare = (price: number, maxPricePerShare: number) =
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
+export const validateBadge = (url: string) => url && checkIfValidUrl(url)
 export const validateLogoFile = (file: File) => !!file
 export const validateCoverFile = (file: File) => !!file
+export const validateBadgeFile = (file: File) => !!file
 export interface StepCustomizeProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -90,8 +92,10 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     lootboxThemeColor: '',
     logoUrl: '',
     coverUrl: '',
+    badgeUrl: '',
     logoFile: '',
     coverFile: '',
+    badgeFile: '',
   }
   const [errors, setErrors] = useState(initialErrors)
   const checkAllTicketCustomizationValidations = () => {
@@ -103,6 +107,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
     if (!validateCover(props.ticketState.coverUrl as string)) valid = false
+    if (!validateBadge(props.ticketState.badgeUrl as string)) valid = false
 
     if (valid) {
       if (!validateLogoFile(props.ticketState.logoFile as File)) {
@@ -128,6 +133,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         lootboxThemeColor: '',
         logoFile: '',
         coverFile: '',
+        badgeFile: '',
       })
       props.setValidity(true)
     } else {
@@ -186,9 +192,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         coverUrl: validateCover(value as string) ? '' : 'Cover image must be a valid URL',
       })
     }
+    if (slug === 'badgeUrl') {
+      setErrors({
+        ...errors,
+        badgeUrl: validateBadge(value as string) ? '' : 'Badge image must be a valid URL',
+      })
+    }
   }
 
-  const onImageInputChange = (inputElementId: 'logo-uploader' | 'cover-uploader', slug: 'logoFile' | 'coverFile') => {
+  const onImageInputChange = (
+    inputElementId: 'badge-uploader' | 'logo-uploader' | 'cover-uploader',
+    slug: 'logoFile' | 'coverFile' | 'badgeFile'
+  ) => {
     // @ts-ignore
     const selectedFiles = document.getElementById(inputElementId)?.files
     if (selectedFiles?.length) {
@@ -201,13 +216,15 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       let elementId: string
       if (slug === 'logoFile') {
         elementId = 'ticket-candy-logo'
-      } else {
+      } else if (slug === 'coverFile') {
         elementId = 'ticket-candy-container'
+      } else {
+        elementId = 'ticket-candy-badge'
       }
       const el = document.getElementById(elementId)
 
       if (!el) {
-        console.error('Could not find element "ticket-candy-logo"')
+        console.error(`Could not find element ${elementId}`)
         return
       }
 
@@ -330,22 +347,14 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             <TicketCardCandyWrapper
               backgroundImage={props.ticketState.coverUrl as string}
               logoImage={props.ticketState.logoUrl as string}
+              badgeImage={props.ticketState.badgeUrl as string}
               themeColor={props.ticketState.lootboxThemeColor as string}
               name={props.ticketState.name as string}
+              screen={screen}
             />
             <br />
             <$Horizontal>
               <$Vertical>
-                <$InputMedium
-                  value={props.ticketState.lootboxThemeColor}
-                  onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
-                  style={{
-                    width: '100px',
-                    border: props.ticketState.lootboxThemeColor
-                      ? `${props.ticketState.lootboxThemeColor} solid 2px `
-                      : '',
-                  }}
-                />
                 {/* <$ColorPreview
                 
                     color={props.ticketState.lootboxThemeColor as string}
@@ -362,11 +371,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                     accept="image/*"
                     onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
                   />
-                  {/* <$InputMedium
-                onChange={(e) => parseInput('logoUrl', e.target.value)}
-                value={props.ticketState.logoUrl}
-                style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              /> */}
                 </$Vertical>
                 <br />
                 <$Vertical>
@@ -379,17 +383,44 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                     accept="image/*"
                     onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
                   />
-                  {/* <$InputMedium
-                onChange={(e) => parseInput('coverUrl', e.target.value)}
-                value={props.ticketState.coverUrl}
-                style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-              /> */}
                 </$Vertical>
+                <br />
+                {/* <$Vertical>
+                  <$InputImageLabel
+                    onClick={(e) => {
+                      if (props.ticketState.badgeFile) {
+                        props.updateTicketState('badgeFile', '')
+                        props.updateTicketState('badgeUrl', '')
+                        console.log(`REMOVING BADGE`)
+                      }
+                    }}
+                    htmlFor="badge-uploader"
+                  >
+                    {props.ticketState.badgeFile ? 'Change' : 'Upload'} Badge
+                  </$InputImageLabel>
+                  <$InputImage
+                    type="file"
+                    id="badge-uploader"
+                    accept="image/*"
+                    onChange={() => onImageInputChange('badge-uploader', 'badgeFile')}
+                  />
+                </$Vertical> */}
               </$Vertical>
               <$Vertical>
                 <$Vertical flex={1}>
                   <div id="color-picker" />
                 </$Vertical>
+                <$InputMedium
+                  value={props.ticketState.lootboxThemeColor}
+                  onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
+                  style={{
+                    width: '80%',
+                    textAlign: 'center',
+                    border: props.ticketState.lootboxThemeColor
+                      ? `${props.ticketState.lootboxThemeColor} solid 2px `
+                      : '',
+                  }}
+                />
               </$Vertical>
             </$Horizontal>
           </$Vertical>

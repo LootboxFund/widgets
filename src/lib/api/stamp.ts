@@ -17,6 +17,7 @@ export const downloadFile = async (fileName: string, fileSrc: Url) => {
 
 interface StampNewLootboxProps {
   backgroundImage: Url
+  badgeImage?: Url
   logoImage: Url
   themeColor: string
   name: string

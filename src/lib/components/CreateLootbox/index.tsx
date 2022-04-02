@@ -184,7 +184,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 4: Customize Ticket
   const refStepCustomize = useRef<HTMLDivElement | null>(null)
-  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File } = {
+  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File; badgeFile?: File } = {
     name: '',
     symbol: '',
     biography: '',
@@ -196,6 +196,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     /** @deprecated logoUrls are now from internal gbucket - use coverFile instead*/
     coverUrl:
       'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
+    badgeUrl: '',
   }
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const updateTicketState = (slug: string, value: string | number) => {
@@ -307,6 +308,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
           logoFile: ticketState.logoFile as File,
           coverFile: ticketState.coverFile as File,
+          badgeFile: ticketState.badgeFile as File,
           fundraisingTarget: fundraisingTarget as BigNumber,
           fundraisingTargetMax: fundraisingLimit as BigNumber,
           receivingWallet: receivingWallet as Address,
@@ -331,6 +333,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
           logoFile: ticketState.logoFile as File,
           coverFile: ticketState.coverFile as File,
+          badgeFile: ticketState.badgeFile as File,
           fundraisingTarget: fundraisingTarget as BigNumber,
           fundraisingTargetMax: fundraisingLimit as BigNumber,
           receivingWallet: receivingWallet as Address,

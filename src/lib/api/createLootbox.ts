@@ -3,7 +3,7 @@ import { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
-import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
+import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
 import { Address, ContractAddress, convertHexToDecimal } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
@@ -37,6 +37,7 @@ interface InstantLootboxArgs {
   lootboxThemeColor: string
   logoFile: File
   coverFile: File
+  badgeFile: File
   fundraisingTarget: any
   fundraisingTargetMax: any
   receivingWallet: Address
@@ -99,9 +100,10 @@ export const createInstantLootbox = async (
   const lootboxInstant = new ethers.Contract(LOOTBOX_INSTANT_FACTORY_ADDRESS, LOOTBOX_INSTANT_FACTORY_ABI, signer)
   const submissionId = uuidv4()
   try {
-    const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+    const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
       uploadLootboxLogo(submissionId, args.logoFile),
       uploadLootboxCover(submissionId, args.coverFile),
+      uploadLootboxBadge(submissionId, args.badgeFile),
     ])
 
     console.log(`
@@ -180,6 +182,7 @@ export const createInstantLootbox = async (
                 // logoImage: ticketState.logoUrl as Url,
                 logoImage: imagePublicPath,
                 backgroundImage: backgroundPublicPath,
+                badgeImage: badgePublicPath,
                 themeColor: args.lootboxThemeColor as string,
                 name: lootboxName,
                 ticketID,
@@ -196,6 +199,7 @@ export const createInstantLootbox = async (
                 backgroundColor: args.lootboxThemeColor as string,
                 // backgroundImage: ticketState.coverUrl as string,
                 backgroundImage: backgroundPublicPath,
+                badgeImage: badgePublicPath,
                 lootbox: {
                   address: lootbox,
                   chainIdHex: manifest.chain.chainIDHex,
@@ -290,9 +294,10 @@ export const createEscrowLootbox = async (
   const lootboxInstant = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
   const submissionId = uuidv4()
   try {
-    const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+    const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
       uploadLootboxLogo(submissionId, args.logoFile),
       uploadLootboxCover(submissionId, args.coverFile),
+      uploadLootboxBadge(submissionId, args.badgeFile),
     ])
 
     console.log(`
@@ -377,6 +382,7 @@ export const createEscrowLootbox = async (
                 // logoImage: ticketState.logoUrl as Url,
                 logoImage: imagePublicPath,
                 backgroundImage: backgroundPublicPath,
+                badgeImage: badgePublicPath,
                 themeColor: args.lootboxThemeColor as string,
                 name: lootboxName,
                 ticketID,
@@ -393,6 +399,7 @@ export const createEscrowLootbox = async (
                 backgroundColor: args.lootboxThemeColor as string,
                 // backgroundImage: ticketState.coverUrl as string,
                 backgroundImage: backgroundPublicPath,
+                badgeImage: badgePublicPath,
                 lootbox: {
                   address: lootbox,
                   chainIdHex: manifest.chain.chainIDHex,

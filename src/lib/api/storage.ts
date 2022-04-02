@@ -24,14 +24,14 @@ export const readTicketMetadata = async (
   lootboxAddress: ContractAddress,
   ticketID: TicketID
 ): Promise<ITicketMetadata> => {
-  const { address, name, description, image, backgroundColor, backgroundImage } = await getLootboxURI({
+  const { address, name, description, image, backgroundColor, backgroundImage, badgeImage } = await getLootboxURI({
     lootboxAddress,
     semver: manifest.googleCloud.semver,
     chainIdHex: manifest.chain.chainIDHex,
     bucket: manifest.storage.buckets.lootboxUri.id,
   })
 
-  return { address, name, description, image, backgroundColor, backgroundImage }
+  return { address, name, description, image, backgroundColor, backgroundImage, badgeImage }
 }
 
 export const createTokenURIData = async (inputs: ITicketMetadata) => {

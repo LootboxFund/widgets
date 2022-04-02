@@ -10,7 +10,7 @@ export default {
 }
 
 const Demo = (args: StepCustomizeProps) => {
-  const INITIAL_TICKET: Record<string, string | number> = {
+  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File; badgeFile?: File } = {
     name: '',
     symbol: '',
     biography: '',
@@ -18,6 +18,7 @@ const Demo = (args: StepCustomizeProps) => {
     lootboxThemeColor: '#B48AF7',
     logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
     coverUrl: 'https://gateway.pinata.cloud/ipfs/QmdZ2uzY9N77j95Vib8nM8AXBfDC4RctqefRwGLZjdsyxN',
+    badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
   }
   const [stage, setStage] = useState<StepStage>('in_progress')
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
