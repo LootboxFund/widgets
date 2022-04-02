@@ -76,7 +76,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "^0.0.33",
-    "@wormgraph/manifest": "^0.2.103",
+    "@wormgraph/manifest": "^0.2.104",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "ethers": "5.5.4",

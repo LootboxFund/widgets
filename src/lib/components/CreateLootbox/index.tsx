@@ -280,6 +280,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
 
     setSubmitStatus('in_progress')
+
     const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
@@ -353,20 +354,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       maxSharesSold = ${maxSharesSold}
       pricePerShare = ${pricePerShare}
       receivingWallet = ${receivingWallet}
-      receivingWallet = ${receivingWallet}
 
       fundraisingTarget = ${fundraisingTarget}
 
       nativeTokenPrice = ${nativeTokenPrice.toString()}
 
       `)
+
       await lootbox.createLootbox(
         ticketState.name,
         ticketState.symbol,
         maxSharesSold.toString(), // uint256 _maxSharesSold,
-        pricePerShare.toString(), // uint256 _sharePriceUSD,
-        receivingWallet,
-        receivingWallet,
+        receivingWallet, // Treasury
+        receivingWallet, // Affiliate
         JSON.stringify(lootboxURI)
       )
       console.log(`Submitted lootbox creation!`)
@@ -392,9 +392,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
               address indexed issuer,
               address indexed treasury,
               uint256 maxSharesSold,
-              uint256 sharePriceUSD
+              uint256 sharePriceUSD,
+              string _data
             )`,
-            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD'],
+            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
           })
           const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
           const receiver = receivingWallet ? receivingWallet.toLowerCase() : ''
@@ -415,20 +416,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             const ticketID = '0x'
             const numShares = ethers.utils.formatEther(maxSharesSold)
             try {
-              const [stampUrl] = await Promise.all([
-                stampNewLootbox({
-                  // backgroundImage: ticketState.coverUrl as Url,
-                  // logoImage: ticketState.logoUrl as Url,
-                  logoImage: imagePublicPath,
-                  backgroundImage: backgroundPublicPath,
-                  themeColor: ticketState.lootboxThemeColor as string,
-                  name: lootboxName,
-                  ticketID,
-                  lootboxAddress: lootbox,
-                  chainIdHex: manifest.chain.chainIDHex,
-                  numShares,
-                }),
-              ])
+              const stampUrl = await stampNewLootbox({
+                // backgroundImage: ticketState.coverUrl as Url,
+                // logoImage: ticketState.logoUrl as Url,
+                logoImage: imagePublicPath,
+                backgroundImage: backgroundPublicPath,
+                themeColor: ticketState.lootboxThemeColor as string,
+                name: lootboxName,
+                ticketID,
+                lootboxAddress: lootbox,
+                chainIdHex: manifest.chain.chainIDHex,
+                numShares,
+              })
+
               console.log(`Stamp URL: ${stampUrl}`)
               // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
               if (stampUrl && !downloaded && !checkMobileBrowser()) {
