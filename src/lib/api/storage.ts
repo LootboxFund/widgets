@@ -33,19 +33,3 @@ export const readTicketMetadata = async (
 
   return { address, name, description, image, backgroundColor, backgroundImage }
 }
-
-export const createTokenURIData = async (inputs: ITicketMetadata) => {
-  const headers = new Headers({
-    'Content-Type': 'application/json',
-    secret: 'mysecret',
-  })
-  const x = await fetch(manifest.pipedream.sources.onLootboxURI.webhookEndpoint, {
-    method: 'POST',
-    headers: headers,
-    mode: 'cors',
-    cache: 'default',
-    body: JSON.stringify(inputs),
-  })
-
-  return x
-}
