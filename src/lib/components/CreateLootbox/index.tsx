@@ -50,6 +50,7 @@ import {
   convertDecimalToHex,
   convertHexToDecimal,
   Url,
+  ITicketMetadata,
 } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
@@ -279,7 +280,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
 
     setSubmitStatus('in_progress')
-    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
+    // const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
+    const LOOTBOX_FACTORY_ADDRESS = '0xfB60F243de225B275958e76DAe8bC4160B57c939'
     const blockNum = await provider.getBlockNumber()
 
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
@@ -296,11 +298,54 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     const signer = await provider.getSigner()
     const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
     const submissionId = uuidv4()
+
     try {
       const [imagePublicPath, backgroundPublicPath] = await Promise.all([
         uploadLootboxLogo(submissionId, ticketState.logoFile),
         uploadLootboxCover(submissionId, ticketState.coverFile),
       ])
+
+      const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
+        .add(new web3Utils.BN('100')) // make it whole
+        .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
+        .mul(fundraisingTarget)
+        .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
+
+      const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number } } = {
+        address: lootbox.address as ContractAddress,
+        name: ticketState.name as string,
+        description: ticketState.description as string,
+        image: imagePublicPath,
+        backgroundColor: ticketState.lootboxThemeColor as string,
+        backgroundImage: backgroundPublicPath,
+        lootbox: {
+          address: lootbox.address as ContractAddress,
+          chainIdHex: manifest.chain.chainIDHex,
+          chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+          chainName: manifest.chain.chainName,
+          targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
+          fundraisingTarget: fundraisingTarget,
+          basisPointsReturnTarget: basisPoints.toString(),
+          returnAmountTarget: basisPointsReturnTarget.toString(),
+          pricePerShare: pricePerShare.toString(),
+          lootboxThemeColor: ticketState.lootboxThemeColor as string,
+          createdAt: new Date().valueOf(),
+          transactionHash: '', // For now we dont have this data at this point
+          blockNumber: '', // For now we dont have this data at this point
+        },
+        socials: {
+          twitter: socialState.twitter,
+          email: socialState.email,
+          instagram: socialState.instagram,
+          tiktok: socialState.tiktok,
+          facebook: socialState.facebook,
+          discord: socialState.discord,
+          youtube: socialState.youtube,
+          snapchat: socialState.snapchat,
+          twitch: socialState.twitch,
+          web: socialState.web,
+        },
+      }
 
       console.log(`
       
@@ -322,7 +367,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         maxSharesSold.toString(), // uint256 _maxSharesSold,
         pricePerShare.toString(), // uint256 _sharePriceUSD,
         receivingWallet,
-        receivingWallet
+        receivingWallet,
+        JSON.stringify(lootboxURI)
       )
       console.log(`Submitted lootbox creation!`)
       const filter = {
@@ -366,11 +412,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             
             `)
             setLootboxAddress(lootbox)
-            const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-              .add(new web3Utils.BN('100')) // make it whole
-              .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-              .mul(fundraisingTarget)
-              .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
             const ticketID = '0x'
             const numShares = ethers.utils.formatEther(maxSharesSold)
@@ -387,42 +428,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
                   lootboxAddress: lootbox,
                   chainIdHex: manifest.chain.chainIDHex,
                   numShares,
-                }),
-                createTokenURIData({
-                  address: lootbox,
-                  name: lootboxName,
-                  description: ticketState.description as string,
-                  // image: ticketState.logoUrl as string,
-                  image: imagePublicPath,
-                  backgroundColor: ticketState.lootboxThemeColor as string,
-                  // backgroundImage: ticketState.coverUrl as string,
-                  backgroundImage: backgroundPublicPath,
-                  lootbox: {
-                    address: lootbox,
-                    chainIdHex: manifest.chain.chainIDHex,
-                    chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-                    chainName: manifest.chain.chainName,
-                    targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-                    fundraisingTarget: fundraisingTarget,
-                    basisPointsReturnTarget: basisPoints.toString(),
-                    returnAmountTarget: basisPointsReturnTarget.toString(),
-                    pricePerShare: pricePerShare.toString(),
-                    lootboxThemeColor: ticketState.lootboxThemeColor as string,
-                    transactionHash: log.transactionHash as string,
-                    blockNumber: log.blockNumber,
-                  },
-                  socials: {
-                    twitter: socialState.twitter,
-                    email: socialState.email,
-                    instagram: socialState.instagram,
-                    tiktok: socialState.tiktok,
-                    facebook: socialState.facebook,
-                    discord: socialState.discord,
-                    youtube: socialState.youtube,
-                    snapchat: socialState.snapchat,
-                    twitch: socialState.twitch,
-                    web: socialState.web,
-                  },
                 }),
               ])
               console.log(`Stamp URL: ${stampUrl}`)
