@@ -36,7 +36,7 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
+import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
 import { createTokenURIData } from 'lib/api/storage'
@@ -280,8 +280,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
 
     setSubmitStatus('in_progress')
-    // const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
-    const LOOTBOX_FACTORY_ADDRESS = '0xfB60F243de225B275958e76DAe8bC4160B57c939'
+    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
     const blockNum = await provider.getBlockNumber()
 
     const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
