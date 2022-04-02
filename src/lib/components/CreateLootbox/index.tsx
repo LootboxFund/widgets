@@ -311,15 +311,26 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         .mul(fundraisingTarget)
         .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
-      const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number } } = {
-        address: lootbox.address as ContractAddress,
+      /**
+       * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
+       * an event listener.
+       *
+       * Warning: we leave some fields empty (i.e. "address" or "transactionHash") because we don't have that data available yet
+       * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
+       * with the backend @cloudfns repo
+       */
+      const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
+        address: '' as ContractAddress, // This gets set in backend Pipedream
         name: ticketState.name as string,
         description: ticketState.description as string,
         image: imagePublicPath,
         backgroundColor: ticketState.lootboxThemeColor as string,
         backgroundImage: backgroundPublicPath,
         lootbox: {
-          address: lootbox.address as ContractAddress,
+          address: '' as ContractAddress, // This gets set in backend Pipedream
+          transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+          blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+          factory: lootbox.address as ContractAddress,
           chainIdHex: manifest.chain.chainIDHex,
           chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
           chainName: manifest.chain.chainName,
@@ -330,8 +341,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           pricePerShare: pricePerShare.toString(),
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
           createdAt: new Date().valueOf(),
-          transactionHash: '', // For now we dont have this data at this point
-          blockNumber: '', // For now we dont have this data at this point
         },
         socials: {
           twitter: socialState.twitter,
