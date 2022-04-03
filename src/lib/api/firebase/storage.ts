@@ -35,3 +35,10 @@ export const uploadLootboxCover = async (folder: string, file: File): Promise<st
   const res = await uploadImageToBucket(fileDestination, file)
   return constructPublicPath(res)
 }
+
+export const uploadLootboxBadge = async (folder: string, file: File): Promise<string> => {
+  const extension = file?.name?.split('.').pop()
+  const fileDestination = `${LOOTBOX_ASSETS}/${folder}/badge${extension ? '.' + extension : ''}`
+  const res = await uploadImageToBucket(fileDestination, file)
+  return constructPublicPath(res)
+}

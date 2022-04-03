@@ -4,7 +4,7 @@ import StepTermsConditions, {
   SubmitStatus,
 } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
-import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
+import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 import { initDApp, useEthers, useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
@@ -67,7 +67,7 @@ const Demo = (args: StepTermsConditionsProps) => {
     const receivingWallet = '0xA86E179eCE6785ad758cd35d81006C12EbaF8D2A'
 
     const signer = await provider.getSigner()
-    const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
+    const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
     try {
       const x = await lootbox
         .connect(signer)

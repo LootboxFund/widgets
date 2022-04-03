@@ -146,7 +146,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       >
         <$Vertical flex={1}>
           <$StepHeading>
-            5. Contact Information
+            6. Contact Information
             <HelpIcon tipID="stepSocials" />
             <ReactTooltip id="stepSocials" place="right" effect="solid">
               Having public profiles is important for building trust with investors.
@@ -162,7 +162,10 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
           <$SocialGridInputs screen={screen}>
             {SOCIALS.map((social) => {
               return (
-                <$Horizontal style={screen === 'mobile' ? { marginBottom: '10px' } : { marginRight: '20px' }}>
+                <$Horizontal
+                  key={social.slug}
+                  style={screen === 'mobile' ? { marginBottom: '10px' } : { marginRight: '20px' }}
+                >
                   <$SocialLogo src={social.icon} />
                   <$InputMedium
                     style={{ width: '100%' }}

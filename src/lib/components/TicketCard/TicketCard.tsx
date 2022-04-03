@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID } from './state'
 import { ContractAddress } from '@wormgraph/helpers'
+import { ScreenSize } from 'lib/hooks/useScreenSize'
 
 export interface TicketCardProps {
   ticketID: string | undefined
@@ -46,8 +47,10 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
 interface TicketCardCandyWrapperProps {
   backgroundImage: string
   logoImage: string
+  badgeImage?: string
   themeColor: string
   name: string
+  screen: ScreenSize
 }
 export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
   return (
@@ -60,6 +63,16 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
       }}
     >
       <$LogoContainer>
+        {props.badgeImage && (
+          <$BadgeImage
+            // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
+            id="ticket-candy-badge"
+            image={props.badgeImage}
+            backgroundShadowColor={props.themeColor}
+            // margin="auto auto 0"
+          />
+        )}
+
         <$TicketLogo
           // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
           id="ticket-candy-logo"
@@ -89,6 +102,7 @@ const BASE_CONTAINER = `
 const $LogoContainer = styled.div`
   flex: 1;
   padding: 2.2rem 2.2rem 1.5rem;
+  display: relative;
 `
 
 export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
@@ -101,6 +115,7 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   background-size: cover;
   cursor: pointer;
   background-position: center;
+  position: relative;
 `
 
 export const $TicketRedeemContainer = styled.section`
@@ -136,6 +151,30 @@ export const $TicketLogo = styled.div<{
   ${(props) => (props.margin && `margin: ${props.margin};`) || 'margin: auto;'}
 `
 
+export const $BadgeImage = styled.div<{
+  image: string
+  backgroundShadowColor?: string
+  screen?: ScreenSize
+}>`
+  width: 100px;
+  height: 100px;
+  border: 0px solid transparent;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  ${(props) => props.image && `background: url("${props.image}");`}
+  background-size: cover;
+  background-position: center;
+  box-shadow: ${(props) =>
+    props.backgroundShadowColor
+      ? `0px 0px 20px 10px ${props.backgroundShadowColor}9A`
+      : `0px 10px 10px rgba(0, 0, 0, 0.2)`};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: absolute;
+  margin-left: ${(props) => (props.screen === 'desktop' ? '40%' : '45%')};
+`
+
 export const $TicketTag = styled.section`
   width: 100%;
   display: flex;
@@ -145,7 +184,6 @@ export const $TicketTag = styled.section`
   border-radius: 10px;
   padding: 20px 10px;
   box-sizing: border-box;
-}
 `
 
 export const $TagText = styled.p`

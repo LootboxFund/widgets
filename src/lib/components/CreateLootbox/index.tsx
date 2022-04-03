@@ -59,6 +59,8 @@ import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import { v4 as uuidv4 } from 'uuid'
 import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
+import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
+import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -89,10 +91,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
 
-  type FormStep = 'stepNetwork' | 'stepFunding' | 'stepReturns' | 'stepCustomize' | 'stepSocials' | 'stepTerms'
+  type FormStep =
+    | 'stepNetwork'
+    | 'stepType'
+    | 'stepFunding'
+    | 'stepReturns'
+    | 'stepCustomize'
+    | 'stepSocials'
+    | 'stepTerms'
 
   const INITIAL_FORM_STATE: Record<FormStep, StepStage> = {
     stepNetwork: 'in_progress',
+    stepType: 'not_yet',
     stepFunding: 'not_yet',
     stepReturns: 'not_yet',
     stepCustomize: 'not_yet',
@@ -104,6 +114,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   // VALIDITY: Validity of the forms
   const INITIAL_VALIDITY: Record<FormStep, boolean> = {
     stepNetwork: false,
+    stepType: false,
     stepFunding: false,
     stepReturns: false,
     stepCustomize: false,
@@ -123,7 +134,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }-${defaultPaybackDate.getDate()}`
     // `${defaultPaybackDate.getFullYear()}-${defaultPaybackDate.getMonth() + 1}-${defaultPaybackDate.getDate()}`
   )
+  const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
+  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('2', 'ether')))
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
 
   // STEP 1: Choose Network
@@ -149,6 +162,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return network && reputationWallet && reputationWallet.length > 0
   }
 
+  // STEP 2: Choose Type
+  const refStepType = useRef<HTMLDivElement | null>(null)
+  const checkTypeStepDone = () => {
+    return fundingType && fundingType.length > 0
+  }
+
   // STEP 2: Choose Funding
   const refStepFunding = useRef<HTMLDivElement | null>(null)
   const [receivingWallet, setReceivingWallet] = useState<Address | undefined>(
@@ -165,7 +184,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 4: Customize Ticket
   const refStepCustomize = useRef<HTMLDivElement | null>(null)
-  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File } = {
+  const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File; badgeFile?: File } = {
     name: '',
     symbol: '',
     biography: '',
@@ -177,6 +196,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     /** @deprecated logoUrls are now from internal gbucket - use coverFile instead*/
     coverUrl:
       'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
+    badgeUrl: '',
   }
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const updateTicketState = (slug: string, value: string | number) => {
@@ -196,7 +216,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
-  const INITIAL_SOCIALS: Record<string, string> = {
+  const INITIAL_SOCIALS: {
+    twitter: string
+    email: string
+    instagram: string
+    tiktok: string
+    facebook: string
+    discord: string
+    youtube: string
+    snapchat: string
+    twitch: string
+    web: string
+  } = {
     twitter: '',
     email: '',
     instagram: '',
@@ -263,215 +294,59 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
-    if (!nativeTokenPrice) {
-      console.error('No token price')
-      setSubmitStatus('failure')
-      return
-    }
-    if (!provider) {
-      throw new Error('No provider')
-    }
-    if (!ticketState.pricePerShare) {
-      throw new Error('Missing share price')
-    }
-    if (!(ticketState.coverFile && ticketState.logoFile)) {
-      throw new Error('Missing images')
-    }
-
-    setSubmitStatus('in_progress')
-
-    const LOOTBOX_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxFactory.address
-    const blockNum = await provider.getBlockNumber()
-
-    const pricePerShare = new web3Utils.BN(web3Utils.toWei(ticketState.pricePerShare.toString(), 'gwei')).div(
-      new web3Utils.BN('10')
-    )
-    const maxSharesSold = fundraisingTarget
-      .mul(new web3Utils.BN(nativeTokenPrice.toString()))
-      .div(pricePerShare)
-      .mul(new web3Utils.BN('11'))
-      .div(new web3Utils.BN('10'))
-      .toString()
-
-    const ethers = useEthers()
-    const signer = await provider.getSigner()
-    const lootbox = new ethers.Contract(LOOTBOX_FACTORY_ADDRESS, LOOTBOX_FACTORY_ABI, signer)
-    const submissionId = uuidv4()
-
-    try {
-      const [imagePublicPath, backgroundPublicPath] = await Promise.all([
-        uploadLootboxLogo(submissionId, ticketState.logoFile),
-        uploadLootboxCover(submissionId, ticketState.coverFile),
-      ])
-
-      const basisPointsReturnTarget = new web3Utils.BN(basisPoints.toString())
-        .add(new web3Utils.BN('100')) // make it whole
-        .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-        .mul(fundraisingTarget)
-        .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
-
-      /**
-       * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
-       * an event listener.
-       *
-       * Warning: we leave some fields empty (i.e. "address" or "transactionHash") because we don't have that data available yet
-       * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
-       * with the backend @cloudfns repo
-       */
-      const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
-        address: '' as ContractAddress, // This gets set in backend Pipedream
-        name: ticketState.name as string,
-        description: ticketState.description as string,
-        image: imagePublicPath,
-        backgroundColor: ticketState.lootboxThemeColor as string,
-        backgroundImage: backgroundPublicPath,
-        lootbox: {
-          address: '' as ContractAddress, // This gets set in backend Pipedream
-          transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-          blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-          factory: lootbox.address as ContractAddress,
-          chainIdHex: manifest.chain.chainIDHex,
-          chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-          chainName: manifest.chain.chainName,
-          targetPaybackDate: paybackDate ? new Date(paybackDate) : new Date(),
-          fundraisingTarget: fundraisingTarget,
-          basisPointsReturnTarget: basisPoints.toString(),
-          returnAmountTarget: basisPointsReturnTarget.toString(),
-          pricePerShare: pricePerShare.toString(),
+    const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    if (fundingType === 'instant') {
+      console.log(`Generating Instant Lootbox...`)
+      await createInstantLootbox(
+        provider,
+        setSubmitStatus,
+        {
+          nativeTokenPrice: nativeTokenPrice as BigNumber,
+          name: ticketState.name as string,
+          symbol: ticketState.symbol as string,
+          biography: ticketState.biography as string,
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
-          createdAt: new Date().valueOf(),
+          logoFile: ticketState.logoFile as File,
+          coverFile: ticketState.coverFile as File,
+          badgeFile: ticketState.badgeFile as File,
+          fundraisingTarget: fundraisingTarget as BigNumber,
+          fundraisingTargetMax: fundraisingLimit as BigNumber,
+          receivingWallet: receivingWallet as Address,
+          currentAccount: current as Address,
+          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+          basisPoints,
+          paybackDate: paybackDate,
+          downloaded,
+          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-        socials: {
-          twitter: socialState.twitter,
-          email: socialState.email,
-          instagram: socialState.instagram,
-          tiktok: socialState.tiktok,
-          facebook: socialState.facebook,
-          discord: socialState.discord,
-          youtube: socialState.youtube,
-          snapchat: socialState.snapchat,
-          twitch: socialState.twitch,
-          web: socialState.web,
+        socialState
+      )
+    } else {
+      await createEscrowLootbox(
+        provider,
+        setSubmitStatus,
+        {
+          nativeTokenPrice: nativeTokenPrice as BigNumber,
+          name: ticketState.name as string,
+          symbol: ticketState.symbol as string,
+          biography: ticketState.biography as string,
+          lootboxThemeColor: ticketState.lootboxThemeColor as string,
+          logoFile: ticketState.logoFile as File,
+          coverFile: ticketState.coverFile as File,
+          badgeFile: ticketState.badgeFile as File,
+          fundraisingTarget: fundraisingTarget as BigNumber,
+          fundraisingTargetMax: fundraisingLimit as BigNumber,
+          receivingWallet: receivingWallet as Address,
+          currentAccount: current as Address,
+          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+          basisPoints,
+          paybackDate: paybackDate,
+          downloaded,
+          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-      }
-
-      console.log(`
-      
-      ticketState.name = ${ticketState.name}
-      ticketState.symbol = ${ticketState.symbol}
-      maxSharesSold = ${maxSharesSold}
-      pricePerShare = ${pricePerShare}
-      receivingWallet = ${receivingWallet}
-
-      fundraisingTarget = ${fundraisingTarget}
-
-      nativeTokenPrice = ${nativeTokenPrice.toString()}
-
-      `)
-
-      await lootbox.createLootbox(
-        ticketState.name,
-        ticketState.symbol,
-        maxSharesSold.toString(), // uint256 _maxSharesSold,
-        receivingWallet, // Treasury
-        receivingWallet, // Affiliate
-        JSON.stringify(lootboxURI)
+        socialState
       )
-      console.log(`Submitted lootbox creation!`)
-      const filter = {
-        fromBlock: blockNum,
-        address: lootbox.address,
-        topics: [
-          ethers.utils.solidityKeccak256(
-            ['string'],
-            ['LootboxCreated(string,address,address,address,uint256,uint256)']
-          ),
-        ],
-      }
-      provider.on(filter, async (log) => {
-        if (log !== undefined) {
-          const decodedLog = decodeEVMLog({
-            eventName: 'LootboxCreated',
-            log: log,
-            abi: `
-            event LootboxCreated(
-              string lootboxName,
-              address indexed lootbox,
-              address indexed issuer,
-              address indexed treasury,
-              uint256 maxSharesSold,
-              uint256 sharePriceUSD,
-              string _data
-            )`,
-            keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
-          })
-          const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
-          const receiver = receivingWallet ? receivingWallet.toLowerCase() : ''
-          const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
-          if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
-            console.log(`
-            
-            ---- 🎉🎉🎉 ----
-            
-            Congratulations! You've created a lootbox!
-            Lootbox Address: ${lootbox}
-    
-            ---------------
-            
-            `)
-            setLootboxAddress(lootbox)
-
-            const ticketID = '0x'
-            const numShares = ethers.utils.formatEther(maxSharesSold)
-            try {
-              const stampUrl = await stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                themeColor: ticketState.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
-                numShares,
-              })
-
-              console.log(`Stamp URL: ${stampUrl}`)
-              // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-              if (stampUrl && !downloaded && !checkMobileBrowser()) {
-                await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
-                setDownloaded(true)
-              }
-            } catch (err) {
-              LogRocket.captureException(err)
-            } finally {
-              setSubmitStatus('success')
-            }
-          }
-        }
-      })
-    } catch (e) {
-      console.log(e)
-      LogRocket.captureException(e)
-      setSubmitStatus('failure')
     }
-  }
-
-  const checkMobileBrowser = (): boolean => {
-    // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
-    let test: string | undefined = (navigator as any)?.userAgent || (navigator as any)?.vendor || (window as any)?.opera
-    if (!test) {
-      return false
-    }
-    return (
-      /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
-        test
-      ) ||
-      /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(
-        test.substr(0, 4)
-      )
-    )
   }
 
   const goToLootboxAdminPage = () => {
@@ -491,8 +366,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       stepNetwork: true,
     })
   }
+  if (checkNetworkStepDone() && checkTypeStepDone() && stage.stepType !== 'may_proceed') {
+    setStage({
+      ...stage,
+      stepType: 'may_proceed',
+    })
+    setValidity({
+      ...validity,
+      stepType: true,
+    })
+  }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     reputationWallet.length > 0 &&
     stage.stepFunding !== 'may_proceed'
@@ -516,6 +402,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     stage.stepReturns !== 'may_proceed'
@@ -536,6 +423,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -557,6 +445,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -575,6 +464,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
   if (
     checkNetworkStepDone() &&
+    checkTypeStepDone() &&
     checkFundingStepDone() &&
     checkReturnsStepDone() &&
     checkCustomizeStepDone() &&
@@ -605,10 +495,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
       />
       <$Spacer></$Spacer>
+      <StepChooseType
+        ref={refStepType}
+        selectedType={fundingType}
+        selectedNetwork={network}
+        stage={stage.stepType}
+        onSelectType={setFundingType}
+        onNext={() => console.log('onNext')}
+        setValidity={(bool: boolean) => console.log(bool)}
+      />
+      <$Spacer></$Spacer>
       <StepChooseFunding
         ref={refStepFunding}
+        type={fundingType}
         selectedNetwork={network}
+        fundraisingLimit={fundraisingLimit}
         fundraisingTarget={fundraisingTarget}
+        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
         setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
         receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
         setReceivingWallet={setReceivingWallet}

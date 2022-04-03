@@ -26,7 +26,10 @@ export const validateReceivingWallet = async (receivingWallet: string, web3Utils
 export interface StepChooseFundingProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
+  type: 'escrow' | 'instant' | 'tournament'
   fundraisingTarget: BigNumber
+  fundraisingLimit: BigNumber
+  setFundraisingLimit: (limit: BigNumber) => void
   setFundraisingTarget: (amount: BigNumber) => void
   receivingWallet: Address
   setReceivingWallet: (addr: Address) => void
@@ -39,9 +42,11 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   const { screen } = useWindowSize()
   const initialErrors = {
     fundraisingTarget: '',
+    fundraisingLimit: '',
     receivingWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
+  const [showMaxInput, setShowMaxInput] = useState(false)
 
   useEffect(() => {
     getLatestPrice()
@@ -52,20 +57,20 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
-  const calculateEquivalentUSDPrice = () => {
+  const calculateEquivalentUSDPrice = (amount: BigNumber) => {
     return nativeTokenPrice
       ? nativeTokenPrice
-          .multipliedBy(props.fundraisingTarget)
+          .multipliedBy(amount)
           .dividedBy(10 ** 18)
           .toFixed(2)
       : 0
   }
 
   const renderInputFundraisingTarget = () => {
-    const calculateInputWidth = () => {
-      const projectedWidth = web3Utils.fromWei(props.fundraisingTarget || '0').toString().length * 20
+    const calculateInputWidth = (amount: BigNumber) => {
+      const projectedWidth = web3Utils.fromWei(amount || '0').toString().length * 20
       const width = projectedWidth > 200 ? 200 : projectedWidth
-      return `${props.fundraisingTarget ? width : 100}px`
+      return `${amount ? width : 100}px`
     }
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
@@ -91,14 +96,24 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       <$Vertical>
         {ref && <div ref={ref}></div>}
         <$StepSubheading>
-          Fundraising Target
-          <HelpIcon tipID="fundraisingTarget" />
-          <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
-            We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the
-            value of the native token. You will receive the money right away, regardless of whether you hit your
-            fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your fundraising
-            target.
-          </ReactTooltip>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+            <div>
+              Target Fundraising Amount
+              <HelpIcon tipID="fundraisingTarget" />
+              <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
+                We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in
+                the value of the native token. You will receive the money right away, regardless of whether you hit your
+                fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your
+                fundraising target.
+              </ReactTooltip>
+            </div>
+            <span
+              onClick={() => setShowMaxInput(!showMaxInput)}
+              style={{ cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {showMaxInput ? `Hide` : `Show`} Max Limit
+            </span>
+          </div>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -122,12 +137,89 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
                 onChange={parseInput}
                 placeholder="0.01"
                 screen={screen}
-                width={calculateInputWidth()}
+                width={calculateInputWidth(props.fundraisingTarget)}
               />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
-              <$InputTranslationHeavy>{`$${calculateEquivalentUSDPrice()} USD`}</$InputTranslationHeavy>
+              <$InputTranslationHeavy>{`$${calculateEquivalentUSDPrice(
+                props.fundraisingTarget
+              )} USD`}</$InputTranslationHeavy>
+            </div>
+          </div>
+        </$InputWrapper>
+      </$Vertical>
+    )
+  }
+  const renderInputFundraisingLimit = () => {
+    const calculateInputWidth = (amount: BigNumber) => {
+      const projectedWidth = web3Utils.fromWei(amount || '0').toString().length * 20
+      const width = projectedWidth > 200 ? 200 : projectedWidth
+      return `${amount ? width : 100}px`
+    }
+    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
+      props.setFundraisingLimit(value)
+      const validFundraise = validateFundraisingTarget(value)
+      const validReceiver = await validateReceivingWallet(props.receivingWallet, web3Utils)
+      if (validFundraise) {
+        setErrors({
+          ...errors,
+          fundraisingLimit: '',
+        })
+      } else if (validFundraise && validReceiver) {
+        props.setValidity(true)
+      } else {
+        setErrors({
+          ...errors,
+          fundraisingLimit: 'Cannot have a negative fundraising limit',
+        })
+        props.setValidity(false)
+      }
+    }
+    return (
+      <$Vertical>
+        {ref && <div ref={ref}></div>}
+        <$StepSubheading>
+          Max Fundraising Limit
+          <HelpIcon tipID="fundraisingLimit" />
+          <ReactTooltip id="fundraisingLimit" place="right" effect="solid">
+            We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the
+            value of the native token. You will receive the money right away, regardless of whether you hit your
+            fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your fundraising
+            target.
+          </ReactTooltip>
+        </$StepSubheading>
+        <$InputWrapper screen={screen}>
+          <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+            <div
+              style={{
+                flex: 9,
+                width: 'auto',
+                maxWidth: '200px',
+                paddingLeft: '10px',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}
+            >
+              {props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />}
+              <$Input
+                type="number"
+                value={web3Utils.fromWei(props.fundraisingLimit).toString()}
+                min="0"
+                onChange={parseInput}
+                placeholder="0.01"
+                screen={screen}
+                width={calculateInputWidth(props.fundraisingLimit)}
+              />
+              <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
+            </div>
+            <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
+              <$InputTranslationHeavy>{`$${calculateEquivalentUSDPrice(
+                props.fundraisingLimit
+              )} USD`}</$InputTranslationHeavy>
             </div>
           </div>
         </$InputWrapper>
@@ -161,7 +253,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     return (
       <$Vertical>
         <$StepSubheading>
-          Receiving Wallet
+          {props.type === 'tournament' ? `Tournament Wallet` : `Receiving Wallet`}
           <HelpIcon tipID="receivingWallet" />
           <ReactTooltip id="receivingWallet" place="right" effect="solid">
             This address will receive the money right away. We highly recommend you use a MultiSig wallet if you are a
@@ -191,7 +283,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>
-              2. How much money do you need?
+              3. How much money do you need?
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
                 We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching
@@ -205,6 +297,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             <br />
             <br />
             {renderInputFundraisingTarget()}
+            {showMaxInput && (
+              <>
+                <br />
+                {renderInputFundraisingLimit()}
+              </>
+            )}
+
             <br />
             {renderInputReceivingWallet()}
           </$Vertical>
