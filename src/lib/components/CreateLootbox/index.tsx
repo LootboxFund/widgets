@@ -36,27 +36,12 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
-import { NetworkOption, NETWORK_OPTIONS } from './state'
+import { NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js'
-import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
-import {
-  Address,
-  BLOCKCHAINS,
-  chainIdHexToSlug,
-  ContractAddress,
-  convertDecimalToHex,
-  convertHexToDecimal,
-  Url,
-  ITicketMetadata,
-} from '@wormgraph/helpers'
+import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
-import { manifest } from '../../../manifest'
-import { decodeEVMLog } from 'lib/api/evm'
-import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
-import { v4 as uuidv4 } from 'uuid'
 import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
