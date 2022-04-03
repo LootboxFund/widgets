@@ -137,6 +137,12 @@
         "internalType": "uint256",
         "name": "sharePriceUSD",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_data",
+        "type": "string"
       }
     ],
     "name": "LootboxCreated",
@@ -345,6 +351,11 @@
         "internalType": "address",
         "name": "_affiliate",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_data",
+        "type": "string"
       }
     ],
     "name": "createLootbox",

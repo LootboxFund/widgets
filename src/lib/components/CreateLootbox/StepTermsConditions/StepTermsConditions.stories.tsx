@@ -10,7 +10,6 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import Web3 from 'web3'
 import { Address, convertHexToDecimal } from '@wormgraph/helpers'
-import { createTokenURIData } from 'lib/api/storage'
 
 export default {
   title: 'CreateLootbox Step - Terms',
@@ -114,41 +113,6 @@ const Demo = (args: StepTermsConditionsProps) => {
             .mul(fundraisingTarget)
             .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
           console.log(`basisPointsReturnTarget = ${basisPointsReturnTarget}`)
-          createTokenURIData({
-            address: lootbox,
-            name: lootboxName,
-            description: 'description',
-            image: 'logo.png',
-            backgroundColor: '#F0B90B',
-            backgroundImage: 'background.png',
-            lootbox: {
-              address: lootbox,
-              chainIdHex: 'chainIdHex',
-              chainIdDecimal: 'chainIdDecimal',
-              chainName: 'chainName',
-              targetPaybackDate: new Date(),
-              fundraisingTarget,
-              fundraisingTargetMax: fundraisingTarget,
-              basisPointsReturnTarget: '10',
-              returnAmountTarget: basisPointsReturnTarget.toString(),
-              pricePerShare: '6000000',
-              lootboxThemeColor: '#000000',
-              transactionHash: event.transactionHash as string,
-              blockNumber: event.blockNumber,
-            },
-            socials: {
-              twitter: '',
-              email: '',
-              instagram: '',
-              tiktok: '',
-              facebook: '',
-              discord: '',
-              youtube: '',
-              snapchat: '',
-              twitch: '',
-              web: '',
-            },
-          })
         }
       })
     } catch (e) {

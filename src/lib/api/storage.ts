@@ -28,24 +28,8 @@ export const readTicketMetadata = async (
     lootboxAddress,
     semver: manifest.googleCloud.semver,
     chainIdHex: manifest.chain.chainIDHex,
-    bucket: manifest.storage.buckets.lootboxUri.id,
+    bucket: manifest.storage.buckets.data.id,
   })
 
   return { address, name, description, image, backgroundColor, backgroundImage, badgeImage }
-}
-
-export const createTokenURIData = async (inputs: ITicketMetadata) => {
-  const headers = new Headers({
-    'Content-Type': 'application/json',
-    secret: 'mysecret',
-  })
-  const x = await fetch(manifest.pipedream.sources.onLootboxURI.webhookEndpoint, {
-    method: 'POST',
-    headers: headers,
-    mode: 'cors',
-    cache: 'default',
-    body: JSON.stringify(inputs),
-  })
-
-  return x
 }

@@ -36,10 +36,9 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxFactory.json'
+import LOOTBOX_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import { NetworkOption, NETWORK_OPTIONS } from './state'
 import { BigNumber } from 'bignumber.js'
-import { createTokenURIData } from 'lib/api/storage'
 import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import {
@@ -50,6 +49,7 @@ import {
   convertDecimalToHex,
   convertHexToDecimal,
   Url,
+  ITicketMetadata,
 } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
