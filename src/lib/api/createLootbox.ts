@@ -10,7 +10,6 @@ import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
-import { BigNumber } from 'bignumber.js'
 
 const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -67,7 +66,9 @@ export const createInstantLootbox = async (
   args: InstantLootboxArgs,
   socials: LootboxSocials
 ) => {
-  const LOOTBOX_INSTANT_FACTORY_ADDRESS = '0xA8891B4A16d40f612c6a4dc36C45c9D2c1e351F2' as ContractAddress // manifest.lootbox.contracts.LootboxInstantFactory.address
+  const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
+    .address as unknown as ContractAddress
+
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
     console.error('No token price')
@@ -107,7 +108,7 @@ export const createInstantLootbox = async (
       address: '' as ContractAddress, // This gets set in backend Pipedream
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_INSTANT_FACTORY_ADDRESS as ContractAddress,
+      factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
       chainIdHex: manifest.chain.chainIDHex,
       chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
       chainName: manifest.chain.chainName,
@@ -219,11 +220,6 @@ export const createInstantLootbox = async (
           
           `)
           args.setLootboxAddress(lootbox)
-          const basisPointsReturnTarget = new web3Utils.BN(args.basisPoints.toString())
-            .add(new web3Utils.BN('100')) // make it whole
-            .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-            .mul(args.fundraisingTargetMax)
-            .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
@@ -270,7 +266,9 @@ export const createEscrowLootbox = async (
   args: InstantLootboxArgs,
   socials: LootboxSocials
 ) => {
-  const LOOTBOX_ESCROW_FACTORY_ADDRESS = '0x8F09827d21b3a4be56C1a374DDFd202a9D056256' // manifest.lootbox.contracts.LootboxEscrowFactory.address
+  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory
+    .address as unknown as ContractAddress
+
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
     console.error('No token price')
@@ -309,7 +307,7 @@ export const createEscrowLootbox = async (
       address: '' as ContractAddress, // This gets set in backend Pipedream
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_ESCROW_FACTORY_ADDRESS as ContractAddress,
+      factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
       chainIdHex: manifest.chain.chainIDHex,
       chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
       chainName: manifest.chain.chainName,
@@ -439,11 +437,6 @@ export const createEscrowLootbox = async (
           
           `)
           args.setLootboxAddress(lootbox)
-          const basisPointsReturnTarget = new web3Utils.BN(args.basisPoints.toString())
-            .add(new web3Utils.BN('100')) // make it whole
-            .mul(new web3Utils.BN('10').pow(new web3Utils.BN((8 - 6).toString())))
-            .mul(args.fundraisingTargetMax)
-            .div(new web3Utils.BN('10').pow(new web3Utils.BN('8')))
 
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
