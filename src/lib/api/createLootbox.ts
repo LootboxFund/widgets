@@ -356,7 +356,7 @@ export const createEscrowLootbox = async (
 
   const ethers = ethersObj
   const signer = await provider.getSigner()
-  const lootboxInstant = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
+  const lootboxEscrow = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
 
   try {
     console.log(`
@@ -375,7 +375,16 @@ export const createEscrowLootbox = async (
     nativeTokenPrice = ${args.nativeTokenPrice.toString()}
 
     `)
-    await lootboxInstant.createLootbox(
+    //   function createLootbox(
+    //     string memory _lootboxName,
+    //     string memory _lootboxSymbol,
+    //     uint256 _targetSharesSold,
+    //     uint256 _maxSharesSold,
+    //     address _treasury,
+    //     address _affiliate,
+    //     string memory _data
+    // )
+    await lootboxEscrow.createLootbox(
       args.name, //     string memory _lootboxName,
       args.symbol, //     string memory _lootboxSymbol,
       targetSharesSold.toString(), // uint256 _targetSharesSold,
@@ -387,7 +396,7 @@ export const createEscrowLootbox = async (
     console.log(`Submitted escrow lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
-      address: lootboxInstant.address,
+      address: lootboxEscrow.address,
       topics: [
         ethers.utils.solidityKeccak256(
           ['string'],

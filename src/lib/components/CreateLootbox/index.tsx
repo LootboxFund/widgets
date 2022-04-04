@@ -307,6 +307,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         socialState
       )
     } else {
+      console.log(`Generating Escrow/Tournament Lootbox...`)
       await createEscrowLootbox(
         provider,
         setSubmitStatus,
@@ -335,7 +336,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-5-demo/lootbox?lootbox=${lootboxAddress}`
+    return `https://www.lootbox.fund/demo/0-2-8-sandbox/lootbox?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {
