@@ -107,7 +107,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
     if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
     if (!validateCover(props.ticketState.coverUrl as string)) valid = false
-    if (!validateBadge(props.ticketState.badgeUrl as string)) valid = false
+    // if (!validateBadge(props.ticketState.badgeUrl as string)) valid = false
 
     if (valid) {
       if (!validateLogoFile(props.ticketState.logoFile as File)) {

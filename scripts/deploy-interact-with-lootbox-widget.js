@@ -9,9 +9,9 @@ const manifest = Manifest.default
  * CONSTANTS
  *
  */
-const bucketName = manifest.googleCloud.bucket.id || 'guildfx-exchange.appspot.com'
+const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 // Testing out upload of file
 const uploadFile = async ({ filename, semver, absPath }) => {
