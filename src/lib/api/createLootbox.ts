@@ -10,6 +10,7 @@ import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
+import { NetworkOption } from 'lib/components/CreateLootbox/state'
 
 const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
@@ -64,7 +65,8 @@ export const createInstantLootbox = async (
   provider: ethersObj.providers.Web3Provider | undefined,
   setSubmitStatus: (status: SubmitStatus) => void,
   args: InstantLootboxArgs,
-  socials: LootboxSocials
+  socials: LootboxSocials,
+  network: NetworkOption
 ) => {
   const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
     .address as unknown as ContractAddress

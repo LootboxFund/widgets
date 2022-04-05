@@ -281,58 +281,62 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   const createLootbox = async () => {
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
-    if (fundingType === 'instant') {
-      console.log(`Generating Instant Lootbox...`)
-      await createInstantLootbox(
-        provider,
-        setSubmitStatus,
-        {
-          nativeTokenPrice: nativeTokenPrice as BigNumber,
-          name: ticketState.name as string,
-          symbol: ticketState.symbol as string,
-          biography: ticketState.biography as string,
-          lootboxThemeColor: ticketState.lootboxThemeColor as string,
-          logoFile: ticketState.logoFile as File,
-          coverFile: ticketState.coverFile as File,
-          badgeFile: ticketState.badgeFile as File,
-          fundraisingTarget: fundraisingTarget as BigNumber,
-          fundraisingTargetMax: fundraisingLimit as BigNumber,
-          receivingWallet: receivingWallet as Address,
-          currentAccount: current as Address,
-          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
-          basisPoints,
-          paybackDate: paybackDate,
-          downloaded,
-          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
-        },
-        socialState
-      )
-    } else {
-      console.log(`Generating Escrow/Tournament Lootbox...`)
-      await createEscrowLootbox(
-        provider,
-        setSubmitStatus,
-        {
-          nativeTokenPrice: nativeTokenPrice as BigNumber,
-          name: ticketState.name as string,
-          symbol: ticketState.symbol as string,
-          biography: ticketState.biography as string,
-          lootboxThemeColor: ticketState.lootboxThemeColor as string,
-          logoFile: ticketState.logoFile as File,
-          coverFile: ticketState.coverFile as File,
-          badgeFile: ticketState.badgeFile as File,
-          fundraisingTarget: fundraisingTarget as BigNumber,
-          fundraisingTargetMax: fundraisingLimit as BigNumber,
-          receivingWallet: receivingWallet as Address,
-          currentAccount: current as Address,
-          setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
-          basisPoints,
-          paybackDate: paybackDate,
-          downloaded,
-          setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
-        },
-        socialState
-      )
+    if (network) {
+      if (fundingType === 'instant') {
+        console.log(`Generating Instant Lootbox...`)
+        await createInstantLootbox(
+          provider,
+          setSubmitStatus,
+          {
+            nativeTokenPrice: nativeTokenPrice as BigNumber,
+            name: ticketState.name as string,
+            symbol: ticketState.symbol as string,
+            biography: ticketState.biography as string,
+            lootboxThemeColor: ticketState.lootboxThemeColor as string,
+            logoFile: ticketState.logoFile as File,
+            coverFile: ticketState.coverFile as File,
+            badgeFile: ticketState.badgeFile as File,
+            fundraisingTarget: fundraisingTarget as BigNumber,
+            fundraisingTargetMax: fundraisingLimit as BigNumber,
+            receivingWallet: receivingWallet as Address,
+            currentAccount: current as Address,
+            setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+            basisPoints,
+            paybackDate: paybackDate,
+            downloaded,
+            setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          },
+          socialState,
+          network
+        )
+      } else {
+        console.log(`Generating Escrow/Tournament Lootbox...`)
+        await createEscrowLootbox(
+          provider,
+          setSubmitStatus,
+          {
+            nativeTokenPrice: nativeTokenPrice as BigNumber,
+            name: ticketState.name as string,
+            symbol: ticketState.symbol as string,
+            biography: ticketState.biography as string,
+            lootboxThemeColor: ticketState.lootboxThemeColor as string,
+            logoFile: ticketState.logoFile as File,
+            coverFile: ticketState.coverFile as File,
+            badgeFile: ticketState.badgeFile as File,
+            fundraisingTarget: fundraisingTarget as BigNumber,
+            fundraisingTargetMax: fundraisingLimit as BigNumber,
+            receivingWallet: receivingWallet as Address,
+            currentAccount: current as Address,
+            setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+            basisPoints,
+            paybackDate: paybackDate,
+            downloaded,
+            setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          },
+          socialState,
+          network
+        )
+      }
     }
   }
 
