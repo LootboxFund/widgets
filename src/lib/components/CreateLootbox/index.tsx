@@ -36,7 +36,7 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { NetworkOption } from './state'
+import { extractURLState_CreateLootboxPage, NetworkOption } from './state'
 import { BigNumber } from 'bignumber.js'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
@@ -66,6 +66,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       }, 3000) // 3 seconds
     }
   }, [])
+  const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
   const [downloaded, setDownloaded] = useState(false)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()

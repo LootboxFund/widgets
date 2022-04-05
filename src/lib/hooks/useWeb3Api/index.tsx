@@ -235,7 +235,7 @@ export const initDApp = async () => {
       //   const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
       //   updateStateToChain(BLOCKCHAINS.UNKNOWN)
       // }
-      window.location.reload()
+      // window.location.reload()
     })
   }
 }
