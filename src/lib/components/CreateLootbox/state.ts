@@ -12,6 +12,10 @@ export interface NetworkOption {
   priceFeed?: Address
   isTestnet?: boolean
   faucetUrl?: string
+  factoryAddress: {
+    escrowFactory: ContractAddress
+    instantFactory: ContractAddress
+  }
 }
 export const NETWORK_OPTIONS: NetworkOption[] = [
   // {
@@ -35,6 +39,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
     faucetUrl: 'https://testnet.binance.org/faucet-smart',
+    factoryAddress: {
+      escrowFactory: '0x5AdA44C7C78f0bD017B77F0829e2a9CB62572123' as ContractAddress,
+      instantFactory: '0xbc7280E8dba198B76a8aFc50C36542d96f2FEb59' as ContractAddress,
+    },
   },
   {
     name: 'Polygon',
@@ -46,6 +54,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     isTestnet: true,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC_COLORED.png?alt=media',
     priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as ContractAddress,
+    factoryAddress: {
+      escrowFactory: '0xB28E7973F4A32f32140621222f413d75c579EEa9' as ContractAddress,
+      instantFactory: '0xCdDF9951877EB654ED8Eb1623b04198ebcC4bAFF' as ContractAddress,
+    },
   },
   // {
   //   name: 'Polygon',
@@ -67,6 +79,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     isAvailable: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH.png?alt=media',
     priceFeed: '0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419' as ContractAddress,
+    factoryAddress: {
+      escrowFactory: '___' as ContractAddress,
+      instantFactory: '___' as ContractAddress,
+    },
   },
   {
     name: 'Solana',
@@ -76,6 +92,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     chainIdDecimal: '',
     isAvailable: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FSOL.png?alt=media',
+    factoryAddress: {
+      escrowFactory: '___' as ContractAddress,
+      instantFactory: '___' as ContractAddress,
+    },
   },
   {
     name: 'Fantom',
@@ -86,6 +106,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     isAvailable: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FFANTOM.png?alt=media',
     priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc' as ContractAddress,
+    factoryAddress: {
+      escrowFactory: '___' as ContractAddress,
+      instantFactory: '___' as ContractAddress,
+    },
   },
 ]
 

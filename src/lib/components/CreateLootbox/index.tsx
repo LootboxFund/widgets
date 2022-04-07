@@ -189,16 +189,37 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   const maxPricePerShare = nativeTokenPrice ? getMaxTicketPrice(nativeTokenPrice, fundraisingTarget, web3Utils) : 0
-  const checkCustomizeStepDone = () =>
-    validateName(ticketState.name as string) &&
-    validateSymbol(ticketState.symbol as string) &&
-    validateBiography(ticketState.biography as string) &&
-    validatePricePerShare(ticketState.pricePerShare as number, maxPricePerShare) &&
-    validateThemeColor(ticketState.lootboxThemeColor as string) &&
-    validateLogo(ticketState.logoUrl as string) &&
-    validateCover(ticketState.coverUrl as string) &&
-    validateLogoFile(ticketState.logoFile as File) &&
-    validateCoverFile(ticketState.coverFile as File)
+  const checkCustomizeStepDone = () => {
+    console.log(`
+      
+    validateName(ticketState.name as string) = ${validateName(ticketState.name as string)}
+    validateSymbol(ticketState.symbol as string) = ${validateSymbol(ticketState.symbol as string)}
+    validateBiography(ticketState.biography as string) = ${validateBiography(ticketState.biography as string)}
+    validatePricePerShare(ticketState.pricePerShare as number, maxPricePerShare) = ${validatePricePerShare(
+      ticketState.pricePerShare as number,
+      maxPricePerShare
+    )}
+    validateThemeColor(ticketState.lootboxThemeColor as string) = ${validateThemeColor(
+      ticketState.lootboxThemeColor as string
+    )}
+    validateLogo(ticketState.logoUrl as string) = ${validateLogo(ticketState.logoUrl as string)}
+    validateCover(ticketState.coverUrl as string) = ${validateCover(ticketState.coverUrl as string)}
+    validateLogoFile(ticketState.logoFile as File) = ${validateLogoFile(ticketState.logoFile as File)}
+    validateCoverFile(ticketState.coverFile as File) = ${validateCoverFile(ticketState.coverFile as File)}
+
+    `)
+    return (
+      validateName(ticketState.name as string) &&
+      validateSymbol(ticketState.symbol as string) &&
+      validateBiography(ticketState.biography as string) &&
+      validatePricePerShare(ticketState.pricePerShare as number, maxPricePerShare) &&
+      validateThemeColor(ticketState.lootboxThemeColor as string) &&
+      validateLogo(ticketState.logoUrl as string) &&
+      validateCover(ticketState.coverUrl as string) &&
+      validateLogoFile(ticketState.logoFile as File) &&
+      validateCoverFile(ticketState.coverFile as File)
+    )
+  }
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)

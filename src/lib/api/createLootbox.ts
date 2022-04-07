@@ -68,8 +68,9 @@ export const createInstantLootbox = async (
   socials: LootboxSocials,
   network: NetworkOption
 ) => {
-  const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
-    .address as unknown as ContractAddress
+  // const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
+  //   .address as unknown as ContractAddress
+  const LOOTBOX_INSTANT_FACTORY_ADDRESS = network.factoryAddress.instantFactory
 
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
@@ -111,9 +112,9 @@ export const createInstantLootbox = async (
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
+      chainIdHex: network.chainIdHex,
+      chainIdDecimal: network.chainIdDecimal,
+      chainName: network.name,
       targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
@@ -237,7 +238,7 @@ export const createInstantLootbox = async (
                 name: lootboxName,
                 ticketID,
                 lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
+                chainIdHex: network.chainIdHex,
                 numShares,
               }),
             ])
@@ -266,10 +267,12 @@ export const createEscrowLootbox = async (
   provider: ethersObj.providers.Web3Provider | undefined,
   setSubmitStatus: (status: SubmitStatus) => void,
   args: InstantLootboxArgs,
-  socials: LootboxSocials
+  socials: LootboxSocials,
+  network: NetworkOption
 ) => {
-  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory
-    .address as unknown as ContractAddress
+  // const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory
+  //   .address as unknown as ContractAddress
+  const LOOTBOX_ESCROW_FACTORY_ADDRESS = network.factoryAddress.escrowFactory
 
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
@@ -310,9 +313,9 @@ export const createEscrowLootbox = async (
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
       factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
+      chainIdHex: network.chainIdHex,
+      chainIdDecimal: network.chainIdDecimal,
+      chainName: network.name,
       targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
@@ -463,7 +466,7 @@ export const createEscrowLootbox = async (
                 name: lootboxName,
                 ticketID,
                 lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
+                chainIdHex: network.chainIdHex,
                 numShares,
               }),
             ])
