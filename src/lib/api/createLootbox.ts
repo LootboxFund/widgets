@@ -112,7 +112,7 @@ export const createInstantLootbox = async (
       chainIdHex: manifest.chain.chainIDHex,
       chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
       chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
+      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
       basisPointsReturnTarget: args.basisPoints.toString(),
