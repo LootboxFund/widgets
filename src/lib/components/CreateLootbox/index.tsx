@@ -46,6 +46,7 @@ import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
+import { manifest } from 'manifest'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -336,7 +337,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-8-sandbox/lootbox?lootbox=${lootboxAddress}`
+    return `${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {

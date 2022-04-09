@@ -14,18 +14,22 @@ export interface TicketCardProps {
 const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
-  const ticket: ITicketFE | undefined = stateID && snap.tickets[stateID] ? snap.tickets[stateID] as ITicketFE : undefined
+  const ticket: ITicketFE | undefined =
+    stateID && snap.tickets[stateID] ? (snap.tickets[stateID] as ITicketFE) : undefined
   return (
     <$TicketCardContainer
-      backgroundImage={ticket?.data?.metadata?.backgroundImage}
+      // @ts-ignore
+      backgroundImage={ticket?.data?.metadata?.data?.lootbox?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
       <$LogoContainer>
         <$TicketLogo
-          backgroundImage={ticket?.data?.metadata?.image}
-          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+          // @ts-ignore
+          backgroundImage={ticket?.data?.metadata?.data?.image}
+          // @ts-ignore
+          backgroundShadowColor={ticket?.data?.metadata?.data?.backgroundColor}
           size={!ticket ? '100px' : undefined}
         >
           {!ticket ? <$Icon>+</$Icon> : null}
@@ -34,7 +38,12 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
 
       {ticket ? (
         <$TicketTag>
-          <$TagText>{ticket?.data?.metadata?.name}</$TagText>
+          <$TagText>
+            {
+              // @ts-ignore
+              ticket?.data?.metadata?.data?.name
+            }
+          </$TagText>
           <$Divider />
           <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
         </$TicketTag>
