@@ -4903,20 +4903,20 @@
     "@webassemblyjs/wast-parser" "1.9.0"
     "@xtuc/long" "4.2.2"
 
-"@wormgraph/helpers@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@wormgraph/helpers/-/helpers-0.1.1.tgz#ce3864a245def07c6f088dde85ff8db59774af0d"
-  integrity sha512-p8n7U63C+JZVe/hw7q2x8JwXRYedTGOR2IrKqxHaXtz1k5pSDHA9ObxuyYEQLUmFnsMiQidXnRIRR3mGDD/BFQ==
+"@wormgraph/helpers@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@wormgraph/helpers/-/helpers-0.1.2.tgz#d3bf884961e787625222db9a0dae0ea1a92420d3"
+  integrity sha512-SU7nbVK8/QBkjr2IX5Y/IfROlSeiNnkx+5GXGyn3zh0YTxhAv8rFgkksWyEFKXOT/rGqufucFRyxxAmycQhSGA==
   dependencies:
     axios "0.25.0"
     lodash "4.17.21"
 
-"@wormgraph/manifest@0.3.17":
-  version "0.3.17"
-  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.3.17.tgz#a1239f13b53976b3a225bf1fc87807d3de7b89fa"
-  integrity sha512-27ilViru+KP6UpkM9NpbofAyDiD9pUDMaTXyW4VqF3bvyKJ05g92JCZr1KP+Uf4jsfBAQzlGXbvIw9vup0lqHA==
+"@wormgraph/manifest@0.3.19":
+  version "0.3.19"
+  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.3.19.tgz#7c80cb46ec24f99480bd94f32a54ab9c41bc3229"
+  integrity sha512-05CjQ/D+P6apZjKBOqe02A81sdtu8CkSuhtL0x7BImKx5v60ptqijRuxtv/WxloRaWzE/tI+vfvR34JSUAy5YA==
   dependencies:
-    "@wormgraph/helpers" "0.1.1"
+    "@wormgraph/helpers" "0.1.2"
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

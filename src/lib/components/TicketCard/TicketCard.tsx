@@ -19,7 +19,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   return (
     <$TicketCardContainer
       // @ts-ignore
-      backgroundImage={ticket?.data?.metadata?.data?.lootbox?.backgroundImage}
+      backgroundImage={ticket?.data.metadata?.data?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
