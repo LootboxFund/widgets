@@ -17,15 +17,15 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const ticket: ITicketFE | undefined = stateID && snap.tickets[stateID] ? snap.tickets[stateID] as ITicketFE : undefined
   return (
     <$TicketCardContainer
-      backgroundImage={ticket?.data?.metadata?.data?.backgroundImage}
+      backgroundImage={ticket?.data?.metadata?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
       <$LogoContainer>
         <$TicketLogo
-          backgroundImage={ticket?.data?.metadata?.data?.image}
-          backgroundShadowColor={ticket?.data?.metadata?.data?.backgroundColor}
+          backgroundImage={ticket?.data?.metadata?.image}
+          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
           size={!ticket ? '100px' : undefined}
         >
           {!ticket ? <$Icon>+</$Icon> : null}
@@ -34,7 +34,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
 
       {ticket ? (
         <$TicketTag>
-          <$TagText>{ticket?.data?.metadata?.data?.name}</$TagText>
+          <$TagText>{ticket?.data?.metadata?.name}</$TagText>
           <$Divider />
           <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
         </$TicketTag>
