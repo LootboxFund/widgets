@@ -85,7 +85,7 @@ export const createInstantLootbox = async (
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
     uploadLootboxLogo(submissionId, args.logoFile),
     uploadLootboxCover(submissionId, args.coverFile),
-    uploadLootboxBadge(submissionId, args.badgeFile),
+    args.badgeFile? uploadLootboxBadge(submissionId, args.badgeFile): null,
   ])
 
   /**
@@ -103,7 +103,7 @@ export const createInstantLootbox = async (
     image: imagePublicPath,
     backgroundColor: args.lootboxThemeColor as string,
     backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath,
+    badgeImage: badgePublicPath || "",
     lootbox: {
       address: '' as ContractAddress, // This gets set in backend Pipedream
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
@@ -112,7 +112,7 @@ export const createInstantLootbox = async (
       chainIdHex: manifest.chain.chainIDHex,
       chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
       chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
+      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
       basisPointsReturnTarget: args.basisPoints.toString(),
@@ -230,7 +230,7 @@ export const createInstantLootbox = async (
                 // logoImage: ticketState.logoUrl as Url,
                 logoImage: imagePublicPath,
                 backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath,
+                badgeImage: badgePublicPath || "",
                 themeColor: args.lootboxThemeColor as string,
                 name: lootboxName,
                 ticketID,
@@ -285,7 +285,7 @@ export const createEscrowLootbox = async (
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
     uploadLootboxLogo(submissionId, args.logoFile),
     uploadLootboxCover(submissionId, args.coverFile),
-    uploadLootboxBadge(submissionId, args.badgeFile),
+    args.badgeFile? uploadLootboxBadge(submissionId, args.badgeFile): null
   ])
   /**
    * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
@@ -302,7 +302,7 @@ export const createEscrowLootbox = async (
     image: imagePublicPath,
     backgroundColor: args.lootboxThemeColor as string,
     backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath,
+    badgeImage: badgePublicPath || "",
     lootbox: {
       address: '' as ContractAddress, // This gets set in backend Pipedream
       transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
@@ -311,7 +311,7 @@ export const createEscrowLootbox = async (
       chainIdHex: manifest.chain.chainIDHex,
       chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
       chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate) : new Date(),
+      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
       basisPointsReturnTarget: args.basisPoints.toString(),
@@ -373,6 +373,10 @@ export const createEscrowLootbox = async (
     fundraisingTargetMax = ${args.fundraisingTargetMax}
 
     nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+
+    logoImage = ${imagePublicPath}
+    coverImage = ${backgroundPublicPath}
+    badgeImage = ${badgePublicPath}
 
     `)
     //   function createLootbox(
@@ -456,7 +460,7 @@ export const createEscrowLootbox = async (
                 // logoImage: ticketState.logoUrl as Url,
                 logoImage: imagePublicPath,
                 backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath,
+                badgeImage: badgePublicPath || "",
                 themeColor: args.lootboxThemeColor as string,
                 name: lootboxName,
                 ticketID,

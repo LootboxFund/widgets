@@ -2,7 +2,7 @@ import react from 'react'
 import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
-import { ticketCardState, generateStateID } from './state'
+import { ticketCardState, generateStateID, ITicketFE, TicketCardState } from './state'
 import { ContractAddress } from '@wormgraph/helpers'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 
@@ -12,22 +12,21 @@ export interface TicketCardProps {
 }
 
 const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
-  const snap = useSnapshot(ticketCardState)
+  const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
-  const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
+  const ticket: ITicketFE | undefined = stateID && snap.tickets[stateID] ? snap.tickets[stateID] as ITicketFE : undefined
   return (
     <$TicketCardContainer
-      backgroundImage={ticket?.data?.metadata?.backgroundImage}
+      backgroundImage={ticket?.data?.metadata?.data?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
       <$LogoContainer>
         <$TicketLogo
-          backgroundImage={ticket?.data?.metadata?.image}
-          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+          backgroundImage={ticket?.data?.metadata?.data?.image}
+          backgroundShadowColor={ticket?.data?.metadata?.data?.backgroundColor}
           size={!ticket ? '100px' : undefined}
-          // margin={ticket ? 'auto auto 0' : 'auto'}
         >
           {!ticket ? <$Icon>+</$Icon> : null}
         </$TicketLogo>
@@ -35,7 +34,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
 
       {ticket ? (
         <$TicketTag>
-          <$TagText>{ticket?.data?.metadata?.name}</$TagText>
+          <$TagText>{ticket?.data?.metadata?.data?.name}</$TagText>
           <$Divider />
           <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
         </$TicketTag>
