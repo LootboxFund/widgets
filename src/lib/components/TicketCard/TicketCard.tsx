@@ -2,7 +2,7 @@ import react from 'react'
 import { COLORS } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
-import { ticketCardState, generateStateID } from './state'
+import { ticketCardState, generateStateID, ITicketFE, TicketCardState } from './state'
 import { ContractAddress } from '@wormgraph/helpers'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 
@@ -12,9 +12,9 @@ export interface TicketCardProps {
 }
 
 const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
-  const snap = useSnapshot(ticketCardState)
+  const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
-  const ticket = stateID && snap.tickets[stateID] ? snap.tickets[stateID] : undefined
+  const ticket: ITicketFE | undefined = stateID && snap.tickets[stateID] ? snap.tickets[stateID] as ITicketFE : undefined
   return (
     <$TicketCardContainer
       backgroundImage={ticket?.data?.metadata?.data?.backgroundImage}
