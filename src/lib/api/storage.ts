@@ -15,7 +15,7 @@ export const getLootboxURI = async ({
   bucket: string
 }) => {
   const filePath = `${bucket}/${chainIdHex}/${lootboxAddress}.json`
-  const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}?alt=media`
+  const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}`
   const lootboxURI = await (await fetch(downloadablePath)).json()
   return lootboxURI
 }
@@ -24,12 +24,12 @@ export const readTicketMetadata = async (
   lootboxAddress: ContractAddress,
   ticketID: TicketID
 ): Promise<ITicketMetadata> => {
-  const { address, name, description, image, backgroundColor, backgroundImage, badgeImage } = await getLootboxURI({
+  const metadata = await getLootboxURI({
     lootboxAddress,
     semver: manifest.googleCloud.semver,
     chainIdHex: manifest.chain.chainIDHex,
     bucket: manifest.storage.buckets.data.id,
   })
 
-  return { address, name, description, image, backgroundColor, backgroundImage, badgeImage }
+  return metadata
 }
