@@ -121,9 +121,23 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   },
 ]
 
+export const POLYGON_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
+  {
+    address: NATIVE_ADDRESS,
+    chainIdHex: '0x89',
+    chainIdDecimal: '137',
+    decimals: 18,
+    logoURI:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+    name: 'Polygon Mainnet',
+    symbol: 'MATIC',
+    priceOracle: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as Address,
+  },
+]
+
 export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
   '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
   '13881': [],
-  '89': [],
+  '0x89': POLYGON_MAINNET_FULL_TOKEN_LIST,
 }
