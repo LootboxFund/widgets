@@ -18,7 +18,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
     stateID && snap.tickets[stateID] ? (snap.tickets[stateID] as ITicketFE) : undefined
   return (
     <$TicketCardContainer
-      backgroundImage={ticket?.data.metadata?.backgroundImage}
+      backgroundImage={ticket?.data?.metadata?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
