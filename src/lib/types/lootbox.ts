@@ -1,4 +1,4 @@
-import { Address, TicketID, ContractAddress, ITicketMetadata } from '@wormgraph/helpers';
+import { Address, TicketID, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
 
 export interface ILootbox {
   address: Address | undefined
@@ -13,7 +13,7 @@ export interface ILootbox {
 
 export interface ITicket {
   id: TicketID | undefined
-  metadata: ITicketMetadata
+  metadata: ITicketMetadata | undefined
 }
 
 export interface IDividend {
