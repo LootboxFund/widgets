@@ -11,7 +11,7 @@ const manifest = Manifest.default
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
+const absPath = '/users/starship420/repo/lootbox/widgets/iife/'
 
 // Testing out upload of file
 const uploadFile = async ({ filename, semver, absPath }) => {
@@ -28,8 +28,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
       // Enable long-lived HTTP caching headers
       // Use only if the contents of the file will never change
       // (If the contents will change, use cacheControl: 'no-cache')
-      // cacheControl: 'public, max-age=31536000',
-      cacheControl: 'no-cache', // ONLY FOR DEV
+      cacheControl: 'public, max-age=31536000',
+      // cacheControl: 'no-cache', // ONLY FOR DEV
     },
   })
   console.log(`${filename} uploaded to ${bucketName}.`)
