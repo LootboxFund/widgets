@@ -120,8 +120,6 @@ export const buyLootboxShares = async (lootboxAddress: Address, amountOfStableco
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
   const tx = await lootbox.connect(signer).purchaseTicket({
     value: amountOfStablecoin,
-    gasLimit: 200000,
-    gasPrice: ethers.utils.parseUnits('6', 'gwei'),
   })
   await tx.wait()
   return tx.hash
