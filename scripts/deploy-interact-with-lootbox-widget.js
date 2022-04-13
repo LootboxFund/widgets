@@ -13,6 +13,13 @@ const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.apps
 const semver = manifest.semver.id || '0.2.0-sandbox'
 const absPath = '/users/starship420/repo/lootbox/widgets/iife/'
 
+console.log(`
+
+  Uploading ${semver} to ${bucketName}
+
+  env: ${process.env.NODE_ENV}
+`)
+
 // Testing out upload of file
 const uploadFile = async ({ filename, semver, absPath }) => {
   // Uploads a local file to the bucket
@@ -39,7 +46,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const InteractWithLootbox =
-  process.env.NODE_ENV === 'production' ? 'InteractWithLootbox.production.js' : 'InteractWithLootbox.js'
+  // process.env.NODE_ENV === 'production' ? 'InteractWithLootbox.production.js' : 'InteractWithLootbox.js'
+  true ? 'InteractWithLootbox.production.js' : 'InteractWithLootbox.js' // Hack for production
 const fileNames = [InteractWithLootbox]
 
 fileNames.map((filename) => {

@@ -17,6 +17,7 @@ console.log(`
 
   Uploading ${semver} to ${bucketName}
 
+  env: ${process.env.NODE_ENV}
 `)
 
 const uploadFile = async ({ filename, semver, absPath }) => {
@@ -42,10 +43,9 @@ const uploadFile = async ({ filename, semver, absPath }) => {
   process.exit()
 }
 
-const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
-// const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
-// const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
-// const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
+// const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
+const CreateLootbox = true ? 'CreateLootbox.production.js' : 'CreateLootbox.js' // Hack for production
+
 const fileNames = [CreateLootbox]
 
 fileNames.map((filename) => {
