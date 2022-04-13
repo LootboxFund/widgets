@@ -36,8 +36,13 @@ export const loadTicketData = async (ticketID: string) => {
   if (!ticketCardState?.lootboxAddress) {
     return
   }
-  const metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  let metadata = undefined
+  try {
+    metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)
+  } catch (e) {
+    console.error(e)
+  }
   const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
     route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,

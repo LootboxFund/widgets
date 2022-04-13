@@ -35,7 +35,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
 
       {ticket ? (
         <$TicketTag>
-          <$TagText>{ticket?.data?.metadata?.name}</$TagText>
+          <$TagText>{ticket?.data?.metadata?.name || 'Lootbox'}</$TagText>
           <$Divider />
           <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
         </$TicketTag>
