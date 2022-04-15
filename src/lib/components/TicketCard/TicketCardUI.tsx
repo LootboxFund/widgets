@@ -25,12 +25,12 @@ const TicketCardUI = (props: TicketCardUIProps) => {
         <$TicketLogo
           backgroundImage={props.backgroundImage}
           backgroundShadowColor={props.backgroundColor}
-          size={'100px'}
+          size={'170px'}
         ></$TicketLogo>
       </$LogoContainer>
 
       <$TicketTag>
-        <$TagText>Hello {props.name}</$TagText>
+        <$TagText>{props.name}</$TagText>
         {/* <$Divider />
         <$TicketIDText>{props.ticketId}</$TicketIDText> */}
       </$TicketTag>

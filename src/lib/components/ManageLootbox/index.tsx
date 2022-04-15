@@ -14,11 +14,12 @@ import CardsIcon from '../../theme/icons/Cards.icon'
 import { NetworkOption } from 'lib/api/network'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
-import $Button from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $StepSubheading } from '../CreateLootbox/StepCard'
 import { $InputWrapper } from '../CreateLootbox/StepChooseFunding'
 import $Input from 'lib/components/Generics/Input'
+import { ScreenSize } from '../../hooks/useScreenSize/index'
+import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
 
 export interface ManageLootboxProps {
   themeColor: string
@@ -108,171 +109,200 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     }
   }, [])
 
+  if (!network?.themeColor) {
+    return null
+  }
+
   return (
-    <$StepCard themeColor={props.themeColor}>
-      <$Horizontal justifyContent="space-between">
-        <$Horizontal>
-          <span>62% Funded</span>
-          <span>2.1246 MATIC</span>
+    <$StepCard themeColor={network.themeColor}>
+      <$Vertical>
+        <$Horizontal justifyContent="space-between">
+          <$Horizontal verticalCenter>
+            <span
+              style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold', marginRight: '10px' }}
+            >
+              62% Funded
+            </span>
+            <span
+              style={{
+                fontSize: '1rem',
+                color: COLORS.surpressedFontColor,
+                fontWeight: 'lighter',
+                marginRight: '10px',
+              }}
+            >
+              2.1246 MATIC
+            </span>
+          </$Horizontal>
+          <$Horizontal>
+            <span style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold' }}>
+              3 MATIC GOAL
+            </span>
+            <HelpIcon tipID="fundingGoal" />
+            <ReactTooltip id="fundingGoal" place="right" effect="solid">
+              Max 10 MATIC
+            </ReactTooltip>
+          </$Horizontal>
         </$Horizontal>
-        <span>3 MATIC GOAL</span>
-      </$Horizontal>
-      <$Horizontal>
+        {network?.themeColor && <ProgressBar themeColor={network.themeColor} progress={62} />}
+      </$Vertical>
+      <$Horizontal style={{ marginTop: '30px' }}>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <h1>Moss Land Vikings</h1>
+            <$ManageLootboxHeading>Moss Land Vikings</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
           </$Horizontal>
-          <span>Created 49 days ago (Feb 15th 2022)</span>
-          <span>
+          <$Datestamp>Created 49 days ago (Feb 15th 2022)</$Datestamp>
+          <$StepSubheading>
             This is the public control panel for Lootbox 0x24...5398. It is made for the Lootbox creator but anyone can
             use it. Watch this Youtube Tutorial to learn how.
-          </span>
-          <$Vertical>
+          </$StepSubheading>
+          <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <span>✅</span>
+              <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <b>1. Create Lootbox</b>
+                  <$NextStepTitle>1. Create Lootbox</$NextStepTitle>
                   <HelpIcon tipID="createLootbox" />
                   <ReactTooltip id="createLootbox" place="right" effect="solid">
                     Lorem Ipsum
                   </ReactTooltip>
                 </$Horizontal>
-                <span>Lorem Ipsum solar descripcom elevair no pointer partoustoura</span>
+                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                </$StepSubheading>
                 <$Horizontal verticalCenter>
                   <$Button screen={screen}>Create Another</$Button>
-                  <HelpIcon tipID="createAnother" />
-                  <ReactTooltip id="createAnother" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
-          <$Vertical>
+          <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <span>✅</span>
+              <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <b>2. Actively Promoting</b>
+                  <$NextStepTitle>2. Actively Promoting</$NextStepTitle>
                   <HelpIcon tipID="activelyPromote" />
                   <ReactTooltip id="activelyPromote" place="right" effect="solid">
                     Lorem Ipsum
                   </ReactTooltip>
                 </$Horizontal>
-                <span>Lorem Ipsum solar descripcom elevair no pointer partoustoura</span>
+                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>Open & Share Lootbox</$Button>
-                  <HelpIcon tipID="shareLootbox" />
-                  <ReactTooltip id="shareLootbox" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
+                  <$Button screen={screen}>View & Share Lootbox</$Button>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
-          <$Vertical>
+          <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <span>☑️</span>
+              <$Checkmark>☑️</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <b>3. Finish Fundraising</b>
+                  <$NextStepTitle>3. Finish Fundraising</$NextStepTitle>
                   <HelpIcon tipID="finishFundraising" />
                   <ReactTooltip id="finishFundraising" place="right" effect="solid">
                     Lorem Ipsum
                   </ReactTooltip>
                 </$Horizontal>
-                <span>Lorem Ipsum solar descripcom elevair no pointer partoustoura</span>
+                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>End Fundraising</$Button>
-                  <HelpIcon tipID="endFundraising" />
-                  <ReactTooltip id="endFundraising" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
+                  <$Button screen={screen} style={{ position: 'relative' }} themeColor={network?.themeColor}>
+                    {network?.icon && (
+                      <$NetworkIcon src={network.icon} style={{ left: '10px', position: 'absolute' }} />
+                    )}
+                    End Fundraising
+                  </$Button>
                 </$Horizontal>
                 <$Horizontal verticalCenter>
                   <$Button screen={screen}>Refund Sponsors</$Button>
-                  <HelpIcon tipID="refundSponsors" />
-                  <ReactTooltip id="refundSponsors" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
-          <$Vertical>
+          <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <span>☑️</span>
+              <$Checkmark>☑️</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <b>4. Play & Earn</b>
+                  <$NextStepTitle>4. Play & Earn</$NextStepTitle>
                   <HelpIcon tipID="playAndEarn" />
                   <ReactTooltip id="playAndEarn" place="right" effect="solid">
                     Lorem Ipsum
                   </ReactTooltip>
                 </$Horizontal>
-                <span>Lorem Ipsum solar descripcom elevair no pointer partoustoura</span>
+                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                </$StepSubheading>
                 <$Horizontal verticalCenter>
                   <$Button screen={screen}>Tweet to Sponsors</$Button>
-                  <HelpIcon tipID="tweetSponsors" />
-                  <ReactTooltip id="tweetSponsors" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
-          <$Vertical>
+          <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <span>☑️</span>
+              <$Checkmark>☑️</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <b>5. Reward Sponsors</b>
+                  <$NextStepTitle>5. Reward Sponsors</$NextStepTitle>
                   <HelpIcon tipID="rewardSponsors" />
                   <ReactTooltip id="rewardSponsors" place="right" effect="solid">
                     Lorem Ipsum
                   </ReactTooltip>
                 </$Horizontal>
-                <span>Lorem Ipsum solar descripcom elevair no pointer partoustoura</span>
+                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>Deposit Earnings</$Button>
-                  <HelpIcon tipID="depositEarnings" />
-                  <ReactTooltip id="depositEarnings" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
+                  <$Button screen={screen} themeColor={network?.themeColor}>
+                    Deposit Earnings
+                  </$Button>
                 </$Horizontal>
                 <$Horizontal verticalCenter>
                   <$Button screen={screen}>View Deposit History</$Button>
-                  <HelpIcon tipID="viewDepositHistory" />
-                  <ReactTooltip id="viewDepositHistory" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
         </$Vertical>
-        <$Vertical flex={1}>
-          <NetworkText />
+        <$Vertical flex={1} spacing={3}>
+          <div
+            style={{
+              maxHeight: '100px',
+              marginBottom: '20px',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <NetworkText />
+          </div>
           {ticketMetadata && (
-            <TicketCardUI
-              backgroundImage={ticketMetadata.backgroundImage as string}
-              logoImage={ticketMetadata.image as string}
-              backgroundColor={ticketMetadata.backgroundColor as string}
-              name={ticketMetadata.name as string}
-              ticketId={'0' as TicketID}
-            ></TicketCardUI>
+            <div style={{ height: 'auto', marginBottom: '20px' }}>
+              <TicketCardUI
+                backgroundImage={ticketMetadata.backgroundImage as string}
+                logoImage={ticketMetadata.image as string}
+                backgroundColor={ticketMetadata.backgroundColor as string}
+                name={ticketMetadata.name as string}
+                ticketId={'0' as TicketID}
+              ></TicketCardUI>
+            </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '50px' }}>
             <TicketsMinted fill={props.themeColor} />
             {network?.icon && <TotalFunded chainLogo={network?.icon} />}
             <PayoutsMade fill={props.themeColor} />
@@ -280,51 +310,53 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           </div>
         </$Vertical>
       </$Horizontal>
-      <$Vertical>
-        <$StepSubheading>
-          Lootbox Address
-          <HelpIcon tipID="lootboxAddress" />
-          <ReactTooltip id="lootboxAddress" place="right" effect="solid">
-            Lorem Ipsum
-          </ReactTooltip>
-        </$StepSubheading>
-        <$InputWrapper screen={screen}>
-          <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
-        </$InputWrapper>
-      </$Vertical>
-      <$Vertical>
-        <$StepSubheading>
-          Treasury Address
-          <HelpIcon tipID="treasuryAddress" />
-          <ReactTooltip id="treasuryAddress" place="right" effect="solid">
-            Lorem Ipsum
-          </ReactTooltip>
-        </$StepSubheading>
-        <$InputWrapper screen={screen}>
-          <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
-        </$InputWrapper>
-      </$Vertical>
-      <$Vertical>
-        <$StepSubheading>
-          Reputation Address
-          <HelpIcon tipID="reputationAddress" />
-          <ReactTooltip id="reputationAddress" place="right" effect="solid">
-            Lorem Ipsum
-          </ReactTooltip>
-        </$StepSubheading>
-        <$InputWrapper screen={screen}>
-          <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
-        </$InputWrapper>
-      </$Vertical>
-      <$Vertical>
-        <$StepSubheading>
-          Advanced Settings
-          <HelpIcon tipID="advancedSettings" />
-          <ReactTooltip id="advancedSettings" place="right" effect="solid">
-            Lorem Ipsum
-          </ReactTooltip>
-        </$StepSubheading>
-        <$Button screen={screen}>Launch OZ Defender</$Button>
+      <$Vertical style={{ padding: '40px' }}>
+        <$Vertical style={{ marginBottom: '20px' }}>
+          <$StepSubheading>
+            Lootbox Address
+            <HelpIcon tipID="lootboxAddress" />
+            <ReactTooltip id="lootboxAddress" place="right" effect="solid">
+              Lorem Ipsum
+            </ReactTooltip>
+          </$StepSubheading>
+          <$InputWrapper screen={screen}>
+            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+          </$InputWrapper>
+        </$Vertical>
+        <$Vertical style={{ marginBottom: '20px' }}>
+          <$StepSubheading>
+            Treasury Address
+            <HelpIcon tipID="treasuryAddress" />
+            <ReactTooltip id="treasuryAddress" place="right" effect="solid">
+              Lorem Ipsum
+            </ReactTooltip>
+          </$StepSubheading>
+          <$InputWrapper screen={screen}>
+            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+          </$InputWrapper>
+        </$Vertical>
+        <$Vertical style={{ marginBottom: '20px' }}>
+          <$StepSubheading>
+            Reputation Address
+            <HelpIcon tipID="reputationAddress" />
+            <ReactTooltip id="reputationAddress" place="right" effect="solid">
+              Lorem Ipsum
+            </ReactTooltip>
+          </$StepSubheading>
+          <$InputWrapper screen={screen}>
+            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+          </$InputWrapper>
+        </$Vertical>
+        <$Vertical>
+          <$StepSubheading style={{ marginBottom: '10px' }}>
+            Advanced Settings
+            <HelpIcon tipID="advancedSettings" />
+            <ReactTooltip id="advancedSettings" place="right" effect="solid">
+              Lorem Ipsum
+            </ReactTooltip>
+          </$StepSubheading>
+          <$Button screen={screen}>Launch OZ Defender</$Button>
+        </$Vertical>
       </$Vertical>
     </$StepCard>
   )
@@ -346,56 +378,102 @@ const $StepCard = styled.div<{
   box-shadow: ${(props) => `0px 3px 20px ${props.themeColor}`};
   border: ${(props) => `3px solid ${props.themeColor}`};
   border-radius: 20px;
-  padding: 20px;
-  max-width: 1000px;
+  padding: 30px;
+  max-width: 800px;
+  font-family: sans-serif;
 `
-const $StepButton = styled.button<{
-  backgroundColor: string
-  borderColor: string
-  clickable?: boolean
-}>`
-  background-color: ${(props) => props.backgroundColor};
-  border: 3px solid ${(props) => props.borderColor};
-  min-height: 50px;
-  border-radius: 0px 0px 15px 15px;
-  flex: 1;
-  cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
-  color: ${COLORS.white};
-  margin-left: 0px;
-  font-weight: 400;
+
+const $Checkmark = styled.span`
+  font-size: 1.5rem;
+  padding: 0px 10px;
+`
+
+const $NextStepTitle = styled.span`
   font-size: 1rem;
+  color: ${COLORS.surpressedFontColor};
+  font-weight: bold;
+`
+
+const $Button = styled.button<{ screen?: ScreenSize; themeColor?: string }>`
+  width: 300px;
+  max-width: 300px;
+  padding: 8px 10px;
+  flex: 1;
+  display: flex;
+  border-radius: 10px;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: center;
-  padding-left: 40px;
-  text-align: left;
+  justify-content: center;
+  border: 0.5px solid #cdcdcd;
+  cursor: pointer;
+  background-color: ${(props) => props.themeColor || '#ffffff'};
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: ${(props) => (props.themeColor ? COLORS.white : COLORS.surpressedFontColor)};
+`
+
+const $Datestamp = styled.span`
+  font-size: 0.9rem;
+  font-weight: lighter;
+  font-style: italic;
+  color: ${COLORS.surpressedFontColor};
+  margin: 10px 0px;
+`
+
+const $ManageLootboxHeading = styled.span`
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: ${COLORS.black};
 `
 
 const TotalFunded = ({ chainLogo }: { chainLogo: string }) => {
   return (
-    <$Horizontal>
-      <$Vertical>
-        <span>2.51 BNB</span>
-        <$Horizontal>
-          <span>Total Funded</span>
+    <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
+      <$Vertical style={{ marginRight: '10px' }}>
+        <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
+          <$StatFigure>2.51</$StatFigure>
+          <$StatLabel>BNB</$StatLabel>
+        </$Horizontal>
+        <$Horizontal verticalCenter>
+          <$Datestamp style={{ margin: '5px 0px' }}>Total Funded</$Datestamp>
           <HelpIcon tipID="totalFunded" />
           <ReactTooltip id="totalFunded" place="right" effect="solid">
             Lorem Ipsum
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
-      <img src={chainLogo} />
+      <img src={chainLogo} width={50} height={50} />
     </$Horizontal>
   )
 }
 
+const $StatFigure = styled.span`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: ${COLORS.black};
+  margin-right: 10px;
+`
+const $StatLabel = styled.span`
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: ${COLORS.surpressedFontColor};
+  text-transform: uppercase;
+`
+
 const TicketsMinted = ({ fill }: { fill: string }) => {
   return (
-    <$Horizontal>
-      <$Vertical>
-        <span>18 Minted</span>
-        <$Horizontal>
-          <span>Sold NFT Tickets</span>
+    <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
+      <$Vertical style={{ marginRight: '10px' }}>
+        <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
+          <$StatFigure>18</$StatFigure>
+          <$StatLabel>minted</$StatLabel>
+        </$Horizontal>
+        <$Horizontal verticalCenter>
+          <$Datestamp style={{ margin: '5px 0px' }}>Sold NFT Tickets</$Datestamp>
           <HelpIcon tipID="soldNFTTickets" />
           <ReactTooltip id="soldNFTTickets" place="right" effect="solid">
             Lorem Ipsum
@@ -409,11 +487,14 @@ const TicketsMinted = ({ fill }: { fill: string }) => {
 
 const PayoutsMade = ({ fill }: { fill: string }) => {
   return (
-    <$Horizontal>
-      <$Vertical>
-        <span>2 Payouts Made</span>
-        <$Horizontal>
-          <span>Deposits Made</span>
+    <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
+      <$Vertical style={{ marginRight: '10px' }}>
+        <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
+          <$StatFigure>2</$StatFigure>
+          <$StatLabel>Payouts</$StatLabel>
+        </$Horizontal>
+        <$Horizontal verticalCenter>
+          <$Datestamp style={{ margin: '5px 0px' }}>Deposits Made</$Datestamp>
           <HelpIcon tipID="depositsMade" />
           <ReactTooltip id="depositsMade" place="right" effect="solid">
             Lorem Ipsum
@@ -427,11 +508,13 @@ const PayoutsMade = ({ fill }: { fill: string }) => {
 
 const LootboxType = ({ fill }: { fill: string }) => {
   return (
-    <$Horizontal>
-      <$Vertical>
-        <span>Escrow</span>
-        <$Horizontal>
-          <span>Lootbox Type</span>
+    <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
+      <$Vertical style={{ marginRight: '10px' }}>
+        <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
+          <$StatLabel>Escrow</$StatLabel>
+        </$Horizontal>
+        <$Horizontal verticalCenter>
+          <$Datestamp style={{ margin: '5px 0px' }}>Lootbox Type</$Datestamp>
           <HelpIcon tipID="lootboxType" />
           <ReactTooltip id="lootboxType" place="right" effect="solid">
             Lorem Ipsum
@@ -439,6 +522,24 @@ const LootboxType = ({ fill }: { fill: string }) => {
         </$Horizontal>
       </$Vertical>
       <GiftIcon fill={fill} />
+    </$Horizontal>
+  )
+}
+
+const ProgressBar = ({ progress, themeColor }: { progress: number; themeColor: string }) => {
+  return (
+    <$Horizontal
+      style={{
+        width: '100%',
+        height: '20px',
+        marginTop: '10px',
+        backgroundColor: `${themeColor}3A`,
+        borderRadius: '10px',
+        marginBottom: '20px',
+        position: 'relative',
+      }}
+    >
+      <div style={{ height: '100%', width: `${progress}%`, backgroundColor: themeColor, borderRadius: '10px' }}></div>
     </$Horizontal>
   )
 }
