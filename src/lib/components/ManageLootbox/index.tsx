@@ -20,6 +20,7 @@ import { $InputWrapper } from '../CreateLootbox/StepChooseFunding'
 import $Input from 'lib/components/Generics/Input'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
+import $SmallerButton from '../Generics/SmallerButton/SmallerButton'
 
 export interface ManageLootboxProps {
   themeColor: string
@@ -173,10 +174,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                  {`Publish your Lootbox to ${network.name} Mainnet. You cannot change anything after publishing.`}
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>Create Another</$Button>
+                  <$SmallerButton screen={screen}>Create Another</$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -194,10 +195,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                  Start sharing your Lootbox on social media for sponsors to buy NFTs. Watch the YouTube Tutorial.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>View & Share Lootbox</$Button>
+                  <$SmallerButton screen={screen}>View & Share Lootbox</$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -215,18 +216,18 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                  Only collect the money if the funding target is hit. Otherwise refund the sponsors.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen} style={{ position: 'relative' }} themeColor={network?.themeColor}>
+                  <$SmallerButton screen={screen} style={{ position: 'relative' }} themeColor={network?.themeColor}>
                     {network?.icon && (
                       <$NetworkIcon src={network.icon} style={{ left: '10px', position: 'absolute' }} />
                     )}
                     End Fundraising
-                  </$Button>
+                  </$SmallerButton>
                 </$Horizontal>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>Refund Sponsors</$Button>
+                  <$SmallerButton screen={screen}>Refund Sponsors</$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -244,10 +245,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                  Play the crypto games you fundraised for. Update your sponsors with news if any.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>Tweet to Sponsors</$Button>
+                  <$SmallerButton screen={screen}>Tweet to Sponsors</$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -265,15 +266,15 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Lorem Ipsum solar descripcom elevair no pointer partoustoura
+                  Share your crypto earnings with sponsors. Anyone can deposit earnings.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen} themeColor={network?.themeColor}>
+                  <$SmallerButton screen={screen} themeColor={network?.themeColor}>
                     Deposit Earnings
-                  </$Button>
+                  </$SmallerButton>
                 </$Horizontal>
                 <$Horizontal verticalCenter>
-                  <$Button screen={screen}>View Deposit History</$Button>
+                  <$SmallerButton screen={screen}>View Deposit History</$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -318,6 +319,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="lootboxAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
+            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
             <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
@@ -330,6 +332,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="treasuryAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
+            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
             <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
@@ -342,6 +345,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="reputationAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
+            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
             <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
@@ -355,7 +359,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               Lorem Ipsum
             </ReactTooltip>
           </$StepSubheading>
-          <$Button screen={screen}>Launch OZ Defender</$Button>
+          <$SmallerButton screen={screen}>Launch OZ Defender</$SmallerButton>
         </$Vertical>
       </$Vertical>
     </$StepCard>
@@ -394,28 +398,6 @@ const $NextStepTitle = styled.span`
   font-weight: bold;
 `
 
-const $Button = styled.button<{ screen?: ScreenSize; themeColor?: string }>`
-  width: 300px;
-  max-width: 300px;
-  padding: 8px 10px;
-  flex: 1;
-  display: flex;
-  border-radius: 10px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  border: 0.5px solid #cdcdcd;
-  cursor: pointer;
-  background-color: ${(props) => props.themeColor || '#ffffff'};
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  margin-bottom: 10px;
-  text-align: center;
-  padding: 10px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: ${(props) => (props.themeColor ? COLORS.white : COLORS.surpressedFontColor)};
-`
-
 const $Datestamp = styled.span`
   font-size: 0.9rem;
   font-weight: lighter;
@@ -424,7 +406,7 @@ const $Datestamp = styled.span`
   margin: 10px 0px;
 `
 
-const $ManageLootboxHeading = styled.span`
+export const $ManageLootboxHeading = styled.span`
   font-size: 2.2rem;
   font-weight: bold;
   color: ${COLORS.black};

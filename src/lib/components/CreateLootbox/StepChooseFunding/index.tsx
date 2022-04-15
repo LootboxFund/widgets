@@ -338,12 +338,12 @@ const $StepChooseFunding = styled.section<{}>`
   color: ${COLORS.black};
 `
 
-const $InputTranslationLight = styled.span`
+export const $InputTranslationLight = styled.span`
   font-weight: 200;
   color: ${COLORS.surpressedFontColor};
 `
 
-const $InputTranslationHeavy = styled.span`
+export const $InputTranslationHeavy = styled.span`
   font-weight: 600;
   color: ${COLORS.surpressedFontColor};
 `
