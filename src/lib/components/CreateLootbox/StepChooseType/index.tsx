@@ -4,7 +4,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $Button } from 'lib/components/Generics/Button'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
-import { NetworkOption } from '../state'
+import { NetworkOption } from 'lib/api/network'
 import WalletStatus from 'lib/components/WalletStatus'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'

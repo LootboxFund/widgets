@@ -14,7 +14,8 @@ export interface TicketCardProps {
 const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
-  const ticket: ITicketFE | undefined = stateID && snap.tickets[stateID] ? snap.tickets[stateID] as ITicketFE : undefined
+  const ticket: ITicketFE | undefined =
+    stateID && snap.tickets[stateID] ? (snap.tickets[stateID] as ITicketFE) : undefined
   return (
     <$TicketCardContainer
       backgroundImage={ticket?.data?.metadata?.data?.backgroundImage}
@@ -98,7 +99,7 @@ const BASE_CONTAINER = `
   padding: 1.5rem;
 `
 
-const $LogoContainer = styled.div`
+export const $LogoContainer = styled.div`
   flex: 1;
   padding: 2.2rem 2.2rem 1.5rem;
   display: relative;
@@ -211,7 +212,7 @@ export const $TicketIDText = styled.p`
   margin: auto;
 `
 
-const $Divider = styled.div`
+export const $Divider = styled.div`
   margin: 0px 10px;
   border: 3px solid rgba(255, 255, 255, 0.33);
   transform: rotate(0deg);

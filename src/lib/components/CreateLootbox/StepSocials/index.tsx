@@ -4,7 +4,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { NetworkOption } from '../state'
+import { NetworkOption } from 'lib/api/network'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { checkIfValidEmail } from 'lib/api/helpers'
