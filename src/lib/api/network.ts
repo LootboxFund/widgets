@@ -11,6 +11,7 @@ export interface NetworkOption {
   priceFeed?: Address
   isTestnet?: boolean
   faucetUrl?: string
+  blockExplorerUrl?: string
 }
 export const NETWORK_OPTIONS: NetworkOption[] = [
   // {
@@ -34,6 +35,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
     faucetUrl: 'https://testnet.binance.org/faucet-smart',
+    blockExplorerUrl: 'https://bscscan.com/address/',
   },
   {
     name: 'Polygon',

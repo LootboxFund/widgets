@@ -17,6 +17,7 @@ import { $InputTranslationHeavy, $InputTranslationLight, $InputWrapper } from '.
 import $Input from '../Generics/Input'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { $TextAreaMedium } from '../CreateLootbox/StepCustomize'
+import WalletStatus from 'lib/components/WalletStatus'
 
 const calculateEquivalentUSDPrice = (amount: BigNumber) => `10,000`
 
@@ -185,9 +186,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             consectetur adipiscing elit, sed do eiusmod.
           </$StepSubheading>
         </$Vertical>
-        <$Vertical flex={1}>
-          <NetworkText />
-        </$Vertical>
+        <$Horizontal flex={1} justifyContent="flex-end">
+          <WalletStatus />
+        </$Horizontal>
       </$Horizontal>
       <$Vertical style={{ marginTop: '40px' }}>
         <$StepSubheading>

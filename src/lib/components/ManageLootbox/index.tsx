@@ -1,11 +1,7 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { initDApp } from 'lib/hooks/useWeb3Api'
-import { initLogging } from 'lib/api/logrocket'
-import LogRocket from 'logrocket'
 import { COLORS, ITicketMetadata, ContractAddress, TicketID } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import { readTicketMetadata } from 'lib/api/storage'
 import TicketCardUI from '../TicketCard/TicketCardUI'
 import NetworkText from 'lib/components/NetworkText'
 import GiftIcon from 'lib/theme/icons/Gift.icon'
@@ -21,108 +17,120 @@ import $Input from 'lib/components/Generics/Input'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
 import $SmallerButton from '../Generics/SmallerButton/SmallerButton'
+import WalletStatus from 'lib/components/WalletStatus'
+import {
+  getLootboxEscrowManagementDetails,
+  getLootboxInstantManagementDetails,
+  LootboxType,
+} from 'lib/hooks/useContract'
+import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 
 export interface ManageLootboxProps {
   themeColor: string
   lootboxAddress: ContractAddress
   ticketID: TicketID
+  ticketMetadata: ITicketMetadata
+  network: NetworkOption
+  setNetwork: (network: NetworkOption) => void
+  lootboxType: LootboxType
 }
 const ManageLootbox = (props: ManageLootboxProps) => {
-  const [ticketMetadata, setTicketMetadata] = useState<ITicketMetadata>()
-  const [network, setNetwork] = useState<NetworkOption>()
   const { screen } = useWindowSize()
-  useEffect(() => {
-    initLogging()
-    if (window.ethereum) {
-      initDApp()
-        .then(() => {
-          // return readTicketMetadata(props.lootboxAddress, props.ticketID)
-          // ------- Temp
-          setTicketMetadata({
-            address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
-            name: 'Genesis Hamster',
-            description:
-              'Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox.',
-            image:
-              'https://firebasestorage.googleapis.com/v0/b/lootbox-fund-prod.appspot.com/o/assets%2Flootbox%2F3b099ea2-6af8-4aa2-b9c9-91d59c2b3041%2Flogo.jpeg?alt=media&token=3bcf700f-2cdd-4251-85aa-9b31bab79b3a',
-            backgroundColor: '#DFDFDF',
-            backgroundImage:
-              'https://firebasestorage.googleapis.com/v0/b/lootbox-fund-prod.appspot.com/o/assets%2Flootbox%2F3b099ea2-6af8-4aa2-b9c9-91d59c2b3041%2Fcover.jpeg?alt=media&token=2a314850-496c-44a2-aa66-3d0a34d47685',
-            badgeImage: '',
-            lootbox: {
-              address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
-              transactionHash: '0xcabb31ad8063f85dedb6ac25cb9f8149b8041c243fb6fc847655fa6244b1d84e',
-              blockNumber: '0x1021d29',
-              chainIdHex: '0x38',
-              chainIdDecimal: '56',
-              chainName: 'Binance Smart Chain',
-              targetPaybackDate: 1652400000000,
-              createdAt: 1649870325537,
-              fundraisingTarget: 'de0b6b3a7640000',
-              fundraisingTargetMax: 'f43fc2c04ee0000',
-              basisPointsReturnTarget: '10',
-              returnAmountTarget: '10',
-              pricePerShare: '0.05',
-              lootboxThemeColor: '#DFDFDF',
-            },
-            socials: {
-              twitter: '',
-              email: '123@123.com',
-              instagram: '',
-              tiktok: '',
-              facebook: '',
-              discord: '',
-              youtube: '',
-              snapchat: '',
-              twitch: '',
-              web: '',
-            },
-          })
-          setNetwork({
-            name: 'Binance',
-            symbol: 'BNB',
-            themeColor: '#F0B90B',
-            chainIdHex: '0x61',
-            chainIdDecimal: '97',
-            isAvailable: true,
-            isTestnet: true,
-            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-            priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
-            faucetUrl: 'https://testnet.binance.org/faucet-smart',
-          })
-          // ------- Temp
-        })
-        .then((metadata) => {
-          // setTicketMetadata(metadata)
-        })
-        .catch((err) => LogRocket.captureException(err))
-    } else {
-      window.addEventListener('ethereum#initialized', initDApp, {
-        once: true,
-      })
-      setTimeout(() => {
-        if (!window.ethereum) {
-          alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
-        } else {
-          initDApp().catch((err) => LogRocket.captureException(err))
-        }
-      }, 3000) // 3 seconds
+
+  const [fundedAmountNative, setFundedAmountNative] = useState()
+  const [fundedAmountUSD, setFundedAmountUSD] = useState()
+  const [fundedAmountShares, setFundedAmountShares] = useState()
+  const [targetAmountNative, setTargetAmountNative] = useState()
+  const [targetAmountUSD, setTargetAmountUSD] = useState()
+  const [targetAmountShares, setTargetAmountShares] = useState()
+  const [maxAmountNative, setMaxAmountNative] = useState()
+  const [maxAmountUSD, setMaxAmountUSD] = useState()
+  const [maxAmountShares, setMaxAmountShares] = useState()
+  const [isActivelyFundraising, setIsActivelyFundraising] = useState()
+  const [mintedCount, setMintedCount] = useState(0)
+  const [payoutsMade, setPayoutsMade] = useState(0)
+  const [deploymentDate, setDeploymentDate] = useState()
+  const [treasuryAddress, setTreasuryAddress] = useState()
+  const [reputationAddress, setReputationAddress] = useState()
+  const [percentageFunded, setPercentageFunded] = useState()
+
+  const loadBlockchainData = async () => {
+    console.log('Loading blockchain data...')
+    console.log(props.lootboxType)
+    console.log(props.network.priceFeed)
+    if (props.lootboxType === 'Escrow' && props.network.priceFeed) {
+      await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
+    } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
+      const [
+        _fundedAmountNative,
+        _fundedAmountUSD,
+        _fundedAmountShares,
+        _targetAmountNative,
+        _targetAmountUSD,
+        _targetAmountShares,
+        _maxAmountNative,
+        _maxAmountUSD,
+        _maxAmountShares,
+        _isActivelyFundraising,
+        _mintedCount,
+        _payoutsMade,
+        _deploymentDate,
+        _treasuryAddress,
+        _reputationAddress,
+        _percentageFunded,
+      ] = await getLootboxInstantManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
+      setFundedAmountNative(_fundedAmountNative)
+      setFundedAmountUSD(_fundedAmountUSD)
+      setFundedAmountShares(_fundedAmountShares)
+      setTargetAmountNative(_targetAmountNative)
+      setTargetAmountUSD(_targetAmountUSD)
+      setTargetAmountShares(_targetAmountShares)
+      setMaxAmountNative(_maxAmountNative)
+      setMaxAmountUSD(_maxAmountUSD)
+      setMaxAmountShares(_maxAmountShares)
+      setIsActivelyFundraising(_isActivelyFundraising)
+      setMintedCount(_mintedCount)
+      setPayoutsMade(_payoutsMade)
+      setDeploymentDate(_deploymentDate)
+      setTreasuryAddress(_treasuryAddress)
+      setReputationAddress(_reputationAddress)
+      setPercentageFunded(_percentageFunded)
     }
+  }
+
+  useEffect(() => {
+    loadBlockchainData()
   }, [])
 
-  if (!network?.themeColor) {
+  if (
+    !props.network.themeColor ||
+    !fundedAmountNative ||
+    !fundedAmountUSD ||
+    !fundedAmountShares ||
+    !targetAmountNative ||
+    !targetAmountUSD ||
+    !targetAmountShares ||
+    !maxAmountNative ||
+    !maxAmountUSD ||
+    !maxAmountShares ||
+    !deploymentDate ||
+    !treasuryAddress ||
+    !reputationAddress
+  ) {
     return null
   }
 
+  const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))
+
   return (
-    <$StepCard themeColor={network.themeColor}>
+    <$StepCard themeColor={props.network.themeColor}>
       <$Vertical>
         <$Horizontal justifyContent="space-between">
           <$Horizontal verticalCenter>
             <span
               style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold', marginRight: '10px' }}
             >
-              62% Funded
+              {`${percentageFunded}% Funded`}
             </span>
             <span
               style={{
@@ -132,12 +140,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 marginRight: '10px',
               }}
             >
-              2.1246 MATIC
+              {`${fundedAmountNative} ${props.network.symbol}`}
             </span>
           </$Horizontal>
           <$Horizontal>
             <span style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold' }}>
-              3 MATIC GOAL
+              {`${targetAmountNative} ${props.network.symbol} Goal`}
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
@@ -145,21 +153,40 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
-        {network?.themeColor && <ProgressBar themeColor={network.themeColor} progress={62} />}
+        {props.network?.themeColor && percentageFunded !== undefined && (
+          <ProgressBar
+            themeColor={props.network.themeColor}
+            progress={percentageFunded > 100 ? 100 : percentageFunded}
+          />
+        )}
       </$Vertical>
       <$Horizontal style={{ marginTop: '30px' }}>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <$ManageLootboxHeading>Moss Land Vikings</$ManageLootboxHeading>
+            <$ManageLootboxHeading>{props.ticketMetadata.name}</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
           </$Horizontal>
-          <$Datestamp>Created 49 days ago (Feb 15th 2022)</$Datestamp>
+          <$Datestamp>{`Created ${daysAgo} day${daysAgo > 1 ? 's' : ''} ago (${new Date(
+            deploymentDate
+          ).toLocaleDateString('en-us', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })})`}</$Datestamp>
           <$StepSubheading>
-            This is the public control panel for Lootbox 0x24...5398. It is made for the Lootbox creator but anyone can
-            use it. Watch this Youtube Tutorial to learn how.
+            <div style={{ display: 'inline-block' }}>
+              <span>This is the public control panel for Lootbox </span>
+              <span
+                onClick={() => window.open(`${props.network.blockExplorerUrl}${props.lootboxAddress}`, '_blank')}
+                style={{ textDecoration: 'underline', fontStyle: 'italic', cursor: 'pointer' }}
+              >{`${truncateAddress(props.lootboxAddress)}`}</span>
+              <span>
+                . It is made for the Lootbox creator but anyone can use it. Watch this Youtube Tutorial to learn how.
+              </span>
+            </div>
           </$StepSubheading>
           <$Vertical style={{ marginTop: '20px' }}>
             <br />
@@ -174,10 +201,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  {`Publish your Lootbox to ${network.name} Mainnet. You cannot change anything after publishing.`}
+                  {`Publish your Lootbox to ${props.network.name} Mainnet. You cannot change your funding goal after publishing.`}
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen}>Create Another</$SmallerButton>
+                  <$SmallerButton onClick={() => window.open('https://lootbox.fund/create', '_blank')} screen={screen}>
+                    Create Another
+                  </$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -198,7 +227,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   Start sharing your Lootbox on social media for sponsors to buy NFTs. Watch the YouTube Tutorial.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen}>View & Share Lootbox</$SmallerButton>
+                  <$SmallerButton
+                    onClick={() => window.open(`https://lootbox.fund/buy?lootbox=${props.lootboxAddress}`, '_blank')}
+                    screen={screen}
+                  >
+                    View & Share Lootbox
+                  </$SmallerButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -206,7 +240,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           <$Vertical style={{ marginTop: '20px' }}>
             <br />
             <$Horizontal>
-              <$Checkmark>☑️</$Checkmark>
+              <$Checkmark>{isActivelyFundraising ? '☑️' : '✅'}</$Checkmark>
               <$Vertical>
                 <$Horizontal>
                   <$NextStepTitle>3. Finish Fundraising</$NextStepTitle>
@@ -219,66 +253,95 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   Only collect the money if the funding target is hit. Otherwise refund the sponsors.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen} style={{ position: 'relative' }} themeColor={network?.themeColor}>
-                    {network?.icon && (
-                      <$NetworkIcon src={network.icon} style={{ left: '10px', position: 'absolute' }} />
+                  <$SmallerButton
+                    screen={screen}
+                    style={{ position: 'relative' }}
+                    themeColor={props.network?.themeColor}
+                  >
+                    {props.network?.icon && (
+                      <$NetworkIcon src={props.network.icon} style={{ left: '10px', position: 'absolute' }} />
                     )}
                     End Fundraising
                   </$SmallerButton>
                 </$Horizontal>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen}>Refund Sponsors</$SmallerButton>
+                  <div style={props.lootboxType === 'Escrow' ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
+                    <$SmallerButton
+                      onClick={() => {
+                        if (props.lootboxType === 'Escrow') {
+                          console.log('Refunding...')
+                        }
+                      }}
+                      screen={screen}
+                    >
+                      Refund Sponsors
+                    </$SmallerButton>
+                  </div>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
-          <$Vertical style={{ marginTop: '20px' }}>
-            <br />
-            <$Horizontal>
-              <$Checkmark>☑️</$Checkmark>
-              <$Vertical>
-                <$Horizontal>
-                  <$NextStepTitle>4. Play & Earn</$NextStepTitle>
-                  <HelpIcon tipID="playAndEarn" />
-                  <ReactTooltip id="playAndEarn" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
-                </$Horizontal>
-                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Play the crypto games you fundraised for. Update your sponsors with news if any.
-                </$StepSubheading>
-                <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen}>Tweet to Sponsors</$SmallerButton>
-                </$Horizontal>
-              </$Vertical>
-            </$Horizontal>
-          </$Vertical>
-          <$Vertical style={{ marginTop: '20px' }}>
-            <br />
-            <$Horizontal>
-              <$Checkmark>☑️</$Checkmark>
-              <$Vertical>
-                <$Horizontal>
-                  <$NextStepTitle>5. Reward Sponsors</$NextStepTitle>
-                  <HelpIcon tipID="rewardSponsors" />
-                  <ReactTooltip id="rewardSponsors" place="right" effect="solid">
-                    Lorem Ipsum
-                  </ReactTooltip>
-                </$Horizontal>
-                <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Share your crypto earnings with sponsors. Anyone can deposit earnings.
-                </$StepSubheading>
-                <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen} themeColor={network?.themeColor}>
-                    Deposit Earnings
-                  </$SmallerButton>
-                </$Horizontal>
-                <$Horizontal verticalCenter>
-                  <$SmallerButton screen={screen}>View Deposit History</$SmallerButton>
-                </$Horizontal>
-              </$Vertical>
-            </$Horizontal>
-          </$Vertical>
+          <div style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+            <$Vertical style={{ marginTop: '20px' }}>
+              <br />
+              <$Horizontal>
+                <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
+                <$Vertical>
+                  <$Horizontal>
+                    <$NextStepTitle>4. Play & Earn</$NextStepTitle>
+                    <HelpIcon tipID="playAndEarn" />
+                    <ReactTooltip id="playAndEarn" place="right" effect="solid">
+                      Lorem Ipsum
+                    </ReactTooltip>
+                  </$Horizontal>
+                  <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                    Play the crypto games you fundraised for. Update your sponsors with news if any. Tag @LootboxFund
+                  </$StepSubheading>
+                  <$Horizontal verticalCenter>
+                    <$SmallerButton
+                      onClick={() => window.open('https://twitter.com/LootboxFund', '_blank')}
+                      screen={screen}
+                    >
+                      Tweet to Sponsors
+                    </$SmallerButton>
+                  </$Horizontal>
+                </$Vertical>
+              </$Horizontal>
+            </$Vertical>
+          </div>
+          <div style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+            <$Vertical style={{ marginTop: '20px' }}>
+              <br />
+              <$Horizontal>
+                <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
+                <$Vertical>
+                  <$Horizontal>
+                    <$NextStepTitle>5. Reward Sponsors</$NextStepTitle>
+                    <HelpIcon tipID="rewardSponsors" />
+                    <ReactTooltip id="rewardSponsors" place="right" effect="solid">
+                      Lorem Ipsum
+                    </ReactTooltip>
+                  </$Horizontal>
+                  <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
+                    Share your crypto earnings with sponsors. Anyone can deposit earnings.
+                  </$StepSubheading>
+                  <$Horizontal verticalCenter>
+                    <$SmallerButton screen={screen} themeColor={props.network?.themeColor}>
+                      Deposit Earnings
+                    </$SmallerButton>
+                  </$Horizontal>
+                  <$Horizontal verticalCenter>
+                    <$SmallerButton
+                      onClick={() => window.open(`${props.network.blockExplorerUrl}${props.lootboxAddress}`, '_blank')}
+                      screen={screen}
+                    >
+                      View Deposit History
+                    </$SmallerButton>
+                  </$Horizontal>
+                </$Vertical>
+              </$Horizontal>
+            </$Vertical>
+          </div>
         </$Vertical>
         <$Vertical flex={1} spacing={3}>
           <div
@@ -290,24 +353,38 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               justifyContent: 'flex-end',
             }}
           >
-            <NetworkText />
+            <WalletStatus />
           </div>
-          {ticketMetadata && (
+          {props.ticketMetadata && (
             <div style={{ height: 'auto', marginBottom: '20px' }}>
               <TicketCardUI
-                backgroundImage={ticketMetadata.backgroundImage as string}
-                logoImage={ticketMetadata.image as string}
-                backgroundColor={ticketMetadata.backgroundColor as string}
-                name={ticketMetadata.name as string}
+                backgroundImage={props.ticketMetadata.backgroundImage as string}
+                logoImage={props.ticketMetadata.image as string}
+                backgroundColor={props.ticketMetadata.backgroundColor as string}
+                name={props.ticketMetadata.name as string}
                 ticketId={'0' as TicketID}
               ></TicketCardUI>
             </div>
           )}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '50px' }}>
-            <TicketsMinted fill={props.themeColor} />
-            {network?.icon && <TotalFunded chainLogo={network?.icon} />}
-            <PayoutsMade fill={props.themeColor} />
-            <LootboxType fill={props.themeColor} />
+            <TicketsMinted fill={props.themeColor} mintedCount={parseInt(mintedCount.toString())} />
+            {props.network?.icon && (
+              <TotalFunded
+                chainLogo={props.network?.icon}
+                networkSymbol={props.network?.symbol}
+                fundedAmountNative={fundedAmountNative}
+                fundedAmountUSD={fundedAmountUSD}
+                fundedAmountShares={fundedAmountShares}
+                targetAmountNative={targetAmountNative}
+                targetAmountUSD={targetAmountUSD}
+                targetAmountShares={targetAmountShares}
+                maxAmountNative={maxAmountNative}
+                maxAmountUSD={maxAmountUSD}
+                maxAmountShares={maxAmountShares}
+              />
+            )}
+            <PayoutsMade fill={props.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
+            <LootboxTypeStat fill={props.themeColor} lootboxType={props.lootboxType} />
           </div>
         </$Vertical>
       </$Horizontal>
@@ -319,10 +396,20 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="lootboxAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
-            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
+            <span
+              onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
+              style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              Copy
+            </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
-            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+            <$Input
+              value={props.lootboxAddress}
+              screen={'mobile'}
+              fontWeight="200"
+              placeholder={props.lootboxAddress}
+            />
           </$InputWrapper>
         </$Vertical>
         <$Vertical style={{ marginBottom: '20px' }}>
@@ -332,10 +419,15 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="treasuryAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
-            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
+            <span
+              onClick={() => navigator.clipboard.writeText(treasuryAddress)}
+              style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              Copy
+            </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
-            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+            <$Input value={treasuryAddress} screen={'mobile'} fontWeight="200" placeholder={treasuryAddress} />
           </$InputWrapper>
         </$Vertical>
         <$Vertical style={{ marginBottom: '20px' }}>
@@ -345,10 +437,15 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <ReactTooltip id="reputationAddress" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
-            <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
+            <span
+              onClick={() => navigator.clipboard.writeText(reputationAddress)}
+              style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              Copy
+            </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
-            <$Input value={''} screen={'mobile'} fontWeight="200" onChange={() => {}} placeholder="placeholder" />
+            <$Input value={reputationAddress} screen={'mobile'} fontWeight="200" placeholder={reputationAddress} />
           </$InputWrapper>
         </$Vertical>
         <$Vertical>
@@ -359,7 +456,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               Lorem Ipsum
             </ReactTooltip>
           </$StepSubheading>
-          <$SmallerButton screen={screen}>Launch OZ Defender</$SmallerButton>
+          <$SmallerButton screen={screen} onClick={() => window.open('https://youtu.be/o2J4M3ESdOo?t=138', '_blank')}>
+            Launch OZ Defender
+          </$SmallerButton>
         </$Vertical>
       </$Vertical>
     </$StepCard>
@@ -412,13 +511,37 @@ export const $ManageLootboxHeading = styled.span`
   color: ${COLORS.black};
 `
 
-const TotalFunded = ({ chainLogo }: { chainLogo: string }) => {
+const TotalFunded = ({
+  chainLogo,
+  networkSymbol,
+  fundedAmountNative,
+  fundedAmountUSD,
+  fundedAmountShares,
+  targetAmountNative,
+  targetAmountUSD,
+  targetAmountShares,
+  maxAmountNative,
+  maxAmountUSD,
+  maxAmountShares,
+}: {
+  chainLogo: string
+  networkSymbol: string
+  fundedAmountNative: string
+  fundedAmountUSD: string
+  fundedAmountShares: string
+  targetAmountNative: string
+  targetAmountUSD: string
+  targetAmountShares: string
+  maxAmountNative: string
+  maxAmountUSD: string
+  maxAmountShares: string
+}) => {
   return (
     <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
-          <$StatFigure>2.51</$StatFigure>
-          <$StatLabel>BNB</$StatLabel>
+          <$StatFigure>{fundedAmountNative}</$StatFigure>
+          <$StatLabel>{networkSymbol}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
           <$Datestamp style={{ margin: '5px 0px' }}>Total Funded</$Datestamp>
@@ -446,12 +569,12 @@ const $StatLabel = styled.span`
   text-transform: uppercase;
 `
 
-const TicketsMinted = ({ fill }: { fill: string }) => {
+const TicketsMinted = ({ fill, mintedCount }: { fill: string; mintedCount: number }) => {
   return (
     <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
-          <$StatFigure>18</$StatFigure>
+          <$StatFigure>{mintedCount}</$StatFigure>
           <$StatLabel>minted</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
@@ -467,12 +590,12 @@ const TicketsMinted = ({ fill }: { fill: string }) => {
   )
 }
 
-const PayoutsMade = ({ fill }: { fill: string }) => {
+const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number }) => {
   return (
     <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
-          <$StatFigure>2</$StatFigure>
+          <$StatFigure>{payoutsMade}</$StatFigure>
           <$StatLabel>Payouts</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
@@ -488,12 +611,12 @@ const PayoutsMade = ({ fill }: { fill: string }) => {
   )
 }
 
-const LootboxType = ({ fill }: { fill: string }) => {
+const LootboxTypeStat = ({ fill, lootboxType }: { fill: string; lootboxType: LootboxType }) => {
   return (
     <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
-          <$StatLabel>Escrow</$StatLabel>
+          <$StatLabel>{lootboxType}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
           <$Datestamp style={{ margin: '5px 0px' }}>Lootbox Type</$Datestamp>

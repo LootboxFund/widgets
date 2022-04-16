@@ -1,10 +1,13 @@
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import ERC20ABI from 'lib/abi/erc20.json'
 import LootboxABI from 'lib/abi/lootbox.json'
+import LootboxPreknownABI from 'lib/abi/LootboxPreknown.json'
+import LootboxEscrowABI from 'lib/abi/LootboxEscrow.json'
+import LootboxInstantABI from 'lib/abi/LootboxInstant.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import BN from 'bignumber.js'
-import { TokenData, Address } from '@wormgraph/helpers'
-import { ethers as ethersObj } from 'ethers'
+import BN, { BigNumber } from 'bignumber.js'
+import { TokenData, Address, ContractAddress } from '@wormgraph/helpers'
+import { Contract, ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
 
 const BNB = 'bnb'
@@ -178,4 +181,331 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<st
   const { provider } = await getProvider()
   const balance = await provider.getBalance(userAddr)
   return balance.toString()
+}
+
+/**
+ * Identifies the Lootbox as Escrow or Instant
+ */
+export type LootboxType = 'Escrow' | 'Instant'
+export const identifyLootboxType = async (lootboxAddress: Address): Promise<LootboxType> => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  const lootboxType = await lootbox.variant()
+  return lootboxType
+}
+
+export const getLootboxEscrowManagementDetails = async (
+  lootboxAddress: ContractAddress,
+  nativePriceFeed: ContractAddress
+) => {
+  console.log('grabing...')
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+  console.log(escrowLootbox)
+  const [
+    shareDecimals,
+    feeDecimals,
+    deploymentStartTime,
+    issuer,
+    sharePriceUSD,
+    sharesSoldCount,
+    sharesSoldTarget,
+    sharesSoldMax,
+    nativeTokenRaisedTotal,
+    isFundraising,
+    treasury,
+    depositIdCounter,
+    ticketIdCounter,
+  ] = await Promise.all([
+    escrowLootbox.shareDecimals(),
+    escrowLootbox.feeDecimals(),
+    escrowLootbox.deploymentStartTime(),
+    escrowLootbox.issuer(),
+    escrowLootbox.sharePriceUSD(),
+    escrowLootbox.sharesSoldCount(),
+    escrowLootbox.sharesSoldTarget(),
+    escrowLootbox.sharesSoldMax(),
+    escrowLootbox.nativeTokenRaisedTotal(),
+    escrowLootbox.isFundraising(),
+    escrowLootbox.treasury(),
+    escrowLootbox.depositIdCounter(),
+    escrowLootbox.ticketIdCounter(),
+  ])
+  const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
+  const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+  const nativeTokenPrice = ethers.BigNumber.from(nativeTokenPriceBN.toString())
+  const priceFeedDecimals = ethers.utils.parseUnits('1', '8')
+  const nativeTokenDecimals = ethers.utils.parseUnits('1', '18')
+
+  console.log(`
+
+  ---- ESCROW LOOTBOX ----
+    
+  shareDecimals,                = ${shareDecimals}
+  feeDecimals,                  = ${feeDecimals}
+  deploymentStartTime,          = ${deploymentStartTime}
+  issuer,                       = ${issuer}
+  sharePriceUSD,                = ${sharePriceUSD}
+  sharesSoldCount,              = ${sharesSoldCount}
+  sharesSoldTarget,             = ${sharesSoldTarget}
+  sharesSoldMax,                = ${sharesSoldMax}
+  nativeTokenRaisedTotal,       = ${nativeTokenRaisedTotal}
+  isFundraising,                = ${isFundraising}
+  treasury,                     = ${treasury}
+  depositIdCounter,             = ${depositIdCounter}
+  ticketIdCounter,              = ${ticketIdCounter}
+  nativeTokenPrice,             = ${nativeTokenPrice.toString()}
+
+  `)
+
+  const fundedAmountNative = parseFloat(ethers.utils.formatUnits(nativeTokenRaisedTotal.toString(), 18)).toFixed(4)
+  const fundedAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(nativeTokenRaisedTotal).mul(nativeTokenPrice).div(priceFeedDecimals).toString(),
+      '18'
+    )
+  ).toFixed(2)
+  const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
+  const maxAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+
+  const maxAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const targetAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldTarget.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+  const targetAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldTarget.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const targetAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldTarget, shareDecimals)).toFixed(0)
+  const isActivelyFundraising = isFundraising
+  const mintedCount = ticketIdCounter
+  const payoutsMade = depositIdCounter
+  const deploymentDate = parseInt(`${deploymentStartTime}000`)
+  const treasuryAddress = treasury
+  const reputationAddress = issuer
+  const percentageFunded = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldCount)
+        .mul(ethers.utils.parseUnits('1', shareDecimals))
+        .div(sharesSoldMax)
+        .toString(),
+      shareDecimals - 2
+    )
+  ).toFixed(1)
+
+  console.log(`
+    
+  ----- ESCROW TRANSLATED -----
+
+  fundedAmountNative,           = ${fundedAmountNative}
+  fundedAmountUSD,              = ${fundedAmountUSD}
+  fundedAmountShares,           = ${fundedAmountShares}
+  targetAmountNative,           = ${targetAmountNative}
+  targetAmountUSD,              = ${targetAmountUSD}
+  targetAmountShares,           = ${targetAmountShares}
+  maxAmountNative,              = ${maxAmountNative}
+  maxAmountUSD,                 = ${maxAmountUSD}
+  maxAmountShares,              = ${maxAmountShares}
+  isActivelyFundraising,        = ${isActivelyFundraising}
+  mintedCount,                  = ${mintedCount}
+  payoutsMade,                  = ${payoutsMade}
+  deploymentDate,               = ${deploymentDate}
+  treasuryAddress,              = ${treasuryAddress}
+  reputationAddress,            = ${reputationAddress}
+  percentageFunded,             = ${percentageFunded}
+
+  `)
+
+  return [
+    fundedAmountNative,
+    fundedAmountUSD,
+    fundedAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
+    targetAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
+    maxAmountShares,
+    isActivelyFundraising,
+    mintedCount,
+    payoutsMade,
+    deploymentDate,
+    treasuryAddress,
+    reputationAddress,
+    percentageFunded,
+  ]
+}
+
+export const getLootboxInstantManagementDetails = async (
+  lootboxAddress: ContractAddress,
+  nativePriceFeed: ContractAddress
+) => {
+  console.log('grabing...')
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
+  const [
+    shareDecimals,
+    feeDecimals,
+    deploymentStartTime,
+    issuer,
+    sharePriceUSD,
+    sharesSoldCount,
+    sharesSoldMax,
+    nativeTokenRaisedTotal,
+    isFundraising,
+    treasury,
+    depositIdCounter,
+    ticketIdCounter,
+  ] = await Promise.all([
+    instantLootbox.shareDecimals(),
+    instantLootbox.feeDecimals(),
+    instantLootbox.deploymentStartTime(),
+    instantLootbox.issuer(),
+    instantLootbox.sharePriceUSD(),
+    instantLootbox.sharesSoldCount(),
+    instantLootbox.sharesSoldMax(),
+    instantLootbox.nativeTokenRaisedTotal(),
+    instantLootbox.isFundraising(),
+    instantLootbox.treasury(),
+    instantLootbox.depositIdCounter(),
+    instantLootbox.ticketIdCounter(),
+  ])
+  const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
+  const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+  const nativeTokenPrice = ethers.BigNumber.from(nativeTokenPriceBN.toString())
+  const priceFeedDecimals = ethers.utils.parseUnits('1', '8')
+  const nativeTokenDecimals = ethers.utils.parseUnits('1', '18')
+
+  console.log(`
+
+  ---- ESCROW LOOTBOX ----
+    
+  shareDecimals,                = ${shareDecimals}
+  feeDecimals,                  = ${feeDecimals}
+  deploymentStartTime,          = ${deploymentStartTime}
+  issuer,                       = ${issuer}
+  sharePriceUSD,                = ${sharePriceUSD}
+  sharesSoldCount,              = ${sharesSoldCount}
+  sharesSoldMax,                = ${sharesSoldMax}
+  nativeTokenRaisedTotal,       = ${nativeTokenRaisedTotal}
+  isFundraising,                = ${isFundraising}
+  treasury,                     = ${treasury}
+  depositIdCounter,             = ${depositIdCounter}
+  ticketIdCounter,              = ${ticketIdCounter}
+  nativeTokenPrice,             = ${nativeTokenPrice.toString()}
+
+  `)
+
+  const fundedAmountNative = parseFloat(ethers.utils.formatUnits(nativeTokenRaisedTotal.toString(), 18)).toFixed(4)
+  const fundedAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(nativeTokenRaisedTotal).mul(nativeTokenPrice).div(priceFeedDecimals).toString(),
+      '18'
+    )
+  ).toFixed(2)
+  const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
+  const maxAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+
+  const maxAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const targetAmountNative = maxAmountNative
+  const targetAmountUSD = maxAmountUSD
+  const targetAmountShares = maxAmountShares
+  const isActivelyFundraising = isFundraising
+  const mintedCount = ticketIdCounter
+  const payoutsMade = depositIdCounter
+  const deploymentDate = parseInt(`${deploymentStartTime}000`)
+  const treasuryAddress = treasury
+  const reputationAddress = issuer
+  const percentageFunded = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldCount)
+        .mul(ethers.utils.parseUnits('1', shareDecimals))
+        .div(sharesSoldMax)
+        .toString(),
+      shareDecimals - 2
+    )
+  ).toFixed(1)
+
+  console.log(`
+    
+  ----- ESCROW TRANSLATED -----
+
+  fundedAmountNative,           = ${fundedAmountNative}
+  fundedAmountUSD,              = ${fundedAmountUSD}
+  fundedAmountShares,           = ${fundedAmountShares}
+  targetAmountNative,           = ${targetAmountNative}
+  targetAmountUSD,              = ${targetAmountUSD}
+  targetAmountShares,           = ${targetAmountShares}
+  maxAmountNative,              = ${maxAmountNative}
+  maxAmountUSD,                 = ${maxAmountUSD}
+  maxAmountShares,              = ${maxAmountShares}
+  isActivelyFundraising,        = ${isActivelyFundraising}
+  mintedCount,                  = ${mintedCount}
+  payoutsMade,                  = ${payoutsMade}
+  deploymentDate,               = ${deploymentDate}
+  treasuryAddress,              = ${treasuryAddress}
+  reputationAddress,            = ${reputationAddress}
+  percentageFunded,             = ${percentageFunded}
+
+  `)
+
+  return [
+    fundedAmountNative,
+    fundedAmountUSD,
+    fundedAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
+    targetAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
+    maxAmountShares,
+    isActivelyFundraising,
+    mintedCount,
+    payoutsMade,
+    deploymentDate,
+    treasuryAddress,
+    reputationAddress,
+    percentageFunded,
+  ]
 }
