@@ -46,6 +46,7 @@ import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
+import { manifest } from 'manifest'
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -121,7 +122,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   )
   const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
-  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('2', 'ether')))
+  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('1.1', 'ether')))
   const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
 
   // STEP 1: Choose Network
@@ -336,7 +337,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-8-sandbox/lootbox?lootbox=${lootboxAddress}`
+    return `${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {

@@ -17,14 +17,16 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
 
   let ticketID = undefined
   try {
-    ;[ticketID] = await Promise.all([
-      getLootboxTicketId(lootboxAddress),
-      initBuySharesState(lootboxAddress),
-      loadUserTickets(),
-    ])
+    ticketID = await getLootboxTicketId(lootboxAddress)
   } catch (err) {
     console.error('Error fetching ticket id', err)
     ticketID = '0'
+  }
+
+  try {
+    await Promise.all([initBuySharesState(lootboxAddress), loadUserTickets()])
+  } catch (err) {
+    console.error('Error initializing state', err)
   }
   ticketMinterState.ticketID = ticketID
   loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
