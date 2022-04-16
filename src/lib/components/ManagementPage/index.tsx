@@ -9,6 +9,8 @@ import LogRocket from 'logrocket'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { readTicketMetadata } from 'lib/api/storage'
 import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
+import { $Horizontal } from 'lib/components/Generics'
+import WalletStatus from 'lib/components/WalletStatus'
 
 const mockJSON = {
   address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
@@ -122,18 +124,21 @@ const ManagementPage = () => {
 
   return (
     <div>
+      <$Horizontal justifyContent="flex-end" style={{ maxWidth: '800px' }}>
+        <WalletStatus />
+      </$Horizontal>
+      <br />
       <ManageLootbox
         themeColor={'#F0B90B'}
         lootboxAddress={lootboxAddress}
         ticketID={'0' as TicketID}
         ticketMetadata={ticketMetadata}
         network={network}
-        setNetwork={(network) => setNetwork(network)}
         lootboxType={lootboxType}
       />
       <br />
       <br />
-      <RewardSponsors lootboxAddress={lootboxAddress} />
+      <RewardSponsors lootboxAddress={lootboxAddress} network={network} lootboxType={lootboxType} />
     </div>
   )
 }

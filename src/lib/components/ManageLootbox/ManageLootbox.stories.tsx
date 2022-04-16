@@ -105,7 +105,6 @@ const Template = (args: ManageLootboxProps) => {
       ticketID={'0' as TicketID}
       ticketMetadata={ticketMetadata}
       network={network}
-      setNetwork={(network) => setNetwork(network)}
       lootboxType={'Escrow'}
     />
   )

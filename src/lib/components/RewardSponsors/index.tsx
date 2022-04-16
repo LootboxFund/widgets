@@ -18,44 +18,63 @@ import $Input from '../Generics/Input'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { $TextAreaMedium } from '../CreateLootbox/StepCustomize'
 import WalletStatus from 'lib/components/WalletStatus'
-
-const calculateEquivalentUSDPrice = (amount: BigNumber) => `10,000`
+import {
+  getLootboxEscrowManagementDetails,
+  getLootboxInstantManagementDetails,
+  getLootboxIssuer,
+  getPriceFeed,
+  LootboxType,
+} from 'lib/hooks/useContract'
+import { ethers } from 'ethers'
 
 type RewardMethod = 'native' | 'erc20'
 export interface RewardSponsorsProps {
   lootboxAddress: ContractAddress
+  lootboxType: LootboxType
+  network: NetworkOption
 }
 const RewardSponsors = (props: RewardSponsorsProps) => {
   const web3Utils = useWeb3Utils()
-  const [network, setNetwork] = useState<NetworkOption>()
+  const [nativeTokenPrice, setNativeTokenPrice] = useState(web3Utils.toBN(0))
+
   const [rewardMethod, setRewardMethod] = useState<RewardMethod>('native')
   const [erc20Address, setErc20Address] = useState<ContractAddress>()
-  const [targetLootboxAddress, setTargetLootboxAddress] = useState<ContractAddress>(props.lootboxAddress)
   const [reputationAddress, setReputationAddress] = useState<Address>()
   const [nativeRewardAmount, setNativeRewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const [nativeRewardUSD, setNativeRewardUSD] = useState(0)
   const [erc20RewardAmount, setErc20RewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [transactionNote, setTransactionNote] = useState('')
   const { screen } = useWindowSize()
+
+  const loadBlockchainData = async () => {
+    const _reputationAddress = await getLootboxIssuer(props.lootboxAddress)
+    setReputationAddress(_reputationAddress)
+    const nativeTokenPriceEther = await getPriceFeed(props.network.priceFeed as ContractAddress)
+    const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+    setNativeTokenPrice(nativeTokenPrice)
+    console.log(`nativeTokenPrice = ${nativeTokenPrice}`)
+    const usdEq = new web3Utils.BN(
+      web3Utils.toWei(
+        nativeTokenPrice
+          .multipliedBy(nativeRewardAmount)
+          .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+          .toString(),
+        'gwei'
+      )
+    ).div(new web3Utils.BN('100000000000000000'))
+    setNativeRewardUSD(usdEq)
+  }
+
   // TEMP
   useEffect(() => {
-    setNetwork({
-      name: 'Binance',
-      symbol: 'BNB',
-      themeColor: '#F0B90B',
-      chainIdHex: '0x61',
-      chainIdDecimal: '97',
-      isAvailable: true,
-      isTestnet: true,
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-      priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
-      faucetUrl: 'https://testnet.binance.org/faucet-smart',
-    })
+    loadBlockchainData()
   }, [])
+
   // TEMP
   const calculateInputWidth = (amount: BigNumber) => {
     const projectedWidth = web3Utils.fromWei(amount || '0').toString().length * 20
-    const width = projectedWidth > 200 ? 200 : projectedWidth
-    return `${amount ? width : 100}px`
+    const width = projectedWidth > 300 ? 300 : projectedWidth
+    return `${amount ? width : 300}px`
   }
   const renderNativeRewardMethod = () => {
     return (
@@ -81,22 +100,33 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
                 alignItems: 'center',
               }}
             >
-              {network && <$NetworkIcon size="medium" src={network.icon} />}
+              {props.network && <$NetworkIcon size="medium" src={props.network.icon} />}
               <$Input
                 type="number"
                 value={web3Utils.fromWei(nativeRewardAmount).toString()}
                 min="0"
-                onChange={(e) => setNativeRewardAmount(web3Utils.toBN(web3Utils.toWei(e.target.value || '0')))}
+                onChange={(e) => {
+                  const nativeAmt = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
+                  setNativeRewardAmount(nativeAmt)
+                  const usdEq = new web3Utils.BN(
+                    web3Utils.toWei(
+                      nativeTokenPrice
+                        .multipliedBy(nativeAmt)
+                        .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+                        .toString(),
+                      'gwei'
+                    )
+                  ).div(new web3Utils.BN('100000000000000000'))
+                  setNativeRewardUSD(usdEq)
+                }}
                 placeholder="0.01"
                 screen={screen}
                 width={calculateInputWidth(nativeRewardAmount)}
               />
-              <$InputTranslationLight>{network?.symbol}</$InputTranslationLight>
+              <$InputTranslationLight>{props.network?.symbol}</$InputTranslationLight>
             </div>
             <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
-              <$InputTranslationHeavy>{`$${calculateEquivalentUSDPrice(
-                nativeRewardAmount
-              )} USD`}</$InputTranslationHeavy>
+              <$InputTranslationHeavy>{`$${nativeRewardUSD} USD`}</$InputTranslationHeavy>
             </div>
           </div>
         </$InputWrapper>
@@ -113,7 +143,12 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           <ReactTooltip id="withErc20Token" place="right" effect="solid">
             Lorem Ipsum
           </ReactTooltip>
-          <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
+          <span
+            onClick={() => navigator.clipboard.writeText(erc20Address as string)}
+            style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+          >
+            Copy
+          </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <$Input
@@ -122,6 +157,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             onChange={(e) => setErc20Address(e.target.value as ContractAddress)}
             placeholder="0x000..."
             screen={screen}
+            style={{ fontWeight: 'lighter' }}
           />
         </$InputWrapper>
         <br />
@@ -146,7 +182,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
                 alignItems: 'center',
               }}
             >
-              {network && <$NetworkIcon size="medium" src={network.icon} />}
+              {props.network && <b style={{ fontSize: '1.2rem', marginRight: '20px' }}>💎</b>}
               <$Input
                 type="number"
                 value={web3Utils.fromWei(erc20RewardAmount).toString()}
@@ -164,14 +200,14 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     )
   }
 
-  if (!network) {
+  if (!props.network) {
     return null
   }
 
   const allConditionsMet = false
 
   return (
-    <$StepCard themeColor={network.themeColor}>
+    <$StepCard themeColor={props.network.themeColor}>
       <$Horizontal>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter style={{ marginBottom: '20px' }}>
@@ -187,7 +223,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           </$StepSubheading>
         </$Vertical>
         <$Horizontal flex={1} justifyContent="flex-end">
-          <WalletStatus />
+          <NetworkText />
         </$Horizontal>
       </$Horizontal>
       <$Vertical style={{ marginTop: '40px' }}>
@@ -198,24 +234,24 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             Lorem Ipsum
           </ReactTooltip>
         </$StepSubheading>
-        {network?.icon && network?.symbol && (
+        {props.network?.icon && props.network?.symbol && (
           <$SmallerButton
             onClick={() => setRewardMethod('native')}
             screen={screen}
-            themeColor={rewardMethod === 'native' ? network?.themeColor : '#ffffff'}
+            themeColor={rewardMethod === 'native' ? props.network?.themeColor : '#ffffff'}
             style={{
               color: rewardMethod === 'native' ? COLORS.white : COLORS.surpressedFontColor,
               position: 'relative',
             }}
           >
-            <$NetworkIcon src={network.icon} style={{ left: '10px', position: 'absolute' }} />
-            {network.symbol}
+            <$NetworkIcon src={props.network.icon} style={{ left: '10px', position: 'absolute' }} />
+            {props.network.symbol}
           </$SmallerButton>
         )}
         <$SmallerButton
           onClick={() => setRewardMethod('erc20')}
           screen={screen}
-          themeColor={rewardMethod === 'erc20' ? network?.themeColor : '#ffffff'}
+          themeColor={rewardMethod === 'erc20' ? props.network?.themeColor : '#ffffff'}
           style={{ color: rewardMethod === 'erc20' ? COLORS.white : COLORS.surpressedFontColor, position: 'relative' }}
         >
           <span style={{ left: '10px', position: 'absolute', fontSize: '1.3rem' }}>💎</span>
@@ -232,17 +268,48 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           <ReactTooltip id="lootboxAddress" place="right" effect="solid">
             Lorem Ipsum
           </ReactTooltip>
-          <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
+          <span
+            onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
+            style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+          >
+            Copy
+          </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <$Input
-              type="number"
-              value={targetLootboxAddress}
+              type="text"
+              value={props.lootboxAddress}
               min="0"
-              onChange={(e) => setTargetLootboxAddress(e.target.value as ContractAddress)}
               screen={screen}
+              style={{ fontWeight: 'lighter' }}
             />
+          </div>
+        </$InputWrapper>
+        <br />
+        <$StepSubheading>
+          Reputation Address
+          <HelpIcon tipID="reputationAddress" />
+          <ReactTooltip id="reputationAddress" place="right" effect="solid">
+            Lorem Ipsum
+          </ReactTooltip>
+          <span
+            onClick={() => navigator.clipboard.writeText(reputationAddress as string)}
+            style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+          >
+            Copy
+          </span>
+        </$StepSubheading>
+        <$InputWrapper screen={screen}>
+          <div
+            style={{
+              display: 'flex',
+              flex: 1,
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}
+          >
+            <$Input type="text" value={reputationAddress} screen={screen} style={{ fontWeight: 'lighter' }} />
           </div>
         </$InputWrapper>
         <br />
@@ -260,27 +327,13 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           maxLength={500}
           style={{ maxWidth: '90%' }}
         />
-        <br />
-        <$StepSubheading>
-          Reputation Address
-          <HelpIcon tipID="reputationAddress" />
-          <ReactTooltip id="reputationAddress" place="right" effect="solid">
-            Lorem Ipsum
-          </ReactTooltip>
-          <span style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}>Copy</span>
-        </$StepSubheading>
-        <$InputWrapper screen={screen}>
-          <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
-            <$Input type="number" value={reputationAddress} screen={screen} />
-          </div>
-        </$InputWrapper>
       </$Vertical>
       <$Vertical style={{ marginTop: '40px' }}>
         <$RewardSponsorsButton
           disabled={!allConditionsMet}
           allConditionsMet={allConditionsMet}
           onClick={() => {}}
-          themeColor={network.themeColor}
+          themeColor={props.network.themeColor}
         >
           REWARD SPONSORS
         </$RewardSponsorsButton>

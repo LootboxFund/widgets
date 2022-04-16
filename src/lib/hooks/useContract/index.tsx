@@ -403,26 +403,6 @@ export const getLootboxInstantManagementDetails = async (
   const priceFeedDecimals = ethers.utils.parseUnits('1', '8')
   const nativeTokenDecimals = ethers.utils.parseUnits('1', '18')
 
-  console.log(`
-
-  ---- ESCROW LOOTBOX ----
-    
-  shareDecimals,                = ${shareDecimals}
-  feeDecimals,                  = ${feeDecimals}
-  deploymentStartTime,          = ${deploymentStartTime}
-  issuer,                       = ${issuer}
-  sharePriceUSD,                = ${sharePriceUSD}
-  sharesSoldCount,              = ${sharesSoldCount}
-  sharesSoldMax,                = ${sharesSoldMax}
-  nativeTokenRaisedTotal,       = ${nativeTokenRaisedTotal}
-  isFundraising,                = ${isFundraising}
-  treasury,                     = ${treasury}
-  depositIdCounter,             = ${depositIdCounter}
-  ticketIdCounter,              = ${ticketIdCounter}
-  nativeTokenPrice,             = ${nativeTokenPrice.toString()}
-
-  `)
-
   const fundedAmountNative = parseFloat(ethers.utils.formatUnits(nativeTokenRaisedTotal.toString(), 18)).toFixed(4)
   const fundedAmountUSD = parseFloat(
     ethers.utils.formatUnits(
@@ -467,29 +447,6 @@ export const getLootboxInstantManagementDetails = async (
     )
   ).toFixed(1)
 
-  console.log(`
-    
-  ----- ESCROW TRANSLATED -----
-
-  fundedAmountNative,           = ${fundedAmountNative}
-  fundedAmountUSD,              = ${fundedAmountUSD}
-  fundedAmountShares,           = ${fundedAmountShares}
-  targetAmountNative,           = ${targetAmountNative}
-  targetAmountUSD,              = ${targetAmountUSD}
-  targetAmountShares,           = ${targetAmountShares}
-  maxAmountNative,              = ${maxAmountNative}
-  maxAmountUSD,                 = ${maxAmountUSD}
-  maxAmountShares,              = ${maxAmountShares}
-  isActivelyFundraising,        = ${isActivelyFundraising}
-  mintedCount,                  = ${mintedCount}
-  payoutsMade,                  = ${payoutsMade}
-  deploymentDate,               = ${deploymentDate}
-  treasuryAddress,              = ${treasuryAddress}
-  reputationAddress,            = ${reputationAddress}
-  percentageFunded,             = ${percentageFunded}
-
-  `)
-
   return [
     fundedAmountNative,
     fundedAmountUSD,
@@ -508,4 +465,12 @@ export const getLootboxInstantManagementDetails = async (
     reputationAddress,
     percentageFunded,
   ]
+}
+
+export const getLootboxIssuer = async (lootboxAddress: ContractAddress) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  const reputationAddress = await lootbox.issuer()
+  return reputationAddress
 }

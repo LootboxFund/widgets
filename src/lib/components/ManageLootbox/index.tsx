@@ -31,7 +31,6 @@ export interface ManageLootboxProps {
   ticketID: TicketID
   ticketMetadata: ITicketMetadata
   network: NetworkOption
-  setNetwork: (network: NetworkOption) => void
   lootboxType: LootboxType
 }
 const ManageLootbox = (props: ManageLootboxProps) => {
@@ -353,7 +352,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               justifyContent: 'flex-end',
             }}
           >
-            <WalletStatus />
+            <NetworkText />
           </div>
           {props.ticketMetadata && (
             <div style={{ height: 'auto', marginBottom: '20px' }}>

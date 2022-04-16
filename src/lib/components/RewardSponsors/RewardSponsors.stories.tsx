@@ -14,7 +14,27 @@ const Template = (args: RewardSponsorsProps) => {
   useEffect(() => {
     initDApp().catch((err) => console.error(err))
   }, [])
-  return <RewardSponsors {...args} lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress} />
+  const network = {
+    name: 'Binance',
+    symbol: 'BNB',
+    themeColor: '#F0B90B',
+    chainIdHex: '0x61',
+    chainIdDecimal: '97',
+    isAvailable: true,
+    isTestnet: true,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
+    priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
+    faucetUrl: 'https://testnet.binance.org/faucet-smart',
+    blockExplorerUrl: 'https://bscscan.com/address/',
+  }
+  return (
+    <RewardSponsors
+      {...args}
+      lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress}
+      lootboxType={'Escrow'}
+      network={network}
+    />
+  )
 }
 
 export const Basic = Template.bind({})
