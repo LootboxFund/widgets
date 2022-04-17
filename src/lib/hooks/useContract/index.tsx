@@ -190,8 +190,11 @@ export type LootboxType = 'Escrow' | 'Instant'
 export const identifyLootboxType = async (lootboxAddress: Address): Promise<LootboxType> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
+  console.log(provider)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  console.log(lootbox)
   const lootboxType = await lootbox.variant()
+  console.log(lootboxType)
   return lootboxType
 }
 
@@ -473,4 +476,42 @@ export const getLootboxIssuer = async (lootboxAddress: ContractAddress) => {
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
   const reputationAddress = await lootbox.issuer()
   return reputationAddress
+}
+
+export const endFundraisingPeriodCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === 'Instant') {
+    console.log('Instant it')
+    const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
+    try {
+      await instantLootbox.connect(signer).endFundraisingPeriod()
+      return {
+        success: true,
+        message: 'Fundraising period ended for Instant Lootbox',
+      }
+    } catch (e) {
+      return {
+        success: false,
+        message: e.message,
+      }
+    }
+  } else {
+    console.log('Escrow it')
+    const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+    try {
+      console.log('ending attempt now...')
+      await escrowLootbox.connect(signer).endFundraisingPeriod()
+      return {
+        success: true,
+        message: 'Fundraising period ended for Escrow Lootbox',
+      }
+    } catch (e) {
+      return {
+        success: false,
+        message: e.message,
+      }
+    }
+  }
 }

@@ -19,6 +19,7 @@ import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
 import $SmallerButton from '../Generics/SmallerButton/SmallerButton'
 import WalletStatus from 'lib/components/WalletStatus'
 import {
+  endFundraisingPeriodCall,
   getLootboxEscrowManagementDetails,
   getLootboxInstantManagementDetails,
   LootboxType,
@@ -58,7 +59,40 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     console.log(props.lootboxType)
     console.log(props.network.priceFeed)
     if (props.lootboxType === 'Escrow' && props.network.priceFeed) {
-      await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
+      const [
+        _fundedAmountNative,
+        _fundedAmountUSD,
+        _fundedAmountShares,
+        _targetAmountNative,
+        _targetAmountUSD,
+        _targetAmountShares,
+        _maxAmountNative,
+        _maxAmountUSD,
+        _maxAmountShares,
+        _isActivelyFundraising,
+        _mintedCount,
+        _payoutsMade,
+        _deploymentDate,
+        _treasuryAddress,
+        _reputationAddress,
+        _percentageFunded,
+      ] = await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
+      setFundedAmountNative(_fundedAmountNative)
+      setFundedAmountUSD(_fundedAmountUSD)
+      setFundedAmountShares(_fundedAmountShares)
+      setTargetAmountNative(_targetAmountNative)
+      setTargetAmountUSD(_targetAmountUSD)
+      setTargetAmountShares(_targetAmountShares)
+      setMaxAmountNative(_maxAmountNative)
+      setMaxAmountUSD(_maxAmountUSD)
+      setMaxAmountShares(_maxAmountShares)
+      setIsActivelyFundraising(_isActivelyFundraising)
+      setMintedCount(_mintedCount)
+      setPayoutsMade(_payoutsMade)
+      setDeploymentDate(_deploymentDate)
+      setTreasuryAddress(_treasuryAddress)
+      setReputationAddress(_reputationAddress)
+      setPercentageFunded(_percentageFunded)
     } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
@@ -100,6 +134,21 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   useEffect(() => {
     loadBlockchainData()
   }, [])
+
+  const endFundraisingPeriod = async () => {
+    console.log('Ending fundraising period...')
+    try {
+      console.log('do something')
+      await endFundraisingPeriodCall(props.lootboxAddress, props.lootboxType)
+    } catch (e) {
+      console.log('error...')
+      console.log(e)
+    }
+  }
+
+  const refundSponsors = async () => {
+    console.log('Refunding sponsors...')
+  }
 
   if (
     !props.network.themeColor ||
@@ -256,6 +305,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     screen={screen}
                     style={{ position: 'relative' }}
                     themeColor={props.network?.themeColor}
+                    onClick={() => endFundraisingPeriod()}
                   >
                     {props.network?.icon && (
                       <$NetworkIcon src={props.network.icon} style={{ left: '10px', position: 'absolute' }} />
@@ -268,7 +318,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     <$SmallerButton
                       onClick={() => {
                         if (props.lootboxType === 'Escrow') {
-                          console.log('Refunding...')
+                          refundSponsors()
                         }
                       }}
                       screen={screen}
