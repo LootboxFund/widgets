@@ -1,6 +1,7 @@
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import react from 'react'
 import styled from 'styled-components'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 
 export const $Button = styled.button<{
   backgroundColor?: string
@@ -21,7 +22,7 @@ export const $Button = styled.button<{
   height: ${(props) => (props.screen === 'desktop' ? '40px' : '30px')};
   font-size: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
   line-height: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
-  font-weight: 700;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-family: sans-serif;
   border: 0px solid transparent;
   ${(props) => (props.disabled ? 'cursor: not-allowed' : 'cursor: pointer')};

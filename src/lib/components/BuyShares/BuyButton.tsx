@@ -2,7 +2,7 @@ import { $Button } from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useEthers } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { useSnapshot } from 'valtio'
 import WalletButton from '../WalletButton'
 import { buySharesState, purchaseLootboxShare } from './state'
@@ -33,8 +33,11 @@ const BuyButton = (props: BuyButtonProps) => {
     .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
     .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
 
-  const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0').minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0').div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0'))
-  const sharesRemainingFmt = sharesRemaining.toFixed(2).length > 8? sharesRemaining.toExponential(2): sharesRemaining.toFixed(2)
+  const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0')
+    .minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
+    .div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0'))
+  const sharesRemainingFmt =
+    sharesRemaining.toFixed(2).length > 8 ? sharesRemaining.toExponential(2) : sharesRemaining.toFixed(2)
 
   const isInsufficientFunds = ballance.lt(quantity)
   const validChain =
@@ -49,7 +52,7 @@ const BuyButton = (props: BuyButtonProps) => {
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+        style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
       >
         {txt}
       </$Button>
@@ -63,7 +66,7 @@ const BuyButton = (props: BuyButtonProps) => {
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+        style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
       >
         {validChain ? 'Select a Token' : 'Switch network'}
       </$Button>
@@ -92,7 +95,7 @@ const BuyButton = (props: BuyButtonProps) => {
       screen={screen}
       backgroundColor={`${COLORS.surpressedBackground}40`}
       color={`${COLORS.surpressedFontColor}80`}
-      style={{ fontWeight: 'lighter', cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+      style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
     >
       Enter an amount
     </$Button>

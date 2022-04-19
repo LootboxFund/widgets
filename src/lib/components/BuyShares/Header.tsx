@@ -1,7 +1,7 @@
 import react from 'react'
 import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
@@ -36,7 +36,12 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
           backgroundColor={`${COLORS.dangerFontColor}80`}
           backgroundColorHover={`${COLORS.dangerFontColor}`}
           color={COLORS.white}
-          style={{ marginRight: '10px', height: '20px', fontSize: '1rem', fontWeight: 'lighter' }}
+          style={{
+            marginRight: '10px',
+            height: '20px',
+            fontSize: TYPOGRAPHY.fontSize.medium,
+            fontWeight: TYPOGRAPHY.fontWeight.light,
+          }}
         >
           Switch Network
         </$Button>
@@ -67,7 +72,6 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
               {renderTinyAccount()}
             </span>
           </$NetworkText>
-          {/* <span style={{ padding: '0px 5px 0px 0px' }}>⚙️</span> */}
         </>
       ) : (
         renderSwitchNetworkButton()
@@ -78,25 +82,26 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
 
 export const $BuySharesHeaderTitle = styled.span<{}>`
   flex: 3;
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
   padding: 0px 0px 0px 10px;
+  color: ${COLORS.black};
 `
 
 export const $BuySharesHeader = styled.div<{}>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export const $NetworkText = styled.span`
-  font-size: 0.8rem;
-  color: ${`${COLORS.surpressedFontColor}`};
+  font-size: ${TYPOGRAPHY.fontSize.small};
+  color: ${COLORS.surpressedFontColor};
   text-align: right;
   margin-right: 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export default BuySharesHeader

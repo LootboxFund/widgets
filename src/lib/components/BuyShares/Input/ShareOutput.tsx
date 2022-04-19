@@ -6,7 +6,7 @@ import $Button from 'lib/components/Generics/Button'
 import { $Input } from 'lib/components/Generics/Input'
 import { buySharesState } from '../state'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { $TokenInput, $FineText, $BalanceText, $TokenSymbol } from './shared'
+import { $TokenInput, $FineText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
 import { USD_DECIMALS } from 'lib/hooks/constants'
 import { COLORS } from 'lib/theme'
@@ -53,9 +53,13 @@ const ShareOutput = (props: ShareOutputProps) => {
             </$TokenSymbol>
           </$Button>
 
-          <$BalanceText screen={screen} style={{ flex: 1 }}>
-            {price ? <$FineText screen={screen}>{`$${price.decimalPlaces(2).toString()}`} USD/Share</$FineText> : ''}
-          </$BalanceText>
+          {price ? (
+            <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right' }}>
+              {`$${price.decimalPlaces(2).toString()}`} USD/Share
+            </$FineText>
+          ) : (
+            ''
+          )}
         </$Vertical>
       </$Horizontal>
     </$TokenInput>

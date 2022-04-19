@@ -9,7 +9,7 @@ import { TokenDataFE, USD_DECIMALS } from 'lib/hooks/constants'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from '../helpers'
-import { $TokenInput, $FineText, $CoinIcon, $BalanceText, $TokenSymbol } from './shared'
+import { $TokenInput, $FineText, $CoinIcon, $TokenSymbol } from './shared'
 
 export interface TokenInputProps {
   selectedToken?: TokenDataFE
@@ -80,9 +80,9 @@ const TokenInput = (props: TokenInputProps) => {
         </$Vertical>
         <$Vertical flex={1}>
           <Button />
-          <$BalanceText screen={screen} style={{ flex: 1 }}>
-            <$FineText screen={screen}>{parseEth(balance)} balance</$FineText>
-          </$BalanceText>
+          <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right' }}>
+            {parseEth(balance)} balance
+          </$FineText>
         </$Vertical>
       </$Horizontal>
     </$TokenInput>
