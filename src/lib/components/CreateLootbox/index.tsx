@@ -48,6 +48,10 @@ import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepCh
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
 import { manifest } from 'manifest'
 
+// Multiplies the fundraisingTarget by this value
+export const defaultFundraisingLimitMultiplier = 11 // base 2
+export const defaultFundraisingLimitMultiplierDecimal = 10
+
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
@@ -122,8 +126,14 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   )
   const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
-  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('1.1', 'ether')))
-  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const seedTarget = web3Utils.toBN(web3Utils.toWei('1', 'ether'))
+
+  const [fundraisingTarget, setFundraisingTarget] = useState(seedTarget)
+  const [fundraisingLimit, setFundraisingLimit] = useState(
+    fundraisingTarget
+      .mul(web3Utils.toBN(defaultFundraisingLimitMultiplier))
+      .div(web3Utils.toBN(defaultFundraisingLimitMultiplierDecimal))
+  )
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
@@ -160,7 +170,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     (snapUserState.currentAccount || undefined) as Address
   )
   const checkFundingStepDone = () => {
-    return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet, web3Utils)
+    return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet)
   }
 
   // STEP 3: Choose Returns
@@ -478,7 +488,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         onSelectNetwork={(network: NetworkOption) => {
           selectNetwork(network, 'stepNetwork')
         }}
-        onNext={() => refStepFunding.current?.scrollIntoView()}
+        onNext={() => refStepType.current?.scrollIntoView()}
         setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
       />
       <$Spacer></$Spacer>
@@ -488,7 +498,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         selectedNetwork={network}
         stage={stage.stepType}
         onSelectType={setFundingType}
-        onNext={() => console.log('onNext')}
+        onNext={() => refStepFunding.current?.scrollIntoView()}
         setValidity={(bool: boolean) => console.log(bool)}
       />
       <$Spacer></$Spacer>

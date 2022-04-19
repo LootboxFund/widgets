@@ -1,7 +1,8 @@
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { COLORS } from 'lib/theme'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWeight?: string }>`
   flex: 1;
@@ -26,5 +27,47 @@ export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWei
     margin: 0;
   }
 `
+
+interface InputDecimalProps {
+  initialValue?: string
+  onChange: (value: string | undefined) => void
+  [key: string]: any
+}
+
+export const InputDecimal = (props: InputDecimalProps) => {
+  const { onChange, initialValue, ...rest } = props
+  const { screen } = useWindowSize()
+  const [value, setValue] = useState<string | undefined>(initialValue || undefined)
+
+  const parseInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value || ''
+
+    let _value: string | undefined = undefined
+
+    if (inputValue?.length === 0) {
+      _value = undefined
+    } else if (inputValue.indexOf('-') > -1) {
+      // Don't allow negative numbers
+      _value = undefined
+    } else {
+      _value = !isNaN(parseFloat(inputValue)) ? inputValue : '0'
+    }
+
+    setValue(_value)
+    onChange(_value)
+  }
+
+  return (
+    <$Input
+      value={value || ''}
+      onChange={parseInput}
+      screen={screen}
+      type="number"
+      placeholder="0.01"
+      min="0"
+      {...rest}
+    />
+  )
+}
 
 export default $Input

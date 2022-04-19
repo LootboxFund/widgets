@@ -35,7 +35,6 @@ const BASE_STYLE = `
   line-height: 22px;
   letter-spacing: 0em;
   text-align: left;
-  
   display: inline;
 `
 
@@ -49,6 +48,8 @@ const $Text = styled.p`
   font-family: sans-serif;
   font-weight: 400;
   color: #575757da;
+  overflow: hidden;
+  text-overflow: ellipsis;
   ${BASE_STYLE}
 `
 

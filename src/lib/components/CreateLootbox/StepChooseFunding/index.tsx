@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
-import $Input from 'lib/components/Generics/Input'
+import { InputDecimal, $Input } from 'lib/components/Generics/Input'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { $NetworkIcon } from '../StepChooseNetwork'
 import { NetworkOption } from '../state'
@@ -14,12 +14,13 @@ import { Address } from '@wormgraph/helpers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { ethers as ethersObj } from 'ethers'
-import { truncateAddress } from 'lib/api/helpers'
+import { defaultFundraisingLimitMultiplier, defaultFundraisingLimitMultiplierDecimal } from '../index'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
-  return fundraisingTarget.gt(0)
+  const web3Utils = useWeb3Utils()
+  return fundraisingTarget.gt(web3Utils.toBN(0))
 }
-export const validateReceivingWallet = async (receivingWallet: string, web3Utils: any) => {
+export const validateReceivingWallet = (receivingWallet: string) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   return ethers.utils.isAddress(receivingWallet)
 }
@@ -72,11 +73,18 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       const width = projectedWidth > 200 ? 200 : projectedWidth
       return `${amount ? width : 100}px`
     }
-    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
-      props.setFundraisingTarget(value)
-      const validFundraise = validateFundraisingTarget(value)
-      const validReceiver = await validateReceivingWallet(props.receivingWallet, web3Utils)
+    const onFundraisingTargetChange = (value: string | undefined) => {
+      const valueBN = web3Utils.toBN(web3Utils.toWei(value || '0'))
+      props.setFundraisingTarget(valueBN)
+      if (!showMaxInput) {
+        // Update target limit as well
+        const valueBNLimit = valueBN
+          .mul(web3Utils.toBN(defaultFundraisingLimitMultiplier))
+          .div(web3Utils.toBN(defaultFundraisingLimitMultiplierDecimal))
+        props.setFundraisingLimit(valueBNLimit)
+      }
+      const validFundraise = validateFundraisingTarget(valueBN)
+      const validReceiver = validateReceivingWallet(props.receivingWallet)
       if (validFundraise) {
         setErrors({
           ...errors,
@@ -87,7 +95,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       } else {
         setErrors({
           ...errors,
-          fundraisingTarget: 'Cannot have a negative fundraising target',
+          fundraisingTarget: 'Fundraising target must be greater than zero',
         })
         props.setValidity(false)
       }
@@ -130,13 +138,9 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               }}
             >
               {props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />}
-              <$Input
-                type="number"
-                value={web3Utils.fromWei(props.fundraisingTarget).toString()}
-                min="0"
-                onChange={parseInput}
-                placeholder="0.01"
-                screen={screen}
+              <InputDecimal
+                initialValue={web3Utils.fromWei(props.fundraisingTarget, 'ether').toString()}
+                onChange={onFundraisingTargetChange}
                 width={calculateInputWidth(props.fundraisingTarget)}
               />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
@@ -157,11 +161,11 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       const width = projectedWidth > 200 ? 200 : projectedWidth
       return `${amount ? width : 100}px`
     }
-    const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
-      props.setFundraisingLimit(value)
-      const validFundraise = validateFundraisingTarget(value)
-      const validReceiver = await validateReceivingWallet(props.receivingWallet, web3Utils)
+    const onFundraisingLimitChange = (value: string | undefined) => {
+      const valueBN = web3Utils.toBN(web3Utils.toWei(value || '0'))
+      props.setFundraisingLimit(valueBN)
+      const validFundraise = validateFundraisingTarget(valueBN)
+      const validReceiver = validateReceivingWallet(props.receivingWallet)
       if (validFundraise) {
         setErrors({
           ...errors,
@@ -172,11 +176,12 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       } else {
         setErrors({
           ...errors,
-          fundraisingLimit: 'Cannot have a negative fundraising limit',
+          fundraisingLimit: 'Fundraising limit must be greater than zero',
         })
         props.setValidity(false)
       }
     }
+
     return (
       <$Vertical>
         {ref && <div ref={ref}></div>}
@@ -205,14 +210,10 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               }}
             >
               {props.selectedNetwork && <$NetworkIcon size="medium" src={props.selectedNetwork.icon} />}
-              <$Input
-                type="number"
-                value={web3Utils.fromWei(props.fundraisingLimit).toString()}
-                min="0"
-                onChange={parseInput}
-                placeholder="0.01"
-                screen={screen}
-                width={calculateInputWidth(props.fundraisingLimit)}
+              <InputDecimal
+                initialValue={web3Utils.fromWei(props.fundraisingLimit, 'ether').toString()}
+                onChange={onFundraisingLimitChange}
+                width={calculateInputWidth(props.fundraisingTarget)}
               />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
             </div>
@@ -229,7 +230,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   const renderInputReceivingWallet = () => {
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       props.setReceivingWallet(e.target.value as Address)
-      const validReceiver = await validateReceivingWallet(e.target.value, web3Utils)
+      const validReceiver = validateReceivingWallet(e.target.value)
       const validFundraiser = validateFundraisingTarget(props.fundraisingTarget)
       if (!validReceiver) {
         setErrors({
