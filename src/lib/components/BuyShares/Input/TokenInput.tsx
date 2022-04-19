@@ -2,11 +2,10 @@ import react from 'react'
 import { COLORS } from 'lib/theme'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $Button } from 'lib/components/Generics/Button'
-import { $Input } from 'lib/components/Generics/Input'
+import { InputDecimal } from 'lib/components/Generics/Input'
 import { buySharesState } from '../state'
 import { useSnapshot } from 'valtio'
 import { TokenDataFE, USD_DECIMALS } from 'lib/hooks/constants'
-import { userState } from 'lib/state/userState'
 import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from '../helpers'
@@ -21,15 +20,10 @@ export interface TokenInputProps {
 
 const TokenInput = (props: TokenInputProps) => {
   const snap = useSnapshot(buySharesState)
-  const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
 
-  const setQuantity = (quantity: string) => {
-    if (quantity?.length === 0) {
-      buySharesState.inputToken.quantity = undefined
-    } else {
-      buySharesState.inputToken.quantity = !isNaN(parseFloat(quantity)) ? quantity : '0'
-    }
+  const setQuantity = (quantity: string | undefined) => {
+    buySharesState.inputToken.quantity = quantity || '0'
   }
 
   const Button = ({}) => {
@@ -79,15 +73,7 @@ const TokenInput = (props: TokenInputProps) => {
     <$TokenInput screen={screen}>
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
-          <$Input
-            value={quantity || ''}
-            onChange={(e) => setQuantity(e.target.value)}
-            type="number"
-            placeholder="0.00"
-            disabled={props.quantityDisabled || !snap.inputToken.data}
-            screen={screen}
-            min={0}
-          ></$Input>
+          <InputDecimal onChange={setQuantity} disabled={props.quantityDisabled || !snap.inputToken.data} />
           {usdValue ? (
             <$FineText screen={screen}>{`Spend ${new BN(usdValue).decimalPlaces(2).toString()}`} USD</$FineText>
           ) : null}
