@@ -1260,6 +1260,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "semver",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -1728,49 +1741,6 @@
         "internalType": "uint256",
         "name": "ticketId",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "erc20Token",
-        "type": "address"
-      }
-    ],
-    "name": "viewOwedErc20TokensToTicket",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_owed",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "ticketId",
-        "type": "uint256"
-      }
-    ],
-    "name": "viewOwedOfNativeTokenToTicket",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_owed",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "ticketId",
-        "type": "uint256"
       }
     ],
     "name": "viewProratedDepositsForTicket",
@@ -1829,35 +1799,6 @@
         "internalType": "bytes32[]",
         "name": "",
         "type": "bytes32[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "ticketId",
-        "type": "uint256"
-      }
-    ],
-    "name": "viewTicketInfo",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_sharesOwned",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_percentageOwned",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_sharePriceUSD",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",

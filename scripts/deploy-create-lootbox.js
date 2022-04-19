@@ -11,7 +11,7 @@ const manifest = Manifest.default
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 console.log(`
 
@@ -43,8 +43,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
   process.exit()
 }
 
-// const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
-const CreateLootbox = true ? 'CreateLootbox.production.js' : 'CreateLootbox.js' // Hack for production
+const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
+// const CreateLootbox = true ? 'CreateLootbox.production.js' : 'CreateLootbox.js' // Hack for production
 
 const fileNames = [CreateLootbox]
 
