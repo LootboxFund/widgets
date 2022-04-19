@@ -4,6 +4,7 @@ import { COLORS } from 'lib/theme'
 import { $Vertical, $Horizontal } from '../Generics'
 import HelpIcon from '../../theme/icons/Help.icon'
 import styled from 'styled-components'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface FundraisingProgressBarProps {
   percentageFunded: number
@@ -14,6 +15,7 @@ export interface FundraisingProgressBarProps {
 }
 
 const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
+  const { screen } = useWindowSize()
   return (
     <$ProgressBarWrapper>
       <$Vertical>
@@ -29,16 +31,18 @@ const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
             >
               {`${props.percentageFunded}% Funded`}
             </span>
-            <span
-              style={{
-                fontSize: TYPOGRAPHY.fontSize.medium,
-                color: COLORS.surpressedFontColor,
-                fontWeight: TYPOGRAPHY.fontWeight.light,
-                marginRight: '10px',
-              }}
-            >
-              {`${props.fundedAmountNative} ${props.networkSymbol}`}
-            </span>
+            {screen !== 'mobile' && (
+              <span
+                style={{
+                  fontSize: TYPOGRAPHY.fontSize.medium,
+                  color: COLORS.surpressedFontColor,
+                  fontWeight: TYPOGRAPHY.fontWeight.light,
+                  marginRight: '10px',
+                }}
+              >
+                {`${props.fundedAmountNative} ${props.networkSymbol}`}
+              </span>
+            )}
           </$Horizontal>
           <$Horizontal>
             <span
