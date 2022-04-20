@@ -4,7 +4,7 @@ const app = new express()
 const storage = new Storage()
 const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
-
+ 
 /**
  * CONSTANTS
  *
@@ -34,7 +34,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
       // Enable long-lived HTTP caching headers
       // Use only if the contents of the file will never change
       // (If the contents will change, use cacheControl: 'no-cache')
-      cacheControl: 'public, max-age=31536000',
+      // cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=no-cache',
     },
   })
   console.log(`${filename} uploaded to ${bucketName}.`)
