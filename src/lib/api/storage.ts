@@ -3,7 +3,7 @@ import { SemanticVersion } from '@wormgraph/manifest'
 import { manifest } from '../../manifest'
 import { encodeURISafe } from './helpers'
 
-export const getLootboxURI = async ({
+const getLootboxURI = async ({
   semver,
   chainIdHex,
   lootboxAddress,
@@ -23,7 +23,7 @@ export const getLootboxURI = async ({
 export const readTicketMetadata = async (
   lootboxAddress: ContractAddress,
   ticketID: TicketID
-): Promise<ITicketMetadata> => {
+): Promise<ITicketMetadata | undefined> => {
   const metadata = await getLootboxURI({
     lootboxAddress,
     semver: manifest.googleCloud.semver,
@@ -31,5 +31,5 @@ export const readTicketMetadata = async (
     bucket: manifest.storage.buckets.data.id,
   })
 
-  return metadata
+  return metadata?.data as ITicketMetadata | undefined
 }

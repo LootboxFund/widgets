@@ -79,7 +79,7 @@ interface GetLootboxDataOutput {
 export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
   const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals] =
     await Promise.all([
       lootbox.name(),
@@ -105,7 +105,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
 export const getLootboxTicketId = async (lootboxAddress: Address): Promise<string> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
   const ticketId = await lootbox.ticketIdCounter()
   return ticketId.toString()
 }
@@ -120,8 +120,10 @@ export const buyLootboxShares = async (lootboxAddress: Address, amountOfStableco
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
-  const tx = await lootbox.connect(signer).purchaseTicket({ value: amountOfStablecoin })
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+  const tx = await lootbox.connect(signer).purchaseTicket({
+    value: amountOfStablecoin,
+  })
   await tx.wait()
   return tx.hash
 }
@@ -130,7 +132,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
   const res: IDividendFragment[] = []
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
   const proratedDeposits = await lootbox.viewProratedDepositsForTicket(ticketID)
   for (let deposit of proratedDeposits) {
     if (deposit.nativeTokenAmount && deposit.nativeTokenAmount.gt('0')) {
@@ -154,7 +156,7 @@ export const getTicketDividends = async (lootboxAddress: Address, ticketID: stri
 export const fetchUserTicketsFromLootbox = async (userAddress: Address, lootboxAddress: Address) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, provider)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
   const userTickets = await lootbox.viewAllTicketsOfHolder(userAddress)
   return userTickets
 }
@@ -163,7 +165,7 @@ export const withdrawEarningsFromLootbox = async (ticketID: string, lootboxAddre
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
-  const lootbox = new ethers.Contract(lootboxAddress, LootboxABI, signer)
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
   const res = await lootbox.connect(signer).withdrawEarnings(ticketID)
   await res.wait()
   return res

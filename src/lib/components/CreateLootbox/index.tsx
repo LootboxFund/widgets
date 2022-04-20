@@ -46,6 +46,11 @@ import { initLogging } from 'lib/api/logrocket'
 import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
+import { manifest } from 'manifest'
+
+// Multiplies the fundraisingTarget by this value
+export const defaultFundraisingLimitMultiplier = 11 // base 2
+export const defaultFundraisingLimitMultiplierDecimal = 10
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -121,8 +126,14 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   )
   const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
-  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('2', 'ether')))
-  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const seedTarget = web3Utils.toBN(web3Utils.toWei('1', 'ether'))
+
+  const [fundraisingTarget, setFundraisingTarget] = useState(seedTarget)
+  const [fundraisingLimit, setFundraisingLimit] = useState(
+    fundraisingTarget
+      .mul(web3Utils.toBN(defaultFundraisingLimitMultiplier))
+      .div(web3Utils.toBN(defaultFundraisingLimitMultiplierDecimal))
+  )
 
   // STEP 1: Choose Network
   const [network, setNetwork] = useState<NetworkOption>()
@@ -159,7 +170,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     (snapUserState.currentAccount || undefined) as Address
   )
   const checkFundingStepDone = () => {
-    return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet, web3Utils)
+    return validateFundraisingTarget(fundraisingTarget) && validateReceivingWallet(reputationWallet)
   }
 
   // STEP 3: Choose Returns
@@ -279,6 +290,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
+    setSubmitStatus('in_progress')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (fundingType === 'instant') {
       console.log(`Generating Instant Lootbox...`)
@@ -336,7 +348,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const goToLootboxAdminPage = () => {
-    return `https://www.lootbox.fund/demo/0-2-8-sandbox/lootbox?lootbox=${lootboxAddress}`
+    return `${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`
   }
 
   if (!nativeTokenPrice) {
@@ -477,7 +489,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         onSelectNetwork={(network: NetworkOption) => {
           selectNetwork(network, 'stepNetwork')
         }}
-        onNext={() => refStepFunding.current?.scrollIntoView()}
+        onNext={() => refStepType.current?.scrollIntoView()}
         setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
       />
       <$Spacer></$Spacer>
@@ -487,7 +499,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         selectedNetwork={network}
         stage={stage.stepType}
         onSelectType={setFundingType}
-        onNext={() => console.log('onNext')}
+        onNext={() => refStepFunding.current?.scrollIntoView()}
         setValidity={(bool: boolean) => console.log(bool)}
       />
       <$Spacer></$Spacer>
@@ -553,7 +565,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => setValidity({ ...validity, stepTerms: bool })}
         onNext={() => console.log('onNext')}
         submitStatus={submitStatus}
-        onSubmit={() => createLootbox()}
+        onSubmit={() => createLootbox()} 
         goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Vertical style={{ marginTop: '20px' }}>

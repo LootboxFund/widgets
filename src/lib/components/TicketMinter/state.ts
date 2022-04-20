@@ -30,10 +30,15 @@ export const loadState = async (lootboxAddress: ContractAddress) => {
   ticketMinterState.lootboxAddress = lootboxAddress
   let ticketID = undefined
   try {
-    ;[ticketID] = await Promise.all([getLootboxTicketId(lootboxAddress), initBuySharesState(lootboxAddress)])
+    ;[ticketID] = await getLootboxTicketId(lootboxAddress)
   } catch (err) {
     console.error('Error fetching ticket id', err)
     ticketID = '0'
+  }
+  try {
+    await initBuySharesState(lootboxAddress)
+  } catch (err) {
+    console.error('Error init buy sharesstate', err)
   }
   ticketMinterState.ticketID = ticketID
   loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))

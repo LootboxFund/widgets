@@ -18,9 +18,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
   //   name: 'Binance',
   //   symbol: 'BNB',
   //   themeColor: '#F0B90B',
-  //   chainIdHex: 'a',
-  //   chainIdDecimal: '',
+  //   chainIdHex: '0x38',
+  //   chainIdDecimal: '56',
   //   isAvailable: true,
+  //   isTestnet: false,
   //   icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
   //   priceFeed: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
   //   blockExplorerUrl: 'https://bscscan.com/address/'

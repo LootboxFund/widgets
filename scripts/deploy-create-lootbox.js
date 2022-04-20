@@ -4,19 +4,20 @@ const app = new express()
 const storage = new Storage()
 const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
-
+ 
 /**
  * CONSTANTS
  *
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
+const absPath = '/users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 console.log(`
 
   Uploading ${semver} to ${bucketName}
 
+  env: ${process.env.NODE_ENV}
 `)
 
 const uploadFile = async ({ filename, semver, absPath }) => {
@@ -33,7 +34,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
       // Enable long-lived HTTP caching headers
       // Use only if the contents of the file will never change
       // (If the contents will change, use cacheControl: 'no-cache')
-      cacheControl: 'public, max-age=31536000',
+      // cacheControl: 'public, max-age=31536000',
+      cacheControl: 'public, max-age=no-cache',
     },
   })
   console.log(`${filename} uploaded to ${bucketName}.`)
@@ -43,9 +45,8 @@ const uploadFile = async ({ filename, semver, absPath }) => {
 }
 
 const CreateLootbox = process.env.NODE_ENV === 'production' ? 'CreateLootbox.production.js' : 'CreateLootbox.js'
-// const WalletStatus = process.env.NODE_ENV === 'production' ? 'WalletStatus.production.js' : 'WalletStatus.js'
-// const TicketMinter = process.env.NODE_ENV === 'production' ? 'TicketMinter.production.js' : 'TicketMinter.js'
-// const UserTickets = process.env.NODE_ENV === 'production' ? 'UserTickets.production.js' : 'UserTickets.js'
+// const CreateLootbox = true ? 'CreateLootbox.production.js' : 'CreateLootbox.js' // Hack for production
+
 const fileNames = [CreateLootbox]
 
 fileNames.map((filename) => {
