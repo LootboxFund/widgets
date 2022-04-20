@@ -23,7 +23,7 @@ const TicketCardUI = (props: TicketCardUIProps) => {
     <$TicketCardContainer backgroundImage={props.backgroundImage}>
       <$LogoContainer>
         <$TicketLogo
-          backgroundImage={props.backgroundImage}
+          backgroundImage={props.logoImage}
           backgroundShadowColor={props.backgroundColor}
           size={'170px'}
         ></$TicketLogo>

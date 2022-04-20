@@ -1,4 +1,4 @@
-import { Address, ContractAddress } from '@wormgraph/helpers'
+import { Address, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useEffect, useState } from 'react'
@@ -32,6 +32,7 @@ export interface RewardSponsorsProps {
   lootboxAddress: ContractAddress
   lootboxType: LootboxType
   network: NetworkOption
+  ticketMetadata: ITicketMetadata
 }
 const RewardSponsors = (props: RewardSponsorsProps) => {
   const web3Utils = useWeb3Utils()
@@ -47,7 +48,13 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const { screen } = useWindowSize()
 
   const loadBlockchainData = async () => {
-    const _reputationAddress = await getLootboxIssuer(props.lootboxAddress)
+    console.log(`Loading fam...`)
+    const [_reputationAddress] = await getLootboxIssuer(props.lootboxAddress)
+    console.log(`
+    
+    _reputationAddress: ${_reputationAddress}
+
+    `)
     setReputationAddress(_reputationAddress)
     const nativeTokenPriceEther = await getPriceFeed(props.network.priceFeed as ContractAddress)
     const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -210,13 +217,14 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     <$StepCard themeColor={props.network.themeColor}>
       <$Horizontal>
         <$Vertical flex={2}>
-          <$Horizontal verticalCenter style={{ marginBottom: '20px' }}>
+          <$Horizontal verticalCenter>
             <$ManageLootboxHeading>Reward Sponsors</$ManageLootboxHeading>
             <HelpIcon tipID="rewardSponsors" />
             <ReactTooltip id="rewardSponsors" place="right" effect="solid">
               Lorem Ipsum
             </ReactTooltip>
           </$Horizontal>
+          <$SubtitleDepositTitle>{`Deposit Earnings back into Lootbox (${props.ticketMetadata.name})`}</$SubtitleDepositTitle>
           <$StepSubheading>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod. Lorem ipsum dolor sit amet,
             consectetur adipiscing elit, sed do eiusmod.
@@ -370,6 +378,14 @@ const $RewardSponsorsButton = styled.button<{ themeColor?: string; allConditions
   font-size: 1.5rem;
   border: 0px;
   padding: 20px;
+`
+
+const $SubtitleDepositTitle = styled.span`
+  font-size: 0.9rem;
+  font-weight: lighter;
+  font-style: italic;
+  color: ${COLORS.surpressedFontColor};
+  margin: 10px 0px 10px 0px;
 `
 
 export default RewardSponsors

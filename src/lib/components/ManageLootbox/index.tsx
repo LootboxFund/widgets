@@ -23,9 +23,12 @@ import {
   getLootboxEscrowManagementDetails,
   getLootboxInstantManagementDetails,
   LootboxType,
+  refundFundraiserCall,
 } from 'lib/hooks/useContract'
 import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
+import { manifest } from 'manifest'
 
+type ManagementButtonState = 'disabled' | 'enabled' | 'pending' | 'error' | 'success'
 export interface ManageLootboxProps {
   themeColor: string
   lootboxAddress: ContractAddress
@@ -33,6 +36,7 @@ export interface ManageLootboxProps {
   ticketMetadata: ITicketMetadata
   network: NetworkOption
   lootboxType: LootboxType
+  scrollToRewardSponsors: () => void
 }
 const ManageLootbox = (props: ManageLootboxProps) => {
   const { screen } = useWindowSize()
@@ -54,10 +58,16 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const [reputationAddress, setReputationAddress] = useState()
   const [percentageFunded, setPercentageFunded] = useState()
 
+  const [endFundraisingButtonState, setEndFundraisingButtonState] = useState<ManagementButtonState>('enabled')
+  const [endFundraisingButtonMessage, setEndFundraisingButtonMessage] = useState('')
+
+  const [refundButtonState, setRefundButtonState] = useState<ManagementButtonState>('enabled')
+  const [refundButtonMessage, setRefundButtonMessage] = useState('')
+
   const loadBlockchainData = async () => {
-    console.log('Loading blockchain data...')
-    console.log(props.lootboxType)
-    console.log(props.network.priceFeed)
+    if (props.lootboxType === 'Instant') {
+      setRefundButtonState('disabled')
+    }
     if (props.lootboxType === 'Escrow' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
@@ -136,18 +146,35 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   }, [])
 
   const endFundraisingPeriod = async () => {
-    console.log('Ending fundraising period...')
+    setEndFundraisingButtonState('pending')
+    setEndFundraisingButtonMessage('')
     try {
-      console.log('do something')
       await endFundraisingPeriodCall(props.lootboxAddress, props.lootboxType)
+      setEndFundraisingButtonState('success')
+      setEndFundraisingButtonMessage('Fundraising period successfully ended. You may now reward sponsors.')
     } catch (e) {
-      console.log('error...')
-      console.log(e)
+      setEndFundraisingButtonState('error')
+      setEndFundraisingButtonMessage(e.data.message)
+      setTimeout(() => {
+        setEndFundraisingButtonState('enabled')
+      }, 2000)
     }
   }
 
   const refundSponsors = async () => {
-    console.log('Refunding sponsors...')
+    setRefundButtonState('pending')
+    setRefundButtonMessage('')
+    try {
+      await refundFundraiserCall(props.lootboxAddress, props.lootboxType)
+      setRefundButtonState('success')
+      setRefundButtonMessage('Fundraising period successfully ended. You may now reward sponsors.')
+    } catch (e) {
+      setRefundButtonState('error')
+      setRefundButtonMessage(e.data.message)
+      setTimeout(() => {
+        setRefundButtonState('enabled')
+      }, 2000)
+    }
   }
 
   if (
@@ -217,7 +244,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               Lorem Ipsum
             </ReactTooltip>
           </$Horizontal>
-          <$Datestamp>{`Created ${daysAgo} day${daysAgo > 1 ? 's' : ''} ago (${new Date(
+          <$Datestamp>{`Created ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago (${new Date(
             deploymentDate
           ).toLocaleDateString('en-us', {
             year: 'numeric',
@@ -249,10 +276,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  {`Publish your Lootbox to ${props.network.name} Mainnet. You cannot change your funding goal after publishing.`}
+                  {`Publish your Lootbox to ${props.network.name}${props.network.isTestnet && ' Testnet'}. You cannot change your funding goal after publishing.`}
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton onClick={() => window.open('https://lootbox.fund/create', '_blank')} screen={screen}>
+                  <$SmallerButton onClick={() => {
+                    window.open(manifest.microfrontends.webflow.createPage, '_blank')
+                  }} screen={screen}>
                     Create Another
                   </$SmallerButton>
                 </$Horizontal>
@@ -276,7 +305,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
                   <$SmallerButton
-                    onClick={() => window.open(`https://lootbox.fund/buy?lootbox=${props.lootboxAddress}`, '_blank')}
+                    onClick={() => window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxAddress}`, '_blank')}
                     screen={screen}
                   >
                     View & Share Lootbox
@@ -291,7 +320,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               <$Checkmark>{isActivelyFundraising ? '☑️' : '✅'}</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <$NextStepTitle>3. Finish Fundraising</$NextStepTitle>
+                  <$NextStepTitle>{isActivelyFundraising ? `3. Finish Fundraising` : `3. Finished Fundraising`}</$NextStepTitle>
                   <HelpIcon tipID="finishFundraising" />
                   <ReactTooltip id="finishFundraising" place="right" effect="solid">
                     Lorem Ipsum
@@ -300,20 +329,24 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
                   Only collect the money if the funding target is hit. Otherwise refund the sponsors.
                 </$StepSubheading>
-                <$Horizontal verticalCenter>
+                <$Vertical style={ isActivelyFundraising ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                   <$SmallerButton
                     screen={screen}
                     style={{ position: 'relative' }}
                     themeColor={props.network?.themeColor}
                     onClick={() => endFundraisingPeriod()}
+                    disabled={endFundraisingButtonState !== 'enabled'}
                   >
                     {props.network?.icon && (
                       <$NetworkIcon src={props.network.icon} style={{ left: '10px', position: 'absolute' }} />
                     )}
-                    End Fundraising
+                    {endFundraisingButtonState === 'pending' ? 'Pending...' : `End Fundraising`}
                   </$SmallerButton>
-                </$Horizontal>
-                <$Horizontal verticalCenter>
+                  {
+                    endFundraisingButtonMessage && <$ErrorMessageMgmtPage status={endFundraisingButtonState}>{endFundraisingButtonMessage}</$ErrorMessageMgmtPage>
+                  }
+                </$Vertical>
+                <$Vertical style={ isActivelyFundraising ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                   <div style={props.lootboxType === 'Escrow' ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                     <$SmallerButton
                       onClick={() => {
@@ -323,10 +356,13 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                       }}
                       screen={screen}
                     >
-                      Refund Sponsors
+                      {refundButtonState === 'pending' ? 'Pending...' : `Refund Sponsors`}
                     </$SmallerButton>
+                    {
+                      refundButtonMessage && <$ErrorMessageMgmtPage status={refundButtonState}>{refundButtonMessage}</$ErrorMessageMgmtPage>
+                    }
                   </div>
-                </$Horizontal>
+                </$Vertical>
               </$Vertical>
             </$Horizontal>
           </$Vertical>
@@ -351,7 +387,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                       onClick={() => window.open('https://twitter.com/LootboxFund', '_blank')}
                       screen={screen}
                     >
-                      Tweet to Sponsors
+                      Tweet Updates to Sponsors
                     </$SmallerButton>
                   </$Horizontal>
                 </$Vertical>
@@ -375,7 +411,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     Share your crypto earnings with sponsors. Anyone can deposit earnings.
                   </$StepSubheading>
                   <$Horizontal verticalCenter>
-                    <$SmallerButton screen={screen} themeColor={props.network?.themeColor}>
+                    <$SmallerButton onClick={() => props.scrollToRewardSponsors()} screen={screen} themeColor={props.network?.themeColor}>
                       Deposit Earnings
                     </$SmallerButton>
                   </$Horizontal>
@@ -558,6 +594,12 @@ export const $ManageLootboxHeading = styled.span`
   font-size: 2.2rem;
   font-weight: bold;
   color: ${COLORS.black};
+`
+
+export const $ErrorMessageMgmtPage = styled.span<{ status: ManagementButtonState }>`
+  font-size: 1rem;
+  color: ${props => props.status === 'success' ? 'green' : 'red' };
+  padding: 0px 0px 10px 0px;
 `
 
 const TotalFunded = ({

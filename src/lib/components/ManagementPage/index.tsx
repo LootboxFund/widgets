@@ -1,8 +1,8 @@
 import ManageLootbox from 'lib/components/ManageLootbox'
 import RewardSponsors from 'lib/components/RewardSponsors'
 import { Address, ContractAddress, ITicketMetadata, TicketID } from '@wormgraph/helpers'
-import { useEffect, useState } from 'react'
-import { NetworkOption } from 'lib/api/network'
+import { useEffect, useRef, useState } from 'react'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import LogRocket from 'logrocket'
@@ -13,45 +13,43 @@ import { $Horizontal } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
 
 const mockJSON = {
-  address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
-  name: 'Genesis Hamster',
-  description:
-    'Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox.',
-  image:
-    'https://firebasestorage.googleapis.com/v0/b/lootbox-fund-prod.appspot.com/o/assets%2Flootbox%2F3b099ea2-6af8-4aa2-b9c9-91d59c2b3041%2Flogo.jpeg?alt=media&token=3bcf700f-2cdd-4251-85aa-9b31bab79b3a',
-  backgroundColor: '#DFDFDF',
-  backgroundImage:
-    'https://firebasestorage.googleapis.com/v0/b/lootbox-fund-prod.appspot.com/o/assets%2Flootbox%2F3b099ea2-6af8-4aa2-b9c9-91d59c2b3041%2Fcover.jpeg?alt=media&token=2a314850-496c-44a2-aa66-3d0a34d47685',
-  badgeImage: '',
-  lootbox: {
-    address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
-    transactionHash: '0xcabb31ad8063f85dedb6ac25cb9f8149b8041c243fb6fc847655fa6244b1d84e',
-    blockNumber: '0x1021d29',
-    chainIdHex: '0x38',
-    chainIdDecimal: '56',
-    chainName: 'Binance Smart Chain',
-    targetPaybackDate: 1652400000000,
-    createdAt: 1649870325537,
-    fundraisingTarget: 'de0b6b3a7640000',
-    fundraisingTargetMax: 'f43fc2c04ee0000',
-    basisPointsReturnTarget: '10',
-    returnAmountTarget: '10',
-    pricePerShare: '0.05',
-    lootboxThemeColor: '#DFDFDF',
-  },
-  socials: {
-    twitter: '',
-    email: '123@123.com',
-    instagram: '',
-    tiktok: '',
-    facebook: '',
-    discord: '',
-    youtube: '',
-    snapchat: '',
-    twitch: '',
-    web: '',
-  },
-}
+    "address": "0x62f84c1B9B0eFb87A13d0e9Ea84D63EE44C279D4" as ContractAddress,
+    "name": "Ocean Voyage",
+    "description": "Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox.\n",
+    "image": "https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/assets%2Flootbox%2F1b0d4f79-9c7f-4468-bfa2-ac0cedbc03ca%2Flogo.png?alt=media&token=0a09f6a5-8456-493c-aa01-9b9f3f62dc8f",
+    "backgroundColor": "#45E5D5",
+    "backgroundImage": "https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/assets%2Flootbox%2F1b0d4f79-9c7f-4468-bfa2-ac0cedbc03ca%2Fcover.png?alt=media&token=ec23a859-9197-406e-a451-4fd3419b3719",
+    "badgeImage": "",
+    "lootbox": {
+      "address": "0x62f84c1B9B0eFb87A13d0e9Ea84D63EE44C279D4" as ContractAddress,
+      "transactionHash": "0xe1ffd7da0518a119977804c9550f7f28ff6ecc2e6ec577c89488f08a390a39a1",
+      "blockNumber": "0x11bf7a9",
+      "chainIdHex": "0x61",
+      "chainIdDecimal": "97",
+      "chainName": "Binance Smart Chain (Testnet)",
+      "targetPaybackDate": 1653004800000,
+      "createdAt": 1650444494034,
+      "fundraisingTarget": "16345785d8a0000",
+      "fundraisingTargetMax": "186cc6acd4b0000",
+      "basisPointsReturnTarget": "10",
+      "returnAmountTarget": "10",
+      "pricePerShare": "0.05",
+      "lootboxThemeColor": "#45E5D5"
+    },
+    "socials": {
+      "twitter": "",
+      "email": "asdflj@asf.com",
+      "instagram": "",
+      "tiktok": "",
+      "facebook": "",
+      "discord": "",
+      "youtube": "",
+      "snapchat": "",
+      "twitch": "",
+      "web": ""
+    }
+  }
+
 
 export interface ManagementPageProps {}
 
@@ -60,6 +58,8 @@ const ManagementPage = () => {
   const [ticketMetadata, setTicketMetadata] = useState<ITicketMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
   const [lootboxType, setLootboxType] = useState<LootboxType>()
+
+  const refRewardSponsors = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const addr = parseUrlParams('lootbox') as ContractAddress
@@ -79,29 +79,10 @@ const ManagementPage = () => {
         })
         .then((metadata) => {
           setTicketMetadata(metadata)
-          // setNetwork({
-          //   name: 'Binance',
-          //   symbol: 'BNB',
-          //   themeColor: '#F0B90B',
-          //   chainIdHex: '0x61',
-          //   chainIdDecimal: '97',
-          //   isAvailable: true,
-          //   isTestnet: true,
-          //   icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-          //   priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
-          //   faucetUrl: 'https://testnet.binance.org/faucet-smart',
-          // })
-          setNetwork({
-            name: 'Binance',
-            symbol: 'BNB',
-            themeColor: '#F0B90B',
-            chainIdHex: 'a',
-            chainIdDecimal: '',
-            isAvailable: true,
-            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-            priceFeed: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee' as Address,
-            blockExplorerUrl: 'https://bscscan.com/address/',
-          })
+          const network = matchNetworkByHex(metadata.lootbox.chainIdHex)
+          if (network) {
+            setNetwork(network)
+          }
         })
         .catch((err) => LogRocket.captureException(err))
     } else {
@@ -135,10 +116,13 @@ const ManagementPage = () => {
         ticketMetadata={ticketMetadata}
         network={network}
         lootboxType={lootboxType}
+        scrollToRewardSponsors={() => refRewardSponsors.current?.scrollIntoView()}
       />
       <br />
       <br />
-      <RewardSponsors lootboxAddress={lootboxAddress} network={network} lootboxType={lootboxType} />
+      <div ref={refRewardSponsors}>
+        <RewardSponsors lootboxAddress={lootboxAddress} ticketMetadata={ticketMetadata} network={network} lootboxType={lootboxType} />
+      </div>
     </div>
   )
 }

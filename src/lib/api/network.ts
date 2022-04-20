@@ -80,3 +80,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc' as ContractAddress,
   },
 ]
+
+export const matchNetworkByHex = (chainIdHex: ChainIDHex) => {
+  return NETWORK_OPTIONS.find(network => network.chainIdHex === chainIdHex)
+}
