@@ -16,6 +16,7 @@ export interface FundraisingProgressBarProps {
   percentageFunded: number
   networkSymbol: string
   targetAmountNative: string
+  wtfMessage: string
   themeColor?: string
 }
 
@@ -53,7 +54,7 @@ export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
-              Max 10 MATIC
+              {props.wtfMessage}
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
@@ -91,6 +92,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
   const [percentageFunded, setPercentageFunded] = useState(0)
   const [targetAmountNative, setTargetAmountNative] = useState('0')
   const [networkSymbol, setNetworkSymbol] = useState('')
+  const [wtfMessage, setWTFMessage] = useState('Calculated as...')
   const userStateSnapshot = useSnapshot(userState)
 
   useEffect(() => {
@@ -101,7 +103,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
     if (lootbox && network) {
       setNetworkSymbol(network.nativeCurrency.symbol)
 
-      const loadData = async () => {
+      const loadData = async (symb: string) => {
         const { sharesSoldMax, sharesSoldCount, sharePriceUSD } = await getLootboxData(lootbox)
 
         const percentageFunded =
@@ -123,8 +125,20 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
         const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
         setTargetAmountNative(maxAmountNativeFmt)
+
+        const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
+          web3Utils.fromWei(sharesSoldMax, 'ether')
+        ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(
+          new web3Utils.BN(sharePriceUSD).mul(new web3Utils.BN(10)),
+          'nano'
+        )} USD at a ${symb} price of ${parseFloat(
+          web3Utils.fromWei(nativeTokenPrice.mul(new web3Utils.BN(10)), 'nano')
+        ).toFixed(2)} USD.`
+        setWTFMessage(wtfBro)
       }
-      loadData().catch((err) => console.error('Error loading data for lootbox progress bar', err))
+      loadData(network.nativeCurrency.symbol).catch((err) =>
+        console.error('Error loading data for lootbox progress bar', err)
+      )
     }
   }, [lootbox, userStateSnapshot])
 
@@ -133,6 +147,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
       percentageFunded={percentageFunded}
       networkSymbol={networkSymbol}
       targetAmountNative={targetAmountNative}
+      wtfMessage={wtfMessage}
     />
   )
 }
