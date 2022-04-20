@@ -16,19 +16,15 @@ import BigNumber from 'bignumber.js'
 import { $InputTranslationHeavy, $InputTranslationLight, $InputWrapper, validateReceivingWallet } from '../CreateLootbox/StepChooseFunding'
 import $Input from '../Generics/Input'
 import { ethers as ethersObj } from 'ethers'
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
-import { $TextAreaMedium } from '../CreateLootbox/StepCustomize'
-import WalletStatus from 'lib/components/WalletStatus'
+import { getProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import {
-  getLootboxEscrowManagementDetails,
-  getLootboxInstantManagementDetails,
   getLootboxIssuer,
   getPriceFeed,
   LootboxType,
   rewardSponsorsInErc20TokenCall,
   rewardSponsorsInNativeTokenCall,
 } from 'lib/hooks/useContract'
-import { ethers } from 'ethers'
+import ERC20ABI from 'lib/abi/erc20.json';
 
 export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
   if (erc20Address === undefined) return false
@@ -53,16 +49,38 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const [nativeRewardAmount, setNativeRewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [nativeRewardUSD, setNativeRewardUSD] = useState(0)
   const [erc20RewardAmount, setErc20RewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
-  const [transactionNote, setTransactionNote] = useState('')
+  // const [transactionNote, setTransactionNote] = useState('')
   const [rewardSubmissionStatus, setRewardSubmissionStatus] = useState<ManagementButtonState>("enabled")
   const [rewardSponsorsStatusMessage, setRewardSponsorsStatusMessage] = useState("")
+  const [approvalSubmissionStatus, setApprovalSubmissionStatus] = useState<ManagementButtonState>("enabled")
+  const [approvalStatusMessage, setApprovalStatusMessage] = useState("")
   const [transactionHash, setTransactionHash] = useState('')
   const [approvalReceived, setApprovalReceived] = useState(false)
+  const [erc20Name, setErc20TokenName] = useState("ERC20")
   const { screen } = useWindowSize()
 
   useEffect(() => {
     generateValidationErrorMessages()
   }, [erc20Address, nativeRewardAmount, erc20RewardAmount])
+
+  const updateErc20TokenIdentified = async (erc20Addr: ContractAddress) => {
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const { provider } = await getProvider()
+    const signer = await provider.getSigner()
+    const erc20 = new ethers.Contract(
+      erc20Addr,
+      ERC20ABI,
+      signer
+    )
+    const name = await erc20.symbol()
+    setErc20TokenName(name)
+  }
+
+  useEffect(() => {
+    if (erc20Address && validateErc20(erc20Address)) {
+      updateErc20TokenIdentified(erc20Address)
+    }
+  }, [erc20Address])
 
   const loadBlockchainData = async () => {
     console.log(`Loading fam...`)
@@ -218,7 +236,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
                 width={calculateInputWidth(erc20RewardAmount)}
                 onWheel={(e) => e.currentTarget.blur()}
               />
-              <$InputTranslationLight>{`VIS`}</$InputTranslationLight>
+              <$InputTranslationLight>{erc20Name}</$InputTranslationLight>
             </div>
           </div>
         </$InputWrapper>
@@ -323,25 +341,45 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   }
 
   const getApprovalForSpend = async () => {
+    if (!erc20Address) {
+      return
+    }
+    setApprovalStatusMessage("")
     setApprovalSubmissionStatus("pending")
-    // setApprovalReceived(true)
-    setApprovalSubmissionStatus("success")
-    setApprovalSponsorsStatusMessage("")
-    setTimeout(() => {
-      setApprovalSubmissionStatus("enabled")
-    }, 5000)
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const { provider } = await getProvider()
+    const signer = await provider.getSigner()
+    const contract = new ethers.Contract(
+      erc20Address,
+      ERC20ABI,
+      signer
+    )
+    try {
+      await contract.approve(props.lootboxAddress, erc20RewardAmount.toString())
+      setApprovalSubmissionStatus("success")
+      setApprovalStatusMessage("")
+      setTimeout(() => {
+        setApprovalReceived(true)
+      }, 2000)
+    } catch (e) {
+      setApprovalSubmissionStatus("error")
+      setApprovalStatusMessage(e.data.message)
+      setTimeout(() => {
+        setApprovalSubmissionStatus('enabled')
+      }, 5000)
+    }
   }
 
   const renderSubmitButtonForErc20Token = () => {
-    if (approvalReceived) {
+    if (!approvalReceived) {
       return (
         <$RewardSponsorsButton
-          disabled={!allConditionsMet() || rewardSubmissionStatus === 'pending' || rewardSubmissionStatus === 'success'}
+          disabled={!allConditionsMet() || approvalSubmissionStatus === 'pending' || approvalSubmissionStatus === 'success'}
           allConditionsMet={allConditionsMet()}
           onClick={() => getApprovalForSpend()}
-          themeColor={rewardSubmissionStatus === 'success' ? COLORS.successFontColor : rewardSubmissionStatus === 'pending' ? `${props.network.themeColor}3A` : props.network.themeColor}
+          themeColor={approvalSubmissionStatus === 'success' ? COLORS.successFontColor : approvalSubmissionStatus === 'pending' ? `${props.network.themeColor}3A` : props.network.themeColor}
         >
-          {rewardSubmissionStatus === 'pending' ? 'SUBMITTING...' : rewardSubmissionStatus === 'success' ? 'TRANSFER APPROVED' : `APPROVE TRANSFER`}
+          {approvalSubmissionStatus === 'pending' ? 'REQUESTING...' : approvalSubmissionStatus === 'success' ? 'TRANSFER APPROVED' : `APPROVE TRANSFER`}
         </$RewardSponsorsButton>
       )
     }
@@ -484,11 +522,20 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         {
           rewardMethod === "native" ? renderSubmitButtonForNativeToken() : renderSubmitButtonForErc20Token()
         }
-        <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+        
+        {
+          approvalSubmissionStatus === "success" || approvalSubmissionStatus === "error" && 
+          <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+            <$ErrorMessageMgmtPage status={approvalSubmissionStatus}>
+              {approvalStatusMessage}
+            </$ErrorMessageMgmtPage>
+          </div>
+        }
+        {rewardSubmissionStatus === "success" || rewardSubmissionStatus === "error" && <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
           <$ErrorMessageMgmtPage status={rewardSubmissionStatus}>
             {rewardSponsorsStatusMessage}
           </$ErrorMessageMgmtPage>
-        </div>
+        </div>}
         {
           transactionHash && (
             <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>

@@ -687,7 +687,7 @@ const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number 
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
           <$StatFigure>{payoutsMade}</$StatFigure>
-          <$StatLabel>Payouts</$StatLabel>
+          <$StatLabel>Rewards</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
           <$Datestamp style={{ margin: '5px 0px' }}>Deposits Made</$Datestamp>

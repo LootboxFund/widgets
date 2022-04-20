@@ -61,6 +61,7 @@
     "deploy:prod": "NODE_ENV=production rollup -c && NODE_ENV=production node scripts/deploy-widgets.js",
     "deploy:terran": "rollup -c && node scripts/deploy-create-lootbox.js",
     "deploy:newton": "rollup -c && node scripts/deploy-interact-with-lootbox-widget.js",
+    "deploy:kepler": "rollup -c && node scripts/deploy-manage-lootbox.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },

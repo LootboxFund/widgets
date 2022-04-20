@@ -75,12 +75,15 @@ const ManagementPage = () => {
           const [lootboxType,isFundraising] = data
           setLootboxType(lootboxType)
           setIsActivelyFundraising(isFundraising)
-          // return readTicketMetadata(addr, '0' as TicketID)
+          return readTicketMetadata(addr, '0' as TicketID)
           // ------- Temp
-          return mockJSON
+          // return mockJSON
           // ------- Temp
         })
-        .then((metadata) => {
+        .then((metadata: ITicketMetadata) => {
+          if (!metadata || !metadata.lootbox) {
+            throw Error("No metadata found")
+          }
           setTicketMetadata(metadata)
           const network = matchNetworkByHex(metadata.lootbox.chainIdHex)
           if (network) {
