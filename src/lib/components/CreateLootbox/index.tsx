@@ -290,6 +290,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
+    setSubmitStatus('in_progress')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (fundingType === 'instant') {
       console.log(`Generating Instant Lootbox...`)
@@ -564,7 +565,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => setValidity({ ...validity, stepTerms: bool })}
         onNext={() => console.log('onNext')}
         submitStatus={submitStatus}
-        onSubmit={() => createLootbox()}
+        onSubmit={() => createLootbox()} 
         goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Vertical style={{ marginTop: '20px' }}>

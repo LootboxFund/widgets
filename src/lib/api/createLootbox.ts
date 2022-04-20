@@ -66,6 +66,7 @@ export const createInstantLootbox = async (
   args: InstantLootboxArgs,
   socials: LootboxSocials
 ) => {
+  setSubmitStatus('in_progress')
   const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
     .address as unknown as ContractAddress
 
@@ -135,7 +136,6 @@ export const createInstantLootbox = async (
     },
   }
 
-  setSubmitStatus('in_progress')
 
   const blockNum = await provider.getBlockNumber()
 
@@ -266,6 +266,7 @@ export const createEscrowLootbox = async (
   args: InstantLootboxArgs,
   socials: LootboxSocials
 ) => {
+  setSubmitStatus('in_progress')
   const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory
     .address as unknown as ContractAddress
 
@@ -334,7 +335,6 @@ export const createEscrowLootbox = async (
     },
   }
 
-  setSubmitStatus('in_progress')
 
   const blockNum = await provider.getBlockNumber()
 
