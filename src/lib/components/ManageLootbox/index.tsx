@@ -28,7 +28,7 @@ import {
 import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
 
-type ManagementButtonState = 'disabled' | 'enabled' | 'pending' | 'error' | 'success'
+export type ManagementButtonState = 'disabled' | 'enabled' | 'pending' | 'error' | 'success'
 export interface ManageLootboxProps {
   themeColor: string
   lootboxAddress: ContractAddress
@@ -255,7 +255,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <div style={{ display: 'inline-block' }}>
               <span>This is the public control panel for Lootbox </span>
               <span
-                onClick={() => window.open(`${props.network.blockExplorerUrl}${props.lootboxAddress}`, '_blank')}
+                onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
                 style={{ textDecoration: 'underline', fontStyle: 'italic', cursor: 'pointer' }}
               >{`${truncateAddress(props.lootboxAddress)}`}</span>
               <span>
@@ -417,7 +417,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   </$Horizontal>
                   <$Horizontal verticalCenter>
                     <$SmallerButton
-                      onClick={() => window.open(`${props.network.blockExplorerUrl}${props.lootboxAddress}`, '_blank')}
+                      onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
                       screen={screen}
                     >
                       View Deposit History

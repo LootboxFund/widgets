@@ -58,6 +58,7 @@ const ManagementPage = () => {
   const [ticketMetadata, setTicketMetadata] = useState<ITicketMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
   const [lootboxType, setLootboxType] = useState<LootboxType>()
+  const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
 
   const refRewardSponsors = useRef<HTMLDivElement | null>(null)
 
@@ -70,8 +71,10 @@ const ManagementPage = () => {
         .then(() => {
           return identifyLootboxType(addr)
         })
-        .then((lootboxType) => {
+        .then((data) => {
+          const [lootboxType,isFundraising] = data
           setLootboxType(lootboxType)
+          setIsActivelyFundraising(isFundraising)
           // return readTicketMetadata(addr, '0' as TicketID)
           // ------- Temp
           return mockJSON
@@ -120,7 +123,7 @@ const ManagementPage = () => {
       />
       <br />
       <br />
-      <div ref={refRewardSponsors}>
+      <div ref={refRewardSponsors} style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
         <RewardSponsors lootboxAddress={lootboxAddress} ticketMetadata={ticketMetadata} network={network} lootboxType={lootboxType} />
       </div>
     </div>

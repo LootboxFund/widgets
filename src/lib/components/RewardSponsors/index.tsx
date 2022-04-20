@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import NetworkText from '../NetworkText'
-import { $ManageLootboxHeading } from '../ManageLootbox'
+import { $ErrorMessageMgmtPage, $ManageLootboxHeading, ManagementButtonState } from '../ManageLootbox'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { $StepSubheading } from '../CreateLootbox/StepCard'
@@ -13,8 +13,9 @@ import $SmallerButton from '../Generics/SmallerButton/SmallerButton'
 import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
 import { COLORS } from '../../theme/index'
 import BigNumber from 'bignumber.js'
-import { $InputTranslationHeavy, $InputTranslationLight, $InputWrapper } from '../CreateLootbox/StepChooseFunding'
+import { $InputTranslationHeavy, $InputTranslationLight, $InputWrapper, validateReceivingWallet } from '../CreateLootbox/StepChooseFunding'
 import $Input from '../Generics/Input'
+import { ethers as ethersObj } from 'ethers'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { $TextAreaMedium } from '../CreateLootbox/StepCustomize'
 import WalletStatus from 'lib/components/WalletStatus'
@@ -24,8 +25,16 @@ import {
   getLootboxIssuer,
   getPriceFeed,
   LootboxType,
+  rewardSponsorsInErc20TokenCall,
+  rewardSponsorsInNativeTokenCall,
 } from 'lib/hooks/useContract'
 import { ethers } from 'ethers'
+
+export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
+  if (erc20Address === undefined) return false
+  const ethers = window.ethers ? window.ethers : ethersObj
+  return ethers.utils.isAddress(erc20Address)
+}
 
 type RewardMethod = 'native' | 'erc20'
 export interface RewardSponsorsProps {
@@ -45,7 +54,15 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const [nativeRewardUSD, setNativeRewardUSD] = useState(0)
   const [erc20RewardAmount, setErc20RewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [transactionNote, setTransactionNote] = useState('')
+  const [rewardSubmissionStatus, setRewardSubmissionStatus] = useState<ManagementButtonState>("enabled")
+  const [rewardSponsorsStatusMessage, setRewardSponsorsStatusMessage] = useState("")
+  const [transactionHash, setTransactionHash] = useState('')
+  const [approvalReceived, setApprovalReceived] = useState(false)
   const { screen } = useWindowSize()
+
+  useEffect(() => {
+    generateValidationErrorMessages()
+  }, [erc20Address, nativeRewardAmount, erc20RewardAmount])
 
   const loadBlockchainData = async () => {
     console.log(`Loading fam...`)
@@ -129,6 +146,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
                 placeholder="0.01"
                 screen={screen}
                 width={calculateInputWidth(nativeRewardAmount)}
+                onWheel={(e) => e.currentTarget.blur()}
               />
               <$InputTranslationLight>{props.network?.symbol}</$InputTranslationLight>
             </div>
@@ -198,6 +216,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
                 placeholder="0.01"
                 screen={screen}
                 width={calculateInputWidth(erc20RewardAmount)}
+                onWheel={(e) => e.currentTarget.blur()}
               />
               <$InputTranslationLight>{`VIS`}</$InputTranslationLight>
             </div>
@@ -207,11 +226,136 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     )
   }
 
+  const rewardSponsorsWithDeposit = async () => {
+    generateValidationErrorMessages()
+    if (!allConditionsMet()) {
+      return 
+    }
+    setRewardSubmissionStatus("pending")
+    setRewardSponsorsStatusMessage("")
+    try {
+      if (rewardMethod === 'native') {
+        const txHash = await rewardSponsorsInNativeTokenCall(props.lootboxAddress, props.lootboxType, nativeRewardAmount.toString())
+        console.log(`txHash = ${txHash}`)
+        setTransactionHash(txHash)
+        setRewardSubmissionStatus("success")
+        setRewardSponsorsStatusMessage("")
+        setTimeout(() => {
+          setRewardSubmissionStatus("enabled")
+        }, 5000)
+      } else if (rewardMethod === 'erc20' && erc20Address) {
+        const txHash = await rewardSponsorsInErc20TokenCall(props.lootboxAddress, props.lootboxType, erc20Address, erc20RewardAmount.toString())
+        setTransactionHash(txHash)
+        setRewardSubmissionStatus("success")
+        setRewardSponsorsStatusMessage("")
+        setTimeout(() => {
+          setRewardSubmissionStatus("enabled")
+        }, 5000)
+      }
+    } catch (e) {
+      console.log(e)
+      setRewardSubmissionStatus("error")
+      setRewardSponsorsStatusMessage(e.data.message)
+      setTimeout(() => {
+        setRewardSubmissionStatus('enabled')
+      }, 2000)
+    }
+  }
+
   if (!props.network) {
     return null
   }
 
-  const allConditionsMet = false
+  const allConditionsMet = () => {
+    if (rewardMethod === 'native') {
+      return nativeRewardAmount.toString() !== "0" && validateReceivingWallet(props.lootboxAddress)
+    } else if (rewardMethod === 'erc20') {
+      return validateErc20(erc20Address) && erc20RewardAmount.toString() !== "0" && validateReceivingWallet(props.lootboxAddress)
+    }
+    return false
+  }
+
+  const generateValidationErrorMessages = () => {
+    console.log(`
+      
+    nativeRewardAmount.toString() = ${parseFloat(nativeRewardAmount.toString())}
+    erc20RewardAmount.toString() = ${parseFloat(erc20RewardAmount.toString())}
+    validateErc20(erc20Address) = ${validateErc20(erc20Address)}
+
+    erc20Address = ${erc20Address}
+
+    `)
+    console.log(nativeRewardAmount)
+    console.log(erc20RewardAmount)
+    if (!validateReceivingWallet(props.lootboxAddress)) {
+      setRewardSponsorsStatusMessage("Lootbox Address is invalid")
+      return
+    }
+    if (rewardMethod === 'native') {
+      if (nativeRewardAmount.toString() === "0") {
+        setRewardSponsorsStatusMessage("Enter an amount of native token to deposit")
+        return
+      }
+    } else if (rewardMethod === 'erc20') {
+      if (erc20RewardAmount.toString() === '0') {
+        setRewardSponsorsStatusMessage("Enter an amount of ERC20 token to deposit")
+        return
+      }
+      if (!validateErc20(erc20Address)) {
+        setRewardSponsorsStatusMessage("Enter a valid ERC20 token address")
+        return
+      }
+    }
+    setRewardSponsorsStatusMessage("")
+  }
+
+  const renderSubmitButtonForNativeToken = () => {
+    return (
+      <$RewardSponsorsButton
+          disabled={!allConditionsMet() || rewardSubmissionStatus === 'pending' || rewardSubmissionStatus === 'success'}
+          allConditionsMet={allConditionsMet()}
+          onClick={() => rewardSponsorsWithDeposit()}
+          themeColor={rewardSubmissionStatus === 'success' ? COLORS.successFontColor : rewardSubmissionStatus === 'pending' ? `${props.network.themeColor}3A` : props.network.themeColor}
+        >
+          {rewardSubmissionStatus === 'pending' ? 'SUBMITTING...' : rewardSubmissionStatus === 'success' ? 'DEPOSIT SUCCESS' : `REWARD SPONSORS`}
+        </$RewardSponsorsButton>
+    )
+  }
+
+  const getApprovalForSpend = async () => {
+    setApprovalSubmissionStatus("pending")
+    // setApprovalReceived(true)
+    setApprovalSubmissionStatus("success")
+    setApprovalSponsorsStatusMessage("")
+    setTimeout(() => {
+      setApprovalSubmissionStatus("enabled")
+    }, 5000)
+  }
+
+  const renderSubmitButtonForErc20Token = () => {
+    if (approvalReceived) {
+      return (
+        <$RewardSponsorsButton
+          disabled={!allConditionsMet() || rewardSubmissionStatus === 'pending' || rewardSubmissionStatus === 'success'}
+          allConditionsMet={allConditionsMet()}
+          onClick={() => getApprovalForSpend()}
+          themeColor={rewardSubmissionStatus === 'success' ? COLORS.successFontColor : rewardSubmissionStatus === 'pending' ? `${props.network.themeColor}3A` : props.network.themeColor}
+        >
+          {rewardSubmissionStatus === 'pending' ? 'SUBMITTING...' : rewardSubmissionStatus === 'success' ? 'TRANSFER APPROVED' : `APPROVE TRANSFER`}
+        </$RewardSponsorsButton>
+      )
+    }
+    return (
+      <$RewardSponsorsButton
+          disabled={!allConditionsMet() || rewardSubmissionStatus === 'pending' || rewardSubmissionStatus === 'success'}
+          allConditionsMet={allConditionsMet()}
+          onClick={() => rewardSponsorsWithDeposit()}
+          themeColor={rewardSubmissionStatus === 'success' ? COLORS.successFontColor : rewardSubmissionStatus === 'pending' ? `${props.network.themeColor}3A` : props.network.themeColor}
+        >
+          {rewardSubmissionStatus === 'pending' ? 'SUBMITTING...' : rewardSubmissionStatus === 'success' ? 'DEPOSIT SUCCESS' : `REWARD SPONSORS`}
+        </$RewardSponsorsButton>
+    )
+  }
 
   return (
     <$StepCard themeColor={props.network.themeColor}>
@@ -321,7 +465,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           </div>
         </$InputWrapper>
         <br />
-        <$StepSubheading>
+        {/* <$StepSubheading>
           <span>Optional Note</span>
           <HelpIcon tipID="ticketBiography" />
           <ReactTooltip id="ticketBiography" place="right" effect="solid">
@@ -334,17 +478,26 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           rows={6}
           maxLength={500}
           style={{ maxWidth: '90%' }}
-        />
+        /> */}
       </$Vertical>
       <$Vertical style={{ marginTop: '40px' }}>
-        <$RewardSponsorsButton
-          disabled={!allConditionsMet}
-          allConditionsMet={allConditionsMet}
-          onClick={() => {}}
-          themeColor={props.network.themeColor}
-        >
-          REWARD SPONSORS
-        </$RewardSponsorsButton>
+        {
+          rewardMethod === "native" ? renderSubmitButtonForNativeToken() : renderSubmitButtonForErc20Token()
+        }
+        <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+          <$ErrorMessageMgmtPage status={rewardSubmissionStatus}>
+            {rewardSponsorsStatusMessage}
+          </$ErrorMessageMgmtPage>
+        </div>
+        {
+          transactionHash && (
+            <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+              <$ErrorMessageMgmtPage status={"success"} onClick={() => window.open(`${props.network.blockExplorerUrl}tx/${transactionHash}`, "_blank")} style={{ cursor: 'pointer' }}>
+                View Transaction Reciept
+              </$ErrorMessageMgmtPage>
+            </div>
+          )
+        }
       </$Vertical>
     </$StepCard>
   )

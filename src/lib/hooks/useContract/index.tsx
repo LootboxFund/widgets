@@ -184,15 +184,23 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<st
  * Identifies the Lootbox as Escrow or Instant
  */
 export type LootboxType = 'Escrow' | 'Instant'
-export const identifyLootboxType = async (lootboxAddress: Address): Promise<LootboxType> => {
+export const identifyLootboxType = async (lootboxAddress: Address): Promise<[LootboxType,boolean]> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
-  
-  const lootboxType = await lootbox.variant()
-  
-  return lootboxType
+  console.log("Checking...")
+  const [lootboxType,isFundraising] = await Promise.all([
+    lootbox.variant(),
+    lootbox.isFundraising()
+  ])
+  console.log(`
+    
+  varient = ${lootboxType}
+  isFundraising = ${isFundraising}
+
+  `)
+  return [lootboxType,isFundraising]
 }
 
 export const getLootboxEscrowManagementDetails = async (
@@ -501,4 +509,48 @@ export const refundFundraiserCall = async (lootboxAddress: ContractAddress, loot
     return await escrowLootbox.connect(signer).cancelFundraiser()
   }
   return
+}
+
+export const rewardSponsorsInNativeTokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, amount: string) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === "Escrow") {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsNative({
+      value: amount,
+    })
+    await tx.wait()
+    return tx.hash
+  } else {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsNative({
+      value: amount,
+    })
+    await tx.wait()
+    return tx.hash
+  }
+}
+
+export const rewardSponsorsInErc20TokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, erc20Address: ContractAddress, amount: string) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === "Escrow") {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsErc20(
+      erc20Address,
+      amount,
+    )
+    await tx.wait()
+    return tx.hash
+  } else {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsErc20(
+      erc20Address,
+      amount,
+    )
+    await tx.wait()
+    return tx.hash
+  }
 }
