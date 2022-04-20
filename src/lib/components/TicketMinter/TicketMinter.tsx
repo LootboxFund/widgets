@@ -6,6 +6,7 @@ import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import FundraisingProgressBar from '../FundraisingProgressBar'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -43,15 +44,11 @@ const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>
   const isMobile = smallScreens.indexOf(screen) >= 0
   const buyWidth = isMobile ? '100%' : '65%'
   const ticketWidth = isMobile ? '100%' : '35%'
+
   return (
     <$TicketMinterContainer>
       {ref && <div ref={ref} />}
-      <FundraisingProgressBar
-        percentageFunded={80}
-        fundedAmountNative={'8'}
-        networkSymbol={'BNB'}
-        targetAmountNative={'10'}
-      />
+      <FundraisingProgressBar lootbox={snap.lootboxAddress as ContractAddress | undefined} />
       <$Row
         style={
           isMobile

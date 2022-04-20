@@ -1,5 +1,5 @@
 import react, { useEffect } from 'react'
-import FundraisingProgressBar, { FundraisingProgressBarProps } from '../FundraisingProgressBar'
+import { FundraisingProgressBar, FundraisingProgressBarProps } from '../FundraisingProgressBar'
 import { $CardViewport } from '../Generics'
 import { COLORS } from 'lib/theme'
 

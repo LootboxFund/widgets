@@ -1,20 +1,29 @@
+import { useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
-import { TYPOGRAPHY } from '@wormgraph/helpers'
+import { ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { COLORS } from 'lib/theme'
 import { $Vertical, $Horizontal } from '../Generics'
 import HelpIcon from '../../theme/icons/Help.icon'
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { getLootboxData, getPriceFeedRaw } from 'lib/hooks/useContract'
+import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
+import { BLOCKCHAINS } from '@wormgraph/helpers'
 
 export interface FundraisingProgressBarProps {
   percentageFunded: number
-  fundedAmountNative: string
   networkSymbol: string
   targetAmountNative: string
   themeColor?: string
 }
 
-const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
+interface LootboxFundraisingProgressBar {
+  lootbox: ContractAddress | undefined
+}
+
+export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
   const { screen } = useWindowSize()
   return (
     <$ProgressBarWrapper>
@@ -29,20 +38,8 @@ const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
                 marginRight: '10px',
               }}
             >
-              {`${props.percentageFunded}% Funded`}
+              {`${props.percentageFunded > 100 ? 100 : props.percentageFunded}% Funded`}
             </span>
-            {screen !== 'mobile' && (
-              <span
-                style={{
-                  fontSize: TYPOGRAPHY.fontSize.medium,
-                  color: COLORS.surpressedFontColor,
-                  fontWeight: TYPOGRAPHY.fontWeight.light,
-                  marginRight: '10px',
-                }}
-              >
-                {`${props.fundedAmountNative} ${props.networkSymbol}`}
-              </span>
-            )}
           </$Horizontal>
           <$Horizontal>
             <span
@@ -89,8 +86,63 @@ const ProgressBar = ({ progress, themeColor }: { progress: number; themeColor: s
   )
 }
 
+const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBar) => {
+  const web3Utils = useWeb3Utils()
+  const [percentageFunded, setPercentageFunded] = useState(0)
+  const [targetAmountNative, setTargetAmountNative] = useState('0')
+  const [networkSymbol, setNetworkSymbol] = useState('')
+  const userStateSnapshot = useSnapshot(userState)
+
+  useEffect(() => {
+    const network =
+      userStateSnapshot.network.currentNetworkIdHex &&
+      Object.values(BLOCKCHAINS).find((b) => b.chainIdHex === userStateSnapshot.network.currentNetworkIdHex)
+
+    if (lootbox && network) {
+      setNetworkSymbol(network.nativeCurrency.symbol)
+
+      const loadData = async () => {
+        const { sharesSoldMax, sharesSoldCount, sharePriceUSD } = await getLootboxData(lootbox)
+
+        const percentageFunded =
+          sharesSoldCount && sharesSoldMax
+            ? new web3Utils.BN(sharesSoldCount)
+                .mul(new web3Utils.BN('100'))
+                .div(new web3Utils.BN(sharesSoldMax))
+                .toNumber()
+            : 0
+        setPercentageFunded(percentageFunded)
+
+        const nativeTokenPriceEther = await getPriceFeedRaw(network.priceFeedUSD as ContractAddress)
+        const nativeTokenPrice = new web3Utils.BN(nativeTokenPriceEther)
+
+        const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax)
+          .mul(new web3Utils.BN(sharePriceUSD))
+          .div(nativeTokenPrice)
+
+        const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
+
+        setTargetAmountNative(maxAmountNativeFmt)
+      }
+      loadData().catch((err) => console.error('Error loading data for lootbox progress bar', err))
+    }
+  }, [lootbox, userStateSnapshot])
+
+  return (
+    <FundraisingProgressBar
+      percentageFunded={percentageFunded}
+      networkSymbol={networkSymbol}
+      targetAmountNative={targetAmountNative}
+    />
+  )
+}
+
+function roundOff(n: number) {
+  return parseFloat(n.toExponential(Math.max(1, 2 + Math.log10(Math.abs(n)))))
+}
+
 const $ProgressBarWrapper = styled.div`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
-export default FundraisingProgressBar
+export default LootboxFundraisingProgressBar
