@@ -1,11 +1,11 @@
 import react from 'react'
 import styled from 'styled-components'
 import { $BuySharesContainer } from 'lib/components/BuyShares/BuyShares'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import $Button from '../Generics/Button'
 import { $Vertical } from '../Generics'
 import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
-import { buySharesState, addTicketToWallet } from './state'
+import { buySharesState } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
@@ -117,7 +117,7 @@ const $TokenPreviewCard = styled.div<{}>`
 `
 
 export const $BlueLinkLink = styled.a<{}>`
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   margin: 10px 0px;
   color: #073effc0;
   text-align: center;
@@ -126,20 +126,20 @@ export const $BlueLinkLink = styled.a<{}>`
   &:hover {
     text-decoration: underline;
   }
-  font-size: 1.1em;
+  font-size: ${TYPOGRAPHY.fontSize.large};
   font-weight: bold;
 `
 
 export const $ErrorText = styled.span<{}>`
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   margin: 10px 0px;
   color: ${COLORS.dangerFontColor};
   text-align: center;
-  font-size: 1.1em;
+  font-size: ${TYPOGRAPHY.fontSize.large};
 `
 
 export const $Sadge = styled.span<{}>`
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   margin: 10px 0px;
   color: ${COLORS.dangerFontColor};
   text-align: center;
@@ -147,7 +147,7 @@ export const $Sadge = styled.span<{}>`
 `
 
 export const $SecondaryLinkText = styled.span<{}>`
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   margin-top: 10px;
   color: ${COLORS.surpressedFontColor};
   text-align: center;

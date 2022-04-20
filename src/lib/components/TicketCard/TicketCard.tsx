@@ -1,5 +1,5 @@
 import react from 'react'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID, ITicketFE, TicketCardState } from './state'
@@ -187,11 +187,10 @@ export const $TicketTag = styled.section`
 `
 
 export const $TagText = styled.p`
-  font-family: sans-serif;
-  font-style: normal;
-  font-weight: 800;
-  font-size: 1.2rem;
-  line-height: 1.4rem;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  font-size: ${TYPOGRAPHY.fontSize.large};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
   text-align: center;
   position: relative;
   color: #ffffff;
@@ -200,9 +199,8 @@ export const $TagText = styled.p`
   margin: auto;
 `
 export const $TicketIDText = styled.p`
-  font-family: sans-serif;
-  font-style: normal;
-  font-weight: 800;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-size: 1.8rem;
   line-height: 2rem;
   text-align: center;
@@ -219,8 +217,8 @@ const $Divider = styled.div`
 `
 
 export const $Icon = styled.div<{ size?: string }>`
-  font-family: open-sans;
-  font-weight: bold;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-size: ${(props) => props.size || '84px'};
   line-height: 100px;
   text-align: center;

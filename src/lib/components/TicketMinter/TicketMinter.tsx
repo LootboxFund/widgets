@@ -1,11 +1,12 @@
-import react, { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 import BuyShares from 'lib/components/BuyShares'
 import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
-import React from 'react'
+import FundraisingProgressBar from '../FundraisingProgressBar'
+import { ContractAddress } from '@wormgraph/helpers'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -16,8 +17,6 @@ export const $TicketMinterContainer = styled.section`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box; */
   box-sizing: border-box;
 `
 
@@ -45,9 +44,11 @@ const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>
   const isMobile = smallScreens.indexOf(screen) >= 0
   const buyWidth = isMobile ? '100%' : '65%'
   const ticketWidth = isMobile ? '100%' : '35%'
+
   return (
     <$TicketMinterContainer>
       {ref && <div ref={ref} />}
+      <FundraisingProgressBar lootbox={snap.lootboxAddress as ContractAddress | undefined} />
       <$Row
         style={
           isMobile

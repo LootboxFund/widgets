@@ -1,10 +1,10 @@
 import styled, { css } from 'styled-components'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { ScreenSize } from 'lib/hooks/useScreenSize/index'
 
 export const $TokenInput = styled.div<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.3rem')};
-  padding: 10px 10px 15px 10px;
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
+  padding: 10px 20px 15px 10px;
   background-color: ${`${COLORS.surpressedBackground}20`};
   border: 0px solid transparent;
   border-radius: 10px;
@@ -13,34 +13,36 @@ export const $TokenInput = styled.div<{ screen: ScreenSize }>`
 `
 
 export const $FineText = styled.span<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '0.9rem' : '0.8rem')};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.medium : TYPOGRAPHY.fontSize.small)};
+  // font-size: ${TYPOGRAPHY.fontSize.medium};
   padding: 0px 0px 0px 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   word-break: break-word;
+  color: ${COLORS.surpressedFontColor};
 `
 
 export const $CoinIcon = styled.img<{ screen: ScreenSize }>`
-  width: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.2rem')};
-  height: ${(props) => (props.screen === 'desktop' ? '1.5rem' : '1.2rem')};
-  margin-right: ${(props) => (props.screen === 'desktop' ? '10px' : '5px')};
+  width: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
+  height: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
+  margin: ${(props) => (props.screen === 'desktop' ? 'auto 10px auto 0' : 'auto 5px auto 0')};
 `
 
 export const $BalanceText = styled.span<{ screen: ScreenSize }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '0.8rem' : '0.7rem')};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.medium : TYPOGRAPHY.fontSize.small)};
   color: ${`${COLORS.surpressedFontColor}`};
   text-align: right;
   margin-right: 5px;
   margin-top: 10px;
-  font-weight: lighter;
-  font-family: sans-serif;
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export const $TokenSymbol = styled.span<{ screen: ScreenSize; padding?: string }>`
-  font-size: ${(props) => (props.screen === 'desktop' ? '1rem' : '0.9rem')};
-  font-weight: bold;
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.medium : TYPOGRAPHY.fontSize.small)};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
   display: block;
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -49,4 +51,5 @@ export const $TokenSymbol = styled.span<{ screen: ScreenSize; padding?: string }
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: ${COLORS.black};
 `

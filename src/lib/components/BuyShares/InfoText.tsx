@@ -2,6 +2,7 @@ import { useSnapshot } from 'valtio'
 import BN from 'bignumber.js'
 import styled from 'styled-components'
 import { buySharesState } from './state'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 
 const InfoText = () => {
   const snap = useSnapshot(buySharesState)
@@ -29,25 +30,24 @@ const InfoText = () => {
 }
 
 const BASE_STYLE = `
-  font-family: sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  line-height: 22px;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
   letter-spacing: 0em;
   text-align: left;
   display: inline;
 `
 
 const $Bold = styled.p`
-  font-weight: 700;
-  color: #575757;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  color: ${COLORS.surpressedFontColor};
   ${BASE_STYLE}
 `
 
 const $Text = styled.p`
-  font-family: sans-serif;
-  font-weight: 400;
-  color: #575757da;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  color: ${COLORS.surpressedFontColor}da;
   overflow: hidden;
   text-overflow: ellipsis;
   ${BASE_STYLE}

@@ -13,5 +13,5 @@ export const parseEth = (amount: string, decimals?: number | undefined): string 
   if (decimals == undefined) {
     decimals = DEFAULT_DECIMALS
   }
-  return new BN(amount).dividedBy(new BN(10).pow(decimals)).decimalPlaces(6).toString()
+  return new BN(amount).dividedBy(new BN(10).pow(decimals)).decimalPlaces(4).toString()
 }
