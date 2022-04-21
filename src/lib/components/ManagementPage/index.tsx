@@ -69,16 +69,7 @@ const ManagementPage = () => {
     if (window.ethereum && addr) {
       initDApp()
         .then(() => {
-          return identifyLootboxType(addr)
-        })
-        .then((data) => {
-          const [lootboxType,isFundraising] = data
-          setLootboxType(lootboxType)
-          setIsActivelyFundraising(isFundraising)
           return readTicketMetadata(addr, '0' as TicketID)
-          // ------- Temp
-          // return mockJSON
-          // ------- Temp
         })
         .then((metadata: ITicketMetadata) => {
           if (!metadata || !metadata.lootbox) {
@@ -89,6 +80,17 @@ const ManagementPage = () => {
           if (network) {
             setNetwork(network)
           }
+          return identifyLootboxType(addr)
+        })
+        .then((data) => {
+          console.log('lootbox type...')
+          console.log(data)
+          const [lootboxType,isFundraising] = data
+          setLootboxType(lootboxType)
+          setIsActivelyFundraising(isFundraising)
+          // ------- Temp
+          // return mockJSON
+          // ------- Temp
         })
         .catch((err) => LogRocket.captureException(err))
     } else {
@@ -105,8 +107,19 @@ const ManagementPage = () => {
     }
   }, [])
 
-  if (!network || !ticketMetadata || !lootboxAddress || !lootboxType) {
-    return <p>Loading...</p>
+  if (!network || !lootboxAddress || !lootboxType || !ticketMetadata) {
+    console.log(network)
+    console.log(lootboxAddress)
+    console.log(lootboxType)
+    console.log(ticketMetadata)
+    if (ticketMetadata && ticketMetadata.lootbox) {
+      return (
+        <section>
+          <WalletStatus targetNetwork={ticketMetadata.lootbox.chainIdHex} />
+        </section>
+      )
+    }
+    return <p>{`Could not find metadata for Lootbox ${lootboxAddress} `}</p>
   }
 
   return (

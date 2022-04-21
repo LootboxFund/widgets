@@ -5,12 +5,15 @@ import { COLORS } from 'lib/theme'
 import { updateStateToChain, useUserInfo, useEthers } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
+import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
-import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/helpers'
+import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex, ChainIDHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
 
-export interface WalletStatusProps {}
+export interface WalletStatusProps {
+  targetNetwork?: ChainIDHex
+}
 const WalletStatus = (props: WalletStatusProps) => {
   const snapUserState = useSnapshot(userState)
   const [provider] = useProvider()
@@ -34,14 +37,27 @@ const WalletStatus = (props: WalletStatusProps) => {
     const result = await requestAccounts()
     if (result.success && provider) {
       const network = await provider.getNetwork()
-      const chainIdHex = convertDecimalToHex(network.chainId.toString())
-      const chainSlug = chainIdHexToSlug(chainIdHex)
-      if (chainSlug) {
-        const blockchain = BLOCKCHAINS[chainSlug]
-        if (blockchain) {
-          updateStateToChain(blockchain)
+      if (props.targetNetwork) {
+        await addCustomEVMChain(props.targetNetwork)
+        const chainSlug = chainIdHexToSlug(props.targetNetwork)
+        if (chainSlug) {
+          const blockchain = BLOCKCHAINS[chainSlug]
+          if (blockchain) {
+            updateStateToChain(blockchain)
+          }
+        }
+      } else {
+        const chainIdHex = convertDecimalToHex(network.chainId.toString())
+        const chainSlug = chainIdHexToSlug(chainIdHex)
+        if (chainSlug) {
+          const blockchain = BLOCKCHAINS[chainSlug]
+          if (blockchain) {
+            updateStateToChain(blockchain)
+          }
         }
       }
+      
+      
       setStatus('success')
     } else {
       setStatus('error')

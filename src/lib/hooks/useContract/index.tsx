@@ -196,7 +196,7 @@ export const identifyLootboxType = async (lootboxAddress: Address): Promise<[Loo
   ])
   console.log(`
     
-  varient = ${lootboxType}
+  variant = ${lootboxType}
   isFundraising = ${isFundraising}
 
   `)
@@ -226,6 +226,7 @@ export const getLootboxEscrowManagementDetails = async (
     treasury,
     depositIdCounter,
     ticketIdCounter,
+    semver
   ] = await Promise.all([
     escrowLootbox.shareDecimals(),
     escrowLootbox.feeDecimals(),
@@ -240,6 +241,7 @@ export const getLootboxEscrowManagementDetails = async (
     escrowLootbox.treasury(),
     escrowLootbox.depositIdCounter(),
     escrowLootbox.ticketIdCounter(),
+    escrowLootbox.semver(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -367,6 +369,7 @@ export const getLootboxEscrowManagementDetails = async (
     treasuryAddress,
     reputationAddress,
     percentageFunded,
+    semver
   ]
 }
 
@@ -391,6 +394,7 @@ export const getLootboxInstantManagementDetails = async (
     treasury,
     depositIdCounter,
     ticketIdCounter,
+    semver
   ] = await Promise.all([
     instantLootbox.shareDecimals(),
     instantLootbox.feeDecimals(),
@@ -404,6 +408,7 @@ export const getLootboxInstantManagementDetails = async (
     instantLootbox.treasury(),
     instantLootbox.depositIdCounter(),
     instantLootbox.ticketIdCounter(),
+    instantLootbox.semver(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -472,6 +477,7 @@ export const getLootboxInstantManagementDetails = async (
     treasuryAddress,
     reputationAddress,
     percentageFunded,
+    semver
   ]
 }
 

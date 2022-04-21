@@ -27,6 +27,7 @@ import {
 } from 'lib/hooks/useContract'
 import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
+import SemverIcon from 'lib/theme/icons/Semver.icon'
 
 export type ManagementButtonState = 'disabled' | 'enabled' | 'pending' | 'error' | 'success'
 export interface ManageLootboxProps {
@@ -53,6 +54,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const [isActivelyFundraising, setIsActivelyFundraising] = useState()
   const [mintedCount, setMintedCount] = useState(0)
   const [payoutsMade, setPayoutsMade] = useState(0)
+  const [semver, setSemver] = useState('undefined')
   const [deploymentDate, setDeploymentDate] = useState()
   const [treasuryAddress, setTreasuryAddress] = useState()
   const [reputationAddress, setReputationAddress] = useState()
@@ -86,6 +88,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _treasuryAddress,
         _reputationAddress,
         _percentageFunded,
+        _semver
       ] = await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
@@ -103,6 +106,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setTreasuryAddress(_treasuryAddress)
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
+      setSemver(_semver)
     } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
@@ -121,6 +125,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _treasuryAddress,
         _reputationAddress,
         _percentageFunded,
+        _semver
       ] = await getLootboxInstantManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
@@ -138,6 +143,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setTreasuryAddress(_treasuryAddress)
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
+      setSemver(_semver)
     }
   }
 
@@ -470,6 +476,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             )}
             <PayoutsMade fill={props.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
             <LootboxTypeStat fill={props.themeColor} lootboxType={props.lootboxType} />
+            <SemverStat fill={props.themeColor} semver={semver} />
           </div>
         </$Vertical>
       </$Horizontal>
@@ -698,6 +705,27 @@ const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number 
         </$Horizontal>
       </$Vertical>
       <SeedlingIcon fill={fill} />
+    </$Horizontal>
+  )
+}
+
+const SemverStat = ({ fill, semver }: { fill: string; semver: string }) => {
+  return (
+    <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
+      <$Vertical style={{ marginRight: '10px' }}>
+        <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
+          <$StatFigure></$StatFigure>
+          <$StatLabel>{semver}</$StatLabel>
+        </$Horizontal>
+        <$Horizontal verticalCenter justifyContent='flex-end'>
+          <$Datestamp style={{ margin: '5px 0px' }}>Version</$Datestamp>
+          <HelpIcon tipID="depositsMade" />
+          <ReactTooltip id="depositsMade" place="right" effect="solid">
+            Lorem Ipsum
+          </ReactTooltip>
+        </$Horizontal>
+      </$Vertical>
+      <SemverIcon fill={fill} />
     </$Horizontal>
   )
 }
