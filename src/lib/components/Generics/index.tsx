@@ -67,3 +67,16 @@ export const $ScrollHorizontal = styled.div<{ height?: string }>`
   align-items: stretch;
   gap: 10px;
 `
+
+export const $Container = styled.section<{ screen: string | undefined }>`
+  width: 100%;
+  height: 100%;
+  border: 0px solid transparent;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  padding: ${(props) => (props.screen === 'mobile' ? '0px' : '20px')};
+  box-shadow: ${(props) => (props.screen === 'mobile' ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.1)')};
+`

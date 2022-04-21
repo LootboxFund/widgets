@@ -12,19 +12,7 @@ import { TokenDataFE } from 'lib/hooks/constants'
 import { ILootbox } from 'lib/types'
 import InfoText from './InfoText'
 import useWindowSize from 'lib/hooks/useScreenSize'
-
-export const $BuySharesContainer = styled.section<{ screen: string | undefined }>`
-  width: 100%;
-  height: 100%;
-  border: 0px solid transparent;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-sizing: border-box;
-  padding: ${(props) => (props.screen === 'mobile' ? '0px' : '20px')};
-  box-shadow: ${(props) => (props.screen === 'mobile' ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.1)')};
-`
+import { $Container } from '../Generics'
 
 interface BuySharesProps {}
 const BuyShares = (props: BuySharesProps) => {
@@ -35,13 +23,13 @@ const BuyShares = (props: BuySharesProps) => {
   const isLoggedIn = snapUserState.accounts.length > 0
 
   return (
-    <$BuySharesContainer screen={screen}>
+    <$Container screen={screen}>
       <BuySharesHeader />
       <TokenInput selectedToken={snap.inputToken.data as TokenDataFE} tokenDisabled={!isLoggedIn} />
       <ShareOutput lootbox={snap.lootbox.data as ILootbox} />
       <BuyButton />
       <InfoText />
-    </$BuySharesContainer>
+    </$Container>
   )
 }
 
