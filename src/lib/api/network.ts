@@ -11,6 +11,7 @@ export interface NetworkOption {
   priceFeed?: Address
   isTestnet?: boolean
   faucetUrl?: string
+  blockExplorerUrl?: string
 }
 export const NETWORK_OPTIONS: NetworkOption[] = [
   // {
@@ -22,7 +23,8 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
   //   isAvailable: true,
   //   isTestnet: false,
   //   icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-  //   priceFeed: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee' as ContractAddress,
+  //   priceFeed: '0x0567f2323251f0aab15c8dfb1967e4e8a7d42aee',
+  //   blockExplorerUrl: 'https://bscscan.com/'
   // },
   {
     name: 'Binance',
@@ -35,6 +37,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
     faucetUrl: 'https://testnet.binance.org/faucet-smart',
+    blockExplorerUrl: 'https://testnet.bscscan.com/',
   },
   {
     name: 'Polygon',
@@ -77,3 +80,7 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     priceFeed: '0xf4766552d15ae4d256ad41b6cf2933482b0680dc' as ContractAddress,
   },
 ]
+
+export const matchNetworkByHex = (chainIdHex: ChainIDHex) => {
+  return NETWORK_OPTIONS.find(network => network.chainIdHex === chainIdHex)
+}

@@ -6,7 +6,7 @@ import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { InputDecimal, $Input } from 'lib/components/Generics/Input'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { $NetworkIcon } from '../StepChooseNetwork'
-import { NetworkOption } from '../state'
+import { NetworkOption } from 'lib/api/network'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { BigNumber } from 'bignumber.js'
 import { useWeb3Utils } from '../../../hooks/useWeb3Api/index'
@@ -324,7 +324,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   )
 })
 
-const $InputWrapper = styled.div<{ screen: ScreenSize }>`
+export const $InputWrapper = styled.div<{ screen: ScreenSize }>`
   background-color: #f1f1f1;
   display: flex;
   padding: 5px 10px;
@@ -339,12 +339,12 @@ const $StepChooseFunding = styled.section<{}>`
   color: ${COLORS.black};
 `
 
-const $InputTranslationLight = styled.span`
+export const $InputTranslationLight = styled.span`
   font-weight: 200;
   color: ${COLORS.surpressedFontColor};
 `
 
-const $InputTranslationHeavy = styled.span`
+export const $InputTranslationHeavy = styled.span`
   font-weight: 600;
   color: ${COLORS.surpressedFontColor};
 `

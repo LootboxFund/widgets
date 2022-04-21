@@ -1,17 +1,15 @@
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import ERC20ABI from 'lib/abi/erc20.json'
+import LootboxABI from 'lib/abi/lootbox.json'
+import LootboxPreknownABI from 'lib/abi/LootboxPreknown.json'
 import LootboxEscrowABI from 'lib/abi/LootboxEscrow.json'
+import LootboxInstantABI from 'lib/abi/LootboxInstant.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import BN from 'bignumber.js'
-import { TokenData, Address } from '@wormgraph/helpers'
-import { ethers as ethersObj } from 'ethers'
+import BN, { BigNumber } from 'bignumber.js'
+import { TokenData, Address, ContractAddress } from '@wormgraph/helpers'
+import { Contract, ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
 
-const BNB = 'bnb'
-const TBNB = 'tbnb'
-const USDC = 'usdc'
-const ETH = 'eth'
-const USDT = 'usdt'
 
 export interface IDividendFragment {
   tokenAddress: Address
@@ -180,4 +178,393 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<st
   const { provider } = await getProvider()
   const balance = await provider.getBalance(userAddr)
   return balance.toString()
+}
+
+/**
+ * Identifies the Lootbox as Escrow or Instant
+ */
+export type LootboxType = 'Escrow' | 'Instant'
+export const identifyLootboxType = async (lootboxAddress: Address): Promise<[LootboxType,boolean]> => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  console.log("Checking...")
+  const [lootboxType,isFundraising] = await Promise.all([
+    lootbox.variant(),
+    lootbox.isFundraising()
+  ])
+  console.log(`
+    
+  variant = ${lootboxType}
+  isFundraising = ${isFundraising}
+
+  `)
+  return [lootboxType,isFundraising]
+}
+
+export const getLootboxEscrowManagementDetails = async (
+  lootboxAddress: ContractAddress,
+  nativePriceFeed: ContractAddress
+) => {
+  
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+  
+  const [
+    shareDecimals,
+    feeDecimals,
+    deploymentStartTime,
+    issuer,
+    sharePriceUSD,
+    sharesSoldCount,
+    sharesSoldTarget,
+    sharesSoldMax,
+    nativeTokenRaisedTotal,
+    isFundraising,
+    treasury,
+    depositIdCounter,
+    ticketIdCounter,
+    semver,
+    symbol
+  ] = await Promise.all([
+    escrowLootbox.shareDecimals(),
+    escrowLootbox.feeDecimals(),
+    escrowLootbox.deploymentStartTime(),
+    escrowLootbox.issuer(),
+    escrowLootbox.sharePriceUSD(),
+    escrowLootbox.sharesSoldCount(),
+    escrowLootbox.sharesSoldTarget(),
+    escrowLootbox.sharesSoldMax(),
+    escrowLootbox.nativeTokenRaisedTotal(),
+    escrowLootbox.isFundraising(),
+    escrowLootbox.treasury(),
+    escrowLootbox.depositIdCounter(),
+    escrowLootbox.ticketIdCounter(),
+    escrowLootbox.semver(),
+    escrowLootbox.symbol()
+  ])
+  const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
+  const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+  const nativeTokenPrice = ethers.BigNumber.from(nativeTokenPriceBN.toString())
+  const priceFeedDecimals = ethers.utils.parseUnits('1', '8')
+  const nativeTokenDecimals = ethers.utils.parseUnits('1', '18')
+
+  // console.log(`
+
+  // ---- ESCROW LOOTBOX ----
+    
+  // shareDecimals,                = ${shareDecimals}
+  // feeDecimals,                  = ${feeDecimals}
+  // deploymentStartTime,          = ${deploymentStartTime}
+  // issuer,                       = ${issuer}
+  // sharePriceUSD,                = ${sharePriceUSD}
+  // sharesSoldCount,              = ${sharesSoldCount}
+  // sharesSoldTarget,             = ${sharesSoldTarget}
+  // sharesSoldMax,                = ${sharesSoldMax}
+  // nativeTokenRaisedTotal,       = ${nativeTokenRaisedTotal}
+  // isFundraising,                = ${isFundraising}
+  // treasury,                     = ${treasury}
+  // depositIdCounter,             = ${depositIdCounter}
+  // ticketIdCounter,              = ${ticketIdCounter}
+  // nativeTokenPrice,             = ${nativeTokenPrice.toString()}
+
+  // `)
+
+  const fundedAmountNative = parseFloat(ethers.utils.formatUnits(nativeTokenRaisedTotal.toString(), 18)).toFixed(4)
+  const fundedAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(nativeTokenRaisedTotal).mul(nativeTokenPrice).div(priceFeedDecimals).toString(),
+      '18'
+    )
+  ).toFixed(2)
+  const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
+  const maxAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+
+  const maxAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const targetAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldTarget.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+  const targetAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldTarget.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const targetAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldTarget, shareDecimals)).toFixed(0)
+  const isActivelyFundraising = isFundraising
+  const mintedCount = ticketIdCounter
+  const payoutsMade = depositIdCounter
+  const deploymentDate = parseInt(`${deploymentStartTime}000`)
+  const treasuryAddress = treasury
+  const reputationAddress = issuer
+  const percentageFunded = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldCount)
+        .mul(ethers.utils.parseUnits('1', shareDecimals))
+        .div(sharesSoldMax)
+        .toString(),
+      shareDecimals - 2
+    )
+  ).toFixed(1)
+
+  // console.log(`
+    
+  // ----- ESCROW TRANSLATED -----
+
+  // fundedAmountNative,           = ${fundedAmountNative}
+  // fundedAmountUSD,              = ${fundedAmountUSD}
+  // fundedAmountShares,           = ${fundedAmountShares}
+  // targetAmountNative,           = ${targetAmountNative}
+  // targetAmountUSD,              = ${targetAmountUSD}
+  // targetAmountShares,           = ${targetAmountShares}
+  // maxAmountNative,              = ${maxAmountNative}
+  // maxAmountUSD,                 = ${maxAmountUSD}
+  // maxAmountShares,              = ${maxAmountShares}
+  // isActivelyFundraising,        = ${isActivelyFundraising}
+  // mintedCount,                  = ${mintedCount}
+  // payoutsMade,                  = ${payoutsMade}
+  // deploymentDate,               = ${deploymentDate}
+  // treasuryAddress,              = ${treasuryAddress}
+  // reputationAddress,            = ${reputationAddress}
+  // percentageFunded,             = ${percentageFunded}
+
+  // `)
+
+  return [
+    fundedAmountNative,
+    fundedAmountUSD,
+    fundedAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
+    targetAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
+    maxAmountShares,
+    isActivelyFundraising,
+    mintedCount,
+    payoutsMade,
+    deploymentDate,
+    treasuryAddress,
+    reputationAddress,
+    percentageFunded,
+    semver,
+    sharePriceUSD,
+    symbol
+  ]
+}
+
+export const getLootboxInstantManagementDetails = async (
+  lootboxAddress: ContractAddress,
+  nativePriceFeed: ContractAddress
+) => {
+  
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
+  const [
+    shareDecimals,
+    feeDecimals,
+    deploymentStartTime,
+    issuer,
+    sharePriceUSD,
+    sharesSoldCount,
+    sharesSoldMax,
+    nativeTokenRaisedTotal,
+    isFundraising,
+    treasury,
+    depositIdCounter,
+    ticketIdCounter,
+    semver,
+    symbol
+  ] = await Promise.all([
+    instantLootbox.shareDecimals(),
+    instantLootbox.feeDecimals(),
+    instantLootbox.deploymentStartTime(),
+    instantLootbox.issuer(),
+    instantLootbox.sharePriceUSD(),
+    instantLootbox.sharesSoldCount(),
+    instantLootbox.sharesSoldMax(),
+    instantLootbox.nativeTokenRaisedTotal(),
+    instantLootbox.isFundraising(),
+    instantLootbox.treasury(),
+    instantLootbox.depositIdCounter(),
+    instantLootbox.ticketIdCounter(),
+    instantLootbox.semver(),
+    instantLootbox.symbol(),
+  ])
+  const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
+  const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
+  const nativeTokenPrice = ethers.BigNumber.from(nativeTokenPriceBN.toString())
+  const priceFeedDecimals = ethers.utils.parseUnits('1', '8')
+  const nativeTokenDecimals = ethers.utils.parseUnits('1', '18')
+
+  const fundedAmountNative = parseFloat(ethers.utils.formatUnits(nativeTokenRaisedTotal.toString(), 18)).toFixed(4)
+  const fundedAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(nativeTokenRaisedTotal).mul(nativeTokenPrice).div(priceFeedDecimals).toString(),
+      '18'
+    )
+  ).toFixed(2)
+  const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
+  const maxAmountNative = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString())
+        .mul(ethers.BigNumber.from(sharePriceUSD))
+        .div(priceFeedDecimals)
+        .div(nativeTokenPrice),
+      18 - 8
+    )
+  ).toFixed(4)
+
+  const maxAmountUSD = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
+      shareDecimals
+    )
+  ).toFixed(2)
+  const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const targetAmountNative = maxAmountNative
+  const targetAmountUSD = maxAmountUSD
+  const targetAmountShares = maxAmountShares
+  const isActivelyFundraising = isFundraising
+  const mintedCount = ticketIdCounter
+  const payoutsMade = depositIdCounter
+  const deploymentDate = parseInt(`${deploymentStartTime}000`)
+  const treasuryAddress = treasury
+  const reputationAddress = issuer
+  const percentageFunded = parseFloat(
+    ethers.utils.formatUnits(
+      ethers.BigNumber.from(sharesSoldCount)
+        .mul(ethers.utils.parseUnits('1', shareDecimals))
+        .div(sharesSoldMax)
+        .toString(),
+      shareDecimals - 2
+    )
+  ).toFixed(1)
+
+  return [
+    fundedAmountNative,
+    fundedAmountUSD,
+    fundedAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
+    targetAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
+    maxAmountShares,
+    isActivelyFundraising,
+    mintedCount,
+    payoutsMade,
+    deploymentDate,
+    treasuryAddress,
+    reputationAddress,
+    percentageFunded,
+    semver,
+    sharePriceUSD,
+    symbol
+  ]
+}
+
+export const getLootboxIssuer = async (lootboxAddress: ContractAddress) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  const [reputationAddress] = await Promise.all([
+    lootbox.issuer()
+  ])
+  return [reputationAddress]
+}
+
+export const endFundraisingPeriodCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === 'Instant') {
+    
+    const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
+    return await instantLootbox.connect(signer).endFundraisingPeriod()
+  } else {
+    
+    const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+    return await escrowLootbox.connect(signer).endFundraisingPeriod()
+  }
+}
+
+export const refundFundraiserCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if  (lootboxType === 'Escrow') {
+    const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+    return await escrowLootbox.connect(signer).cancelFundraiser()
+  }
+  return
+}
+
+export const rewardSponsorsInNativeTokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, amount: string) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === "Escrow") {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsNative({
+      value: amount,
+    })
+    await tx.wait()
+    return tx.hash
+  } else {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsNative({
+      value: amount,
+    })
+    await tx.wait()
+    return tx.hash
+  }
+}
+
+export const rewardSponsorsInErc20TokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, erc20Address: ContractAddress, amount: string) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === "Escrow") {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsErc20(
+      erc20Address,
+      amount,
+    )
+    await tx.wait()
+    return tx.hash
+  } else {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
+    const tx = await lootbox.connect(signer).depositEarningsErc20(
+      erc20Address,
+      amount,
+    )
+    await tx.wait()
+    return tx.hash
+  }
 }
