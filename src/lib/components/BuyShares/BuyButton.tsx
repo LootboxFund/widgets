@@ -83,7 +83,12 @@ const BuyButton = (props: BuyButtonProps) => {
         backgroundColor={`${COLORS.trustBackground}C0`}
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
-        style={{ minHeight: '60px', height: '100px' }}
+        style={{
+          minHeight: '60px',
+          height: '100px',
+          filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+          boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+        }}
         disabled={snapBuySharesState.ui.isButtonLoading}
       >
         <LoadingText loading={snapBuySharesState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />

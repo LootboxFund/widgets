@@ -55,7 +55,7 @@ const UserTickets = (props: Props) => {
       return (
         <$Horizontal justifyContent="center" height="100%" width="100%" spacing={3} position="relative" verticalCenter>
           <LeftChevronIcon onClick={decrementPage} />
-          <$Horizontal flexWrap overflowHidden justifyContent="center" height="100%" width="100%" spacing={3}>
+          <$Horizontal flexWrap justifyContent="center" height="100%" width="100%" spacing={3}>
             {children}
           </$Horizontal>
           <RightChevronIcon onClick={incrementPage} />
