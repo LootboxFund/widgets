@@ -20,6 +20,7 @@ export interface StepChooseReturnsProps {
   selectedNetwork?: NetworkOption
   paybackDate: string | undefined
   setPaybackDate: (date: string) => void
+  setPayoutUSDPrice: (payout?: BigNumber) => void
   setValidity: (bool: boolean) => void
   fundraisingTarget: BigNumber
   basisPoints: number
@@ -37,6 +38,10 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
   const [errors, setErrors] = useState(initialErrors)
 
   useEffect(() => {
+    props.setPayoutUSDPrice(calculateEquivalentUSDPrice(props.basisPoints))
+  }, [props.basisPoints, nativeTokenPrice, props.fundraisingTarget])
+
+  useEffect(() => {
     getLatestPrice()
   }, [props.selectedNetwork])
   const getLatestPrice = async () => {
@@ -49,7 +54,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
     const price = nativeTokenPrice
       ? nativeTokenPrice
           .multipliedBy(props.fundraisingTarget)
-          .multipliedBy((100 + (basisPoints || 0)) / 100)
+          .multipliedBy((100 + (basisPoints ? basisPoints / 100 : 0)) / 100)
           .dividedBy(10 ** 18)
           .toFixed(2)
       : web3Utils.toBN(0)
@@ -62,7 +67,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
     const price = nativeTokenPrice
       ? nativeTokenPrice
           .multipliedBy(props.fundraisingTarget)
-          .multipliedBy((100 + (basisPoints || 0)) / 100)
+          .multipliedBy((100 + (basisPoints ? basisPoints / 100 : 0)) / 100)
           .minus(nativeTokenPrice.multipliedBy(props.fundraisingTarget))
           .dividedBy(10 ** 18)
           .toFixed(2)
@@ -92,8 +97,9 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
     }
     const parseInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.valueAsNumber
-      props.setBasisPoints(value)
-      const validReturn = validateReturnTarget(value)
+      const basisPoints = Math.round(value * 100)
+      props.setBasisPoints(basisPoints)
+      const validReturn = validateReturnTarget(basisPoints)
       const validPayback = validatePaybackPeriod(props.paybackDate)
 
       if (validReturn) {
@@ -147,7 +153,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
                 <$Input
                   type="number"
                   min="0"
-                  value={props.basisPoints}
+                  value={Math.round(props.basisPoints) / 100}
                   onChange={parseInput}
                   placeholder="10"
                   screen={screen}

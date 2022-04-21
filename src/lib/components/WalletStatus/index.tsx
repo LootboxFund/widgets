@@ -118,7 +118,7 @@ const WalletStatus = (props: WalletStatusProps) => {
         backgroundColorHover={`${COLORS.dangerBackground}`}
         style={{
           minHeight: '50px',
-          // border: `1px solid ${COLORS.dangerFontColor}40`,
+          border: `1px solid ${COLORS.dangerFontColor}40`,
           fontWeight: 500,
           fontSize: '1.2rem',
         }}

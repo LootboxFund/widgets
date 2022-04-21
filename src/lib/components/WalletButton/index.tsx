@@ -81,9 +81,6 @@ const WalletButton = (props: WalletButtonProps) => {
         color={`${COLORS.trustFontColor}`}
         backgroundColor={`${COLORS.trustBackground}80`}
         style={{
-          // border: `1px solid ${COLORS.trustFontColor}40`,
-          // fontWeight: 500,
-          // fontSize: '1.2rem',
           ...BASE_BUTTON_STYLE,
         }}
       >
@@ -98,9 +95,6 @@ const WalletButton = (props: WalletButtonProps) => {
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
         style={{
-          // border: `1px solid ${COLORS.warningFontColor}40`,
-          // fontWeight: 500,
-          // fontSize: '1rem',
           ...BASE_BUTTON_STYLE,
         }}
       >
@@ -119,13 +113,10 @@ const WalletButton = (props: WalletButtonProps) => {
       backgroundColor={`${COLORS.dangerBackground}80`}
       backgroundColorHover={`${COLORS.dangerBackground}`}
       style={{
-        // border: `1px solid ${COLORS.dangerFontColor}40`,
-        // fontWeight: 500,
-        // fontSize: '1.2rem',
         ...BASE_BUTTON_STYLE,
       }}
     >
-      Connect Wallet
+      Connect wallet
     </$Button>
   )
 }
