@@ -3,7 +3,7 @@ import { ScreenSize } from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 
 const $SmallerButton = styled.button<{ screen?: ScreenSize; themeColor?: string }>`
-  width: 300px;
+  width: 100%;
   max-width: 300px;
   padding: 8px 10px;
   flex: 1;

@@ -25,6 +25,7 @@ import {
   rewardSponsorsInNativeTokenCall,
 } from 'lib/hooks/useContract'
 import ERC20ABI from 'lib/abi/erc20.json';
+import { ScreenSize } from '../../hooks/useScreenSize/index';
 
 export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
   if (erc20Address === undefined) return false
@@ -396,11 +397,11 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   }
 
   return (
-    <$StepCard themeColor={props.network.themeColor}>
+    <$StepCard screen={screen} themeColor={props.network.themeColor}>
       <$Horizontal>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <$ManageLootboxHeading>Reward Sponsors</$ManageLootboxHeading>
+            <$ManageLootboxHeading screen={screen}>Reward Sponsors</$ManageLootboxHeading>
             <HelpIcon tipID="rewardSponsors" />
             <ReactTooltip id="rewardSponsors" place="right" effect="solid">
               Lorem Ipsum
@@ -412,9 +413,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             consectetur adipiscing elit, sed do eiusmod.
           </$StepSubheading>
         </$Vertical>
-        <$Horizontal flex={1} justifyContent="flex-end">
+        {screen === 'desktop' && <$Horizontal flex={1} justifyContent="flex-end">
           <NetworkText />
-        </$Horizontal>
+        </$Horizontal>}
       </$Horizontal>
       <$Vertical style={{ marginTop: '40px' }}>
         <$StepSubheading>
@@ -553,15 +554,16 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
 const $StepCard = styled.div<{
   themeColor: string
   boxShadow?: string
+  screen: ScreenSize
 }>`
   height: auto;
-  width: 100%;
+  width: auto;
   display: flex;
   flex-direction: column;
   box-shadow: ${(props) => `0px 3px 20px ${props.themeColor}`};
   border: ${(props) => `3px solid ${props.themeColor}`};
   border-radius: 20px;
-  padding: 40px;
+  padding: ${props => props.screen === 'desktop' ? '40px' : '20px'};
   max-width: 800px;
   font-family: sans-serif;
 `

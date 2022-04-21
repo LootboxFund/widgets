@@ -204,18 +204,18 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))
 
   return (
-    <$StepCard themeColor={props.network.themeColor}>
+    <$StepCard themeColor={props.network.themeColor} screen={screen}>
       <$Vertical>
-        <$Horizontal justifyContent="space-between">
+        <$Horizontal justifyContent="space-between" style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
           <$Horizontal verticalCenter>
             <span
-              style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold', marginRight: '10px' }}
+              style={{ fontSize: screen === 'desktop' ? '1.3rem' : '1rem', color: COLORS.surpressedFontColor, fontWeight: 'bold', marginRight: '10px' }}
             >
               {`${percentageFunded}% Funded`}
             </span>
             <span
               style={{
-                fontSize: '1rem',
+                fontSize: screen === 'desktop' ? '1.3rem' : '0.8rem',
                 color: COLORS.surpressedFontColor,
                 fontWeight: 'lighter',
                 marginRight: '10px',
@@ -225,7 +225,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             </span>
           </$Horizontal>
           <$Horizontal>
-            <span style={{ fontSize: '1.3rem', color: COLORS.surpressedFontColor, fontWeight: 'bold' }}>
+            <span style={{ fontSize: screen === 'desktop' ? '1.3rem' : '1rem', color: COLORS.surpressedFontColor, fontWeight: 'bold' }}>
               {`${targetAmountNative} ${props.network.symbol} Goal`}
             </span>
             <HelpIcon tipID="fundingGoal" />
@@ -241,10 +241,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           />
         )}
       </$Vertical>
-      <$Horizontal style={{ marginTop: '30px' }}>
+      <$Horizontal style={screen === 'desktop' ? { marginTop: '30px' } : { flexDirection: 'column' }}>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <$ManageLootboxHeading>{props.ticketMetadata.name}</$ManageLootboxHeading>
+            <$ManageLootboxHeading screen={screen}>{props.ticketMetadata.name}</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
               Lorem Ipsum
@@ -271,7 +271,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           </$StepSubheading>
           <$Vertical style={{ marginTop: '20px' }}>
             <br />
-            <$Horizontal>
+            <$Horizontal style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
               <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
@@ -296,7 +296,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           </$Vertical>
           <$Vertical style={{ marginTop: '20px' }}>
             <br />
-            <$Horizontal>
+            <$Horizontal style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
               <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
@@ -322,7 +322,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           </$Vertical>
           <$Vertical style={{ marginTop: '20px' }}>
             <br />
-            <$Horizontal>
+            <$Horizontal style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
               <$Checkmark>{isActivelyFundraising ? '☑️' : '✅'}</$Checkmark>
               <$Vertical>
                 <$Horizontal>
@@ -375,7 +375,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           <div style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
             <$Vertical style={{ marginTop: '20px' }}>
               <br />
-              <$Horizontal>
+              <$Horizontal style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
                 <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
                 <$Vertical>
                   <$Horizontal>
@@ -403,7 +403,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           <div style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
             <$Vertical style={{ marginTop: '20px' }}>
               <br />
-              <$Horizontal>
+              <$Horizontal style={screen === 'desktop' ? {} : { flexDirection: 'column' } }>
                 <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
                 <$Vertical>
                   <$Horizontal>
@@ -436,13 +436,19 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical flex={1} spacing={3}>
           <div
-            style={{
+            style={screen === 'desktop' ? {
               maxHeight: '100px',
               marginBottom: '20px',
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'flex-end',
-            }}
+            } : { 
+              maxHeight: '100px',
+              marginTop: '30px',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-end'
+             }}
           >
             <NetworkText />
           </div>
@@ -457,7 +463,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               ></TicketCardUI>
             </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: '50px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginTop: screen === 'desktop' ? '50px' : '20px' }}>
             <TicketsMinted fill={props.themeColor} mintedCount={parseInt(mintedCount.toString())} />
             {props.network?.icon && (
               <TotalFunded
@@ -480,7 +486,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           </div>
         </$Vertical>
       </$Horizontal>
-      <$Vertical style={{ padding: '40px' }}>
+      <$Vertical style={screen === 'desktop' ? { padding: '40px' } : { padding: '0px', marginTop: '80px' }}>
         <$Vertical style={{ marginBottom: '20px' }}>
           <$StepSubheading>
             Lootbox Address
@@ -565,15 +571,16 @@ const $Spacer = styled.div<{}>`
 const $StepCard = styled.div<{
   themeColor: string
   boxShadow?: string
+  screen: ScreenSize
 }>`
   height: auto;
-  width: 100%;
+  width: auto;
   display: flex;
   flex-direction: column;
   box-shadow: ${(props) => `0px 3px 20px ${props.themeColor}`};
   border: ${(props) => `3px solid ${props.themeColor}`};
   border-radius: 20px;
-  padding: 30px;
+  padding: ${props => props.screen === 'desktop' ? '30px' : '20px'};
   max-width: 800px;
   font-family: sans-serif;
 `
@@ -597,8 +604,8 @@ const $Datestamp = styled.span`
   margin: 10px 0px;
 `
 
-export const $ManageLootboxHeading = styled.span`
-  font-size: 2.2rem;
+export const $ManageLootboxHeading = styled.span<{screen: ScreenSize}>`
+  font-size: ${props => props.screen === 'desktop' ? '2.2rem' : '1.5rem' };
   font-weight: bold;
   color: ${COLORS.black};
 `
@@ -607,6 +614,7 @@ export const $ErrorMessageMgmtPage = styled.span<{ status: ManagementButtonState
   font-size: 1rem;
   color: ${props => props.status === 'success' ? 'green' : 'red' };
   padding: 0px 0px 10px 0px;
+  word-break: break-all;
 `
 
 const TotalFunded = ({

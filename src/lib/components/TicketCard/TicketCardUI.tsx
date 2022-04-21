@@ -1,4 +1,5 @@
 import { TicketID } from '@wormgraph/helpers'
+import useWindowSize from 'lib/hooks/useScreenSize'
 import {
   $Divider,
   $LogoContainer,
@@ -19,13 +20,14 @@ interface TicketCardUIProps {
 }
 
 const TicketCardUI = (props: TicketCardUIProps) => {
+  const { screen } = useWindowSize()
   return (
     <$TicketCardContainer backgroundImage={props.backgroundImage}>
       <$LogoContainer>
         <$TicketLogo
           backgroundImage={props.logoImage}
           backgroundShadowColor={props.backgroundColor}
-          size={'170px'}
+          size={screen === 'desktop' ? '170px' : '100px'}
         ></$TicketLogo>
       </$LogoContainer>
 
