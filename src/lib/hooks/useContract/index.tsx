@@ -226,7 +226,8 @@ export const getLootboxEscrowManagementDetails = async (
     treasury,
     depositIdCounter,
     ticketIdCounter,
-    semver
+    semver,
+    symbol
   ] = await Promise.all([
     escrowLootbox.shareDecimals(),
     escrowLootbox.feeDecimals(),
@@ -242,6 +243,7 @@ export const getLootboxEscrowManagementDetails = async (
     escrowLootbox.depositIdCounter(),
     escrowLootbox.ticketIdCounter(),
     escrowLootbox.semver(),
+    escrowLootbox.symbol()
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -369,7 +371,9 @@ export const getLootboxEscrowManagementDetails = async (
     treasuryAddress,
     reputationAddress,
     percentageFunded,
-    semver
+    semver,
+    sharePriceUSD,
+    symbol
   ]
 }
 
@@ -394,7 +398,8 @@ export const getLootboxInstantManagementDetails = async (
     treasury,
     depositIdCounter,
     ticketIdCounter,
-    semver
+    semver,
+    symbol
   ] = await Promise.all([
     instantLootbox.shareDecimals(),
     instantLootbox.feeDecimals(),
@@ -409,6 +414,7 @@ export const getLootboxInstantManagementDetails = async (
     instantLootbox.depositIdCounter(),
     instantLootbox.ticketIdCounter(),
     instantLootbox.semver(),
+    instantLootbox.symbol(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -477,7 +483,9 @@ export const getLootboxInstantManagementDetails = async (
     treasuryAddress,
     reputationAddress,
     percentageFunded,
-    semver
+    semver,
+    sharePriceUSD,
+    symbol
   ]
 }
 

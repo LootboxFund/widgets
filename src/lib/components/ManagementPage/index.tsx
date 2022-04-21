@@ -107,11 +107,12 @@ const ManagementPage = () => {
     }
   }, [])
 
+  console.log(network)
+  console.log(lootboxAddress)
+  console.log(lootboxType)
+  console.log(ticketMetadata)
+
   if (!network || !lootboxAddress || !lootboxType || !ticketMetadata) {
-    console.log(network)
-    console.log(lootboxAddress)
-    console.log(lootboxType)
-    console.log(ticketMetadata)
     if (ticketMetadata && ticketMetadata.lootbox) {
       return (
         <section>
@@ -119,7 +120,7 @@ const ManagementPage = () => {
         </section>
       )
     }
-    return <p>{`Could not find metadata for Lootbox ${lootboxAddress} `}</p>
+    return <p>{`Could not find metadata for Lootbox ${lootboxAddress}. Make sure your Metamask is connected to the right blockchain. We cannot tell you which Chain its on, please ask the original issuer. Once you switch to the right chain, this will load correctly.`}</p>
   }
 
   return (

@@ -26,6 +26,7 @@ import {
 } from 'lib/hooks/useContract'
 import ERC20ABI from 'lib/abi/erc20.json';
 import { ScreenSize } from '../../hooks/useScreenSize/index';
+import { InputDecimal } from 'lib/components/Generics/Input';
 
 export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
   if (erc20Address === undefined) return false
@@ -126,7 +127,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           Reward with Native Token
           <HelpIcon tipID="withNativeToken" />
           <ReactTooltip id="withNativeToken" place="right" effect="solid">
-            Lorem Ipsum
+            {`Reward your sponsors with the same native token originally used to fund your Lootbox. In this case it would be ${props.network.symbol} on ${props.network.name}${props.network.isTestnet && ' (Testnet)'}. It is totally up to you which method you use to reward sponsors. ERC20 tokens are also supported.`}
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -144,28 +145,24 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
               }}
             >
               {props.network && <$NetworkIcon size="medium" src={props.network.icon} />}
-              <$Input
-                type="number"
-                value={web3Utils.fromWei(nativeRewardAmount).toString()}
-                min="0"
-                onChange={(e) => {
-                  const nativeAmt = web3Utils.toBN(web3Utils.toWei(e.target.value || '0'))
-                  setNativeRewardAmount(nativeAmt)
-                  const usdEq = new web3Utils.BN(
-                    web3Utils.toWei(
-                      nativeTokenPrice
-                        .multipliedBy(nativeAmt)
-                        .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
-                        .toString(),
-                      'gwei'
-                    )
-                  ).div(new web3Utils.BN('100000000000000000'))
-                  setNativeRewardUSD(usdEq)
-                }}
-                placeholder="0.01"
-                screen={screen}
-                width={calculateInputWidth(nativeRewardAmount)}
-                onWheel={(e) => e.currentTarget.blur()}
+              <InputDecimal
+                onChange={
+                  (e: string) => {
+                    const nativeAmt = web3Utils.toBN(web3Utils.toWei(e || '0'))
+                    setNativeRewardAmount(nativeAmt)
+                    const usdEq = new web3Utils.BN(
+                      web3Utils.toWei(
+                        nativeTokenPrice
+                          .multipliedBy(nativeAmt)
+                          .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+                          .toString(),
+                        'gwei'
+                      )
+                    ).div(new web3Utils.BN('100000000000000000'))
+                    setNativeRewardUSD(usdEq)
+                  }
+                }
+                width={calculateInputWidth(erc20RewardAmount)}
               />
               <$InputTranslationLight>{props.network?.symbol}</$InputTranslationLight>
             </div>
@@ -185,7 +182,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           ERC20 Contract Address
           <HelpIcon tipID="withErc20Token" />
           <ReactTooltip id="withErc20Token" place="right" effect="solid">
-            Lorem Ipsum
+            Enter the contract address of the ERC20 Token you'd like to transfer. You can get the official contract address by finding it on CoinMarketCap or CoinGecko. Deposits in ERC20 reqiure a two step process of first approving the amount, and then the actual transfer.
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(erc20Address as string)}
@@ -193,6 +190,13 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           >
             Copy
           </span>
+          <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${erc20Address}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
+            </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <$Input
@@ -209,7 +213,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           Amount of ERC20 Token
           <HelpIcon tipID="withNativeToken" />
           <ReactTooltip id="withNativeToken" place="right" effect="solid">
-            Lorem Ipsum
+            Enter the amount of ERC20 Token you'd like to transfer. This number is expressed in the tokens decimals, so 1 USDX = 18 decimals while 1 USDY may be 6 decimals. You can verify the decimals by viewing the contract on a Block Explorer. If you do not understand what this means, please refer to the EVM documentation. Note that your Metamask wallet also shows units in the tokens decimals, so you can use the same units in your wallet.
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -227,16 +231,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
               }}
             >
               {props.network && <b style={{ fontSize: '1.2rem', marginRight: '20px' }}>💎</b>}
-              <$Input
-                type="number"
-                value={web3Utils.fromWei(erc20RewardAmount).toString()}
-                min="0"
-                onChange={(e) => setErc20RewardAmount(web3Utils.toBN(web3Utils.toWei(e.target.value || '0')))}
-                placeholder="0.01"
-                screen={screen}
-                width={calculateInputWidth(erc20RewardAmount)}
-                onWheel={(e) => e.currentTarget.blur()}
-              />
+              <InputDecimal onChange={(e: string) => setErc20RewardAmount(web3Utils.toBN(web3Utils.toWei(e || '0')))} width={calculateInputWidth(erc20RewardAmount)} />
               <$InputTranslationLight>{erc20Name}</$InputTranslationLight>
             </div>
           </div>
@@ -356,7 +351,8 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       signer
     )
     try {
-      await contract.approve(props.lootboxAddress, erc20RewardAmount.toString())
+      const tx = await contract.approve(props.lootboxAddress, erc20RewardAmount.toString())
+      await tx.wait()
       setApprovalSubmissionStatus("success")
       setApprovalStatusMessage("")
       setTimeout(() => {
@@ -404,13 +400,12 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             <$ManageLootboxHeading screen={screen}>Reward Sponsors</$ManageLootboxHeading>
             <HelpIcon tipID="rewardSponsors" />
             <ReactTooltip id="rewardSponsors" place="right" effect="solid">
-              Lorem Ipsum
+              Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Deposited amounts can be redeemed by all sponsors who own an NFT ticket purchased from your Lootbox. Each NFT ticket will redeem its proportioal share of earnings based on its number of shares purchased vs total shares sold.
             </ReactTooltip>
           </$Horizontal>
           <$SubtitleDepositTitle>{`Deposit Earnings back into Lootbox (${props.ticketMetadata.name})`}</$SubtitleDepositTitle>
           <$StepSubheading>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod. Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit, sed do eiusmod.
+          Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Rewards can only be redeemed if they own an NFT ticket minted from your Lootbox.
           </$StepSubheading>
         </$Vertical>
         {screen === 'desktop' && <$Horizontal flex={1} justifyContent="flex-end">
@@ -422,7 +417,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           Pick Reward Method
           <HelpIcon tipID="rewardMethod" />
           <ReactTooltip id="rewardMethod" place="right" effect="solid">
-            Lorem Ipsum
+            Anyone can deposit rewards into your Lootbox. You can choose to deposit native tokens or any ERC20 token.
           </ReactTooltip>
         </$StepSubheading>
         {props.network?.icon && props.network?.symbol && (
@@ -455,9 +450,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       <$Vertical style={{ marginTop: '20px' }}>
         <$StepSubheading>
           Lootbox Address
-          <HelpIcon tipID="lootboxAddress" />
-          <ReactTooltip id="lootboxAddress" place="right" effect="solid">
-            Lorem Ipsum
+          <HelpIcon tipID="lootboxAddressReward" />
+          <ReactTooltip id="lootboxAddressReward" place="right" effect="solid">
+          {`Every Lootbox has its own smart contract address. This Lootbox is on ${props.network.name}${props.network.isTestnet && ' Testnet'} with contract address ${props.lootboxAddress}. You can verify all details you see on this UI by viewing it on a Block Explorer.`}
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
@@ -465,6 +460,13 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           >
             Copy
           </span>
+          <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
+            </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -480,9 +482,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         <br />
         <$StepSubheading>
           Reputation Address
-          <HelpIcon tipID="reputationAddress" />
-          <ReactTooltip id="reputationAddress" place="right" effect="solid">
-            Lorem Ipsum
+          <HelpIcon tipID="reputationAddressReward" />
+          <ReactTooltip id="reputationAddressReward" place="right" effect="solid">
+          This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides a good return on investment for sponsors, this reputatioin address will be associated with that good on-chain performance. Likewise, this wallet will be associated with bad performance if this Lootbox does poorly. But don't worry too much about bad performance, as its more important that there is ample history of Lootboxes created by this reputation address. Owning an address with a good reputation is a valuable asset that will help you in future fundraising. However, sponsors should not rely solely on on-chain performance history, as anyone can just send funds to their own Lootbox to make it look like good performance. Always check their social media (off-chain reputation) as well to get the full picture.
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(reputationAddress as string)}
@@ -490,6 +492,13 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           >
             Copy
           </span>
+          <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${erc20Address}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
+            </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div

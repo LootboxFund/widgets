@@ -17,7 +17,7 @@ import $Input from 'lib/components/Generics/Input'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 import { $NetworkIcon } from '../CreateLootbox/StepChooseNetwork'
 import $SmallerButton from '../Generics/SmallerButton/SmallerButton'
-import WalletStatus from 'lib/components/WalletStatus'
+import { ethers as ethersObj } from 'ethers'
 import {
   endFundraisingPeriodCall,
   getLootboxEscrowManagementDetails,
@@ -28,6 +28,8 @@ import {
 import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
 import SemverIcon from 'lib/theme/icons/Semver.icon'
+
+const ethers = window.ethers ? window.ethers : ethersObj
 
 export type ManagementButtonState = 'disabled' | 'enabled' | 'pending' | 'error' | 'success'
 export interface ManageLootboxProps {
@@ -55,6 +57,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const [mintedCount, setMintedCount] = useState(0)
   const [payoutsMade, setPayoutsMade] = useState(0)
   const [semver, setSemver] = useState('undefined')
+  const [sharePriceUSD, setSharePriceUSD] = useState('0')
+  const [lootboxSymbol, setLootboxSymbol] = useState('')
   const [deploymentDate, setDeploymentDate] = useState()
   const [treasuryAddress, setTreasuryAddress] = useState()
   const [reputationAddress, setReputationAddress] = useState()
@@ -88,7 +92,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _treasuryAddress,
         _reputationAddress,
         _percentageFunded,
-        _semver
+        _semver,
+        _sharePriceUSD,
+        _symbol
       ] = await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
@@ -107,6 +113,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
+      setSharePriceUSD(_sharePriceUSD)
+      setLootboxSymbol(_symbol)
     } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
@@ -125,7 +133,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _treasuryAddress,
         _reputationAddress,
         _percentageFunded,
-        _semver
+        _semver,
+        _sharePriceUSD,
+        _symbol
       ] = await getLootboxInstantManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
@@ -144,6 +154,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
+      setSharePriceUSD(_sharePriceUSD)
+      setLootboxSymbol(_symbol)
     }
   }
 
@@ -203,6 +215,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
 
   const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))
 
+  const sharePriceFormatted = (ethers.utils.formatUnits(sharePriceUSD || "0", '8') || "0").toString()
+
   return (
     <$StepCard themeColor={props.network.themeColor} screen={screen}>
       <$Vertical>
@@ -230,7 +244,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
-              Max 10 MATIC
+              {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for $${sharePriceFormatted} USD each, for a target value of approx ${targetAmountNative} ${props.network.symbol} which is equal to $${targetAmountUSD} USD today. Shares are purchased in ${props.network.symbol} which fluctuates in price, resulting in the Lootbox selling shares at differing prices as well. You could end up with an unexpected amount of ${props.network.symbol} with an unexpected value in USD. So far, ${fundedAmountShares} shares have been sold, demoniated as ${fundedAmountNative} ${props.network.symbol} which is currently equal to $${fundedAmountUSD}. The max amount of shares for sale is ${maxAmountShares}, which is approx ${maxAmountNative} ${props.network.symbol} or $${maxAmountUSD} USD today. If you need more predictability on the end amount of fundraised, we are releasing a v2A Lootbox that computes everything in USD stablecoins and v2B that computes everything in native token.`}
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
@@ -247,7 +261,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <$ManageLootboxHeading screen={screen}>{props.ticketMetadata.name}</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
-              Lorem Ipsum
+              {`This is the human-friendly name of the Lootbox, but the real name is its contract address ${props.lootboxAddress}. When sponsors buy from this Lootbox and receive it in their wallet, it will have the symbol ${lootboxSymbol} with 0 decimals. If sponsors want to transfer their NFT to another wallet, they will need to use OpenZeppelin Defender as Metamask does not support all ERC721 transfers. The tutorial for this can be found on the LootboxFund YouTube channel.`}
             </ReactTooltip>
           </$Horizontal>
           <$Datestamp>{`Created ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago (${new Date(
@@ -278,7 +292,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   <$NextStepTitle>1. Create Lootbox</$NextStepTitle>
                   <HelpIcon tipID="createLootbox" />
                   <ReactTooltip id="createLootbox" place="right" effect="solid">
-                    Lorem Ipsum
+                    You've already completed this step if you're on this Manage Lootbox page. If you want to create another, click the button below or visit https://lootbox.fund/create
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
@@ -303,7 +317,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   <$NextStepTitle>2. Actively Promoting</$NextStepTitle>
                   <HelpIcon tipID="activelyPromote" />
                   <ReactTooltip id="activelyPromote" place="right" effect="solid">
-                    Lorem Ipsum
+                    There is no such thing as free money. If you want sponsors, you need to earn their trust and recognition by promoting your Lootbox on social media. If you want to learn how to do proper fundraising, watch our Bootcamp Series on the LootboxFund YouTube channel.
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
@@ -329,7 +343,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   <$NextStepTitle>{isActivelyFundraising ? `3. Finish Fundraising` : `3. Finished Fundraising`}</$NextStepTitle>
                   <HelpIcon tipID="finishFundraising" />
                   <ReactTooltip id="finishFundraising" place="right" effect="solid">
-                    Lorem Ipsum
+                    In an Escrow Lootbox, you may only collect your fundraised amounts if the target funding is hit. You may exceed the target funding, but only up to the max amount of shares available for sale. Click the "End Fundraising" button will send the funds to your receiving wallet. If you can't hit your funding goal, you may refund sponsors, which simply deposits the funds back into the Lootbox for sponsors to redeem (the funds will not automatically be sent to their wallet, you must tell them to redeem it by email or social media). If you created an Instant Lootbox instead, then the funds get instantly sent to your receiving wallet and there is no refund (you would need to manually deposit funds back). Before you can deposit funds back, you need to end the fundraising.
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
@@ -382,7 +396,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     <$NextStepTitle>4. Play & Earn</$NextStepTitle>
                     <HelpIcon tipID="playAndEarn" />
                     <ReactTooltip id="playAndEarn" place="right" effect="solid">
-                      Lorem Ipsum
+                      Now that you've received the funds, you can go play and earn. It is good practice to update your sponsors on social media so that they know what you are doing with the money, and so that other people can see you as a professional. Make sure you also include #LootboxFund or tag us, so that people can understand what is going on. If they do not understand its a Lootbox, you will miss out on future potential sponsors.
                     </ReactTooltip>
                   </$Horizontal>
                   <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
@@ -408,9 +422,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 <$Vertical>
                   <$Horizontal>
                     <$NextStepTitle>5. Reward Sponsors</$NextStepTitle>
-                    <HelpIcon tipID="rewardSponsors" />
-                    <ReactTooltip id="rewardSponsors" place="right" effect="solid">
-                      Lorem Ipsum
+                    <HelpIcon tipID="rewardSponsorsMgmt" />
+                    <ReactTooltip id="rewardSponsorsMgmt" place="right" effect="solid">
+                      If you have earned a profit, you can reward your sponsors by depositing earnings back into your Lootbox for sponsors to redeem. Anyone can deposit into your Lootbox, which allows a friend or stranger to assist you too. Make sure you make a social media post about it so that sponsors and strangers can see your success. This will help you in future fundraising. Be sure to use #LootboxFund or tag us, so that they are not confused and understand what is going on.
                     </ReactTooltip>
                   </$Horizontal>
                   <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
@@ -469,6 +483,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               <TotalFunded
                 chainLogo={props.network?.icon}
                 networkSymbol={props.network?.symbol}
+                networkName={props.network.name}
                 fundedAmountNative={fundedAmountNative}
                 fundedAmountUSD={fundedAmountUSD}
                 fundedAmountShares={fundedAmountShares}
@@ -478,6 +493,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 maxAmountNative={maxAmountNative}
                 maxAmountUSD={maxAmountUSD}
                 maxAmountShares={maxAmountShares}
+                sharePriceFormatted={sharePriceFormatted}
               />
             )}
             <PayoutsMade fill={props.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
@@ -492,13 +508,20 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             Lootbox Address
             <HelpIcon tipID="lootboxAddress" />
             <ReactTooltip id="lootboxAddress" place="right" effect="solid">
-              Lorem Ipsum
+              {`Every Lootbox has its own smart contract address. This Lootbox is on ${props.network.name}${props.network.isTestnet && ' Testnet'} with contract address ${props.lootboxAddress}. You can verify all details you see on this UI by viewing it on a Block Explorer.`}
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
               Copy
+            </span>
+            <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -512,16 +535,23 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical style={{ marginBottom: '20px' }}>
           <$StepSubheading>
-            Treasury Address
+            Receiving Wallet
             <HelpIcon tipID="treasuryAddress" />
             <ReactTooltip id="treasuryAddress" place="right" effect="solid">
-              Lorem Ipsum
+              The receiving wallet is where the funds raised by this Lootbox will go. This may be the original issuer's wallet, or it may be an ESports Tournament Wallet, or another smart contract destination. Make sure that the receiving wallet matches what you expected/intended. Anyone can create a Lootbox and style it to look like any other Lootbox, so always check that the receiving wallet is correct.
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(treasuryAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
               Copy
+            </span>
+            <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${treasuryAddress}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -533,13 +563,20 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             Reputation Address
             <HelpIcon tipID="reputationAddress" />
             <ReactTooltip id="reputationAddress" place="right" effect="solid">
-              Lorem Ipsum
+              This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides a good return on investment for sponsors, this reputatioin address will be associated with that good on-chain performance. Likewise, this wallet will be associated with bad performance if this Lootbox does poorly. But don't worry too much about bad performance, as its more important that there is ample history of Lootboxes created by this reputation address. Owning an address with a good reputation is a valuable asset that will help you in future fundraising. However, sponsors should not rely solely on on-chain performance history, as anyone can just send funds to their own Lootbox to make it look like good performance. Always check their social media (off-chain reputation) as well to get the full picture.
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(reputationAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
               Copy
+            </span>
+            <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
+            <span
+              onClick={() => window.open(`${props.network.blockExplorerUrl}address/${reputationAddress}`, '_blank')}
+              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+            >
+              View on Block Explorer
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -551,7 +588,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             Advanced Settings
             <HelpIcon tipID="advancedSettings" />
             <ReactTooltip id="advancedSettings" place="right" effect="solid">
-              Lorem Ipsum
+              This Lootbox management page handles 90% of use cases. If you need access to the full Lootbox controls, you will need to import this contract into OpenZeppelin Defender and interact with the blockchain directly. The most likely reason why you would need to use Advanced Controls is if you accidentally trap tokens in your Lootbox and need to rescue them (tokens get trapped if you just send them to the Lootbox address directly. always use the UI to reward sponsors instead of sending tokens directly. trapped tokens can be rescued easily but its a hassle). A full tutorial on Advanced Controls can be found on the LootboxFund YouTube Channel.
             </ReactTooltip>
           </$StepSubheading>
           <$SmallerButton screen={screen} onClick={() => window.open('https://youtu.be/o2J4M3ESdOo?t=138', '_blank')}>
@@ -620,6 +657,7 @@ export const $ErrorMessageMgmtPage = styled.span<{ status: ManagementButtonState
 const TotalFunded = ({
   chainLogo,
   networkSymbol,
+  networkName,
   fundedAmountNative,
   fundedAmountUSD,
   fundedAmountShares,
@@ -629,9 +667,11 @@ const TotalFunded = ({
   maxAmountNative,
   maxAmountUSD,
   maxAmountShares,
+  sharePriceFormatted,
 }: {
   chainLogo: string
   networkSymbol: string
+  networkName: string
   fundedAmountNative: string
   fundedAmountUSD: string
   fundedAmountShares: string
@@ -641,6 +681,7 @@ const TotalFunded = ({
   maxAmountNative: string
   maxAmountUSD: string
   maxAmountShares: string
+  sharePriceFormatted: string
 }) => {
   return (
     <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
@@ -653,7 +694,7 @@ const TotalFunded = ({
           <$Datestamp style={{ margin: '5px 0px' }}>Total Funded</$Datestamp>
           <HelpIcon tipID="totalFunded" />
           <ReactTooltip id="totalFunded" place="right" effect="solid">
-            Lorem Ipsum
+          {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for $${sharePriceFormatted} USD each, for a target value of approx ${targetAmountNative} ${networkSymbol} which is equal to $${targetAmountUSD} USD today. Shares are purchased in ${networkSymbol} which fluctuates in price, resulting in the Lootbox selling shares at differing prices as well. You could end up with an unexpected amount of ${networkSymbol} with an unexpected value in USD. So far, ${fundedAmountShares} shares have been sold, demoniated as ${fundedAmountNative} ${networkSymbol} which is currently equal to $${fundedAmountUSD}. The max amount of shares for sale is ${maxAmountShares}, which is approx ${maxAmountNative} ${networkSymbol} or $${maxAmountUSD} USD today. If you need more predictability on the end amount of fundraised, we are releasing a v2A Lootbox that computes everything in USD stablecoins and v2B that computes everything in native token.`}
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -687,7 +728,7 @@ const TicketsMinted = ({ fill, mintedCount }: { fill: string; mintedCount: numbe
           <$Datestamp style={{ margin: '5px 0px' }}>Sold NFT Tickets</$Datestamp>
           <HelpIcon tipID="soldNFTTickets" />
           <ReactTooltip id="soldNFTTickets" place="right" effect="solid">
-            Lorem Ipsum
+            The number of NFT tickets sold by this Lootbox. One sponsor may own multiple NFT tickets and they may be traded to new owners. Each NFT ticket may contain a different number of shares. If you would like to see the total number of unique sponsors owned by this Lootbox, import this contract into OpenZeppelin Defender (Advanced Settings). A full tutorial can be found on the LootboxFund YouTube Channel.
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -708,7 +749,7 @@ const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number 
           <$Datestamp style={{ margin: '5px 0px' }}>Deposits Made</$Datestamp>
           <HelpIcon tipID="depositsMade" />
           <ReactTooltip id="depositsMade" place="right" effect="solid">
-            Lorem Ipsum
+            The number of times a deposit was put into this Lootbox. Each deposit is a payout reward for sponsors to redeem. Only sponsors who own an NFT ticket from this Lootbox can redeem their proportinal share of deposited rewards. Anyone can deposit into a Lootbox. If you would like to see the total number of unique addresses who deposited into this Lootbox, import this contract into OpenZeppelin Defender (Advanced Settings). A full tutorial can be found on the LootboxFund YouTube Channel.
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -727,9 +768,9 @@ const SemverStat = ({ fill, semver }: { fill: string; semver: string }) => {
         </$Horizontal>
         <$Horizontal verticalCenter justifyContent='flex-end'>
           <$Datestamp style={{ margin: '5px 0px' }}>Version</$Datestamp>
-          <HelpIcon tipID="depositsMade" />
-          <ReactTooltip id="depositsMade" place="right" effect="solid">
-            Lorem Ipsum
+          <HelpIcon tipID="versionSemver" />
+          <ReactTooltip id="versionSemver" place="right" effect="solid">
+            This is the version of the LootboxFund smart contract which you can use to determine its features available. The Lootbox team is continously improving this technology and future Lootboxes will have a different version number. While future Lootbox versions are not guaranteed to be backwards compatible, you can always access past Lootboxes as we freeze the cloud infrastructure that provides this UI. Furthermore, if this UI ever becomes unavailable, you can always use OpenZeppelin Defender to interact with the smart contract directly as it is forever available on the blockchain.
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -749,7 +790,7 @@ const LootboxTypeStat = ({ fill, lootboxType }: { fill: string; lootboxType: Loo
           <$Datestamp style={{ margin: '5px 0px' }}>Lootbox Type</$Datestamp>
           <HelpIcon tipID="lootboxType" />
           <ReactTooltip id="lootboxType" place="right" effect="solid">
-            Lorem Ipsum
+            There are two types of Lootboxes, Escrow & Instant. Most Lootboxes are Escrow type, which means it has a target fundraising amount and the funds can only be accessed when that target is hit, otherwise the money is refunded back to sponsors. In comparison, an Instant Lootbox will transfer raised funds immediately to the receiving wallet without waiting, and refunds must be done manually by the issuer of the Lootbox (the reputation address). For more info, check out the LootboxFund YouTube channel. 
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
