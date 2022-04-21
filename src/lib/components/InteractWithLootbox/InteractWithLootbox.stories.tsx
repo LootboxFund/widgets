@@ -31,7 +31,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="100vw" height="550px" maxWidth="940px">
+    <$CardViewport margin="0 auto" width="100%" height="550px" maxWidth="940px">
       <InteractWithLootbox />
     </$CardViewport>
   )

@@ -9,6 +9,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
 import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
+import { BASE_BUTTON_STYLE } from '../BuyShares/BuyButton'
 
 export interface WalletButtonProps {}
 const WalletButton = (props: WalletButtonProps) => {
@@ -63,10 +64,10 @@ const WalletButton = (props: WalletButtonProps) => {
         color={`${COLORS.warningBackground}`}
         backgroundColor={`${COLORS.warningBackground}80`}
         style={{
-          minHeight: '50px',
-          border: `1px solid ${COLORS.warningBackground}40`,
-          fontWeight: 500,
-          fontSize: '1.2rem',
+          // border: `1px solid ${COLORS.warningBackground}40`,
+          // fontWeight: 500,
+          // fontSize: '1.2rem',
+          ...BASE_BUTTON_STYLE,
         }}
       >
         Loading...
@@ -80,10 +81,10 @@ const WalletButton = (props: WalletButtonProps) => {
         color={`${COLORS.trustFontColor}`}
         backgroundColor={`${COLORS.trustBackground}80`}
         style={{
-          minHeight: '50px',
-          border: `1px solid ${COLORS.trustFontColor}40`,
-          fontWeight: 500,
-          fontSize: '1.2rem',
+          // border: `1px solid ${COLORS.trustFontColor}40`,
+          // fontWeight: 500,
+          // fontSize: '1.2rem',
+          ...BASE_BUTTON_STYLE,
         }}
       >
         Connected
@@ -97,10 +98,10 @@ const WalletButton = (props: WalletButtonProps) => {
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
         style={{
-          minHeight: '50px',
-          border: `1px solid ${COLORS.warningFontColor}40`,
-          fontWeight: 500,
-          fontSize: '1rem',
+          // border: `1px solid ${COLORS.warningFontColor}40`,
+          // fontWeight: 500,
+          // fontSize: '1rem',
+          ...BASE_BUTTON_STYLE,
         }}
       >
         Please install MetaMask
@@ -118,10 +119,10 @@ const WalletButton = (props: WalletButtonProps) => {
       backgroundColor={`${COLORS.dangerBackground}80`}
       backgroundColorHover={`${COLORS.dangerBackground}`}
       style={{
-        minHeight: '50px',
         // border: `1px solid ${COLORS.dangerFontColor}40`,
-        fontWeight: 500,
-        fontSize: '1.2rem',
+        // fontWeight: 500,
+        // fontSize: '1.2rem',
+        ...BASE_BUTTON_STYLE,
       }}
     >
       Connect Wallet

@@ -43,10 +43,11 @@ export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number
   }
 `
 
-export const $CardViewport = styled.div<{ width?: string; height?: string; maxWidth?: string }>`
+export const $CardViewport = styled.div<{ margin?: string; width?: string; height?: string; maxWidth?: string }>`
   width: ${(props) => (props.width ? props.width : '300px')};
   height: ${(props) => (props.height ? props.height : '600px')};
   ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
+  ${(props) => props.margin && `margin: ${props.margin};`}
 `
 
 export const $ScrollVertical = styled.div<{ height?: string }>`
