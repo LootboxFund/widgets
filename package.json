@@ -62,6 +62,7 @@
     "deploy:terran": "rollup -c && node scripts/deploy-create-lootbox.js",
     "deploy:newton": "rollup -c && node scripts/deploy-interact-with-lootbox-widget.js",
     "deploy:kepler": "rollup -c && node scripts/deploy-manage-lootbox.js",
+    "deploy:sagan": "rollup -c && node scripts/deploy-searchbar.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
