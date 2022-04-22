@@ -78,7 +78,7 @@
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
-    "@wormgraph/helpers": "0.1.2",
+    "@wormgraph/helpers": "0.1.3",
     "@wormgraph/manifest": "0.3.32",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",

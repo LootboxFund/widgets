@@ -1,16 +1,13 @@
 import react from 'react'
 import styled from 'styled-components'
-import { $BuySharesContainer } from 'lib/components/BuyShares/BuyShares'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import $Button from '../Generics/Button'
 import { $Vertical } from '../Generics'
-import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
 import { buySharesState } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
-import InfoText from './InfoText'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
@@ -39,7 +36,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const ErrorSection = () => (
-    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
+    <$Vertical style={{ minHeight: '150px', justifyContent: 'center' }}>
       <$Sadge>🤕</$Sadge>
       <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
@@ -48,44 +45,14 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const SuccessSection = () => (
-    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
+    <$Vertical style={{ minHeight: '150px', justifyContent: 'center' }}>
       <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
-      {/* <$Button
-        screen={screen}
-        onClick={addToWallet}
-        backgroundColor={`${COLORS.surpressedBackground}`}
-        backgroundColorHover={`${COLORS.surpressedBackground}ae`}
-        color={`${COLORS.white}`}
-        colorHover={COLORS.white}
-        style={{ fontSize: '1.3em' }}
-      >
-        Add to Wallet
-      </$Button> */}
       {bscScanUrl && <ViewOnBSCScan />}
     </$Vertical>
   )
 
-  // const addToWallet = async () => {
-  //   // try {
-  //   //   await addTicketToWallet()
-  //   // } catch (err) {
-  //   //   console.error(err)
-  //   // }
-  // }
   return (
-    <$BuySharesContainer screen={screen}>
-      <$BuySharesHeader>
-        {snap.lastTransaction.success ? (
-          <$BuySharesHeaderTitle>Success!</$BuySharesHeaderTitle>
-        ) : (
-          <$BuySharesHeaderTitle>❌ Transaction Failed!</$BuySharesHeaderTitle>
-        )}
-
-        <span onClick={goToBuySharesComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
-          X
-        </span>
-      </$BuySharesHeader>
-
+    <$Vertical>
       <$TokenPreviewCard>{!snap.lastTransaction.success ? <ErrorSection /> : <SuccessSection />}</$TokenPreviewCard>
 
       <$Button
@@ -99,8 +66,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
       >
         Back
       </$Button>
-      <InfoText />
-    </$BuySharesContainer>
+    </$Vertical>
   )
 }
 

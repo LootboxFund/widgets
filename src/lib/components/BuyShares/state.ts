@@ -52,6 +52,7 @@ const buySharesSnapshot: BuySharesState = {
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,
       shareDecimals: undefined,
+      variant: undefined,
     },
     quantity: undefined,
   },
@@ -156,7 +157,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
   buySharesState.lootbox.address = lootboxAddress
 
   try {
-    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals } =
+    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
       await getLootboxData(lootboxAddress)
     buySharesState.lootbox.data = {
       address: lootboxAddress,
@@ -167,6 +168,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       sharesSoldMax: sharesSoldMax,
       ticketIdCounter: ticketIdCounter,
       shareDecimals: shareDecimals,
+      variant: variant,
     }
   } catch (err) {
     console.error('Error fetching lootbox data', err)
@@ -179,6 +181,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,
       shareDecimals: undefined,
+      variant: undefined,
     }
   }
 }

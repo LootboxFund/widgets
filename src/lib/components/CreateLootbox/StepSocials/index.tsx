@@ -2,82 +2,14 @@ import react, { useState, forwardRef } from 'react'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { NetworkOption } from 'lib/api/network'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { ScreenSize } from '../../../hooks/useScreenSize/index'
-
-export interface SocialFragment {
-  slug: string
-  name: string
-  placeholder: string
-  icon: string
-}
-const SOCIALS: SocialFragment[] = [
-  {
-    slug: 'email',
-    name: 'Email',
-    placeholder: 'Email',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
-  },
-  {
-    slug: 'twitter',
-    name: 'Twitter',
-    placeholder: 'Twitter',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
-  },
-  {
-    slug: 'youtube',
-    name: 'YouTube',
-    placeholder: 'YouTube 1 min Intro Video',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
-  },
-  {
-    slug: 'instagram',
-    name: 'Instagram',
-    placeholder: 'Instagram',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
-  },
-  {
-    slug: 'tiktok',
-    name: 'Tiktok',
-    placeholder: 'Tiktok',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftiktok.png?alt=media',
-  },
-  {
-    slug: 'facebook',
-    name: 'Facebook',
-    placeholder: 'Facebook',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
-  },
-  {
-    slug: 'discord',
-    name: 'Discord',
-    placeholder: 'Discord Server',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
-  },
-  {
-    slug: 'snapchat',
-    name: 'Snapchat',
-    placeholder: 'Snapchat',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fsnapchat.png?alt=media',
-  },
-  {
-    slug: 'twitch',
-    name: 'Twitch',
-    placeholder: 'Twitch',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
-  },
-  {
-    slug: 'web',
-    name: 'Website',
-    placeholder: 'Website',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
-  },
-]
+import { SOCIALS } from 'lib/hooks/constants'
 
 export interface StepSocialsProps {
   stage: StepStage
@@ -188,7 +120,7 @@ const $StepSocials = styled.section<{}>`
   width: 100%;
   color: ${COLORS.black};
 `
-const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
+export const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
   ${({ screen }) => {
     if (screen === 'mobile') {
       return `
@@ -207,7 +139,7 @@ const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
   }}
 `
 
-const $SocialLogo = styled.img`
+export const $SocialLogo = styled.img`
   width: 50px;
   height: 50px;
   margin-right: 10px;
@@ -218,7 +150,8 @@ export const $InputMedium = styled.input`
   border: none;
   border-radius: 10px;
   padding: 5px 20px;
-  font-size: 1rem;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export default StepSocials

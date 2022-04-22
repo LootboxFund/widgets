@@ -20,10 +20,10 @@ export const $Button = styled.button<{
   min-height: ${(props) => (props.screen === 'desktop' ? '40px' : '40px')};
   max-height: ${(props) => (props.screen === 'desktop' ? '50px' : '0.35px')};
   height: ${(props) => (props.screen === 'desktop' ? '40px' : '30px')};
-  font-size: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
-  line-height: ${(props) => (props.screen === 'desktop' ? '1.7rem' : '1.5rem')};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
+  line-height: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   border: 0px solid transparent;
   ${(props) => (props.disabled ? 'cursor: not-allowed' : 'cursor: pointer')};
   ${(props) => props.color && `color: ${props.color}`};

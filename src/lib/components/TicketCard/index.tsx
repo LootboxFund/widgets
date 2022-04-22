@@ -14,6 +14,7 @@ export interface TicketCardWidgetProps {
   ticketID: string | undefined
   isRedeemEnabled?: boolean
   onScrollToMint?: () => void
+  forceLoading?: boolean
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -52,7 +53,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       {ticket && ticket.route === '/payout' ? (
         <ViewPayout ticketID={props.ticketID} />
       ) : (
-        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} />
+        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
     </$RootContainer>

@@ -42,6 +42,7 @@ interface InstantLootboxArgs {
   currentAccount: Address
   setLootboxAddress: (address: ContractAddress) => void
   basisPoints: number
+  returnAmountTarget: string
   paybackDate: string
   downloaded: boolean
   setDownloaded: (downloaded: boolean) => void
@@ -116,8 +117,8 @@ export const createInstantLootbox = async (
       targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
-      basisPointsReturnTarget: args.basisPoints.toString(),
-      returnAmountTarget: args.basisPoints.toString(),
+      basisPointsReturnTarget: args.basisPoints.toString(), // 100 basis points = 1% return
+      returnAmountTarget: args.returnAmountTarget.toString(),
       pricePerShare: PRICE_PER_SHARE.toString(),
       lootboxThemeColor: args.lootboxThemeColor as string,
       createdAt: new Date().valueOf(),
@@ -135,7 +136,6 @@ export const createInstantLootbox = async (
       web: socials.web,
     },
   }
-
 
   const blockNum = await provider.getBlockNumber()
 
@@ -162,10 +162,11 @@ export const createInstantLootbox = async (
     pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
     affiliateWallet = ${args.receivingWallet}
-
     fundraisingTargetMax = ${args.fundraisingTargetMax}
-
     nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+
+    basisPoints = ${args.basisPoints}
+    returnAmountTarget = ${args.returnAmountTarget}
 
     `)
 
@@ -316,7 +317,7 @@ export const createEscrowLootbox = async (
       fundraisingTarget: args.fundraisingTarget,
       fundraisingTargetMax: args.fundraisingTargetMax,
       basisPointsReturnTarget: args.basisPoints.toString(),
-      returnAmountTarget: args.basisPoints.toString(),
+      returnAmountTarget: args.returnAmountTarget.toString(),
       pricePerShare: PRICE_PER_SHARE.toString(),
       lootboxThemeColor: args.lootboxThemeColor as string,
       createdAt: new Date().valueOf(),
@@ -334,7 +335,6 @@ export const createEscrowLootbox = async (
       web: socials.web,
     },
   }
-
 
   const blockNum = await provider.getBlockNumber()
 
@@ -377,6 +377,9 @@ export const createEscrowLootbox = async (
     logoImage = ${imagePublicPath}
     coverImage = ${backgroundPublicPath}
     badgeImage = ${badgePublicPath}
+
+    basisPoints = ${args.basisPoints}
+    returnAmountTarget = ${args.returnAmountTarget}
 
     `)
     //   function createLootbox(

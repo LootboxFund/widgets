@@ -20,10 +20,7 @@ const getLootboxURI = async ({
   return lootboxURI
 }
 
-export const readTicketMetadata = async (
-  lootboxAddress: ContractAddress,
-  ticketID: TicketID
-): Promise<ITicketMetadata | undefined> => {
+export const readTicketMetadata = async (lootboxAddress: ContractAddress): Promise<ITicketMetadata | undefined> => {
   const metadata = await getLootboxURI({
     lootboxAddress,
     semver: manifest.googleCloud.semver,

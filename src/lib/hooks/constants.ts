@@ -1,5 +1,7 @@
 import { TokenData, Address } from '@wormgraph/helpers'
 import { manifest } from '../../manifest'
+import { SocialFragment } from 'lib/types'
+import { ScreenSize } from './useScreenSize'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
@@ -127,3 +129,68 @@ export const tokenMap: Record<string, TokenDataFE[]> = {
   '13881': [],
   '89': [],
 }
+
+export const SOCIALS: SocialFragment[] = [
+  {
+    slug: 'email',
+    name: 'Email',
+    placeholder: 'Email',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
+  },
+  {
+    slug: 'twitter',
+    name: 'Twitter',
+    placeholder: 'Twitter',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
+  },
+  {
+    slug: 'youtube',
+    name: 'YouTube',
+    placeholder: 'YouTube 1 min Intro Video',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
+  },
+  {
+    slug: 'instagram',
+    name: 'Instagram',
+    placeholder: 'Instagram',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
+  },
+  {
+    slug: 'tiktok',
+    name: 'Tiktok',
+    placeholder: 'Tiktok',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftiktok.png?alt=media',
+  },
+  {
+    slug: 'facebook',
+    name: 'Facebook',
+    placeholder: 'Facebook',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
+  },
+  {
+    slug: 'discord',
+    name: 'Discord',
+    placeholder: 'Discord Server',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
+  },
+  {
+    slug: 'snapchat',
+    name: 'Snapchat',
+    placeholder: 'Snapchat',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fsnapchat.png?alt=media',
+  },
+  {
+    slug: 'twitch',
+    name: 'Twitch',
+    placeholder: 'Twitch',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
+  },
+  {
+    slug: 'web',
+    name: 'Website',
+    placeholder: 'Website',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
+  },
+]
+
+export const smallScreens: ScreenSize[] = ['mobile', 'tablet']

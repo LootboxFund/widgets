@@ -11,6 +11,8 @@ import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { BLOCKCHAINS } from '@wormgraph/helpers'
 
+export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
+
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {
   const ethers = useEthers()
@@ -52,7 +54,7 @@ const BuyButton = (props: BuyButtonProps) => {
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+        style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
       >
         {txt}
       </$Button>
@@ -66,7 +68,7 @@ const BuyButton = (props: BuyButtonProps) => {
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+        style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
       >
         {validChain ? 'Select a Token' : 'Switch network'}
       </$Button>
@@ -83,7 +85,11 @@ const BuyButton = (props: BuyButtonProps) => {
         backgroundColor={`${COLORS.trustBackground}C0`}
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
-        style={{ minHeight: '60px', height: '100px' }}
+        style={{
+          ...BASE_BUTTON_STYLE,
+          filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+          boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+        }}
         disabled={snapBuySharesState.ui.isButtonLoading}
       >
         <LoadingText loading={snapBuySharesState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />
@@ -95,7 +101,7 @@ const BuyButton = (props: BuyButtonProps) => {
       screen={screen}
       backgroundColor={`${COLORS.surpressedBackground}40`}
       color={`${COLORS.surpressedFontColor}80`}
-      style={{ fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'not-allowed', minHeight: '60px', height: '100px' }}
+      style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
     >
       Enter an amount
     </$Button>

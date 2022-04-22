@@ -30,7 +30,7 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="340px">
+    <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
       <BuyShares />
     </$CardViewport>
   )

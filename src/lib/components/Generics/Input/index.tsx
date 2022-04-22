@@ -1,5 +1,5 @@
 import { ScreenSize } from 'lib/hooks/useScreenSize'
-import { COLORS } from 'lib/theme'
+import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -8,12 +8,12 @@ export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWei
   flex: 1;
   height: ${(props) => (props.screen === 'desktop' ? '50px' : '40px')};
   padding: ${(props) => (props.screen === 'desktop' ? '10px' : '5px 10px')};
-  font-size: ${(props) => (props.screen === 'desktop' ? '2rem' : '1.5rem')};
-  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : 'bold')};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xxlarge : TYPOGRAPHY.fontSize.xlarge)};
+  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : TYPOGRAPHY.fontWeight.bold)};
   border: 0px solid transparent;
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0);
-  font-family: sans-serif;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   width: ${(props) => (props.width ? props.width : '100%')};
   min-width: 70px;
   max-width: ${(props) => (props.width ? props.width : '100%')};

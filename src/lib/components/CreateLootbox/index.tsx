@@ -175,7 +175,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   // STEP 3: Choose Returns
   const refStepReturns = useRef<HTMLDivElement | null>(null)
-  const [basisPoints, setBasisPoints] = useState(10)
+  const [basisPoints, setBasisPoints] = useState(1000) // 1000 basis points => 10% return
+  const [payoutUSD, setPayoutUSD] = useState(web3Utils.toBN(0))
   const checkReturnsStepDone = () => validateReturnTarget(basisPoints) && validatePaybackPeriod(paybackDate)
 
   // STEP 4: Customize Ticket
@@ -312,6 +313,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           currentAccount: current as Address,
           setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
           basisPoints,
+          returnAmountTarget: payoutUSD?.toString() || '0',
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
@@ -338,6 +340,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           currentAccount: current as Address,
           setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
           basisPoints,
+          returnAmountTarget: payoutUSD?.toString() || '0',
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
@@ -524,6 +527,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         fundraisingTarget={fundraisingTarget}
         basisPoints={basisPoints}
         setBasisPoints={(basisPoints: number) => setBasisPoints(basisPoints)}
+        setPayoutUSDPrice={(payout) => setPayoutUSD(payout)}
         paybackDate={paybackDate}
         setPaybackDate={(date: string) => setPaybackDate(date)}
         stage={stage.stepReturns}
@@ -565,7 +569,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => setValidity({ ...validity, stepTerms: bool })}
         onNext={() => console.log('onNext')}
         submitStatus={submitStatus}
-        onSubmit={() => createLootbox()} 
+        onSubmit={() => createLootbox()}
         goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Vertical style={{ marginTop: '20px' }}>

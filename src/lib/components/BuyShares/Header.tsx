@@ -9,11 +9,14 @@ import $Button from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
 import { Address, BLOCKCHAINS } from '@wormgraph/helpers'
+import { $Vertical, $Horizontal } from '../Generics'
+import { buySharesState } from './state'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {
   const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
+  const snapBuySharesState = useSnapshot(buySharesState)
 
   const isWalletConnected = snapUserState.accounts.length > 0
 
@@ -58,9 +61,29 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
     return
   }
 
+  const variant = snapBuySharesState.lootbox?.data?.variant
+  const name = snapBuySharesState.lootbox?.data?.name
+
+  let subHeader = 'Buy Shares'
+
+  if (variant && name) {
+    subHeader = `${variant} Lootbox - ${name}`
+  } else if (variant) {
+    subHeader = variant
+  } else {
+    subHeader = name || ''
+  }
+
   return (
     <$BuySharesHeader>
-      <$BuySharesHeaderTitle>🎁 BUY LOOTBOX SHARES</$BuySharesHeaderTitle>
+      <$Horizontal>
+        <$Icon>🎁</$Icon>
+        <$Vertical>
+          <$BuySharesHeaderTitle>Mint your Profit Sharing NFT</$BuySharesHeaderTitle>
+          {subHeader ? <$BuySharesHeaderSubTitle>{subHeader}</$BuySharesHeaderSubTitle> : undefined}
+        </$Vertical>
+      </$Horizontal>
+
       {validChain ? (
         <>
           <$NetworkText style={{ flex: 2 }}>
@@ -81,11 +104,17 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
 }
 
 export const $BuySharesHeaderTitle = styled.span<{}>`
-  flex: 3;
-  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  padding: 0px 0px 0px 10px;
   color: ${COLORS.black};
+`
+
+export const $BuySharesHeaderSubTitle = styled.span`
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.small};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  color: ${COLORS.surpressedFontColor};
 `
 
 export const $BuySharesHeader = styled.div<{}>`
@@ -102,6 +131,12 @@ export const $NetworkText = styled.span`
   margin-right: 10px;
   font-weight: ${TYPOGRAPHY.fontWeight.light};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
+`
+
+export const $Icon = styled.span`
+  flex: 1;
+  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
+  margin-right: 10px;
 `
 
 export default BuySharesHeader

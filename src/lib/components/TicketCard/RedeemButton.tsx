@@ -87,7 +87,12 @@ const RedeemButton = (props: RedeemButtonProps) => {
           backgroundColor={`${COLORS.trustBackground}C0`}
           backgroundColorHover={`${COLORS.trustBackground}`}
           color={COLORS.trustFontColor}
-          style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+          style={{
+            minHeight: '60px',
+            height: '100px',
+            filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))',
+            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+          }}
           disabled={loading}
         >
           <LoadingText loading={loading} text="REDEEM" color={COLORS.trustFontColor} />
@@ -102,7 +107,12 @@ const RedeemButton = (props: RedeemButtonProps) => {
         backgroundColor={`${COLORS.trustBackground}C0`}
         backgroundColorHover={`${COLORS.trustBackground}`}
         color={COLORS.trustFontColor}
-        style={{ minHeight: '60px', height: '100px', filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))' }}
+        style={{
+          minHeight: '60px',
+          height: '100px',
+          filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))',
+          boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+        }}
       >
         View Payout
       </$Button>

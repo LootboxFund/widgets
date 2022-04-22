@@ -39,7 +39,7 @@ export const loadTicketData = async (ticketID: string) => {
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
   let metadata = undefined
   try {
-    metadata = await readTicketMetadata(ticketCardState.lootboxAddress, ticketID)
+    metadata = await readTicketMetadata(ticketCardState.lootboxAddress)
   } catch (e) {
     console.error(e)
   }

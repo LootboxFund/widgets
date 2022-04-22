@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { forwardRef } from 'react'
 import styled from 'styled-components'
 import BuyButton from 'lib/components/BuyShares/BuyButton'
 import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
@@ -8,42 +8,63 @@ import { useSnapshot } from 'valtio'
 import { buySharesState } from './state'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
-import { TokenDataFE } from 'lib/hooks/constants'
+import { smallScreens, TokenDataFE } from 'lib/hooks/constants'
 import { ILootbox } from 'lib/types'
 import InfoText from './InfoText'
 import useWindowSize from 'lib/hooks/useScreenSize'
-
-export const $BuySharesContainer = styled.section<{ screen: string | undefined }>`
-  width: 100%;
-  height: 100%;
-  border: 0px solid transparent;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-sizing: border-box;
-  padding: ${(props) => (props.screen === 'mobile' ? '0px' : '20px')};
-  box-shadow: ${(props) => (props.screen === 'mobile' ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.1)')};
-`
+import { $Container, $Horizontal, $Vertical } from '../Generics'
+import TicketCard from '../TicketCard'
+import PurchaseComplete from './PurchaseComplete'
 
 interface BuySharesProps {}
-const BuyShares = (props: BuySharesProps) => {
+const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
 
+  const isMobile = smallScreens.indexOf(screen) >= 0
+  const buyWidth = isMobile ? '100%' : '65%'
+  const ticketWidth = isMobile ? '100%' : '35%'
   const isLoggedIn = snapUserState.accounts.length > 0
 
+  const ticketId = snap?.lootbox?.data?.ticketIdCounter || '0'
+
   return (
-    <$BuySharesContainer screen={screen}>
+    <$Container screen={screen}>
+      {isMobile ? (
+        <$TicketWrapper marginBottom="20px" width={ticketWidth}>
+          <TicketCard ticketID={ticketId} forceLoading={true} />
+        </$TicketWrapper>
+      ) : undefined}
+      {ref && <div ref={ref} />}
       <BuySharesHeader />
-      <TokenInput selectedToken={snap.inputToken.data as TokenDataFE} tokenDisabled={!isLoggedIn} />
-      <ShareOutput lootbox={snap.lootbox.data as ILootbox} />
-      <BuyButton />
-      <InfoText />
-    </$BuySharesContainer>
+      <$Horizontal spacing={2}>
+        <$Vertical spacing={2} width={buyWidth}>
+          {snap.route === '/complete' ? (
+            <PurchaseComplete />
+          ) : (
+            <$Vertical spacing={2} width="100%">
+              <TokenInput selectedToken={snap.inputToken.data as TokenDataFE} tokenDisabled={!isLoggedIn} />
+              <ShareOutput lootbox={snap.lootbox.data as ILootbox} />
+              <BuyButton />
+            </$Vertical>
+          )}
+          <InfoText />
+        </$Vertical>
+        {!isMobile ? (
+          <$TicketWrapper width={ticketWidth}>
+            <TicketCard ticketID={ticketId} forceLoading={true} />
+          </$TicketWrapper>
+        ) : undefined}
+      </$Horizontal>
+    </$Container>
   )
-}
+})
+
+const $TicketWrapper = styled.section<{ width: string; marginBottom?: string }>`
+  width: ${(props) => props.width};
+  margin-bottom: ${(props) => (props.marginBottom ? props.marginBottom : '0px')};
+`
 
 export const $CurrencyExchangeRate = styled.span`
   font-size: 0.8rem;
