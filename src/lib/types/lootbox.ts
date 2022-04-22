@@ -9,6 +9,7 @@ export interface ILootbox {
   sharesSoldMax: string | undefined
   ticketIdCounter: string | undefined
   shareDecimals: string | undefined
+  variant: string | undefined
 }
 
 export interface ITicket {
