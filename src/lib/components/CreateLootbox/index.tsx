@@ -36,7 +36,7 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { NetworkOption } from './state'
+import { NetworkOption } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
 import { getPriceFeed } from 'lib/hooks/useContract'
 import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'

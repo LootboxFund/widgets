@@ -65,6 +65,7 @@ export const InputDecimal = (props: InputDecimalProps) => {
       type="number"
       placeholder="0.01"
       min="0"
+      onWheel={(e) => e.currentTarget.blur()}
       {...rest}
     />
   )
