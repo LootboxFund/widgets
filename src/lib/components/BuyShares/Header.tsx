@@ -64,16 +64,13 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
   const variant = snapBuySharesState.lootbox?.data?.variant
   const name = snapBuySharesState.lootbox?.data?.name
 
-  let subHeader = 'Buy Shares'
+  let subHeader: string
 
   if (variant && name) {
     subHeader = `${variant} Lootbox - ${name}`
-  } else if (variant) {
-    subHeader = variant
   } else {
-    subHeader = name || ''
+    subHeader = (variant ? `${variant} Lootbox` : undefined) || name || 'Buy Shares'
   }
-
   return (
     <$BuySharesHeader>
       <$Horizontal>
