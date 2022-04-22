@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { forwardRef, useEffect } from 'react'
 import styled from 'styled-components'
 import BuyButton from 'lib/components/BuyShares/BuyButton'
 import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
@@ -17,7 +17,7 @@ import TicketCard from '../TicketCard'
 import PurchaseComplete from './PurchaseComplete'
 
 interface BuySharesProps {}
-const BuyShares = (props: BuySharesProps) => {
+const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -36,6 +36,7 @@ const BuyShares = (props: BuySharesProps) => {
           <TicketCard ticketID={ticketId} />
         </$TicketWrapper>
       ) : undefined}
+      {ref && <div ref={ref} />}
       <BuySharesHeader />
       <$Horizontal spacing={2}>
         <$Vertical spacing={2} width={buyWidth}>
@@ -58,10 +59,9 @@ const BuyShares = (props: BuySharesProps) => {
       </$Horizontal>
     </$Container>
   )
-}
+})
 
 const $TicketWrapper = styled.section<{ width: string; marginBottom?: string }>`
-  height: 100%;
   width: ${(props) => props.width};
   margin-bottom: ${(props) => (props.marginBottom ? props.marginBottom : '0px')};
 `

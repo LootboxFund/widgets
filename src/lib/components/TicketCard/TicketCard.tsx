@@ -16,8 +16,11 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
   const ticket: ITicketFE | undefined =
     stateID && snap.tickets[stateID] ? (snap.tickets[stateID] as ITicketFE) : undefined
+
+  const lootboxAddr = snap.lootboxAddress || 'lootbox'
   return (
     <$TicketCardContainer
+      key={`TicketCard-${lootboxAddr}-${ticketID}`}
       backgroundImage={ticket?.data?.metadata?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()

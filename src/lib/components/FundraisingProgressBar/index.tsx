@@ -78,7 +78,6 @@ const ProgressBar = ({ progress, themeColor }: { progress: number; themeColor: s
         marginTop: '10px',
         backgroundColor: `${themeColor}3A`,
         borderRadius: '10px',
-        marginBottom: '20px',
         position: 'relative',
       }}
     >

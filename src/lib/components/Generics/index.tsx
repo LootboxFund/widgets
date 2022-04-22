@@ -12,6 +12,7 @@ interface HorizontalProps {
   readonly width?: string
   readonly overflowHidden?: boolean
   readonly position?: 'absolute' | 'relative'
+  padding?: string
 }
 const SPACING_VALS = [4, 8, 16, 24, 48]
 
@@ -27,6 +28,7 @@ export const $Horizontal = styled.div<HorizontalProps>`
   ${(props) => props.width && `width: ${props.width};`}
   ${(props) => props.overflowHidden && `overflow: hidden;`}
   ${(props) => props.position && `position: ${props.position};`}
+  ${(props) => props.padding && `padding: ${props.padding};`}
   
 
   & > *:not(:last-child) {
@@ -34,12 +36,19 @@ export const $Horizontal = styled.div<HorizontalProps>`
   }
 `
 
-export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number; width?: string; height?: string }>`
+export const $Vertical = styled.div<{
+  spacing?: 1 | 2 | 3 | 4 | 5
+  flex?: number
+  width?: string
+  height?: string
+  padding?: string
+}>`
   display: flex;
   flex-direction: column;
   ${(props) => props.flex && `flex: ${props.flex};`};
   ${(props) => props.width && `width: ${props.width};`};
   ${(props) => props.height && `height: ${props.height};`};
+  ${(props) => props.padding && `padding: ${props.padding};`}
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }

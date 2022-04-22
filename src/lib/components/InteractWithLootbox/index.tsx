@@ -2,7 +2,6 @@ import react, { useEffect } from 'react'
 import InteractWithLootbox from './InteractWithLootbox'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { ticketMinterState } from 'lib/components/TicketMinter/state'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
@@ -12,7 +11,6 @@ import { initLogging } from 'lib/api/logrocket'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
-  ticketMinterState.lootboxAddress = lootboxAddress
   userTicketState.lootboxAddress = lootboxAddress
 
   let ticketID = undefined
@@ -28,7 +26,6 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
   } catch (err) {
     console.error('Error initializing state', err)
   }
-  ticketMinterState.ticketID = ticketID
   loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
 }
 
