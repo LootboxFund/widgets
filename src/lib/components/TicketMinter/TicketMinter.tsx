@@ -4,9 +4,10 @@ import TicketCard from 'lib/components/TicketCard'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { ticketMinterState } from './state'
-import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import useWindowSize from 'lib/hooks/useScreenSize'
 import FundraisingProgressBar from '../FundraisingProgressBar'
 import { ContractAddress } from '@wormgraph/helpers'
+import { smallScreens } from 'lib/hooks/constants'
 
 export const $TicketMinterContainer = styled.section`
   width: 100%;
@@ -36,14 +37,12 @@ const $TicketWrapper = styled.section<{ screen: string | undefined }>`
   padding-bottom: ${(props) => (props.screen === 'mobile' ? '30px' : '0px')};
 `
 
-const smallScreens: ScreenSize[] = ['mobile', 'tablet']
-
 const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>) => {
   const snap = useSnapshot(ticketMinterState)
   const { screen } = useWindowSize()
   const isMobile = smallScreens.indexOf(screen) >= 0
-  const buyWidth = isMobile ? '100%' : '65%'
-  const ticketWidth = isMobile ? '100%' : '35%'
+  const buyWidth = '100%'
+  const ticketWidth = '100%'
 
   return (
     <$TicketMinterContainer>
@@ -61,11 +60,13 @@ const TicketMinter = forwardRef((props: {}, ref: React.RefObject<HTMLDivElement>
         <$Col width={buyWidth}>
           <BuyShares />
         </$Col>
-        <$Col width={ticketWidth}>
-          <$TicketWrapper screen={screen}>
-            <TicketCard ticketID={snap.ticketID} />
-          </$TicketWrapper>
-        </$Col>
+        {/* {isMobile ? (
+          <$Col width={ticketWidth}>
+            <$TicketWrapper screen={screen}>
+              <TicketCard ticketID={snap.ticketID} />
+            </$TicketWrapper>
+          </$Col>
+        ) : undefined} */}
       </$Row>
     </$TicketMinterContainer>
   )

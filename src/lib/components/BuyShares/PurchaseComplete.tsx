@@ -36,7 +36,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const ErrorSection = () => (
-    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
+    <$Vertical style={{ minHeight: '150px', justifyContent: 'center' }}>
       <$Sadge>🤕</$Sadge>
       <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
@@ -45,7 +45,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   const SuccessSection = () => (
-    <$Vertical style={{ minHeight: '140px', justifyContent: 'center' }}>
+    <$Vertical style={{ minHeight: '150px', justifyContent: 'center' }}>
       <$Sadge style={{ paddingBottom: '15px' }}>✅</$Sadge>
       {bscScanUrl && <ViewOnBSCScan />}
     </$Vertical>

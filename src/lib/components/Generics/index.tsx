@@ -34,10 +34,12 @@ export const $Horizontal = styled.div<HorizontalProps>`
   }
 `
 
-export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number }>`
+export const $Vertical = styled.div<{ spacing?: 1 | 2 | 3 | 4 | 5; flex?: number; width?: string; height?: string }>`
   display: flex;
   flex-direction: column;
   ${(props) => props.flex && `flex: ${props.flex};`};
+  ${(props) => props.width && `width: ${props.width};`};
+  ${(props) => props.height && `height: ${props.height};`};
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }

@@ -1,6 +1,7 @@
 import { TokenData, Address } from '@wormgraph/helpers'
 import { manifest } from '../../manifest'
 import { SocialFragment } from 'lib/types'
+import { ScreenSize } from './useScreenSize'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
@@ -191,3 +192,5 @@ export const SOCIALS: SocialFragment[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
   },
 ]
+
+export const smallScreens: ScreenSize[] = ['mobile', 'tablet']
