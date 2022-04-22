@@ -105,7 +105,6 @@ const BASE_CONTAINER = `
 export const $LogoContainer = styled.div`
   flex: 1;
   padding: 2.2rem 2.2rem 1.5rem;
-  display: relative;
 `
 
 export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
@@ -136,8 +135,8 @@ export const $TicketLogo = styled.div<{
   padding-top: 100%;
   ${(props) =>
     props.size
-      ? `width: ${props.size};\nheight: ${props.size};padding-top: unset; margin-top: 30% !important;`
-      : `width: calc(min(100%, 220px));\npadding-top: calc(min(100%, 220px));`}
+      ? `width: ${props.size};\nheight: ${props.size};padding-top: unset;\nmargin: 30% auto !important;`
+      : `width: calc(min(100%, 220px));\npadding-top: calc(min(100%, 220px));\nmargin: auto;`}
   border: 0px solid transparent;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
@@ -151,7 +150,6 @@ export const $TicketLogo = styled.div<{
   display: flex;
   flex-direction: column;
   justify-content: center;
-  ${(props) => (props.margin && `margin: ${props.margin};`) || 'margin: auto;'}
 `
 
 export const $BadgeImage = styled.div<{
