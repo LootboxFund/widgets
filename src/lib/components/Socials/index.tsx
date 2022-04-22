@@ -64,7 +64,6 @@ const Socials = ({ lootbox }: SocialsProps) => {
   const formattedROI = web3Utils
     .fromWei(new web3Utils.BN(basisPointsReturnTarget).mul(new web3Utils.BN(10)), 'kwei')
     .toString()
-  console.log(targetPaybackDateUnix)
   const today = new Date()
   const paybackDate = new Date(targetPaybackDateUnix)
   const diffTime = paybackDate.valueOf() - today.valueOf()

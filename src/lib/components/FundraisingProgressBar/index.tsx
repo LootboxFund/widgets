@@ -11,6 +11,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from '@wormgraph/helpers'
+import { buySharesState } from '../BuyShares/state'
 
 export interface FundraisingProgressBarProps {
   percentageFunded: number
@@ -93,6 +94,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
   const [networkSymbol, setNetworkSymbol] = useState('')
   const [wtfMessage, setWTFMessage] = useState('Calculated as...')
   const userStateSnapshot = useSnapshot(userState)
+  const buySharesStateSnapshot = useSnapshot(buySharesState)
 
   useEffect(() => {
     const network =
@@ -139,7 +141,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
         console.error('Error loading data for lootbox progress bar', err)
       )
     }
-  }, [lootbox, userStateSnapshot])
+  }, [lootbox, userStateSnapshot, buySharesStateSnapshot.lastTransaction])
 
   return (
     <FundraisingProgressBar

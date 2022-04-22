@@ -73,7 +73,11 @@ const TokenInput = (props: TokenInputProps) => {
     <$TokenInput screen={screen}>
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
-          <InputDecimal onChange={setQuantity} disabled={props.quantityDisabled || !snap.inputToken.data} />
+          <InputDecimal
+            onChange={setQuantity}
+            initialValue={buySharesState.inputToken.quantity}
+            disabled={props.quantityDisabled || !snap.inputToken.data}
+          />
           {usdValue ? (
             <$FineText screen={screen}>{`Spend ${new BN(usdValue).decimalPlaces(2).toString()}`} USD</$FineText>
           ) : null}
