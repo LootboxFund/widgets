@@ -3,14 +3,11 @@ import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import $Button from '../Generics/Button'
 import { $Vertical } from '../Generics'
-import { $BuySharesHeader, $BuySharesHeaderTitle } from './Header'
 import { buySharesState } from './state'
 import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
-import InfoText from './InfoText'
-import { $Container } from '../Generics'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
@@ -55,19 +52,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
   )
 
   return (
-    <$Container screen={screen}>
-      <$BuySharesHeader>
-        {snap.lastTransaction.success ? (
-          <$BuySharesHeaderTitle>Success!</$BuySharesHeaderTitle>
-        ) : (
-          <$BuySharesHeaderTitle>❌ Transaction Failed!</$BuySharesHeaderTitle>
-        )}
-
-        <span onClick={goToBuySharesComponent} style={{ padding: '0px 5px 0px 0px', cursor: 'pointer' }}>
-          X
-        </span>
-      </$BuySharesHeader>
-
+    <$Vertical>
       <$TokenPreviewCard>{!snap.lastTransaction.success ? <ErrorSection /> : <SuccessSection />}</$TokenPreviewCard>
 
       <$Button
@@ -81,8 +66,7 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
       >
         Back
       </$Button>
-      <InfoText />
-    </$Container>
+    </$Vertical>
   )
 }
 
