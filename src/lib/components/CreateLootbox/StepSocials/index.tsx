@@ -151,6 +151,7 @@ export const $InputMedium = styled.input`
   border-radius: 10px;
   padding: 5px 20px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export default StepSocials
