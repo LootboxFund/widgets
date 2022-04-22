@@ -5,19 +5,29 @@ import { useSnapshot } from 'valtio'
 import { ticketCardState, generateStateID, ITicketFE, TicketCardState } from './state'
 import { ContractAddress } from '@wormgraph/helpers'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
+import $Spinner from '../Generics/Spinner'
 
 export interface TicketCardProps {
   ticketID: string | undefined
   onScrollToMint?: () => void
+  forceLoading?: boolean // hack to show loading
 }
 
-const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
+const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
   const ticket: ITicketFE | undefined =
     stateID && snap.tickets[stateID] ? (snap.tickets[stateID] as ITicketFE) : undefined
 
   const lootboxAddr = snap.lootboxAddress || 'lootbox'
+
+  const Icon = () => {
+    if (forceLoading) {
+      return <$Spinner style={{ margin: 'auto' }} />
+    } else {
+      return <$Icon>+</$Icon>
+    }
+  }
   return (
     <$TicketCardContainer
       key={`TicketCard-${lootboxAddr}-${ticketID}`}
@@ -32,7 +42,7 @@ const TicketCard = ({ ticketID, onScrollToMint }: TicketCardProps) => {
           backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
           size={!ticket ? '100px' : undefined}
         >
-          {!ticket ? <$Icon>+</$Icon> : null}
+          {!ticket ? <Icon /> : null}
         </$TicketLogo>
       </$LogoContainer>
 

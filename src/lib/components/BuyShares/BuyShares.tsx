@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from 'react'
+import React, { forwardRef } from 'react'
 import styled from 'styled-components'
 import BuyButton from 'lib/components/BuyShares/BuyButton'
 import TokenInput from 'lib/components/BuyShares/Input/TokenInput'
@@ -33,7 +33,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
     <$Container screen={screen}>
       {isMobile ? (
         <$TicketWrapper marginBottom="20px" width={ticketWidth}>
-          <TicketCard ticketID={ticketId} />
+          <TicketCard ticketID={ticketId} forceLoading={true} />
         </$TicketWrapper>
       ) : undefined}
       {ref && <div ref={ref} />}
@@ -53,7 +53,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
         </$Vertical>
         {!isMobile ? (
           <$TicketWrapper width={ticketWidth}>
-            <TicketCard ticketID={ticketId} />
+            <TicketCard ticketID={ticketId} forceLoading={true} />
           </$TicketWrapper>
         ) : undefined}
       </$Horizontal>
