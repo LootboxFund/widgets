@@ -76,7 +76,7 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
       }}
     >
       <$LogoContainer>
-        {props.badgeImage && (
+        {/* {props.badgeImage && (
           <$BadgeImage
             // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
             id="ticket-candy-badge"
@@ -84,7 +84,7 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
             backgroundShadowColor={props.themeColor}
             // margin="auto auto 0"
           />
-        )}
+        )} */}
 
         <$TicketLogo
           // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
