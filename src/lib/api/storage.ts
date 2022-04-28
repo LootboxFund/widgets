@@ -1,7 +1,7 @@
-import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@wormgraph/helpers'
-import { SemanticVersion } from '@wormgraph/manifest'
+import { ITicketMetadata, ContractAddress } from '@wormgraph/helpers'
 import { manifest } from '../../manifest'
 import { encodeURISafe } from './helpers'
+import { parseTicketMetadata } from '../utils/parseTicketMetadata'
 
 const getLootboxURI = async ({ lootboxAddress, bucket }: { lootboxAddress: ContractAddress; bucket: string }) => {
   const filePath = `${bucket}/${lootboxAddress}.json`
@@ -16,5 +16,5 @@ export const readTicketMetadata = async (lootboxAddress: ContractAddress): Promi
     bucket: manifest.storage.buckets.data.id,
   })
 
-  return metadata?.data as ITicketMetadata | undefined
+  return parseTicketMetadata(metadata)
 }
