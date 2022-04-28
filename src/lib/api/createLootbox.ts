@@ -224,11 +224,11 @@ export const createInstantLootbox = async (
             address indexed lootbox,
             address indexed issuer,
             address indexed treasury,
+            uint256 targetSharesSold,
             uint256 maxSharesSold,
-            uint256 sharePriceUSD,
             string _data
           )`,
-          keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
+          keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'targetSharesSold', 'maxSharesSold', '_data'],
         })
         const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
         const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
@@ -431,22 +431,13 @@ export const createEscrowLootbox = async (
     returnAmountTarget = ${args.returnAmountTarget}
 
     `)
-    //   function createLootbox(
-    //     string memory _lootboxName,
-    //     string memory _lootboxSymbol,
-    //     uint256 _targetSharesSold,
-    //     uint256 _maxSharesSold,
-    //     address _treasury,
-    //     address _affiliate,
-    //     string memory _data
-    // )
+
     await lootboxEscrow.createLootbox(
       args.name, //     string memory _lootboxName,
       args.symbol, //     string memory _lootboxSymbol,
       targetSharesSold.toString(), // uint256 _targetSharesSold,
       maxSharesSold.toString(), // uint256 _maxSharesSold,
       args.receivingWallet, //     address _treasury,
-      args.receivingWallet, //     address _affiliate
       JSON.stringify(lootboxURI) // string memory _data
     )
     console.log(`Submitted escrow lootbox creation!`)
@@ -456,7 +447,7 @@ export const createEscrowLootbox = async (
       topics: [
         ethers.utils.solidityKeccak256(
           ['string'],
-          ['LootboxCreated(string,address,address,address,uint256,uint256,uint256,string)']
+          ['LootboxCreated(string,address,address,address,uint256,uint256,string)']
         ),
       ],
     }
@@ -473,19 +464,9 @@ export const createEscrowLootbox = async (
             address indexed treasury,
             uint256 targetSharesSold,
             uint256 maxSharesSold,
-            uint256 sharePriceUSD,
             string _data
           )`,
-          keys: [
-            'lootboxName',
-            'lootbox',
-            'issuer',
-            'treasury',
-            'targetSharesSold',
-            'maxSharesSold',
-            'sharePriceUSD',
-            '_data',
-          ],
+          keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'targetSharesSold', 'maxSharesSold', '_data'],
         })
         const { issuer, lootbox, lootboxName, targetSharesSold, maxSharesSold, treasury } = decodedLog as any
         const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
