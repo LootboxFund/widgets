@@ -39,20 +39,20 @@ const Socials = ({ lootbox }: SocialsProps) => {
     if (lootbox) {
       readTicketMetadata(lootbox)
         .then((metadata) => {
-          setBasisPointsReturnTarget(metadata?.lootbox?.basisPointsReturnTarget || '0')
-          setTargetPaybackDateUnix(metadata?.lootbox?.targetPaybackDate || 0)
-          setLootboxDescription(metadata?.description || '')
+          setBasisPointsReturnTarget(metadata?.lootboxCustomSchema?.lootbox?.basisPointsReturnTarget || '0')
+          setTargetPaybackDateUnix(metadata?.lootboxCustomSchema?.lootbox?.targetPaybackDate || 0)
+          setLootboxDescription(metadata?.lootboxCustomSchema?.lootbox.description || '')
           setSocials({
-            email: metadata?.socials?.email || '',
-            twitter: metadata?.socials?.twitter || '',
-            youtube: metadata?.socials?.youtube || '',
-            instagram: metadata?.socials?.instagram || '',
-            tiktok: metadata?.socials?.tiktok || '',
-            facebook: metadata?.socials?.facebook || '',
-            discord: metadata?.socials?.discord || '',
-            snapchat: metadata?.socials?.snapchat || '',
-            twitch: metadata?.socials?.twitch || '',
-            web: metadata?.socials?.web || '',
+            email: metadata?.lootboxCustomSchema?.socials?.email || '',
+            twitter: metadata?.lootboxCustomSchema?.socials?.twitter || '',
+            youtube: metadata?.lootboxCustomSchema?.socials?.youtube || '',
+            instagram: metadata?.lootboxCustomSchema?.socials?.instagram || '',
+            tiktok: metadata?.lootboxCustomSchema?.socials?.tiktok || '',
+            facebook: metadata?.lootboxCustomSchema?.socials?.facebook || '',
+            discord: metadata?.lootboxCustomSchema?.socials?.discord || '',
+            snapchat: metadata?.lootboxCustomSchema?.socials?.snapchat || '',
+            twitch: metadata?.lootboxCustomSchema?.socials?.twitch || '',
+            web: metadata?.lootboxCustomSchema?.socials?.web || '',
           })
         })
         .catch((err) => {

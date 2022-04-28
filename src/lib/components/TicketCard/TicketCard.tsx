@@ -21,6 +21,8 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
 
   const lootboxAddr = snap.lootboxAddress || 'lootbox'
 
+  const metadata = ticket?.data?.metadata
+
   const Icon = () => {
     if (forceLoading) {
       return <$Spinner style={{ margin: 'auto' }} />
@@ -31,15 +33,15 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
   return (
     <$TicketCardContainer
       key={`TicketCard-${lootboxAddr}-${ticketID}`}
-      backgroundImage={ticket?.data?.metadata?.backgroundImage}
+      backgroundImage={metadata?.lootboxCustomSchema?.lootbox?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
       <$LogoContainer>
         <$TicketLogo
-          backgroundImage={ticket?.data?.metadata?.image}
-          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+          backgroundImage={metadata?.lootboxCustomSchema?.lootbox?.image}
+          backgroundShadowColor={metadata?.lootboxCustomSchema?.lootbox?.backgroundColor}
           size={!ticket ? '100px' : undefined}
         >
           {!ticket ? <Icon /> : null}
@@ -48,7 +50,7 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
 
       {ticket ? (
         <$TicketTag>
-          <$TagText>{ticket?.data?.metadata?.name || 'Lootbox'}</$TagText>
+          <$TagText>{metadata?.lootboxCustomSchema?.lootbox?.name || 'Lootbox'}</$TagText>
           <$Divider />
           <$TicketIDText>{ticket?.data?.id ? `#${ticket.data?.id}` : ''}</$TicketIDText>
         </$TicketTag>
