@@ -1,6 +1,5 @@
 import AggregatorV3Interface from '@chainlink/abi/v0.7/interfaces/AggregatorV3Interface.json'
 import ERC20ABI from 'lib/abi/erc20.json'
-import LootboxABI from 'lib/abi/lootbox.json'
 import LootboxPreknownABI from 'lib/abi/LootboxPreknown.json'
 import LootboxEscrowABI from 'lib/abi/LootboxEscrow.json'
 import LootboxInstantABI from 'lib/abi/LootboxInstant.json'
@@ -9,7 +8,6 @@ import BN, { BigNumber } from 'bignumber.js'
 import { TokenData, Address, ContractAddress } from '@wormgraph/helpers'
 import { Contract, ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
-
 
 export interface IDividendFragment {
   tokenAddress: Address
@@ -187,34 +185,30 @@ export const getUserBalanceOfNativeToken = async (userAddr: Address): Promise<st
  * Identifies the Lootbox as Escrow or Instant
  */
 export type LootboxType = 'Escrow' | 'Instant'
-export const identifyLootboxType = async (lootboxAddress: Address): Promise<[LootboxType,boolean]> => {
+export const identifyLootboxType = async (lootboxAddress: Address): Promise<[LootboxType, boolean]> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
-  
+
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
-  console.log("Checking...")
-  const [lootboxType,isFundraising] = await Promise.all([
-    lootbox.variant(),
-    lootbox.isFundraising()
-  ])
+  console.log('Checking...')
+  const [lootboxType, isFundraising] = await Promise.all([lootbox.variant(), lootbox.isFundraising()])
   console.log(`
     
   variant = ${lootboxType}
   isFundraising = ${isFundraising}
 
   `)
-  return [lootboxType,isFundraising]
+  return [lootboxType, isFundraising]
 }
 
 export const getLootboxEscrowManagementDetails = async (
   lootboxAddress: ContractAddress,
   nativePriceFeed: ContractAddress
 ) => {
-  
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
-  
+
   const [
     shareDecimals,
     feeDecimals,
@@ -230,7 +224,7 @@ export const getLootboxEscrowManagementDetails = async (
     depositIdCounter,
     ticketIdCounter,
     semver,
-    symbol
+    symbol,
   ] = await Promise.all([
     escrowLootbox.shareDecimals(),
     escrowLootbox.feeDecimals(),
@@ -246,7 +240,7 @@ export const getLootboxEscrowManagementDetails = async (
     escrowLootbox.depositIdCounter(),
     escrowLootbox.ticketIdCounter(),
     escrowLootbox.semver(),
-    escrowLootbox.symbol()
+    escrowLootbox.symbol(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -257,7 +251,7 @@ export const getLootboxEscrowManagementDetails = async (
   // console.log(`
 
   // ---- ESCROW LOOTBOX ----
-    
+
   // shareDecimals,                = ${shareDecimals}
   // feeDecimals,                  = ${feeDecimals}
   // deploymentStartTime,          = ${deploymentStartTime}
@@ -335,7 +329,7 @@ export const getLootboxEscrowManagementDetails = async (
   ).toFixed(1)
 
   // console.log(`
-    
+
   // ----- ESCROW TRANSLATED -----
 
   // fundedAmountNative,           = ${fundedAmountNative}
@@ -376,7 +370,7 @@ export const getLootboxEscrowManagementDetails = async (
     percentageFunded,
     semver,
     sharePriceUSD,
-    symbol
+    symbol,
   ]
 }
 
@@ -384,7 +378,6 @@ export const getLootboxInstantManagementDetails = async (
   lootboxAddress: ContractAddress,
   nativePriceFeed: ContractAddress
 ) => {
-  
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
@@ -402,7 +395,7 @@ export const getLootboxInstantManagementDetails = async (
     depositIdCounter,
     ticketIdCounter,
     semver,
-    symbol
+    symbol,
   ] = await Promise.all([
     instantLootbox.shareDecimals(),
     instantLootbox.feeDecimals(),
@@ -488,7 +481,7 @@ export const getLootboxInstantManagementDetails = async (
     percentageFunded,
     semver,
     sharePriceUSD,
-    symbol
+    symbol,
   ]
 }
 
@@ -496,9 +489,7 @@ export const getLootboxIssuer = async (lootboxAddress: ContractAddress) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
-  const [reputationAddress] = await Promise.all([
-    lootbox.issuer()
-  ])
+  const [reputationAddress] = await Promise.all([lootbox.issuer()])
   return [reputationAddress]
 }
 
@@ -507,11 +498,9 @@ export const endFundraisingPeriodCall = async (lootboxAddress: ContractAddress, 
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
   if (lootboxType === 'Instant') {
-    
     const instantLootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, provider)
     return await instantLootbox.connect(signer).endFundraisingPeriod()
   } else {
-    
     const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
     return await escrowLootbox.connect(signer).endFundraisingPeriod()
   }
@@ -521,18 +510,22 @@ export const refundFundraiserCall = async (lootboxAddress: ContractAddress, loot
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
-  if  (lootboxType === 'Escrow') {
+  if (lootboxType === 'Escrow') {
     const escrowLootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
     return await escrowLootbox.connect(signer).cancelFundraiser()
   }
   return
 }
 
-export const rewardSponsorsInNativeTokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, amount: string) => {
+export const rewardSponsorsInNativeTokenCall = async (
+  lootboxAddress: ContractAddress,
+  lootboxType: LootboxType,
+  amount: string
+) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
-  if (lootboxType === "Escrow") {
+  if (lootboxType === 'Escrow') {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
     const tx = await lootbox.connect(signer).depositEarningsNative({
       value: amount,
@@ -549,24 +542,23 @@ export const rewardSponsorsInNativeTokenCall = async (lootboxAddress: ContractAd
   }
 }
 
-export const rewardSponsorsInErc20TokenCall = async (lootboxAddress: ContractAddress, lootboxType: LootboxType, erc20Address: ContractAddress, amount: string) => {
+export const rewardSponsorsInErc20TokenCall = async (
+  lootboxAddress: ContractAddress,
+  lootboxType: LootboxType,
+  erc20Address: ContractAddress,
+  amount: string
+) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
-  if (lootboxType === "Escrow") {
+  if (lootboxType === 'Escrow') {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
-    const tx = await lootbox.connect(signer).depositEarningsErc20(
-      erc20Address,
-      amount,
-    )
+    const tx = await lootbox.connect(signer).depositEarningsErc20(erc20Address, amount)
     await tx.wait()
     return tx.hash
   } else {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
-    const tx = await lootbox.connect(signer).depositEarningsErc20(
-      erc20Address,
-      amount,
-    )
+    const tx = await lootbox.connect(signer).depositEarningsErc20(erc20Address, amount)
     await tx.wait()
     return tx.hash
   }
