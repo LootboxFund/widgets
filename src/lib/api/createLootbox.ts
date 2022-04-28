@@ -166,6 +166,12 @@ export const createInstantLootbox = async (
   const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
     new web3Utils.BN('10')
   )
+  const targetSharesSold = args.fundraisingTarget
+    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+    .div(pricePerShare)
+    .mul(new web3Utils.BN('11'))
+    .div(new web3Utils.BN('10'))
+    .toString()
   const maxSharesSold = args.fundraisingTargetMax
     .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
     .div(pricePerShare)
@@ -182,10 +188,10 @@ export const createInstantLootbox = async (
     
     ticketState.name = ${args.name}
     ticketState.symbol = ${args.symbol}
+    targetSharesSold = ${targetSharesSold}
     maxSharesSold = ${maxSharesSold}
     pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
-    affiliateWallet = ${args.receivingWallet}
     fundraisingTargetMax = ${args.fundraisingTargetMax}
     nativeTokenPrice = ${args.nativeTokenPrice.toString()}
 
@@ -197,11 +203,12 @@ export const createInstantLootbox = async (
     await lootboxInstant.createLootbox(
       args.name, // string memory _lootboxName,
       args.symbol, // string memory _lootboxSymbol,
+      targetSharesSold.toString(),
       maxSharesSold.toString(), // uint256 _maxSharesSold,
       args.receivingWallet, // address _treasury,
-      args.receivingWallet, // address _affiliate,
       JSON.stringify(lootboxURI) // string memory _data
     )
+
     console.log(`Submitted lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
@@ -416,7 +423,6 @@ export const createEscrowLootbox = async (
     maxSharesSold = ${maxSharesSold}
     pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
-    affiliateWallet = ${args.receivingWallet}
 
     fundraisingTarget = ${args.fundraisingTarget}
     fundraisingTargetMax = ${args.fundraisingTargetMax}
