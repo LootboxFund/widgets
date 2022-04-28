@@ -293,6 +293,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const createLootbox = async () => {
     setSubmitStatus('in_progress')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    if (!snapUserState?.network?.currentNetworkIdHex) {
+      throw new Error('Network not set')
+    }
     if (fundingType === 'instant') {
       console.log(`Generating Instant Lootbox...`)
       await createInstantLootbox(
@@ -318,7 +321,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-        socialState
+        socialState,
+        snapUserState.network.currentNetworkIdHex
       )
     } else {
       console.log(`Generating Escrow/Tournament Lootbox...`)
@@ -345,7 +349,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-        socialState
+        socialState,
+        snapUserState.network.currentNetworkIdHex
       )
     }
   }

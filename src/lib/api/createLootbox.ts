@@ -4,7 +4,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
-import { Address, ContractAddress, convertHexToDecimal, ITicketMetadata } from '@wormgraph/helpers'
+import { Address, ChainIDHex, ContractAddress, convertHexToDecimal, ITicketMetadata } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
@@ -65,11 +65,21 @@ export const createInstantLootbox = async (
   provider: ethersObj.providers.Web3Provider | undefined,
   setSubmitStatus: (status: SubmitStatus) => void,
   args: InstantLootboxArgs,
-  socials: LootboxSocials
+  socials: LootboxSocials,
+  chainIdHex: ChainIDHex
 ) => {
   setSubmitStatus('in_progress')
-  const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxInstantFactory
-    .address as unknown as ContractAddress
+  const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
+  if (!chain) {
+    throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
+  }
+
+  const LOOTBOX_INSTANT_FACTORY_ADDRESS = manifest.lootbox.contracts[chainIdHex]?.LootboxInstantFactory
+    ?.address as unknown as ContractAddress
+
+  if (!LOOTBOX_INSTANT_FACTORY_ADDRESS) {
+    throw new Error('Could not find lootbox instant factory address')
+  }
 
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
@@ -98,42 +108,56 @@ export const createInstantLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
-    address: '' as ContractAddress, // This gets set in backend Pipedream
-    name: args.name as string,
-    description: args.biography as string,
-    image: imagePublicPath,
-    backgroundColor: args.lootboxThemeColor as string,
-    backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath || '',
-    lootbox: {
-      address: '' as ContractAddress, // This gets set in backend Pipedream
-      transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
-      fundraisingTarget: args.fundraisingTarget,
-      fundraisingTargetMax: args.fundraisingTargetMax,
-      basisPointsReturnTarget: args.basisPoints.toString(), // 100 basis points = 1% return
-      returnAmountTarget: args.returnAmountTarget.toString(),
-      pricePerShare: PRICE_PER_SHARE.toString(),
-      lootboxThemeColor: args.lootboxThemeColor as string,
-      createdAt: new Date().valueOf(),
-    },
-    socials: {
-      twitter: socials.twitter,
-      email: socials.email,
-      instagram: socials.instagram,
-      tiktok: socials.tiktok,
-      facebook: socials.facebook,
-      discord: socials.discord,
-      youtube: socials.youtube,
-      snapchat: socials.snapchat,
-      twitch: socials.twitch,
-      web: socials.web,
+  const lootboxURI: ITicketMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+    image: '', // will be filled in by backend
+    external_url: '', // will be filled in by backend
+    description: args.biography,
+    name: args.name,
+    background_color: args.lootboxThemeColor.replace('#', ''), // Opensea is not expecting a hashtag according to their docs
+    animation_url: '',
+    youtube_url: socials.youtube || '',
+    lootboxCustomSchema: {
+      version: '', // will be filled in by backend
+      chain: {
+        address: '' as ContractAddress, // will be filled in by backend
+        title: '', // will be filled in by backend
+        chainIdHex: '', // will be filled in by backend
+        chainName: '', // will be filled in by backend
+        chainIdDecimal: '', // will be filled in by backend
+      },
+      lootbox: {
+        createdAt: new Date().valueOf(),
+        factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
+        fundraisingTarget: args.fundraisingTarget,
+        fundraisingTargetMax: args.fundraisingTargetMax,
+        basisPointsReturnTarget: args.basisPoints?.toString(),
+        returnAmountTarget: args.returnAmountTarget,
+        targetPaybackDate: Number(args.paybackDate),
+        transactionHash: '', // will be filled in by backend
+        blockNumber: '', // will be filled in by backend
+
+        name: args.name,
+        description: args.biography,
+        image: imagePublicPath,
+        backgroundColor: args.lootboxThemeColor,
+        backgroundImage: backgroundPublicPath,
+        badgeImage: badgePublicPath || '',
+        pricePerShare: '',
+        lootboxThemeColor: args.lootboxThemeColor,
+      },
+
+      socials: {
+        twitter: socials.twitter,
+        email: socials.email,
+        instagram: socials.instagram,
+        tiktok: socials.tiktok,
+        facebook: socials.facebook,
+        discord: socials.discord,
+        youtube: socials.youtube,
+        snapchat: socials.snapchat,
+        twitch: socials.twitch,
+        web: socials.web,
+      },
     },
   }
 
@@ -236,7 +260,7 @@ export const createInstantLootbox = async (
                 name: lootboxName,
                 ticketID,
                 lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
+                chainIdHex: chain.chainIdHex,
                 numShares,
               }),
             ])
@@ -265,11 +289,22 @@ export const createEscrowLootbox = async (
   provider: ethersObj.providers.Web3Provider | undefined,
   setSubmitStatus: (status: SubmitStatus) => void,
   args: InstantLootboxArgs,
-  socials: LootboxSocials
+  socials: LootboxSocials,
+  chainIdHex: ChainIDHex
 ) => {
   setSubmitStatus('in_progress')
-  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts.LootboxEscrowFactory
-    .address as unknown as ContractAddress
+
+  const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
+  if (!chain) {
+    throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
+  }
+
+  const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts[chainIdHex]?.LootboxEscrowFactory
+    ?.address as unknown as ContractAddress
+
+  if (!LOOTBOX_ESCROW_FACTORY_ADDRESS) {
+    throw new Error('Could not find lootbox escrow factory address')
+  }
 
   const web3Utils = useWeb3Utils()
   if (!args.nativeTokenPrice) {
@@ -297,42 +332,56 @@ export const createEscrowLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
-    address: '' as ContractAddress, // This gets set in backend Pipedream
-    name: args.name as string,
-    description: args.biography as string,
-    image: imagePublicPath,
-    backgroundColor: args.lootboxThemeColor as string,
-    backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath || '',
-    lootbox: {
-      address: '' as ContractAddress, // This gets set in backend Pipedream
-      transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
-      fundraisingTarget: args.fundraisingTarget,
-      fundraisingTargetMax: args.fundraisingTargetMax,
-      basisPointsReturnTarget: args.basisPoints.toString(),
-      returnAmountTarget: args.returnAmountTarget.toString(),
-      pricePerShare: PRICE_PER_SHARE.toString(),
-      lootboxThemeColor: args.lootboxThemeColor as string,
-      createdAt: new Date().valueOf(),
-    },
-    socials: {
-      twitter: socials.twitter,
-      email: socials.email,
-      instagram: socials.instagram,
-      tiktok: socials.tiktok,
-      facebook: socials.facebook,
-      discord: socials.discord,
-      youtube: socials.youtube,
-      snapchat: socials.snapchat,
-      twitch: socials.twitch,
-      web: socials.web,
+  const lootboxURI: ITicketMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+    image: '', // will be filled in by backend
+    external_url: '', // will be filled in by backend
+    description: args.biography,
+    name: args.name,
+    background_color: args.lootboxThemeColor.replace('#', ''), // Opensea is not expecting a hashtag according to their docs
+    animation_url: '',
+    youtube_url: socials.youtube || '',
+    lootboxCustomSchema: {
+      version: '', // will be filled in by backend
+      chain: {
+        address: '' as ContractAddress, // will be filled in by backend
+        title: '', // will be filled in by backend
+        chainIdHex: '', // will be filled in by backend
+        chainName: '', // will be filled in by backend
+        chainIdDecimal: '', // will be filled in by backend
+      },
+      lootbox: {
+        createdAt: new Date().valueOf(),
+        factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
+        fundraisingTarget: args.fundraisingTarget,
+        fundraisingTargetMax: args.fundraisingTargetMax,
+        basisPointsReturnTarget: args.basisPoints?.toString(),
+        returnAmountTarget: args.returnAmountTarget,
+        targetPaybackDate: Number(args.paybackDate),
+        transactionHash: '', // will be filled in by backend
+        blockNumber: '', // will be filled in by backend
+
+        name: args.name,
+        description: args.biography,
+        image: imagePublicPath,
+        backgroundColor: args.lootboxThemeColor,
+        backgroundImage: backgroundPublicPath,
+        badgeImage: badgePublicPath || '',
+        pricePerShare: '',
+        lootboxThemeColor: args.lootboxThemeColor,
+      },
+
+      socials: {
+        twitter: socials.twitter,
+        email: socials.email,
+        instagram: socials.instagram,
+        tiktok: socials.tiktok,
+        facebook: socials.facebook,
+        discord: socials.discord,
+        youtube: socials.youtube,
+        snapchat: socials.snapchat,
+        twitch: socials.twitch,
+        web: socials.web,
+      },
     },
   }
 
@@ -468,7 +517,7 @@ export const createEscrowLootbox = async (
                 name: lootboxName,
                 ticketID,
                 lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
+                chainIdHex: chain.chainIdHex,
                 numShares,
               }),
             ])
