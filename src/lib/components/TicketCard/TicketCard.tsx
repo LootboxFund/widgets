@@ -208,6 +208,7 @@ export const $TagText = styled.p`
   width: 100%;
   padding: 5px;
   margin: auto;
+  word-break: break-all;
 `
 export const $TicketIDText = styled.p`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
@@ -219,6 +220,7 @@ export const $TicketIDText = styled.p`
   color: #ffffff;
   width: 100%;
   margin: auto;
+  word-break: break-all;
 `
 
 export const $Divider = styled.div`

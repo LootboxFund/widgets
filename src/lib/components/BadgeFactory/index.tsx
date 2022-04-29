@@ -49,11 +49,11 @@ export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
 export const validateLogoFile = (file: File) => !!file
 export const validateCoverFile = (file: File) => !!file
-export interface BadgeFactoryProps {
+export interface CustomizeBadgeProps {
   stage: StepStage
   selectedNetwork: NetworkOption
 }
-const CustomizeBadge = forwardRef((props: BadgeFactoryProps, ref: React.RefObject<HTMLDivElement>) => {
+const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const [themeColor, setThemeColor] = useState('')

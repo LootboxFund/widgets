@@ -1,12 +1,15 @@
 import React from 'react'
-import BadgeMinter, { TemplateProps } from 'lib/components/BadgeMinter'
+import BadgeMinter from 'lib/components/BadgeMinter'
 
 export default {
   title: 'BadgeMinter',
   component: BadgeMinter,
 }
 
-const Demo = (args: TemplateProps) => <BadgeMinter {...args} />
-
+const Demo = () => (
+  <div style={{ width: '760px', height: '600px' }}>
+    <BadgeMinter />
+  </div>
+)
 export const Basic = Demo.bind({})
 Basic.args = {}

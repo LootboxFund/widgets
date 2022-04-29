@@ -1,11 +1,11 @@
-import BadgeFactory, { BadgeFactoryProps } from 'lib/components/BadgeFactory'
+import BadgeFactory from 'lib/components/BadgeFactory'
 
 export default {
   title: 'BadgeFactory',
   component: BadgeFactory,
 }
 
-const Demo = (args: BadgeFactoryProps) => {
+const Demo = () => {
   return (
     <div style={{ width: '760px', height: '600px' }}>
       <BadgeFactory />
