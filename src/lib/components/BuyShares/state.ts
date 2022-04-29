@@ -47,7 +47,7 @@ const buySharesSnapshot: BuySharesState = {
       address: undefined,
       name: undefined,
       symbol: undefined,
-      sharePriceUSD: undefined,
+      sharePriceWei: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,
@@ -95,10 +95,10 @@ const updateLootboxQuantity = () => {
     buySharesState.inputToken.data &&
     buySharesState.inputToken.quantity !== undefined &&
     buySharesState.inputToken.data.usdPrice &&
-    buySharesState.lootbox.data.sharePriceUSD
+    buySharesState.lootbox.data.sharePriceWei
   ) {
     const inputTokenPrice = buySharesState.inputToken.data.usdPrice
-    const outputTokenPrice = buySharesState.lootbox.data.sharePriceUSD
+    const outputTokenPrice = buySharesState.lootbox.data.sharePriceWei
     buySharesState.lootbox.quantity = new BN(buySharesState.inputToken.quantity)
       .multipliedBy(new BN(inputTokenPrice))
       .dividedBy(new BN(outputTokenPrice))
@@ -157,13 +157,13 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
   buySharesState.lootbox.address = lootboxAddress
 
   try {
-    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
+    const { name, symbol, sharePriceWei, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
       await getLootboxData(lootboxAddress)
     buySharesState.lootbox.data = {
       address: lootboxAddress,
       name: name,
       symbol: symbol,
-      sharePriceUSD: sharePriceUSD,
+      sharePriceWei: sharePriceWei,
       sharesSoldCount: sharesSoldCount,
       sharesSoldMax: sharesSoldMax,
       ticketIdCounter: ticketIdCounter,
@@ -176,7 +176,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       address: undefined,
       name: undefined,
       symbol: undefined,
-      sharePriceUSD: undefined,
+      sharePriceWei: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,

@@ -43,13 +43,24 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     name: 'Polygon',
     symbol: 'MATIC',
     themeColor: '#8F5AE8',
-    chainIdHex: 'b',
-    chainIdDecimal: '',
-    isAvailable: false,
-    isTestnet: false,
+    chainIdHex: '0x13881',
+    chainIdDecimal: '80001',
+    isAvailable: true,
+    isTestnet: true,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-    priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as ContractAddress,
+    priceFeed: '0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada' as ContractAddress,
   },
+  // {
+  //   name: 'Polygon',
+  //   symbol: 'MATIC',
+  //   themeColor: '#8F5AE8',
+  //   chainIdHex: 'b',
+  //   chainIdDecimal: '',
+  //   isAvailable: false,
+  //   isTestnet: false,
+  //   icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+  //   priceFeed: '0xab594600376ec9fd91f8e885dadf0ce036862de0' as ContractAddress,
+  // },
   {
     name: 'Ethereum',
     symbol: 'ETH',
@@ -82,5 +93,5 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
 ]
 
 export const matchNetworkByHex = (chainIdHex: ChainIDHex) => {
-  return NETWORK_OPTIONS.find(network => network.chainIdHex === chainIdHex)
+  return NETWORK_OPTIONS.find((network) => network.chainIdHex === chainIdHex)
 }

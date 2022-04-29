@@ -28,9 +28,10 @@ const ShareOutput = (props: ShareOutputProps) => {
       ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
       : new BN(0).toString()
 
-  const price = snap.lootbox.data?.sharePriceUSD
-    ? new BN(snap.lootbox.data?.sharePriceUSD).div(new BN(10).pow(USD_DECIMALS))
-    : undefined
+  // const price = snap.lootbox.data?.sharePriceWei
+  //   ? new BN(snap.lootbox.data?.sharePriceUSD).div(new BN(10).pow(USD_DECIMALS))
+  //   : undefined
+  const price = new BN('-1')
 
   return (
     <$TokenInput screen={screen}>

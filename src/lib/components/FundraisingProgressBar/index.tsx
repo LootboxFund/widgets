@@ -105,7 +105,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
       setNetworkSymbol(network.nativeCurrency.symbol)
 
       const loadData = async (symb: string) => {
-        const { sharesSoldMax, sharesSoldCount, sharePriceUSD } = await getLootboxData(lootbox)
+        const { sharesSoldMax, sharesSoldCount, sharePriceWei } = await getLootboxData(lootbox)
 
         const percentageFunded =
           sharesSoldCount && sharesSoldMax
@@ -119,9 +119,8 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
         const nativeTokenPriceEther = await getPriceFeedRaw(network.priceFeedUSD as ContractAddress)
         const nativeTokenPrice = new web3Utils.BN(nativeTokenPriceEther)
 
-        const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax)
-          .mul(new web3Utils.BN(sharePriceUSD))
-          .div(nativeTokenPrice)
+        const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax).mul(new web3Utils.BN(sharePriceWei))
+        //   .div(nativeTokenPrice)
 
         const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
@@ -130,11 +129,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
         const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
           web3Utils.fromWei(sharesSoldMax, 'ether')
         ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(
-          new web3Utils.BN(sharePriceUSD).mul(new web3Utils.BN(10)),
-          'nano'
-        )} USD at a ${symb} price of ${parseFloat(
-          web3Utils.fromWei(nativeTokenPrice.mul(new web3Utils.BN(10)), 'nano')
-        ).toFixed(2)} USD.`
+          new web3Utils.BN(sharePriceWei),
+          'wei'
+        )} ${symb}.`
         setWTFMessage(wtfBro)
       }
       loadData(network.nativeCurrency.symbol).catch((err) =>

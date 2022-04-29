@@ -237,7 +237,7 @@ export const createInstantLootbox = async (
           )`,
           keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'targetSharesSold', 'maxSharesSold', '_data'],
         })
-        const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
+        const { issuer, lootbox, lootboxName, maxSharesSold, treasury } = decodedLog as any
         const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
         const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
         if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {

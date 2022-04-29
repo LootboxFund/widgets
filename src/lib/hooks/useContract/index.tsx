@@ -63,7 +63,7 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
 interface GetLootboxDataOutput {
   name: string
   symbol: string
-  sharePriceUSD: string
+  sharePriceWei: string
   sharesSoldCount: string
   sharesSoldMax: string
   ticketIdCounter: string
@@ -74,11 +74,11 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
-  const [name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant] =
+  const [name, symbol, sharePriceWei, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant] =
     await Promise.all([
       lootbox.name(),
       lootbox.symbol(),
-      lootbox.sharePriceUSD(),
+      lootbox.sharePriceWei(),
       lootbox.sharesSoldCount(),
       lootbox.sharesSoldMax(),
       lootbox.ticketIdCounter(),
@@ -89,7 +89,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
   return {
     name: name.toString(),
     symbol: symbol.toString(),
-    sharePriceUSD: sharePriceUSD.toString(),
+    sharePriceWei: sharePriceWei.toString(),
     sharesSoldCount: sharesSoldCount.toString(),
     sharesSoldMax: sharesSoldMax.toString(),
     ticketIdCounter: ticketIdCounter.toString(),
