@@ -215,7 +215,7 @@ const $NetworkOption = styled.button<{ isAvailable?: boolean; themeColor?: strin
   ${(props) => !props.isSelected && props.isAvailable && 'box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);'}
 `
 
-const $NetworkName = styled.span<{ isAvailable?: boolean; isSelected?: boolean }>`
+export const $NetworkName = styled.span<{ isAvailable?: boolean; isSelected?: boolean }>`
   font-size: ${TYPOGRAPHY.fontSize.large};
   ${(props) => props.isAvailable && 'text-transform: uppercase'};
   ${(props) =>
@@ -224,7 +224,7 @@ const $NetworkName = styled.span<{ isAvailable?: boolean; isSelected?: boolean }
   ${(props) => props.isSelected && 'color: white'};
 `
 
-const $ComingSoon = styled.span<{ isSelected?: boolean }>`
+export const $ComingSoon = styled.span<{ isSelected?: boolean }>`
   font-size: ${TYPOGRAPHY.fontSize.xsmall};
   color: ${(props) => (props.isSelected ? COLORS.white : COLORS.surpressedFontColor)};
   text-transform: uppercase;

@@ -239,7 +239,7 @@ const $StepTermsConditions = styled.section<{}>`
   color: ${COLORS.black};
 `
 
-const $TermCheckbox = styled.input`
+export const $TermCheckbox = styled.input`
   width: 20px;
   height: 20px;
   min-width: 20px;
@@ -256,7 +256,7 @@ const $TwitterAlert = styled.span`
   margin-top: 20px;
 `
 
-const $TermOfService = styled.span`
+export const $TermOfService = styled.span`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.large};
   font-weight: ${TYPOGRAPHY.fontWeight.light};
@@ -283,7 +283,7 @@ const $CopyableInput = styled.div`
   flex: 1;
 `
 
-const $CopyButton = styled.button`
+export const $CopyButton = styled.button`
   width: 20px;
   height: 20px;
   border: none;

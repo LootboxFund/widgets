@@ -15,6 +15,9 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import { checkIfValidEmail, checkIfValidUrl } from 'lib/api/helpers'
 import { SOCIALS } from 'lib/hooks/constants'
 import { $SocialLogo } from '../CreateLootbox/StepSocials'
+import WalletStatus from 'lib/components/WalletStatus'
+import { $ComingSoon, $NetworkIcon, $NetworkName } from '../CreateLootbox/StepChooseNetwork'
+import { $TermCheckbox, $TermOfService, TermsFragment } from '../CreateLootbox/StepTermsConditions'
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
   name: '',
@@ -50,7 +53,7 @@ export interface BadgeFactoryProps {
   stage: StepStage
   selectedNetwork: NetworkOption
 }
-const BadgeFactoryStepOne = forwardRef((props: BadgeFactoryProps, ref: React.RefObject<HTMLDivElement>) => {
+const CustomizeBadge = forwardRef((props: BadgeFactoryProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const [themeColor, setThemeColor] = useState('')
@@ -211,7 +214,7 @@ const BadgeFactoryStepOne = forwardRef((props: BadgeFactoryProps, ref: React.Ref
   }
 
   return (
-    <$BadgeFactoryStepOne style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+    <$CustomizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}
@@ -239,7 +242,7 @@ const BadgeFactoryStepOne = forwardRef((props: BadgeFactoryProps, ref: React.Ref
         >
           <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
-              <span>Create Your Guild Badge</span>
+              <span>Customize Your Guild Badge</span>
               <HelpIcon tipID="customizeGuildBadge" />
               <ReactTooltip id="customizeGuildBadge" place="right" effect="solid">
                 Lorem ipsum
@@ -374,11 +377,11 @@ const BadgeFactoryStepOne = forwardRef((props: BadgeFactoryProps, ref: React.Ref
           </$Vertical>
         </div>
       </StepCard>
-    </$BadgeFactoryStepOne>
+    </$CustomizeBadge>
   )
 })
 
-const $BadgeFactoryStepOne = styled.section<{}>`
+const $CustomizeBadge = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
   color: ${COLORS.black};
@@ -459,29 +462,153 @@ export const $ColorPreview = styled.div<{ color: string }>`
   background-color: ${(props: { color: string }) => props.color};
 `
 
+const BADGE_FACTORY_NETWORKS = [
+  {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    themeColor: '#627EEA',
+    chainIdHex: '0x1',
+    chainIdDecimal: '1',
+    isAvailable: true,
+    isTestnet: false,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH_COLORED.png?alt=media',
+  },
+  {
+    name: 'Binance',
+    symbol: 'BNB',
+    themeColor: '#F0B90B',
+    chainIdHex: '0x38',
+    chainIdDecimal: '56',
+    isAvailable: true,
+    isTestnet: false,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
+  },
+  {
+    name: 'Polygon',
+    symbol: 'MATIC',
+    themeColor: '#8F5AE8',
+    chainIdHex: '0x89',
+    chainIdDecimal: '137',
+    isAvailable: false,
+    isTestnet: false,
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+  },
+]
 interface ValidatePurchasingTokenBalanceProps {
   stage: StepStage
-  selectedNetwork: NetworkOption
 }
 const ValidatePurchasingTokenBalance = (props: ValidatePurchasingTokenBalanceProps) => {
   const initialErrors = {
     errorOne: '',
     errorTwo: '',
   }
+  const { screen } = useWindowSize()
   const [errors, setErrors] = useState(initialErrors)
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkOption>()
   return (
-    <$BadgeFactoryStepOne style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+    <$CustomizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       <StepCard
-        themeColor={props.selectedNetwork?.themeColor}
+        themeColor={selectedNetwork?.themeColor}
         stage={props.stage}
         onNext={() => {}}
         errors={Object.values(errors)}
       >
-        <p>ValidatePurchasingTokenBalance</p>
+        <$Vertical>
+          <$StepHeading>
+            <span>Verify Eligibility</span>
+            <HelpIcon tipID="verifyEligibility" />
+            <ReactTooltip id="verifyEligibility" place="right" effect="solid">
+              Lorem ipsum
+            </ReactTooltip>
+          </$StepHeading>
+          <$StepSubheading>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua.
+          </$StepSubheading>
+          <br />
+          <$Vertical>
+            {BADGE_FACTORY_NETWORKS.map((network) => {
+              return (
+                <$VerifyGuildTokenButton
+                  isSelected={selectedNetwork?.chainIdHex === network.chainIdHex}
+                  themeColor={network.themeColor}
+                  onClick={() => {
+                    if (network.isAvailable) {
+                      setSelectedNetwork(network)
+                    }
+                  }}
+                  key={network.chainIdHex}
+                  isAvailable={network.isAvailable}
+                >
+                  <$NetworkIcon src={network.icon} />
+                  {network.isAvailable ? (
+                    <$Horizontal flex={1} justifyContent="space-between">
+                      <$NetworkName
+                        isAvailable={network.isAvailable}
+                        isSelected={selectedNetwork?.chainIdHex === network.chainIdHex}
+                      >
+                        {network.name}
+                      </$NetworkName>
+                      <$ComingSoon isSelected={selectedNetwork?.chainIdHex === network.chainIdHex}>
+                        {network.isTestnet && 'Testnet'}
+                      </$ComingSoon>
+                    </$Horizontal>
+                  ) : (
+                    <$Horizontal flex={1} justifyContent="space-between">
+                      <$NetworkName>{network.name}</$NetworkName>
+                      <$ComingSoon>Coming Soon</$ComingSoon>
+                    </$Horizontal>
+                  )}
+                </$VerifyGuildTokenButton>
+              )
+            })}
+          </$Vertical>
+        </$Vertical>
+        {screen !== 'mobile' && selectedNetwork && (
+          <$Vertical flex={1}>
+            <img
+              style={{ width: '150px', marginTop: '50px' }}
+              src={
+                selectedNetwork?.chainIdHex === '0x1'
+                  ? 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FGUILD_TOKEN.png?alt=media'
+                  : 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FGUILD_TOKEN_BSC.png?alt=media'
+              }
+            />
+          </$Vertical>
+        )}
+        {screen !== 'mobile' && !selectedNetwork && (
+          <$Vertical flex={1}>
+            <img
+              style={{ width: '150px', marginTop: '50px' }}
+              src={
+                'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FGUILD_TOKEN_BLACK.png?alt=media'
+              }
+            />
+          </$Vertical>
+        )}
       </StepCard>
-    </$BadgeFactoryStepOne>
+    </$CustomizeBadge>
   )
 }
+
+const $VerifyGuildTokenButton = styled.button<{ isAvailable?: boolean; themeColor?: string; isSelected?: boolean }>`
+  width: 300px;
+  padding: 8px 10px;
+  flex: 1;
+  display: flex;
+  border-radius: 10px;
+  flex-direction: row;
+  margin-bottom: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  border: 0.5px solid #cdcdcd;
+  ${(props) => props.isAvailable && 'cursor: pointer'};
+  ${(props) =>
+    props.themeColor && props.isSelected
+      ? `background-color: ${props.themeColor}`
+      : props.isAvailable && 'background-color: white'};
+  ${(props) => !props.isSelected && props.isAvailable && 'box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);'}
+`
 
 interface SubmitBadgeFactoryOnPolygonProps {
   stage: StepStage
@@ -492,41 +619,109 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
     errorOne: '',
     errorTwo: '',
   }
+  const [termsState, updateTermsState] = useState({
+    termA: false,
+    termB: false,
+  })
   const [errors, setErrors] = useState(initialErrors)
+  const TERMS: TermsFragment[] = [
+    {
+      slug: 'termA',
+      text: 'I agree to conduct business ethically & professionally as a fiduciary to my investors and fellow gamers.',
+    },
+    {
+      slug: 'termB',
+      text: 'I agree to the Lootbox Terms & Conditions and release Lootbox DAO from any liability as a permissionless protocol.',
+    },
+  ]
+  const updateCheckbox = (slug: string, checked: any) => {
+    updateTermsState({
+      ...termsState,
+      [slug]: checked,
+    })
+  }
   return (
-    <$BadgeFactoryStepOne style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+    <$CustomizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       <StepCard
         themeColor={props.selectedNetwork?.themeColor}
         stage={props.stage}
         onNext={() => {}}
         errors={Object.values(errors)}
       >
-        <p>SubmitBadgeFactoryOnPolygon</p>
+        <$Vertical>
+          <$StepHeading>
+            <span>Create Badge</span>
+            <HelpIcon tipID="verifyEligibility" />
+            <ReactTooltip id="verifyEligibility" place="right" effect="solid">
+              Lorem ipsum
+            </ReactTooltip>
+          </$StepHeading>
+          <$StepSubheading>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua.
+          </$StepSubheading>
+          <br />
+          {TERMS.map((term) => {
+            return (
+              <div
+                key={term.slug}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  marginBottom: '10px',
+                }}
+              >
+                <$TermCheckbox
+                  onClick={(e) => updateCheckbox(term.slug, e.currentTarget.checked)}
+                  value={term.slug}
+                  type="checkbox"
+                ></$TermCheckbox>
+                <$TermOfService key={term.slug}>{term.text}</$TermOfService>
+              </div>
+            )
+          })}
+        </$Vertical>
       </StepCard>
-    </$BadgeFactoryStepOne>
+    </$CustomizeBadge>
   )
-}
-
-const network = {
-  name: 'Binance',
-  symbol: 'BNB',
-  themeColor: '#F0B90B',
-  chainIdHex: 'a',
-  chainIdDecimal: '',
-  isAvailable: true,
-  icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
 }
 
 const BadgeFactory = () => {
   return (
     <$Vertical>
-      <ValidatePurchasingTokenBalance stage="in_progress" selectedNetwork={network} />
+      <ValidatePurchasingTokenBalance stage="in_progress" />
       <br />
       <br />
-      <BadgeFactoryStepOne stage="in_progress" selectedNetwork={network} />
+      <CustomizeBadge
+        stage="in_progress"
+        selectedNetwork={{
+          name: 'Polygon',
+          symbol: 'MATIC',
+          themeColor: '#8F5AE8',
+          chainIdHex: '0x89',
+          chainIdDecimal: '137',
+          isAvailable: false,
+          isTestnet: false,
+          icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+        }}
+      />
       <br />
       <br />
-      <SubmitBadgeFactoryOnPolygon stage="in_progress" selectedNetwork={network} />
+      <SubmitBadgeFactoryOnPolygon
+        stage="in_progress"
+        selectedNetwork={{
+          name: 'Polygon',
+          symbol: 'MATIC',
+          themeColor: '#8F5AE8',
+          chainIdHex: '0x89',
+          chainIdDecimal: '137',
+          isAvailable: false,
+          isTestnet: false,
+          icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+        }}
+      />
     </$Vertical>
   )
 }
