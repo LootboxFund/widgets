@@ -78,7 +78,22 @@ const BuyButton = (props: BuyButtonProps) => {
       </$Button>
     )
   }
-  if (!isWalletConnected) {
+
+  if (!snapBuySharesState.lootbox.address) {
+    return (
+      <$Button
+        screen={screen}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
+        style={{ ...BASE_BUTTON_STYLE }}
+        disabled
+      >
+        Lootbox not found
+      </$Button>
+    )
+  } else if (!isWalletConnected) {
     return <WalletButton></WalletButton>
   } else if (isWrongChain) {
     return (
