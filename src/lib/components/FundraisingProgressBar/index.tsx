@@ -118,7 +118,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
             : 0
         setPercentageFunded(percentageFunded)
 
-        const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax).mul(new web3Utils.BN(sharePriceWei))
+        const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax)
+          .mul(new web3Utils.BN(sharePriceWei))
+          .div(new web3Utils.BN('10').pow(new web3Utils.BN(18)))
 
         const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
