@@ -92,16 +92,12 @@ const updateLootboxQuantity = () => {
     buySharesState.lootbox.quantity = '0'
   } else if (
     buySharesState.lootbox.data &&
-    buySharesState.inputToken.data &&
     buySharesState.inputToken.quantity !== undefined &&
-    buySharesState.inputToken.data.usdPrice &&
     buySharesState.lootbox.data.sharePriceWei
   ) {
-    const inputTokenPrice = buySharesState.inputToken.data.usdPrice
-    const outputTokenPrice = buySharesState.lootbox.data.sharePriceWei
     buySharesState.lootbox.quantity = new BN(buySharesState.inputToken.quantity)
-      .multipliedBy(new BN(inputTokenPrice))
-      .dividedBy(new BN(outputTokenPrice))
+      .multipliedBy(new BN(10).pow(18))
+      .div(new BN(buySharesState.lootbox.data.sharePriceWei))
       .toString()
   }
 }

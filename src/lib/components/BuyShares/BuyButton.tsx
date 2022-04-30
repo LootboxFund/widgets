@@ -44,7 +44,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
   const isInputAmountValid =
     snapBuySharesState.inputToken.quantity && parseFloat(snapBuySharesState.inputToken.quantity) > 0
-  const ballance = new BN(snapBuySharesState.inputToken.balance || '0')
+  const balance = new BN(snapBuySharesState.inputToken.balance || '0')
   const quantity = parseWei(
     snapBuySharesState.inputToken.quantity || '0',
     snapBuySharesState.inputToken.data?.decimals || 18
@@ -53,16 +53,17 @@ const BuyButton = (props: BuyButtonProps) => {
     snapBuySharesState.lootbox.quantity || '0',
     snapBuySharesState.lootbox.data?.shareDecimals || 18
   )
+
   const withinMaxShares = new BN(lootQuantity)
     .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
-    .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
+    .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '0')
 
   const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0')
     .minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
     .div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0'))
   const sharesRemainingFmt =
     sharesRemaining.toFixed(2).length > 8 ? sharesRemaining.toExponential(2) : sharesRemaining.toFixed(2)
-  const isInsufficientFunds = ballance.lt(quantity)
+  const isInsufficientFunds = balance.lt(quantity)
   const isWrongChain = metadata?.lootboxCustomSchema?.chain?.chainIdHex !== snapUserState.network.currentNetworkIdHex
 
   const SuppressedButton = ({ txt }: { txt: string }) => {
@@ -83,14 +84,12 @@ const BuyButton = (props: BuyButtonProps) => {
     return (
       <$Button
         screen={screen}
-        backgroundColor={`${COLORS.trustBackground}C0`}
-        backgroundColorHover={`${COLORS.trustBackground}`}
-        color={COLORS.trustFontColor}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
         onClick={switchChain}
-        // backgroundColor={`${COLORS.surpressedBackground}40`}
-        // color={`${COLORS.surpressedFontColor}80`}
         style={{ ...BASE_BUTTON_STYLE }}
-        // onClick=
       >
         Switch network
       </$Button>

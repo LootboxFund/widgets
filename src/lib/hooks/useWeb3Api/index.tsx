@@ -98,6 +98,10 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
     const chainInfo = BLOCKCHAINS[chainSlug]
     if (chainInfo && provider) {
       try {
+        // TODO: this method does not throw when rejected by user in metamask
+        // If you want to change chains, you need to call:
+        // await provider.send('wallet_switchEthereumChain'...) which
+        // will correctly throw when the user denies the request
         await provider.send('wallet_addEthereumChain', [
           {
             chainId: chainInfo.chainIdHex,
