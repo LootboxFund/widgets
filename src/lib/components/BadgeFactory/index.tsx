@@ -5,6 +5,7 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/componen
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import { v4 as uuidv4 } from 'uuid'
 import {
   $Divider,
   $TagText,
@@ -30,6 +31,7 @@ import WalletStatus from 'lib/components/WalletStatus'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { getUserBalanceOfToken } from 'lib/hooks/useContract'
+import { uploadLootboxLogo } from 'lib/api/firebase/storage'
 
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
@@ -926,6 +928,11 @@ const BadgeFactory = () => {
   const updateTicketState = (param: string, value: string | File | undefined) => {
     setTicketState({ ...ticketState, [param]: value })
   }
+  const submitBadgeFactory = async () => {
+    const submissionId = `badge-bcs/${uuidv4()}`
+    const [imagePublicPath] = await Promise.all([uploadLootboxLogo(submissionId, ticketState.logoFile as File)])
+    console.log(`Submit badge factory... ${imagePublicPath}`)
+  }
   return (
     <$Vertical>
       <WalletStatus />
@@ -985,7 +992,7 @@ const BadgeFactory = () => {
           }}
           submitStatus={submitStatus}
           setSubmitStatus={setSubmitStatus}
-          submitBadgeFactory={() => console.log('Submit badge factory...')}
+          submitBadgeFactory={() => submitBadgeFactory()}
           viewBadgeFactory={() => console.log('View Badge Factory...')}
           selectedNetwork={{
             name: 'Polygon',
