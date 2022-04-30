@@ -162,13 +162,13 @@ export const createInstantLootbox = async (
   const blockNum = await provider.getBlockNumber()
 
   const targetSharesSold = args.fundraisingTarget
-    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
-    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .div(new web3Utils.BN(SHARE_PRICE_WEI))
     .toString()
 
   const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
-    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .div(new web3Utils.BN(SHARE_PRICE_WEI))
     .toString()
 
   const ethers = ethersObj
@@ -382,13 +382,13 @@ export const createEscrowLootbox = async (
   const blockNum = await provider.getBlockNumber()
 
   const targetSharesSold = args.fundraisingTarget
-    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
-    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .div(new web3Utils.BN(SHARE_PRICE_WEI))
     .toString()
 
   const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
-    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
+    .div(new web3Utils.BN(SHARE_PRICE_WEI))
     .toString()
 
   const ethers = ethersObj
