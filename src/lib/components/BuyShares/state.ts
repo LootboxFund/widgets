@@ -18,6 +18,7 @@ import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
   route: BuySharesRoute
+  loading: boolean
   lootbox: {
     address: Address | undefined
     data: ILootbox | undefined
@@ -41,6 +42,7 @@ export interface BuySharesState {
 }
 const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
+  loading: true,
   lootbox: {
     address: undefined,
     data: {
@@ -83,8 +85,7 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
-  // loadInputTokenData()  called in initBuySharesState
+  loadInputTokenData()
 })
 
 const updateLootboxQuantity = () => {
@@ -143,6 +144,8 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
+  buySharesState.loading = true
+
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   loadInputTokenData()
 
@@ -179,6 +182,8 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       shareDecimals: undefined,
       variant: undefined,
     }
+  } finally {
+    buySharesState.loading = false
   }
 }
 

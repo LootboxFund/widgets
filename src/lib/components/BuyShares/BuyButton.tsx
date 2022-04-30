@@ -22,6 +22,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
   const [metadata, setMetadata] = useState<ITicketMetadata | undefined>()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (snapBuySharesState.lootbox.address) {
@@ -31,6 +32,9 @@ const BuyButton = (props: BuyButtonProps) => {
         })
         .catch((err) => {
           console.error('Could not read metadata', err)
+        })
+        .finally(() => {
+          setLoading(false)
         })
     }
   }, [snapBuySharesState.lootbox.address])
@@ -79,7 +83,19 @@ const BuyButton = (props: BuyButtonProps) => {
     )
   }
 
-  if (!snapBuySharesState.lootbox.address) {
+  if (snapBuySharesState.loading || loading) {
+    return (
+      <$Button
+        screen={screen}
+        backgroundColor={`${COLORS.surpressedBackground}40`}
+        color={`${COLORS.surpressedFontColor}80`}
+        style={{ ...BASE_BUTTON_STYLE }}
+        disabled
+      >
+        <LoadingText loading={true} text="Loading" color={`${COLORS.surpressedFontColor}80`} />
+      </$Button>
+    )
+  } else if (!snapBuySharesState.lootbox.address) {
     return (
       <$Button
         screen={screen}
@@ -94,7 +110,7 @@ const BuyButton = (props: BuyButtonProps) => {
       </$Button>
     )
   } else if (!isWalletConnected) {
-    return <WalletButton></WalletButton>
+    return <WalletButton />
   } else if (isWrongChain) {
     return (
       <$Button
