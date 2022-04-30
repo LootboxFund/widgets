@@ -47,8 +47,10 @@ export const NETWORK_OPTIONS: NetworkOption[] = [
     chainIdDecimal: '80001',
     isAvailable: true,
     isTestnet: true,
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC_COLORED.png?alt=media',
     priceFeed: '0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada' as ContractAddress,
+    faucetUrl: 'https://faucet.polygon.technology/',
+    blockExplorerUrl: 'https://mumbai.polygonscan.com/',
   },
   // {
   //   name: 'Polygon',
