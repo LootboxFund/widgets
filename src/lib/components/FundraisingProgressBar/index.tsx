@@ -92,7 +92,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
   const [percentageFunded, setPercentageFunded] = useState(0)
   const [targetAmountNative, setTargetAmountNative] = useState('0')
   const [networkSymbol, setNetworkSymbol] = useState('')
-  const [wtfMessage, setWTFMessage] = useState('Calculated as...')
+  const [wtfMessage, setWTFMessage] = useState(
+    'This is the max amount of funds that this gamer is looking to fundraise.'
+  )
   const userStateSnapshot = useSnapshot(userState)
   const buySharesStateSnapshot = useSnapshot(buySharesState)
 
@@ -116,23 +118,20 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
             : 0
         setPercentageFunded(percentageFunded)
 
-        const nativeTokenPriceEther = await getPriceFeedRaw(network.priceFeedUSD as ContractAddress)
-        const nativeTokenPrice = new web3Utils.BN(nativeTokenPriceEther)
-
         const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax).mul(new web3Utils.BN(sharePriceWei))
-        //   .div(nativeTokenPrice)
 
         const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
         setTargetAmountNative(maxAmountNativeFmt)
 
-        const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
-          web3Utils.fromWei(sharesSoldMax, 'ether')
-        ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(
-          new web3Utils.BN(sharePriceWei),
-          'wei'
-        )} ${symb}.`
-        setWTFMessage(wtfBro)
+        // const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
+        //   web3Utils.fromWei(sharesSoldMax, 'ether')
+        // ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(
+        //   new web3Utils.BN(sharePriceWei),
+        //   'wei'
+        // )} ${symb}.`
+        // const wtfBro = 'This is the max amount of funds that this gamer is looking to fundraise.'
+        // setWTFMessage(wtfBro)
       }
       loadData(network.nativeCurrency.symbol).catch((err) =>
         console.error('Error loading data for lootbox progress bar', err)
