@@ -22,6 +22,10 @@ const WalletButton = (props: WalletButtonProps) => {
   const { requestAccounts } = useUserInfo()
 
   useEffect(() => {
+    connectWallet()
+  }, [])
+
+  useEffect(() => {
     if (snapUserState.accounts.length > 0) {
       setStatus('success')
     }

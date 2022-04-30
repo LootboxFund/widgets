@@ -33,21 +33,23 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
   const renderSwitchNetworkButton = () => {
     if (isWalletConnected) {
       return (
-        <$Button
-          screen={screen}
-          onClick={switchChain}
-          backgroundColor={`${COLORS.dangerFontColor}80`}
-          backgroundColorHover={`${COLORS.dangerFontColor}`}
-          color={COLORS.white}
-          style={{
-            marginRight: '10px',
-            height: '20px',
-            fontSize: TYPOGRAPHY.fontSize.medium,
-            fontWeight: TYPOGRAPHY.fontWeight.light,
-          }}
-        >
-          Switch Network
-        </$Button>
+        <$ButtonWrapper>
+          <$Button
+            screen={screen}
+            onClick={switchChain}
+            backgroundColor={`${COLORS.dangerFontColor}80`}
+            backgroundColorHover={`${COLORS.dangerFontColor}`}
+            color={COLORS.white}
+            style={{
+              marginRight: '10px',
+              height: '20px',
+              fontSize: TYPOGRAPHY.fontSize.medium,
+              fontWeight: TYPOGRAPHY.fontWeight.light,
+            }}
+          >
+            Switch Network
+          </$Button>
+        </$ButtonWrapper>
       )
     }
     return
@@ -134,6 +136,11 @@ export const $Icon = styled.span`
   flex: 1;
   font-size: ${TYPOGRAPHY.fontSize.xxlarge};
   margin-right: 10px;
+`
+
+const $ButtonWrapper = styled.div`
+  max-width: 230px;
+  margin-left: auto;
 `
 
 export default BuySharesHeader
