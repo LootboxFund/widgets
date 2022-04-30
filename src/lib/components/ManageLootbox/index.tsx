@@ -559,7 +559,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               marginTop: screen === 'desktop' ? '50px' : '20px',
             }}
           >
-            <TicketsMinted fill={props.themeColor} mintedCount={parseInt(mintedCount.toString())} />
+            <TicketsMinted fill={props.network.themeColor} mintedCount={parseInt(mintedCount.toString())} />
             {props.network?.icon && (
               <TotalFunded
                 chainLogo={props.network?.icon}
@@ -571,9 +571,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 maxAmountShares={maxAmountShares}
               />
             )}
-            <PayoutsMade fill={props.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
-            <LootboxTypeStat fill={props.themeColor} lootboxType={props.lootboxType} />
-            <SemverStat fill={props.themeColor} semver={semver} />
+            <PayoutsMade fill={props.network.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
+            <LootboxTypeStat fill={props.network.themeColor} lootboxType={props.lootboxType} />
+            <SemverStat fill={props.network.themeColor} semver={semver} />
           </div>
         </$Vertical>
       </$Horizontal>
