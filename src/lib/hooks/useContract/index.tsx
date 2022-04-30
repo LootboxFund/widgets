@@ -214,7 +214,6 @@ export const getLootboxEscrowManagementDetails = async (
     feeDecimals,
     deploymentStartTime,
     issuer,
-    sharePriceUSD,
     sharesSoldCount,
     sharesSoldTarget,
     sharesSoldMax,
@@ -230,7 +229,6 @@ export const getLootboxEscrowManagementDetails = async (
     escrowLootbox.feeDecimals(),
     escrowLootbox.deploymentStartTime(),
     escrowLootbox.issuer(),
-    escrowLootbox.sharePriceUSD(),
     escrowLootbox.sharesSoldCount(),
     escrowLootbox.sharesSoldTarget(),
     escrowLootbox.sharesSoldMax(),
@@ -256,7 +254,6 @@ export const getLootboxEscrowManagementDetails = async (
   // feeDecimals,                  = ${feeDecimals}
   // deploymentStartTime,          = ${deploymentStartTime}
   // issuer,                       = ${issuer}
-  // sharePriceUSD,                = ${sharePriceUSD}
   // sharesSoldCount,              = ${sharesSoldCount}
   // sharesSoldTarget,             = ${sharesSoldTarget}
   // sharesSoldMax,                = ${sharesSoldMax}
@@ -277,40 +274,9 @@ export const getLootboxEscrowManagementDetails = async (
     )
   ).toFixed(2)
   const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
-  const maxAmountNative = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldMax.toString())
-        .mul(ethers.BigNumber.from(sharePriceUSD))
-        .div(priceFeedDecimals)
-        .div(nativeTokenPrice),
-      18 - 8
-    )
-  ).toFixed(4)
 
-  const maxAmountUSD = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
-      shareDecimals
-    )
-  ).toFixed(2)
   const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
-  const targetAmountNative = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldTarget.toString())
-        .mul(ethers.BigNumber.from(sharePriceUSD))
-        .div(priceFeedDecimals)
-        .div(nativeTokenPrice),
-      18 - 8
-    )
-  ).toFixed(4)
-  const targetAmountUSD = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldTarget.toString())
-        .mul(ethers.BigNumber.from(sharePriceUSD))
-        .div(priceFeedDecimals),
-      shareDecimals
-    )
-  ).toFixed(2)
+
   const targetAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldTarget, shareDecimals)).toFixed(0)
   const isActivelyFundraising = isFundraising
   const mintedCount = ticketIdCounter
@@ -355,11 +321,7 @@ export const getLootboxEscrowManagementDetails = async (
     fundedAmountNative,
     fundedAmountUSD,
     fundedAmountShares,
-    targetAmountNative,
-    targetAmountUSD,
     targetAmountShares,
-    maxAmountNative,
-    maxAmountUSD,
     maxAmountShares,
     isActivelyFundraising,
     mintedCount,
@@ -369,7 +331,6 @@ export const getLootboxEscrowManagementDetails = async (
     reputationAddress,
     percentageFunded,
     semver,
-    sharePriceUSD,
     symbol,
   ]
 }
@@ -386,7 +347,6 @@ export const getLootboxInstantManagementDetails = async (
     feeDecimals,
     deploymentStartTime,
     issuer,
-    sharePriceUSD,
     sharesSoldCount,
     sharesSoldMax,
     nativeTokenRaisedTotal,
@@ -401,7 +361,6 @@ export const getLootboxInstantManagementDetails = async (
     instantLootbox.feeDecimals(),
     instantLootbox.deploymentStartTime(),
     instantLootbox.issuer(),
-    instantLootbox.sharePriceUSD(),
     instantLootbox.sharesSoldCount(),
     instantLootbox.sharesSoldMax(),
     instantLootbox.nativeTokenRaisedTotal(),
@@ -426,25 +385,9 @@ export const getLootboxInstantManagementDetails = async (
     )
   ).toFixed(2)
   const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
-  const maxAmountNative = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldMax.toString())
-        .mul(ethers.BigNumber.from(sharePriceUSD))
-        .div(priceFeedDecimals)
-        .div(nativeTokenPrice),
-      18 - 8
-    )
-  ).toFixed(4)
 
-  const maxAmountUSD = parseFloat(
-    ethers.utils.formatUnits(
-      ethers.BigNumber.from(sharesSoldMax.toString()).mul(ethers.BigNumber.from(sharePriceUSD)).div(priceFeedDecimals),
-      shareDecimals
-    )
-  ).toFixed(2)
   const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
-  const targetAmountNative = maxAmountNative
-  const targetAmountUSD = maxAmountUSD
+
   const targetAmountShares = maxAmountShares
   const isActivelyFundraising = isFundraising
   const mintedCount = ticketIdCounter
@@ -466,11 +409,7 @@ export const getLootboxInstantManagementDetails = async (
     fundedAmountNative,
     fundedAmountUSD,
     fundedAmountShares,
-    targetAmountNative,
-    targetAmountUSD,
     targetAmountShares,
-    maxAmountNative,
-    maxAmountUSD,
     maxAmountShares,
     isActivelyFundraising,
     mintedCount,
@@ -480,7 +419,6 @@ export const getLootboxInstantManagementDetails = async (
     reputationAddress,
     percentageFunded,
     semver,
-    sharePriceUSD,
     symbol,
   ]
 }

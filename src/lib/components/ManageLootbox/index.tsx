@@ -50,14 +50,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const [targetAmountNative, setTargetAmountNative] = useState()
   const [targetAmountUSD, setTargetAmountUSD] = useState()
   const [targetAmountShares, setTargetAmountShares] = useState()
-  const [maxAmountNative, setMaxAmountNative] = useState()
   const [maxAmountUSD, setMaxAmountUSD] = useState()
   const [maxAmountShares, setMaxAmountShares] = useState()
   const [isActivelyFundraising, setIsActivelyFundraising] = useState()
   const [mintedCount, setMintedCount] = useState(0)
   const [payoutsMade, setPayoutsMade] = useState(0)
   const [semver, setSemver] = useState('undefined')
-  const [sharePriceUSD, setSharePriceUSD] = useState('0')
   const [lootboxSymbol, setLootboxSymbol] = useState('')
   const [deploymentDate, setDeploymentDate] = useState()
   const [treasuryAddress, setTreasuryAddress] = useState()
@@ -79,11 +77,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _fundedAmountNative,
         _fundedAmountUSD,
         _fundedAmountShares,
-        _targetAmountNative,
-        _targetAmountUSD,
         _targetAmountShares,
-        _maxAmountNative,
-        _maxAmountUSD,
         _maxAmountShares,
         _isActivelyFundraising,
         _mintedCount,
@@ -93,17 +87,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _reputationAddress,
         _percentageFunded,
         _semver,
-        _sharePriceUSD,
         _symbol,
       ] = await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
       setFundedAmountShares(_fundedAmountShares)
-      setTargetAmountNative(_targetAmountNative)
-      setTargetAmountUSD(_targetAmountUSD)
       setTargetAmountShares(_targetAmountShares)
-      setMaxAmountNative(_maxAmountNative)
-      setMaxAmountUSD(_maxAmountUSD)
       setMaxAmountShares(_maxAmountShares)
       setIsActivelyFundraising(_isActivelyFundraising)
       setMintedCount(_mintedCount)
@@ -113,18 +102,13 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
-      setSharePriceUSD(_sharePriceUSD)
       setLootboxSymbol(_symbol)
     } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
         _fundedAmountUSD,
         _fundedAmountShares,
-        _targetAmountNative,
-        _targetAmountUSD,
         _targetAmountShares,
-        _maxAmountNative,
-        _maxAmountUSD,
         _maxAmountShares,
         _isActivelyFundraising,
         _mintedCount,
@@ -134,17 +118,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _reputationAddress,
         _percentageFunded,
         _semver,
-        _sharePriceUSD,
         _symbol,
       ] = await getLootboxInstantManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
       setFundedAmountShares(_fundedAmountShares)
-      setTargetAmountNative(_targetAmountNative)
-      setTargetAmountUSD(_targetAmountUSD)
       setTargetAmountShares(_targetAmountShares)
-      setMaxAmountNative(_maxAmountNative)
-      setMaxAmountUSD(_maxAmountUSD)
       setMaxAmountShares(_maxAmountShares)
       setIsActivelyFundraising(_isActivelyFundraising)
       setMintedCount(_mintedCount)
@@ -154,7 +133,6 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setReputationAddress(_reputationAddress)
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
-      setSharePriceUSD(_sharePriceUSD)
       setLootboxSymbol(_symbol)
     }
   }
@@ -169,7 +147,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     try {
       await endFundraisingPeriodCall(props.lootboxAddress, props.lootboxType)
       setEndFundraisingButtonState('success')
-      setEndFundraisingButtonMessage('Fundraising period successfully ended. You may now reward sponsors.')
+      setEndFundraisingButtonMessage(
+        'Fundraising period successfully ended. You may now reward sponsors. Please refresh the page.'
+      )
     } catch (e) {
       setEndFundraisingButtonState('error')
       setEndFundraisingButtonMessage(e.data.message)
@@ -195,16 +175,30 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     }
   }
 
+  console.log(`
+    
+  !props.network.themeColor  = ${props.network.themeColor}
+  !fundedAmountNative = ${fundedAmountNative}
+  !fundedAmountUSD    = ${fundedAmountUSD}
+  !fundedAmountShares = ${fundedAmountShares}
+  !targetAmountNative = ${targetAmountNative}
+  !targetAmountUSD    = ${targetAmountUSD}
+  !targetAmountShares = ${targetAmountShares}
+  !maxAmountUSD       = ${maxAmountUSD}
+  !maxAmountShares    = ${maxAmountShares}
+  !deploymentDate     = ${deploymentDate}
+  !treasuryAddress    = ${treasuryAddress}
+  !reputationAddress  = ${reputationAddress}
+
+
+  `)
+
   if (
     !props.network.themeColor ||
     !fundedAmountNative ||
     !fundedAmountUSD ||
     !fundedAmountShares ||
-    !targetAmountNative ||
-    !targetAmountUSD ||
     !targetAmountShares ||
-    !maxAmountNative ||
-    !maxAmountUSD ||
     !maxAmountShares ||
     !deploymentDate ||
     !treasuryAddress ||
@@ -214,8 +208,6 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   }
 
   const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))
-
-  const sharePriceFormatted = (ethers.utils.formatUnits(sharePriceUSD || '0', '8') || '0').toString()
 
   return (
     <$StepCard themeColor={props.network.themeColor} screen={screen}>
@@ -255,7 +247,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
-              {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for $${sharePriceFormatted} USD each, for a target value of approx ${targetAmountNative} ${props.network.symbol} which is equal to $${targetAmountUSD} USD today. Shares are purchased in ${props.network.symbol} which fluctuates in price, resulting in the Lootbox selling shares at differing prices as well. You could end up with an unexpected amount of ${props.network.symbol} with an unexpected value in USD. So far, ${fundedAmountShares} shares have been sold, demoniated as ${fundedAmountNative} ${props.network.symbol} which is currently equal to $${fundedAmountUSD}. The max amount of shares for sale is ${maxAmountShares}, which is approx ${maxAmountNative} ${props.network.symbol} or $${maxAmountUSD} USD today. If you need more predictability on the end amount of fundraised, we are releasing a v2A Lootbox that computes everything in USD stablecoins and v2B that computes everything in native token.`}
+              {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for a target value of approx ${targetAmountNative} ${props.network.symbol}. Shares are purchased in ${props.network.symbol}. The max amount of shares for sale is ${maxAmountShares}.`}
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
@@ -524,9 +516,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           {props.ticketMetadata && (
             <div style={{ height: 'auto', marginBottom: '20px' }}>
               <TicketCardUI
-                backgroundImage={props.ticketMetadata.backgroundImage as string}
-                logoImage={props.ticketMetadata.image as string}
-                backgroundColor={props.ticketMetadata.backgroundColor as string}
+                backgroundImage={props.ticketMetadata.lootboxCustomSchema?.lootbox.backgroundImage as string}
+                logoImage={props.ticketMetadata.lootboxCustomSchema?.lootbox.image as string}
+                backgroundColor={props.ticketMetadata.lootboxCustomSchema?.lootbox.backgroundColor as string}
                 name={props.ticketMetadata.name as string}
                 ticketId={'0' as TicketID}
               ></TicketCardUI>
@@ -547,15 +539,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 networkSymbol={props.network?.symbol}
                 networkName={props.network.name}
                 fundedAmountNative={fundedAmountNative}
-                fundedAmountUSD={fundedAmountUSD}
                 fundedAmountShares={fundedAmountShares}
-                targetAmountNative={targetAmountNative}
-                targetAmountUSD={targetAmountUSD}
                 targetAmountShares={targetAmountShares}
-                maxAmountNative={maxAmountNative}
-                maxAmountUSD={maxAmountUSD}
                 maxAmountShares={maxAmountShares}
-                sharePriceFormatted={sharePriceFormatted}
               />
             )}
             <PayoutsMade fill={props.themeColor} payoutsMade={parseInt(payoutsMade.toString())} />
@@ -741,29 +727,17 @@ const TotalFunded = ({
   networkSymbol,
   networkName,
   fundedAmountNative,
-  fundedAmountUSD,
   fundedAmountShares,
-  targetAmountNative,
-  targetAmountUSD,
   targetAmountShares,
-  maxAmountNative,
-  maxAmountUSD,
   maxAmountShares,
-  sharePriceFormatted,
 }: {
   chainLogo: string
   networkSymbol: string
   networkName: string
   fundedAmountNative: string
-  fundedAmountUSD: string
   fundedAmountShares: string
-  targetAmountNative: string
-  targetAmountUSD: string
   targetAmountShares: string
-  maxAmountNative: string
-  maxAmountUSD: string
   maxAmountShares: string
-  sharePriceFormatted: string
 }) => {
   return (
     <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
@@ -776,7 +750,7 @@ const TotalFunded = ({
           <$Datestamp style={{ margin: '5px 0px' }}>Total Funded</$Datestamp>
           <HelpIcon tipID="totalFunded" />
           <ReactTooltip id="totalFunded" place="right" effect="solid">
-            {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for $${sharePriceFormatted} USD each, for a target value of approx ${targetAmountNative} ${networkSymbol} which is equal to $${targetAmountUSD} USD today. Shares are purchased in ${networkSymbol} which fluctuates in price, resulting in the Lootbox selling shares at differing prices as well. You could end up with an unexpected amount of ${networkSymbol} with an unexpected value in USD. So far, ${fundedAmountShares} shares have been sold, demoniated as ${fundedAmountNative} ${networkSymbol} which is currently equal to $${fundedAmountUSD}. The max amount of shares for sale is ${maxAmountShares}, which is approx ${maxAmountNative} ${networkSymbol} or $${maxAmountUSD} USD today. If you need more predictability on the end amount of fundraised, we are releasing a v2A Lootbox that computes everything in USD stablecoins and v2B that computes everything in native token.`}
+            {`This Lootbox has a goal of selling ${targetAmountShares} shares purchased in ${networkSymbol}. So far, ${fundedAmountShares} shares have been sold. The max amount of shares for sale is ${maxAmountShares}.`}
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
