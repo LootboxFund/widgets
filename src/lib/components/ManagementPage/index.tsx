@@ -81,29 +81,42 @@ const ManagementPage = () => {
         </section>
       )
     }
-    return (
-      <p>{`Could not find metadata for Lootbox ${lootboxAddress}. Make sure your Metamask is connected to the right blockchain. We cannot tell you which Chain its on, please ask the original issuer. Once you switch to the right chain, this will load correctly.`}</p>
-    )
+    return <p>{`Could not find metadata for Lootbox ${lootboxAddress}.`}</p>
   }
 
   return (
     <div>
       <$Horizontal justifyContent="flex-end" style={{ maxWidth: '800px' }}>
-        <WalletStatus />
+        <WalletStatus targetNetwork={network.chainIdHex} />
       </$Horizontal>
       <br />
-      <ManageLootbox
-        themeColor={'#F0B90B'}
-        lootboxAddress={lootboxAddress}
-        ticketID={'0' as TicketID}
-        ticketMetadata={ticketMetadata}
-        network={network}
-        lootboxType={lootboxType}
-        scrollToRewardSponsors={() => refRewardSponsors.current?.scrollIntoView()}
-      />
+      <div
+        style={
+          ticketMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
+            ? { opacity: 0.2, cursor: 'not-allowed' }
+            : {}
+        }
+      >
+        <ManageLootbox
+          themeColor={'#F0B90B'}
+          lootboxAddress={lootboxAddress}
+          ticketID={'0' as TicketID}
+          ticketMetadata={ticketMetadata}
+          network={network}
+          lootboxType={lootboxType}
+          scrollToRewardSponsors={() => refRewardSponsors.current?.scrollIntoView()}
+        />
+      </div>
       <br />
       <br />
-      <div ref={refRewardSponsors} style={isActivelyFundraising ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
+      <div
+        ref={refRewardSponsors}
+        style={
+          isActivelyFundraising || ticketMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
+            ? { opacity: 0.2, cursor: 'not-allowed' }
+            : {}
+        }
+      >
         <RewardSponsors
           lootboxAddress={lootboxAddress}
           ticketMetadata={ticketMetadata}
