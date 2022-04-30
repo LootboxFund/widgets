@@ -6,9 +6,9 @@ import { $TicketRedeemContainer } from './TicketCard'
 import { parseEth } from 'lib/utils/bnConversion'
 import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
-import { ContractAddress } from '@wormgraph/helpers'
-import { COLORS } from 'lib/theme'
+import { ContractAddress, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { IDividend } from 'lib/types'
+import { $Sadge } from '../BuyShares/PurchaseComplete'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -43,6 +43,18 @@ const ViewPayout = (props: ViewPayoutProps) => {
     }
   }
 
+  const NoDividendsYet = () => {
+    return (
+      <$NoDividendContainer>
+        <$NoDividendIcon>🧐</$NoDividendIcon>
+        <br />
+        <$NoDividendText>
+          The gamer has not deposited any earnings yet. Come back later to claim your rewards.
+        </$NoDividendText>
+      </$NoDividendContainer>
+    )
+  }
+
   return (
     <$TicketRedeemContainer>
       <$Horizontal justifyContent="space-between">
@@ -50,7 +62,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
         <$XIcon onClick={() => sendToCardView()}>X</$XIcon>
       </$Horizontal>
 
-      {dividends &&
+      {dividends && dividends?.length > 0 ? (
         [...dividends].sort(sortDividends).map((dividend, idx) => {
           return (
             <$DividendRow key={`${snap.lootboxAddress}-${props.ticketID}-${idx}`} isActive={!dividend.isRedeemed}>
@@ -58,7 +70,10 @@ const ViewPayout = (props: ViewPayoutProps) => {
               <$DividendTokenSymbol>{dividend.tokenSymbol}</$DividendTokenSymbol>
             </$DividendRow>
           )
-        })}
+        })
+      ) : (
+        <NoDividendsYet />
+      )}
     </$TicketRedeemContainer>
   )
 }
@@ -116,6 +131,26 @@ const $XIcon = styled.span`
   font-family: sans-serif;
   padding: 0px 5px 0px 0px;
   cursor: pointer;
+`
+
+const $NoDividendIcon = styled.section`
+  width: 100%;
+  font-size: 3rem;
+  text-align: center;
+`
+
+const $NoDividendText = styled.span`
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  color: ${COLORS.surpressedFontColor};
+`
+
+const $NoDividendContainer = styled.section`
+  flex: 1;
+  margin: 0 auto;
+  flex-direction: column;
+  margin-top: 20px;
 `
 
 export default ViewPayout
