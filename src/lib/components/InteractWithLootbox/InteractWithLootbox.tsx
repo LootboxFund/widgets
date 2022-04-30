@@ -15,7 +15,7 @@ const InteractWithLootbox = () => {
   const lootboxAddress = buySharesStateSnapshot?.lootbox?.address as ContractAddress | undefined
 
   return (
-    <$Vertical spacing={4} padding="1em">
+    <$Vertical spacing={5} padding="1em">
       <LootboxFundraisingProgressBar lootbox={lootboxAddress} />
       <BuyShares ref={ref} />
       <$TicketContainer>
