@@ -130,7 +130,7 @@ export const createInstantLootbox = async (
         fundraisingTargetMax: args.fundraisingTargetMax,
         basisPointsReturnTarget: args.basisPoints?.toString(),
         returnAmountTarget: args.returnAmountTarget,
-        targetPaybackDate: Number(args.paybackDate),
+        targetPaybackDate: new Date(args.paybackDate).valueOf(),
         transactionHash: '', // will be filled in by backend
         blockNumber: '', // will be filled in by backend
 
@@ -350,7 +350,7 @@ export const createEscrowLootbox = async (
         fundraisingTargetMax: args.fundraisingTargetMax,
         basisPointsReturnTarget: args.basisPoints?.toString(),
         returnAmountTarget: args.returnAmountTarget,
-        targetPaybackDate: Number(args.paybackDate),
+        targetPaybackDate: new Date(args.paybackDate).valueOf(),
         transactionHash: '', // will be filled in by backend
         blockNumber: '', // will be filled in by backend
 
