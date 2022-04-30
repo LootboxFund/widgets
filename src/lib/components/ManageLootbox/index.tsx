@@ -44,14 +44,15 @@ export interface ManageLootboxProps {
 const ManageLootbox = (props: ManageLootboxProps) => {
   const { screen } = useWindowSize()
 
-  const [fundedAmountNative, setFundedAmountNative] = useState()
-  const [fundedAmountUSD, setFundedAmountUSD] = useState()
-  const [fundedAmountShares, setFundedAmountShares] = useState()
-  const [targetAmountNative, setTargetAmountNative] = useState()
-  const [targetAmountUSD, setTargetAmountUSD] = useState()
-  const [targetAmountShares, setTargetAmountShares] = useState()
-  const [maxAmountUSD, setMaxAmountUSD] = useState()
-  const [maxAmountShares, setMaxAmountShares] = useState()
+  const [fundedAmountNative, setFundedAmountNative] = useState('0')
+  const [fundedAmountUSD, setFundedAmountUSD] = useState('0')
+  const [fundedAmountShares, setFundedAmountShares] = useState('0')
+  const [targetAmountNative, setTargetAmountNative] = useState('0')
+  const [targetAmountUSD, setTargetAmountUSD] = useState('0')
+  const [targetAmountShares, setTargetAmountShares] = useState('0')
+  const [maxAmountUSD, setMaxAmountUSD] = useState('0')
+  const [maxAmountNative, setMaxAmountNative] = useState('0')
+  const [maxAmountShares, setMaxAmountShares] = useState('0')
   const [isActivelyFundraising, setIsActivelyFundraising] = useState()
   const [mintedCount, setMintedCount] = useState(0)
   const [payoutsMade, setPayoutsMade] = useState(0)
@@ -60,7 +61,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   const [deploymentDate, setDeploymentDate] = useState()
   const [treasuryAddress, setTreasuryAddress] = useState()
   const [reputationAddress, setReputationAddress] = useState()
-  const [percentageFunded, setPercentageFunded] = useState()
+  const [percentageFunded, setPercentageFunded] = useState(0)
+  const [sharePriceWei, setSharePriceWei] = useState('0')
 
   const [endFundraisingButtonState, setEndFundraisingButtonState] = useState<ManagementButtonState>('enabled')
   const [endFundraisingButtonMessage, setEndFundraisingButtonMessage] = useState('')
@@ -78,7 +80,11 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _fundedAmountUSD,
         _fundedAmountShares,
         _targetAmountShares,
+        _targetAmountNative,
+        _targetAmountUSD,
         _maxAmountShares,
+        _maxAmountNative,
+        _maxAmountUSD,
         _isActivelyFundraising,
         _mintedCount,
         _payoutsMade,
@@ -88,12 +94,17 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _percentageFunded,
         _semver,
         _symbol,
+        _sharePriceWei,
       ] = await getLootboxEscrowManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
+      setFundedAmountShares(_fundedAmountShares)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
-      setFundedAmountShares(_fundedAmountShares)
       setTargetAmountShares(_targetAmountShares)
+      setTargetAmountNative(_targetAmountNative.toString())
+      setTargetAmountUSD(_targetAmountUSD.toString())
       setMaxAmountShares(_maxAmountShares)
+      setMaxAmountNative(_maxAmountNative.toString())
+      setMaxAmountUSD(_maxAmountUSD.toString())
       setIsActivelyFundraising(_isActivelyFundraising)
       setMintedCount(_mintedCount)
       setPayoutsMade(_payoutsMade)
@@ -103,13 +114,18 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
       setLootboxSymbol(_symbol)
+      setSharePriceWei(_sharePriceWei)
     } else if (props.lootboxType === 'Instant' && props.network.priceFeed) {
       const [
         _fundedAmountNative,
         _fundedAmountUSD,
         _fundedAmountShares,
         _targetAmountShares,
+        _targetAmountNative,
+        _targetAmountUSD,
         _maxAmountShares,
+        _maxAmountNative,
+        _maxAmountUSD,
         _isActivelyFundraising,
         _mintedCount,
         _payoutsMade,
@@ -119,12 +135,17 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         _percentageFunded,
         _semver,
         _symbol,
+        _sharePriceWei,
       ] = await getLootboxInstantManagementDetails(props.lootboxAddress, props.network.priceFeed as ContractAddress)
       setFundedAmountNative(_fundedAmountNative)
       setFundedAmountUSD(_fundedAmountUSD)
       setFundedAmountShares(_fundedAmountShares)
       setTargetAmountShares(_targetAmountShares)
+      setTargetAmountNative(_targetAmountNative.toString())
+      setTargetAmountUSD(_targetAmountUSD.toString())
       setMaxAmountShares(_maxAmountShares)
+      setMaxAmountNative(_maxAmountNative.toString())
+      setMaxAmountUSD(_maxAmountUSD.toString())
       setIsActivelyFundraising(_isActivelyFundraising)
       setMintedCount(_mintedCount)
       setPayoutsMade(_payoutsMade)
@@ -134,6 +155,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       setPercentageFunded(_percentageFunded)
       setSemver(_semver)
       setLootboxSymbol(_symbol)
+      setSharePriceWei(_sharePriceWei)
     }
   }
 
@@ -175,23 +197,22 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     }
   }
 
-  console.log(`
-    
-  !props.network.themeColor  = ${props.network.themeColor}
-  !fundedAmountNative = ${fundedAmountNative}
-  !fundedAmountUSD    = ${fundedAmountUSD}
-  !fundedAmountShares = ${fundedAmountShares}
-  !targetAmountNative = ${targetAmountNative}
-  !targetAmountUSD    = ${targetAmountUSD}
-  !targetAmountShares = ${targetAmountShares}
-  !maxAmountUSD       = ${maxAmountUSD}
-  !maxAmountShares    = ${maxAmountShares}
-  !deploymentDate     = ${deploymentDate}
-  !treasuryAddress    = ${treasuryAddress}
-  !reputationAddress  = ${reputationAddress}
+  // console.log(`
 
+  // !props.network.themeColor  = ${props.network.themeColor}
+  // !fundedAmountNative = ${fundedAmountNative}
+  // !fundedAmountUSD    = ${fundedAmountUSD}
+  // !fundedAmountShares = ${fundedAmountShares}
+  // !targetAmountNative = ${targetAmountNative}
+  // !targetAmountUSD    = ${targetAmountUSD}
+  // !targetAmountShares = ${targetAmountShares}
+  // !maxAmountUSD       = ${maxAmountUSD}
+  // !maxAmountShares    = ${maxAmountShares}
+  // !deploymentDate     = ${deploymentDate}
+  // !treasuryAddress    = ${treasuryAddress}
+  // !reputationAddress  = ${reputationAddress}
 
-  `)
+  // `)
 
   if (
     !props.network.themeColor ||
@@ -204,7 +225,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     !treasuryAddress ||
     !reputationAddress
   ) {
-    return null
+    return <p>Loading data from Blockchain. This may take up to 1 minute...</p>
   }
 
   const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))
@@ -243,11 +264,16 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 fontWeight: 'bold',
               }}
             >
-              {`${targetAmountNative} ${props.network.symbol} Goal`}
+              {`${ethers.utils.formatUnits(targetAmountNative, '18')} ${props.network.symbol} Goal`}
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
-              {`Lootbox fundraisers are dynamic. This Lootbox has a goal of selling ${targetAmountShares} shares for a target value of approx ${targetAmountNative} ${props.network.symbol}. Shares are purchased in ${props.network.symbol}. The max amount of shares for sale is ${maxAmountShares}.`}
+              {`This Lootbox has a goal of selling ${targetAmountShares} shares for a target value of approx ${ethers.utils.formatUnits(
+                targetAmountNative,
+                '18'
+              )} ${
+                props.network.symbol
+              } equal to $${targetAmountUSD} at todays prices. The max amount of shares for sale is ${maxAmountShares}.`}
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
@@ -368,9 +394,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     "End Fundraising" button will send the funds to your receiving wallet. If you can't hit your funding
                     goal, you may refund sponsors, which simply deposits the funds back into the Lootbox for sponsors to
                     redeem (the funds will not automatically be sent to their wallet, you must tell them to redeem it by
-                    email or social media). If you created an Instant Lootbox instead, then the funds get instantly sent
-                    to your receiving wallet and there is no refund (you would need to manually deposit funds back).
-                    Before you can deposit funds back, you need to end the fundraising.
+                    email or social media). Only the issuer of the Lootbox can offer a refund, but after 30 days anyone
+                    can force a refund if the target has not been hit. If you created an Instant Lootbox instead, then
+                    the funds get instantly sent to your receiving wallet and there is no refund (you would need to
+                    manually deposit funds back). Before you can deposit funds back, you need to end the fundraising.
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>

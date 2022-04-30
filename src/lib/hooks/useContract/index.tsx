@@ -224,6 +224,7 @@ export const getLootboxEscrowManagementDetails = async (
     ticketIdCounter,
     semver,
     symbol,
+    sharePriceWei,
   ] = await Promise.all([
     escrowLootbox.shareDecimals(),
     escrowLootbox.feeDecimals(),
@@ -239,6 +240,7 @@ export const getLootboxEscrowManagementDetails = async (
     escrowLootbox.ticketIdCounter(),
     escrowLootbox.semver(),
     escrowLootbox.symbol(),
+    escrowLootbox.sharePriceWei(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -276,8 +278,20 @@ export const getLootboxEscrowManagementDetails = async (
   const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
 
   const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const maxAmountNative = ethers.BigNumber.from(sharesSoldMax)
+    .mul(sharePriceWei)
+    .div(ethers.utils.parseUnits('1', shareDecimals))
+  const maxAmountUSD = ethers.utils.formatUnits(maxAmountNative.mul(nativeTokenPrice).div(priceFeedDecimals), '18')
 
   const targetAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldTarget, shareDecimals)).toFixed(0)
+  const targetAmountNative = ethers.BigNumber.from(sharesSoldTarget)
+    .mul(sharePriceWei)
+    .div(ethers.utils.parseUnits('1', shareDecimals))
+  const targetAmountUSD = ethers.utils.formatUnits(
+    targetAmountNative.mul(nativeTokenPrice).div(priceFeedDecimals),
+    '18'
+  )
+
   const isActivelyFundraising = isFundraising
   const mintedCount = ticketIdCounter
   const payoutsMade = depositIdCounter
@@ -294,35 +308,40 @@ export const getLootboxEscrowManagementDetails = async (
     )
   ).toFixed(1)
 
-  // console.log(`
+  console.log(`
 
-  // ----- ESCROW TRANSLATED -----
+  ----- ESCROW TRANSLATED -----
 
-  // fundedAmountNative,           = ${fundedAmountNative}
-  // fundedAmountUSD,              = ${fundedAmountUSD}
-  // fundedAmountShares,           = ${fundedAmountShares}
-  // targetAmountNative,           = ${targetAmountNative}
-  // targetAmountUSD,              = ${targetAmountUSD}
-  // targetAmountShares,           = ${targetAmountShares}
-  // maxAmountNative,              = ${maxAmountNative}
-  // maxAmountUSD,                 = ${maxAmountUSD}
-  // maxAmountShares,              = ${maxAmountShares}
-  // isActivelyFundraising,        = ${isActivelyFundraising}
-  // mintedCount,                  = ${mintedCount}
-  // payoutsMade,                  = ${payoutsMade}
-  // deploymentDate,               = ${deploymentDate}
-  // treasuryAddress,              = ${treasuryAddress}
-  // reputationAddress,            = ${reputationAddress}
-  // percentageFunded,             = ${percentageFunded}
+  fundedAmountNative,           = ${fundedAmountNative}
+  fundedAmountUSD,              = ${fundedAmountUSD}
+  fundedAmountShares,           = ${fundedAmountShares}
+  targetAmountNative,           = ${targetAmountNative}
+  targetAmountUSD,              = ${targetAmountUSD}
+  targetAmountShares,           = ${targetAmountShares}
+  maxAmountNative,              = ${maxAmountNative}
+  maxAmountUSD,                 = ${maxAmountUSD}
+  maxAmountShares,              = ${maxAmountShares}
+  isActivelyFundraising,        = ${isActivelyFundraising}
+  mintedCount,                  = ${mintedCount}
+  payoutsMade,                  = ${payoutsMade}
+  deploymentDate,               = ${deploymentDate}
+  treasuryAddress,              = ${treasuryAddress}
+  reputationAddress,            = ${reputationAddress}
+  percentageFunded,             = ${percentageFunded}
+  sharePriceWei                 = ${sharePriceWei}
 
-  // `)
+  `)
 
   return [
     fundedAmountNative,
     fundedAmountUSD,
     fundedAmountShares,
     targetAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
     maxAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
     isActivelyFundraising,
     mintedCount,
     payoutsMade,
@@ -332,6 +351,7 @@ export const getLootboxEscrowManagementDetails = async (
     percentageFunded,
     semver,
     symbol,
+    sharePriceWei,
   ]
 }
 
@@ -347,6 +367,7 @@ export const getLootboxInstantManagementDetails = async (
     feeDecimals,
     deploymentStartTime,
     issuer,
+    sharesSoldTarget,
     sharesSoldCount,
     sharesSoldMax,
     nativeTokenRaisedTotal,
@@ -356,11 +377,13 @@ export const getLootboxInstantManagementDetails = async (
     ticketIdCounter,
     semver,
     symbol,
+    sharePriceWei,
   ] = await Promise.all([
     instantLootbox.shareDecimals(),
     instantLootbox.feeDecimals(),
     instantLootbox.deploymentStartTime(),
     instantLootbox.issuer(),
+    instantLootbox.sharesSoldTarget(),
     instantLootbox.sharesSoldCount(),
     instantLootbox.sharesSoldMax(),
     instantLootbox.nativeTokenRaisedTotal(),
@@ -370,6 +393,7 @@ export const getLootboxInstantManagementDetails = async (
     instantLootbox.ticketIdCounter(),
     instantLootbox.semver(),
     instantLootbox.symbol(),
+    instantLootbox.sharePriceWei(),
   ])
   const nativeTokenPriceEther = await getPriceFeed(nativePriceFeed)
   const nativeTokenPriceBN = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -387,8 +411,20 @@ export const getLootboxInstantManagementDetails = async (
   const fundedAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldCount.toString(), shareDecimals)).toFixed(0)
 
   const maxAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldMax, shareDecimals)).toFixed(0)
+  const maxAmountNative = ethers.BigNumber.from(sharesSoldMax)
+    .mul(sharePriceWei)
+    .div(ethers.utils.parseUnits('1', shareDecimals))
+  const maxAmountUSD = ethers.utils.formatUnits(maxAmountNative.mul(nativeTokenPrice).div(priceFeedDecimals), '18')
 
-  const targetAmountShares = maxAmountShares
+  const targetAmountShares = parseFloat(ethers.utils.formatUnits(sharesSoldTarget, shareDecimals)).toFixed(0)
+  const targetAmountNative = ethers.BigNumber.from(sharesSoldTarget)
+    .mul(sharePriceWei)
+    .div(ethers.utils.parseUnits('1', shareDecimals))
+  const targetAmountUSD = ethers.utils.formatUnits(
+    targetAmountNative.mul(nativeTokenPrice).div(priceFeedDecimals),
+    '18'
+  )
+
   const isActivelyFundraising = isFundraising
   const mintedCount = ticketIdCounter
   const payoutsMade = depositIdCounter
@@ -405,12 +441,40 @@ export const getLootboxInstantManagementDetails = async (
     )
   ).toFixed(1)
 
+  console.log(`
+
+  ----- INSTANT TRANSLATED -----
+
+  fundedAmountNative,           = ${fundedAmountNative}
+  fundedAmountUSD,              = ${fundedAmountUSD}
+  fundedAmountShares,           = ${fundedAmountShares}
+  targetAmountNative,           = ${targetAmountNative}
+  targetAmountUSD,              = ${targetAmountUSD}
+  targetAmountShares,           = ${targetAmountShares}
+  maxAmountNative,              = ${maxAmountNative}
+  maxAmountUSD,                 = ${maxAmountUSD}
+  maxAmountShares,              = ${maxAmountShares}
+  isActivelyFundraising,        = ${isActivelyFundraising}
+  mintedCount,                  = ${mintedCount}
+  payoutsMade,                  = ${payoutsMade}
+  deploymentDate,               = ${deploymentDate}
+  treasuryAddress,              = ${treasuryAddress}
+  reputationAddress,            = ${reputationAddress}
+  percentageFunded,             = ${percentageFunded}
+  sharePriceWei                 = ${sharePriceWei}
+
+  `)
+
   return [
     fundedAmountNative,
     fundedAmountUSD,
     fundedAmountShares,
     targetAmountShares,
+    targetAmountNative,
+    targetAmountUSD,
     maxAmountShares,
+    maxAmountNative,
+    maxAmountUSD,
     isActivelyFundraising,
     mintedCount,
     payoutsMade,
@@ -420,6 +484,7 @@ export const getLootboxInstantManagementDetails = async (
     percentageFunded,
     semver,
     symbol,
+    sharePriceWei,
   ]
 }
 
