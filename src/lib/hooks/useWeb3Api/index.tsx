@@ -114,6 +114,13 @@ export const addCustomEVMChain = async (chainIdHex: string) => {
           `Could not connect to the desired chain ${chainInfo.chainIdHex} in hex (${chainInfo.chainIdDecimal} in decimals)`
         )
         console.error(e)
+        if (e.code.toString() == '-32602') {
+          await (window?.ethereum as any).request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x1' }],
+          })
+          updateStateToChain(chainInfo)
+        }
         return
       }
     }

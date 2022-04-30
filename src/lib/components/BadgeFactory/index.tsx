@@ -4,41 +4,32 @@ import ColorPicker from 'simple-color-picker'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { COLORS } from 'lib/theme'
-import useWindowSize from 'lib/hooks/useScreenSize'
-import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import {
+  $Divider,
+  $TagText,
+  $TicketIDText,
+  $TicketLogo,
+  $TicketTag,
+  TicketCardCandyWrapper,
+} from 'lib/components/TicketCard/TicketCard'
 import { NetworkOption } from 'lib/api/network'
-import { BigNumber } from 'bignumber.js'
-import { getPriceFeed } from 'lib/hooks/useContract'
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import { checkIfValidEmail, checkIfValidUrl } from 'lib/api/helpers'
 import { SOCIALS } from 'lib/hooks/constants'
 import { $SocialLogo } from '../CreateLootbox/StepSocials'
-import WalletStatus from 'lib/components/WalletStatus'
+import { ethers as ethersObj } from 'ethers'
 import { $ComingSoon, $NetworkIcon, $NetworkName } from '../CreateLootbox/StepChooseNetwork'
-import { $TermCheckbox, $TermOfService, TermsFragment } from '../CreateLootbox/StepTermsConditions'
-
-const INITIAL_TICKET: Record<string, string | File | undefined> = {
-  name: '',
-  symbol: '',
-  themeColor: '#B48AF7',
-  logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
-  coverUrl: 'https://gateway.pinata.cloud/ipfs/QmdZ2uzY9N77j95Vib8nM8AXBfDC4RctqefRwGLZjdsyxN',
-  badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
-  logoFile: undefined,
-  coverFile: undefined,
-  twitter: '',
-  email: '',
-  instagram: '',
-  tiktok: '',
-  facebook: '',
-  discord: '',
-  youtube: '',
-  snapchat: '',
-  twitch: '',
-  web: '',
-}
+import { $TermCheckbox, $TermOfService, SubmitStatus, TermsFragment } from '../CreateLootbox/StepTermsConditions'
+import { addCustomEVMChain, getProvider } from 'lib/hooks/useWeb3Api'
+import ERC20ABI from 'lib/abi/erc20.json'
+import { ContractAddress, ChainIDHex, Address } from '@wormgraph/helpers'
+import WalletButton from '../WalletButton'
+import WalletStatus from 'lib/components/WalletStatus'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
+import { getUserBalanceOfToken } from 'lib/hooks/useContract'
 
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
@@ -52,28 +43,29 @@ export const validateCoverFile = (file: File) => !!file
 export interface CustomizeBadgeProps {
   stage: StepStage
   selectedNetwork: NetworkOption
+  setCustomizeComplete: (bool: Boolean) => void
+  ticketState: Record<string, string | File | undefined>
+  updateTicketState: (param: string, value: string | File | undefined) => void
 }
 const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const [themeColor, setThemeColor] = useState('')
-  const [ticketState, setTicketState] = useState(INITIAL_TICKET)
-
-  const updateTicketState = (param: string, value: string | File | undefined) => {
-    setTicketState({ ...ticketState, [param]: value })
-  }
 
   useEffect(() => {
     const colorPickerElement = document.getElementById('color-picker')
-    const picker = new ColorPicker({ el: colorPickerElement || undefined, color: ticketState.themeColor as string })
+    const picker = new ColorPicker({
+      el: colorPickerElement || undefined,
+      color: props.ticketState.themeColor as string,
+    })
     picker.onChange((color: string) => {
       setThemeColor(color)
     })
   }, [])
 
   useEffect(() => {
-    if (themeColor !== ticketState.themeColor) {
-      updateTicketState('themeColor', themeColor)
+    if (themeColor !== props.ticketState.themeColor) {
+      props.updateTicketState('themeColor', themeColor)
     }
   }, [themeColor, props])
 
@@ -90,23 +82,15 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
   const [errors, setErrors] = useState(initialErrors)
   const checkAllTicketCustomizationValidations = () => {
     let valid = true
-    if (!validateName(ticketState.name as string)) valid = false
-    if (!validateSymbol(ticketState.symbol as string)) valid = false
-    if (!validateThemeColor(ticketState.themeColor as string)) valid = false
-    if (!validateLogo(ticketState.logoUrl as string)) valid = false
-    if (!validateCover(ticketState.coverUrl as string)) valid = false
+    if (!validateName(props.ticketState.name as string)) valid = false
+    if (!validateSymbol(props.ticketState.symbol as string)) valid = false
+    if (!validateThemeColor(props.ticketState.themeColor as string)) valid = false
+    if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
 
     if (valid) {
-      if (!validateLogoFile(ticketState.logoFile as File)) {
+      if (!validateLogoFile(props.ticketState.logoFile as File)) {
         valid = false
         setErrors({ ...errors, logoFile: 'Please upload a logo image' })
-      }
-      if (!validateCoverFile(ticketState.coverFile as File)) {
-        valid = false
-        setErrors({
-          ...errors,
-          coverFile: 'Please upload a cover photo',
-        })
       }
     }
 
@@ -117,19 +101,21 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
         symbol: '',
         themeColor: '',
         logoFile: '',
-        coverFile: '',
         email: '',
       })
     }
     return valid
   }
   useEffect(() => {
-    checkAllTicketCustomizationValidations()
-  }, [ticketState])
+    const isValid = checkAllTicketCustomizationValidations()
+    if (isValid) {
+      props.setCustomizeComplete(isValid)
+    }
+  }, [props.ticketState])
 
   const parseInput = (slug: string, text: string) => {
     const value = slug === 'symbol' ? (text as string).toUpperCase().replace(' ', '') : text
-    updateTicketState(slug, value)
+    props.updateTicketState(slug, value)
     if (slug === 'name') {
       setErrors({
         ...errors,
@@ -186,7 +172,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
     if (selectedFiles?.length) {
       const file = selectedFiles[0]
 
-      updateTicketState(slug, file)
+      props.updateTicketState(slug, file)
 
       // Display the image in the UI
       // This updates the TicketCardCandyWrapper's logo and background
@@ -264,7 +250,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
             <$InputMedium
               maxLength={30}
               onChange={(e) => parseInput('name', e.target.value)}
-              value={ticketState.name as string}
+              value={props.ticketState.name as string}
             />
             <br />
             <$StepSubheading>
@@ -276,7 +262,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
             </$StepSubheading>
             <$InputMedium
               onChange={(e) => parseInput('symbol', e.target.value)}
-              value={ticketState.symbol as string}
+              value={props.ticketState.symbol as string}
               maxLength={9}
             />
             <br />
@@ -299,7 +285,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
                     <$SocialLogo src={social.icon} />
                     <$InputMedium
                       style={{ width: '100%', fontSize: '1rem' }}
-                      value={ticketState[social.slug] as string}
+                      value={props.ticketState[social.slug] as string}
                       onChange={(e) => parseInput(social.slug, e.target.value)}
                       placeholder={social.placeholder}
                     ></$InputMedium>
@@ -311,11 +297,11 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
           </$Vertical>
           <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
             <div style={{ height: '400px', marginBottom: '50px' }}>
-              <TicketCardCandyWrapper
-                backgroundImage={ticketState.coverUrl as string}
-                logoImage={ticketState.logoUrl as string}
-                themeColor={ticketState.themeColor as string}
-                name={ticketState.name as string}
+              <BadgeCardCandyWrapper
+                backgroundImage={props.ticketState.coverUrl as string}
+                logoImage={props.ticketState.logoUrl as string}
+                themeColor={props.ticketState.themeColor as string}
+                name={props.ticketState.name as string}
                 screen={screen}
               />
             </div>
@@ -336,7 +322,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="logo-uploader">
-                    {ticketState.logoFile ? '✅' : '⚠️  Upload'} Logo
+                    {props.ticketState.logoFile ? '✅' : '⚠️  Upload'} Logo
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
@@ -348,7 +334,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="cover-uploader">
-                    {ticketState.coverFile ? '✅' : '⚠️  Upload'} Cover
+                    {props.ticketState.coverFile ? '✅' : 'Upload'} Cover
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
@@ -364,12 +350,12 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
                   <div id="color-picker" />
                 </$Vertical>
                 <$InputMedium
-                  value={ticketState.themeColor as string}
+                  value={props.ticketState.themeColor as string}
                   onChange={(e) => parseInput('themeColor', e.target.value)}
                   style={{
                     width: '80%',
                     textAlign: 'center',
-                    border: ticketState.themeColor ? `${ticketState.themeColor} solid 2px ` : '',
+                    border: props.ticketState.themeColor ? `${props.ticketState.themeColor} solid 2px ` : '',
                   }}
                 />
               </$Vertical>
@@ -462,6 +448,76 @@ export const $ColorPreview = styled.div<{ color: string }>`
   background-color: ${(props: { color: string }) => props.color};
 `
 
+interface BadgeCardCandyWrapperProps {
+  backgroundImage: string
+  logoImage: string
+  badgeImage?: string
+  themeColor: string
+  name: string
+  screen: ScreenSize
+}
+export const BadgeCardCandyWrapper = (props: BadgeCardCandyWrapperProps) => {
+  return (
+    <$TicketCardContainer
+      id="ticket-candy-container"
+      backgroundImage={props.backgroundImage}
+      onClick={() => {
+        console.log('click')
+      }}
+    >
+      <$LogoContainer>
+        {/* {props.badgeImage && (
+          <$BadgeImage
+            // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
+            id="ticket-candy-badge"
+            image={props.badgeImage}
+            backgroundShadowColor={props.themeColor}
+            // margin="auto auto 0"
+          />
+        )} */}
+
+        <$TicketLogo
+          // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
+          id="ticket-candy-logo"
+          backgroundImage={props.logoImage}
+          backgroundShadowColor={props.themeColor}
+          // margin="auto auto 0"
+        />
+      </$LogoContainer>
+
+      <$TicketTag>
+        <$TagText>{props.name || 'Guild Name'}</$TagText>
+      </$TicketTag>
+    </$TicketCardContainer>
+  )
+}
+
+const BASE_CONTAINER = `
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 1.5rem;
+`
+
+export const $LogoContainer = styled.div`
+  flex: 1;
+  padding: 2.2rem 2.2rem 1.5rem;
+`
+
+export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
+  ${BASE_CONTAINER}
+  border: 0px solid transparent;
+  border-radius: 20px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  background: ${(props) => (props.backgroundColor ? props.backgroundColor : `${COLORS.surpressedBackground}15`)};
+  ${(props) => (props.backgroundImage ? `background: url("${props.backgroundImage}");` : '')}
+  background-size: cover;
+  cursor: pointer;
+  background-position: center;
+  position: relative;
+`
+
 const BADGE_FACTORY_NETWORKS = [
   {
     name: 'Ethereum',
@@ -472,6 +528,7 @@ const BADGE_FACTORY_NETWORKS = [
     isAvailable: true,
     isTestnet: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FETH_COLORED.png?alt=media',
+    validityTokenAddr: '0x83e9f223e1edb3486f876ee888d76bfba26c475a' as ContractAddress,
   },
   {
     name: 'Binance',
@@ -482,6 +539,7 @@ const BADGE_FACTORY_NETWORKS = [
     isAvailable: true,
     isTestnet: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
+    validityTokenAddr: '0x0565805ca3a4105faee51983b0bd8ffb5ce1455c' as ContractAddress,
   },
   {
     name: 'Polygon',
@@ -492,19 +550,61 @@ const BADGE_FACTORY_NETWORKS = [
     isAvailable: false,
     isTestnet: false,
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+    validityTokenAddr: '' as ContractAddress,
   },
 ]
 interface ValidatePurchasingTokenBalanceProps {
   stage: StepStage
+  validateTokenRequirementsMet: (bool: Boolean) => void
 }
 const ValidatePurchasingTokenBalance = (props: ValidatePurchasingTokenBalanceProps) => {
   const initialErrors = {
-    errorOne: '',
-    errorTwo: '',
+    errorBalance: '',
   }
   const { screen } = useWindowSize()
   const [errors, setErrors] = useState(initialErrors)
   const [selectedNetwork, setSelectedNetwork] = useState<NetworkOption>()
+  const snapUserState = useSnapshot(userState)
+  const verifyEligibility = async (erc20Addr: ContractAddress, chainIdHex: ChainIDHex) => {
+    console.log(`--- verifying eligibility for ${erc20Addr} on chain ${chainIdHex}`)
+    await addCustomEVMChain(chainIdHex)
+    console.log(`--- added custom chain ${chainIdHex}`)
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const { provider } = await getProvider()
+    // const signer = await provider.getSigner()
+    // console.log(`--- got signer = ${signer._address}`)
+    const erc20 = new ethers.Contract(erc20Addr, ERC20ABI)
+    console.log(`--- got erc20 = ${erc20Addr}`)
+    console.log(erc20)
+    const currentUser = (snapUserState.currentAccount || undefined) as Address
+    console.log(`--- got currentUser`)
+    console.log(currentUser)
+    try {
+      // const balance = await erc20.balanceOf(currentUser)
+      const balance = await getUserBalanceOfToken(erc20Addr, currentUser)
+      console.log(`
+        
+      Balance = ${balance.toString()}
+      
+      `)
+      if (ethers.BigNumber.from(balance.toString()).gte(ethers.BigNumber.from('200000000000000000000'))) {
+        console.log('Passes the validation check')
+        setErrors({
+          ...errors,
+          errorBalance: '',
+        })
+        props.validateTokenRequirementsMet(true)
+      } else {
+        setErrors({
+          ...errors,
+          errorBalance: 'Must have at least 200 GUILD token in your wallet',
+        })
+        props.validateTokenRequirementsMet(false)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
   return (
     <$CustomizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       <StepCard
@@ -532,9 +632,10 @@ const ValidatePurchasingTokenBalance = (props: ValidatePurchasingTokenBalancePro
                 <$VerifyGuildTokenButton
                   isSelected={selectedNetwork?.chainIdHex === network.chainIdHex}
                   themeColor={network.themeColor}
-                  onClick={() => {
+                  onClick={async () => {
                     if (network.isAvailable) {
-                      setSelectedNetwork(network)
+                      await setSelectedNetwork(network)
+                      await verifyEligibility(network.validityTokenAddr, network.chainIdHex)
                     }
                   }}
                   key={network.chainIdHex}
@@ -613,17 +714,38 @@ const $VerifyGuildTokenButton = styled.button<{ isAvailable?: boolean; themeColo
 interface SubmitBadgeFactoryOnPolygonProps {
   stage: StepStage
   selectedNetwork: NetworkOption
+  verifyAgreedTerms: (bool: Boolean) => void
+  submitStatus: SubmitStatus
+  setSubmitStatus: (status: SubmitStatus) => void
+  submitBadgeFactory: () => void
+  viewBadgeFactory: () => void
 }
 const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) => {
   const initialErrors = {
     errorOne: '',
     errorTwo: '',
   }
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setTimeLeft(null)
+    }
+    if (!timeLeft) return
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeLeft])
   const [termsState, updateTermsState] = useState({
     termA: false,
     termB: false,
   })
   const [errors, setErrors] = useState(initialErrors)
+  useEffect(() => {
+    if (termsState.termA && termsState.termB) {
+      props.verifyAgreedTerms(true)
+    }
+  }, [termsState])
   const TERMS: TermsFragment[] = [
     {
       slug: 'termA',
@@ -640,6 +762,51 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
       [slug]: checked,
     })
   }
+  const renderActionBar = () => {
+    if (props.stage === 'in_progress') {
+      return (
+        <$CreateBadgeFactory allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
+          Create Guild Badge
+        </$CreateBadgeFactory>
+      )
+    } else if (props.stage === 'may_proceed') {
+      if (props.submitStatus === 'failure') {
+        return (
+          <CreateBadgeFactory
+            allConditionsMet={true}
+            themeColor={COLORS.dangerFontColor}
+            onSubmit={() => props.submitBadgeFactory()}
+            text="Failed, try again?"
+          />
+        )
+      } else if (props.submitStatus === 'success') {
+        return (
+          <$CreateBadgeFactory
+            allConditionsMet={true}
+            onClick={() => props.viewBadgeFactory()}
+            themeColor={COLORS.successFontColor}
+          >
+            View Your Guild Badge
+          </$CreateBadgeFactory>
+        )
+      } else if (props.submitStatus === 'in_progress') {
+        return (
+          <$CreateBadgeFactory allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
+            {`...submitting (${timeLeft})`}
+          </$CreateBadgeFactory>
+        )
+      }
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={true}
+          themeColor={props.selectedNetwork?.themeColor}
+          onSubmit={() => props.submitBadgeFactory()}
+          text="Create Guild Badge"
+        />
+      )
+    }
+    return
+  }
   return (
     <$CustomizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       <StepCard
@@ -647,6 +814,12 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
         stage={props.stage}
         onNext={() => {}}
         errors={Object.values(errors)}
+        customActionBar={
+          (props.stage === 'in_progress' || props.stage === 'may_proceed') &&
+          Object.values(errors).filter((e) => e).length === 0
+            ? renderActionBar
+            : undefined
+        }
       >
         <$Vertical>
           <$StepHeading>
@@ -688,40 +861,144 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
   )
 }
 
+interface CreateBadgeFactoryProps {
+  allConditionsMet: boolean
+  themeColor?: string
+  onSubmit: () => void
+  text: string
+}
+export const CreateBadgeFactory = (props: CreateBadgeFactoryProps) => {
+  return (
+    <$CreateBadgeFactory
+      disabled={!props.allConditionsMet}
+      allConditionsMet={props.allConditionsMet}
+      onClick={props.onSubmit}
+      themeColor={props.themeColor}
+    >
+      {props.text}
+    </$CreateBadgeFactory>
+  )
+}
+
+const $CreateBadgeFactory = styled.button<{ themeColor?: string; allConditionsMet: boolean }>`
+  background-color: ${(props) => (props.allConditionsMet ? props.themeColor : `${props.themeColor}30`)};
+  min-height: 50px;
+  border-radius: 10px;
+  flex: 1;
+  text-transform: uppercase;
+  cursor: ${(props) => (props.allConditionsMet ? 'pointer' : 'not-allowed')};
+  color: ${(props) => (props.allConditionsMet ? COLORS.white : `${props.themeColor}40`)};
+  font-weight: 600;
+  font-size: 1.5rem;
+  border: 0px;
+  margin: 20px;
+  padding: 20px;
+`
+
+const INITIAL_TICKET: Record<string, string | File | undefined> = {
+  name: '',
+  symbol: '',
+  themeColor: '#B48AF7',
+  logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
+  coverUrl: 'https://gateway.pinata.cloud/ipfs/QmdZ2uzY9N77j95Vib8nM8AXBfDC4RctqefRwGLZjdsyxN',
+  badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
+  logoFile: undefined,
+  coverFile: undefined,
+  twitter: '',
+  email: '',
+  instagram: '',
+  tiktok: '',
+  facebook: '',
+  discord: '',
+  youtube: '',
+  snapchat: '',
+  twitch: '',
+  web: '',
+}
 const BadgeFactory = () => {
+  const snapUserState = useSnapshot(userState)
+  const isWalletConnected = snapUserState.accounts.length > 0
+  const [stageValidatePurchasingToken, setStageValidatePurchasingToken] = useState<StepStage>('in_progress')
+  const [stageCustomizeBadge, setStageCustomizeBadge] = useState<StepStage>('not_yet')
+  const [stageAgreeTerms, setStageAgreeTerms] = useState<StepStage>('not_yet')
+  const [ticketState, setTicketState] = useState(INITIAL_TICKET)
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
+  const updateTicketState = (param: string, value: string | File | undefined) => {
+    setTicketState({ ...ticketState, [param]: value })
+  }
   return (
     <$Vertical>
-      <ValidatePurchasingTokenBalance stage="in_progress" />
+      <WalletStatus />
       <br />
       <br />
-      <CustomizeBadge
-        stage="in_progress"
-        selectedNetwork={{
-          name: 'Polygon',
-          symbol: 'MATIC',
-          themeColor: '#8F5AE8',
-          chainIdHex: '0x89',
-          chainIdDecimal: '137',
-          isAvailable: false,
-          isTestnet: false,
-          icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-        }}
-      />
+      <div style={isWalletConnected ? {} : { opacity: '0.2', cursor: 'not-allowed' }}>
+        <ValidatePurchasingTokenBalance
+          stage={stageValidatePurchasingToken}
+          validateTokenRequirementsMet={(bool: Boolean) => {
+            if (bool) {
+              setStageValidatePurchasingToken('may_proceed')
+              setStageCustomizeBadge('in_progress')
+            } else {
+              setStageCustomizeBadge('not_yet')
+            }
+          }}
+        />
+      </div>
       <br />
       <br />
-      <SubmitBadgeFactoryOnPolygon
-        stage="in_progress"
-        selectedNetwork={{
-          name: 'Polygon',
-          symbol: 'MATIC',
-          themeColor: '#8F5AE8',
-          chainIdHex: '0x89',
-          chainIdDecimal: '137',
-          isAvailable: false,
-          isTestnet: false,
-          icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-        }}
-      />
+      <div style={stageCustomizeBadge === 'not_yet' ? { opacity: '0.2', cursor: 'not-allowed' } : {}}>
+        <CustomizeBadge
+          stage={stageCustomizeBadge}
+          setCustomizeComplete={(bool: Boolean) => {
+            if (bool) {
+              setStageCustomizeBadge('may_proceed')
+              setStageAgreeTerms('in_progress')
+            } else {
+              setStageCustomizeBadge('not_yet')
+            }
+          }}
+          ticketState={ticketState}
+          updateTicketState={updateTicketState}
+          selectedNetwork={{
+            name: 'Polygon',
+            symbol: 'MATIC',
+            themeColor: '#8F5AE8',
+            chainIdHex: '0x89',
+            chainIdDecimal: '137',
+            isAvailable: false,
+            isTestnet: false,
+            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+          }}
+        />
+      </div>
+      <br />
+      <br />
+      <div style={stageAgreeTerms === 'not_yet' ? { opacity: '0.2', cursor: 'not-allowed' } : {}}>
+        <SubmitBadgeFactoryOnPolygon
+          stage={stageAgreeTerms}
+          verifyAgreedTerms={(bool: Boolean) => {
+            if (bool) {
+              setStageAgreeTerms('may_proceed')
+            } else {
+              setStageAgreeTerms('not_yet')
+            }
+          }}
+          submitStatus={submitStatus}
+          setSubmitStatus={setSubmitStatus}
+          submitBadgeFactory={() => console.log('Submit badge factory...')}
+          viewBadgeFactory={() => console.log('View Badge Factory...')}
+          selectedNetwork={{
+            name: 'Polygon',
+            symbol: 'MATIC',
+            themeColor: '#8F5AE8',
+            chainIdHex: '0x89',
+            chainIdDecimal: '137',
+            isAvailable: false,
+            isTestnet: false,
+            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+          }}
+        />
+      </div>
     </$Vertical>
   )
 }
