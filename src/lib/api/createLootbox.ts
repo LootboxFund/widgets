@@ -11,6 +11,9 @@ import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 
+const SHARE_PRICE_WEI = '1000000000' // HARDCODED FOR NOW
+const SHARE_PRICE_WEI_DECIMALS = '18' // HARDCODED FOR NOW
+
 const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
   let test: string | undefined = (navigator as any)?.userAgent || (navigator as any)?.vendor || (window as any)?.opera
@@ -28,7 +31,6 @@ const checkMobileBrowser = (): boolean => {
 }
 
 interface InstantLootboxArgs {
-  nativeTokenPrice: any
   name: string
   symbol: string
   biography: string
@@ -82,11 +84,7 @@ export const createInstantLootbox = async (
   }
 
   const web3Utils = useWeb3Utils()
-  if (!args.nativeTokenPrice) {
-    console.error('No token price')
-    setSubmitStatus('failure')
-    return
-  }
+
   if (!provider) {
     throw new Error('No provider')
   }
@@ -142,7 +140,7 @@ export const createInstantLootbox = async (
         backgroundColor: args.lootboxThemeColor,
         backgroundImage: backgroundPublicPath,
         badgeImage: badgePublicPath || '',
-        pricePerShare: '',
+        pricePerShare: SHARE_PRICE_WEI,
         lootboxThemeColor: args.lootboxThemeColor,
       },
 
@@ -163,20 +161,14 @@ export const createInstantLootbox = async (
 
   const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
-    new web3Utils.BN('10')
-  )
   const targetSharesSold = args.fundraisingTarget
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
+    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
+    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .toString()
+
   const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
+    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
+    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .toString()
 
   const ethers = ethersObj
@@ -190,10 +182,9 @@ export const createInstantLootbox = async (
     ticketState.symbol = ${args.symbol}
     targetSharesSold = ${targetSharesSold}
     maxSharesSold = ${maxSharesSold}
-    pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
     fundraisingTargetMax = ${args.fundraisingTargetMax}
-    nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+    sharePriceWei = ${SHARE_PRICE_WEI}
 
     basisPoints = ${args.basisPoints}
     returnAmountTarget = ${args.returnAmountTarget}
@@ -314,11 +305,7 @@ export const createEscrowLootbox = async (
   }
 
   const web3Utils = useWeb3Utils()
-  if (!args.nativeTokenPrice) {
-    console.error('No token price')
-    setSubmitStatus('failure')
-    return
-  }
+
   if (!provider) {
     throw new Error('No provider')
   }
@@ -373,7 +360,7 @@ export const createEscrowLootbox = async (
         backgroundColor: args.lootboxThemeColor,
         backgroundImage: backgroundPublicPath,
         badgeImage: badgePublicPath || '',
-        pricePerShare: '',
+        pricePerShare: SHARE_PRICE_WEI,
         lootboxThemeColor: args.lootboxThemeColor,
       },
 
@@ -394,20 +381,14 @@ export const createEscrowLootbox = async (
 
   const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
-    new web3Utils.BN('10')
-  )
   const targetSharesSold = args.fundraisingTarget
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
+    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
+    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .toString()
+
   const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
+    .mul(new web3Utils.BN(SHARE_PRICE_WEI))
+    .div(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .toString()
 
   const ethers = ethersObj
@@ -421,13 +402,12 @@ export const createEscrowLootbox = async (
     ticketState.symbol = ${args.symbol}
     targetSharesSold = ${targetSharesSold}
     maxSharesSold = ${maxSharesSold}
-    pricePerShare = ${pricePerShare}
     receivingWallet = ${args.receivingWallet}
 
     fundraisingTarget = ${args.fundraisingTarget}
     fundraisingTargetMax = ${args.fundraisingTargetMax}
 
-    nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+    sharePriceWei = ${SHARE_PRICE_WEI}
 
     logoImage = ${imagePublicPath}
     coverImage = ${backgroundPublicPath}
