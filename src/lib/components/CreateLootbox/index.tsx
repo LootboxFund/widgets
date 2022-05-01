@@ -13,7 +13,11 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
-import { extractURLState_CreateLootboxPage } from './state'
+import {
+  extractURLState_CreateLootboxPage,
+  InitialFormStateCreateLootbox,
+  InitialFormValidityCreateLootbox,
+} from './state'
 import StepChooseFunding, {
   validateFundraisingTarget,
   validateReceivingWallet,
@@ -35,9 +39,17 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { NetworkOption } from 'lib/api/network'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
-import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
+import {
+  Address,
+  BLOCKCHAINS,
+  chainIdHexToSlug,
+  ChainInfo,
+  ChainSlugs,
+  ContractAddress,
+  convertDecimalToHex,
+} from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { initLogging } from 'lib/api/logrocket'
@@ -45,6 +57,9 @@ import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
 import { manifest } from 'manifest'
+import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateLootbox/StepMagicLink'
+import { ethers } from 'ethers'
+import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 11 // base 2
@@ -55,7 +70,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     initLogging()
     if (window.ethereum) {
-      initDApp().catch((err) => LogRocket.captureException(err))
+      initDApp()
+        .then(() => initFromUrlParams())
+        .catch((err) => LogRocket.captureException(err))
     } else {
       window.addEventListener('ethereum#initialized', initDApp, {
         once: true,
@@ -64,11 +81,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         if (!window.ethereum) {
           alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
         } else {
-          initDApp().catch((err) => LogRocket.captureException(err))
+          initDApp()
+            .then(() => {
+              initFromUrlParams()
+            })
+            .catch((err) => LogRocket.captureException(err))
         }
       }, 3000) // 3 seconds
     }
   }, [])
+  const [loadedUrlParams, setLoadedUrlParams] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -77,8 +99,75 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
+  const [preconfigParams, setPreconfigParams] = useState<string[]>([])
 
-  const { INITIAL_FORM_STATE, INITIAL_VALIDITY, INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
+  const initFromUrlParams = async () => {
+    const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
+    console.log('------- INITIAL_URL_PARAMS -------')
+    console.log(INITIAL_URL_PARAMS)
+    const prefilledFields = []
+
+    if (INITIAL_URL_PARAMS.network && validNetworks.includes(INITIAL_URL_PARAMS.network || '')) {
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network)
+      if (networkOption) {
+        setNetwork(networkOption)
+        prefilledFields.push(`Network set to ${networkOption.name}`)
+      }
+    }
+    if (INITIAL_URL_PARAMS.type && validTypes.includes(INITIAL_URL_PARAMS.type || '')) {
+      setFundingType(INITIAL_URL_PARAMS.type as LootboxType)
+      prefilledFields.push(`Funding type set to ${INITIAL_URL_PARAMS.type}`)
+    }
+    if (INITIAL_URL_PARAMS.fundingTarget && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingTarget))) {
+      console.log(`Setting funding target... ${INITIAL_URL_PARAMS.fundingTarget}`)
+      setFundraisingTarget(web3Utils.toBN(INITIAL_URL_PARAMS.fundingTarget))
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
+      prefilledFields.push(
+        `Funding target set to ${parseFloat(
+          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()
+        ).toFixed(4)} ${networkOption?.symbol}`
+      )
+    }
+    if (INITIAL_URL_PARAMS.fundingLimit && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingLimit))) {
+      setFundraisingLimit(web3Utils.toBN(INITIAL_URL_PARAMS.fundingLimit))
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
+      prefilledFields.push(
+        `Funding limit set to ${parseFloat(
+          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()
+        ).toFixed(4)} ${networkOption?.symbol}`
+      )
+    }
+    if (INITIAL_URL_PARAMS.receivingWallet) {
+      setReceivingWallet(INITIAL_URL_PARAMS.receivingWallet as Address)
+      prefilledFields.push(`Receiving wallet set to ${INITIAL_URL_PARAMS.receivingWallet}`)
+    }
+    if (INITIAL_URL_PARAMS.returnsTarget && !isNaN(parseInt(INITIAL_URL_PARAMS.returnsTarget))) {
+      setBasisPoints(parseInt(INITIAL_URL_PARAMS.returnsTarget))
+      prefilledFields.push(
+        `Returns target set to ${ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString()}%`
+      )
+    }
+    if (INITIAL_URL_PARAMS.returnsDate) {
+      const paybackDate = new Date(INITIAL_URL_PARAMS.returnsDate)
+      if (INITIAL_URL_PARAMS.returnsDate && paybackDate instanceof Date && !isNaN(paybackDate.getTime())) {
+        setPaybackDate(INITIAL_URL_PARAMS.returnsDate)
+        prefilledFields.push(`Returns date set to ${INITIAL_URL_PARAMS.returnsDate}`)
+      }
+    }
+    if (INITIAL_URL_PARAMS.themeColor) {
+      updateTicketState('lootboxThemeColor', INITIAL_URL_PARAMS.themeColor)
+    }
+    if (INITIAL_URL_PARAMS.campaignWebsite) {
+      updateSocialState('web', INITIAL_URL_PARAMS.campaignWebsite)
+      prefilledFields.push(`Lootbox website for more info set to "${INITIAL_URL_PARAMS.campaignWebsite}"`)
+    }
+    if (INITIAL_URL_PARAMS.campaignBio) {
+      updateTicketState('biography', INITIAL_URL_PARAMS.campaignBio)
+      prefilledFields.push(`Lootbox description set to "${INITIAL_URL_PARAMS.campaignBio}"`)
+    }
+    setLoadedUrlParams(true)
+    setPreconfigParams(prefilledFields)
+  }
 
   type FormStep =
     | 'stepNetwork'
@@ -89,9 +178,27 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     | 'stepSocials'
     | 'stepTerms'
 
+  const INITIAL_FORM_STATE: InitialFormStateCreateLootbox = {
+    stepNetwork: 'in_progress',
+    stepType: 'not_yet',
+    stepFunding: 'not_yet',
+    stepReturns: 'not_yet',
+    stepCustomize: 'not_yet',
+    stepSocials: 'not_yet',
+    stepTerms: 'not_yet',
+  }
   const [stage, setStage] = useState(INITIAL_FORM_STATE)
 
   // VALIDITY: Validity of the forms
+  const INITIAL_VALIDITY: InitialFormValidityCreateLootbox = {
+    stepNetwork: false,
+    stepType: false,
+    stepFunding: false,
+    stepReturns: false,
+    stepCustomize: false,
+    stepSocials: false,
+    stepTerms: false,
+  }
   const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
   // Prevent: Step 2-6 Warning used before declaration
@@ -107,9 +214,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   )
   const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
-  const seedTarget = web3Utils.toBN(web3Utils.toWei('1', 'ether'))
 
-  const [fundraisingTarget, setFundraisingTarget] = useState(seedTarget)
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [fundraisingLimit, setFundraisingLimit] = useState(
     fundraisingTarget
       .mul(web3Utils.toBN(defaultFundraisingLimitMultiplier))
@@ -129,7 +235,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
   }
   const checkNetworkStepDone = () => {
-    return network && reputationWallet && reputationWallet.length > 0
+    return isWalletConnected && network && reputationWallet && reputationWallet.length > 0
   }
 
   // STEP 2: Choose Type
@@ -174,19 +280,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   const checkCustomizeStepDone = () => {
-    console.log(`
-      
-    validateName(ticketState.name as string) = ${validateName(ticketState.name as string)}
-    validateSymbol(ticketState.symbol as string) = ${validateSymbol(ticketState.symbol as string)}
-    validateBiography(ticketState.biography as string) = ${validateBiography(ticketState.biography as string)}
-    validateThemeColor(ticketState.lootboxThemeColor as string) = ${validateThemeColor(
-      ticketState.lootboxThemeColor as string
-    )}
-    validateLogo(ticketState.logoUrl as string) = ${validateLogo(ticketState.logoUrl as string)}
-    validateCover(ticketState.coverUrl as string) = ${validateCover(ticketState.coverUrl as string)}
-    validateLogoFile(ticketState.logoFile as File) = ${validateLogoFile(ticketState.logoFile as File)}
-    validateCoverFile(ticketState.coverFile as File) = ${validateCoverFile(ticketState.coverFile as File)}
-    `)
     return (
       validateName(ticketState.name as string) &&
       validateSymbol(ticketState.symbol as string) &&
@@ -474,6 +567,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   return (
     <$CreateLootbox>
+      {preconfigParams && preconfigParams.length > 0 && (
+        <div>
+          <StepPrefillDisclaimer selectedNetwork={network} prefilledFields={preconfigParams} />
+          <$Spacer></$Spacer>
+        </div>
+      )}
       <StepChooseNetwork
         selectedNetwork={network}
         stage={stage.stepNetwork}
@@ -494,20 +593,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => console.log(bool)}
       />
       <$Spacer></$Spacer>
-      <StepChooseFunding
-        ref={refStepFunding}
-        type={fundingType}
-        selectedNetwork={network}
-        fundraisingLimit={fundraisingLimit}
-        fundraisingTarget={fundraisingTarget}
-        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
-        setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
-        receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
-        setReceivingWallet={setReceivingWallet}
-        stage={stage.stepFunding}
-        setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
-        onNext={() => refStepReturns.current?.scrollIntoView()}
-      />
+      {loadedUrlParams && (
+        <StepChooseFunding
+          ref={refStepFunding}
+          type={fundingType}
+          selectedNetwork={network}
+          fundraisingLimit={fundraisingLimit}
+          fundraisingTarget={fundraisingTarget}
+          setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
+          setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
+          receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
+          setReceivingWallet={setReceivingWallet}
+          stage={stage.stepFunding}
+          setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
+          onNext={() => refStepReturns.current?.scrollIntoView()}
+        />
+      )}
+
       <$Spacer></$Spacer>
       <StepChooseReturns
         ref={refStepReturns}
@@ -584,6 +686,24 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           </$Horizontal>
         ) : null}
       </$Vertical>
+      <$Spacer></$Spacer>
+      <StepMagicLink
+        network={network?.chainIdHex}
+        type={fundingType}
+        fundingTarget={fundraisingTarget.toString()}
+        fundingLimit={fundraisingLimit.toString()}
+        receivingWallet={receivingWallet}
+        returnsTarget={basisPoints.toString()}
+        returnsDate={paybackDate}
+        logoImage={undefined}
+        coverImage={undefined}
+        themeColor={ticketState.themeColor as string}
+        campaignBio={ticketState.biography as string}
+        campaignWebsite={socialState.web}
+        uploadImages={() => ['logoImage', 'coverImage']}
+        stage="in_progress"
+        selectedNetwork={network}
+      />
       <$Spacer></$Spacer>
     </$CreateLootbox>
   )

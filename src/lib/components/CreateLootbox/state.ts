@@ -4,7 +4,7 @@ import { StepStage } from './StepCard'
 import { ethers } from 'ethers'
 import { validNetworks, validTypes } from './StepMagicLink'
 
-interface InitialFormStateCreateLootbox {
+export interface InitialFormStateCreateLootbox {
   stepNetwork: StepStage
   stepType: StepStage
   stepFunding: StepStage
@@ -13,7 +13,7 @@ interface InitialFormStateCreateLootbox {
   stepSocials: StepStage
   stepTerms: StepStage
 }
-interface InitialFormValidityCreateLootbox {
+export interface InitialFormValidityCreateLootbox {
   stepNetwork: boolean
   stepType: boolean
   stepFunding: boolean
@@ -52,9 +52,9 @@ export const extractURLState_CreateLootboxPage = () => {
     returnsDate: url.searchParams.get('returnsDate'),
     logoImage: url.searchParams.get('logoImage'),
     coverImage: url.searchParams.get('coverImage'),
-    campaignName: url.searchParams.get('campaignName'),
     campaignBio: url.searchParams.get('campaignBio'),
     campaignWebsite: url.searchParams.get('campaignWebsite'),
+    themeColor: url.searchParams.get('themeColor'),
   }
   if (validNetworks.includes(params.network || '')) {
     INITIAL_FORM_STATE.stepNetwork = 'may_proceed'
@@ -73,7 +73,7 @@ export const extractURLState_CreateLootboxPage = () => {
   }
   if (
     params.returnsTarget &&
-    !isNaN(parseFloat(params.returnsTarget)) &&
+    !isNaN(parseInt(params.returnsTarget)) &&
     ethers.utils.isAddress(params.receivingWallet || '')
   ) {
     INITIAL_FORM_STATE.stepReturns = 'may_proceed'
