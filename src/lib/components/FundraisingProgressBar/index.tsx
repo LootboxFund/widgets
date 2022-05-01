@@ -112,9 +112,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
         const percentageFunded =
           sharesSoldCount && sharesSoldMax
             ? new web3Utils.BN(sharesSoldCount)
-                .mul(new web3Utils.BN('100'))
+                .mul(new web3Utils.BN('1000')) // multiply by 1000 (instead of 100) to get 1 decimal place
                 .div(new web3Utils.BN(sharesSoldMax))
-                .toNumber()
+                .toNumber() / 10 // divide by 10 to account for the 1000 multiplier and yield decimal
             : 0
         setPercentageFunded(percentageFunded)
 
