@@ -1,6 +1,6 @@
 import { $Button } from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useEthers } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain, useEthers } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { useSnapshot } from 'valtio'
@@ -9,7 +9,9 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { BLOCKCHAINS } from '@wormgraph/helpers'
+import { BLOCKCHAINS, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
+import { useEffect, useState } from 'react'
+import { readTicketMetadata } from 'lib/api/storage'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
 
@@ -19,10 +21,34 @@ const BuyButton = (props: BuyButtonProps) => {
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
+  const [metadata, setMetadata] = useState<ITicketMetadata | undefined>()
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (snapBuySharesState.lootbox.address) {
+      readTicketMetadata(snapBuySharesState.lootbox.address as ContractAddress)
+        .then((data) => {
+          setMetadata(data)
+        })
+        .catch((err) => {
+          console.error('Could not read metadata', err)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    }
+  }, [snapBuySharesState.lootbox.address])
+
+  const switchChain = async () => {
+    if (metadata?.lootboxCustomSchema?.chain?.chainIdHex) {
+      await addCustomEVMChain(metadata?.lootboxCustomSchema?.chain?.chainIdHex)
+    }
+  }
+
   const isWalletConnected = snapUserState.accounts.length > 0
   const isInputAmountValid =
     snapBuySharesState.inputToken.quantity && parseFloat(snapBuySharesState.inputToken.quantity) > 0
-  const ballance = new BN(snapBuySharesState.inputToken.balance || '0')
+  const balance = new BN(snapBuySharesState.inputToken.balance || '0')
   const quantity = parseWei(
     snapBuySharesState.inputToken.quantity || '0',
     snapBuySharesState.inputToken.data?.decimals || 18
@@ -31,22 +57,18 @@ const BuyButton = (props: BuyButtonProps) => {
     snapBuySharesState.lootbox.quantity || '0',
     snapBuySharesState.lootbox.data?.shareDecimals || 18
   )
+
   const withinMaxShares = new BN(lootQuantity)
     .plus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
-    .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '')
+    .lte(snapBuySharesState.lootbox.data?.sharesSoldMax || '0')
 
   const sharesRemaining = new BN(snapBuySharesState.lootbox.data?.sharesSoldMax || '0')
     .minus(snapBuySharesState.lootbox.data?.sharesSoldCount || '0')
     .div(new BN(10).pow(snapBuySharesState.lootbox.data?.shareDecimals || '0'))
   const sharesRemainingFmt =
     sharesRemaining.toFixed(2).length > 8 ? sharesRemaining.toExponential(2) : sharesRemaining.toFixed(2)
-
-  const isInsufficientFunds = ballance.lt(quantity)
-  const validChain =
-    snapUserState.network.currentNetworkIdHex &&
-    Object.values(BLOCKCHAINS)
-      .map((b) => b.chainIdHex)
-      .includes(snapUserState.network.currentNetworkIdHex)
+  const isInsufficientFunds = balance.lt(quantity)
+  const isWrongChain = metadata?.lootboxCustomSchema?.chain?.chainIdHex !== snapUserState.network.currentNetworkIdHex
 
   const SuppressedButton = ({ txt }: { txt: string }) => {
     return (
@@ -60,17 +82,47 @@ const BuyButton = (props: BuyButtonProps) => {
       </$Button>
     )
   }
-  if (!isWalletConnected) {
-    return <WalletButton></WalletButton>
-  } else if (isWalletConnected && (!snapBuySharesState.inputToken.data || !snapBuySharesState.lootbox.data)) {
+
+  if (snapBuySharesState.loading || loading) {
     return (
       <$Button
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
+        style={{ ...BASE_BUTTON_STYLE }}
+        disabled
       >
-        {validChain ? 'Select a Token' : 'Switch network'}
+        <LoadingText loading={true} text="Loading" color={`${COLORS.surpressedFontColor}80`} />
+      </$Button>
+    )
+  } else if (!snapBuySharesState.lootbox.address) {
+    return (
+      <$Button
+        screen={screen}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
+        style={{ ...BASE_BUTTON_STYLE }}
+        disabled
+      >
+        Lootbox not found
+      </$Button>
+    )
+  } else if (!isWalletConnected) {
+    return <WalletButton />
+  } else if (isWrongChain) {
+    return (
+      <$Button
+        screen={screen}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
+        onClick={switchChain}
+        style={{ ...BASE_BUTTON_STYLE }}
+      >
+        Switch network
       </$Button>
     )
   } else if (isInsufficientFunds) {

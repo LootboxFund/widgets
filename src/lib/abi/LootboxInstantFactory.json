@@ -7,11 +7,6 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "_nativeTokenPriceFeed",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_ticketPurchaseFee",
         "type": "uint256"
@@ -20,84 +15,15 @@
         "internalType": "address",
         "name": "_brokerAddress",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_baseTokenURI",
+        "type": "string"
       }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "lootbox",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "affiliate",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "affiliateFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "ticketPurchaseFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "lootboxIssuer",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "lootboxTreasury",
-        "type": "address"
-      }
-    ],
-    "name": "AffiliateReceipt",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "affiliate",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "whitelistedBy",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "ticketAffiliateFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "timestamp",
-        "type": "uint256"
-      }
-    ],
-    "name": "AffiliateWhitelisted",
-    "type": "event"
   },
   {
     "anonymous": false,
@@ -129,13 +55,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "maxSharesSold",
+        "name": "targetSharesSold",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "sharePriceUSD",
+        "name": "maxSharesSold",
         "type": "uint256"
       },
       {
@@ -276,45 +202,21 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "affiliate",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "ticketAffiliateFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "addAffiliate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "brokerAddress",
+    "name": "baseTokenURI",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "string",
         "name": "",
-        "type": "address"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "lootbox",
-        "type": "address"
-      }
-    ],
-    "name": "checkLootboxAffiliate",
+    "inputs": [],
+    "name": "brokerAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -339,17 +241,17 @@
       },
       {
         "internalType": "uint256",
+        "name": "_targetSharesSold",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "_maxSharesSold",
         "type": "uint256"
       },
       {
         "internalType": "address",
         "name": "_treasury",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_affiliate",
         "type": "address"
       },
       {
@@ -432,33 +334,7 @@
   },
   {
     "inputs": [],
-    "name": "listAffiliates",
-    "outputs": [
-      {
-        "internalType": "bytes32[]",
-        "name": "_affiliates",
-        "type": "bytes32[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "lootboxImplementation",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "nativeTokenPriceFeed",
     "outputs": [
       {
         "internalType": "address",
@@ -523,19 +399,6 @@
     "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "sharePriceUSD",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

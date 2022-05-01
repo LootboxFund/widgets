@@ -1,20 +1,10 @@
-import { ChainIDHex, ITicketMetadata, TicketID, Address, ContractAddress } from '@wormgraph/helpers'
-import { SemanticVersion } from '@wormgraph/manifest'
+import { ITicketMetadata, ContractAddress } from '@wormgraph/helpers'
 import { manifest } from '../../manifest'
 import { encodeURISafe } from './helpers'
+import { parseTicketMetadata } from '../utils/parseTicketMetadata'
 
-const getLootboxURI = async ({
-  semver,
-  chainIdHex,
-  lootboxAddress,
-  bucket,
-}: {
-  semver: SemanticVersion
-  chainIdHex: ChainIDHex
-  lootboxAddress: ContractAddress
-  bucket: string
-}) => {
-  const filePath = `${bucket}/${chainIdHex}/${lootboxAddress}.json`
+const getLootboxURI = async ({ lootboxAddress, bucket }: { lootboxAddress: ContractAddress; bucket: string }) => {
+  const filePath = `${bucket}/${lootboxAddress}.json`
   const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}`
   const lootboxURI = await (await fetch(downloadablePath)).json()
   return lootboxURI
@@ -23,10 +13,8 @@ const getLootboxURI = async ({
 export const readTicketMetadata = async (lootboxAddress: ContractAddress): Promise<ITicketMetadata | undefined> => {
   const metadata = await getLootboxURI({
     lootboxAddress,
-    semver: manifest.googleCloud.semver,
-    chainIdHex: manifest.chain.chainIDHex,
     bucket: manifest.storage.buckets.data.id,
   })
 
-  return metadata?.data as ITicketMetadata | undefined
+  return parseTicketMetadata(metadata)
 }

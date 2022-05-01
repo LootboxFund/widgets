@@ -227,12 +227,6 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "affiliate",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
         "name": "broker",
         "type": "address"
       },
@@ -269,19 +263,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "nativeTokensSentToAffiliate",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "sharesPurchased",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "sharePriceUSD",
+        "name": "sharePriceWei",
         "type": "uint256"
       }
     ],
@@ -324,7 +312,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "sharePriceUSD",
+        "name": "sharePriceWei",
         "type": "uint256"
       }
     ],
@@ -547,12 +535,12 @@
   },
   {
     "inputs": [],
-    "name": "affiliate",
+    "name": "_tokenURI",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "string",
         "name": "",
-        "type": "address"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -943,6 +931,11 @@
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "_baseTokenURI",
+        "type": "string"
+      },
+      {
         "internalType": "uint256",
         "name": "_targetSharesSold",
         "type": "uint256"
@@ -963,28 +956,13 @@
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "_nativeTokenPriceFeed",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "_ticketPurchaseFee",
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "_ticketAffiliateFee",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "_broker",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_affiliate",
         "type": "address"
       }
     ],
@@ -1305,7 +1283,20 @@
   },
   {
     "inputs": [],
-    "name": "sharePriceUSD",
+    "name": "sharePriceWei",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sharePriceWeiDecimals",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1408,19 +1399,6 @@
   },
   {
     "inputs": [],
-    "name": "ticketAffiliateFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "ticketIdCounter",
     "outputs": [
       {
@@ -1504,7 +1482,7 @@
         "type": "string"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {

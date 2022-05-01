@@ -27,11 +27,26 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
     }
     return undefined
   }
+
+  const getBscScanName = () => {
+    let name = 'bscscan'
+    if (snapUserState.network.currentNetworkIdHex) {
+      const chainSlug = chainIdHexToSlug(snapUserState.network.currentNetworkIdHex)
+      if (snapUserState.network.currentNetworkIdHex && chainSlug && BLOCKCHAINS[chainSlug]) {
+        // return `${BLOCKCHAINS[chainSlug].blockExplorerUrls[0]}tx/${snap.lastTransaction.hash}`
+        if (BLOCKCHAINS[chainSlug]?.chainName?.toLowerCase()?.startsWith('p')) {
+          name = 'polyscan'
+        }
+      }
+    }
+    return name
+  }
+
   const bscScanUrl = getBscScanUrl()
 
   const ViewOnBSCScan = () => (
     <$BlueLinkLink href={bscScanUrl} target="_blank">
-      View on BscScan
+      View on {getBscScanName()}
     </$BlueLinkLink>
   )
 

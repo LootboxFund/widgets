@@ -8,7 +8,7 @@ export interface TokenDataFE extends TokenData {
   usdPrice?: string
 }
 export const USD_DECIMALS = 8
-export const DEFAULT_CHAIN_ID_HEX = manifest.chain.chainIDHex
+export const DEFAULT_CHAIN_ID_HEX = manifest.chains[0].chainIdHex
 export const DEFAULT_TICKET_IMAGE = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-logo.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-background.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
@@ -70,6 +70,34 @@ export const DEMO_CUSTOM_TOKENS_BSC_MAINNET: TokenDataFE[] = [
   },
 ]
 
+export const MUMBAI_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
+  {
+    address: NATIVE_ADDRESS,
+    chainIdHex: '0x13881',
+    chainIdDecimal: '80001',
+    decimals: 18,
+    name: 'Mumbai',
+    symbol: 'tMatic',
+    logoURI:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC_COLORED.png?alt=media',
+    priceOracle: '0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada' as Address,
+  },
+]
+
+export const POLYGON_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
+  {
+    address: NATIVE_ADDRESS,
+    chainIdHex: '0x89',
+    chainIdDecimal: '137',
+    decimals: 18,
+    name: 'Mumbai',
+    symbol: 'Matic',
+    logoURI:
+      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC_COLORED.png?alt=media',
+    priceOracle: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0' as Address,
+  },
+]
+
 export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   {
     address: NATIVE_ADDRESS,
@@ -126,8 +154,8 @@ export const BSC_TESTNET_FULL_TOKEN_LIST: TokenDataFE[] = [
 export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
   '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
-  '13881': [],
-  '89': [],
+  '0x13881': MUMBAI_TESTNET_FULL_TOKEN_LIST,
+  '89': POLYGON_MAINNET_FULL_TOKEN_LIST,
 }
 
 export const SOCIALS: SocialFragment[] = [

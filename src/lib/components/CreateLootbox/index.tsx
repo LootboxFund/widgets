@@ -10,7 +10,7 @@ import {
   addCustomEVMChain,
 } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
-import { subscribe, useSnapshot } from 'valtio'
+import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import StepChooseFunding, {
@@ -23,14 +23,12 @@ import StepChooseReturns, {
   validateReturnTarget,
 } from 'lib/components/CreateLootbox/StepChooseReturns'
 import StepCustomize, {
-  getMaxTicketPrice,
   validateBiography,
   validateCover,
   validateLogo,
   validateLogoFile,
   validateCoverFile,
   validateName,
-  validatePricePerShare,
   validateSymbol,
   validateThemeColor,
 } from 'lib/components/CreateLootbox/StepCustomize'
@@ -38,7 +36,6 @@ import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { NetworkOption } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
-import { getPriceFeed } from 'lib/hooks/useContract'
 import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
@@ -79,7 +76,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
-  const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
 
   type FormStep =
     | 'stepNetwork'
@@ -147,13 +143,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       })
     }
   }
-  const getLatestPrice = async () => {
-    if (network?.priceFeed) {
-      const nativeTokenPriceEther = await getPriceFeed(network.priceFeed)
-      const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
-      setNativeTokenPrice(nativeTokenPrice)
-    }
-  }
   const checkNetworkStepDone = () => {
     return network && reputationWallet && reputationWallet.length > 0
   }
@@ -199,12 +188,10 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
-  const maxPricePerShare = nativeTokenPrice ? getMaxTicketPrice(nativeTokenPrice, fundraisingTarget, web3Utils) : 0
   const checkCustomizeStepDone = () =>
     validateName(ticketState.name as string) &&
     validateSymbol(ticketState.symbol as string) &&
     validateBiography(ticketState.biography as string) &&
-    validatePricePerShare(ticketState.pricePerShare as number, maxPricePerShare) &&
     validateThemeColor(ticketState.lootboxThemeColor as string) &&
     validateLogo(ticketState.logoUrl as string) &&
     validateCover(ticketState.coverUrl as string) &&
@@ -293,13 +280,15 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const createLootbox = async () => {
     setSubmitStatus('in_progress')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    if (!snapUserState?.network?.currentNetworkIdHex) {
+      throw new Error('Network not set')
+    }
     if (fundingType === 'instant') {
       console.log(`Generating Instant Lootbox...`)
       await createInstantLootbox(
         provider,
         setSubmitStatus,
         {
-          nativeTokenPrice: nativeTokenPrice as BigNumber,
           name: ticketState.name as string,
           symbol: ticketState.symbol as string,
           biography: ticketState.biography as string,
@@ -318,7 +307,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-        socialState
+        socialState,
+        snapUserState.network.currentNetworkIdHex
       )
     } else {
       console.log(`Generating Escrow/Tournament Lootbox...`)
@@ -326,7 +316,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         provider,
         setSubmitStatus,
         {
-          nativeTokenPrice: nativeTokenPrice as BigNumber,
           name: ticketState.name as string,
           symbol: ticketState.symbol as string,
           biography: ticketState.biography as string,
@@ -345,7 +334,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
         },
-        socialState
+        socialState,
+        snapUserState.network.currentNetworkIdHex
       )
     }
   }
@@ -354,9 +344,6 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     return `${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`
   }
 
-  if (!nativeTokenPrice) {
-    getLatestPrice()
-  }
   if (checkNetworkStepDone() && stage.stepNetwork !== 'may_proceed') {
     setStage({
       ...stage,

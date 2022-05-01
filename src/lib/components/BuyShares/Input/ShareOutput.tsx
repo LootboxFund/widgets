@@ -28,9 +28,12 @@ const ShareOutput = (props: ShareOutputProps) => {
       ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
       : new BN(0).toString()
 
-  const price = snap.lootbox.data?.sharePriceUSD
-    ? new BN(snap.lootbox.data?.sharePriceUSD).div(new BN(10).pow(USD_DECIMALS))
-    : undefined
+  // const sharePerUSD =
+  //   snap?.lootbox?.data?.sharePriceWei && snap?.inputToken?.data?.usdPrice
+  //     ? new BN(snap.lootbox.data.sharePriceWei)
+  //         .multipliedBy(new BN(10).pow(USD_DECIMALS))
+  //         .div(new BN(snap.inputToken.data.usdPrice))
+  //     : undefined
 
   return (
     <$TokenInput screen={screen}>
@@ -53,13 +56,13 @@ const ShareOutput = (props: ShareOutputProps) => {
             </$TokenSymbol>
           </$Button>
 
-          {price ? (
-            <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right' }}>
-              {`$${price.decimalPlaces(2).toString()}`} USD/Share
+          {/* {sharePerUSD ? (
+            <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+              {`${sharePerUSD?.toExponential(1)?.toString()}`} Shares/USD
             </$FineText>
           ) : (
             ''
-          )}
+          )} */}
         </$Vertical>
       </$Horizontal>
     </$TokenInput>

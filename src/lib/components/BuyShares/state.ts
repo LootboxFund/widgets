@@ -18,6 +18,7 @@ import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 export type BuySharesRoute = '/buyShares' | '/complete'
 export interface BuySharesState {
   route: BuySharesRoute
+  loading: boolean
   lootbox: {
     address: Address | undefined
     data: ILootbox | undefined
@@ -41,13 +42,14 @@ export interface BuySharesState {
 }
 const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
+  loading: true,
   lootbox: {
     address: undefined,
     data: {
       address: undefined,
       name: undefined,
       symbol: undefined,
-      sharePriceUSD: undefined,
+      sharePriceWei: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,
@@ -83,8 +85,7 @@ subscribe(buySharesState.inputToken, () => {
 })
 
 subscribe(userState, () => {
-  initBuySharesState(buySharesState.lootbox.address).catch((err) => console.error(err))
-  // loadInputTokenData()  called in initBuySharesState
+  loadInputTokenData()
 })
 
 const updateLootboxQuantity = () => {
@@ -92,16 +93,12 @@ const updateLootboxQuantity = () => {
     buySharesState.lootbox.quantity = '0'
   } else if (
     buySharesState.lootbox.data &&
-    buySharesState.inputToken.data &&
     buySharesState.inputToken.quantity !== undefined &&
-    buySharesState.inputToken.data.usdPrice &&
-    buySharesState.lootbox.data.sharePriceUSD
+    buySharesState.lootbox.data.sharePriceWei
   ) {
-    const inputTokenPrice = buySharesState.inputToken.data.usdPrice
-    const outputTokenPrice = buySharesState.lootbox.data.sharePriceUSD
     buySharesState.lootbox.quantity = new BN(buySharesState.inputToken.quantity)
-      .multipliedBy(new BN(inputTokenPrice))
-      .dividedBy(new BN(outputTokenPrice))
+      .multipliedBy(new BN(10).pow(18))
+      .div(new BN(buySharesState.lootbox.data.sharePriceWei))
       .toString()
   }
 }
@@ -147,6 +144,8 @@ export const purchaseLootboxShare = async () => {
 }
 
 export const initBuySharesState = async (lootboxAddress: Address | undefined) => {
+  buySharesState.loading = true
+
   buySharesState.inputToken.data = getTokenFromList(NATIVE_ADDRESS)
   loadInputTokenData()
 
@@ -157,13 +156,13 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
   buySharesState.lootbox.address = lootboxAddress
 
   try {
-    const { name, symbol, sharePriceUSD, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
+    const { name, symbol, sharePriceWei, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
       await getLootboxData(lootboxAddress)
     buySharesState.lootbox.data = {
       address: lootboxAddress,
       name: name,
       symbol: symbol,
-      sharePriceUSD: sharePriceUSD,
+      sharePriceWei: sharePriceWei,
       sharesSoldCount: sharesSoldCount,
       sharesSoldMax: sharesSoldMax,
       ticketIdCounter: ticketIdCounter,
@@ -176,13 +175,15 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       address: undefined,
       name: undefined,
       symbol: undefined,
-      sharePriceUSD: undefined,
+      sharePriceWei: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
       ticketIdCounter: undefined,
       shareDecimals: undefined,
       variant: undefined,
     }
+  } finally {
+    buySharesState.loading = false
   }
 }
 

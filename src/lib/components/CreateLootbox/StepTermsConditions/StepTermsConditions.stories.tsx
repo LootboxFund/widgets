@@ -74,8 +74,8 @@ const Demo = (args: StepTermsConditionsProps) => {
         .createLootbox(
           'name',
           'symbol',
+          '5000000000000000000',
           '5000000000000000000000', // uint256 _maxSharesSold,
-          '7000000', // uint256 _sharePriceUSD,
           receivingWallet,
           receivingWallet
         )
@@ -92,7 +92,7 @@ const Demo = (args: StepTermsConditionsProps) => {
         from: snapUserState.currentAccount,
       }
       lootbox.events.LootboxCreated(options).on('data', (event: any) => {
-        const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = event.returnValues
+        const { issuer, lootbox, treasury } = event.returnValues
 
         if (issuer === snapUserState.currentAccount && treasury === receivingWallet) {
           console.log(`
