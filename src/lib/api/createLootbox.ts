@@ -11,7 +11,7 @@ import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 
-const SHARE_PRICE_WEI = '1000000000' // HARDCODED FOR NOW
+const SHARE_PRICE_WEI = '1000000000000' // HARDCODED FOR NOW
 const SHARE_PRICE_WEI_DECIMALS = '18' // HARDCODED FOR NOW
 
 const checkMobileBrowser = (): boolean => {
