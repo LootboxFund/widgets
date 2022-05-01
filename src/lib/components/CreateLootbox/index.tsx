@@ -13,6 +13,7 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
+import { extractURLState_CreateLootboxPage } from './state'
 import StepChooseFunding, {
   validateFundraisingTarget,
   validateReceivingWallet,
@@ -77,6 +78,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
 
+  const { INITIAL_FORM_STATE, INITIAL_VALIDITY, INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
+
   type FormStep =
     | 'stepNetwork'
     | 'stepType'
@@ -86,27 +89,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     | 'stepSocials'
     | 'stepTerms'
 
-  const INITIAL_FORM_STATE: Record<FormStep, StepStage> = {
-    stepNetwork: 'in_progress',
-    stepType: 'not_yet',
-    stepFunding: 'not_yet',
-    stepReturns: 'not_yet',
-    stepCustomize: 'not_yet',
-    stepSocials: 'not_yet',
-    stepTerms: 'not_yet',
-  }
   const [stage, setStage] = useState(INITIAL_FORM_STATE)
 
   // VALIDITY: Validity of the forms
-  const INITIAL_VALIDITY: Record<FormStep, boolean> = {
-    stepNetwork: false,
-    stepType: false,
-    stepFunding: false,
-    stepReturns: false,
-    stepCustomize: false,
-    stepSocials: false,
-    stepTerms: false,
-  }
   const [validity, setValidity] = useState(INITIAL_VALIDITY)
 
   // Prevent: Step 2-6 Warning used before declaration
@@ -188,15 +173,31 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
-  const checkCustomizeStepDone = () =>
-    validateName(ticketState.name as string) &&
-    validateSymbol(ticketState.symbol as string) &&
-    validateBiography(ticketState.biography as string) &&
-    validateThemeColor(ticketState.lootboxThemeColor as string) &&
-    validateLogo(ticketState.logoUrl as string) &&
-    validateCover(ticketState.coverUrl as string) &&
-    validateLogoFile(ticketState.logoFile as File) &&
-    validateCoverFile(ticketState.coverFile as File)
+  const checkCustomizeStepDone = () => {
+    console.log(`
+      
+    validateName(ticketState.name as string) = ${validateName(ticketState.name as string)}
+    validateSymbol(ticketState.symbol as string) = ${validateSymbol(ticketState.symbol as string)}
+    validateBiography(ticketState.biography as string) = ${validateBiography(ticketState.biography as string)}
+    validateThemeColor(ticketState.lootboxThemeColor as string) = ${validateThemeColor(
+      ticketState.lootboxThemeColor as string
+    )}
+    validateLogo(ticketState.logoUrl as string) = ${validateLogo(ticketState.logoUrl as string)}
+    validateCover(ticketState.coverUrl as string) = ${validateCover(ticketState.coverUrl as string)}
+    validateLogoFile(ticketState.logoFile as File) = ${validateLogoFile(ticketState.logoFile as File)}
+    validateCoverFile(ticketState.coverFile as File) = ${validateCoverFile(ticketState.coverFile as File)}
+    `)
+    return (
+      validateName(ticketState.name as string) &&
+      validateSymbol(ticketState.symbol as string) &&
+      validateBiography(ticketState.biography as string) &&
+      validateThemeColor(ticketState.lootboxThemeColor as string) &&
+      validateLogo(ticketState.logoUrl as string) &&
+      validateCover(ticketState.coverUrl as string) &&
+      validateLogoFile(ticketState.logoFile as File) &&
+      validateCoverFile(ticketState.coverFile as File)
+    )
+  }
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
