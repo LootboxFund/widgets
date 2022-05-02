@@ -69,6 +69,8 @@ const BuyButton = (props: BuyButtonProps) => {
     sharesRemaining.toFixed(2).length > 8 ? sharesRemaining.toExponential(2) : sharesRemaining.toFixed(2)
   const isInsufficientFunds = balance.lt(quantity)
   const isWrongChain = metadata?.lootboxCustomSchema?.chain?.chainIdHex !== snapUserState.network.currentNetworkIdHex
+  const isMetadataLoaded = !!metadata
+  const isLootboxLoaded = Object.keys(snapBuySharesState?.lootbox?.data || {}).length > 0
 
   const SuppressedButton = ({ txt }: { txt: string }) => {
     return (
@@ -111,7 +113,7 @@ const BuyButton = (props: BuyButtonProps) => {
     )
   } else if (!isWalletConnected) {
     return <WalletButton />
-  } else if (isWrongChain) {
+  } else if (isMetadataLoaded && isWrongChain) {
     return (
       <$Button
         screen={screen}
@@ -123,6 +125,20 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ ...BASE_BUTTON_STYLE }}
       >
         Switch network
+      </$Button>
+    )
+  } else if (!isLootboxLoaded) {
+    return (
+      <$Button
+        screen={screen}
+        color={`${COLORS.dangerFontColor}90`}
+        colorHover={COLORS.dangerFontColor}
+        backgroundColor={`${COLORS.dangerBackground}80`}
+        backgroundColorHover={`${COLORS.dangerBackground}`}
+        style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
+        disabled
+      >
+        Lootbox could not be loaded
       </$Button>
     )
   } else if (isInsufficientFunds) {
