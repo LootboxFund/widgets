@@ -60,6 +60,8 @@ import { manifest } from 'manifest'
 import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateLootbox/StepMagicLink'
 import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
+import { v4 as uuidv4 } from 'uuid'
+import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 11 // base 2
@@ -700,7 +702,18 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         themeColor={ticketState.themeColor as string}
         campaignBio={ticketState.biography as string}
         campaignWebsite={socialState.web}
-        uploadImages={() => ['logoImage', 'coverImage']}
+        uploadImages={async () => {
+          if (!ticketState.logoFile || !ticketState.coverFile) {
+            throw new Error('Logo or cover image not set')
+          }
+          const submissionId = uuidv4()
+          const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+            uploadLootboxLogo(submissionId, ticketState.logoFile),
+            uploadLootboxCover(submissionId, ticketState.coverFile),
+          ])
+
+          return [imagePublicPath, backgroundPublicPath]
+        }}
         stage="in_progress"
         selectedNetwork={network}
       />

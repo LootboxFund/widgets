@@ -11,6 +11,7 @@ import { StepStage } from '../StepCard/index'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
+import LogRocket from 'logrocket'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -28,7 +29,7 @@ export interface StepMagicLinkProps {
   themeColor: string | undefined
   campaignBio: string | undefined
   campaignWebsite: string | undefined
-  uploadImages: () => [string, string]
+  uploadImages: () => Promise<[string, string]>
   selectedNetwork: NetworkOption | undefined
   stage: StepStage
 }
@@ -77,13 +78,18 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     if (includeCampaignWebsite) {
       queryParams.campaignWebsite = props.campaignWebsite
     }
-    const [logoImage, coverImage] = await props.uploadImages()
-    if (includeLogoImage) {
-      queryParams.logoImage = logoImage
+    try {
+      const [logoImage, coverImage] = await props.uploadImages()
+      if (includeLogoImage) {
+        queryParams.logoImage = logoImage
+      }
+      if (includeCoverImage) {
+        queryParams.coverImage = coverImage
+      }
+    } catch (err) {
+      LogRocket.captureException(err)
     }
-    if (includeCoverImage) {
-      queryParams.coverImage = coverImage
-    }
+
     const magicLink = queryString.stringifyUrl({ url: window.location.origin, query: queryParams })
     console.log(`Magic link is = ${magicLink}`)
     setMagicLink(magicLink)
