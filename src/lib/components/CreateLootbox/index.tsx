@@ -61,11 +61,24 @@ import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateL
 import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { v4 as uuidv4 } from 'uuid'
-import { uploadLootboxLogo, uploadLootboxCover } from 'lib/api/firebase/storage'
+import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 11 // base 2
 export const defaultFundraisingLimitMultiplierDecimal = 10
+
+const encodeImageURI = (imageURI: string) => {
+  const match = imageURI.match(`${LOOTBOX_ASSET_FOLDER}(.*)`)?.[0]
+  if (match) {
+    // remove ?alt=media
+    const parts = match.split('?')
+    const encoded = parts[0]
+    // const replace = `${encoded}`
+    var re = new RegExp(encoded, 'g')
+    return `${imageURI.replace(re, encodeURIComponent(encoded))}`
+  }
+  return imageURI
+}
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -167,6 +180,17 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       updateTicketState('biography', INITIAL_URL_PARAMS.campaignBio)
       prefilledFields.push(`Lootbox description set to "${INITIAL_URL_PARAMS.campaignBio}"`)
     }
+    if (INITIAL_URL_PARAMS.logoImage) {
+      const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
+      updateTicketState('logoUrl', decodedLogo)
+      prefilledFields.push(`Lootbox logo image set to "${INITIAL_URL_PARAMS.logoImage}"`)
+    }
+    if (INITIAL_URL_PARAMS.coverImage) {
+      const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
+      updateTicketState('coverUrl', decodedCover)
+      prefilledFields.push(`Lootbox cover image set to "${INITIAL_URL_PARAMS.coverImage}"`)
+    }
+
     setLoadedUrlParams(true)
     setPreconfigParams(prefilledFields)
   }
