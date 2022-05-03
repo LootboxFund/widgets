@@ -724,13 +724,22 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         campaignBio={ticketState.biography as string}
         campaignWebsite={socialState.web}
         uploadImages={async () => {
-          if (!ticketState.logoFile || !ticketState.coverFile) {
-            throw new Error('Logo or cover image not set')
+          if (!ticketState.logoFile && !ticketState.logoUrl) {
+            throw new Error('Logo not set')
           }
+
+          if (!ticketState.coverFile && !ticketState.coverUrl) {
+            throw new Error('Cover not set')
+          }
+
           const submissionId = uuidv4()
           const [imagePublicPath, backgroundPublicPath] = await Promise.all([
-            uploadLootboxLogo(submissionId, ticketState.logoFile),
-            uploadLootboxCover(submissionId, ticketState.coverFile),
+            ticketState.logoFile
+              ? uploadLootboxLogo(submissionId, ticketState.logoFile)
+              : (ticketState.logoUrl as string),
+            ticketState.coverFile
+              ? uploadLootboxCover(submissionId, ticketState.coverFile)
+              : (ticketState.coverUrl as string),
           ])
 
           return [imagePublicPath, backgroundPublicPath]
