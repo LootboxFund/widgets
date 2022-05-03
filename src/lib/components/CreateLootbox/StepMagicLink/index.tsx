@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import queryString from 'query-string'
 import { $Vertical } from 'lib/components/Generics'
 import { $TermCheckbox, $TermOfService } from '../StepTermsConditions'
-import { BLOCKCHAINS, chainIdHexToSlug, ChainInfo, ChainSlugs } from '@wormgraph/helpers'
+import { BLOCKCHAINS, chainIdHexToSlug, ChainInfo, ChainSlugs, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { ethers } from 'ethers'
 import StepCard, { $StepHeading, $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
 import { StepStage } from '../StepCard/index'
@@ -12,6 +12,8 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import LogRocket from 'logrocket'
+import $Button from 'lib/components/Generics/Button'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -45,12 +47,14 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const [includeReturnsTarget, setIncludeReturnsTarget] = useState(true)
   const [includeReturnsDate, setIncludeReturnsDate] = useState(true)
   const [includeLogoImage, setIncludeLogoImage] = useState(true)
-  const [includeCoverImage, setIncludeCoverImage] = useState(false)
-  const [includeThemeColor, setIncludeThemeColor] = useState(false)
+  const [includeCoverImage, setIncludeCoverImage] = useState(true)
+  const [includeThemeColor, setIncludeThemeColor] = useState(true)
   const [includeCampaignBio, setIncludeCampaignBio] = useState(true)
   const [includeCampaignWebsite, setIncludeCampaignWebsite] = useState(true)
+  const [loading, setLoading] = useState(false)
 
   const generateMagicLink = async () => {
+    setLoading(true)
     let queryParams: any = {}
     if (includeNetwork || includeFundingTarget || includeFundingLimit) {
       queryParams.network = props.network
@@ -93,6 +97,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     const magicLink = queryString.stringifyUrl({ url: window.location.origin, query: queryParams })
     console.log(`Magic link is = ${magicLink}`)
     setMagicLink(magicLink)
+    setLoading(false)
   }
   if (!props.network || !props.selectedNetwork) {
     return null
@@ -103,7 +108,16 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     return (
       <$StepMagicLink>
         <div style={{ width: '100%', textAlign: 'center' }}>
-          <button onClick={() => setShowMagicLinkGenerator(true)}>Show Magic Link</button>
+          <$Button
+            screen={screen}
+            onClick={() => setShowMagicLinkGenerator(true)}
+            disabled={loading}
+            backgroundColor={`${COLORS.surpressedBackground}40`}
+            color={`${COLORS.surpressedFontColor}`}
+            style={{ paddingLeft: '20px', paddingRight: '20px' }}
+          >
+            Show magic link
+          </$Button>
         </div>
       </$StepMagicLink>
     )
@@ -226,12 +240,25 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
               text={`Set the website in the Lootbox social links automatically`}
               locked={false}
             />
-            <button onClick={() => generateMagicLink()}>Generate</button>
+            <br />
+            <br />
+            <$Button
+              screen={screen}
+              onClick={() => generateMagicLink()}
+              disabled={loading}
+              color={COLORS.trustFontColor}
+              backgroundColor={COLORS.trustBackground}
+            >
+              <LoadingText loading={loading} text="Generate" color={COLORS.trustFontColor} />
+            </$Button>
           </$Vertical>
           <br />
           {magicLink && (
             <$Vertical>
-              <input value={magicLink}></input>
+              <input
+                value={magicLink}
+                style={{ fontSize: TYPOGRAPHY.fontSize.large, fontFamily: TYPOGRAPHY.fontFamily.regular }}
+              ></input>
               <span>Copy</span>
             </$Vertical>
           )}
