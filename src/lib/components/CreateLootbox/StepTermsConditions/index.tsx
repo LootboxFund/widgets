@@ -105,7 +105,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     props.updateTermsState(slug, checked)
   }
   const submitWithCountdown = () => {
-    setTimeLeft(60)
+    setTimeLeft(90)
     props.onSubmit()
   }
   const renderActionBar = () => {
