@@ -175,12 +175,14 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       prefilledFields.push(`Lootbox description set to "${INITIAL_URL_PARAMS.campaignBio}"`)
     }
     if (INITIAL_URL_PARAMS.logoImage) {
-      const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
+      // const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
+      const decodedLogo = INITIAL_URL_PARAMS.logoImage
       tempStateObject = { ...tempStateObject, logoUrl: decodedLogo }
       prefilledFields.push(`Lootbox logo image set to "${INITIAL_URL_PARAMS.logoImage}"`)
     }
     if (INITIAL_URL_PARAMS.coverImage) {
-      const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
+      // const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
+      const decodedCover = INITIAL_URL_PARAMS.coverImage
       tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
       prefilledFields.push(`Lootbox cover image set to "${INITIAL_URL_PARAMS.coverImage}"`)
     }
