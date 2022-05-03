@@ -112,9 +112,9 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
             screen={screen}
             onClick={() => setShowMagicLinkGenerator(true)}
             disabled={loading}
-            backgroundColor={`${COLORS.surpressedBackground}40`}
-            color={`${COLORS.surpressedFontColor}c0`}
-            style={{ paddingLeft: '20px', paddingRight: '20px' }}
+            backgroundColor={`${COLORS.surpressedBackground}15`}
+            color={`${COLORS.surpressedFontColor}70`}
+            style={{ paddingLeft: '20px', paddingRight: '20px', fontWeight: TYPOGRAPHY.fontWeight.regular }}
           >
             Create magic link
           </$Button>
