@@ -114,6 +114,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     console.log(INITIAL_URL_PARAMS)
     const prefilledFields = []
 
+    let tempStateObject = {}
+
     if (INITIAL_URL_PARAMS.network && validNetworks.includes(INITIAL_URL_PARAMS.network || '')) {
       const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network)
       if (networkOption) {
@@ -162,26 +164,29 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       }
     }
     if (INITIAL_URL_PARAMS.themeColor) {
-      updateTicketState('lootboxThemeColor', INITIAL_URL_PARAMS.themeColor)
+      tempStateObject = { ...tempStateObject, lootboxThemeColor: INITIAL_URL_PARAMS.themeColor }
     }
     if (INITIAL_URL_PARAMS.campaignWebsite) {
       updateSocialState('web', INITIAL_URL_PARAMS.campaignWebsite)
       prefilledFields.push(`Lootbox website for more info set to "${INITIAL_URL_PARAMS.campaignWebsite}"`)
     }
     if (INITIAL_URL_PARAMS.campaignBio) {
-      updateTicketState('biography', INITIAL_URL_PARAMS.campaignBio)
+      tempStateObject = { ...tempStateObject, biography: INITIAL_URL_PARAMS.campaignBio }
       prefilledFields.push(`Lootbox description set to "${INITIAL_URL_PARAMS.campaignBio}"`)
     }
     if (INITIAL_URL_PARAMS.logoImage) {
       const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
-      updateTicketState('logoUrl', decodedLogo)
+      tempStateObject = { ...tempStateObject, logoUrl: decodedLogo }
       prefilledFields.push(`Lootbox logo image set to "${INITIAL_URL_PARAMS.logoImage}"`)
     }
     if (INITIAL_URL_PARAMS.coverImage) {
       const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
-      updateTicketState('coverUrl', decodedCover)
+      tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
       prefilledFields.push(`Lootbox cover image set to "${INITIAL_URL_PARAMS.coverImage}"`)
     }
+
+    // @ts-ignore bullshit typing shit
+    setTicketState({ ...ticketState, ...tempStateObject })
 
     setLoadedUrlParams(true)
     setPreconfigParams(prefilledFields)
