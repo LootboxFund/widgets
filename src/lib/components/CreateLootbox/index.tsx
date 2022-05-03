@@ -172,19 +172,19 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
     if (INITIAL_URL_PARAMS.campaignBio) {
       tempStateObject = { ...tempStateObject, biography: INITIAL_URL_PARAMS.campaignBio }
-      prefilledFields.push(`Lootbox description set to "${INITIAL_URL_PARAMS.campaignBio}"`)
+      prefilledFields.push(`Lootbox description is already set`)
     }
     if (INITIAL_URL_PARAMS.logoImage) {
       // const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
       const decodedLogo = INITIAL_URL_PARAMS.logoImage
       tempStateObject = { ...tempStateObject, logoUrl: decodedLogo }
-      prefilledFields.push(`Lootbox logo image set to "${INITIAL_URL_PARAMS.logoImage}"`)
+      prefilledFields.push(`Lootbox logo image is already set`)
     }
     if (INITIAL_URL_PARAMS.coverImage) {
       // const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
       const decodedCover = INITIAL_URL_PARAMS.coverImage
       tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
-      prefilledFields.push(`Lootbox cover image set to "${INITIAL_URL_PARAMS.coverImage}"`)
+      prefilledFields.push(`Lootbox cover image is already set`)
     }
 
     // @ts-ignore bullshit typing shit
