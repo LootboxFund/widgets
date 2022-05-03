@@ -125,7 +125,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   return (
     <$StepMagicLink>
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={() => {}} errors={[]}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <$StepHeading>
             Create Magic Link
             <HelpIcon tipID="stepNetwork" />
@@ -257,9 +257,22 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
             <$Vertical>
               <input
                 value={magicLink}
-                style={{ fontSize: TYPOGRAPHY.fontSize.large, fontFamily: TYPOGRAPHY.fontFamily.regular }}
+                style={{
+                  fontSize: TYPOGRAPHY.fontSize.large,
+                  fontFamily: TYPOGRAPHY.fontFamily.regular,
+                  color: COLORS.surpressedFontColor,
+                }}
               ></input>
-              <span>Copy</span>
+              <br />
+              <span
+                style={{
+                  fontSize: TYPOGRAPHY.fontSize.large,
+                  fontFamily: TYPOGRAPHY.fontFamily.regular,
+                  color: COLORS.surpressedFontColor,
+                }}
+              >
+                Copy the link above ☝️ and send it to the person you want to create a Lootbox for.
+              </span>
             </$Vertical>
           )}
         </div>
@@ -288,6 +301,8 @@ const IncludeTerm = (props: IncludeTermProps) => {
     alignItems: 'flex-start',
     marginBottom: '10px',
     fontFamily: 'sans-serif',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   }
   if (props.locked) {
     termStyles = { ...termStyles, opacity: '0.2', cursor: 'not-allowed' }
@@ -301,7 +316,7 @@ const IncludeTerm = (props: IncludeTermProps) => {
         checked={props.checked}
         type="checkbox"
       ></$TermCheckbox>
-      <$TermOfService>{props.text}</$TermOfService>
+      <$TermOfService style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{props.text}</$TermOfService>
     </div>
   )
 }

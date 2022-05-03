@@ -342,7 +342,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               screen={screen}
             />
             <br />
-            <$Horizontal>
+            <$Horizontal flexWrap>
               <$Vertical>
                 {/* <$ColorPreview
                 
@@ -403,7 +403,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                   value={props.ticketState.lootboxThemeColor}
                   onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
                   style={{
-                    width: '80%',
+                    width: '120px',
                     textAlign: 'center',
                     border: props.ticketState.lootboxThemeColor
                       ? `${props.ticketState.lootboxThemeColor} solid 2px `
