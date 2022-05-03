@@ -342,7 +342,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               screen={screen}
             />
             <br />
-            <$Horizontal flexWrap>
+            <$Horizontal flexWrap={screen === 'mobile'}>
               <$Vertical>
                 {/* <$ColorPreview
                 
