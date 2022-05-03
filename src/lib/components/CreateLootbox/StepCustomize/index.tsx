@@ -14,6 +14,11 @@ import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import { checkIfValidUrl } from 'lib/api/helpers'
 
+const INITAL_LOGO =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media'
+const INITIAL_COVER =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media'
+
 export const getMaxTicketPrice = (
   nativeTokenPrice: BigNumber,
   fundraisingTarget: BigNumber,
@@ -329,8 +334,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
           </$Vertical>
           <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
             <TicketCardCandyWrapper
-              backgroundImage={props.ticketState.coverUrl as string}
-              logoImage={props.ticketState.logoUrl as string}
+              backgroundImage={(props.ticketState.coverUrl as string) || INITIAL_COVER}
+              logoImage={(props.ticketState.logoUrl as string) || INITAL_LOGO}
               badgeImage={props.ticketState.badgeUrl as string}
               themeColor={props.ticketState.lootboxThemeColor as string}
               name={props.ticketState.name as string}
