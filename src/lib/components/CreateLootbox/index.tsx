@@ -41,15 +41,7 @@ import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
-import {
-  Address,
-  BLOCKCHAINS,
-  chainIdHexToSlug,
-  ChainInfo,
-  ChainSlugs,
-  ContractAddress,
-  convertDecimalToHex,
-} from '@wormgraph/helpers'
+import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { initLogging } from 'lib/api/logrocket'
@@ -294,11 +286,9 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     pricePerShare: 0.05,
     lootboxThemeColor: '#000000',
     /** @deprecated logoUrls are now from internal gbucket - use logoFile instead */
-    logoUrl:
-      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media',
+    logoUrl: '',
     /** @deprecated logoUrls are now from internal gbucket - use coverFile instead*/
-    coverUrl:
-      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
+    coverUrl: '',
     badgeUrl: '',
   }
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
@@ -311,10 +301,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       validateSymbol(ticketState.symbol as string) &&
       validateBiography(ticketState.biography as string) &&
       validateThemeColor(ticketState.lootboxThemeColor as string) &&
-      validateLogo(ticketState.logoUrl as string) &&
-      validateCover(ticketState.coverUrl as string) &&
-      validateLogoFile(ticketState.logoFile as File) &&
-      validateCoverFile(ticketState.coverFile as File)
+      (validateLogo(ticketState.logoUrl as string) || validateLogoFile(ticketState.logoFile as File)) &&
+      (validateCover(ticketState.coverUrl as string) || validateCoverFile(ticketState.coverFile as File))
     )
   }
 

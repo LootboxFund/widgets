@@ -105,16 +105,16 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateBiography(props.ticketState.biography as string)) valid = false
     if (!validatePricePerShare(props.ticketState.pricePerShare as number, maxPricePerShare)) valid = false
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
-    if (!validateLogo(props.ticketState.logoUrl as string)) valid = false
-    if (!validateCover(props.ticketState.coverUrl as string)) valid = false
-    // if (!validateBadge(props.ticketState.badgeUrl as string)) valid = false
 
     if (valid) {
-      if (!validateLogoFile(props.ticketState.logoFile as File)) {
+      if (!validateLogoFile(props.ticketState.logoFile as File) && !validateLogo(props.ticketState.logoUrl as string)) {
         valid = false
         setErrors({ ...errors, logoFile: 'Please upload a logo image' })
       }
-      if (!validateCoverFile(props.ticketState.coverFile as File)) {
+      if (
+        !validateCoverFile(props.ticketState.coverFile as File) &&
+        !validateCover(props.ticketState.coverUrl as string)
+      ) {
         valid = false
         setErrors({
           ...errors,
@@ -134,6 +134,8 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         logoFile: '',
         coverFile: '',
         badgeFile: '',
+        logoUrl: '',
+        coverUrl: '',
       })
       props.setValidity(true)
     } else {
@@ -178,24 +180,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       setErrors({
         ...errors,
         lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color',
-      })
-    }
-    if (slug === 'logoUrl') {
-      setErrors({
-        ...errors,
-        logoUrl: validateLogo(value as string) ? '' : 'Logo must be a valid URL',
-      })
-    }
-    if (slug === 'coverUrl') {
-      setErrors({
-        ...errors,
-        coverUrl: validateCover(value as string) ? '' : 'Cover image must be a valid URL',
-      })
-    }
-    if (slug === 'badgeUrl') {
-      setErrors({
-        ...errors,
-        badgeUrl: validateBadge(value as string) ? '' : 'Badge image must be a valid URL',
       })
     }
   }
@@ -363,7 +347,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="logo-uploader">
-                    {props.ticketState.logoFile ? '✅' : '⚠️  Upload'} Logo
+                    {props.ticketState.logoFile || props.ticketState.logoUrl ? '✅' : '⚠️  Upload'} Logo
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
@@ -375,7 +359,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="cover-uploader">
-                    {props.ticketState.coverFile ? '✅' : '⚠️  Upload'} Cover
+                    {props.ticketState.coverFile || props.ticketState.coverUrl ? '✅' : '⚠️  Upload'} Cover
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
