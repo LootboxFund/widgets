@@ -13,6 +13,11 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
+import {
+  extractURLState_CreateLootboxPage,
+  InitialFormStateCreateLootbox,
+  InitialFormValidityCreateLootbox,
+} from './state'
 import StepChooseFunding, {
   validateFundraisingTarget,
   validateReceivingWallet,
@@ -34,7 +39,7 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { NetworkOption } from 'lib/api/network'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
 import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
@@ -44,17 +49,37 @@ import LogRocket from 'logrocket'
 import StepChooseType, { LootboxType } from 'lib/components/CreateLootbox/StepChooseType'
 import { createEscrowLootbox, createInstantLootbox } from 'lib/api/createLootbox'
 import { manifest } from 'manifest'
+import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateLootbox/StepMagicLink'
+import { ethers } from 'ethers'
+import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
+import { v4 as uuidv4 } from 'uuid'
+import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 11 // base 2
 export const defaultFundraisingLimitMultiplierDecimal = 10
+
+const encodeImageURI = (imageURI: string) => {
+  const match = imageURI.match(`${LOOTBOX_ASSET_FOLDER}(.*)`)?.[0]
+  if (match) {
+    // remove ?alt=media
+    const parts = match.split('?')
+    const encoded = parts[0]
+    // const replace = `${encoded}`
+    var re = new RegExp(encoded, 'g')
+    return `${imageURI.replace(re, encodeURIComponent(encoded))}`
+  }
+  return imageURI
+}
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
   useEffect(() => {
     initLogging()
     if (window.ethereum) {
-      initDApp().catch((err) => LogRocket.captureException(err))
+      initDApp()
+        .then(() => initFromUrlParams())
+        .catch((err) => LogRocket.captureException(err))
     } else {
       window.addEventListener('ethereum#initialized', initDApp, {
         once: true,
@@ -63,11 +88,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         if (!window.ethereum) {
           alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
         } else {
-          initDApp().catch((err) => LogRocket.captureException(err))
+          initDApp()
+            .then(() => {
+              initFromUrlParams()
+            })
+            .catch((err) => LogRocket.captureException(err))
         }
       }, 3000) // 3 seconds
     }
   }, [])
+  const [loadedUrlParams, setLoadedUrlParams] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
@@ -76,6 +106,93 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
+  const [preconfigParams, setPreconfigParams] = useState<string[]>([])
+
+  const initFromUrlParams = async () => {
+    const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
+    console.log('------- INITIAL_URL_PARAMS -------')
+    console.log(INITIAL_URL_PARAMS)
+    const prefilledFields = []
+
+    let tempStateObject = {}
+
+    if (INITIAL_URL_PARAMS.network && validNetworks.includes(INITIAL_URL_PARAMS.network || '')) {
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network)
+      if (networkOption) {
+        setNetwork(networkOption)
+        prefilledFields.push(`Network set to ${networkOption.name}`)
+      }
+    }
+    if (INITIAL_URL_PARAMS.type && validTypes.includes(INITIAL_URL_PARAMS.type || '')) {
+      setFundingType(INITIAL_URL_PARAMS.type as LootboxType)
+      prefilledFields.push(`Funding type set to ${INITIAL_URL_PARAMS.type}`)
+    }
+    if (INITIAL_URL_PARAMS.fundingTarget && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingTarget))) {
+      console.log(`Setting funding target... ${INITIAL_URL_PARAMS.fundingTarget}`)
+      setFundraisingTarget(web3Utils.toBN(INITIAL_URL_PARAMS.fundingTarget))
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
+      prefilledFields.push(
+        `Funding target set to ${parseFloat(
+          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()
+        ).toFixed(4)} ${networkOption?.symbol}`
+      )
+    }
+    if (INITIAL_URL_PARAMS.fundingLimit && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingLimit))) {
+      setFundraisingLimit(web3Utils.toBN(INITIAL_URL_PARAMS.fundingLimit))
+      const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
+      prefilledFields.push(
+        `Funding limit set to ${parseFloat(
+          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()
+        ).toFixed(4)} ${networkOption?.symbol}`
+      )
+    }
+    if (INITIAL_URL_PARAMS.receivingWallet) {
+      setReceivingWallet(INITIAL_URL_PARAMS.receivingWallet as Address)
+      prefilledFields.push(`Receiving wallet set to ${INITIAL_URL_PARAMS.receivingWallet}`)
+    }
+    if (INITIAL_URL_PARAMS.returnsTarget && !isNaN(parseInt(INITIAL_URL_PARAMS.returnsTarget))) {
+      setBasisPoints(parseInt(INITIAL_URL_PARAMS.returnsTarget))
+      prefilledFields.push(
+        `Returns target set to ${ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString()}%`
+      )
+    }
+    if (INITIAL_URL_PARAMS.returnsDate) {
+      const paybackDate = new Date(INITIAL_URL_PARAMS.returnsDate)
+      if (INITIAL_URL_PARAMS.returnsDate && paybackDate instanceof Date && !isNaN(paybackDate.getTime())) {
+        setPaybackDate(INITIAL_URL_PARAMS.returnsDate)
+        prefilledFields.push(`Returns date set to ${INITIAL_URL_PARAMS.returnsDate}`)
+      }
+    }
+    if (INITIAL_URL_PARAMS.themeColor) {
+      tempStateObject = { ...tempStateObject, lootboxThemeColor: INITIAL_URL_PARAMS.themeColor }
+    }
+    if (INITIAL_URL_PARAMS.campaignWebsite) {
+      updateSocialState('web', INITIAL_URL_PARAMS.campaignWebsite)
+      prefilledFields.push(`Lootbox website for more info set to "${INITIAL_URL_PARAMS.campaignWebsite}"`)
+    }
+    if (INITIAL_URL_PARAMS.campaignBio) {
+      tempStateObject = { ...tempStateObject, biography: INITIAL_URL_PARAMS.campaignBio }
+      prefilledFields.push(`Lootbox description is already set`)
+    }
+    if (INITIAL_URL_PARAMS.logoImage) {
+      // const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
+      const decodedLogo = INITIAL_URL_PARAMS.logoImage
+      tempStateObject = { ...tempStateObject, logoUrl: decodedLogo }
+      prefilledFields.push(`Lootbox logo image is already set`)
+    }
+    if (INITIAL_URL_PARAMS.coverImage) {
+      // const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
+      const decodedCover = INITIAL_URL_PARAMS.coverImage
+      tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
+      prefilledFields.push(`Lootbox cover image is already set`)
+    }
+
+    // @ts-ignore bullshit typing shit
+    setTicketState({ ...ticketState, ...tempStateObject })
+
+    setLoadedUrlParams(true)
+    setPreconfigParams(prefilledFields)
+  }
 
   type FormStep =
     | 'stepNetwork'
@@ -86,7 +203,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     | 'stepSocials'
     | 'stepTerms'
 
-  const INITIAL_FORM_STATE: Record<FormStep, StepStage> = {
+  const INITIAL_FORM_STATE: InitialFormStateCreateLootbox = {
     stepNetwork: 'in_progress',
     stepType: 'not_yet',
     stepFunding: 'not_yet',
@@ -98,7 +215,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [stage, setStage] = useState(INITIAL_FORM_STATE)
 
   // VALIDITY: Validity of the forms
-  const INITIAL_VALIDITY: Record<FormStep, boolean> = {
+  const INITIAL_VALIDITY: InitialFormValidityCreateLootbox = {
     stepNetwork: false,
     stepType: false,
     stepFunding: false,
@@ -122,9 +239,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   )
   const [fundingType, setFundingType] = useState<LootboxType>('escrow')
   const reputationWallet = (snapUserState.currentAccount || '') as Address
-  const seedTarget = web3Utils.toBN(web3Utils.toWei('1', 'ether'))
 
-  const [fundraisingTarget, setFundraisingTarget] = useState(seedTarget)
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [fundraisingLimit, setFundraisingLimit] = useState(
     fundraisingTarget
       .mul(web3Utils.toBN(defaultFundraisingLimitMultiplier))
@@ -144,7 +260,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
   }
   const checkNetworkStepDone = () => {
-    return network && reputationWallet && reputationWallet.length > 0
+    return isWalletConnected && network && reputationWallet && reputationWallet.length > 0
   }
 
   // STEP 2: Choose Type
@@ -177,26 +293,25 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     pricePerShare: 0.05,
     lootboxThemeColor: '#000000',
     /** @deprecated logoUrls are now from internal gbucket - use logoFile instead */
-    logoUrl:
-      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media',
+    logoUrl: '',
     /** @deprecated logoUrls are now from internal gbucket - use coverFile instead*/
-    coverUrl:
-      'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media',
+    coverUrl: '',
     badgeUrl: '',
   }
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
-  const checkCustomizeStepDone = () =>
-    validateName(ticketState.name as string) &&
-    validateSymbol(ticketState.symbol as string) &&
-    validateBiography(ticketState.biography as string) &&
-    validateThemeColor(ticketState.lootboxThemeColor as string) &&
-    validateLogo(ticketState.logoUrl as string) &&
-    validateCover(ticketState.coverUrl as string) &&
-    validateLogoFile(ticketState.logoFile as File) &&
-    validateCoverFile(ticketState.coverFile as File)
+  const checkCustomizeStepDone = () => {
+    return (
+      validateName(ticketState.name as string) &&
+      validateSymbol(ticketState.symbol as string) &&
+      validateBiography(ticketState.biography as string) &&
+      validateThemeColor(ticketState.lootboxThemeColor as string) &&
+      (validateLogo(ticketState.logoUrl as string) || validateLogoFile(ticketState.logoFile as File)) &&
+      (validateCover(ticketState.coverUrl as string) || validateCoverFile(ticketState.coverFile as File))
+    )
+  }
 
   // STEP 5: Socials
   const refStepSocials = useRef<HTMLDivElement | null>(null)
@@ -295,6 +410,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
           logoFile: ticketState.logoFile as File,
           coverFile: ticketState.coverFile as File,
+          logoUrl: ticketState.logoUrl as string,
+          coverUrl: ticketState.coverUrl as string,
           badgeFile: ticketState.badgeFile as File,
           fundraisingTarget: fundraisingTarget as BigNumber,
           fundraisingTargetMax: fundraisingLimit as BigNumber,
@@ -322,6 +439,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           lootboxThemeColor: ticketState.lootboxThemeColor as string,
           logoFile: ticketState.logoFile as File,
           coverFile: ticketState.coverFile as File,
+          logoUrl: ticketState.logoUrl as string,
+          coverUrl: ticketState.coverUrl as string,
           badgeFile: ticketState.badgeFile as File,
           fundraisingTarget: fundraisingTarget as BigNumber,
           fundraisingTargetMax: fundraisingLimit as BigNumber,
@@ -473,6 +592,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   return (
     <$CreateLootbox>
+      {preconfigParams && preconfigParams.length > 0 && (
+        <div>
+          <StepPrefillDisclaimer selectedNetwork={network} prefilledFields={preconfigParams} />
+          <$Spacer></$Spacer>
+        </div>
+      )}
       <StepChooseNetwork
         selectedNetwork={network}
         stage={stage.stepNetwork}
@@ -493,20 +618,23 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         setValidity={(bool: boolean) => console.log(bool)}
       />
       <$Spacer></$Spacer>
-      <StepChooseFunding
-        ref={refStepFunding}
-        type={fundingType}
-        selectedNetwork={network}
-        fundraisingLimit={fundraisingLimit}
-        fundraisingTarget={fundraisingTarget}
-        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
-        setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
-        receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
-        setReceivingWallet={setReceivingWallet}
-        stage={stage.stepFunding}
-        setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
-        onNext={() => refStepReturns.current?.scrollIntoView()}
-      />
+      {loadedUrlParams && (
+        <StepChooseFunding
+          ref={refStepFunding}
+          type={fundingType}
+          selectedNetwork={network}
+          fundraisingLimit={fundraisingLimit}
+          fundraisingTarget={fundraisingTarget}
+          setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
+          setFundraisingTarget={(target: BigNumber) => setFundraisingTarget(target)}
+          receivingWallet={receivingWallet === undefined ? reputationWallet : receivingWallet}
+          setReceivingWallet={setReceivingWallet}
+          stage={stage.stepFunding}
+          setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
+          onNext={() => refStepReturns.current?.scrollIntoView()}
+        />
+      )}
+
       <$Spacer></$Spacer>
       <StepChooseReturns
         ref={refStepReturns}
@@ -583,6 +711,44 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           </$Horizontal>
         ) : null}
       </$Vertical>
+      <$Spacer></$Spacer>
+      <StepMagicLink
+        network={network?.chainIdHex}
+        type={fundingType}
+        fundingTarget={fundraisingTarget.toString()}
+        fundingLimit={fundraisingLimit.toString()}
+        receivingWallet={receivingWallet}
+        returnsTarget={basisPoints.toString()}
+        returnsDate={paybackDate}
+        logoImage={undefined}
+        coverImage={undefined}
+        themeColor={ticketState.themeColor as string}
+        campaignBio={ticketState.biography as string}
+        campaignWebsite={socialState.web}
+        uploadImages={async () => {
+          if (!ticketState.logoFile && !ticketState.logoUrl) {
+            throw new Error('Logo not set')
+          }
+
+          if (!ticketState.coverFile && !ticketState.coverUrl) {
+            throw new Error('Cover not set')
+          }
+
+          const submissionId = uuidv4()
+          const [imagePublicPath, backgroundPublicPath] = await Promise.all([
+            ticketState.logoFile
+              ? uploadLootboxLogo(submissionId, ticketState.logoFile)
+              : (ticketState.logoUrl as string),
+            ticketState.coverFile
+              ? uploadLootboxCover(submissionId, ticketState.coverFile)
+              : (ticketState.coverUrl as string),
+          ])
+
+          return [imagePublicPath, backgroundPublicPath]
+        }}
+        stage="in_progress"
+        selectedNetwork={network}
+      />
       <$Spacer></$Spacer>
     </$CreateLootbox>
   )

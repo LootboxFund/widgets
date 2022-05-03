@@ -25,7 +25,7 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
 
   const Icon = () => {
     if (forceLoading) {
-      return <$Spinner style={{ margin: 'auto' }} />
+      return <$Spinner style={{ margin: 'auto' }} color={`${COLORS.surpressedFontColor}80`} />
     } else {
       return <$Icon>+</$Icon>
     }

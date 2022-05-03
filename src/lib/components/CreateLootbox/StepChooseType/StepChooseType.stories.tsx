@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import StepChooseType, { LootboxType, StepChooseTypeProps } from 'lib/components/CreateLootbox/StepChooseType'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
-import { NetworkOption } from '../state'
 import { ContractAddress } from '@wormgraph/helpers'
 
 export default {

@@ -105,7 +105,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     props.updateTermsState(slug, checked)
   }
   const submitWithCountdown = () => {
-    setTimeLeft(60)
+    setTimeLeft(90)
     props.onSubmit()
   }
   const renderActionBar = () => {
@@ -233,13 +233,13 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
   )
 })
 
-const $StepTermsConditions = styled.section<{}>`
+export const $StepTermsConditions = styled.section<{}>`
   font-family: sans-serif;
   width: 100%;
   color: ${COLORS.black};
 `
 
-const $TermCheckbox = styled.input`
+export const $TermCheckbox = styled.input`
   width: 20px;
   height: 20px;
   min-width: 20px;
@@ -256,7 +256,7 @@ const $TwitterAlert = styled.span`
   margin-top: 20px;
 `
 
-const $TermOfService = styled.span`
+export const $TermOfService = styled.span`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.large};
   font-weight: ${TYPOGRAPHY.fontWeight.light};

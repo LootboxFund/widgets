@@ -35,8 +35,10 @@ interface InstantLootboxArgs {
   symbol: string
   biography: string
   lootboxThemeColor: string
-  logoFile: File
-  coverFile: File
+  logoFile?: File
+  coverFile?: File
+  logoUrl?: string
+  coverUrl?: string
   badgeFile: File
   fundraisingTarget: any
   fundraisingTargetMax: any
@@ -88,13 +90,19 @@ export const createInstantLootbox = async (
   if (!provider) {
     throw new Error('No provider')
   }
-  if (!(args.coverFile && args.logoFile)) {
-    throw new Error('Missing images')
+
+  if (!args.coverFile && !args.coverUrl) {
+    throw new Error('Missing cover file')
   }
+
+  if (!args.logoFile && !args.logoUrl) {
+    throw new Error('Missing logo file')
+  }
+
   const submissionId = uuidv4()
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
-    uploadLootboxLogo(submissionId, args.logoFile),
-    uploadLootboxCover(submissionId, args.coverFile),
+    args.logoFile ? uploadLootboxLogo(submissionId, args.logoFile) : (args.logoUrl as string),
+    args.coverFile ? uploadLootboxCover(submissionId, args.coverFile) : (args.coverUrl as string),
     args.badgeFile ? uploadLootboxBadge(submissionId, args.badgeFile) : null,
   ])
 
@@ -309,13 +317,19 @@ export const createEscrowLootbox = async (
   if (!provider) {
     throw new Error('No provider')
   }
-  if (!(args.coverFile && args.logoFile)) {
-    throw new Error('Missing images')
+
+  if (!args.coverFile && !args.coverUrl) {
+    throw new Error('Missing cover file')
   }
+
+  if (!args.logoFile && !args.logoUrl) {
+    throw new Error('Missing logo file')
+  }
+
   const submissionId = uuidv4()
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
-    uploadLootboxLogo(submissionId, args.logoFile),
-    uploadLootboxCover(submissionId, args.coverFile),
+    args.logoFile ? uploadLootboxLogo(submissionId, args.logoFile) : (args.logoUrl as string),
+    args.coverFile ? uploadLootboxCover(submissionId, args.coverFile) : (args.coverUrl as string),
     args.badgeFile ? uploadLootboxBadge(submissionId, args.badgeFile) : null,
   ])
   /**
