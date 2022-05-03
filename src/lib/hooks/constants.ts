@@ -155,7 +155,7 @@ export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x38': BSC_MAINNET_FULL_TOKEN_LIST,
   '0x61': BSC_TESTNET_FULL_TOKEN_LIST,
   '0x13881': MUMBAI_TESTNET_FULL_TOKEN_LIST,
-  '89': POLYGON_MAINNET_FULL_TOKEN_LIST,
+  '0x89': POLYGON_MAINNET_FULL_TOKEN_LIST,
 }
 
 export const SOCIALS: SocialFragment[] = [
