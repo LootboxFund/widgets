@@ -94,7 +94,10 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
       LogRocket.captureException(err)
     }
 
-    const magicLink = queryString.stringifyUrl({ url: window.location.origin, query: queryParams })
+    const magicLink = queryString.stringifyUrl({
+      url: `${window.location.origin}${window.location.pathname}`,
+      query: queryParams,
+    })
     console.log(`Magic link is = ${magicLink}`)
     setMagicLink(magicLink)
     setLoading(false)
