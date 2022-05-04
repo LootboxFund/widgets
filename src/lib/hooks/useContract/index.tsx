@@ -66,6 +66,7 @@ interface GetLootboxDataOutput {
   sharePriceWei: string
   sharesSoldCount: string
   sharesSoldMax: string
+  sharesSoldTarget: string
   ticketIdCounter: string
   shareDecimals: string
   variant: string
@@ -74,17 +75,27 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
-  const [name, symbol, sharePriceWei, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant] =
-    await Promise.all([
-      lootbox.name(),
-      lootbox.symbol(),
-      lootbox.sharePriceWei(),
-      lootbox.sharesSoldCount(),
-      lootbox.sharesSoldMax(),
-      lootbox.ticketIdCounter(),
-      lootbox.shareDecimals(),
-      lootbox.variant(),
-    ])
+  const [
+    name,
+    symbol,
+    sharePriceWei,
+    sharesSoldCount,
+    sharesSoldMax,
+    ticketIdCounter,
+    shareDecimals,
+    variant,
+    sharesSoldTarget,
+  ] = await Promise.all([
+    lootbox.name(),
+    lootbox.symbol(),
+    lootbox.sharePriceWei(),
+    lootbox.sharesSoldCount(),
+    lootbox.sharesSoldMax(),
+    lootbox.ticketIdCounter(),
+    lootbox.shareDecimals(),
+    lootbox.variant(),
+    lootbox.sharesSoldTarget(),
+  ])
 
   return {
     name: name.toString(),
@@ -95,6 +106,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
     ticketIdCounter: ticketIdCounter.toString(),
     shareDecimals: shareDecimals.toString(),
     variant: variant.toString(),
+    sharesSoldTarget: sharesSoldTarget.toString(),
   }
 }
 
