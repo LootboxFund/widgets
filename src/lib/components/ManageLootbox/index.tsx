@@ -280,7 +280,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         {props.network?.themeColor && percentageFunded !== undefined && (
           <ProgressBar
             themeColor={props.network.themeColor}
-            progress={percentageFunded > 100 ? 100 : percentageFunded}
+            // progress={percentageFunded > 100 ? 100 : percentageFunded}
+            progress={percentageFunded}
           />
         )}
       </$Vertical>
