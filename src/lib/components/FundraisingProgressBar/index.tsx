@@ -40,7 +40,8 @@ export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
                 marginRight: '10px',
               }}
             >
-              {`${props.percentageFunded > 100 ? 100 : props.percentageFunded}% Funded`}
+              {/* {`${props.percentageFunded > 100 ? 100 : props.percentageFunded}% Funded`} */}
+              {`${props.percentageFunded}% Funded`}
             </span>
           </$Horizontal>
           <$Horizontal>
@@ -92,9 +93,7 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
   const [percentageFunded, setPercentageFunded] = useState(0)
   const [targetAmountNative, setTargetAmountNative] = useState('0')
   const [networkSymbol, setNetworkSymbol] = useState('')
-  const [wtfMessage, setWTFMessage] = useState(
-    'This is the max amount of funds that this gamer is looking to fundraise.'
-  )
+  const [wtfMessage, setWTFMessage] = useState('This is the target funding goal of the gamer.')
   const userStateSnapshot = useSnapshot(userState)
   const buySharesStateSnapshot = useSnapshot(buySharesState)
 
@@ -107,33 +106,39 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
       setNetworkSymbol(network.nativeCurrency.symbol)
 
       const loadData = async (symb: string) => {
-        const { sharesSoldMax, sharesSoldCount, sharePriceWei } = await getLootboxData(lootbox)
+        const { sharesSoldMax, sharesSoldTarget, sharesSoldCount, sharePriceWei } = await getLootboxData(lootbox)
 
         const percentageFunded =
-          sharesSoldCount && sharesSoldMax
+          sharesSoldCount && sharesSoldTarget
             ? new web3Utils.BN(sharesSoldCount)
                 .mul(new web3Utils.BN('1000')) // multiply by 1000 (instead of 100) to get 1 decimal place
-                .div(new web3Utils.BN(sharesSoldMax))
+                .div(new web3Utils.BN(sharesSoldTarget))
                 .toNumber() / 10 // divide by 10 to account for the 1000 multiplier and yield decimal
             : 0
         setPercentageFunded(percentageFunded)
+
+        const targetAmountNativeBN = new web3Utils.BN(sharesSoldTarget)
+          .mul(new web3Utils.BN(sharePriceWei))
+          .div(new web3Utils.BN('10').pow(new web3Utils.BN(18)))
 
         const maxAmountNativeBN = new web3Utils.BN(sharesSoldMax)
           .mul(new web3Utils.BN(sharePriceWei))
           .div(new web3Utils.BN('10').pow(new web3Utils.BN(18)))
 
+        const targetAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(targetAmountNativeBN, 'ether'))).toString()
         const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
-        setTargetAmountNative(maxAmountNativeFmt)
+        setTargetAmountNative(targetAmountNativeFmt)
 
+        const wtfBro = `${targetAmountNativeFmt} ${symb} is the target funding goal of this lootbox. The maximum capacity of this lootbox is ${maxAmountNativeFmt} ${symb}. So far, this lootbox has raised ${percentageFunded}% of its funding goal.`
         // const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
-        //   web3Utils.fromWei(sharesSoldMax, 'ether')
+        //   web3Utils.fromWei(sharesSoldTarget, 'ether')
         // ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(
         //   new web3Utils.BN(sharePriceWei),
         //   'wei'
         // )} ${symb}.`
         // const wtfBro = 'This is the max amount of funds that this gamer is looking to fundraise.'
-        // setWTFMessage(wtfBro)
+        setWTFMessage(wtfBro)
       }
       loadData(network.nativeCurrency.symbol).catch((err) =>
         console.error('Error loading data for lootbox progress bar', err)
