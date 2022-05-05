@@ -19,27 +19,9 @@ const INITAL_LOGO =
 const INITIAL_COVER =
   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-background.png?alt=media'
 
-export const getMaxTicketPrice = (
-  nativeTokenPrice: BigNumber,
-  fundraisingTarget: BigNumber,
-  web3Utils: any
-): number => {
-  const price = nativeTokenPrice
-    ? nativeTokenPrice
-        .multipliedBy(fundraisingTarget)
-        .dividedBy(10 ** 18)
-        .toFixed(2)
-    : web3Utils.toBN(0)
-  if (!price && isNaN(price)) {
-    return 0
-  }
-  return price
-}
-
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
 export const validateBiography = (bio: string) => bio.length >= 12
-export const validatePricePerShare = (price: number, maxPricePerShare: number) => price > 0 && price <= maxPricePerShare
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
@@ -86,14 +68,10 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
-  const maxPricePerShare = nativeTokenPrice
-    ? getMaxTicketPrice(nativeTokenPrice, props.fundraisingTarget, web3Utils)
-    : 0
   const initialErrors = {
     name: '',
     symbol: '',
     biography: '',
-    pricePerShare: '',
     lootboxThemeColor: '',
     logoUrl: '',
     coverUrl: '',
@@ -108,7 +86,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (!validateName(props.ticketState.name as string)) valid = false
     if (!validateSymbol(props.ticketState.symbol as string)) valid = false
     if (!validateBiography(props.ticketState.biography as string)) valid = false
-    if (!validatePricePerShare(props.ticketState.pricePerShare as number, maxPricePerShare)) valid = false
     if (!validateThemeColor(props.ticketState.lootboxThemeColor as string)) valid = false
 
     if (valid) {
@@ -134,7 +111,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         name: '',
         symbol: '',
         biography: '',
-        pricePerShare: '',
         lootboxThemeColor: '',
         logoFile: '',
         coverFile: '',
@@ -171,14 +147,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       setErrors({
         ...errors,
         biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters',
-      })
-    }
-    if (slug === 'pricePerShare') {
-      setErrors({
-        ...errors,
-        pricePerShare: validatePricePerShare(value as number, maxPricePerShare)
-          ? ''
-          : `Price per share must be greater than zero and less than $${maxPricePerShare}`,
       })
     }
     if (slug === 'lootboxThemeColor') {
@@ -308,28 +276,6 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               maxLength={500}
             />
             <br />
-            {/* <$StepSubheading>
-              <span>Share Price</span>
-              <HelpIcon tipID="pricePerShare" />
-              <ReactTooltip id="pricePerShare" place="right" effect="solid">
-                We recommend leaving this at the default value. When investors buy NFT tickets from your Lootbox, they
-                specify many shares they want. The more shares owned in a ticket, the higher the % of Lootbox earnings
-                they receive. It is possible to buy fractional shares. The only reason you may want to customize your
-                share price is for psychological pricing.
-              </ReactTooltip>
-            </$StepSubheading>
-            <$Horizontal verticalCenter flex={1}>
-              <$CurrencySign>$</$CurrencySign>
-              <$InputMedium
-                type="number"
-                min="0"
-                onChange={(e) => parseInput('pricePerShare', e.target.valueAsNumber)}
-                value={props.ticketState.pricePerShare}
-                onWheel={(e) => e.currentTarget.blur()}
-                style={{ width: '100%' }}
-              />
-            </$Horizontal> */}
-
             <br />
           </$Vertical>
           <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
