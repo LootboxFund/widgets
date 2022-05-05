@@ -149,6 +149,7 @@ export const $StepSubheading = styled.span<{}>`
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+  word-break: break-word;
 `
 
 export const $StepError = styled.span<{}>`
