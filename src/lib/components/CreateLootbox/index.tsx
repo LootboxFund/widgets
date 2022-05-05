@@ -593,7 +593,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   return (
     <$CreateLootbox>
       {preconfigParams && preconfigParams.length > 0 && (
-        <div>
+        <div style={{ width: '100%' }}>
           <StepPrefillDisclaimer selectedNetwork={network} prefilledFields={preconfigParams} />
           <$Spacer></$Spacer>
         </div>

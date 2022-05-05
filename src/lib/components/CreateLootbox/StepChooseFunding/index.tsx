@@ -166,13 +166,18 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       props.setFundraisingLimit(valueBN)
       const validFundraise = validateFundraisingTarget(valueBN)
       const validReceiver = validateReceivingWallet(props.receivingWallet)
-      if (validFundraise) {
+      if (validFundraise && validReceiver) {
+        props.setValidity(true)
+        setErrors({
+          ...errors,
+          fundraisingLimit: '',
+          receivingWallet: '',
+        })
+      } else if (validFundraise) {
         setErrors({
           ...errors,
           fundraisingLimit: '',
         })
-      } else if (validFundraise && validReceiver) {
-        props.setValidity(true)
       } else {
         setErrors({
           ...errors,

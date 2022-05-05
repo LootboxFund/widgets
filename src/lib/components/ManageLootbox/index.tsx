@@ -280,7 +280,8 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         {props.network?.themeColor && percentageFunded !== undefined && (
           <ProgressBar
             themeColor={props.network.themeColor}
-            progress={percentageFunded > 100 ? 100 : percentageFunded}
+            // progress={percentageFunded > 100 ? 100 : percentageFunded}
+            progress={percentageFunded}
           />
         )}
       </$Vertical>
@@ -329,7 +330,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
                   {`Publish your Lootbox to ${props.network.name}${
-                    props.network.isTestnet && ' Testnet'
+                    props.network.isTestnet ? ' Testnet' : ''
                   }. You cannot change your funding goal after publishing.`}
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
