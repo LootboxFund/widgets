@@ -98,167 +98,167 @@ export const createInstantLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
-    address: '' as ContractAddress, // This gets set in backend Pipedream
-    name: args.name as string,
-    description: args.biography as string,
-    image: imagePublicPath,
-    backgroundColor: args.lootboxThemeColor as string,
-    backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath || '',
-    lootbox: {
-      address: '' as ContractAddress, // This gets set in backend Pipedream
-      transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
-      fundraisingTarget: args.fundraisingTarget,
-      fundraisingTargetMax: args.fundraisingTargetMax,
-      basisPointsReturnTarget: args.basisPoints.toString(), // 100 basis points = 1% return
-      returnAmountTarget: args.returnAmountTarget.toString(),
-      pricePerShare: PRICE_PER_SHARE.toString(),
-      lootboxThemeColor: args.lootboxThemeColor as string,
-      createdAt: new Date().valueOf(),
-    },
-    socials: {
-      twitter: socials.twitter,
-      email: socials.email,
-      instagram: socials.instagram,
-      tiktok: socials.tiktok,
-      facebook: socials.facebook,
-      discord: socials.discord,
-      youtube: socials.youtube,
-      snapchat: socials.snapchat,
-      twitch: socials.twitch,
-      web: socials.web,
-    },
-  }
+  // const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
+  //   address: '' as ContractAddress, // This gets set in backend Pipedream
+  //   name: args.name as string,
+  //   description: args.biography as string,
+  //   image: imagePublicPath,
+  //   backgroundColor: args.lootboxThemeColor as string,
+  //   backgroundImage: backgroundPublicPath,
+  //   badgeImage: badgePublicPath || '',
+  //   lootbox: {
+  //     address: '' as ContractAddress, // This gets set in backend Pipedream
+  //     transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+  //     blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+  //     factory: LOOTBOX_INSTANT_FACTORY_ADDRESS,
+  //     chainIdHex: manifest.chain.chainIDHex,
+  //     chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+  //     chainName: manifest.chain.chainName,
+  //     targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
+  //     fundraisingTarget: args.fundraisingTarget,
+  //     fundraisingTargetMax: args.fundraisingTargetMax,
+  //     basisPointsReturnTarget: args.basisPoints.toString(), // 100 basis points = 1% return
+  //     returnAmountTarget: args.returnAmountTarget.toString(),
+  //     pricePerShare: PRICE_PER_SHARE.toString(),
+  //     lootboxThemeColor: args.lootboxThemeColor as string,
+  //     createdAt: new Date().valueOf(),
+  //   },
+  //   socials: {
+  //     twitter: socials.twitter,
+  //     email: socials.email,
+  //     instagram: socials.instagram,
+  //     tiktok: socials.tiktok,
+  //     facebook: socials.facebook,
+  //     discord: socials.discord,
+  //     youtube: socials.youtube,
+  //     snapchat: socials.snapchat,
+  //     twitch: socials.twitch,
+  //     web: socials.web,
+  //   },
+  // }
 
-  const blockNum = await provider.getBlockNumber()
+  // const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
-    new web3Utils.BN('10')
-  )
-  const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
-    .toString()
+  // const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
+  //   new web3Utils.BN('10')
+  // )
+  // const maxSharesSold = args.fundraisingTargetMax
+  //   .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+  //   .div(pricePerShare)
+  //   .mul(new web3Utils.BN('11'))
+  //   .div(new web3Utils.BN('10'))
+  //   .toString()
 
-  const ethers = ethersObj
-  const signer = await provider.getSigner()
-  const lootboxInstant = new ethers.Contract(LOOTBOX_INSTANT_FACTORY_ADDRESS, LOOTBOX_INSTANT_FACTORY_ABI, signer)
+  // const ethers = ethersObj
+  // const signer = await provider.getSigner()
+  // const lootboxInstant = new ethers.Contract(LOOTBOX_INSTANT_FACTORY_ADDRESS, LOOTBOX_INSTANT_FACTORY_ABI, signer)
 
-  try {
-    console.log(`
-    
-    ticketState.name = ${args.name}
-    ticketState.symbol = ${args.symbol}
-    maxSharesSold = ${maxSharesSold}
-    pricePerShare = ${pricePerShare}
-    receivingWallet = ${args.receivingWallet}
-    affiliateWallet = ${args.receivingWallet}
-    fundraisingTargetMax = ${args.fundraisingTargetMax}
-    nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+  // try {
+  //   console.log(`
 
-    basisPoints = ${args.basisPoints}
-    returnAmountTarget = ${args.returnAmountTarget}
+  //   ticketState.name = ${args.name}
+  //   ticketState.symbol = ${args.symbol}
+  //   maxSharesSold = ${maxSharesSold}
+  //   pricePerShare = ${pricePerShare}
+  //   receivingWallet = ${args.receivingWallet}
+  //   affiliateWallet = ${args.receivingWallet}
+  //   fundraisingTargetMax = ${args.fundraisingTargetMax}
+  //   nativeTokenPrice = ${args.nativeTokenPrice.toString()}
 
-    `)
+  //   basisPoints = ${args.basisPoints}
+  //   returnAmountTarget = ${args.returnAmountTarget}
 
-    await lootboxInstant.createLootbox(
-      args.name, // string memory _lootboxName,
-      args.symbol, // string memory _lootboxSymbol,
-      maxSharesSold.toString(), // uint256 _maxSharesSold,
-      args.receivingWallet, // address _treasury,
-      args.receivingWallet, // address _affiliate,
-      JSON.stringify(lootboxURI) // string memory _data
-    )
-    console.log(`Submitted lootbox creation!`)
-    const filter = {
-      fromBlock: blockNum,
-      address: lootboxInstant.address,
-      topics: [
-        ethers.utils.solidityKeccak256(
-          ['string'],
-          ['LootboxCreated(string,address,address,address,uint256,uint256,string)']
-        ),
-      ],
-    }
-    provider.on(filter, async (log) => {
-      if (log !== undefined) {
-        const decodedLog = decodeEVMLog({
-          eventName: 'LootboxCreated',
-          log: log,
-          abi: `
-          event LootboxCreated(
-            string lootboxName,
-            address indexed lootbox,
-            address indexed issuer,
-            address indexed treasury,
-            uint256 maxSharesSold,
-            uint256 sharePriceUSD,
-            string _data
-          )`,
-          keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
-        })
-        const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
-        const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
-        const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
-        if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
-          console.log(`
-          
-          ---- 🎉🎉🎉 ----
-          
-          Congratulations! You've created an Instant lootbox!
-          Instant Lootbox Address: ${lootbox}
-  
-          ---------------
-          
-          `)
-          args.setLootboxAddress(lootbox)
+  //   `)
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
-                numShares,
-              }),
-            ])
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-          }
-        }
-      }
-    })
-  } catch (e) {
-    console.log(e)
-    LogRocket.captureException(e)
-    setSubmitStatus('failure')
-  }
+  //   await lootboxInstant.createLootbox(
+  //     args.name, // string memory _lootboxName,
+  //     args.symbol, // string memory _lootboxSymbol,
+  //     maxSharesSold.toString(), // uint256 _maxSharesSold,
+  //     args.receivingWallet, // address _treasury,
+  //     args.receivingWallet, // address _affiliate,
+  //     JSON.stringify(lootboxURI) // string memory _data
+  //   )
+  //   console.log(`Submitted lootbox creation!`)
+  //   const filter = {
+  //     fromBlock: blockNum,
+  //     address: lootboxInstant.address,
+  //     topics: [
+  //       ethers.utils.solidityKeccak256(
+  //         ['string'],
+  //         ['LootboxCreated(string,address,address,address,uint256,uint256,string)']
+  //       ),
+  //     ],
+  //   }
+  //   provider.on(filter, async (log) => {
+  //     if (log !== undefined) {
+  //       const decodedLog = decodeEVMLog({
+  //         eventName: 'LootboxCreated',
+  //         log: log,
+  //         abi: `
+  //         event LootboxCreated(
+  //           string lootboxName,
+  //           address indexed lootbox,
+  //           address indexed issuer,
+  //           address indexed treasury,
+  //           uint256 maxSharesSold,
+  //           uint256 sharePriceUSD,
+  //           string _data
+  //         )`,
+  //         keys: ['lootboxName', 'lootbox', 'issuer', 'treasury', 'maxSharesSold', 'sharePriceUSD', '_data'],
+  //       })
+  //       const { issuer, lootbox, lootboxName, maxSharesSold, sharePriceUSD, treasury } = decodedLog as any
+  //       const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
+  //       const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
+  //       if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
+  //         console.log(`
+
+  //         ---- 🎉🎉🎉 ----
+
+  //         Congratulations! You've created an Instant lootbox!
+  //         Instant Lootbox Address: ${lootbox}
+
+  //         ---------------
+
+  //         `)
+  //         args.setLootboxAddress(lootbox)
+
+  //         const ticketID = '0x'
+  //         const numShares = ethers.utils.formatEther(maxSharesSold)
+  //         try {
+  //           const [stampUrl] = await Promise.all([
+  //             stampNewLootbox({
+  //               // backgroundImage: ticketState.coverUrl as Url,
+  //               // logoImage: ticketState.logoUrl as Url,
+  //               logoImage: imagePublicPath,
+  //               backgroundImage: backgroundPublicPath,
+  //               badgeImage: badgePublicPath || '',
+  //               themeColor: args.lootboxThemeColor as string,
+  //               name: lootboxName,
+  //               ticketID,
+  //               lootboxAddress: lootbox,
+  //               chainIdHex: manifest.chain.chainIDHex,
+  //               numShares,
+  //             }),
+  //           ])
+  //           console.log(`Stamp URL: ${stampUrl}`)
+  //           // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+  //           if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+  //             await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+  //             args.setDownloaded(true)
+  //           }
+  //         } catch (err) {
+  //           LogRocket.captureException(err)
+  //         } finally {
+  //           setSubmitStatus('success')
+  //         }
+  //       }
+  //     }
+  //   })
+  // } catch (e) {
+  //   console.log(e)
+  //   LogRocket.captureException(e)
+  //   setSubmitStatus('failure')
+  // }
 }
 
 export const createEscrowLootbox = async (
@@ -297,198 +297,198 @@ export const createEscrowLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
-    address: '' as ContractAddress, // This gets set in backend Pipedream
-    name: args.name as string,
-    description: args.biography as string,
-    image: imagePublicPath,
-    backgroundColor: args.lootboxThemeColor as string,
-    backgroundImage: backgroundPublicPath,
-    badgeImage: badgePublicPath || '',
-    lootbox: {
-      address: '' as ContractAddress, // This gets set in backend Pipedream
-      transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
-      factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
-      chainIdHex: manifest.chain.chainIDHex,
-      chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
-      chainName: manifest.chain.chainName,
-      targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
-      fundraisingTarget: args.fundraisingTarget,
-      fundraisingTargetMax: args.fundraisingTargetMax,
-      basisPointsReturnTarget: args.basisPoints.toString(),
-      returnAmountTarget: args.returnAmountTarget.toString(),
-      pricePerShare: PRICE_PER_SHARE.toString(),
-      lootboxThemeColor: args.lootboxThemeColor as string,
-      createdAt: new Date().valueOf(),
-    },
-    socials: {
-      twitter: socials.twitter,
-      email: socials.email,
-      instagram: socials.instagram,
-      tiktok: socials.tiktok,
-      facebook: socials.facebook,
-      discord: socials.discord,
-      youtube: socials.youtube,
-      snapchat: socials.snapchat,
-      twitch: socials.twitch,
-      web: socials.web,
-    },
-  }
+  // const lootboxURI: ITicketMetadata & { lootbox: { createdAt: number; factory: ContractAddress } } = {
+  //   address: '' as ContractAddress, // This gets set in backend Pipedream
+  //   name: args.name as string,
+  //   description: args.biography as string,
+  //   image: imagePublicPath,
+  //   backgroundColor: args.lootboxThemeColor as string,
+  //   backgroundImage: backgroundPublicPath,
+  //   badgeImage: badgePublicPath || '',
+  //   lootbox: {
+  //     address: '' as ContractAddress, // This gets set in backend Pipedream
+  //     transactionHash: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+  //     blockNumber: '', // This gets set in backend Pipedream - For now we dont have this data at this point
+  //     factory: LOOTBOX_ESCROW_FACTORY_ADDRESS,
+  //     chainIdHex: manifest.chain.chainIDHex,
+  //     chainIdDecimal: convertHexToDecimal(manifest.chain.chainIDHex),
+  //     chainName: manifest.chain.chainName,
+  //     targetPaybackDate: args.paybackDate ? new Date(args.paybackDate).valueOf() : new Date().valueOf(),
+  //     fundraisingTarget: args.fundraisingTarget,
+  //     fundraisingTargetMax: args.fundraisingTargetMax,
+  //     basisPointsReturnTarget: args.basisPoints.toString(),
+  //     returnAmountTarget: args.returnAmountTarget.toString(),
+  //     pricePerShare: PRICE_PER_SHARE.toString(),
+  //     lootboxThemeColor: args.lootboxThemeColor as string,
+  //     createdAt: new Date().valueOf(),
+  //   },
+  //   socials: {
+  //     twitter: socials.twitter,
+  //     email: socials.email,
+  //     instagram: socials.instagram,
+  //     tiktok: socials.tiktok,
+  //     facebook: socials.facebook,
+  //     discord: socials.discord,
+  //     youtube: socials.youtube,
+  //     snapchat: socials.snapchat,
+  //     twitch: socials.twitch,
+  //     web: socials.web,
+  //   },
+  // }
 
-  const blockNum = await provider.getBlockNumber()
+  // const blockNum = await provider.getBlockNumber()
 
-  const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
-    new web3Utils.BN('10')
-  )
-  const targetSharesSold = args.fundraisingTarget
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
-    .toString()
-  const maxSharesSold = args.fundraisingTargetMax
-    .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
-    .div(pricePerShare)
-    .mul(new web3Utils.BN('11'))
-    .div(new web3Utils.BN('10'))
-    .toString()
+  // const pricePerShare = new web3Utils.BN(web3Utils.toWei(PRICE_PER_SHARE.toString(), 'gwei')).div(
+  //   new web3Utils.BN('10')
+  // )
+  // const targetSharesSold = args.fundraisingTarget
+  //   .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+  //   .div(pricePerShare)
+  //   .mul(new web3Utils.BN('11'))
+  //   .div(new web3Utils.BN('10'))
+  //   .toString()
+  // const maxSharesSold = args.fundraisingTargetMax
+  //   .mul(new web3Utils.BN(args.nativeTokenPrice.toString()))
+  //   .div(pricePerShare)
+  //   .mul(new web3Utils.BN('11'))
+  //   .div(new web3Utils.BN('10'))
+  //   .toString()
 
-  const ethers = ethersObj
-  const signer = await provider.getSigner()
-  const lootboxEscrow = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
+  // const ethers = ethersObj
+  // const signer = await provider.getSigner()
+  // const lootboxEscrow = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
 
-  try {
-    console.log(`
-    
-    ticketState.name = ${args.name}
-    ticketState.symbol = ${args.symbol}
-    targetSharesSold = ${targetSharesSold}
-    maxSharesSold = ${maxSharesSold}
-    pricePerShare = ${pricePerShare}
-    receivingWallet = ${args.receivingWallet}
-    affiliateWallet = ${args.receivingWallet}
+  // try {
+  //   console.log(`
 
-    fundraisingTarget = ${args.fundraisingTarget}
-    fundraisingTargetMax = ${args.fundraisingTargetMax}
+  //   ticketState.name = ${args.name}
+  //   ticketState.symbol = ${args.symbol}
+  //   targetSharesSold = ${targetSharesSold}
+  //   maxSharesSold = ${maxSharesSold}
+  //   pricePerShare = ${pricePerShare}
+  //   receivingWallet = ${args.receivingWallet}
+  //   affiliateWallet = ${args.receivingWallet}
 
-    nativeTokenPrice = ${args.nativeTokenPrice.toString()}
+  //   fundraisingTarget = ${args.fundraisingTarget}
+  //   fundraisingTargetMax = ${args.fundraisingTargetMax}
 
-    logoImage = ${imagePublicPath}
-    coverImage = ${backgroundPublicPath}
-    badgeImage = ${badgePublicPath}
+  //   nativeTokenPrice = ${args.nativeTokenPrice.toString()}
 
-    basisPoints = ${args.basisPoints}
-    returnAmountTarget = ${args.returnAmountTarget}
+  //   logoImage = ${imagePublicPath}
+  //   coverImage = ${backgroundPublicPath}
+  //   badgeImage = ${badgePublicPath}
 
-    `)
-    //   function createLootbox(
-    //     string memory _lootboxName,
-    //     string memory _lootboxSymbol,
-    //     uint256 _targetSharesSold,
-    //     uint256 _maxSharesSold,
-    //     address _treasury,
-    //     address _affiliate,
-    //     string memory _data
-    // )
-    await lootboxEscrow.createLootbox(
-      args.name, //     string memory _lootboxName,
-      args.symbol, //     string memory _lootboxSymbol,
-      targetSharesSold.toString(), // uint256 _targetSharesSold,
-      maxSharesSold.toString(), // uint256 _maxSharesSold,
-      args.receivingWallet, //     address _treasury,
-      args.receivingWallet, //     address _affiliate
-      JSON.stringify(lootboxURI) // string memory _data
-    )
-    console.log(`Submitted escrow lootbox creation!`)
-    const filter = {
-      fromBlock: blockNum,
-      address: lootboxEscrow.address,
-      topics: [
-        ethers.utils.solidityKeccak256(
-          ['string'],
-          ['LootboxCreated(string,address,address,address,uint256,uint256,uint256,string)']
-        ),
-      ],
-    }
-    provider.on(filter, async (log) => {
-      if (log !== undefined) {
-        const decodedLog = decodeEVMLog({
-          eventName: 'LootboxCreated',
-          log: log,
-          abi: `
-          event LootboxCreated(
-            string lootboxName,
-            address indexed lootbox,
-            address indexed issuer,
-            address indexed treasury,
-            uint256 targetSharesSold,
-            uint256 maxSharesSold,
-            uint256 sharePriceUSD,
-            string _data
-          )`,
-          keys: [
-            'lootboxName',
-            'lootbox',
-            'issuer',
-            'treasury',
-            'targetSharesSold',
-            'maxSharesSold',
-            'sharePriceUSD',
-            '_data',
-          ],
-        })
-        const { issuer, lootbox, lootboxName, targetSharesSold, maxSharesSold, treasury } = decodedLog as any
-        const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
-        const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
-        if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
-          console.log(`
-          
-          ---- 🎉🎉🎉 ----
-          
-          Congratulations! You've created an Escrow Lootbox!
-          Escrow Lootbox Address: ${lootbox}
-  
-          ---------------
-          
-          `)
-          args.setLootboxAddress(lootbox)
+  //   basisPoints = ${args.basisPoints}
+  //   returnAmountTarget = ${args.returnAmountTarget}
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: manifest.chain.chainIDHex,
-                numShares,
-              }),
-            ])
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-          }
-        }
-      }
-    })
-  } catch (e) {
-    console.log(e)
-    LogRocket.captureException(e)
-    setSubmitStatus('failure')
-  }
+  //   `)
+  //   //   function createLootbox(
+  //   //     string memory _lootboxName,
+  //   //     string memory _lootboxSymbol,
+  //   //     uint256 _targetSharesSold,
+  //   //     uint256 _maxSharesSold,
+  //   //     address _treasury,
+  //   //     address _affiliate,
+  //   //     string memory _data
+  //   // )
+  //   await lootboxEscrow.createLootbox(
+  //     args.name, //     string memory _lootboxName,
+  //     args.symbol, //     string memory _lootboxSymbol,
+  //     targetSharesSold.toString(), // uint256 _targetSharesSold,
+  //     maxSharesSold.toString(), // uint256 _maxSharesSold,
+  //     args.receivingWallet, //     address _treasury,
+  //     args.receivingWallet, //     address _affiliate
+  //     JSON.stringify(lootboxURI) // string memory _data
+  //   )
+  //   console.log(`Submitted escrow lootbox creation!`)
+  //   const filter = {
+  //     fromBlock: blockNum,
+  //     address: lootboxEscrow.address,
+  //     topics: [
+  //       ethers.utils.solidityKeccak256(
+  //         ['string'],
+  //         ['LootboxCreated(string,address,address,address,uint256,uint256,uint256,string)']
+  //       ),
+  //     ],
+  //   }
+  //   provider.on(filter, async (log) => {
+  //     if (log !== undefined) {
+  //       const decodedLog = decodeEVMLog({
+  //         eventName: 'LootboxCreated',
+  //         log: log,
+  //         abi: `
+  //         event LootboxCreated(
+  //           string lootboxName,
+  //           address indexed lootbox,
+  //           address indexed issuer,
+  //           address indexed treasury,
+  //           uint256 targetSharesSold,
+  //           uint256 maxSharesSold,
+  //           uint256 sharePriceUSD,
+  //           string _data
+  //         )`,
+  //         keys: [
+  //           'lootboxName',
+  //           'lootbox',
+  //           'issuer',
+  //           'treasury',
+  //           'targetSharesSold',
+  //           'maxSharesSold',
+  //           'sharePriceUSD',
+  //           '_data',
+  //         ],
+  //       })
+  //       const { issuer, lootbox, lootboxName, targetSharesSold, maxSharesSold, treasury } = decodedLog as any
+  //       const receiver = args.receivingWallet ? args.receivingWallet.toLowerCase() : ''
+  //       const current = args.currentAccount ? (args.currentAccount as String).toLowerCase() : ''
+  //       if (issuer.toLowerCase() === current && treasury.toLowerCase() === receiver) {
+  //         console.log(`
+
+  //         ---- 🎉🎉🎉 ----
+
+  //         Congratulations! You've created an Escrow Lootbox!
+  //         Escrow Lootbox Address: ${lootbox}
+
+  //         ---------------
+
+  //         `)
+  //         args.setLootboxAddress(lootbox)
+
+  //         const ticketID = '0x'
+  //         const numShares = ethers.utils.formatEther(maxSharesSold)
+  //         try {
+  //           const [stampUrl] = await Promise.all([
+  //             stampNewLootbox({
+  //               // backgroundImage: ticketState.coverUrl as Url,
+  //               // logoImage: ticketState.logoUrl as Url,
+  //               logoImage: imagePublicPath,
+  //               backgroundImage: backgroundPublicPath,
+  //               badgeImage: badgePublicPath || '',
+  //               themeColor: args.lootboxThemeColor as string,
+  //               name: lootboxName,
+  //               ticketID,
+  //               lootboxAddress: lootbox,
+  //               chainIdHex: manifest.chain.chainIDHex,
+  //               numShares,
+  //             }),
+  //           ])
+  //           console.log(`Stamp URL: ${stampUrl}`)
+  //           // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+  //           if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+  //             await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+  //             args.setDownloaded(true)
+  //           }
+  //         } catch (err) {
+  //           LogRocket.captureException(err)
+  //         } finally {
+  //           setSubmitStatus('success')
+  //         }
+  //       }
+  //     }
+  //   })
+  // } catch (e) {
+  //   console.log(e)
+  //   LogRocket.captureException(e)
+  //   setSubmitStatus('failure')
+  // }
 }

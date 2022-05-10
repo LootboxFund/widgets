@@ -902,7 +902,7 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
   symbol: '',
   themeColor: '#B48AF7',
   logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
-  coverUrl: 'https://gateway.pinata.cloud/ipfs/QmdZ2uzY9N77j95Vib8nM8AXBfDC4RctqefRwGLZjdsyxN',
+  coverUrl: 'https://img.freepik.com/free-photo/gray-painted-background_53876-94041.jpg',
   badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
   logoFile: undefined,
   coverFile: undefined,

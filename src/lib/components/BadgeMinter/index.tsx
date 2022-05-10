@@ -7,7 +7,7 @@ import ColorPicker from 'simple-color-picker'
 import styled from 'styled-components'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from '../CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
-import { $InputImage, $InputImageLabel, $InputMedium } from '../BadgeFactory'
+import { $InputImage, $InputImageLabel, $InputMedium, CreateBadgeFactory } from '../BadgeFactory'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import {
@@ -23,11 +23,11 @@ import { $SocialLogo } from '../CreateLootbox/StepSocials'
 import { SOCIALS } from 'lib/hooks/constants'
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
-  guildName: '',
+  guildName: 'Sync Shield Guild',
   memberName: '',
   themeColor: '#B48AF7',
-  logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
-  coverUrl: 'https://gateway.pinata.cloud/ipfs/QmdZ2uzY9N77j95Vib8nM8AXBfDC4RctqefRwGLZjdsyxN',
+  logoUrl: 'https://i.pinimg.com/564x/db/4c/02/db4c0275b7f87aebe0c335f59420ada5.jpg',
+  coverUrl: 'https://img.freepik.com/free-photo/gray-painted-background_53876-94041.jpg',
   badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
   logoFile: undefined,
   coverFile: undefined,
@@ -96,14 +96,14 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     if (!validateName(ticketState.guildName as string)) valid = false
     if (!validateName(ticketState.memberName as string)) valid = false
     if (!validateThemeColor(ticketState.themeColor as string)) valid = false
-    if (!validateLogo(ticketState.logoUrl as string)) valid = false
+    // if (!validateLogo(ticketState.logoUrl as string)) valid = false
     if (!validateCover(ticketState.coverUrl as string)) valid = false
 
     if (valid) {
-      if (!validateLogoFile(ticketState.logoFile as File)) {
-        valid = false
-        setErrors({ ...errors, logoFile: 'Please upload a logo image' })
-      }
+      // if (!validateLogoFile(ticketState.logoFile as File)) {
+      //   valid = false
+      //   setErrors({ ...errors, logoFile: 'Please upload a logo image' })
+      // }
       if (!validateCoverFile(ticketState.coverFile as File)) {
         valid = false
         setErrors({
@@ -224,6 +224,14 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
         stage={props.stage}
         onNext={() => {}}
         errors={Object.values(errors)}
+        customActionBar={() => (
+          <CreateBadgeFactory
+            allConditionsMet={true}
+            themeColor={props.selectedNetwork?.themeColor}
+            onSubmit={() => console.log('createBadgeFactory')}
+            text="Mint Guild Badge"
+          />
+        )}
       >
         <div
           style={
@@ -245,15 +253,15 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
         >
           <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
-              <span>Mint Your Guild Badge</span>
+              <span>Join Sync Shield Guild</span>
               <HelpIcon tipID="customizeGuildBadge" />
               <ReactTooltip id="customizeGuildBadge" place="right" effect="solid">
                 Lorem ipsum
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+              Mint your Official Guild Badge to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua.
             </$StepSubheading>
             <br />
             <br />
