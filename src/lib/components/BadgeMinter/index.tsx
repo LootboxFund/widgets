@@ -34,14 +34,14 @@ import WalletStatus from '../WalletStatus'
 
 // CONSTANTS
 const targetChainIdHex = '0x13881'
-const VIEW_BADGE_URL = 'https://viewbadge.io/'
+const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-3.surge.sh'
 //
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
-  guildName: 'Sync Shield Guild',
+  guildName: '',
   memberName: '',
   themeColor: '#B48AF7',
-  logoUrl: 'https://i.pinimg.com/564x/db/4c/02/db4c0275b7f87aebe0c335f59420ada5.jpg',
+  logoUrl: '',
   coverUrl: 'https://img.freepik.com/free-photo/gray-painted-background_53876-94041.jpg',
   badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
   logoFile: undefined,
@@ -76,11 +76,20 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const [themeColor, setThemeColor] = useState('')
   const [badgeAddress, setBadgeAddress] = useState<ContractAddress>()
+  const [shouldReloadBadgeDetails, setShouldReloadBadgeDetails] = useState(false)
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const [logoImage, setLogoImage] = useState('')
   const [provider, loading] = useProvider()
   const [finalTicketId, setFinalTicketId] = useState('')
+
+  console.log(`
+    
+    ------ ticketState
+
+
+  `)
+  console.log(ticketState)
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   useEffect(() => {
@@ -103,7 +112,6 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     console.log(`Finding addr = ${addr}`)
     if (addr) {
       setBadgeAddress(addr)
-      getBadgeDetails(addr as ContractAddress)
     }
     const colorPickerElement = document.getElementById('color-picker')
     const picker = new ColorPicker({ el: colorPickerElement || undefined, color: ticketState.themeColor as string })
@@ -111,6 +119,12 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
       setThemeColor(color)
     })
   }, [])
+
+  useEffect(() => {
+    if (badgeAddress) {
+      getBadgeDetails(badgeAddress)
+    }
+  }, [badgeAddress, shouldReloadBadgeDetails])
 
   useEffect(() => {
     if (themeColor !== ticketState.themeColor) {
@@ -173,9 +187,15 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     const { provider } = await getProvider()
     const signer = await provider.getSigner()
     const badge = new ethers.Contract(addr, BADGE_ABI, signer)
-    const [logoImageUrl] = await Promise.all([badge.logoImageUrl()])
+    const [logoImageUrl, guildName] = await Promise.all([badge.logoImageUrl(), badge.name()])
     setLogoImage(logoImageUrl)
-    updateTicketState('logoUrl', logoImageUrl)
+    console.log(`
+      
+    guildName = ${guildName}
+    logoImageUrl = ${logoImageUrl}
+
+    `)
+    setTicketState({ ...ticketState, guildName, logoUrl: logoImageUrl })
   }
 
   const parseInput = (slug: string, text: string) => {
@@ -417,6 +437,18 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     return
   }
 
+  if (!badgeAddress) {
+    return <p>No Badge Smart Contract found in URL</p>
+  }
+
+  if (!snapUserState.currentAccount) {
+    return <p>Connect with Metamask</p>
+  } else {
+    if (!shouldReloadBadgeDetails) {
+      setShouldReloadBadgeDetails(true)
+    }
+  }
+
   return (
     <$PersonalizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
@@ -447,12 +479,13 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
         >
           <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
-              <span>Join Sync Shield Guild</span>
+              <span>{`Join ${ticketState.guildName}`}</span>
               <HelpIcon tipID="customizeGuildBadge" />
               <ReactTooltip id="customizeGuildBadge" place="right" effect="solid">
                 Lorem ipsum
               </ReactTooltip>
             </$StepHeading>
+            <$StepSubheading style={{ fontSize: '0.8rem' }}>{badgeAddress}</$StepSubheading>
             <$StepSubheading>
               {`Mint your Official Guild Badge to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
               tempor.`}

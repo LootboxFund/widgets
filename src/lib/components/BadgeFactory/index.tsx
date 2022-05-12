@@ -39,7 +39,7 @@ import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 // CONSTANTS
 const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
 const targetChainIdHex = '0x13881'
-const BADGE_FACTORY_URL = 'https://badge-factory.netlify.app/'
+const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-3.surge.sh'
 // ------------
 
 export const validateName = (name: string) => name.length > 0
@@ -927,20 +927,21 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
   name: '',
   symbol: '',
   themeColor: '#B48AF7',
-  logoUrl: 'https://gateway.pinata.cloud/ipfs/Qmdit9THgH3ifxYZnc4f1oHtifwxVcGMeVdUpWCPD2LuYC',
+  logoUrl:
+    'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Flogo-placeholder.png?alt=media',
   coverUrl: 'https://img.freepik.com/free-photo/gray-painted-background_53876-94041.jpg',
   badgeUrl: 'https://i.pinimg.com/736x/14/b4/c2/14b4c205eba27ac480719a51adc98169.jpg',
   logoFile: undefined,
   coverFile: undefined,
   twitter: '',
   email: '',
-  instagram: '',
+  numberOfScholars: '',
   tiktok: '',
   facebook: '',
   discord: '',
   youtube: '',
-  snapchat: '',
-  twitch: '',
+  location: '',
+  gamesPlayed: '',
   web: '',
 }
 const BadgeFactory = () => {

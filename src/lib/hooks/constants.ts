@@ -201,6 +201,27 @@ export const SOCIALS: SocialFragment[] = [
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
     shownOn: ['create-loobox', 'badge-factory', 'badge-member'],
   },
+  {
+    slug: 'numberOfScholars',
+    name: '# of Scholars',
+    placeholder: '# of Scholars',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fcrowd.png?alt=media',
+    shownOn: ['badge-factory'],
+  },
+  {
+    slug: 'location',
+    name: 'Location',
+    placeholder: 'Country Location',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Flocation.png?alt=media',
+    shownOn: ['badge-factory', 'badge-member'],
+  },
+  {
+    slug: 'gamesPlayed',
+    name: 'Games Played',
+    placeholder: 'Games Played',
+    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fgame-icon.png?alt=media',
+    shownOn: ['badge-factory', 'badge-member'],
+  },
 ]
 
 export const smallScreens: ScreenSize[] = ['mobile', 'tablet']

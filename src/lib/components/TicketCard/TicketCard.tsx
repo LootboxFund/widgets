@@ -31,7 +31,7 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
   return (
     <$TicketCardContainer
       key={`TicketCard-${lootboxAddr}-${ticketID}`}
-      backgroundImage={ticket?.data?.metadata?.backgroundImage}
+      backgroundImage={ticket?.data?.metadata?.lootboxCustomSchema?.lootbox?.backgroundImage}
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
@@ -39,13 +39,12 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
       <$LogoContainer>
         <$TicketLogo
           backgroundImage={ticket?.data?.metadata?.image}
-          backgroundShadowColor={ticket?.data?.metadata?.backgroundColor}
+          backgroundShadowColor={ticket?.data?.metadata?.lootboxCustomSchema?.lootbox?.backgroundColor}
           size={!ticket ? '100px' : undefined}
         >
           {!ticket ? <Icon /> : null}
         </$TicketLogo>
       </$LogoContainer>
-
       {ticket ? (
         <$TicketTag>
           <$TagText>{ticket?.data?.metadata?.name || 'Lootbox'}</$TagText>

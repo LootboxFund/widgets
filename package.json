@@ -54,6 +54,7 @@
   "scripts": {
     "watch": "rollup -c -w",
     "build": "rollup -c",
+    "build:blockchainspace-integration": "rollup --config rollup-bcs.config.js",
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
     "build-storybook": "build-storybook",
@@ -63,6 +64,8 @@
     "deploy:newton": "rollup -c && node scripts/deploy-interact-with-lootbox-widget.js",
     "deploy:kepler": "rollup -c && node scripts/deploy-manage-lootbox.js",
     "deploy:sagan": "rollup -c && node scripts/deploy-searchbar.js",
+    "deploy:hayashi": "yarn build:blockchainspace-integration && node scripts/deploy-badge-factory-bcs.js",
+    "deploy:van-allen": "yarn build:blockchainspace-integration && node scripts/deploy-badge-minter-bcs.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
