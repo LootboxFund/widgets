@@ -34,10 +34,10 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { getUserBalanceOfToken } from 'lib/hooks/useContract'
 import { uploadLootboxLogo } from 'lib/api/firebase/storage'
-import BADGE_FACTORY_ABI from 'lib/abi/LootboxBadgeFactory.json'
+import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 
 // CONSTANTS
-const BADGE_FACTORY_ADDRESS = '0xC08C690963A81097A769049858A832b4db310a8A' as ContractAddress
+const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
 const targetChainIdHex = '0x13881'
 const BADGE_FACTORY_URL = 'https://badge-factory.netlify.app/'
 // ------------
@@ -729,7 +729,7 @@ interface SubmitBadgeFactoryOnPolygonProps {
   submitStatus: SubmitStatus
   setSubmitStatus: (status: SubmitStatus) => void
   submitBadgeFactory: () => void
-  viewBadgeFactory: (addr: Address) => void
+  viewBadgeFactory: () => void
 }
 const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) => {
   const initialErrors = {
@@ -782,7 +782,7 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
     if (snapUserState.network.currentNetworkIdHex !== targetChainIdHex) {
       return (
         <$CreateBadgeFactory onClick={switchChains} allConditionsMet={true} themeColor={'#5D0076'}>
-          {`Switch to Polygon`}
+          {`Continue with Polygon`}
         </$CreateBadgeFactory>
       )
     }
@@ -806,7 +806,9 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
         return (
           <$CreateBadgeFactory
             allConditionsMet={true}
-            onClick={() => props.viewBadgeFactory()}
+            onClick={() => {
+              props.viewBadgeFactory()
+            }}
             themeColor={COLORS.successFontColor}
           >
             View Your Guild Badge
@@ -823,7 +825,10 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
         <CreateBadgeFactory
           allConditionsMet={true}
           themeColor={props.selectedNetwork?.themeColor}
-          onSubmit={() => props.submitBadgeFactory()}
+          onSubmit={() => {
+            setTimeLeft(99)
+            props.submitBadgeFactory()
+          }}
           text="Create Guild Badge"
         />
       )
@@ -940,8 +945,6 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
 }
 const BadgeFactory = () => {
   const [provider, loading] = useProvider()
-
-  const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const snapUserState = useSnapshot(userState)
   const isWalletConnected = snapUserState.accounts.length > 0
   const [stageValidatePurchasingToken, setStageValidatePurchasingToken] = useState<StepStage>('in_progress')
@@ -951,21 +954,11 @@ const BadgeFactory = () => {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const [badgeFactoryAddress, setBadgeFactoryAddress] = useState<string>('')
   const [errors, setErrors] = useState<Record<string, string>>({})
-  useEffect(() => {
-    if (timeLeft === 0) {
-      setTimeLeft(null)
-    }
-    if (!timeLeft) return
-    const intervalId = setInterval(() => {
-      setTimeLeft(timeLeft - 1)
-    }, 1000)
-    return () => clearInterval(intervalId)
-  }, [timeLeft])
+
   const updateTicketState = (param: string, value: string | File | undefined) => {
     setTicketState({ ...ticketState, [param]: value })
   }
   const submitBadgeFactory = async () => {
-    setTimeLeft(60)
     setSubmitStatus('in_progress')
     const currentUser = (snapUserState.currentAccount || undefined) as Address
     const submissionId = `badge-bcs/${uuidv4()}`

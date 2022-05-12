@@ -1,10 +1,11 @@
-import { COLORS } from '@wormgraph/helpers'
+import { Address, COLORS, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { checkIfValidEmail, checkIfValidUrl } from 'lib/api/helpers'
 import { NetworkOption } from 'lib/api/network'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import react, { forwardRef, useEffect, useState } from 'react'
 import ColorPicker from 'simple-color-picker'
 import styled from 'styled-components'
+import { ethers as ethersObj, Contract } from 'ethers'
 import StepCard, { $StepHeading, $StepSubheading, StepStage } from '../CreateLootbox/StepCard'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $InputImage, $InputImageLabel, $InputMedium, CreateBadgeFactory } from '../BadgeFactory'
@@ -21,6 +22,20 @@ import {
 } from '../TicketCard/TicketCard'
 import { $SocialLogo } from '../CreateLootbox/StepSocials'
 import { SOCIALS } from 'lib/hooks/constants'
+import parseUrlParams from 'lib/utils/parseUrlParams'
+import { addCustomEVMChain, getProvider, useProvider } from 'lib/hooks/useWeb3Api'
+import BADGE_ABI from 'lib/abi/BadgeBCS.json'
+import { decodeEVMLog } from 'lib/api/evm'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
+import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
+import LogRocket from 'logrocket'
+import WalletStatus from '../WalletStatus'
+
+// CONSTANTS
+const targetChainIdHex = '0x13881'
+const VIEW_BADGE_URL = 'https://viewbadge.io/'
+//
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
   guildName: 'Sync Shield Guild',
@@ -46,7 +61,6 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
 export const validateBiography = (bio: string) => bio.length >= 12
-export const validatePricePerShare = (price: number, maxPricePerShare: number) => price > 0 && price <= maxPricePerShare
 export const validateThemeColor = (color: string) => color.length === 7 && color[0] === '#'
 export const validateLogo = (url: string) => url && checkIfValidUrl(url)
 export const validateCover = (url: string) => url && checkIfValidUrl(url)
@@ -58,15 +72,39 @@ export interface PersonalizeBadgeProps {
 }
 const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
+  const snapUserState = useSnapshot(userState)
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const [themeColor, setThemeColor] = useState('')
+  const [badgeAddress, setBadgeAddress] = useState<ContractAddress>()
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
+  const [logoImage, setLogoImage] = useState('')
+  const [provider, loading] = useProvider()
+  const [finalTicketId, setFinalTicketId] = useState('')
+
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setTimeLeft(null)
+    }
+    if (!timeLeft) return
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeLeft])
 
   const updateTicketState = (param: string, value: string | File | undefined) => {
     setTicketState({ ...ticketState, [param]: value })
   }
 
   useEffect(() => {
+    const addr = parseUrlParams('badge') as ContractAddress
+    console.log(`Finding addr = ${addr}`)
+    if (addr) {
+      setBadgeAddress(addr)
+      getBadgeDetails(addr as ContractAddress)
+    }
     const colorPickerElement = document.getElementById('color-picker')
     const picker = new ColorPicker({ el: colorPickerElement || undefined, color: ticketState.themeColor as string })
     picker.onChange((color: string) => {
@@ -129,6 +167,16 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
   useEffect(() => {
     checkAllTicketCustomizationValidations()
   }, [ticketState])
+
+  const getBadgeDetails = async (addr: ContractAddress) => {
+    const ethers = window.ethers ? window.ethers : ethersObj
+    const { provider } = await getProvider()
+    const signer = await provider.getSigner()
+    const badge = new ethers.Contract(addr, BADGE_ABI, signer)
+    const [logoImageUrl] = await Promise.all([badge.logoImageUrl()])
+    setLogoImage(logoImageUrl)
+    updateTicketState('logoUrl', logoImageUrl)
+  }
 
   const parseInput = (slug: string, text: string) => {
     const value = slug === 'symbol' ? (text as string).toUpperCase().replace(' ', '') : text
@@ -216,6 +264,159 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     }
   }
 
+  const validateAllInputs = () => {
+    let valid = true
+    if (!validateName(ticketState.memberName as string)) {
+      valid = false
+    }
+    if (!validateCoverFile(ticketState.coverFile as File)) {
+      valid = false
+    }
+    if (!validateThemeColor(ticketState.themeColor as string)) {
+      valid = false
+    }
+    return valid
+  }
+
+  const mintBadge = async () => {
+    setTimeLeft(99)
+    setSubmitStatus('in_progress')
+    const currentUser = (snapUserState.currentAccount || '') as Address
+    if (!provider) {
+      throw new Error('No provider')
+    }
+    if (!badgeAddress) {
+      throw new Error('No badge found!')
+    }
+    const blockNum = await provider.getBlockNumber()
+    const ethers = ethersObj
+    const signer = await provider.getSigner()
+    const badgeFactory = new ethers.Contract(badgeAddress, BADGE_ABI, signer)
+    try {
+      console.log(`--- Minting badge...`)
+      await badgeFactory.mintBadge(ticketState.memberName as string, JSON.stringify(ticketState))
+      console.log(`Submitted badge mint!`)
+      const filter = {
+        fromBlock: blockNum,
+        address: badgeFactory.address,
+        topics: [ethers.utils.solidityKeccak256(['string'], ['MintBadge(address,uint256,string,string)'])],
+      }
+      provider.on(filter, async (log) => {
+        if (log !== undefined) {
+          const decodedLog = decodeEVMLog({
+            eventName: 'MintBadge',
+            log: log,
+            abi: `
+            event MintBadge(
+              address indexed purchaser,
+              uint256 ticketId,
+              string memberName,
+              string _data
+            )`,
+            keys: ['purchaser', 'ticketId', 'memberName', '_data'],
+          })
+          const { purchaser, ticketId, memberName, _data } = decodedLog as any
+          console.log(`
+
+            --- purchaser: ${purchaser} vs ${currentUser}
+            --- ticket: id = ${ticketId}, memberName = ${memberName}
+
+          `)
+          console.log(_data)
+          if (
+            purchaser.toLowerCase() === currentUser.toLowerCase() &&
+            memberName.toLowerCase() === (ticketState.memberName as string).toLowerCase()
+          ) {
+            console.log(`
+
+              ---- 🎉🎉🎉 ----
+
+              Congratulations! You've minted a Badge!
+
+              ${memberName}
+              Badge Factory Address: ${badgeAddress}
+              Ticket ID: ${ticketId}
+
+              ---------------
+
+            `)
+            setFinalTicketId(ticketId)
+            setSubmitStatus('success')
+          }
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      LogRocket.captureException(e)
+      setSubmitStatus('failure')
+    }
+  }
+
+  const switchChains = async () => {
+    await addCustomEVMChain(targetChainIdHex)
+    console.log(`--- added custom chain ${targetChainIdHex}`)
+  }
+
+  const renderActionBar = () => {
+    console.log(`
+        
+      snapUserState.network.currentNetworkIdHex = ${snapUserState.network.currentNetworkIdHex}
+      targetChainIdHex = ${targetChainIdHex}
+      provider = ${provider?.network?.chainId}
+  
+      `)
+    if (snapUserState.network.currentNetworkIdHex !== targetChainIdHex) {
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={validateAllInputs()}
+          themeColor={props.selectedNetwork?.themeColor}
+          onSubmit={() => switchChains()}
+          text="Continue with Polygon"
+        />
+      )
+    }
+    if (submitStatus === 'failure') {
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={validateAllInputs()}
+          themeColor={COLORS.dangerFontColor}
+          onSubmit={() => mintBadge()}
+          text="Failed, try again?"
+        />
+      )
+    } else if (submitStatus === 'success') {
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={true}
+          themeColor={COLORS.successFontColor}
+          onSubmit={() => {
+            window.open(`${VIEW_BADGE_URL}?badge=${badgeAddress}&id=${finalTicketId}`)
+          }}
+          text="Success! View Badge"
+        />
+      )
+    } else if (submitStatus === 'in_progress') {
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={false}
+          themeColor={props.selectedNetwork?.themeColor}
+          onSubmit={() => console.log('submitting...')}
+          text={`...submitting (${timeLeft})`}
+        />
+      )
+    } else if (submitStatus === 'unsubmitted') {
+      return (
+        <CreateBadgeFactory
+          allConditionsMet={validateAllInputs()}
+          themeColor={props.selectedNetwork?.themeColor}
+          onSubmit={() => mintBadge()}
+          text="Mint Guild Badge"
+        />
+      )
+    }
+    return
+  }
+
   return (
     <$PersonalizeBadge style={props.stage === 'not_yet' ? { opacity: 0.2, cursor: 'not-allowed' } : {}}>
       {ref && <div ref={ref}></div>}
@@ -224,14 +425,7 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
         stage={props.stage}
         onNext={() => {}}
         errors={Object.values(errors)}
-        customActionBar={() => (
-          <CreateBadgeFactory
-            allConditionsMet={true}
-            themeColor={props.selectedNetwork?.themeColor}
-            onSubmit={() => console.log('createBadgeFactory')}
-            text="Mint Guild Badge"
-          />
-        )}
+        customActionBar={renderActionBar}
       >
         <div
           style={
@@ -260,8 +454,8 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Mint your Official Guild Badge to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor incididunt ut labore et dolore magna aliqua.
+              {`Mint your Official Guild Badge to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+              tempor.`}
             </$StepSubheading>
             <br />
             <br />
@@ -378,20 +572,28 @@ const $PersonalizeBadge = styled.section<{}>`
 `
 
 const BadgeMinter = () => {
+  const snapUserState = useSnapshot(userState)
+  const isWalletConnected = snapUserState.accounts.length > 0
   return (
-    <PersonalizeBadge
-      stage="in_progress"
-      selectedNetwork={{
-        name: 'Polygon',
-        symbol: 'MATIC',
-        themeColor: '#8F5AE8',
-        chainIdHex: '0x89',
-        chainIdDecimal: '137',
-        isAvailable: false,
-        isTestnet: false,
-        icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
-      }}
-    ></PersonalizeBadge>
+    <div>
+      <WalletStatus targetNetwork={targetChainIdHex} />
+      <br />
+      <div style={isWalletConnected ? { marginTop: '20px' } : { opacity: '0.2', cursor: 'not-allowed' }}>
+        <PersonalizeBadge
+          stage="in_progress"
+          selectedNetwork={{
+            name: 'Polygon',
+            symbol: 'MATIC',
+            themeColor: '#8F5AE8',
+            chainIdHex: '0x89',
+            chainIdDecimal: '137',
+            isAvailable: false,
+            isTestnet: false,
+            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+          }}
+        ></PersonalizeBadge>
+      </div>
+    </div>
   )
 }
 
