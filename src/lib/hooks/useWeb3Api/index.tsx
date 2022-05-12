@@ -94,8 +94,10 @@ export const useUserInfo = () => {
 export const addCustomEVMChain = async (chainIdHex: string) => {
   const { provider } = await getProvider()
   const chainSlug = chainIdHexToSlug(chainIdHex)
+  console.log(`${chainSlug} and ${provider.network?.chainId}`)
   if (chainSlug && provider) {
     const chainInfo = BLOCKCHAINS[chainSlug]
+    console.log(chainInfo)
     if (chainInfo && provider) {
       try {
         await provider.send('wallet_addEthereumChain', [

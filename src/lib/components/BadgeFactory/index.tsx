@@ -14,6 +14,8 @@ import {
   $TicketTag,
   TicketCardCandyWrapper,
 } from 'lib/components/TicketCard/TicketCard'
+import LogRocket from 'logrocket'
+import { decodeEVMLog } from 'lib/api/evm'
 import { NetworkOption } from 'lib/api/network'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
@@ -23,7 +25,7 @@ import { $SocialLogo } from '../CreateLootbox/StepSocials'
 import { ethers as ethersObj } from 'ethers'
 import { $ComingSoon, $NetworkIcon, $NetworkName } from '../CreateLootbox/StepChooseNetwork'
 import { $TermCheckbox, $TermOfService, SubmitStatus, TermsFragment } from '../CreateLootbox/StepTermsConditions'
-import { addCustomEVMChain, getProvider } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain, getProvider, useProvider } from 'lib/hooks/useWeb3Api'
 import ERC20ABI from 'lib/abi/erc20.json'
 import { ContractAddress, ChainIDHex, Address } from '@wormgraph/helpers'
 import WalletButton from '../WalletButton'
@@ -32,6 +34,13 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { getUserBalanceOfToken } from 'lib/hooks/useContract'
 import { uploadLootboxLogo } from 'lib/api/firebase/storage'
+import BADGE_FACTORY_ABI from 'lib/abi/LootboxBadgeFactory.json'
+
+// CONSTANTS
+const BADGE_FACTORY_ADDRESS = '0xC08C690963A81097A769049858A832b4db310a8A' as ContractAddress
+const targetChainIdHex = '0x13881'
+const BADGE_FACTORY_URL = 'https://badge-factory.netlify.app/'
+// ------------
 
 export const validateName = (name: string) => name.length > 0
 export const validateSymbol = (symbol: string) => symbol.length > 0
@@ -578,7 +587,7 @@ const ValidatePurchasingTokenBalance = (props: ValidatePurchasingTokenBalancePro
     const erc20 = new ethers.Contract(erc20Addr, ERC20ABI)
     console.log(`--- got erc20 = ${erc20Addr}`)
     console.log(erc20)
-    const currentUser = (snapUserState.currentAccount || undefined) as Address
+    const currentUser = (snapUserState.currentAccount || '') as Address
     console.log(`--- got currentUser`)
     console.log(currentUser)
     try {
@@ -720,13 +729,14 @@ interface SubmitBadgeFactoryOnPolygonProps {
   submitStatus: SubmitStatus
   setSubmitStatus: (status: SubmitStatus) => void
   submitBadgeFactory: () => void
-  viewBadgeFactory: () => void
+  viewBadgeFactory: (addr: Address) => void
 }
 const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) => {
   const initialErrors = {
     errorOne: '',
     errorTwo: '',
   }
+  const snapUserState = useSnapshot(userState)
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   useEffect(() => {
     if (timeLeft === 0) {
@@ -764,7 +774,18 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
       [slug]: checked,
     })
   }
+  const switchChains = async () => {
+    await addCustomEVMChain(targetChainIdHex)
+    console.log(`--- added custom chain ${targetChainIdHex}`)
+  }
   const renderActionBar = () => {
+    if (snapUserState.network.currentNetworkIdHex !== targetChainIdHex) {
+      return (
+        <$CreateBadgeFactory onClick={switchChains} allConditionsMet={true} themeColor={'#5D0076'}>
+          {`Switch to Polygon`}
+        </$CreateBadgeFactory>
+      )
+    }
     if (props.stage === 'in_progress') {
       return (
         <$CreateBadgeFactory allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
@@ -918,6 +939,9 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
   web: '',
 }
 const BadgeFactory = () => {
+  const [provider, loading] = useProvider()
+
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const snapUserState = useSnapshot(userState)
   const isWalletConnected = snapUserState.accounts.length > 0
   const [stageValidatePurchasingToken, setStageValidatePurchasingToken] = useState<StepStage>('in_progress')
@@ -925,13 +949,93 @@ const BadgeFactory = () => {
   const [stageAgreeTerms, setStageAgreeTerms] = useState<StepStage>('not_yet')
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
+  const [badgeFactoryAddress, setBadgeFactoryAddress] = useState<string>('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setTimeLeft(null)
+    }
+    if (!timeLeft) return
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeLeft])
   const updateTicketState = (param: string, value: string | File | undefined) => {
     setTicketState({ ...ticketState, [param]: value })
   }
   const submitBadgeFactory = async () => {
+    setTimeLeft(60)
+    setSubmitStatus('in_progress')
+    const currentUser = (snapUserState.currentAccount || undefined) as Address
     const submissionId = `badge-bcs/${uuidv4()}`
     const [imagePublicPath] = await Promise.all([uploadLootboxLogo(submissionId, ticketState.logoFile as File)])
-    console.log(`Submit badge factory... ${imagePublicPath}`)
+    console.log(`Submit badge factory image... ${imagePublicPath}`)
+    if (!provider) {
+      throw new Error('No provider')
+    }
+    const blockNum = await provider.getBlockNumber()
+    const ethers = ethersObj
+    const signer = await provider.getSigner()
+    const badgeFactory = new ethers.Contract(BADGE_FACTORY_ADDRESS, BADGE_FACTORY_ABI, signer)
+    try {
+      console.log(`--- Creating badge factory...`)
+      await badgeFactory.createBadge(ticketState.name, ticketState.symbol, imagePublicPath, JSON.stringify(ticketState))
+      console.log(`Submitted badge factory creation!`)
+      const filter = {
+        fromBlock: blockNum,
+        address: badgeFactory.address,
+        topics: [ethers.utils.solidityKeccak256(['string'], ['BadgeCreated(string,address,address,string)'])],
+      }
+      provider.on(filter, async (log) => {
+        if (log !== undefined) {
+          const decodedLog = decodeEVMLog({
+            eventName: 'BadgeCreated',
+            log: log,
+            abi: `
+            event BadgeCreated(
+              string badgeName,
+              address indexed badge,
+              address indexed issuer,
+              string _data
+            )`,
+            keys: ['badgeName', 'badge', 'issuer', '_data'],
+          })
+          const { badgeName, badge, issuer, _data } = decodedLog as any
+          console.log(`
+
+            --- issuer: ${issuer} vs ${currentUser}
+            --- badge: ${badgeName} vs ${ticketState.name}
+            --- address = ${badge}
+
+          `)
+          console.log(_data)
+          if (
+            issuer.toLowerCase() === currentUser.toLowerCase() &&
+            badgeName.toLowerCase() === (ticketState.name as string).toLowerCase()
+          ) {
+            console.log(`
+
+              ---- 🎉🎉🎉 ----
+
+              Congratulations! You've created a Badge Factory!
+
+              ${badgeName}
+              Badge Factory Address: ${badge}
+
+              ---------------
+
+            `)
+            setBadgeFactoryAddress(badge)
+            setSubmitStatus('success')
+          }
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      LogRocket.captureException(e)
+      setSubmitStatus('failure')
+    }
   }
   return (
     <$Vertical>
@@ -993,7 +1097,9 @@ const BadgeFactory = () => {
           submitStatus={submitStatus}
           setSubmitStatus={setSubmitStatus}
           submitBadgeFactory={() => submitBadgeFactory()}
-          viewBadgeFactory={() => console.log('View Badge Factory...')}
+          viewBadgeFactory={() => {
+            window.open(`${BADGE_FACTORY_URL}?badge=${badgeFactoryAddress}`, '_blank')
+          }}
           selectedNetwork={{
             name: 'Polygon',
             symbol: 'MATIC',
