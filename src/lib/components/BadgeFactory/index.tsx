@@ -39,7 +39,7 @@ import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 // CONSTANTS
 const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
 const targetChainIdHex = '0x13881'
-const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-3.surge.sh'
+const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-4.surge.sh'
 // ------------
 
 export const validateName = (name: string) => name.length > 0

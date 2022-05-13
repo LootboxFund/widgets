@@ -10,6 +10,9 @@ import StepCard, { $StepHeading, $StepSubheading, StepStage } from '../CreateLoo
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $InputImage, $InputImageLabel, $InputMedium, CreateBadgeFactory } from '../BadgeFactory'
 import HelpIcon from 'lib/theme/icons/Help.icon'
+import { v4 as uuidv4 } from 'uuid'
+import { uploadLootboxLogo } from 'lib/api/firebase/storage'
+import { downloadFile, stampNewBadge } from 'lib/api/stamp'
 import ReactTooltip from 'react-tooltip'
 import {
   $Divider,
@@ -31,10 +34,11 @@ import { useSnapshot } from 'valtio'
 import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
 import LogRocket from 'logrocket'
 import WalletStatus from '../WalletStatus'
+import { checkMobileBrowser } from 'lib/api/createLootbox'
 
 // CONSTANTS
 const targetChainIdHex = '0x13881'
-const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-3.surge.sh'
+const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-4.surge.sh'
 //
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
@@ -82,14 +86,7 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
   const [logoImage, setLogoImage] = useState('')
   const [provider, loading] = useProvider()
   const [finalTicketId, setFinalTicketId] = useState('')
-
-  console.log(`
-    
-    ------ ticketState
-
-
-  `)
-  console.log(ticketState)
+  const [stampUrl, setStampUrl] = useState('')
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   useEffect(() => {
@@ -108,16 +105,16 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
   }
 
   useEffect(() => {
-    const addr = parseUrlParams('badge') as ContractAddress
-    console.log(`Finding addr = ${addr}`)
-    if (addr) {
-      setBadgeAddress(addr)
-    }
     const colorPickerElement = document.getElementById('color-picker')
     const picker = new ColorPicker({ el: colorPickerElement || undefined, color: ticketState.themeColor as string })
     picker.onChange((color: string) => {
       setThemeColor(color)
     })
+    const addr = parseUrlParams('badge') as ContractAddress
+    console.log(`Finding addr = ${addr}`)
+    if (addr) {
+      setBadgeAddress(addr)
+    }
   }, [])
 
   useEffect(() => {
@@ -196,6 +193,13 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
 
     `)
     setTicketState({ ...ticketState, guildName, logoUrl: logoImageUrl })
+    if (shouldReloadBadgeDetails) {
+      const colorPickerElement = document.getElementById('color-picker')
+      const picker = new ColorPicker({ el: colorPickerElement || undefined, color: ticketState.themeColor as string })
+      picker.onChange((color: string) => {
+        setThemeColor(color)
+      })
+    }
   }
 
   const parseInput = (slug: string, text: string) => {
@@ -308,6 +312,8 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
     if (!badgeAddress) {
       throw new Error('No badge found!')
     }
+    const submissionId = `badge-bcs/${uuidv4()}`
+    const [imagePublicPath] = await Promise.all([uploadLootboxLogo(submissionId, ticketState.coverFile as File)])
     const blockNum = await provider.getBlockNumber()
     const ethers = ethersObj
     const signer = await provider.getSigner()
@@ -361,7 +367,34 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
 
             `)
             setFinalTicketId(ticketId)
-            setSubmitStatus('success')
+            try {
+              const [stampUrl] = await Promise.all([
+                stampNewBadge({
+                  backgroundImage: imagePublicPath,
+                  logoImage: ticketState.logoUrl as string,
+                  themeColor: ticketState.themeColor as string,
+                  guildName: ticketState.guildName as string,
+                  memberName: ticketState.memberName as string,
+                  ticketID: ticketId.toString(),
+                  badgeAddress: badgeAddress,
+                  chainIdHex: targetChainIdHex,
+                }),
+              ])
+              console.log(`Stamp URL: ${stampUrl}`)
+              setStampUrl(stampUrl)
+              // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+              if (stampUrl && !checkMobileBrowser()) {
+                await downloadFile(
+                  `${ticketState.guildName}-${badgeAddress}-${ticketState.memberName}-${ticketId}`,
+                  stampUrl
+                )
+              }
+            } catch (err) {
+              LogRocket.captureException(err)
+              console.log(err)
+            } finally {
+              setSubmitStatus('success')
+            }
           }
         }
       })
@@ -374,17 +407,10 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
 
   const switchChains = async () => {
     await addCustomEVMChain(targetChainIdHex)
-    console.log(`--- added custom chain ${targetChainIdHex}`)
+    // console.log(`--- added custom chain ${targetChainIdHex}`)
   }
 
   const renderActionBar = () => {
-    console.log(`
-        
-      snapUserState.network.currentNetworkIdHex = ${snapUserState.network.currentNetworkIdHex}
-      targetChainIdHex = ${targetChainIdHex}
-      provider = ${provider?.network?.chainId}
-  
-      `)
     if (snapUserState.network.currentNetworkIdHex !== targetChainIdHex) {
       return (
         <CreateBadgeFactory
@@ -410,7 +436,7 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
           allConditionsMet={true}
           themeColor={COLORS.successFontColor}
           onSubmit={() => {
-            window.open(`${VIEW_BADGE_URL}?badge=${badgeAddress}&id=${finalTicketId}`)
+            window.open(stampUrl, '_blank')
           }}
           text="Success! View Badge"
         />

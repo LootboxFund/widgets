@@ -57,3 +57,48 @@ export const stampNewLootbox = async (props: StampNewLootboxProps): Promise<stri
     return ''
   }
 }
+
+interface StampNewBadgeProps {
+  backgroundImage: Url
+  logoImage: Url
+  themeColor: string
+  guildName: string
+  memberName: string
+  ticketID: string
+  badgeAddress: ContractAddress
+  chainIdHex: ChainIDHex
+}
+export const stampNewBadge = async (props: StampNewBadgeProps): Promise<string> => {
+  // constants
+  const BADGE_STAMP_URL = 'https://stamp-nft-mfvwkxffsq-uc.a.run.app/stamp/new/badge-bcs'
+  //
+  const { backgroundImage, logoImage, themeColor, guildName, memberName, ticketID, badgeAddress, chainIdHex } = props
+  const stampConfig = {
+    backgroundImage,
+    logoImage,
+    themeColor,
+    guildName,
+    memberName,
+    ticketID,
+    badgeAddress,
+    chainIdHex,
+  }
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    secret: '7XsxFA!C&X8f*5&65g3XFNXmJ^K#Y1BDlx2kVZRp',
+  })
+  try {
+    const data = await fetch(BADGE_STAMP_URL, {
+      method: 'POST',
+      headers: headers,
+      mode: 'cors',
+      cache: 'default',
+      body: JSON.stringify(stampConfig),
+    })
+    const { stamp } = await data.json()
+    return stamp
+  } catch (e) {
+    console.log(e)
+    return ''
+  }
+}
