@@ -38,7 +38,7 @@ import { checkMobileBrowser } from 'lib/api/createLootbox'
 
 // CONSTANTS
 const targetChainIdHex = '0x13881'
-const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-4.surge.sh'
+const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-5.surge.sh'
 const BADGE_MINTER_PIPEDREAM_URL = 'https://cf437c8b70a35a93625d1aac738e09f9.m.pipedream.net'
 const BADGE_MINTER_PIPEDREAM_SECRET = 'z6dLUlZRYkje3tpXgQYZK1$M1Q@gYO0a8mhjJ%K*'
 //
@@ -542,13 +542,16 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
               <span>{`Join ${ticketState.guildName}`}</span>
               <HelpIcon tipID="customizeGuildBadge" />
               <ReactTooltip id="customizeGuildBadge" place="right" effect="solid">
-                Lorem ipsum
+                {`Mint this NFT for free on the Polygon network. You can use this badge to join ${ticketState.guildName} and show your support.`}
               </ReactTooltip>
             </$StepHeading>
-            <$StepSubheading style={{ fontSize: '0.8rem' }}>{badgeAddress}</$StepSubheading>
             <$StepSubheading>
-              {`Mint your Official Guild Badge to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-              tempor.`}
+              {`Share this link with your guild members to mint your Official Guild Badge. In partnership with BlockchainSpace & LootboxFund.`}
+            </$StepSubheading>
+            <$StepSubheading style={{ fontSize: '0.8rem' }}>
+              <a href={`${props.selectedNetwork.blockExplorerUrl}address/${badgeAddress}`} target="_blank">
+                {badgeAddress}
+              </a>
             </$StepSubheading>
             <br />
             <br />
@@ -556,7 +559,8 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
               <span>Member Name</span>
               <HelpIcon tipID="badgeName" />
               <ReactTooltip id="badgeName" place="right" effect="solid">
-                Lorem ipsum
+                Ideally use the same name that your guild members know you as. That could be your gamertag, your discord
+                username, or your real name. It's your choice.
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -570,7 +574,7 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
                 <span>Contact Info</span>
                 <HelpIcon tipID="contactInfo" />
                 <ReactTooltip id="contactInfo" place="right" effect="solid">
-                  Lorem ipsum
+                  Optional but highly recommended. Providing this info to your guild will help them reach you.
                 </ReactTooltip>
               </$StepSubheading>
               {SOCIALS.filter((social) => social.shownOn.includes('badge-member')).map((social) => {
@@ -610,12 +614,11 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
               <b>Styling Your NFT Badge</b>
               <HelpIcon tipID="styleNFTBadge" />
               <ReactTooltip id="styleNFTBadge" place="right" effect="solid">
-                Lorem ipsum
+                {`Everyone in ${ticketState.guildName} will use the same Guild Logo, but every person will have their own unique background image on their Badge.`}
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+              {`Customize the look & feel of your Guild Badge. This is your NFT membership pass.`}
             </$StepSubheading>
             <$Horizontal>
               <$Vertical>
@@ -683,6 +686,7 @@ const BadgeMinter = () => {
             isAvailable: false,
             isTestnet: false,
             icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC.png?alt=media',
+            blockExplorerUrl: 'https://mumbai.polygonscan.com/',
           }}
         ></PersonalizeBadge>
       </div>
@@ -770,5 +774,36 @@ export const $BadgeCandyWrapper = styled.section<{ backgroundColor?: string; bac
   background-position: center;
   position: relative;
 `
+
+// const MyBadges = () => {
+//   const [badgeAddress, setBadgeAddress] = useState('')
+//   const snapUserState = useSnapshot(userState)
+//   useEffect(() => {
+//     const addr = parseUrlParams('badge') as ContractAddress
+//     console.log(`Finding addr = ${addr}`)
+//     if (addr) {
+//       setBadgeAddress(addr)
+//       loadMyBadges(addr as ContractAddress)
+//     }
+//   }, [])
+//   const loadMyBadges = async (badgeAddr: ContractAddress) => {
+//     if (!badgeAddr) {
+//       throw new Error('No badge initialized')
+//     }
+//     if (!snapUserState.currentAccount) {
+//       throw new Error('No user account')
+//     }
+//     // use ERC721Enumerable to get the tokens owned by an address (https://ethereum.stackexchange.com/questions/68438/erc721-how-to-get-the-owned-tokens-of-an-address)
+//     const badges = await fetchUserTicketsFromLootbox(snapUserState.currentAccount, badgeAddr)
+//     for (const ticket of userTicketState.userTickets) {
+//       try {
+//         await loadTicketData(ticket)
+//       } catch (err) {
+//         console.error('Error loading ticket', err)
+//       }
+//     }
+//   }
+//   return <p>My Tickets</p>
+// }
 
 export default BadgeMinter

@@ -39,7 +39,7 @@ import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 // CONSTANTS
 const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
 const targetChainIdHex = '0x13881'
-const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-4.surge.sh'
+const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-5.surge.sh'
 const BADGE_FACTORY_PIPEDREAM_SECRET = '!ND8m&#3lJHD$@OG2%aSASS9QT8gHm7Bx6Ey#3Pe'
 const BADGE_FACTORY_PIPEDREAM_URL = 'https://a6ca529710347be0c41943605b1e2df6.m.pipedream.net'
 // ------------
@@ -244,12 +244,12 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
               <span>Customize Your Guild Badge</span>
               <HelpIcon tipID="customizeGuildBadge" />
               <ReactTooltip id="customizeGuildBadge" place="right" effect="solid">
-                Lorem ipsum
+                This Guild Badge acts as an on-chain identification tool to verify your guild members authenticity.
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+              This Guild Badge tool will launch an NFT collection to the blockchain for your members to mint for free.
+              Each member can customize their own NFT badge.
             </$StepSubheading>
             <br />
             <br />
@@ -257,7 +257,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
               <span>Badge Name</span>
               <HelpIcon tipID="badgeName" />
               <ReactTooltip id="badgeName" place="right" effect="solid">
-                Lorem ipsum
+                This is the name of the NFT collection that will appear on the blockchain.
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -270,7 +270,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
               <span>NFT Symbol</span>
               <HelpIcon tipID="nftSymbol" />
               <ReactTooltip id="nftSymbol" place="right" effect="solid">
-                Lorem ipsum
+                This is the symbol shortname that will appear in your Metamask.
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -284,7 +284,7 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
                 <span>Contact Info</span>
                 <HelpIcon tipID="contactInfo" />
                 <ReactTooltip id="contactInfo" place="right" effect="solid">
-                  Lorem ipsum
+                  Optional fields but highly encouraged to fill out so that your members can reach you.
                 </ReactTooltip>
               </$StepSubheading>
               {SOCIALS.filter((social) => social.shownOn.includes('badge-factory')).map((social) => {
@@ -323,12 +323,14 @@ const CustomizeBadge = forwardRef((props: CustomizeBadgeProps, ref: React.RefObj
               <b>Styling Your NFT Badge</b>
               <HelpIcon tipID="styleNFTBadge" />
               <ReactTooltip id="styleNFTBadge" place="right" effect="solid">
-                Lorem ipsum
+                When your guild members customize and mint their badge, they will all use your same logo while appearing
+                customized to their style. When you see everyone's badges, this creates a powerful feeling of unity in
+                your community.
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+              Upload your Guild Logo here. Each guild member can customize their own NFT badge while using the same
+              guild logo. The cover photo will not be used, it is for demo only.
             </$StepSubheading>
             <$Horizontal>
               <$Vertical>
@@ -631,12 +633,30 @@ const ValidatePurchasingTokenBalance = (props: ValidatePurchasingTokenBalancePro
             <span>Verify Eligibility</span>
             <HelpIcon tipID="verifyEligibility" />
             <ReactTooltip id="verifyEligibility" place="right" effect="solid">
-              Lorem ipsum
+              This Guild Badge tool will deploy your own NFT collection to the Blockchain, and allow your guild members
+              to customize their own NFTs. Use tools such as BlockchainSpace to verify authenticity of your members.
             </ReactTooltip>
           </$StepHeading>
-          <$StepSubheading>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua.
+          <$StepSubheading style={{ display: 'inline-block' }}>
+            <span>Create your own Guild Badge for your community members to mint. In partnership with</span>
+            <a href="https://www.blockchainspace.asia/" target="_blank" style={{ margin: '0px 5px' }}>
+              BlockchainSpace
+            </a>
+            <span>and</span>
+            <a href="https://lootbox.fund" target="_blank" style={{ margin: '0px 5px' }}>
+              Lootbox Fund.
+            </a>
+          </$StepSubheading>
+          <$StepSubheading style={{ display: 'inline-block', marginTop: '10px' }}>
+            <span>Free to use, but you must own at least 200</span>
+            <a
+              href="https://coinmarketcap.com/currencies/blockchainspace/"
+              target="_blank"
+              style={{ margin: '0px 5px' }}
+            >
+              GUILD token
+            </a>
+            <span>in your Metamask to use this tool.</span>
           </$StepSubheading>
           <br />
           <$Vertical>
@@ -763,11 +783,11 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
   const TERMS: TermsFragment[] = [
     {
       slug: 'termA',
-      text: 'I agree to conduct business ethically & professionally as a fiduciary to my investors and fellow gamers.',
+      text: 'I understand that after launching this NFT Collection, I will need to share the link to my guild members for them to mint their Official Guild Badge.',
     },
     {
       slug: 'termB',
-      text: 'I agree to the Lootbox Terms & Conditions and release Lootbox DAO from any liability as a permissionless protocol.',
+      text: 'I agree to the terms & conditions of BlockchainSpace and Lootbox Fund.',
     },
   ]
   const updateCheckbox = (slug: string, checked: any) => {
@@ -854,14 +874,15 @@ const SubmitBadgeFactoryOnPolygon = (props: SubmitBadgeFactoryOnPolygonProps) =>
         <$Vertical>
           <$StepHeading>
             <span>Create Badge</span>
-            <HelpIcon tipID="verifyEligibility" />
-            <ReactTooltip id="verifyEligibility" place="right" effect="solid">
-              Lorem ipsum
+            <HelpIcon tipID="createBadge" />
+            <ReactTooltip id="createBadge" place="right" effect="solid">
+              Creating a Guild Badge is free, but there will be a small gas fee paid to the blockchain network to
+              process this transaction.
             </ReactTooltip>
           </$StepHeading>
           <$StepSubheading>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua.
+            Launch your Guild Badge on Polygon. After successful deployment of this NFT Collection, you will be given a
+            link to share with community members for them to personalize & mint their Guild badge.
           </$StepSubheading>
           <br />
           {TERMS.map((term) => {

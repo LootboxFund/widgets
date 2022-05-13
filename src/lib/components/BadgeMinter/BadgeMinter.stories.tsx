@@ -7,7 +7,7 @@ export default {
 }
 
 const Demo = () => (
-  <div style={{ width: '760px', height: '600px' }}>
+  <div style={{ width: 'auto', maxWidth: '760px', height: '600px' }}>
     <BadgeMinter />
   </div>
 )

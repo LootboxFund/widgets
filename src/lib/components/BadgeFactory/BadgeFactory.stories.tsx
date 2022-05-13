@@ -7,7 +7,7 @@ export default {
 
 const Demo = () => {
   return (
-    <div style={{ width: '760px', height: '600px' }}>
+    <div style={{ width: 'auto', maxWidth: '760px', height: '600px' }}>
       <BadgeFactory />
     </div>
   )
