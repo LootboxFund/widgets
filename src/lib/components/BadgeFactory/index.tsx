@@ -37,7 +37,7 @@ import { uploadLootboxLogo } from 'lib/api/firebase/storage'
 import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 
 // CONSTANTS
-const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
+const BADGE_FACTORY_ADDRESS = '0xa6210E95867F007eBE60dC5Ed32f776758740898' as ContractAddress
 const targetChainIdHex = '0x13881'
 const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-5.surge.sh'
 const BADGE_FACTORY_PIPEDREAM_SECRET = '!ND8m&#3lJHD$@OG2%aSASS9QT8gHm7Bx6Ey#3Pe'
