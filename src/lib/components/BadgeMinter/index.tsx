@@ -39,6 +39,8 @@ import { checkMobileBrowser } from 'lib/api/createLootbox'
 // CONSTANTS
 const targetChainIdHex = '0x13881'
 const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-4.surge.sh'
+const BADGE_MINTER_PIPEDREAM_URL = 'https://cf437c8b70a35a93625d1aac738e09f9.m.pipedream.net'
+const BADGE_MINTER_PIPEDREAM_SECRET = 'z6dLUlZRYkje3tpXgQYZK1$M1Q@gYO0a8mhjJ%K*'
 //
 
 const INITIAL_TICKET: Record<string, string | File | undefined> = {
@@ -60,6 +62,9 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
   snapchat: '',
   twitch: '',
   web: '',
+  gamesPlayed: '',
+  location: '',
+  numberOfScholars: '',
 }
 
 export const validateName = (name: string) => name.length > 0
@@ -368,7 +373,7 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
             `)
             setFinalTicketId(ticketId)
             try {
-              const [stampUrl] = await Promise.all([
+              const [_stampUrl] = await Promise.all([
                 stampNewBadge({
                   backgroundImage: imagePublicPath,
                   logoImage: ticketState.logoUrl as string,
@@ -380,8 +385,37 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
                   chainIdHex: targetChainIdHex,
                 }),
               ])
-              console.log(`Stamp URL: ${stampUrl}`)
-              setStampUrl(stampUrl)
+              console.log(`Stamp URL: ${_stampUrl}`)
+              setStampUrl(_stampUrl)
+              const nftData = {
+                guildName: ticketState.guildName as string,
+                memberName: ticketState.memberName as string,
+                themeColor: ticketState.themeColor as string,
+                logoUrl: ticketState.logoUrl as string,
+                coverUrl: ticketState.coverUrl as string,
+                twitter: ticketState.twitter as string,
+                email: ticketState.email as string,
+                facebook: ticketState.facebook as string,
+                discord: ticketState.discord as string,
+                web: ticketState.web as string,
+                gamesPlayed: ticketState.gamesPlayed as string,
+                location: ticketState.location as string,
+                numberOfScholars: ticketState.numberOfScholars as string,
+                stampImage: _stampUrl as string,
+                ticketId: ticketId.toString(),
+                badgeAddress: badgeAddress,
+              }
+              const headers = new Headers({
+                'Content-Type': 'application/json',
+                secret: BADGE_MINTER_PIPEDREAM_SECRET,
+              })
+              await fetch(`${BADGE_MINTER_PIPEDREAM_URL}`, {
+                method: 'POST',
+                headers: headers,
+                mode: 'cors',
+                cache: 'default',
+                body: JSON.stringify(nftData),
+              })
               // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
               if (stampUrl && !checkMobileBrowser()) {
                 await downloadFile(

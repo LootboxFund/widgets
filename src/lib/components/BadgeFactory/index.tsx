@@ -40,6 +40,8 @@ import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 const BADGE_FACTORY_ADDRESS = '0xA1E0F31e037DCB577756A85930c8822B3bfa1Be7' as ContractAddress
 const targetChainIdHex = '0x13881'
 const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-4.surge.sh'
+const BADGE_FACTORY_PIPEDREAM_SECRET = '!ND8m&#3lJHD$@OG2%aSASS9QT8gHm7Bx6Ey#3Pe'
+const BADGE_FACTORY_PIPEDREAM_URL = 'https://a6ca529710347be0c41943605b1e2df6.m.pipedream.net'
 // ------------
 
 export const validateName = (name: string) => name.length > 0
@@ -939,6 +941,7 @@ const INITIAL_TICKET: Record<string, string | File | undefined> = {
   tiktok: '',
   facebook: '',
   discord: '',
+  twitch: '',
   youtube: '',
   location: '',
   gamesPlayed: '',
@@ -1021,6 +1024,32 @@ const BadgeFactory = () => {
 
             `)
             setBadgeFactoryAddress(badge)
+            const guildDataPipedream = {
+              name: ticketState.name,
+              symbol: ticketState.symbol as string,
+              logoUrl: imagePublicPath,
+              twitter: ticketState.twitter as string,
+              email: ticketState.email as string,
+              numberOfScholars: ticketState.numberOfScholars as string,
+              facebook: ticketState.facebook as string,
+              discord: ticketState.discord as string,
+              twitch: ticketState.twitch as string,
+              location: ticketState.location as string,
+              gamesPlayed: ticketState.gamesPlayed as string,
+              web: ticketState.web as string,
+              badgeAddress: badge,
+            }
+            const headers = new Headers({
+              'Content-Type': 'application/json',
+              secret: BADGE_FACTORY_PIPEDREAM_SECRET,
+            })
+            await fetch(`${BADGE_FACTORY_PIPEDREAM_URL}`, {
+              method: 'POST',
+              headers: headers,
+              mode: 'cors',
+              cache: 'default',
+              body: JSON.stringify(guildDataPipedream),
+            })
             setSubmitStatus('success')
           }
         }

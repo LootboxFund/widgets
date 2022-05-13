@@ -157,7 +157,7 @@ export const SOCIALS: SocialFragment[] = [
     name: 'Instagram',
     placeholder: 'Instagram',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
-    shownOn: ['create-loobox', 'badge-member'],
+    shownOn: ['create-loobox'],
   },
   {
     slug: 'tiktok',
@@ -192,7 +192,7 @@ export const SOCIALS: SocialFragment[] = [
     name: 'Twitch',
     placeholder: 'Twitch',
     icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
-    shownOn: ['create-loobox', 'badge-factory', 'badge-member'],
+    shownOn: ['create-loobox', 'badge-factory'],
   },
   {
     slug: 'web',
