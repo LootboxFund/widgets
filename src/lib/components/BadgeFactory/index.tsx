@@ -27,7 +27,7 @@ import { $ComingSoon, $NetworkIcon, $NetworkName } from '../CreateLootbox/StepCh
 import { $TermCheckbox, $TermOfService, SubmitStatus, TermsFragment } from '../CreateLootbox/StepTermsConditions'
 import { addCustomEVMChain, getProvider, useProvider } from 'lib/hooks/useWeb3Api'
 import ERC20ABI from 'lib/abi/erc20.json'
-import { ContractAddress, ChainIDHex, Address } from '@wormgraph/helpers'
+import { ContractAddress, ChainIDHex, Address, chainIdHexToSlug } from '@wormgraph/helpers'
 import WalletButton from '../WalletButton'
 import WalletStatus from 'lib/components/WalletStatus'
 import { userState } from 'lib/state/userState'
@@ -37,9 +37,9 @@ import { uploadLootboxLogo } from 'lib/api/firebase/storage'
 import BADGE_FACTORY_ABI from 'lib/abi/BadgeFactoryBCS.json'
 
 // CONSTANTS
-const BADGE_FACTORY_ADDRESS = '0xa6210E95867F007eBE60dC5Ed32f776758740898' as ContractAddress
+const BADGE_FACTORY_ADDRESS = '0xadb85990dB2430aEb00e455feFf920CEA63d7eb7' as ContractAddress
 const targetChainIdHex = '0x13881'
-const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-5.surge.sh'
+const BADGE_FACTORY_URL = 'https://badge-minter-bcs-v1-7.surge.sh'
 const BADGE_FACTORY_PIPEDREAM_SECRET = '!ND8m&#3lJHD$@OG2%aSASS9QT8gHm7Bx6Ey#3Pe'
 const BADGE_FACTORY_PIPEDREAM_URL = 'https://a6ca529710347be0c41943605b1e2df6.m.pipedream.net'
 // ------------
@@ -1059,6 +1059,8 @@ const BadgeFactory = () => {
               gamesPlayed: ticketState.gamesPlayed as string,
               web: ticketState.web as string,
               badgeAddress: badge,
+              chainIdHex: targetChainIdHex,
+              chainSlug: chainIdHexToSlug(targetChainIdHex),
             }
             const headers = new Headers({
               'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import { Address, COLORS, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
+import { Address, chainIdHexToSlug, COLORS, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { checkIfValidEmail, checkIfValidUrl } from 'lib/api/helpers'
 import { NetworkOption } from 'lib/api/network'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
@@ -35,10 +35,11 @@ import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
 import LogRocket from 'logrocket'
 import WalletStatus from '../WalletStatus'
 import { checkMobileBrowser } from 'lib/api/createLootbox'
+import { BadgeList } from 'lib/components/BadgeList'
 
 // CONSTANTS
 const targetChainIdHex = '0x13881'
-const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-5.surge.sh'
+const VIEW_BADGE_URL = 'https://badge-viewer-bcs-v1-7.surge.sh'
 const BADGE_MINTER_PIPEDREAM_URL = 'https://cf437c8b70a35a93625d1aac738e09f9.m.pipedream.net'
 const BADGE_MINTER_PIPEDREAM_SECRET = 'z6dLUlZRYkje3tpXgQYZK1$M1Q@gYO0a8mhjJ%K*'
 //
@@ -404,6 +405,8 @@ const PersonalizeBadge = forwardRef((props: PersonalizeBadgeProps, ref: React.Re
                 stampImage: _stampUrl as string,
                 ticketId: ticketId.toString(),
                 badgeAddress: badgeAddress,
+                chainIdHex: targetChainIdHex,
+                chainSlug: chainIdHexToSlug(targetChainIdHex),
               }
               const headers = new Headers({
                 'Content-Type': 'application/json',
@@ -690,6 +693,10 @@ const BadgeMinter = () => {
           }}
         ></PersonalizeBadge>
       </div>
+      <br />
+      <br />
+      <br />
+      {snapUserState.currentAccount && <BadgeList />}
     </div>
   )
 }
@@ -774,36 +781,5 @@ export const $BadgeCandyWrapper = styled.section<{ backgroundColor?: string; bac
   background-position: center;
   position: relative;
 `
-
-// const MyBadges = () => {
-//   const [badgeAddress, setBadgeAddress] = useState('')
-//   const snapUserState = useSnapshot(userState)
-//   useEffect(() => {
-//     const addr = parseUrlParams('badge') as ContractAddress
-//     console.log(`Finding addr = ${addr}`)
-//     if (addr) {
-//       setBadgeAddress(addr)
-//       loadMyBadges(addr as ContractAddress)
-//     }
-//   }, [])
-//   const loadMyBadges = async (badgeAddr: ContractAddress) => {
-//     if (!badgeAddr) {
-//       throw new Error('No badge initialized')
-//     }
-//     if (!snapUserState.currentAccount) {
-//       throw new Error('No user account')
-//     }
-//     // use ERC721Enumerable to get the tokens owned by an address (https://ethereum.stackexchange.com/questions/68438/erc721-how-to-get-the-owned-tokens-of-an-address)
-//     const badges = await fetchUserTicketsFromLootbox(snapUserState.currentAccount, badgeAddr)
-//     for (const ticket of userTicketState.userTickets) {
-//       try {
-//         await loadTicketData(ticket)
-//       } catch (err) {
-//         console.error('Error loading ticket', err)
-//       }
-//     }
-//   }
-//   return <p>My Tickets</p>
-// }
 
 export default BadgeMinter

@@ -8,7 +8,7 @@ const storage = new Storage()
  *
  */
 const bucketName = 'lootbox-widgets-staging'
-const semver = '0.4.1f-blockchainspace-integration'
+const semver = '0.4.1h-blockchainspace-integration'
 const absPath = '/users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 console.log(`
