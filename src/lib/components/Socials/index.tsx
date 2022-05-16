@@ -122,13 +122,13 @@ const $PaybackDateSubHeader = styled.p`
 `
 
 const $AboutLootboxHeader = styled.h1`
-  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
 `
 
 const $LootboxDescription = styled.p`
-  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-weight: ${TYPOGRAPHY.fontWeight.light};
   margin-top: 0.5em;

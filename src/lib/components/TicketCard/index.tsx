@@ -20,6 +20,7 @@ export interface TicketCardWidgetProps {
   isRedeemEnabled?: boolean
   onScrollToMint?: () => void
   forceLoading?: boolean
+  showDownloadOption?: boolean
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -95,20 +96,36 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
         <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
-      <$Button
-        onClick={downloadStamp}
-        screen={screen}
-        backgroundColor={COLORS.white}
-        color={`${COLORS.surpressedFontColor}80`}
-        style={{
-          border: 'none',
-          boxShadow: 'none',
-          fontWeight: TYPOGRAPHY.fontWeight.regular,
-          fontSize: TYPOGRAPHY.fontSize.large,
-        }}
-      >
-        Download
-      </$Button>
+      {props.showDownloadOption &&
+        (!!ticket ? (
+          <$Button
+            onClick={downloadStamp}
+            screen={screen}
+            backgroundColor={COLORS.white}
+            color={`${COLORS.surpressedFontColor}80`}
+            style={{
+              border: 'none',
+              boxShadow: 'none',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.medium,
+            }}
+          >
+            Download Image
+          </$Button>
+        ) : (
+          <$Button
+            screen={screen}
+            backgroundColor={COLORS.white}
+            color={`${COLORS.surpressedFontColor}80`}
+            style={{
+              border: 'none',
+              boxShadow: 'none',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+              cursor: 'default',
+            }}
+          ></$Button>
+        ))}
     </$RootContainer>
   )
 }

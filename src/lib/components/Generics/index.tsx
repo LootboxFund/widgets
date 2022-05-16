@@ -72,6 +72,7 @@ export const $ScrollVertical = styled.div<{ height?: string }>`
 `
 export const $ScrollHorizontal = styled.div<{ height?: string }>`
   overflow-x: scroll;
+  overflow-y: hidden;
   ${(props) => (props.height ? `height: ${props.height}` : 'height: 80%')};
   display: flex;
   flex-direction: row;

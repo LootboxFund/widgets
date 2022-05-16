@@ -143,7 +143,7 @@ const $NoDividendText = styled.span`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-size: ${TYPOGRAPHY.fontSize.large};
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
-  color: ${COLORS.surpressedFontColor};
+  color: ${COLORS.surpressedFontColor}da;
 `
 
 const $NoDividendContainer = styled.section`

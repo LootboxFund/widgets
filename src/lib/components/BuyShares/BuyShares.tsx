@@ -23,8 +23,8 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
   const { screen } = useWindowSize()
 
   const isMobile = smallScreens.indexOf(screen) >= 0
-  const buyWidth = isMobile ? '100%' : '65%'
-  const ticketWidth = isMobile ? '100%' : '35%'
+  const buyWidth = isMobile ? '100%' : '68%'
+  const ticketWidth = isMobile ? '100%' : '32%'
   const isLoggedIn = snapUserState.accounts.length > 0
 
   const ticketId = snap?.lootbox?.data?.ticketIdCounter || '0'
@@ -33,7 +33,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
     <$Container screen={screen}>
       {isMobile ? (
         <$TicketWrapper marginBottom="20px" width={ticketWidth}>
-          <TicketCard ticketID={ticketId} forceLoading={true} />
+          <TicketCard ticketID={ticketId} forceLoading={true} showDownloadOption={true} />
         </$TicketWrapper>
       ) : undefined}
       {ref && <div ref={ref} />}
@@ -53,7 +53,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
         </$Vertical>
         {!isMobile ? (
           <$TicketWrapper width={ticketWidth}>
-            <TicketCard ticketID={ticketId} forceLoading={true} />
+            <TicketCard ticketID={ticketId} forceLoading={true} showDownloadOption={false} />
           </$TicketWrapper>
         ) : undefined}
       </$Horizontal>
