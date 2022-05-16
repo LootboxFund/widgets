@@ -10,6 +10,7 @@ export interface ILootbox {
   ticketIdCounter: string | undefined
   shareDecimals: string | undefined
   variant: string | undefined
+  ticketPurchaseFee: string | undefined
 }
 
 export interface ITicket {

@@ -8,7 +8,6 @@ import { buySharesState } from '../state'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $TokenInput, $FineText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
-import { USD_DECIMALS } from 'lib/hooks/constants'
 import { COLORS } from 'lib/theme'
 
 export interface ShareOutputProps {
@@ -23,6 +22,7 @@ const ShareOutput = (props: ShareOutputProps) => {
   const quantity: string = snap.lootbox.quantity || '0'
   const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
+
   const percentageShares =
     quantityBN && shareDecimals && sharesSoldMax
       ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)

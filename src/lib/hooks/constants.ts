@@ -8,6 +8,7 @@ export interface TokenDataFE extends TokenData {
   usdPrice?: string
 }
 export const USD_DECIMALS = 8
+export const FEE_DECIMALS = 8
 export const DEFAULT_CHAIN_ID_HEX = manifest.chains[0].chainIdHex
 export const DEFAULT_TICKET_IMAGE = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-logo.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-background.png?alt=media`

@@ -9,7 +9,7 @@ import {
   getUserBalanceOfNativeToken,
 } from 'lib/hooks/useContract'
 import { ILootbox } from 'lib/types'
-import { TokenDataFE, NATIVE_ADDRESS } from 'lib/hooks/constants'
+import { TokenDataFE, NATIVE_ADDRESS, FEE_DECIMALS } from 'lib/hooks/constants'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import { userState } from 'lib/state/userState'
@@ -55,6 +55,7 @@ const buySharesSnapshot: BuySharesState = {
       ticketIdCounter: undefined,
       shareDecimals: undefined,
       variant: undefined,
+      ticketPurchaseFee: undefined,
     },
     quantity: undefined,
   },
@@ -94,10 +95,17 @@ const updateLootboxQuantity = () => {
   } else if (
     buySharesState.lootbox.data &&
     buySharesState.inputToken.quantity !== undefined &&
+    buySharesState.lootbox.data.ticketPurchaseFee !== undefined &&
     buySharesState.lootbox.data.sharePriceWei
   ) {
-    buySharesState.lootbox.quantity = new BN(buySharesState.inputToken.quantity)
-      .multipliedBy(new BN(10).pow(18))
+    const inputTokenQuantity = new BN(buySharesState.inputToken.quantity).multipliedBy(new BN(10).pow(18))
+
+    const deductableFee = inputTokenQuantity.multipliedBy(
+      new BN(buySharesState.lootbox.data.ticketPurchaseFee).dividedBy(new BN(10).pow(FEE_DECIMALS))
+    )
+
+    buySharesState.lootbox.quantity = inputTokenQuantity
+      .minus(deductableFee)
       .div(new BN(buySharesState.lootbox.data.sharePriceWei))
       .toString()
   }
@@ -156,8 +164,17 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
   buySharesState.lootbox.address = lootboxAddress
 
   try {
-    const { name, symbol, sharePriceWei, sharesSoldCount, sharesSoldMax, ticketIdCounter, shareDecimals, variant } =
-      await getLootboxData(lootboxAddress)
+    const {
+      name,
+      symbol,
+      sharePriceWei,
+      sharesSoldCount,
+      sharesSoldMax,
+      ticketIdCounter,
+      shareDecimals,
+      variant,
+      ticketPurchaseFee,
+    } = await getLootboxData(lootboxAddress)
     buySharesState.lootbox.data = {
       address: lootboxAddress,
       name: name,
@@ -168,6 +185,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       ticketIdCounter: ticketIdCounter,
       shareDecimals: shareDecimals,
       variant: variant,
+      ticketPurchaseFee,
     }
   } catch (err) {
     console.error('Error fetching lootbox data', err)
@@ -181,6 +199,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       ticketIdCounter: undefined,
       shareDecimals: undefined,
       variant: undefined,
+      ticketPurchaseFee: undefined,
     }
   } finally {
     buySharesState.loading = false

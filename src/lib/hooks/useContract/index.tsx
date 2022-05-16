@@ -70,6 +70,7 @@ interface GetLootboxDataOutput {
   ticketIdCounter: string
   shareDecimals: string
   variant: string
+  ticketPurchaseFee: string
 }
 export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
@@ -85,6 +86,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
     shareDecimals,
     variant,
     sharesSoldTarget,
+    ticketPurchaseFee,
   ] = await Promise.all([
     lootbox.name(),
     lootbox.symbol(),
@@ -95,6 +97,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
     lootbox.shareDecimals(),
     lootbox.variant(),
     lootbox.sharesSoldTarget(),
+    lootbox.ticketPurchaseFee(),
   ])
 
   return {
@@ -107,6 +110,7 @@ export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootbo
     shareDecimals: shareDecimals.toString(),
     variant: variant.toString(),
     sharesSoldTarget: sharesSoldTarget.toString(),
+    ticketPurchaseFee: ticketPurchaseFee.toString(),
   }
 }
 
