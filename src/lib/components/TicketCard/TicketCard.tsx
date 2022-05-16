@@ -38,7 +38,7 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
         !ticket && onScrollToMint && onScrollToMint()
       }}
     >
-      <$LogoContainer>
+      <$LogoContainer padding={ticket ? '1.5rem 1.2rem 0' : undefined}>
         <$TicketLogo
           backgroundImage={metadata?.lootboxCustomSchema?.lootbox?.image}
           backgroundShadowColor={metadata?.lootboxCustomSchema?.lootbox?.backgroundColor}
@@ -77,7 +77,7 @@ export const TicketCardCandyWrapper = (props: TicketCardCandyWrapperProps) => {
         console.log('click')
       }}
     >
-      <$LogoContainer>
+      <$LogoContainer padding={'1.5rem 1.2rem 1.2rem'}>
         {props.badgeImage && (
           <$BadgeImage
             // id used to set logo image in "components/CreateLootbox/StepCustomize/index.ts"
@@ -110,13 +110,16 @@ const BASE_CONTAINER = `
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 1.5rem;
+  gap: 1rem;
+  padding: 1rem;
 `
 
-export const $LogoContainer = styled.div`
+export const $LogoContainer = styled.div<{ padding?: string }>`
   flex: 1;
-  padding: 2.2rem 2.2rem 1.5rem;
+  padding: ${(props) => props.padding || '1rem'};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `
 
 export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`

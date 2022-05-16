@@ -44,7 +44,8 @@ const InteractWithLootbox = () => {
 }
 
 const $TicketContainer = styled.section<{}>`
-  height: 400px;
+  height: 530px;
+  padding-top: 40px;
 `
 
 export default InteractWithLootbox

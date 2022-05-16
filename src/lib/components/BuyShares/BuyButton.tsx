@@ -91,7 +91,7 @@ const BuyButton = (props: BuyButtonProps) => {
         screen={screen}
         backgroundColor={`${COLORS.surpressedBackground}40`}
         color={`${COLORS.surpressedFontColor}80`}
-        style={{ ...BASE_BUTTON_STYLE }}
+        style={{ ...BASE_BUTTON_STYLE, fontWeight: TYPOGRAPHY.fontWeight.regular }}
         disabled
       >
         <LoadingText loading={true} text="Loading" color={`${COLORS.surpressedFontColor}80`} />
