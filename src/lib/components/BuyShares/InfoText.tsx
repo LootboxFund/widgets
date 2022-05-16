@@ -3,9 +3,14 @@ import BN from 'bignumber.js'
 import styled from 'styled-components'
 import { buySharesState } from './state'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
+import { useState } from 'react'
+import { $Button } from '../Generics/Button'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 const InfoText = () => {
   const snap = useSnapshot(buySharesState)
+  const { screen } = useWindowSize()
+  const [isHidden, setIsHidden] = useState(true)
 
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
@@ -20,12 +25,36 @@ const InfoText = () => {
     : new BN(0)
 
   return (
-    <$Text>
-      * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as <$Bold>{quantityFMT} Shares</$Bold>{' '}
-      out of <$Bold>{maxShares.toFixed(0)} Shares Total</$Bold>. This entitles the holder of this NFT to{' '}
-      <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold> deposited by the issuer.{' '}
-      There is no guarantee of a return, consult your financial advisor before investing.
-    </$Text>
+    <$InfoTextContainer>
+      <$HideTings isHidden={isHidden}>
+        <$Button
+          onClick={() => setIsHidden(!isHidden)}
+          screen={screen}
+          backgroundColor={COLORS.white}
+          color={`${COLORS.surpressedFontColor}80`}
+          style={{
+            display: isHidden ? 'auto' : 'none',
+            position: 'absolute',
+            bottom: '0',
+            left: '40%',
+            border: 'none',
+            boxShadow: 'none',
+            fontWeight: TYPOGRAPHY.fontWeight.bold,
+            fontSize: TYPOGRAPHY.fontSize.medium,
+            textDecoration: 'underline',
+            fontStyle: 'italic',
+          }}
+        >
+          Read More
+        </$Button>
+      </$HideTings>
+      <$Text>
+        * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as{' '}
+        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Total</$Bold>. This entitles the
+        holder of this NFT to <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold>{' '}
+        deposited by the issuer. There is no guarantee of a return, consult your financial advisor before investing.
+      </$Text>
+    </$InfoTextContainer>
   )
 }
 
@@ -53,6 +82,24 @@ const $Text = styled.p`
   ${BASE_STYLE}
 `
 
-const $BoldText = styled.p``
+const $HideTings = styled.div<{ isHidden: boolean }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: ${(props) =>
+    props.isHidden
+      ? `linear-gradient(
+    180deg,
+    rgba(196, 196, 196, 0) 0%,
+    rgba(255, 255, 255, 0.47) 17.71%,
+    rgba(255, 255, 255, 0.9) 40%,
+    #ffffff 77.08%
+  );`
+      : 'none'};
+`
+
+const $InfoTextContainer = styled.div`
+  position: relative;
+`
 
 export default InfoText
