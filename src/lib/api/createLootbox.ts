@@ -14,7 +14,7 @@ import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 const SHARE_PRICE_WEI = '1000000000000' // HARDCODED FOR NOW
 const SHARE_PRICE_WEI_DECIMALS = '18' // HARDCODED FOR NOW
 
-const checkMobileBrowser = (): boolean => {
+export const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
   let test: string | undefined = (navigator as any)?.userAgent || (navigator as any)?.vendor || (window as any)?.opera
   if (!test) {
