@@ -69,7 +69,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       //    const stampUrl = metadata.image
       // However, there was a bug previously where it was not recoreded properly
       // So for now, we just generate the path on the fly...
-      const stampFilePath = `${manifest.storage.buckets.stamp.id}/${metadata.lootboxCustomSchema.chain.address}.png`
+      const stampFilePath = `${manifest.storage.buckets.stamp.id}/${metadata.lootboxCustomSchema.chain.address}/${props.ticketID}.png`
       const encodeURISafe = (stringFragment: string) =>
         encodeURIComponent(stringFragment).replace(/'/g, '%27').replace(/"/g, '%22')
       const stampUrl = `${manifest.storage.downloadUrl}/${encodeURISafe(stampFilePath)}?alt=media`
