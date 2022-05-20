@@ -9,9 +9,9 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { BLOCKCHAINS, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
+import { BLOCKCHAINS, ContractAddress, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
-import { readTicketMetadata } from 'lib/api/storage'
+import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
 
@@ -21,12 +21,12 @@ const BuyButton = (props: BuyButtonProps) => {
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
-  const [metadata, setMetadata] = useState<ITicketMetadata | undefined>()
+  const [metadata, setMetadata] = useState<ILootboxMetadata | undefined>()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (snapBuySharesState.lootbox.address) {
-      readTicketMetadata(snapBuySharesState.lootbox.address as ContractAddress)
+      readLootboxMetadata(snapBuySharesState.lootbox.address as ContractAddress)
         .then((data) => {
           setMetadata(data)
         })

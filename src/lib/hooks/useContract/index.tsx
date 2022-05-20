@@ -60,6 +60,13 @@ export const approveERC20Token = async (delegator: Address | undefined, tokenDat
   return token.connect(signer).approve(delegator, quantity).send({ from: signer._address })
 }
 
+export const getTicketId = async (lootboxAddress: Address): Promise<string> => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
+  return await lootbox.ticketId()
+}
+
 interface GetLootboxDataOutput {
   name: string
   symbol: string

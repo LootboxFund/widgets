@@ -1,4 +1,4 @@
-import { Address, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
+import { Address, ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useEffect, useState } from 'react'
@@ -39,7 +39,7 @@ export interface RewardSponsorsProps {
   lootboxAddress: ContractAddress
   lootboxType: LootboxType
   network: NetworkOption
-  ticketMetadata: ITicketMetadata
+  lootboxMetadata: ILootboxMetadata
 }
 const RewardSponsors = (props: RewardSponsorsProps) => {
   const web3Utils = useWeb3Utils()
@@ -403,7 +403,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
               Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Deposited amounts can be redeemed by all sponsors who own an NFT ticket purchased from your Lootbox. Each NFT ticket will redeem its proportioal share of earnings based on its number of shares purchased vs total shares sold.
             </ReactTooltip>
           </$Horizontal>
-          <$SubtitleDepositTitle>{`Deposit Earnings back into Lootbox (${props.ticketMetadata.name})`}</$SubtitleDepositTitle>
+          <$SubtitleDepositTitle>{`Deposit Earnings back into Lootbox (${props.lootboxMetadata.name})`}</$SubtitleDepositTitle>
           <$StepSubheading>
           Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Rewards can only be redeemed if they own an NFT ticket minted from your Lootbox.
           </$StepSubheading>

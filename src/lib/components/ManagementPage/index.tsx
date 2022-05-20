@@ -1,13 +1,13 @@
 import ManageLootbox from 'lib/components/ManageLootbox'
 import RewardSponsors from 'lib/components/RewardSponsors'
-import { Address, ContractAddress, ITicketMetadata, TicketID } from '@wormgraph/helpers'
+import { Address, ContractAddress, ILootboxMetadata, ITicketMetadata, TicketID } from '@wormgraph/helpers'
 import { useEffect, useRef, useState } from 'react'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import LogRocket from 'logrocket'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import { readTicketMetadata } from 'lib/api/storage'
+import { readLootboxMetadata } from 'lib/api/storage'
 import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
 import { $Horizontal } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
@@ -16,7 +16,7 @@ export interface ManagementPageProps {}
 
 const ManagementPage = () => {
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
-  const [ticketMetadata, setTicketMetadata] = useState<ITicketMetadata>()
+  const [lootboxMetadata, setLootboxMetadata] = useState<ILootboxMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
   const [lootboxType, setLootboxType] = useState<LootboxType>()
   const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
@@ -30,13 +30,13 @@ const ManagementPage = () => {
     if (window.ethereum && addr) {
       initDApp()
         .then(() => {
-          return readTicketMetadata(addr)
+          return readLootboxMetadata(addr)
         })
-        .then((metadata: ITicketMetadata) => {
+        .then((metadata: ILootboxMetadata) => {
           if (!metadata || !metadata?.lootboxCustomSchema) {
             throw Error('No metadata found')
           }
-          setTicketMetadata(metadata)
+          setLootboxMetadata(metadata)
           const network = matchNetworkByHex(metadata?.lootboxCustomSchema?.chain?.chainIdHex)
           if (network) {
             setNetwork(network)
@@ -71,13 +71,13 @@ const ManagementPage = () => {
   console.log(network)
   console.log(lootboxAddress)
   console.log(lootboxType)
-  console.log(ticketMetadata)
+  console.log(lootboxMetadata)
 
-  if (!network || !lootboxAddress || !lootboxType || !ticketMetadata) {
-    if (ticketMetadata && ticketMetadata?.lootboxCustomSchema?.lootbox) {
+  if (!network || !lootboxAddress || !lootboxType || !lootboxMetadata) {
+    if (lootboxMetadata && lootboxMetadata?.lootboxCustomSchema?.lootbox) {
       return (
         <section>
-          <WalletStatus targetNetwork={ticketMetadata?.lootboxCustomSchema?.chain?.chainIdHex} />
+          <WalletStatus targetNetwork={lootboxMetadata?.lootboxCustomSchema?.chain?.chainIdHex} />
         </section>
       )
     }
@@ -92,7 +92,7 @@ const ManagementPage = () => {
       <br />
       <div
         style={
-          ticketMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
+          lootboxMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
             ? { opacity: 0.2, cursor: 'not-allowed' }
             : {}
         }
@@ -101,7 +101,7 @@ const ManagementPage = () => {
           themeColor={'#F0B90B'}
           lootboxAddress={lootboxAddress}
           ticketID={'0' as TicketID}
-          ticketMetadata={ticketMetadata}
+          lootboxMetadata={lootboxMetadata}
           network={network}
           lootboxType={lootboxType}
           scrollToRewardSponsors={() => refRewardSponsors.current?.scrollIntoView()}
@@ -112,14 +112,14 @@ const ManagementPage = () => {
       <div
         ref={refRewardSponsors}
         style={
-          isActivelyFundraising || ticketMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
+          isActivelyFundraising || lootboxMetadata.lootboxCustomSchema.chain.chainIdHex != network.chainIdHex
             ? { opacity: 0.2, cursor: 'not-allowed' }
             : {}
         }
       >
         <RewardSponsors
           lootboxAddress={lootboxAddress}
-          ticketMetadata={ticketMetadata}
+          lootboxMetadata={lootboxMetadata}
           network={network}
           lootboxType={lootboxType}
         />

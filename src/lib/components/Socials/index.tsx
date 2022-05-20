@@ -4,7 +4,7 @@ import { $Horizontal, $Container, $Vertical } from '../Generics'
 import { $SocialGridInputs, $SocialLogo, $InputMedium } from '../CreateLootbox/StepSocials'
 import { SOCIALS } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { readTicketMetadata } from 'lib/api/storage'
+import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 
@@ -37,7 +37,7 @@ const Socials = ({ lootbox }: SocialsProps) => {
 
   useEffect(() => {
     if (lootbox) {
-      readTicketMetadata(lootbox)
+      readLootboxMetadata(lootbox)
         .then((metadata) => {
           setBasisPointsReturnTarget(metadata?.lootboxCustomSchema?.lootbox?.basisPointsReturnTarget || '0')
           setTargetPaybackDateUnix(metadata?.lootboxCustomSchema?.lootbox?.targetPaybackDate || 0)
