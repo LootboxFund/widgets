@@ -40,7 +40,7 @@ export const stampNewLootbox = async (props: StampNewLootboxProps): Promise<stri
   }
   const headers = new Headers({
     'Content-Type': 'application/json',
-    secret: 'mysecret',
+    secret: 'kjnlkvsjdnlkjsfnlvksjdnlksjdnvrjgnwoeirwhoqiwhqowncasljcnalsknaslkcnvlkdnlsdknscldksdjfnskdjfbksdjfbskdjqlwekjqwlekjqwlj',
   })
   try {
     const data = await fetch(manifest.cloudRun.containers.stampNewLootbox.fullRoute, {
@@ -86,7 +86,7 @@ export const stampNewTicket = async (props: StampNewTicketProps): Promise<string
   }
   const headers = new Headers({
     'Content-Type': 'application/json',
-    secret: 'mysecret',
+    secret: ';kdfng;dkjfgn;dkfjgnsldkjfna;sdaposdjpaokcpaoskpaosckapsocksdgnekrfnvlsdknalkdcnalsdgbrhejbgjrbkbakjsbaksjbksdjfs',
   })
   try {
     const data = await fetch(manifest.cloudRun.containers.stampNewTicket.fullRoute, {
