@@ -56,6 +56,7 @@ const buySharesSnapshot: BuySharesState = {
       sharePriceWei: undefined,
       sharesSoldCount: undefined,
       sharesSoldMax: undefined,
+      sharesSoldTarget: undefined,
       ticketIdCounter: undefined,
       shareDecimals: undefined,
       variant: undefined,
@@ -232,6 +233,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       sharePriceWei,
       sharesSoldCount,
       sharesSoldMax,
+      sharesSoldTarget,
       ticketIdCounter,
       shareDecimals,
       variant,
@@ -247,6 +249,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       ticketIdCounter: ticketIdCounter,
       shareDecimals: shareDecimals,
       variant: variant,
+      sharesSoldTarget,
       ticketPurchaseFee,
     }
   } catch (err) {
@@ -261,6 +264,7 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
       ticketIdCounter: undefined,
       shareDecimals: undefined,
       variant: undefined,
+      sharesSoldTarget: undefined,
       ticketPurchaseFee: undefined,
     }
   } finally {

@@ -15,13 +15,13 @@ const InfoText = () => {
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
   const quantityFMT = new BN(quantity).toFixed(2)
-  const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
+  const sharesSoldTarget = snap.lootbox?.data?.sharesSoldTarget
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
   const percentageShares =
-    quantityBN && shareDecimals && sharesSoldMax ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100) : new BN(0)
+    quantityBN && shareDecimals && sharesSoldTarget ? quantityBN.dividedBy(sharesSoldTarget).multipliedBy(100) : new BN(0)
 
-  const maxShares = snap.lootbox.data?.sharesSoldMax
-    ? new BN(snap.lootbox.data?.sharesSoldMax).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
+  const maxShares = snap.lootbox.data?.sharesSoldTarget
+    ? new BN(snap.lootbox.data?.sharesSoldTarget).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
     : new BN(0)
 
   return (
@@ -50,7 +50,7 @@ const InfoText = () => {
       </$HideTings>
       <$Text>
         * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as{' '}
-        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Total</$Bold>. This entitles the
+        <$Bold>{quantityFMT}</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares</$Bold>. This entitles the
         holder of this NFT to <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold>{' '}
         deposited by the issuer. There is no guarantee of a return, consult your financial advisor before investing.
       </$Text>

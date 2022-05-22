@@ -7,6 +7,7 @@ export interface ILootbox {
   sharePriceWei: string | undefined
   sharesSoldCount: string | undefined
   sharesSoldMax: string | undefined
+  sharesSoldTarget: string | undefined
   ticketIdCounter: string | undefined
   shareDecimals: string | undefined
   variant: string | undefined
