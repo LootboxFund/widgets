@@ -5,7 +5,7 @@ import { parseLootboxMetadata } from '../utils/parseTicketMetadata'
 
 const getLootboxURI = async ({ lootboxAddress, bucket }: { lootboxAddress: ContractAddress; bucket: string }) => {
   try {
-    const filePath = `${bucket}/${lootboxAddress}/lootbox.json`
+    const filePath = `${bucket}/${lootboxAddress.toLowerCase()}/lootbox.json`
     const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}`
     const lootboxURI = await (await fetch(downloadablePath)).json()
     return lootboxURI
@@ -24,7 +24,7 @@ const getLootboxURI = async ({ lootboxAddress, bucket }: { lootboxAddress: Contr
 }
 
 const getTicketURI = async ({ lootboxAddress, bucket, ticket }: { lootboxAddress: ContractAddress; bucket: string, ticket: string }) => {
-  const filePath = `${bucket}/${lootboxAddress}/${ticket}.json`
+  const filePath = `${bucket}/${lootboxAddress.toLowerCase()}/${ticket}.json`
   const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}`
   const ticketURI = await (await fetch(downloadablePath)).json()
   return ticketURI
