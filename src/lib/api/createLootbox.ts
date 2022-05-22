@@ -4,7 +4,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
-import { Address, ChainIDHex, ContractAddress, convertHexToDecimal, ITicketMetadata } from '@wormgraph/helpers'
+import { Address, ChainIDHex, ContractAddress, convertHexToDecimal, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
@@ -14,7 +14,7 @@ import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 const SHARE_PRICE_WEI = '1000000000000' // HARDCODED FOR NOW
 const SHARE_PRICE_WEI_DECIMALS = '18' // HARDCODED FOR NOW
 
-const checkMobileBrowser = (): boolean => {
+export const checkMobileBrowser = (): boolean => {
   // Checks if on mobile browser https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser
   let test: string | undefined = (navigator as any)?.userAgent || (navigator as any)?.vendor || (window as any)?.opera
   if (!test) {
@@ -114,7 +114,7 @@ export const createInstantLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+  const lootboxURI: ILootboxMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
     image: '', // will be filled in by backend
     external_url: '', // will be filled in by backend
     description: args.biography,
@@ -340,7 +340,7 @@ export const createEscrowLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ITicketMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+  const lootboxURI: ILootboxMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
     image: '', // will be filled in by backend
     external_url: '', // will be filled in by backend
     description: args.biography,

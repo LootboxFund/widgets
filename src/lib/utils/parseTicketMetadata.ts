@@ -1,15 +1,15 @@
-import { ContractAddress, ITicketMetadata, ITicketMetadataDeprecated } from '@wormgraph/helpers'
+import { ContractAddress, ILootboxMetadata, ITicketMetadata, ITicketMetadataDeprecated } from '@wormgraph/helpers'
 
 interface ExtendedTicketMetadataDeprecated {
   data: ITicketMetadataDeprecated
 }
 
-export const parseTicketMetadata = (metadata: ITicketMetadata | ExtendedTicketMetadataDeprecated): ITicketMetadata => {
+export const parseLootboxMetadata = (metadata: ILootboxMetadata| ExtendedTicketMetadataDeprecated): ILootboxMetadata => {
   // @ts-ignore - because of the extended metadata
   if (metadata?.data != null) {
     // Deprecated metadata structure - needed for backwards compatibility
     const castedMetada = metadata as ExtendedTicketMetadataDeprecated
-    const coercedMetadata: ITicketMetadata = {
+    const coercedMetadata: ILootboxMetadata = {
       external_url: '', // Not used in FE
       description: castedMetada?.data?.description || '',
       name: castedMetada?.data?.name || '',
@@ -61,6 +61,6 @@ export const parseTicketMetadata = (metadata: ITicketMetadata | ExtendedTicketMe
     return coercedMetadata
   } else {
     // New metadata structure
-    return metadata as ITicketMetadata
+    return metadata as ILootboxMetadata
   }
 }

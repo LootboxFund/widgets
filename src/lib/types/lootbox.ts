@@ -1,4 +1,4 @@
-import { Address, TicketID, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
+import { Address, TicketID, ContractAddress, ITicketMetadata, ILootboxMetadata } from '@wormgraph/helpers'
 
 export interface ILootbox {
   address: Address | undefined
@@ -7,6 +7,7 @@ export interface ILootbox {
   sharePriceWei: string | undefined
   sharesSoldCount: string | undefined
   sharesSoldMax: string | undefined
+  sharesSoldTarget: string | undefined
   ticketIdCounter: string | undefined
   shareDecimals: string | undefined
   variant: string | undefined
@@ -15,7 +16,8 @@ export interface ILootbox {
 
 export interface ITicket {
   id: TicketID | undefined
-  metadata: ITicketMetadata | undefined
+  // @TODO make this correct ITicketMetadata type
+  metadata: ILootboxMetadata | undefined
 }
 
 export interface IDividend {

@@ -1,6 +1,6 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { COLORS, ITicketMetadata, ContractAddress, TicketID } from '@wormgraph/helpers'
+import { COLORS, ITicketMetadata, ContractAddress, TicketID, ILootboxMetadata } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import TicketCardUI from '../TicketCard/TicketCardUI'
 import NetworkText from 'lib/components/NetworkText'
@@ -36,7 +36,7 @@ export interface ManageLootboxProps {
   themeColor: string
   lootboxAddress: ContractAddress
   ticketID: TicketID
-  ticketMetadata: ITicketMetadata
+  lootboxMetadata: ILootboxMetadata
   network: NetworkOption
   lootboxType: LootboxType
   scrollToRewardSponsors: () => void
@@ -288,7 +288,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       <$Horizontal style={screen === 'desktop' ? { marginTop: '30px' } : { flexDirection: 'column' }}>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <$ManageLootboxHeading screen={screen}>{props.ticketMetadata.name}</$ManageLootboxHeading>
+            <$ManageLootboxHeading screen={screen}>{props.lootboxMetadata.name}</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
               {`This is the human-friendly name of the Lootbox, but the real name is its contract address ${props.lootboxAddress}. When sponsors buy from this Lootbox and receive it in their wallet, it will have the symbol ${lootboxSymbol} with 0 decimals. If sponsors want to transfer their NFT to another wallet, they will need to use OpenZeppelin Defender as Metamask does not support all ERC721 transfers. The tutorial for this can be found on the LootboxFund YouTube channel.`}
@@ -541,13 +541,13 @@ const ManageLootbox = (props: ManageLootboxProps) => {
           >
             <NetworkText />
           </div>
-          {props.ticketMetadata && (
+          {props.lootboxMetadata && (
             <div style={{ height: 'auto', marginBottom: '20px' }}>
               <TicketCardUI
-                backgroundImage={props.ticketMetadata.lootboxCustomSchema?.lootbox.backgroundImage as string}
-                logoImage={props.ticketMetadata.lootboxCustomSchema?.lootbox.image as string}
-                backgroundColor={props.ticketMetadata.lootboxCustomSchema?.lootbox.backgroundColor as string}
-                name={props.ticketMetadata.name as string}
+                backgroundImage={props.lootboxMetadata.lootboxCustomSchema?.lootbox.backgroundImage as string}
+                logoImage={props.lootboxMetadata.lootboxCustomSchema?.lootbox.image as string}
+                backgroundColor={props.lootboxMetadata.lootboxCustomSchema?.lootbox.backgroundColor as string}
+                name={props.lootboxMetadata.name as string}
                 ticketId={'0' as TicketID}
               ></TicketCardUI>
             </div>

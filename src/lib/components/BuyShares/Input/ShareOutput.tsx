@@ -20,12 +20,12 @@ const ShareOutput = (props: ShareOutputProps) => {
 
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
-  const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
+  const sharesSoldTarget = snap.lootbox?.data?.sharesSoldTarget
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
 
   const percentageShares =
-    quantityBN && shareDecimals && sharesSoldMax
-      ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
+    quantityBN && shareDecimals && sharesSoldTarget
+      ? quantityBN.dividedBy(sharesSoldTarget).multipliedBy(100).toFixed(2)
       : new BN(0).toString()
 
   // const sharePerUSD =
@@ -52,7 +52,7 @@ const ShareOutput = (props: ShareOutputProps) => {
             justifyContent="center"
           >
             <$TokenSymbol screen={screen} padding={'10px'}>
-              {props.lootbox?.name ? props.lootbox.name : <$FineText screen={screen}>loading...</$FineText>}
+              {props.lootbox?.name ? props.lootbox.name : <$FineText screen={screen} style={{color: `${COLORS.surpressedFontColor}aa`}}>loading...</$FineText>}
             </$TokenSymbol>
           </$Button>
 

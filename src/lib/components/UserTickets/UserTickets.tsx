@@ -1,7 +1,7 @@
 import react, { useState } from 'react'
 import { userTicketState } from './state'
 import { useSnapshot } from 'valtio'
-import { $Horizontal, $ScrollHorizontal } from '../Generics'
+import { $Horizontal, $ScrollHorizontal, $Vertical } from '../Generics'
 import TicketCard from 'lib/components/TicketCard'
 import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -9,6 +9,8 @@ import styled from 'styled-components'
 import { Address } from '@wormgraph/helpers'
 import RightChevronIcon from 'lib/theme/icons/Right.icon'
 import LeftChevronIcon from 'lib/theme/icons/Left.icon'
+import { $BuySharesHeaderSubTitle, $BuySharesHeaderTitle } from '../BuyShares/Header'
+import { buySharesState } from '../BuyShares/state'
 
 const TICKET_PAGINATION = 3
 
@@ -17,6 +19,7 @@ interface Props {
 }
 const UserTickets = (props: Props) => {
   const snap = useSnapshot(userTicketState)
+  const buySharesSnapshot = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
   const [pageIdx, setPageIdx] = useState(0)
   const isPaginated = screen === 'desktop'
@@ -66,20 +69,35 @@ const UserTickets = (props: Props) => {
     }
   }
 
+  const subheader = buySharesSnapshot.lootbox?.data
+    ? `${buySharesSnapshot.lootbox.data?.variant} Lootbox - ${buySharesSnapshot.lootbox.data?.name}`
+    : undefined
+
   return (
-    <Wrapper>
-      {tickets.map((ticketID, idx) => (
-        <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
-          <TicketCard ticketID={ticketID} isRedeemEnabled={true} onScrollToMint={props.onScrollToMint}></TicketCard>
-        </$TicketWrapper>
-      ))}
-    </Wrapper>
+    <$Vertical height="100%" width="100%">
+      <$Vertical padding={screen === 'mobile' || screen === 'tablet' ? '0px 0px 20px 0px' : '0px 0px 20px 75px'}>
+        <$BuySharesHeaderTitle>REDEEM PROFIT SHARING</$BuySharesHeaderTitle>
+        {subheader ? <$BuySharesHeaderSubTitle>{subheader}</$BuySharesHeaderSubTitle> : undefined}
+      </$Vertical>
+      <Wrapper>
+        {tickets.map((ticketID, idx) => (
+          <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
+            <TicketCard
+              ticketID={ticketID}
+              isRedeemEnabled={true}
+              onScrollToMint={props.onScrollToMint}
+              showDownloadOption={true}
+            ></TicketCard>
+          </$TicketWrapper>
+        ))}
+      </Wrapper>
+    </$Vertical>
   )
 }
 
 const $TicketWrapper = styled.div`
-  max-width: 260px;
-  min-width: 220px;
+  max-width: 280px;
+  min-width: 240px;
   width: 100%;
   height: 100%;
 `

@@ -1,6 +1,6 @@
 import { ITicket, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
-import { readTicketMetadata } from 'lib/api/storage'
+import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
@@ -39,7 +39,8 @@ export const loadTicketData = async (ticketID: string) => {
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
   let metadata = undefined
   try {
-    metadata = await readTicketMetadata(ticketCardState.lootboxAddress)
+    // @TODO make this readTicketMetadata
+    metadata = await readLootboxMetadata(ticketCardState.lootboxAddress)
   } catch (e) {
     console.error(e)
   }
