@@ -50,6 +50,7 @@ export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
                 fontSize: TYPOGRAPHY.fontSize.xlarge,
                 color: COLORS.surpressedFontColor,
                 fontWeight: TYPOGRAPHY.fontWeight.bold,
+                textAlign: screen === 'mobile' ? 'end' : 'start',
               }}
             >
               {`${props.targetAmountNative} ${props.networkSymbol} Goal`}

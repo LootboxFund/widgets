@@ -9,7 +9,7 @@ import { ContractAddress, COLORS } from '@wormgraph/helpers'
 import LootboxFundraisingProgressBar from '../FundraisingProgressBar'
 import BuyShares from '../BuyShares/BuyShares'
 import $Button from '../Generics/Button'
-import useWindowSize from 'lib/hooks/useScreenSize'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { manifest } from '../../../manifest'
 
 const InteractWithLootbox = () => {
@@ -22,7 +22,7 @@ const InteractWithLootbox = () => {
     <$Vertical spacing={5} padding="1em">
       <LootboxFundraisingProgressBar lootbox={lootboxAddress} />
       <BuyShares ref={ref} />
-      <$TicketContainer>
+      <$TicketContainer screen={screen}>
         <UserTickets
           onScrollToMint={() => {
             ref.current?.scrollIntoView()
@@ -43,8 +43,7 @@ const InteractWithLootbox = () => {
   )
 }
 
-const $TicketContainer = styled.section<{}>`
-  height: 530px;
+const $TicketContainer = styled.section<{screen: ScreenSize}>`
   padding-top: 40px;
 `
 
