@@ -20,13 +20,14 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
     console.error('Error fetching ticket id', err)
     ticketID = '0'
   }
+  
+  loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
 
   try {
     await Promise.all([initBuySharesState(lootboxAddress), loadUserTickets()])
   } catch (err) {
     console.error('Error initializing state', err)
   }
-  loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
 }
 
 const InteractWithLootboxWidget = () => {
