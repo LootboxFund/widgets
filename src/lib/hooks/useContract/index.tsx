@@ -325,7 +325,8 @@ export const getLootboxEscrowManagementDetails = async (
     ethers.utils.formatUnits(
       ethers.BigNumber.from(sharesSoldCount)
         .mul(ethers.utils.parseUnits('1', shareDecimals))
-        .div(sharesSoldMax)
+        // .div(sharesSoldMax)
+        .div(sharesSoldTarget)
         .toString(),
       shareDecimals - 2
     )
