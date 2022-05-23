@@ -86,7 +86,6 @@ const UserTickets = (props: Props) => {
               ticketID={ticketID}
               isRedeemEnabled={true}
               onScrollToMint={props.onScrollToMint}
-              showDownloadOption={true}
             ></TicketCard>
           </$TicketWrapper>
         ))}

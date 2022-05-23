@@ -33,19 +33,19 @@ const InfoText = () => {
           backgroundColor={COLORS.white}
           color={`${COLORS.surpressedFontColor}80`}
           style={{
-            display: isHidden ? 'auto' : 'none',
             position: 'absolute',
-            bottom: '0',
-            left: '40%',
+            bottom: screen === 'desktop'? '0' : '-35px',
             border: 'none',
             boxShadow: 'none',
             fontWeight: TYPOGRAPHY.fontWeight.bold,
             fontSize: TYPOGRAPHY.fontSize.medium,
             textDecoration: 'underline',
             fontStyle: 'italic',
+            width: '100%',
+            background: 'transparent'
           }}
         >
-          Read More
+          {isHidden? 'Read More': 'Hide'}
         </$Button>
       </$HideTings>
       <$Text>
@@ -100,6 +100,7 @@ const $HideTings = styled.div<{ isHidden: boolean }>`
 
 const $InfoTextContainer = styled.div`
   position: relative;
+  height: 100%;
 `
 
 export default InfoText
