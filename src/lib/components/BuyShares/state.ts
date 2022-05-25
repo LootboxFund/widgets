@@ -101,6 +101,21 @@ const updateLootboxQuantity = () => {
   }
 }
 
+export const fillLootboxEstimate = () => {
+  if (buySharesState.lootbox.data) {
+    const { sharesSoldMax, sharesSoldCount, ticketPurchaseFee, sharePriceWei } = buySharesState.lootbox.data
+    const sharesAvailable = new BN(sharesSoldMax).minus(new BN(sharesSoldCount))
+    if (sharesAvailable.gt(new BN('0'))) {
+      // From the shares available, calculate how much native token is needed to buy them by including the lootbox fee
+      const nativeTokenWithoutFee = sharesAvailable.multipliedBy(new BN(sharePriceWei)).dividedBy(new BN(10).pow(18))
+      
+      const amountOfNativeTokenNeeded = nativeTokenWithoutFee.multipliedBy(new BN(10).pow(FEE_DECIMALS)).dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
+      return amountOfNativeTokenNeeded      
+    }
+  }
+  return new BN('0')
+}
+
 export const purchaseLootboxShare = async () => {
   if (
     !buySharesState.lootbox.data ||
