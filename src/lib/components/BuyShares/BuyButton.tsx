@@ -175,7 +175,7 @@ const BuyButton = (props: BuyButtonProps) => {
   } else if (isInsufficientFunds) {
     return <SuppressedButton txt={'Insufficient funds'}></SuppressedButton>
   } else if (isInputAmountValid && !withinMaxShares) {
-    return <SuppressedButton txt={`Max ${sharesRemainingFmt} shares left`}></SuppressedButton>
+    return <SuppressedButton txt={`Only ${sharesRemainingFmt} shares left`}></SuppressedButton>
   } else if (isInputAmountValid) {
     return (
       <$Button
