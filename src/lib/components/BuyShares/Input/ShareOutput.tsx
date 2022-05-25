@@ -29,12 +29,12 @@ const ShareOutput = (props: ShareOutputProps) => {
 
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
-  const sharesSoldTarget = snap.lootbox?.data?.sharesSoldTarget
+  const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
 
   const percentageShares =
-    quantityBN && shareDecimals && sharesSoldTarget
-      ? quantityBN.dividedBy(sharesSoldTarget).multipliedBy(100).toFixed(2)
+    quantityBN && shareDecimals && sharesSoldMax
+      ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
       : new BN(0).toString()
 
   // const sharePerUSD =

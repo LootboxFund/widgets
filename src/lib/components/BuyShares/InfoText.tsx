@@ -15,13 +15,13 @@ const InfoText = () => {
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
   const quantityFMT = new BN(quantity).toFixed(2)
-  const sharesSoldTarget = snap.lootbox?.data?.sharesSoldTarget
+  const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
   const percentageShares =
-    quantityBN && shareDecimals && sharesSoldTarget ? quantityBN.dividedBy(sharesSoldTarget).multipliedBy(100) : new BN(0)
+    quantityBN && shareDecimals && sharesSoldMax ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100) : new BN(0)
 
-  const maxShares = snap.lootbox.data?.sharesSoldTarget
-    ? new BN(snap.lootbox.data?.sharesSoldTarget).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
+  const maxShares = snap.lootbox.data?.sharesSoldMax
+    ? new BN(snap.lootbox.data?.sharesSoldMax).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
     : new BN(0)
 
   return (
