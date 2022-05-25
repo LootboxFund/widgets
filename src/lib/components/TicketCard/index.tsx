@@ -30,22 +30,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
-
-  useEffect(() => {
-    window.onload = async () => {
-      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
-      ticketCardState.lootboxAddress = lootboxAddress
-      try {
-        await initDApp()
-      } catch (err) {
-        console.error('Error loading DApp in TicketCard', err)
-      }
-      if (props.ticketID) {
-        loadTicketData(props.ticketID).catch((err) => console.error('Error loading ticket data', err))
-      }
-    }
-  }, [])
-
+  
   useEffect(() => {
     if (props.ticketID) {
       loadTicketData(props.ticketID).catch((err) => console.error(err))

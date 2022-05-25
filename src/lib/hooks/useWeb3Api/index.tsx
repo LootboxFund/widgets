@@ -72,6 +72,7 @@ export const useUserInfo = () => {
       return {
         success: false,
         message: 'Please install MetaMask',
+        code: e?.code || -1
       }
     }
   }
@@ -202,15 +203,6 @@ export const getProvider = async (fallbackChain?: ChainIDHex): Promise<ProviderO
 
 export const initDApp = async (fallbackChain?: ChainIDHex) => {
   const { provider, metamask } = await getProvider(fallbackChain)
-  // if (metamask) {
-  //   provider
-  //     .send('eth_requestAccounts', [])
-  //     .then((userAccounts) => {
-  //       userState.accounts = userAccounts
-  //       userState.currentAccount = userAccounts[0]
-  //     })
-  //     .catch((err) => console.error(err))
-  // }
   const network = await provider.getNetwork()
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
   const chainSlug = chainIdHexToSlug(chainIdHex)
@@ -222,6 +214,10 @@ export const initDApp = async (fallbackChain?: ChainIDHex) => {
   }
 
   if (metamask) {
+    const accounts = await provider.listAccounts()
+    userState.accounts = accounts as Address[]
+    userState.currentAccount = accounts[0] as Address
+
     ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
       userState.accounts = accounts
       userState.currentAccount = accounts[0]

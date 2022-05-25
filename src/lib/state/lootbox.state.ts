@@ -52,11 +52,6 @@ export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Prom
 
 export const loadLootboxOnChainData = async (lootboxAddress: ContractAddress): Promise<OnChainLootbox | undefined> => {
     
-    if (lootboxState[lootboxAddress]?.onChain) {
-        // OnChain data already loaded
-        return lootboxState[lootboxAddress]?.onChain
-    }
-
     let metadata: ILootboxMetadata | undefined = lootboxState[lootboxAddress]?.metadata
     if (!lootboxState[lootboxAddress]?.metadata) {
         try {

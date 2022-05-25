@@ -5,6 +5,7 @@ import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -33,15 +34,17 @@ export const ticketCardState = proxy(ticketCardSnapshot)
 export const generateStateID = (lootboxAddress: ContractAddress, ticketID: string) => `${lootboxAddress}${ticketID}`
 
 export const loadTicketData = async (ticketID: string) => {
-  if (!ticketCardState?.lootboxAddress) {
+  // HACK: read from url params if no lootbox in state for snappier loading
+  const lootboxAddress = ticketCardState?.lootboxAddress || parseUrlParams('lootbox') as ContractAddress
+  if (!lootboxAddress) {
     return
   }
-  const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  const stateID = generateStateID(lootboxAddress, ticketID)
   
   let metadata = undefined
   try {
     // @TODO make this readTicketMetadata
-    metadata = await loadLootboxMetadata(ticketCardState.lootboxAddress)
+    metadata = await loadLootboxMetadata(lootboxAddress)
   } catch (e) {
     console.error(e)
   }
