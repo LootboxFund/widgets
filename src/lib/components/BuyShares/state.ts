@@ -136,7 +136,7 @@ export const purchaseLootboxShare = async () => {
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
 
-    const shares = buySharesState.lootbox.quantity || "0"
+    const shares = new BN(buySharesState.lootbox.quantity || "0").toFixed(2)
 
     // Stamp the ticket + write metadata
     const metadata = await loadLootboxMetadata(buySharesState.lootbox.address as ContractAddress)
