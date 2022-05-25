@@ -1,10 +1,10 @@
 import { ITicket, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
-import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
+import { loadLootboxMetadata } from 'lib/state/lootbox.state'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ContractAddress } from '@wormgraph/helpers'
+import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -37,13 +37,15 @@ export const loadTicketData = async (ticketID: string) => {
     return
   }
   const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  
   let metadata = undefined
   try {
     // @TODO make this readTicketMetadata
-    metadata = await readLootboxMetadata(ticketCardState.lootboxAddress)
+    metadata = await loadLootboxMetadata(ticketCardState.lootboxAddress)
   } catch (e) {
     console.error(e)
   }
+  
   const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
     route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,

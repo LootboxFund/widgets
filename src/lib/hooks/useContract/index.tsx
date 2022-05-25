@@ -5,7 +5,7 @@ import LootboxEscrowABI from 'lib/abi/LootboxEscrow.json'
 import LootboxInstantABI from 'lib/abi/LootboxInstant.json'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import BN, { BigNumber } from 'bignumber.js'
-import { TokenData, Address, ContractAddress } from '@wormgraph/helpers'
+import { TokenData, Address, ContractAddress, ChainIDHex } from '@wormgraph/helpers'
 import { Contract, ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
 
@@ -79,9 +79,9 @@ interface GetLootboxDataOutput {
   variant: string
   ticketPurchaseFee: string
 }
-export const getLootboxData = async (lootboxAddress: Address): Promise<GetLootboxDataOutput> => {
+export const getLootboxData = async (lootboxAddress: Address, fallbackChain?: ChainIDHex): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
-  const { provider } = await getProvider()
+  const { provider } = await getProvider(fallbackChain)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
   const [
     name,

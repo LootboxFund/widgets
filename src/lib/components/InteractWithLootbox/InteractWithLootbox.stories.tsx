@@ -18,11 +18,6 @@ const Template = () => {
   useEffect(() => {
     const load = async () => {
       lootboxAddress = parseUrlParams('lootbox') as ContractAddress
-      try {
-        await initDApp()
-      } catch (err) {
-        console.error('Error initializing DApp', err)
-      }
       if (lootboxAddress) {
         onLoad(lootboxAddress)
       }
