@@ -110,7 +110,7 @@ export const fillLootboxEstimate = () => {
       const nativeTokenWithoutFee = sharesAvailable.multipliedBy(new BN(sharePriceWei)).dividedBy(new BN(10).pow(18))
       
       const amountOfNativeTokenNeeded = nativeTokenWithoutFee.multipliedBy(new BN(10).pow(FEE_DECIMALS)).dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
-      return amountOfNativeTokenNeeded      
+      return amountOfNativeTokenNeeded.toFixed(0, 1)  // Round down
     }
   }
   return new BN('0')
