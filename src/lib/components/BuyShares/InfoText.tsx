@@ -27,32 +27,56 @@ const InfoText = () => {
   return (
     <$InfoTextContainer>
       <$HideTings isHidden={isHidden}>
-        <$Button
-          onClick={() => setIsHidden(!isHidden)}
-          screen={screen}
-          backgroundColor={COLORS.white}
-          color={`${COLORS.surpressedFontColor}80`}
-          style={{
-            position: 'absolute',
-            bottom: screen === 'desktop'? '0' : '-35px',
-            border: 'none',
-            boxShadow: 'none',
-            fontWeight: TYPOGRAPHY.fontWeight.bold,
-            fontSize: TYPOGRAPHY.fontSize.medium,
-            textDecoration: 'underline',
-            fontStyle: 'italic',
-            width: '100%',
-            background: 'transparent'
-          }}
-        >
-          {isHidden? 'Read More': 'Hide'}
-        </$Button>
+        {isHidden?
+          <$Button
+            onClick={() => setIsHidden(!isHidden)}
+            screen={screen}
+            backgroundColor={COLORS.white}
+            color={`${COLORS.surpressedFontColor}80`}
+            style={{
+              position: 'absolute',
+              bottom: '0px',
+              border: 'none',
+              boxShadow: 'none',
+              fontWeight: TYPOGRAPHY.fontWeight.bold,
+              fontSize: TYPOGRAPHY.fontSize.medium,
+              textDecoration: 'underline',
+              fontStyle: 'italic',
+              width: '100%',
+              background: 'transparent'
+            }}
+          >
+            Read More
+          </$Button>
+        : undefined}
+        
       </$HideTings>
       <$Text>
         * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as{' '}
-        <$Bold>{quantityFMT}</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares</$Bold>. This entitles the
+        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Maximum</$Bold>. This entitles the
         holder of this NFT to <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold>{' '}
-        deposited by the issuer. There is no guarantee of a return, consult your financial advisor before investing.
+        deposited by the issuer. This {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the 
+        final amount of shares sold at the end of the Fundraising period. Lootbox takes a 3.2% fee of all investments in a Lootbox. 
+        There is no guarantee of a return, consult your financial advisor before investing. 
+        {!isHidden? 
+          <span
+            onClick={() => setIsHidden(!isHidden)}
+            style={{
+              position: 'relative',
+              border: 'none',
+              boxShadow: 'none',
+              fontWeight: TYPOGRAPHY.fontWeight.bold,
+              fontSize: TYPOGRAPHY.fontSize.small,
+              lineHeight: TYPOGRAPHY.fontSize.medium,
+              textDecoration: 'underline',
+              fontStyle: 'italic',
+              paddingLeft: '30px',
+              cursor: 'pointer'
+            }}
+          >
+            hide
+          </span>
+          :undefined}    
       </$Text>
     </$InfoTextContainer>
   )
@@ -60,8 +84,8 @@ const InfoText = () => {
 
 const BASE_STYLE = `
   font-family: ${TYPOGRAPHY.fontFamily.regular};
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  line-height: ${TYPOGRAPHY.fontSize.xlarge};
+  font-size: ${TYPOGRAPHY.fontSize.small};
+  line-height: ${TYPOGRAPHY.fontSize.medium};
   letter-spacing: 0em;
   text-align: left;
   display: inline;
@@ -96,11 +120,18 @@ const $HideTings = styled.div<{ isHidden: boolean }>`
     #ffffff 77.08%
   );`
       : 'none'};
+  display: ${(props) =>  
+      props.isHidden
+        ?'auto'
+        :'none'
+      };
+  };
 `
 
 const $InfoTextContainer = styled.div`
   position: relative;
   height: 100%;
+  padding-top: 10px;
 `
 
 export default InfoText

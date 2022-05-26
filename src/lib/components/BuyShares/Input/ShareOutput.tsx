@@ -80,7 +80,7 @@ const ShareOutput = (props: ShareOutputProps) => {
             </$TokenSymbol>
           </$Button>
           <$TokenSymbol screen={screen} padding={'10px'} onClick={fillUpLootbox} style={{cursor: 'pointer', color: `${COLORS.trustBackground}ee`, textAlign: 'right', fontWeight: TYPOGRAPHY.fontWeight.regular}}>
-              Max
+              max
           </$TokenSymbol>
         
           {/* {sharePerUSD ? (
