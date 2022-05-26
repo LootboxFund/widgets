@@ -3,20 +3,17 @@ import { proxy, subscribe } from 'valtio'
 import BN from 'bignumber.js'
 import {
   getPriceFeedRaw,
-  getLootboxData,
   buyLootboxShares,
   getUserBalanceOfToken,
   getUserBalanceOfNativeToken,
   getLootboxTicketId,
 } from 'lib/hooks/useContract'
-import { ILootbox } from 'lib/types'
+import { loadLootbox, OnChainLootbox, lootboxState, loadLootboxMetadata } from 'lib/state/lootbox.state'
 import { TokenDataFE, NATIVE_ADDRESS, FEE_DECIMALS } from 'lib/hooks/constants'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { parseWei } from './helpers'
 import { userState } from 'lib/state/userState'
-import { addERC721ToWallet } from 'lib/hooks/useWeb3Api'
 import { stampNewTicket } from 'lib/api/stamp'
-import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import { manifest } from 'manifest'
 
 export type BuySharesRoute = '/buyShares' | '/complete'
@@ -24,8 +21,8 @@ export interface BuySharesState {
   route: BuySharesRoute
   loading: boolean
   lootbox: {
+    data: OnChainLootbox | undefined
     address: Address | undefined
-    data: ILootbox | undefined
     quantity: string | undefined
   }
   inputToken: {
@@ -48,20 +45,8 @@ const buySharesSnapshot: BuySharesState = {
   route: '/buyShares',
   loading: true,
   lootbox: {
+    data: undefined,
     address: undefined,
-    data: {
-      address: undefined,
-      name: undefined,
-      symbol: undefined,
-      sharePriceWei: undefined,
-      sharesSoldCount: undefined,
-      sharesSoldMax: undefined,
-      sharesSoldTarget: undefined,
-      ticketIdCounter: undefined,
-      shareDecimals: undefined,
-      variant: undefined,
-      ticketPurchaseFee: undefined,
-    },
     quantity: undefined,
   },
   inputToken: {
@@ -116,6 +101,21 @@ const updateLootboxQuantity = () => {
   }
 }
 
+export const fillLootboxEstimate = () => {
+  if (buySharesState.lootbox.data) {
+    const { sharesSoldMax, sharesSoldCount, ticketPurchaseFee, sharePriceWei } = buySharesState.lootbox.data
+    const sharesAvailable = new BN(sharesSoldMax).minus(new BN(sharesSoldCount))
+    if (sharesAvailable.gt(new BN('0'))) {
+      // From the shares available, calculate how much native token is needed to buy them by including the lootbox fee
+      const nativeTokenWithoutFee = sharesAvailable.multipliedBy(new BN(sharePriceWei)).dividedBy(new BN(10).pow(18))
+      
+      const amountOfNativeTokenNeeded = nativeTokenWithoutFee.multipliedBy(new BN(10).pow(FEE_DECIMALS)).dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
+      return amountOfNativeTokenNeeded.toFixed(0, 1)  // Round down
+    }
+  }
+  return new BN('0')
+}
+
 export const purchaseLootboxShare = async () => {
   if (
     !buySharesState.lootbox.data ||
@@ -136,10 +136,11 @@ export const purchaseLootboxShare = async () => {
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
 
-    const shares = buySharesState.lootbox.quantity || "0"
+    const shares = new BN(buySharesState.lootbox.quantity || "0").toFixed(2)
 
     // Stamp the ticket + write metadata
-    const metadata = await readLootboxMetadata(buySharesState.lootbox.address as ContractAddress);
+    const metadata = await loadLootboxMetadata(buySharesState.lootbox.address as ContractAddress)
+
     await stampNewTicket({
       backgroundImage: metadata?.lootboxCustomSchema?.lootbox?.backgroundImage || "",
       logoImage: metadata?.lootboxCustomSchema?.lootbox?.image || "",
@@ -227,59 +228,12 @@ export const initBuySharesState = async (lootboxAddress: Address | undefined) =>
   buySharesState.lootbox.address = lootboxAddress
 
   try {
-    const {
-      name,
-      symbol,
-      sharePriceWei,
-      sharesSoldCount,
-      sharesSoldMax,
-      sharesSoldTarget,
-      ticketIdCounter,
-      shareDecimals,
-      variant,
-      ticketPurchaseFee,
-    } = await getLootboxData(lootboxAddress)
-    buySharesState.lootbox.data = {
-      address: lootboxAddress,
-      name: name,
-      symbol: symbol,
-      sharePriceWei: sharePriceWei,
-      sharesSoldCount: sharesSoldCount,
-      sharesSoldMax: sharesSoldMax,
-      ticketIdCounter: ticketIdCounter,
-      shareDecimals: shareDecimals,
-      variant: variant,
-      sharesSoldTarget,
-      ticketPurchaseFee,
-    }
+    const lootbox = await loadLootbox(lootboxAddress as ContractAddress)
+    buySharesState.lootbox.data = lootbox?.onChain
   } catch (err) {
     console.error('Error fetching lootbox data', err)
-    buySharesState.lootbox.data = {
-      address: undefined,
-      name: undefined,
-      symbol: undefined,
-      sharePriceWei: undefined,
-      sharesSoldCount: undefined,
-      sharesSoldMax: undefined,
-      ticketIdCounter: undefined,
-      shareDecimals: undefined,
-      variant: undefined,
-      sharesSoldTarget: undefined,
-      ticketPurchaseFee: undefined,
-    }
   } finally {
     buySharesState.loading = false
-  }
-}
-
-export const addTicketToWallet = async () => {
-  if (buySharesState.lootbox.data) {
-    await addERC721ToWallet({
-      address: buySharesState.lootbox.data.address as Address,
-      decimals: 1,
-      symbol: buySharesState.lootbox.data.symbol || 'Lootbox',
-      image: 'https://www.dictionary.com/e/wp-content/uploads/2018/06/pics-300x300.jpg',
-    })
   }
 }
 

@@ -33,7 +33,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
     <$Container screen={screen}>
       {isMobile ? (
         <$TicketWrapper marginBottom="20px" width={ticketWidth}>
-          <TicketCard ticketID={ticketId} forceLoading={true} showDownloadOption={true} />
+          <TicketCard ticketID={ticketId} forceLoading={true} isDownloadLootbox={true}/>
         </$TicketWrapper>
       ) : undefined}
       {ref && <div ref={ref} />}
@@ -53,7 +53,7 @@ const BuyShares = forwardRef((props: BuySharesProps, ref: React.RefObject<HTMLDi
         </$Vertical>
         {!isMobile ? (
           <$TicketWrapper width={ticketWidth}>
-            <TicketCard ticketID={ticketId} forceLoading={true} showDownloadOption={false} />
+            <TicketCard ticketID={ticketId} forceLoading={true} isDownloadLootbox={true}/>
           </$TicketWrapper>
         ) : undefined}
       </$Horizontal>

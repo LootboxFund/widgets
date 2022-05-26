@@ -273,7 +273,7 @@ export const createInstantLootbox = async (
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+              await downloadFile(`${lootbox}-lootbox`, stampUrl)
               args.setDownloaded(true)
             }
           } catch (err) {
@@ -505,7 +505,7 @@ export const createEscrowLootbox = async (
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootboxName}-${lootbox}`, stampUrl)
+              await downloadFile(`${lootbox}-lootbox`, stampUrl)
               args.setDownloaded(true)
             }
           } catch (err) {

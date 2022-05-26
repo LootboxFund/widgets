@@ -5,18 +5,15 @@ import { DEFAULT_CHAIN_ID_HEX } from '../constants'
 import {
   Address,
   BLOCKCHAINS,
+  ChainIDHex,
   chainIdHexToSlug,
   ChainInfo,
-  ChainSlugs,
   convertDecimalToHex,
   TokenData,
 } from '@wormgraph/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import Web3Utils from 'web3-utils'
 import { ethers as ethersObj } from 'ethers'
-
-const DEFAULT_CHAIN_SLUG = chainIdHexToSlug(DEFAULT_CHAIN_ID_HEX)
-const DEFAULT_BLOCKCHAIN = DEFAULT_CHAIN_SLUG && BLOCKCHAINS[DEFAULT_CHAIN_SLUG]
 
 export const useWeb3Utils = () => {
   return window.web3 && window.web3.utils ? window.web3.utils : Web3Utils
@@ -75,6 +72,7 @@ export const useUserInfo = () => {
       return {
         success: false,
         message: 'Please install MetaMask',
+        code: e?.code || -1
       }
     }
   }
@@ -180,7 +178,7 @@ interface ProviderOutput {
   provider: ethersObj.providers.Web3Provider | ethersObj.providers.JsonRpcProvider
   metamask: unknown
 }
-export const getProvider = async (): Promise<ProviderOutput> => {
+export const getProvider = async (fallbackChain?: ChainIDHex): Promise<ProviderOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   let metamask: unknown = undefined
   try {
@@ -191,25 +189,20 @@ export const getProvider = async (): Promise<ProviderOutput> => {
   let provider: ethersObj.providers.Web3Provider | ethersObj.providers.JsonRpcProvider
   if (metamask) {
     provider = new ethers.providers.Web3Provider(metamask as any)
-  } else {
+  } else if (fallbackChain) {
+    const DEFAULT_CHAIN_SLUG = chainIdHexToSlug(fallbackChain)
+    const DEFAULT_BLOCKCHAIN = DEFAULT_CHAIN_SLUG && BLOCKCHAINS[DEFAULT_CHAIN_SLUG]
     provider = new ethers.providers.JsonRpcProvider(
-      DEFAULT_BLOCKCHAIN?.rpcUrls[0] || 'https://bsc-dataseed.binance.org/'
+      DEFAULT_BLOCKCHAIN?.rpcUrls[0]
     )
+  } else {
+    provider = new ethers.providers.JsonRpcProvider()
   }
   return { provider, metamask }
 }
 
-export const initDApp = async () => {
-  const { provider, metamask } = await getProvider()
-  // if (metamask) {
-  //   provider
-  //     .send('eth_requestAccounts', [])
-  //     .then((userAccounts) => {
-  //       userState.accounts = userAccounts
-  //       userState.currentAccount = userAccounts[0]
-  //     })
-  //     .catch((err) => console.error(err))
-  // }
+export const initDApp = async (fallbackChain?: ChainIDHex) => {
+  const { provider, metamask } = await getProvider(fallbackChain)
   const network = await provider.getNetwork()
   const chainIdHex = convertDecimalToHex(network.chainId.toString())
   const chainSlug = chainIdHexToSlug(chainIdHex)
@@ -221,6 +214,10 @@ export const initDApp = async () => {
   }
 
   if (metamask) {
+    const accounts = await provider.listAccounts()
+    userState.accounts = accounts as Address[]
+    userState.currentAccount = accounts[0] as Address
+
     ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
       userState.accounts = accounts
       userState.currentAccount = accounts[0]

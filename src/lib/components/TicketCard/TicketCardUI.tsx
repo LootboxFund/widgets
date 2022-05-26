@@ -27,7 +27,7 @@ const TicketCardUI = (props: TicketCardUIProps) => {
         <$TicketLogo
           backgroundImage={props.logoImage}
           backgroundShadowColor={props.backgroundColor}
-          size={screen === 'desktop' ? '170px' : '100px'}
+          // size={screen === 'desktop' ? '170px' : '100px'}
         ></$TicketLogo>
       </$LogoContainer>
 

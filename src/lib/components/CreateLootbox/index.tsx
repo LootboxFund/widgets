@@ -56,7 +56,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 
 // Multiplies the fundraisingTarget by this value
-export const defaultFundraisingLimitMultiplier = 11 // base 2
+export const defaultFundraisingLimitMultiplier = 10 // base 2 - examples: 10 = 100%, 11 = 110%
 export const defaultFundraisingLimitMultiplierDecimal = 10
 
 const encodeImageURI = (imageURI: string) => {
@@ -81,7 +81,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         .then(() => initFromUrlParams())
         .catch((err) => LogRocket.captureException(err))
     } else {
-      window.addEventListener('ethereum#initialized', initDApp, {
+      window.addEventListener('ethereum#initialized', () => initDApp(), {
         once: true,
       })
       setTimeout(() => {

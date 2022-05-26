@@ -74,6 +74,7 @@ const TokenInput = (props: TokenInputProps) => {
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <InputDecimal
+            id="buy-share-input"
             onChange={setQuantity}
             initialValue={buySharesState.inputToken.quantity}
             disabled={props.quantityDisabled || !snap.inputToken.data}

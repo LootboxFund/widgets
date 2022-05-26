@@ -1,10 +1,11 @@
 import { ITicket, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
-import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
+import { loadLootboxMetadata } from 'lib/state/lootbox.state'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ContractAddress } from '@wormgraph/helpers'
+import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import parseUrlParams from 'lib/utils/parseUrlParams'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -33,17 +34,21 @@ export const ticketCardState = proxy(ticketCardSnapshot)
 export const generateStateID = (lootboxAddress: ContractAddress, ticketID: string) => `${lootboxAddress}${ticketID}`
 
 export const loadTicketData = async (ticketID: string) => {
-  if (!ticketCardState?.lootboxAddress) {
+  // HACK: read from url params if no lootbox in state for snappier loading
+  const lootboxAddress = ticketCardState?.lootboxAddress || parseUrlParams('lootbox') as ContractAddress
+  if (!lootboxAddress) {
     return
   }
-  const stateID = generateStateID(ticketCardState.lootboxAddress, ticketID)
+  const stateID = generateStateID(lootboxAddress, ticketID)
+  
   let metadata = undefined
   try {
     // @TODO make this readTicketMetadata
-    metadata = await readLootboxMetadata(ticketCardState.lootboxAddress)
+    metadata = await loadLootboxMetadata(lootboxAddress)
   } catch (e) {
     console.error(e)
   }
+  
   const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
     route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,

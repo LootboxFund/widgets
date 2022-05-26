@@ -55,7 +55,7 @@ const ManagementPage = () => {
         })
         .catch((err) => LogRocket.captureException(err))
     } else {
-      window.addEventListener('ethereum#initialized', initDApp, {
+      window.addEventListener('ethereum#initialized', () => initDApp(), {
         once: true,
       })
       setTimeout(() => {

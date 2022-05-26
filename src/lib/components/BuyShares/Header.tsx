@@ -4,9 +4,6 @@ import { userState } from 'lib/state/userState'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
-import { DEFAULT_CHAIN_ID_HEX } from '../../hooks/constants'
-import $Button from 'lib/components/Generics/Button'
-import useWindowSize from 'lib/hooks/useScreenSize'
 import { truncateAddress } from 'lib/api/helpers'
 import { Address, BLOCKCHAINS } from '@wormgraph/helpers'
 import { $Vertical, $Horizontal } from '../Generics'
@@ -14,46 +11,9 @@ import { buySharesState } from './state'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {
-  const { screen } = useWindowSize()
+  // const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
-
-  const isWalletConnected = snapUserState.accounts.length > 0
-
-  const validChain =
-    snapUserState.network.currentNetworkIdHex &&
-    Object.values(BLOCKCHAINS)
-      .map((b) => b.chainIdHex)
-      .includes(snapUserState.network.currentNetworkIdHex)
-
-  const switchChain = async () => {
-    await addCustomEVMChain(DEFAULT_CHAIN_ID_HEX)
-  }
-
-  const renderSwitchNetworkButton = () => {
-    if (isWalletConnected) {
-      return (
-        <$ButtonWrapper>
-          <$Button
-            screen={screen}
-            onClick={switchChain}
-            backgroundColor={`${COLORS.dangerFontColor}80`}
-            backgroundColorHover={`${COLORS.dangerFontColor}`}
-            color={COLORS.white}
-            style={{
-              marginRight: '10px',
-              height: '20px',
-              fontSize: TYPOGRAPHY.fontSize.medium,
-              fontWeight: TYPOGRAPHY.fontWeight.light,
-            }}
-          >
-            Switch Network
-          </$Button>
-        </$ButtonWrapper>
-      )
-    }
-    return
-  }
 
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
@@ -83,21 +43,17 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
         </$Vertical>
       </$Horizontal>
 
-      {validChain ? (
-        <>
-          <$NetworkText style={{ flex: 2 }}>
-            <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
-            <span
-              onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
-              style={{ cursor: 'pointer' }}
-            >
-              {renderTinyAccount()}
-            </span>
-          </$NetworkText>
-        </>
-      ) : (
-        renderSwitchNetworkButton()
-      )}
+      <>
+        <$NetworkText style={{ flex: 2 }}>
+          <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+          <span
+            onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
+            style={{ cursor: 'pointer' }}
+          >
+            {renderTinyAccount()}
+          </span>
+        </$NetworkText>
+      </>
     </$BuySharesHeader>
   )
 }

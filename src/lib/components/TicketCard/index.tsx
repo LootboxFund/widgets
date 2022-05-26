@@ -20,7 +20,8 @@ export interface TicketCardWidgetProps {
   isRedeemEnabled?: boolean
   onScrollToMint?: () => void
   forceLoading?: boolean
-  showDownloadOption?: boolean
+  isDownloadLootbox?: boolean
+  
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -29,22 +30,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
-
-  useEffect(() => {
-    window.onload = async () => {
-      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
-      ticketCardState.lootboxAddress = lootboxAddress
-      try {
-        await initDApp()
-      } catch (err) {
-        console.error('Error loading DApp in TicketCard', err)
-      }
-      if (props.ticketID) {
-        loadTicketData(props.ticketID).catch((err) => console.error('Error loading ticket data', err))
-      }
-    }
-  }, [])
-
+  
   useEffect(() => {
     if (props.ticketID) {
       loadTicketData(props.ticketID).catch((err) => console.error(err))
@@ -69,19 +55,21 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       //    const stampUrl = metadata.image
       // However, there was a bug previously where it was not recoreded properly
       // So for now, we just generate the path on the fly...
-      const stampFilePath = `${manifest.storage.buckets.stamp.id}/${metadata.lootboxCustomSchema.chain.address}/${props.ticketID}.png`
+
+      const key = props.isDownloadLootbox ? 'lootbox' : props.ticketID
+
+
+      const stampFilePath = `${manifest.storage.buckets.stamp.id}/${metadata.lootboxCustomSchema.chain.address}/${key}.png`
       const encodeURISafe = (stringFragment: string) =>
         encodeURIComponent(stringFragment).replace(/'/g, '%27').replace(/"/g, '%22')
       const stampUrl = `${manifest.storage.downloadUrl}/${encodeURISafe(stampFilePath)}?alt=media`
-
-      console.log('opening stamp url', stampUrl)
 
       if (isMetamaskMobileBrowser) {
         // Seems like mobile metamask browser, which crashes when trying to download a file
         // So instead, here we just open the url in a new tab
         window.open(stampUrl, '_blank')
       } else {
-        await downloadFile(`${snap.lootboxAddress}-ticket_${props.ticketID}`, stampUrl)
+        await downloadFile(`${snap.lootboxAddress}-${key}`, stampUrl)
       }
     } catch (err) {
       console.error('Error downloading stamp', err)
@@ -96,8 +84,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
         <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
-      {props.showDownloadOption &&
-        (!!ticket ? (
+      {!!ticket ? (
           <$Button
             onClick={downloadStamp}
             screen={screen}
@@ -125,7 +112,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               cursor: 'default',
             }}
           ></$Button>
-        ))}
+        )}
     </$RootContainer>
   )
 }

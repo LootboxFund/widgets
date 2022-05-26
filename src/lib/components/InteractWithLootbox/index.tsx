@@ -1,32 +1,50 @@
 import react, { useEffect } from 'react'
 import InteractWithLootbox from './InteractWithLootbox'
 import { initDApp } from 'lib/hooks/useWeb3Api'
+import { readLootboxMetadata } from 'lib/api/storage'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state'
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { initBuySharesState } from 'lib/components/BuyShares/state'
-import { ContractAddress } from '@wormgraph/helpers'
+import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
+import { loadLootboxMetadata } from 'lib/state/lootbox.state'
+import LogRocket from 'logrocket'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
   userTicketState.lootboxAddress = lootboxAddress
+
+  
+  let metadata: ILootboxMetadata | undefined = undefined
+
+  try {
+    metadata = await loadLootboxMetadata(lootboxAddress)
+  } catch (err) {
+    console.error(err)
+  }
+
+  try {
+    await initDApp(metadata?.lootboxCustomSchema?.chain?.chainIdHex)
+  } catch (err) {
+    LogRocket.captureException(err)
+  }
+
+  initBuySharesState(lootboxAddress).catch((err) => LogRocket.captureException(err))
+  
+  loadUserTickets().catch((err) => LogRocket.captureException(err))
 
   let ticketID = undefined
   try {
     ticketID = await getLootboxTicketId(lootboxAddress)
   } catch (err) {
     console.error('Error fetching ticket id', err)
+    LogRocket.captureException(err)
     ticketID = '0'
   }
-
-  try {
-    await Promise.all([initBuySharesState(lootboxAddress), loadUserTickets()])
-  } catch (err) {
-    console.error('Error initializing state', err)
-  }
-  loadTicketData(ticketID).catch((err) => console.error('Error loading ticket data', err))
+  
+  loadTicketData(ticketID).catch((err) => LogRocket.captureException(err))
 }
 
 const InteractWithLootboxWidget = () => {
@@ -34,11 +52,6 @@ const InteractWithLootboxWidget = () => {
     const load = async () => {
       initLogging()
       const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
-      try {
-        await initDApp()
-      } catch (err) {
-        console.error('Error initializing DApp', err)
-      }
       if (lootboxAddress) {
         onLoad(lootboxAddress)
       }

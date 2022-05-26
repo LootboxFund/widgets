@@ -112,6 +112,7 @@ const BASE_CONTAINER = `
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+  min-height: 300px;
 `
 
 export const $LogoContainer = styled.div<{ padding?: string }>`

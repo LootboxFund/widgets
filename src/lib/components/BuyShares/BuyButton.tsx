@@ -12,6 +12,7 @@ import { LoadingText } from 'lib/components/Generics/Spinner'
 import { BLOCKCHAINS, ContractAddress, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
+import detectEthereumProvider from '@metamask/detect-provider'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
 
@@ -23,6 +24,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const { screen } = useWindowSize()
   const [metadata, setMetadata] = useState<ILootboxMetadata | undefined>()
   const [loading, setLoading] = useState(true)
+  const [hasMetaMask, setHasMetaMask] = useState(true)
 
   useEffect(() => {
     if (snapBuySharesState.lootbox.address) {
@@ -72,6 +74,14 @@ const BuyButton = (props: BuyButtonProps) => {
   const isMetadataLoaded = !!metadata
   const isLootboxLoaded = Object.keys(snapBuySharesState?.lootbox?.data || {}).length > 0
 
+  useEffect(() => {
+    detectEthereumProvider({mustBeMetaMask: true}).then((data) => {
+      if (!data) {
+        setHasMetaMask(false)
+      }
+    }).catch((err) => console.error(err))
+  }, [])
+
   const SuppressedButton = ({ txt }: { txt: string }) => {
     return (
       <$Button
@@ -85,7 +95,28 @@ const BuyButton = (props: BuyButtonProps) => {
     )
   }
 
-  if (snapBuySharesState.loading || loading) {
+  const NoMetamaskButton = () => {
+    const openMetamaskInstallLink = () => {
+      window.open('https://metamask.io/', '_blank')
+    }
+    return (
+      <$Button
+        screen={screen}
+        onClick={() => openMetamaskInstallLink()}
+        color={`${COLORS.warningFontColor}`}
+        backgroundColor={`${COLORS.warningBackground}`}
+        style={{
+          ...BASE_BUTTON_STYLE,
+        }}
+      >
+        Please install MetaMask
+      </$Button>
+    )
+  }
+  
+  if (!hasMetaMask) {
+    return <NoMetamaskButton />
+  } else if (snapBuySharesState.loading || loading) {
     return (
       <$Button
         screen={screen}
@@ -144,7 +175,11 @@ const BuyButton = (props: BuyButtonProps) => {
   } else if (isInsufficientFunds) {
     return <SuppressedButton txt={'Insufficient funds'}></SuppressedButton>
   } else if (isInputAmountValid && !withinMaxShares) {
-    return <SuppressedButton txt={`Max ${sharesRemainingFmt} shares left`}></SuppressedButton>
+    if (sharesRemaining.eq(new BN('0'))) {
+      return <SuppressedButton txt={`Lootbox sold out!`}></SuppressedButton>
+    } else {
+      return <SuppressedButton txt={`Only ${sharesRemainingFmt} shares left`}></SuppressedButton>
+    }
   } else if (isInputAmountValid) {
     return (
       <$Button

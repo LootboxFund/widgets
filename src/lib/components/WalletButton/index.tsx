@@ -22,10 +22,6 @@ const WalletButton = (props: WalletButtonProps) => {
   const { requestAccounts } = useUserInfo()
 
   useEffect(() => {
-    connectWallet()
-  }, [])
-
-  useEffect(() => {
     if (snapUserState.accounts.length > 0) {
       setStatus('success')
     }
@@ -35,7 +31,10 @@ const WalletButton = (props: WalletButtonProps) => {
     setStatus('loading')
     try {
       const result = await requestAccounts()
-      if (result.success && provider) {
+      if (result?.code === 4001) {
+        // User rejected
+        setStatus('ready')
+      } else if (result.success && provider) {
         const network = await provider.getNetwork()
         const chainIdHex = convertDecimalToHex(network.chainId.toString())
         const chainSlug = chainIdHexToSlug(chainIdHex)
