@@ -3,12 +3,12 @@ import UserTickets from './UserTickets'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { loadState } from './state'
-import { ContractAddress } from '@wormgraph/helpers';
+import { ContractAddress } from '@wormgraph/helpers'
 
 const UserTicketsWidget = () => {
   useEffect(() => {
     const load = async () => {
-      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress;
+      const lootboxAddress = parseUrlParams('lootbox') as ContractAddress
       try {
         await initDApp()
       } catch (err) {

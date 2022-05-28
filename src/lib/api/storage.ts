@@ -23,7 +23,15 @@ const getLootboxURI = async ({ lootboxAddress, bucket }: { lootboxAddress: Contr
   return undefined
 }
 
-const getTicketURI = async ({ lootboxAddress, bucket, ticket }: { lootboxAddress: ContractAddress; bucket: string, ticket: string }) => {
+const getTicketURI = async ({
+  lootboxAddress,
+  bucket,
+  ticket,
+}: {
+  lootboxAddress: ContractAddress
+  bucket: string
+  ticket: string
+}) => {
   const filePath = `${bucket}/${lootboxAddress.toLowerCase()}/${ticket}.json`
   const downloadablePath = `${manifest.storage.downloadUrl}/${encodeURISafe(filePath)}`
   const ticketURI = await (await fetch(downloadablePath)).json()
@@ -37,9 +45,12 @@ export const readLootboxMetadata = async (lootboxAddress: ContractAddress): Prom
   })
 
   return parseLootboxMetadata(metadata)
-} 
+}
 
-export const readTicketMetadata = async (lootboxAddress: ContractAddress, ticket: string): Promise<ITicketMetadata | undefined> => {
+export const readTicketMetadata = async (
+  lootboxAddress: ContractAddress,
+  ticket: string
+): Promise<ITicketMetadata | undefined> => {
   const metadata = await getTicketURI({
     lootboxAddress,
     bucket: manifest.storage.buckets.data.id,

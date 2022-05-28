@@ -4,7 +4,14 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
-import { Address, ChainIDHex, ContractAddress, convertHexToDecimal, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
+import {
+  Address,
+  ChainIDHex,
+  ContractAddress,
+  convertHexToDecimal,
+  ILootboxMetadata,
+  ITicketMetadata,
+} from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'

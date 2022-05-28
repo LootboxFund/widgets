@@ -79,7 +79,10 @@ interface GetLootboxDataOutput {
   variant: string
   ticketPurchaseFee: string
 }
-export const getLootboxData = async (lootboxAddress: Address, fallbackChain?: ChainIDHex): Promise<GetLootboxDataOutput> => {
+export const getLootboxData = async (
+  lootboxAddress: Address,
+  fallbackChain?: ChainIDHex
+): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider(fallbackChain)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)

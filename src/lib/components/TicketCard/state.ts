@@ -35,12 +35,12 @@ export const generateStateID = (lootboxAddress: ContractAddress, ticketID: strin
 
 export const loadTicketData = async (ticketID: string) => {
   // HACK: read from url params if no lootbox in state for snappier loading
-  const lootboxAddress = ticketCardState?.lootboxAddress || parseUrlParams('lootbox') as ContractAddress
+  const lootboxAddress = ticketCardState?.lootboxAddress || (parseUrlParams('lootbox') as ContractAddress)
   if (!lootboxAddress) {
     return
   }
   const stateID = generateStateID(lootboxAddress, ticketID)
-  
+
   let metadata = undefined
   try {
     // @TODO make this readTicketMetadata
@@ -48,7 +48,7 @@ export const loadTicketData = async (ticketID: string) => {
   } catch (e) {
     console.error(e)
   }
-  
+
   const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
     route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,

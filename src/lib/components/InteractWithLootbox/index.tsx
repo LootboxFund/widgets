@@ -16,7 +16,6 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
   userTicketState.lootboxAddress = lootboxAddress
 
-  
   let metadata: ILootboxMetadata | undefined = undefined
 
   try {
@@ -32,7 +31,7 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
   }
 
   initBuySharesState(lootboxAddress).catch((err) => LogRocket.captureException(err))
-  
+
   loadUserTickets().catch((err) => LogRocket.captureException(err))
 
   let ticketID = undefined
@@ -43,7 +42,7 @@ export const onLoad = async (lootboxAddress: ContractAddress) => {
     LogRocket.captureException(err)
     ticketID = '0'
   }
-  
+
   loadTicketData(ticketID).catch((err) => LogRocket.captureException(err))
 }
 

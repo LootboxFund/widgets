@@ -3,7 +3,6 @@ import { userTicketState } from './state'
 import { useSnapshot } from 'valtio'
 import { $Horizontal, $ScrollHorizontal, $Vertical } from '../Generics'
 import TicketCard from 'lib/components/TicketCard'
-import { $Icon } from 'lib/components/TicketCard/TicketCard'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 import { Address } from '@wormgraph/helpers'
@@ -82,11 +81,7 @@ const UserTickets = (props: Props) => {
       <Wrapper>
         {tickets.map((ticketID, idx) => (
           <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
-            <TicketCard
-              ticketID={ticketID}
-              isRedeemEnabled={true}
-              onScrollToMint={props.onScrollToMint}
-            ></TicketCard>
+            <TicketCard ticketID={ticketID} isRedeemEnabled={true} onScrollToMint={props.onScrollToMint}></TicketCard>
           </$TicketWrapper>
         ))}
       </Wrapper>

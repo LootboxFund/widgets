@@ -72,7 +72,7 @@ export const useUserInfo = () => {
       return {
         success: false,
         message: 'Please install MetaMask',
-        code: e?.code || -1
+        code: e?.code || -1,
       }
     }
   }
@@ -192,9 +192,7 @@ export const getProvider = async (fallbackChain?: ChainIDHex): Promise<ProviderO
   } else if (fallbackChain) {
     const DEFAULT_CHAIN_SLUG = chainIdHexToSlug(fallbackChain)
     const DEFAULT_BLOCKCHAIN = DEFAULT_CHAIN_SLUG && BLOCKCHAINS[DEFAULT_CHAIN_SLUG]
-    provider = new ethers.providers.JsonRpcProvider(
-      DEFAULT_BLOCKCHAIN?.rpcUrls[0]
-    )
+    provider = new ethers.providers.JsonRpcProvider(DEFAULT_BLOCKCHAIN?.rpcUrls[0])
   } else {
     provider = new ethers.providers.JsonRpcProvider()
   }
@@ -217,7 +215,6 @@ export const initDApp = async (fallbackChain?: ChainIDHex) => {
     const accounts = await provider.listAccounts()
     userState.accounts = accounts as Address[]
     userState.currentAccount = accounts[0] as Address
-
     ;(metamask as any).on('accountsChanged', async (accounts: Address[]) => {
       userState.accounts = accounts
       userState.currentAccount = accounts[0]

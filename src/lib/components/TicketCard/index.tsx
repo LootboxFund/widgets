@@ -21,7 +21,6 @@ export interface TicketCardWidgetProps {
   onScrollToMint?: () => void
   forceLoading?: boolean
   isDownloadLootbox?: boolean
-  
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -30,7 +29,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
-  
+
   useEffect(() => {
     if (props.ticketID) {
       loadTicketData(props.ticketID).catch((err) => console.error(err))
@@ -58,7 +57,6 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
 
       const key = props.isDownloadLootbox ? 'lootbox' : props.ticketID
 
-
       const stampFilePath = `${manifest.storage.buckets.stamp.id}/${metadata.lootboxCustomSchema.chain.address}/${key}.png`
       const encodeURISafe = (stringFragment: string) =>
         encodeURIComponent(stringFragment).replace(/'/g, '%27').replace(/"/g, '%22')
@@ -85,34 +83,34 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
       {!!ticket ? (
-          <$Button
-            onClick={downloadStamp}
-            screen={screen}
-            backgroundColor={COLORS.white}
-            color={`${COLORS.surpressedFontColor}80`}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              fontWeight: TYPOGRAPHY.fontWeight.regular,
-              fontSize: TYPOGRAPHY.fontSize.medium,
-            }}
-          >
-            Download Image
-          </$Button>
-        ) : (
-          <$Button
-            screen={screen}
-            backgroundColor={COLORS.white}
-            color={`${COLORS.surpressedFontColor}80`}
-            style={{
-              border: 'none',
-              boxShadow: 'none',
-              fontWeight: TYPOGRAPHY.fontWeight.regular,
-              fontSize: TYPOGRAPHY.fontSize.large,
-              cursor: 'default',
-            }}
-          ></$Button>
-        )}
+        <$Button
+          onClick={downloadStamp}
+          screen={screen}
+          backgroundColor={COLORS.white}
+          color={`${COLORS.surpressedFontColor}80`}
+          style={{
+            border: 'none',
+            boxShadow: 'none',
+            fontWeight: TYPOGRAPHY.fontWeight.regular,
+            fontSize: TYPOGRAPHY.fontSize.medium,
+          }}
+        >
+          Download Image
+        </$Button>
+      ) : (
+        <$Button
+          screen={screen}
+          backgroundColor={COLORS.white}
+          color={`${COLORS.surpressedFontColor}80`}
+          style={{
+            border: 'none',
+            boxShadow: 'none',
+            fontWeight: TYPOGRAPHY.fontWeight.regular,
+            fontSize: TYPOGRAPHY.fontSize.large,
+            cursor: 'default',
+          }}
+        ></$Button>
+      )}
     </$RootContainer>
   )
 }

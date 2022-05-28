@@ -75,11 +75,13 @@ const BuyButton = (props: BuyButtonProps) => {
   const isLootboxLoaded = Object.keys(snapBuySharesState?.lootbox?.data || {}).length > 0
 
   useEffect(() => {
-    detectEthereumProvider({mustBeMetaMask: true}).then((data) => {
-      if (!data) {
-        setHasMetaMask(false)
-      }
-    }).catch((err) => console.error(err))
+    detectEthereumProvider({ mustBeMetaMask: true })
+      .then((data) => {
+        if (!data) {
+          setHasMetaMask(false)
+        }
+      })
+      .catch((err) => console.error(err))
   }, [])
 
   const SuppressedButton = ({ txt }: { txt: string }) => {
@@ -113,7 +115,7 @@ const BuyButton = (props: BuyButtonProps) => {
       </$Button>
     )
   }
-  
+
   if (!hasMetaMask) {
     return <NoMetamaskButton />
   } else if (snapBuySharesState.loading || loading) {
