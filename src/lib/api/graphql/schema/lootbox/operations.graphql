@@ -1,0 +1,9 @@
+query GetLootboxByAddress($payload: GetLootboxByAddressPayload) {
+  getLootboxByAddress(payload: $payload) {
+    ... on LootboxResponseSuccess {
+      lootbox {
+        address
+      }
+    }
+  }
+}
