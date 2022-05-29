@@ -9,6 +9,12 @@ export const GET_LOOTBOX = gql`
           id
         }
       }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
     }
   }
 `

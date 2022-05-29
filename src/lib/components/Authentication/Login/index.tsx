@@ -17,7 +17,7 @@ const Login = (props: Props) => {
 
   const queryDaBish = async () => {
     console.log('....querying....')
-    await getLootbox({ variables: { address: 'fuck you bish' } })
+    await getLootbox({ variables: { address: '0xDb4c88fC88e1ca18d6b970038a97fb6f086974A2' } })
   }
 
   console.log('gql data:', data, loading, error)
