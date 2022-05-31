@@ -1,6 +1,7 @@
 import { useSnapshot } from 'valtio'
 import { useAuth } from 'lib/hooks/useAuth'
 import { $Button } from '../../Generics/Button'
+import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -11,27 +12,23 @@ import { $Vertical } from 'lib/components/Generics'
 import { useState } from 'react'
 import { $Header, $InputMedium, $ErrorMessage, $ChangeMode } from '../Shared'
 
-type Mode = 'password' | 'wallet'
+type Mode = 'wallet' | 'password'
 
 interface Props {
-  initialMode?: Mode
+  onSignUpCallback: (mode: Mode) => void
 }
-const Login = (props: Props) => {
-  const { user, signInWithWallet, signInWithEmailAndPassword } = useAuth()
+const Signup = (props: Props) => {
+  const { signUpWithWallet, signUpWithEmailAndPassword } = useAuth()
+  const [email, setEmail] = useState<string>('')
   const { screen } = useWindowSize()
+  const userStateSnapshot = useSnapshot(userState)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const userStateSnapshot = useSnapshot(userState)
-  const [mode, setMode] = useState<Mode>(props.initialMode || 'wallet')
-  const [email, setEmail] = useState<string>('')
+  const [mode, setMode] = useState<Mode>('wallet')
   const [password, setPassword] = useState<string>('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState<string>('')
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
-
-  const changeMode = (mode: Mode) => {
-    setMode(mode)
-    setErrorMessage('')
-  }
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)
@@ -39,6 +36,44 @@ const Login = (props: Props) => {
 
   const parsePassword = (inputPassword: string) => {
     setPassword(inputPassword)
+  }
+
+  const parsePasswordConfirmation = (inputPasswordConfirmation: string) => {
+    setPasswordConfirmation(inputPasswordConfirmation)
+  }
+
+  const changeMode = (mode: Mode) => {
+    setMode(mode)
+    setErrorMessage('')
+  }
+
+  const handleSignup = async () => {
+    setLoading(true)
+    try {
+      await signUpWithWallet(email)
+      props.onSignUpCallback(mode)
+    } catch (err) {
+      setErrorMessage(err?.message || 'An error occured!')
+      LogRocket.captureException(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSignUpWithEmailAndPassword = async () => {
+    setLoading(true)
+    try {
+      if (passwordConfirmation !== password) {
+        throw new Error('Passwords do not match!')
+      }
+      await signUpWithEmailAndPassword(email, password)
+      props.onSignUpCallback(mode)
+    } catch (err) {
+      setErrorMessage(err?.message || 'An error occured!')
+      LogRocket.captureException(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const ChangeAuthProvider = () => {
@@ -49,45 +84,27 @@ const Login = (props: Props) => {
     }
   }
 
-  const handleLoginWithWallet = async () => {
-    setLoading(true)
-    try {
-      await signInWithWallet()
-    } catch (err) {
-      setErrorMessage(err?.message || 'An error occured!')
-      LogRocket.captureException(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleLoginWithEmailAndPassword = async () => {
-    setLoading(true)
-    try {
-      await signInWithEmailAndPassword(email, password)
-    } catch (err) {
-      setErrorMessage(err?.message || 'An error occured!')
-      LogRocket.captureException(err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   return (
     <$Vertical spacing={4}>
-      <$Header>Login</$Header>
+      <$Header>Register</$Header>
+      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email" />
       {mode === 'password' ? (
         <$Vertical spacing={4}>
-          <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email"></$InputMedium>
           <$InputMedium
             onChange={(e) => parsePassword(e.target.value)}
             value={password}
             placeholder="password"
             type="password"
           ></$InputMedium>
+          <$InputMedium
+            onChange={(e) => parsePasswordConfirmation(e.target.value)}
+            value={passwordConfirmation}
+            placeholder="confirm password"
+            type="password"
+          ></$InputMedium>
           <$Button
             screen={screen}
-            onClick={handleLoginWithEmailAndPassword}
+            onClick={handleSignUpWithEmailAndPassword}
             backgroundColor={`${COLORS.trustBackground}C0`}
             backgroundColorHover={`${COLORS.trustBackground}`}
             color={COLORS.trustFontColor}
@@ -98,7 +115,7 @@ const Login = (props: Props) => {
             }}
             disabled={loading}
           >
-            <LoadingText loading={loading} text="Login" color={COLORS.trustFontColor} />
+            <LoadingText loading={loading} text="Sign Up" color={COLORS.trustFontColor} />
           </$Button>
         </$Vertical>
       ) : null}
@@ -106,7 +123,7 @@ const Login = (props: Props) => {
       {mode === 'wallet' && isWalletConnected ? (
         <$Button
           screen={screen}
-          onClick={handleLoginWithWallet}
+          onClick={handleSignup}
           backgroundColor={`${COLORS.trustBackground}C0`}
           backgroundColorHover={`${COLORS.trustBackground}`}
           color={COLORS.trustFontColor}
@@ -117,7 +134,7 @@ const Login = (props: Props) => {
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="Login with Wallet" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text="Wallet Sign Up" color={COLORS.trustFontColor} />
         </$Button>
       ) : null}
 
@@ -127,4 +144,4 @@ const Login = (props: Props) => {
   )
 }
 
-export default Login
+export default Signup

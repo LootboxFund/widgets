@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
-import Authentication from '.'
+import Authentication from './index'
 
 export default {
   title: 'Authentication',

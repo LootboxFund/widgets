@@ -1,38 +1,50 @@
 import {
   MutationCreateUserWithWalletArgs,
   CreateUserResponse,
-  CreateUserWithWalletPayload,
-  AuthenticateWalletPayload,
   MutationAuthenticateWalletArgs,
   AuthenticateWalletResponse,
   AuthenticateWalletResponseSuccess,
+  MutationCreateUserWithPasswordArgs,
 } from '../../api/graphql/generated/types'
 import { useSnapshot } from 'valtio'
 import { useEffect, useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { auth } from 'lib/api/firebase/app'
-import { User } from 'lib/api/graphql/generated/types'
 import { ethers } from 'ethers'
-import { useProvider, getProvider } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
-import { JsonRpcProvider } from 'ethers/node_modules/@ethersproject/providers'
 import { generateSignatureMessage } from 'lib/utils/signatureMessage'
 import { v4 as uuidv4 } from 'uuid'
-import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN } from './api.gql'
-import { signInWithCustomToken } from 'firebase/auth'
+import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD } from './api.gql'
+import { signInWithCustomToken, signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
+import { getProvider } from 'lib/hooks/useWeb3Api'
+import { UserID } from 'lib/types'
 
-interface SignUpWithWallet {}
+// interface FrontendWallet {
+//   id: WalletID
+//   address: Address
+// }
+
+interface FrontendUser {
+  id: UserID
+  email: string | null
+  //   wallets: FrontendWallet[]
+}
 
 export const useAuth = () => {
-  //   const [user, setUser] = useState<User | null>(null)
-  const [user, setUser] = useState<any | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<FrontendUser | null>(null)
   const userStateSnapshot = useSnapshot(userState)
-  const [signUpWithWalletMutation, { loading: loadingSignup, error }] = useMutation<
-    CreateUserResponse,
+
+  const [signUpWithWalletMutation] = useMutation<
+    { createUserWithWallet: CreateUserResponse },
     MutationCreateUserWithWalletArgs
   >(SIGN_UP_WITH_WALLET)
+
+  const [signUpWithPasswordMutation] = useMutation<
+    { createUserWithPassword: CreateUserResponse },
+    MutationCreateUserWithPasswordArgs
+  >(SIGN_UP_WITH_PASSWORD)
+
   const [authenticateWalletMutation] = useMutation<
     { authenticateWallet: AuthenticateWalletResponse },
     MutationAuthenticateWalletArgs
@@ -40,16 +52,12 @@ export const useAuth = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log('onAuthStateChanged', user)
       if (user) {
-        console.log('AUTH', user)
-        const { uid, displayName, photoURL, email } = user
-        const userData = { uid, displayName, photoURL, email }
+        const { uid, email } = user
+        const userData: FrontendUser = { id: uid as UserID, email: email }
         setUser(userData)
-        setLoading(false)
       } else {
         setUser(null)
-        setLoading(false)
       }
     })
 
@@ -59,12 +67,12 @@ export const useAuth = () => {
   }, [])
 
   const signUpWithWallet = async (email: string) => {
-    const { signature, message } = await getSignature()
+    if (!email) {
+      throw new Error('Email is required')
+    }
 
-    setLoading(true)
-    //   try {
-    console.log('signing up...? ')
-    signUpWithWalletMutation({
+    const { signature, message } = await getSignature()
+    const { data } = await signUpWithWalletMutation({
       variables: {
         payload: {
           email,
@@ -73,38 +81,64 @@ export const useAuth = () => {
         },
       },
     })
-    // console.log('SIGN_UP_WITH_WALLET', data)
-    // setUser(data.createUserWithWallet.user)
-    // setLoading(false)
-    //   }
+
+    if (!data) {
+      throw new Error('An error occured!')
+    } else if (data?.createUserWithWallet?.__typename === 'ResponseError') {
+      throw new Error(data.createUserWithWallet.error.message)
+    }
   }
 
   const signInWithWallet = async () => {
     const { signature, message } = await getSignature()
 
-    try {
-      setLoading(true)
-
-      console.log('loggin in')
-
-      const { data } = await authenticateWalletMutation({
-        variables: {
-          payload: {
-            message,
-            signedMessage: signature,
-          },
+    const { data } = await authenticateWalletMutation({
+      variables: {
+        payload: {
+          message,
+          signedMessage: signature,
         },
-      })
+      },
+    })
 
-      if (!data) {
-        throw new Error('Server error')
-      } else if (data?.authenticateWallet.__typename === 'ResponseError') {
-        throw data.authenticateWallet.error
-      }
-      // Sign in
-      await signInWithCustomToken(auth, (data.authenticateWallet as AuthenticateWalletResponseSuccess).token)
-    } catch (err) {
-      setLoading(false)
+    if (!data) {
+      throw new Error('Server error')
+    } else if (data?.authenticateWallet.__typename === 'ResponseError') {
+      throw data.authenticateWallet.error
+    }
+
+    await signInWithCustomToken(auth, (data.authenticateWallet as AuthenticateWalletResponseSuccess).token)
+  }
+
+  const signInWithEmailAndPassword = async (email: string, password: string) => {
+    if (!email) {
+      throw new Error('Email is required')
+    }
+    if (!password) {
+      throw new Error('Password is required')
+    }
+    await signInWithEmailAndPasswordFirebase(auth, email, password)
+  }
+
+  const signUpWithEmailAndPassword = async (email: string, password: string) => {
+    if (!email) {
+      throw new Error('Email is required')
+    }
+    if (!password) {
+      throw new Error('Password is required')
+    }
+    const { data } = await signUpWithPasswordMutation({
+      variables: {
+        payload: {
+          email,
+          password,
+        },
+      },
+    })
+    if (!data) {
+      throw new Error('An error occured!')
+    } else if (data?.createUserWithPassword?.__typename === 'ResponseError') {
+      throw new Error(data.createUserWithPassword.error.message)
     }
   }
 
@@ -128,5 +162,11 @@ export const useAuth = () => {
     return { signature: result, message }
   }
 
-  return { user, loading: loading || loadingSignup, signInWithWallet, signUpWithWallet }
+  return {
+    user,
+    signInWithWallet,
+    signUpWithWallet,
+    signInWithEmailAndPassword,
+    signUpWithEmailAndPassword,
+  }
 }
