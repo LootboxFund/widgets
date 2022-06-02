@@ -24,7 +24,6 @@ import BigNumber from 'bignumber.js'
 import { bulkMintNFTsContractCall, getPriceFeed, LootboxType } from 'lib/hooks/useContract'
 
 export interface BulkMintProps {
-  themeColor: string
   lootboxAddress: ContractAddress
   network: NetworkOption
   lootboxMetadata: ILootboxMetadata

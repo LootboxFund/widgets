@@ -111,7 +111,6 @@ const Demo = (args: BulkMintProps) => {
   return (
     <BulkMint
       {...args}
-      themeColor={'#F0B90B'}
       lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress}
       lootboxMetadata={ticketMetadata}
       network={network}
