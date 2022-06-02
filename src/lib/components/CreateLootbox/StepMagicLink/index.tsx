@@ -34,6 +34,7 @@ export interface StepMagicLinkProps {
   uploadImages: () => Promise<[string, string]>
   selectedNetwork: NetworkOption | undefined
   stage: StepStage
+  tournamentId?: string
 }
 const StepMagicLink = (props: StepMagicLinkProps) => {
   const { screen } = useWindowSize()
@@ -51,6 +52,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const [includeThemeColor, setIncludeThemeColor] = useState(true)
   const [includeCampaignBio, setIncludeCampaignBio] = useState(true)
   const [includeCampaignWebsite, setIncludeCampaignWebsite] = useState(true)
+  const [includeTournamentId, setIncludeTournamentId] = useState(true)
   const [loading, setLoading] = useState(false)
 
   const generateMagicLink = async () => {
@@ -81,6 +83,9 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     }
     if (includeCampaignWebsite) {
       queryParams.campaignWebsite = props.campaignWebsite
+    }
+    if (includeTournamentId && props.tournamentId) {
+      queryParams.tournamentId = props.tournamentId
     }
     try {
       const [logoImage, coverImage] = await props.uploadImages()
@@ -241,6 +246,13 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
               checked={includeCampaignWebsite}
               onClick={setIncludeCampaignWebsite}
               text={`Set the website in the Lootbox social links automatically`}
+              locked={false}
+            />
+            <IncludeTerm
+              slug="tournamentId"
+              checked={includeTournamentId}
+              onClick={setIncludeTournamentId}
+              text={`Set the tournament id to ${props.tournamentId}`}
               locked={false}
             />
             <br />

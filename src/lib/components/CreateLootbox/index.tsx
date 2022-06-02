@@ -54,6 +54,7 @@ import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
+import { TournamentID } from 'lib/types'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 10 // base 2 - examples: 10 = 100%, 11 = 110%
@@ -104,6 +105,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [provider, loading] = useProvider()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0
+  const [tournamentId, setTournamentId] = useState<string>('')
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
@@ -185,6 +187,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       const decodedCover = INITIAL_URL_PARAMS.coverImage
       tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
       prefilledFields.push(`Lootbox cover image is already set`)
+    }
+
+    if (INITIAL_URL_PARAMS.tournamentId) {
+      setTournamentId(INITIAL_URL_PARAMS.tournamentId)
+      prefilledFields.push(`Tournament ID is set`)
     }
 
     // @ts-ignore bullshit typing shit
@@ -423,6 +430,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          tournamentId: tournamentId as TournamentID,
         },
         socialState,
         snapUserState.network.currentNetworkIdHex
@@ -452,6 +460,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          tournamentId: tournamentId as TournamentID,
         },
         socialState,
         snapUserState.network.currentNetworkIdHex
@@ -748,6 +757,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         }}
         stage="in_progress"
         selectedNetwork={network}
+        tournamentId={tournamentId}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>
