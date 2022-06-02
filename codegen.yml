@@ -1,5 +1,5 @@
 overwrite: true
-schema: 'http://localhost:8080/graphql' # NEXT_PUBLIC_GRAPHQL_ENDPOINT
+schema: 'http://localhost:8080/graphql' # TODO: dynamically load from manifest
 generates:
   src/lib/api/graphql/generated/types.ts:
     plugins:
