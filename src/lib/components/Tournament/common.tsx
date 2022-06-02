@@ -1,8 +1,10 @@
 import styled from 'styled-components'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
+import { Lootbox, LootboxSnapshot } from 'lib/api/graphql/generated/types'
+import { $Horizontal } from '../Generics'
 
 export const $h1 = styled.h1`
   font-size: ${TYPOGRAPHY.fontSize.xxlarge};
@@ -73,7 +75,7 @@ export const HiddenDescription = ({ description, screen }: { description: string
           </$Button>
         ) : undefined}
       </$HideTings>
-      <$p>{isHidden ? description.slice(0, 800) : description}</$p>
+      <$p>{isHidden ? description.slice(0, 500) : description}</$p>
       {!isHidden ? (
         <$Button
           onClick={() => setIsHidden(!isHidden)}
@@ -125,3 +127,45 @@ export const EmptyResult = () => {
     </div>
   )
 }
+
+interface LootboxListProps {
+  onClickLootbox?: (lootbox: LootboxSnapshot) => void
+  lootboxes: LootboxSnapshot[]
+  screen: ScreenSize
+}
+export const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) => {
+  return (
+    <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+      {lootboxes.map((lootbox, index) => {
+        return (
+          <$LootboxThumbailContainer
+            key={index}
+            screen={screen}
+            onClick={() => {
+              onClickLootbox && onClickLootbox(lootbox)
+            }}
+          >
+            <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
+          </$LootboxThumbailContainer>
+        )
+      })}
+    </$Horizontal>
+  )
+}
+
+const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
+  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '30%')};
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 24px;
+`
+
+export const $SearchInput = styled.input`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  height: 40px;
+`

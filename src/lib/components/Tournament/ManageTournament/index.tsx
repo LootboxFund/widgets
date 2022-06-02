@@ -1,14 +1,20 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { $h1, $h2, $p, EmptyResult, HiddenDescription, TournamentError } from '../common'
-import { QueryTournamentArgs, TournamentResponse, TournamentResponseSuccess } from 'lib/api/graphql/generated/types'
+import { $h1, $h2, $p, EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
+import {
+  LootboxSnapshot,
+  QueryTournamentArgs,
+  TournamentResponse,
+  TournamentResponseSuccess,
+} from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useQuery } from '@apollo/client'
 import { GET_MY_TOURNAMENT } from '../api.gql'
 import { useEffect, useState } from 'react'
 import { TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
+import { manifest } from 'manifest'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -17,6 +23,7 @@ interface ManageTournamentProps {
 /** Manage Tournament Widget */
 const ManageTournament = (props: ManageTournamentProps) => {
   const { screen } = useWindowSize()
+  const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ myTournament: TournamentResponse }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
     {
@@ -25,6 +32,8 @@ const ManageTournament = (props: ManageTournamentProps) => {
       },
     }
   )
+
+  console.log(data)
 
   if (loading) {
     return <Spinner />
@@ -53,13 +62,38 @@ const ManageTournament = (props: ManageTournamentProps) => {
     )
   }
 
+  const filteredLootboxSnapshots: LootboxSnapshot[] = !!searchTerm
+    ? [
+        ...(tournament.lootboxSnapshots?.filter(
+          (snapshot) =>
+            snapshot?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+        ) || []),
+      ]
+    : [...(tournament?.lootboxSnapshots || [])]
+
   return (
-    <$Vertical>
-      <$h2>MANAGE</$h2>
+    <$Vertical spacing={4}>
+      <$h2 style={{ marginBottom: '-4px' }}>MANAGE</$h2>
       <$h1>{tournament.title}</$h1>
       <$Divider margin="0px 0px 20px 0px" />
       <Options />
       <HiddenDescription description={tournament.description} screen={screen} />
+
+      <$SearchInput
+        type="search"
+        placeholder="🔍 Search Lootboxes by Name or Address"
+        onChange={(e) => setSearchTerm(e.target.value || '')}
+      />
+      <LootboxList
+        lootboxes={filteredLootboxSnapshots || []}
+        screen={screen}
+        onClickLootbox={(lootbox) => {
+          lootbox &&
+            lootbox.address &&
+            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+        }}
+      />
     </$Vertical>
   )
 }
