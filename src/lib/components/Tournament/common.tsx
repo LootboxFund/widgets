@@ -3,7 +3,7 @@ import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
-import { Lootbox, LootboxSnapshot } from 'lib/api/graphql/generated/types'
+import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
 import { $Horizontal } from '../Generics'
 
 export const $h1 = styled.h1`
@@ -17,6 +17,14 @@ export const $h2 = styled.h2`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 export const $p = styled.p`
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor}ce;
+`
+
+export const $span = styled.span`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.xlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
@@ -49,6 +57,8 @@ const $DescriptionContainer = styled.div`
 export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
   const [isHidden, setIsHidden] = useState(true)
 
+  const truncate = screen === 'mobile' ? 350 : 500
+
   return (
     <$DescriptionContainer>
       <$HideTings isHidden={isHidden}>
@@ -75,7 +85,7 @@ export const HiddenDescription = ({ description, screen }: { description: string
           </$Button>
         ) : undefined}
       </$HideTings>
-      <$p>{isHidden ? description.slice(0, 500) : description}</$p>
+      <$p>{isHidden ? description.slice(0, truncate) : description}</$p>
       {!isHidden ? (
         <$Button
           onClick={() => setIsHidden(!isHidden)}
@@ -97,6 +107,11 @@ export const HiddenDescription = ({ description, screen }: { description: string
         >
           Hide
         </$Button>
+      ) : null}
+      {!isHidden ? (
+        <>
+          <br />
+        </>
       ) : null}
     </$DescriptionContainer>
   )
@@ -129,8 +144,8 @@ export const EmptyResult = () => {
 }
 
 interface LootboxListProps {
-  onClickLootbox?: (lootbox: LootboxSnapshot) => void
-  lootboxes: LootboxSnapshot[]
+  onClickLootbox?: (lootbox: LootboxTournamentSnapshot) => void
+  lootboxes: LootboxTournamentSnapshot[]
   screen: ScreenSize
 }
 export const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) => {
@@ -168,4 +183,55 @@ export const $SearchInput = styled.input`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   height: 40px;
+`
+
+export const $ErrorMessage = styled.span`
+  color: ${COLORS.dangerFontColor}ae;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-weight: ${TYPOGRAPHY.fontWeight.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+`
+
+export const $Header = styled.span`
+  font-size: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor};
+`
+
+export const $InputMedium = styled.input`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  height: 40px;
+
+  color: ${COLORS.surpressedFontColor}ae;
+
+  &:focus {
+    color: ${COLORS.black}ca;
+  }
+`
+
+export const $InputLabel = styled.label`
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor}ae;
+`
+
+export const $TextAreaMedium = styled.textarea`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  max-width: 100%;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor}ae;
+
+  &:focus {
+    color: ${COLORS.black}ca;
+  }
 `

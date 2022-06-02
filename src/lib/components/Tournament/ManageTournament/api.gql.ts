@@ -1,18 +1,14 @@
 import { gql } from '@apollo/client'
 
-export const GET_TOURNAMENT = gql`
-  query Query($id: ID!) {
-    tournament(id: $id) {
-      ... on TournamentResponseSuccess {
+export const EDIT_TOURNAMENT = gql`
+  mutation Mutation($payload: EditTournamentPayload!) {
+    editTournament(payload: $payload) {
+      ... on EditTournamentResponseSuccess {
         tournament {
+          id
           title
           description
           tournamentLink
-          lootboxSnapshots {
-            address
-            name
-            stampImage
-          }
         }
       }
       ... on ResponseError {
@@ -30,6 +26,7 @@ export const GET_MY_TOURNAMENT = gql`
     myTournament(id: $id) {
       ... on MyTournamentResponseSuccess {
         tournament {
+          id
           title
           description
           tournamentLink
@@ -37,6 +34,7 @@ export const GET_MY_TOURNAMENT = gql`
             address
             name
             stampImage
+            status
           }
         }
       }

@@ -14,13 +14,13 @@ import { useMutation } from '@apollo/client'
 import { CREATE_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
+import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
 
 interface CreateTournamentProps {
-  mode: 'edit' | 'create'
   onSuccessCallback?: () => void
 }
 
-const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTournamentProps) => {
+const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
   const [tournamentPayload, setTournamentPayload] = useState<CreateTournamentPayload>({ title: '', description: '' })
@@ -60,28 +60,23 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
       return
     }
 
-    if (mode === 'create') {
-      try {
-        const { data } = await createTournament({
-          variables: {
-            payload: tournamentPayload,
-          },
-        })
+    try {
+      const { data } = await createTournament({
+        variables: {
+          payload: tournamentPayload,
+        },
+      })
 
-        if (!data) {
-          throw new Error('An error occured!')
-        } else if (data?.createTournament?.__typename === 'ResponseError') {
-          throw new Error(data.createTournament.error.message)
-        }
-
-        onSuccessCallback && onSuccessCallback()
-      } catch (err) {
-        LogRocket.captureException(err)
-        setErrorMessage(err?.message || 'An error occured!')
+      if (!data) {
+        throw new Error('An error occured!')
+      } else if (data?.createTournament?.__typename === 'ResponseError') {
+        throw new Error(data.createTournament.error.message)
       }
-    } else {
-      setErrorMessage('Not implemented yet')
-      return
+
+      onSuccessCallback && onSuccessCallback()
+    } catch (err) {
+      LogRocket.captureException(err)
+      setErrorMessage(err?.message || 'An error occured!')
     }
   }
 
@@ -90,7 +85,6 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
       <$Vertical
         spacing={4}
         width="380px"
-        height="520px"
         padding="1.6rem"
         style={{
           background: '#FFFFFF',
@@ -98,6 +92,7 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
           borderRadius: '21px',
           justifyContent: 'space-between',
           boxSizing: 'border-box',
+          minHeight: '520px',
         }}
       >
         <$Vertical spacing={4}>
@@ -106,6 +101,9 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
             onChange={(e) => parseTitle(e.target.value)}
             value={tournamentPayload.title}
             placeholder="Title"
+            style={{
+              color: `${COLORS.black}ca`,
+            }}
           ></$InputMedium>
 
           <$TextAreaMedium
@@ -113,12 +111,18 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
             value={tournamentPayload.description}
             placeholder="Description"
             rows={4}
+            style={{
+              color: `${COLORS.black}ca`,
+            }}
           ></$TextAreaMedium>
 
           <$InputMedium
             onChange={(e) => parseTournamentLink(e.target.value)}
             value={tournamentPayload?.tournamentLink || ''}
             placeholder="Link to Tournament"
+            style={{
+              color: `${COLORS.black}ca`,
+            }}
           ></$InputMedium>
 
           <$Button
@@ -142,41 +146,6 @@ const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTourname
     </AuthGuard>
   )
 }
-
-export const $ErrorMessage = styled.span`
-  color: ${COLORS.dangerFontColor}ae;
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  font-weight: ${TYPOGRAPHY.fontWeight.medium};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-`
-
-export const $Header = styled.span`
-  font-size: ${TYPOGRAPHY.fontSize.large};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.surpressedFontColor};
-`
-
-export const $InputMedium = styled.input`
-  background-color: ${`${COLORS.surpressedBackground}1A`};
-  border: none;
-  border-radius: 10px;
-  padding: 5px 10px;
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  height: 40px;
-`
-
-export const $TextAreaMedium = styled.textarea`
-  background-color: ${`${COLORS.surpressedBackground}1A`};
-  border: none;
-  border-radius: 10px;
-  padding: 5px 10px;
-  max-height: 200px;
-  max-width: 100%;
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-`
 
 export const $ChangeMode = styled.div`
   font-family: ${TYPOGRAPHY.fontFamily.regular};

@@ -1,20 +1,31 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { $h1, $h2, $p, EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
 import {
-  LootboxSnapshot,
+  $h1,
+  $h2,
+  $p,
+  EmptyResult,
+  HiddenDescription,
+  TournamentError,
+  LootboxList,
+  $SearchInput,
+  $span,
+} from '../common'
+import {
+  LootboxTournamentSnapshot,
   QueryTournamentArgs,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useQuery } from '@apollo/client'
-import { GET_MY_TOURNAMENT } from '../api.gql'
+import { GET_MY_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
 import { TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
+import EditTournament from './EditTournament'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -33,7 +44,22 @@ const ManageTournament = (props: ManageTournamentProps) => {
     }
   )
 
-  console.log(data)
+  const Options = ({}) => {
+    const Option = ({ text, link }: { text: string; link: string }) => {
+      return (
+        <$span onClick={() => window.open(link)} style={{ cursor: 'pointer', marginRight: '15px' }}>
+          👉 {text}
+        </$span>
+      )
+    }
+    return (
+      <$Horizontal flexWrap>
+        <Option text="Create Magic Link" link={'google.com'} />
+        <Option text="View Tournament" link={'google.com'} />
+        <Option text="Public View" link={'google.com'} />
+      </$Horizontal>
+    )
+  }
 
   if (loading) {
     return <Spinner />
@@ -45,24 +71,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   const { tournament } = data.myTournament as TournamentResponseSuccess
 
-  const Options = ({}) => {
-    const Option = ({ text, link }: { text: string; link: string }) => {
-      return (
-        <$p onClick={() => window.open(link)} style={{ cursor: 'pointer', marginRight: '10px' }}>
-          👉 {text}
-        </$p>
-      )
-    }
-    return (
-      <$Horizontal>
-        <Option text="Create Magic Link" link={'google.com'} />
-        <Option text="View Tournament" link={'google.com'} />
-        <Option text="Public View" link={'google.com'} />
-      </$Horizontal>
-    )
-  }
-
-  const filteredLootboxSnapshots: LootboxSnapshot[] = !!searchTerm
+  const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
     ? [
         ...(tournament.lootboxSnapshots?.filter(
           (snapshot) =>
@@ -94,6 +103,13 @@ const ManageTournament = (props: ManageTournamentProps) => {
             window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
         }}
       />
+      <$Divider margin="0px 0px 20px 0px" />
+      <$h2 style={{ marginBottom: '-4px' }}>EDIT</$h2>
+      <$h1>{tournament.title}</$h1>
+      <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
+      <br />
+      <br />
+      <br />
     </$Vertical>
   )
 }

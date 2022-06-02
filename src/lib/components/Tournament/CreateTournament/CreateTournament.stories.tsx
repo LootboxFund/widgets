@@ -8,7 +8,7 @@ import CreateTournament from './index'
 
 export default {
   title: 'CreateTournament',
-  component: <CreateTournament mode="create" />,
+  component: <CreateTournament />,
 }
 
 const Template = () => {
@@ -26,7 +26,7 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-        <CreateTournament mode="create" />
+        <CreateTournament />
       </$CardViewport>
     </ApolloProvider>
   )
