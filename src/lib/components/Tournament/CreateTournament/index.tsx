@@ -1,19 +1,19 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import styled from 'styled-components'
-import AuthGuard from '../AuthGuard'
-import { $Vertical } from '../Generics'
+import AuthGuard from '../../AuthGuard'
+import { $Vertical } from '../../Generics'
 import {
   CreateTournamentPayload,
   CreateTournamentResponse,
   MutationCreateTournamentArgs,
-} from '../../api/graphql/generated/types'
-import $Button from '../Generics/Button'
+} from '../../../api/graphql/generated/types'
+import $Button from '../../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation } from '@apollo/client'
 import { CREATE_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
-import { LoadingText } from '../Generics/Spinner'
+import { LoadingText } from '../../Generics/Spinner'
 
 interface CreateTournamentProps {
   mode: 'edit' | 'create'

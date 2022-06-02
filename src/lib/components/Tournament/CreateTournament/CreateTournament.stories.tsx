@@ -1,5 +1,5 @@
 import React from 'react'
-import { $CardViewport } from '../Generics'
+import { $CardViewport } from '../../Generics'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import client from 'lib/api/graphql/client'
