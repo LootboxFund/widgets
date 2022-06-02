@@ -9,7 +9,8 @@ import WalletButton from 'lib/components/WalletButton'
 import LogRocket from 'logrocket'
 import { $Vertical } from 'lib/components/Generics'
 import { useState } from 'react'
-import { $Header, $InputMedium, $ErrorMessage, $ChangeMode } from '../Shared'
+import { $InputMedium, $ChangeMode } from '../Shared'
+import { $Header, $ErrorMessage } from '../../Generics/Typography'
 
 type Mode = 'password' | 'wallet'
 

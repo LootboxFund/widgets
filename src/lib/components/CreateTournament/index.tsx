@@ -17,9 +17,10 @@ import { LoadingText } from '../Generics/Spinner'
 
 interface CreateTournamentProps {
   mode: 'edit' | 'create'
+  onSuccessCallback?: () => void
 }
 
-const CreateTournament = ({ mode = 'create' }: CreateTournamentProps) => {
+const CreateTournament = ({ mode = 'create', onSuccessCallback }: CreateTournamentProps) => {
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
   const [tournamentPayload, setTournamentPayload] = useState<CreateTournamentPayload>({ title: '', description: '' })
@@ -73,7 +74,7 @@ const CreateTournament = ({ mode = 'create' }: CreateTournamentProps) => {
           throw new Error(data.createTournament.error.message)
         }
 
-        // TODO: redirect to tournament page
+        onSuccessCallback && onSuccessCallback()
       } catch (err) {
         LogRocket.captureException(err)
         setErrorMessage(err?.message || 'An error occured!')
