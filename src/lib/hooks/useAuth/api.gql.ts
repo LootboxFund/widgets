@@ -50,22 +50,3 @@ export const GET_WALLET_LOGIN_TOKEN = gql`
     }
   }
 `
-
-export const GET_MY_PROFILE = gql`
-  query GetMyProfileSuccess {
-    getMyProfile {
-      ... on GetMyProfileSuccess {
-        user {
-          id
-          email
-        }
-      }
-      ... on ResponseError {
-        error {
-          code
-          message
-        }
-      }
-    }
-  }
-`

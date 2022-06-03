@@ -19,6 +19,7 @@ import { signInWithCustomToken, signInWithEmailAndPassword as signInWithEmailAnd
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import { UserID } from 'lib/types'
+import client from 'lib/api/graphql/client'
 
 // interface FrontendWallet {
 //   id: WalletID
@@ -59,6 +60,7 @@ export const useAuth = () => {
       } else {
         setUser(null)
       }
+      client.resetStore()
     })
 
     return () => {
