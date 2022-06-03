@@ -1,17 +1,7 @@
 import AuthGuard from '../../AuthGuard'
-import { $Vertical, $Divider, $Horizontal } from '../../Generics'
+import { $Vertical, $Divider, $Horizontal, $span, $p, $h1 } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import {
-  $h1,
-  $h2,
-  $p,
-  EmptyResult,
-  HiddenDescription,
-  TournamentError,
-  LootboxList,
-  $SearchInput,
-  $span,
-} from '../common'
+import { $h2, EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,

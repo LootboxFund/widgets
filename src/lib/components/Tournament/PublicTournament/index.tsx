@@ -1,4 +1,4 @@
-import { $Divider, $Horizontal, $Vertical } from '../../Generics'
+import { $Divider, $Horizontal, $Vertical, $h1, $span } from '../../Generics'
 import { useQuery } from '@apollo/client'
 import { GET_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
@@ -10,18 +10,7 @@ import {
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import {
-  $h1,
-  $p,
-  $HideTings,
-  HiddenDescription,
-  TournamentError,
-  EmptyResult,
-  $SearchInput,
-  LootboxList,
-  $span,
-  $h2,
-} from '../common'
+import { $HideTings, HiddenDescription, TournamentError, EmptyResult, $SearchInput, LootboxList, $h2 } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'

@@ -4,34 +4,14 @@ import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
-import { $Horizontal } from '../Generics'
+import { $Horizontal, $p, $h1 } from '../Generics'
 
-export const $h1 = styled.h1`
-  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-`
 export const $h2 = styled.h2`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor};
 `
-export const $p = styled.p`
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  line-height: ${TYPOGRAPHY.fontSize.xlarge};
-  font-weight: ${TYPOGRAPHY.fontWeight.regular};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.surpressedFontColor}ce;
-`
-
-export const $span = styled.span`
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  line-height: ${TYPOGRAPHY.fontSize.xlarge};
-  font-weight: ${TYPOGRAPHY.fontWeight.regular};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.surpressedFontColor}ce;
-`
-
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
   width: 100%;
@@ -173,6 +153,7 @@ const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
   width: 100%;
   cursor: pointer;
   margin-bottom: 24px;
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.5));
 `
 
 export const $SearchInput = styled.input`

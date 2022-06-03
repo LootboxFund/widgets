@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+export * from './Typography'
+
 interface HorizontalProps {
   readonly justifyContent?: 'flex-start' | 'center' | 'space-evenly' | 'space-between' | 'flex-end'
   readonly verticalCenter?: boolean
@@ -42,6 +44,7 @@ export const $Vertical = styled.div<{
   width?: string
   height?: string
   padding?: string
+  maxWidth?: string
 }>`
   display: flex;
   flex-direction: column;
@@ -49,6 +52,7 @@ export const $Vertical = styled.div<{
   ${(props) => props.width && `width: ${props.width};`};
   ${(props) => props.height && `height: ${props.height};`};
   ${(props) => props.padding && `padding: ${props.padding};`}
+  ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }

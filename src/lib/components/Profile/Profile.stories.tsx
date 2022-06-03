@@ -25,7 +25,7 @@ const Template = () => {
 
   return (
     <ApolloProvider client={client}>
-      <$CardViewport width="100vw" height="450px">
+      <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
         <Profile />
       </$CardViewport>
     </ApolloProvider>

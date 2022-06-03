@@ -84,7 +84,8 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     <AuthGuard>
       <$Vertical
         spacing={4}
-        width="380px"
+        width="100%"
+        maxWidth="420px"
         padding="1.6rem"
         style={{
           background: '#FFFFFF',

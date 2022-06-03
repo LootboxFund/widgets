@@ -5,6 +5,8 @@ import {
   AuthenticateWalletResponse,
   AuthenticateWalletResponseSuccess,
   MutationCreateUserWithPasswordArgs,
+  ConnectWalletResponse,
+  MutationConnectWalletArgs,
 } from '../../api/graphql/generated/types'
 import { useSnapshot } from 'valtio'
 import { useEffect, useState } from 'react'
@@ -14,12 +16,13 @@ import { ethers } from 'ethers'
 import { userState } from 'lib/state/userState'
 import { generateSignatureMessage } from 'lib/utils/signatureMessage'
 import { v4 as uuidv4 } from 'uuid'
-import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD } from './api.gql'
+import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD, CONNECT_WALLET } from './api.gql'
 import { signInWithCustomToken, signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import { UserID } from 'lib/types'
 import client from 'lib/api/graphql/client'
+import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 
 // interface FrontendWallet {
 //   id: WalletID
@@ -51,6 +54,11 @@ export const useAuth = () => {
     MutationAuthenticateWalletArgs
   >(GET_WALLET_LOGIN_TOKEN)
 
+  const [connectWalletMutation] = useMutation<{ connectWallet: ConnectWalletResponse }, MutationConnectWalletArgs>(
+    CONNECT_WALLET,
+    { refetchQueries: [{ query: GET_MY_WALLETS }] }
+  )
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -68,7 +76,7 @@ export const useAuth = () => {
     }
   }, [])
 
-  const signUpWithWallet = async (email: string) => {
+  const signUpWithWallet = async (email: string): Promise<void> => {
     if (!email) {
       throw new Error('Email is required')
     }
@@ -91,7 +99,7 @@ export const useAuth = () => {
     }
   }
 
-  const signInWithWallet = async () => {
+  const signInWithWallet = async (): Promise<void> => {
     const { signature, message } = await getSignature()
 
     const { data } = await authenticateWalletMutation({
@@ -112,7 +120,7 @@ export const useAuth = () => {
     await signInWithCustomToken(auth, (data.authenticateWallet as AuthenticateWalletResponseSuccess).token)
   }
 
-  const signInWithEmailAndPassword = async (email: string, password: string) => {
+  const signInWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
     if (!email) {
       throw new Error('Email is required')
     }
@@ -122,7 +130,7 @@ export const useAuth = () => {
     await signInWithEmailAndPasswordFirebase(auth, email, password)
   }
 
-  const signUpWithEmailAndPassword = async (email: string, password: string) => {
+  const signUpWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
     if (!email) {
       throw new Error('Email is required')
     }
@@ -141,6 +149,25 @@ export const useAuth = () => {
       throw new Error('An error occured!')
     } else if (data?.createUserWithPassword?.__typename === 'ResponseError') {
       throw new Error(data.createUserWithPassword.error.message)
+    }
+  }
+
+  const connectWallet = async (): Promise<void> => {
+    const { signature, message } = await getSignature()
+
+    const { data } = await connectWalletMutation({
+      variables: {
+        payload: {
+          message,
+          signedMessage: signature,
+        },
+      },
+    })
+
+    if (!data) {
+      throw new Error('Server error')
+    } else if (data?.connectWallet.__typename === 'ResponseError') {
+      throw data.connectWallet.error
     }
   }
 
@@ -170,5 +197,6 @@ export const useAuth = () => {
     signUpWithWallet,
     signInWithEmailAndPassword,
     signUpWithEmailAndPassword,
+    connectWallet,
   }
 }

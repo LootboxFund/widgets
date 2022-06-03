@@ -6,15 +6,6 @@ export const GET_MY_PROFILE = gql`
       ... on GetMyProfileSuccess {
         user {
           email
-          wallets {
-            address
-            createdAt
-            lootboxSnapshots {
-              stampImage
-              name
-              address
-            }
-          }
         }
       }
       ... on ResponseError {

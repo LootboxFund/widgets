@@ -50,3 +50,24 @@ export const GET_WALLET_LOGIN_TOKEN = gql`
     }
   }
 `
+
+export const CONNECT_WALLET = gql`
+  mutation Mutation($payload: ConnectWalletPayload!) {
+    connectWallet(payload: $payload) {
+      ... on ConnectWalletResponseSuccess {
+        wallet {
+          id
+          userId
+          address
+          createdAt
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

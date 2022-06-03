@@ -41,8 +41,8 @@ const Authentication = () => {
   return (
     <$Vertical
       spacing={4}
-      width="380px"
-      // height="420px"
+      width="100%"
+      maxWidth="380px"
       height="520px"
       padding="1.6rem"
       style={{
