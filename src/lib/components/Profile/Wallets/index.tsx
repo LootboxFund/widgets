@@ -23,14 +23,10 @@ import { useAuth } from 'lib/hooks/useAuth'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 
-interface GetMyProfileQuery {
-  getMyProfile: GetMyProfileResponse
-}
-
 const Wallets = () => {
   const { screen } = useWindowSize()
   const { connectWallet } = useAuth()
-  const { data, loading, error } = useQuery<GetMyProfileQuery>(GET_MY_WALLETS)
+  const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_WALLETS)
   const [removeWallet] = useMutation<{ removeWallet: RemoveWalletResponse }, MutationRemoveWalletArgs>(REMOVE_WALLET, {
     refetchQueries: [{ query: GET_MY_WALLETS }],
   })
@@ -157,7 +153,7 @@ const Wallets = () => {
       </$h1>
       <ReactTooltip id="Wallets" place="right" effect="solid">
         Wallets are used as an alternative login to your account, and they also help us find your data like your
-        Lootboxes.
+        Lootboxes. You need to have installed MetaMask to use this feature.
       </ReactTooltip>
       <$SearchInput type="search" placeholder="🔍 Search by Address" />
       <WalletsList wallets={userDB.wallets || []} />

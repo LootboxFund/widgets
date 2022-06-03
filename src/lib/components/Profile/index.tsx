@@ -9,6 +9,7 @@ import { $Vertical } from '../Generics'
 import { $h1, $p } from '../Generics/Typography'
 import Spinner from '../Generics/Spinner'
 import Wallets from './Wallets'
+import MyLootboxes from './MyLootboxes'
 
 const Profile = () => {
   const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_PROFILE)
@@ -22,9 +23,12 @@ const Profile = () => {
   }
 
   return (
-    <$Vertical>
+    <$Vertical spacing={5}>
       <$h1 textAlign="center">Profile</$h1>
       <Wallets />
+      <MyLootboxes />
+      <br />
+      <br />
     </$Vertical>
   )
 }
