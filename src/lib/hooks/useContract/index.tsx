@@ -79,7 +79,10 @@ interface GetLootboxDataOutput {
   variant: string
   ticketPurchaseFee: string
 }
-export const getLootboxData = async (lootboxAddress: Address, fallbackChain?: ChainIDHex): Promise<GetLootboxDataOutput> => {
+export const getLootboxData = async (
+  lootboxAddress: Address,
+  fallbackChain?: ChainIDHex
+): Promise<GetLootboxDataOutput> => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider(fallbackChain)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
@@ -586,6 +589,33 @@ export const rewardSponsorsInErc20TokenCall = async (
   } else {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
     const tx = await lootbox.connect(signer).depositEarningsErc20(erc20Address, amount)
+    await tx.wait()
+    return tx.hash
+  }
+}
+
+export const bulkMintNFTsContractCall = async (
+  lootboxAddress: ContractAddress,
+  lootboxType: LootboxType,
+  receiverAddr: Address,
+  amountToSpend: BigNumber,
+  numToMint: number
+) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  if (lootboxType === 'Escrow') {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+    const tx = await lootbox.connect(signer).bulkMintNFTs(receiverAddr, numToMint, {
+      value: amountToSpend,
+    })
+    await tx.wait()
+    return tx.hash
+  } else {
+    const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
+    const tx = await lootbox.connect(signer).bulkMintNFTs(receiverAddr, numToMint, {
+      value: amountToSpend,
+    })
     await tx.wait()
     return tx.hash
   }
