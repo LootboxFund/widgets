@@ -97,9 +97,9 @@ export const $Container = styled.section<{ screen: string | undefined }>`
   padding: ${(props) => (props.screen === 'mobile' ? '0px' : '20px')};
   box-shadow: ${(props) => (props.screen === 'mobile' ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.1)')};
 `
-export const $Divider = styled.div<{ margin?: string }>`
+export const $Divider = styled.div<{ margin?: string; width?: string }>`
   margin: ${(props) => (props.margin ? props.margin : '20px 0px')};
   height: 0px;
-  width: 100%;
+  width: ${(props) => (props.width ? props.width : '100%')};
   border-top: 1px solid rgba(0, 0, 0, 0.23);
 `

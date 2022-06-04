@@ -37,11 +37,12 @@ export const $h3 = styled.h2`
   color: ${COLORS.surpressedFontColor};
 `
 
-export const $p = styled.p`
+export const $p = styled.p<{ textAlign?: 'center' | 'start' }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.xlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
+  text-align: ${(props) => props.textAlign || 'start'};
   color: ${COLORS.surpressedFontColor}ce;
 `
 
