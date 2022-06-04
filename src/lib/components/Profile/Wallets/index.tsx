@@ -22,6 +22,7 @@ import $Button from 'lib/components/Generics/Button'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
+import WalletButton from 'lib/components/WalletButton'
 
 const Wallets = () => {
   const { screen } = useWindowSize()
@@ -35,6 +36,7 @@ const Wallets = () => {
   const userStateSnapshot = useSnapshot(userState)
   const [walletStatus, setWalletStatus] = useState<{ [key: Address]: { loading: boolean; errorMessage: string } }>({})
 
+  const isWalletConnected = !!userStateSnapshot.currentAccount
   const isMetamask = !!window.ethereum
 
   const handleRemoveWallet = async (wallet: Wallet) => {
@@ -185,22 +187,35 @@ const Wallets = () => {
           icon="🔐"
         />
       )}
-      <$Button
-        screen={screen}
-        onClick={handleWalletConnect}
-        backgroundColor={`${COLORS.trustBackground}C0`}
-        backgroundColorHover={`${COLORS.trustBackground}`}
-        color={COLORS.trustFontColor}
-        style={{
-          fontWeight: TYPOGRAPHY.fontWeight.regular,
-          fontSize: TYPOGRAPHY.fontSize.large,
-          boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
-          width: 'fit-content',
-        }}
-        disabled={connectLoading}
-      >
-        <LoadingText loading={connectLoading} text={connectText} color={COLORS.trustFontColor} />
-      </$Button>
+      {!isWalletConnected ? (
+        <div>
+          <WalletButton
+            style={{
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+              boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
+            }}
+          />
+        </div>
+      ) : (
+        <div>
+          <$Button
+            screen={screen}
+            onClick={handleWalletConnect}
+            backgroundColor={`${COLORS.trustBackground}C0`}
+            backgroundColorHover={`${COLORS.trustBackground}`}
+            color={COLORS.trustFontColor}
+            style={{
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+              boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
+            }}
+            disabled={connectLoading}
+          >
+            <LoadingText loading={connectLoading} text={connectText} color={COLORS.trustFontColor} />
+          </$Button>
+        </div>
+      )}
       {connectErrorMessage ? <$ErrorMessage>{connectErrorMessage}</$ErrorMessage> : null}
     </$Vertical>
   )
