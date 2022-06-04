@@ -17,7 +17,11 @@ import { userState } from 'lib/state/userState'
 import { generateSignatureMessage } from 'lib/utils/signatureMessage'
 import { v4 as uuidv4 } from 'uuid'
 import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD, CONNECT_WALLET } from './api.gql'
-import { signInWithCustomToken, signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase, sendEmailVerification } from 'firebase/auth'
+import {
+  signInWithCustomToken,
+  signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
+  sendEmailVerification,
+} from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import { UserID } from 'lib/types'
@@ -25,16 +29,13 @@ import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'
 
-// interface FrontendWallet {
-//   id: WalletID
-//   address: Address
-// }
-
 interface FrontendUser {
   id: UserID
   email: string | null
-  //   wallets: FrontendWallet[]
+  isEmailVerified: boolean
 }
+
+const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 export const useAuth = () => {
   const [user, setUser] = useState<FrontendUser | null>(null)
@@ -64,7 +65,7 @@ export const useAuth = () => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const { uid, email } = user
-        const userData: FrontendUser = { id: uid as UserID, email: email }
+        const userData: FrontendUser = { id: uid as UserID, email: email, isEmailVerified: user.emailVerified }
         setUser(userData)
       } else {
         setUser(null)
@@ -118,11 +119,20 @@ export const useAuth = () => {
       throw data.authenticateWallet.error
     }
 
-    const { user } = await signInWithCustomToken(auth, (data.authenticateWallet as AuthenticateWalletResponseSuccess).token)
+    const { user } = await signInWithCustomToken(
+      auth,
+      (data.authenticateWallet as AuthenticateWalletResponseSuccess).token
+    )
 
-    // Send email verification 
-    if (!user.emailVerified) {
-      sendEmailVerification(user).catch(err => LogRocket.captureException(err))
+    // Send email verification only once on login
+    const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
+    if (!user.emailVerified && !verificationEmailAlreadySent) {
+      sendEmailVerification(user)
+        .then(() => {
+          console.log('email verification sent')
+          localStorage.setItem(EMAIL_VERIFICATION_COOKIE_NAME, 'true')
+        })
+        .catch((err) => LogRocket.captureException(err))
     }
   }
 
@@ -133,12 +143,17 @@ export const useAuth = () => {
     if (!password) {
       throw new Error('Password is required')
     }
-    const {user} = await signInWithEmailAndPasswordFirebase(auth, email, password)
+    const { user } = await signInWithEmailAndPasswordFirebase(auth, email, password)
 
-    // Send email verification 
-    if (!user.emailVerified) {
-      sendEmailVerification(user).catch(err => {console.log('error sending email', err) 
-        LogRocket.captureException(err)})
+    // Send email verification only once on login
+    const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
+    if (!user.emailVerified && !verificationEmailAlreadySent) {
+      sendEmailVerification(user)
+        .then(() => {
+          console.log('email verification sent')
+          localStorage.setItem(EMAIL_VERIFICATION_COOKIE_NAME, 'true')
+        })
+        .catch((err) => LogRocket.captureException(err))
     }
   }
 

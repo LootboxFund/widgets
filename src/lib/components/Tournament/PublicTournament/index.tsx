@@ -1,4 +1,4 @@
-import { $Divider, $Horizontal, $Vertical, $h1, $span } from '../../Generics'
+import { $Divider, $Horizontal, $Vertical, $h1, $span, $h3 } from '../../Generics'
 import { useQuery } from '@apollo/client'
 import { GET_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import {
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import { $HideTings, HiddenDescription, TournamentError, EmptyResult, $SearchInput, LootboxList, $h2 } from '../common'
+import { $HideTings, HiddenDescription, TournamentError, EmptyResult, $SearchInput, LootboxList } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
@@ -67,7 +67,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$h2 style={{ marginBottom: '-4px' }}>TOURNAMENT</$h2>
+      <$h3 style={{ marginBottom: '-4px' }}>TOURNAMENT</$h3>
       <$h1>{tournament.title}</$h1>
       <$Divider margin="0px 0px 20px 0px" />
       <Options />

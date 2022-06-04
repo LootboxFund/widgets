@@ -6,12 +6,6 @@ import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
 import { $Horizontal, $p, $h1 } from '../Generics'
 
-export const $h2 = styled.h2`
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  font-weight: ${TYPOGRAPHY.fontWeight.bold};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.surpressedFontColor};
-`
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
   width: 100%;

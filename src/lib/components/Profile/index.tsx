@@ -10,6 +10,7 @@ import { $h1, $p } from '../Generics/Typography'
 import Spinner from '../Generics/Spinner'
 import Wallets from './Wallets'
 import MyLootboxes from './MyLootboxes'
+import Onboarding from './Onboarding'
 
 const Profile = () => {
   const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_PROFILE)
@@ -25,6 +26,7 @@ const Profile = () => {
   return (
     <$Vertical spacing={5}>
       <$h1 textAlign="center">Profile</$h1>
+      <Onboarding />
       <Wallets />
       <MyLootboxes />
       <br />

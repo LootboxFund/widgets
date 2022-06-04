@@ -1,15 +1,12 @@
 import { useQuery } from '@apollo/client'
-import {
-  GetMyProfileResponse,
-  GetMyProfileResponseResolvers,
-  GetMyProfileSuccess,
-  LootboxSnapshot,
-} from 'lib/api/graphql/generated/types'
+import { GetMyProfileResponse, GetMyProfileSuccess, LootboxSnapshot } from 'lib/api/graphql/generated/types'
 import { $h1, $Horizontal, $p, $Vertical } from 'lib/components/Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 import { GET_MY_WALLET_LOOTBOXES } from './api.gql'
+import { Oopsies, $Link } from '../common'
+import { manifest } from 'manifest'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -36,14 +33,16 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
 
 const MyLootboxes = () => {
   const { screen } = useWindowSize()
-  const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_WALLET_LOOTBOXES)
+  const { data, loading, error } = useQuery<{
+    getMyProfile: GetMyProfileResponse
+  }>(GET_MY_WALLET_LOOTBOXES)
 
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <MyLootboxesError message={error?.message || ''} />
+    return <Oopsies title="Error loading Lootboxes" message={error?.message || ''} icon="🤕" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <MyLootboxesError message={data?.getMyProfile?.error?.message || ''} />
+    return <Oopsies title="Error loading Lootboxes" message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
   }
 
   const lootboxSnapshots: LootboxSnapshot[] = []
@@ -60,16 +59,22 @@ const MyLootboxes = () => {
   return (
     <$Vertical spacing={4}>
       <$h1>My Lootboxes</$h1>
-      <LootboxList lootboxes={lootboxSnapshots} screen={screen} />
-    </$Vertical>
-  )
-}
-
-const MyLootboxesError = ({ message }: { message: string }) => {
-  return (
-    <$Vertical>
-      <$p>An error occured:</$p>
-      <$p>{message}</$p>
+      {lootboxSnapshots.length > 0 ? (
+        <LootboxList lootboxes={lootboxSnapshots} screen={screen} />
+      ) : (
+        <Oopsies
+          title="We couldn't find your Lootbox"
+          message={
+            <span>
+              Already made one? Then you need to add your wallet ☝️ Otherwise, you can{' '}
+              <$Link target="_blank" href={manifest.microfrontends.webflow.createPage}>
+                create a Lootbox here.
+              </$Link>
+            </span>
+          }
+          icon="🧐"
+        />
+      )}
     </$Vertical>
   )
 }

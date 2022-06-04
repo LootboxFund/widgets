@@ -1,5 +1,8 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import styled from 'styled-components'
+import { $p, $Vertical, $h3, $Horizontal, $h1, $h2 } from '../Generics'
+
+const BLUE = '#4fe2ff'
 
 export const $SearchInput = styled.input`
   background-color: ${`${COLORS.surpressedBackground}1A`};
@@ -10,3 +13,29 @@ export const $SearchInput = styled.input`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   height: 40px;
 `
+
+export const $Link = styled.a`
+  color: #1abaff;
+  font-style: italic;
+  cursor: pointer;
+`
+
+export const Oopsies = ({
+  icon,
+  message,
+  title,
+}: {
+  icon: string
+  message: React.ReactElement | string
+  title: string
+}) => {
+  return (
+    <$Vertical>
+      <$Horizontal>
+        <$h1>{icon}</$h1>
+        <$h2 style={{ marginLeft: '10px', paddingTop: '3px' }}>{title}</$h2>
+      </$Horizontal>
+      <$p style={{ margin: `0px auto auto calc(${TYPOGRAPHY.fontSize.xxlarge} + 10px)` }}>{message}</$p>
+    </$Vertical>
+  )
+}

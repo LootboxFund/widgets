@@ -12,7 +12,7 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $ErrorMessage, $h1, $p, $span } from 'lib/components/Generics/Typography'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
-import { $SearchInput } from '../common'
+import { $Link, $SearchInput, Oopsies } from '../common'
 import styled from 'styled-components'
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { truncateAddress } from 'lib/api/helpers'
@@ -33,8 +33,9 @@ const Wallets = () => {
   const [connectLoading, setConnectLoading] = useState(false)
   const [connectErrorMessage, setConnectErrorMessage] = useState('')
   const userStateSnapshot = useSnapshot(userState)
-
   const [walletStatus, setWalletStatus] = useState<{ [key: Address]: { loading: boolean; errorMessage: string } }>({})
+
+  const isMetamask = !!window.ethereum
 
   const handleRemoveWallet = async (wallet: Wallet) => {
     setWalletStatus({ ...walletStatus, [wallet.address]: { loading: true, errorMessage: '' } })
@@ -136,15 +137,17 @@ const Wallets = () => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <WalletsError message={error?.message || ''} />
+    return <Oopsies message={error?.message || ''} icon="🤕" title="Error loading Wallets" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <WalletsError message={data?.getMyProfile?.error?.message || ''} />
+    return <Oopsies message={data?.getMyProfile?.error?.message || ''} icon="🤕" title="Error loading Wallets" />
   }
 
   const { user: userDB } = data.getMyProfile as GetMyProfileSuccess
   const connectText = userStateSnapshot.currentAccount
-    ? `Connect ${truncateAddress(userStateSnapshot.currentAccount)}`
-    : 'Connect Wallet'
+    ? `Add ${truncateAddress(userStateSnapshot.currentAccount)}`
+    : 'Add Wallet'
+
+  const wallets = userDB.wallets || []
 
   return (
     <$Vertical spacing={4}>
@@ -152,11 +155,36 @@ const Wallets = () => {
         Wallets <HelpIcon tipID="Wallets" />
       </$h1>
       <ReactTooltip id="Wallets" place="right" effect="solid">
-        Wallets are used as an alternative login to your account, and they also help us find your data like your
-        Lootboxes. You need to have installed MetaMask to use this feature.
+        Wallets are used as an alternative login to your account. They also help us find your data like your Lootboxes.
+        You need to have installed MetaMask to use this feature.
       </ReactTooltip>
-      <$SearchInput type="search" placeholder="🔍 Search by Address" />
-      <WalletsList wallets={userDB.wallets || []} />
+      {!isMetamask ? (
+        <Oopsies
+          icon="🦊"
+          title="MetaMask not detected!"
+          message={
+            <span>
+              Your MetaMask wallet is used as your web3 identity. You will need one to interact with the blockchain. You
+              can{' '}
+              <$Link target="_blank" href="https://metamask.io/download/">
+                download MetaMask here.
+              </$Link>
+            </span>
+          }
+        />
+      ) : null}
+      {wallets.length > 0 ? (
+        <$Vertical spacing={4}>
+          <$SearchInput type="search" placeholder="🔍 Search by Address" />
+          <WalletsList wallets={wallets || []} />
+        </$Vertical>
+      ) : (
+        <Oopsies
+          title="Add a wallet"
+          message="Wallets are used to sign into your account. We also use them to find your Lootboxes. Try adding a MetaMask wallet, and use it to login."
+          icon="🔐"
+        />
+      )}
       <$Button
         screen={screen}
         onClick={handleWalletConnect}
@@ -166,23 +194,14 @@ const Wallets = () => {
         style={{
           fontWeight: TYPOGRAPHY.fontWeight.regular,
           fontSize: TYPOGRAPHY.fontSize.large,
-          maxWidth: '300px',
           boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
+          width: 'fit-content',
         }}
         disabled={connectLoading}
       >
         <LoadingText loading={connectLoading} text={connectText} color={COLORS.trustFontColor} />
       </$Button>
       {connectErrorMessage ? <$ErrorMessage>{connectErrorMessage}</$ErrorMessage> : null}
-    </$Vertical>
-  )
-}
-
-const WalletsError = ({ message }: { message: string }) => {
-  return (
-    <$Vertical>
-      <$p>An error occured:</$p>
-      <$p>{message}</$p>
     </$Vertical>
   )
 }

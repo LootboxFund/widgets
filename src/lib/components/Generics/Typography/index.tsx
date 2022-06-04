@@ -23,6 +23,20 @@ export const $h1 = styled.h1<{ textAlign?: 'center' | 'start' }>`
   color: ${COLORS.surpressedFontColor};
 `
 
+export const $h2 = styled.h2`
+  font-size: ${TYPOGRAPHY.fontSize.xlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor};
+`
+
+export const $h3 = styled.h2`
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  color: ${COLORS.surpressedFontColor};
+`
+
 export const $p = styled.p`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.xlarge};

@@ -1,7 +1,7 @@
 import AuthGuard from '../../AuthGuard'
-import { $Vertical, $Divider, $Horizontal, $span, $p, $h1 } from '../../Generics'
+import { $Vertical, $Divider, $Horizontal, $span, $p, $h1, $h3 } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { $h2, EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
+import { EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -73,7 +73,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$h2 style={{ marginBottom: '-4px' }}>MANAGE</$h2>
+      <$h3 style={{ marginBottom: '-4px' }}>MANAGE</$h3>
       <$h1>{tournament.title}</$h1>
       <$Divider margin="0px 0px 20px 0px" />
       <Options />
@@ -94,7 +94,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
         }}
       />
       <$Divider margin="0px 0px 20px 0px" />
-      <$h2 style={{ marginBottom: '-4px' }}>EDIT</$h2>
+      <$h3 style={{ marginBottom: '-4px' }}>EDIT</$h3>
       <$h1>{tournament.title}</$h1>
       <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
       <br />
