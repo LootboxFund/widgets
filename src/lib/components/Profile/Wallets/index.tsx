@@ -12,7 +12,7 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $ErrorMessage, $h1, $p, $span } from 'lib/components/Generics/Typography'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
-import { $Link, $SearchInput, Oopsies } from '../common'
+import { $Link, $SearchInput, Oopsies, $SettingContainer } from '../common'
 import styled from 'styled-components'
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { truncateAddress } from 'lib/api/helpers'
@@ -90,7 +90,7 @@ const Wallets = () => {
         <$Vertical spacing={4}>
           {wallets.map((wallet) => {
             return (
-              <$WalletContainer>
+              <$SettingContainer>
                 <$Horizontal key={wallet.id} justifyContent="space-between">
                   <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">
                     {truncateAddress((wallet.address || '') as Address)}
@@ -128,7 +128,7 @@ const Wallets = () => {
                     <$ErrorMessage>{walletStatus[wallet.address as Address]?.errorMessage}</$ErrorMessage>
                   </div>
                 ) : null}
-              </$WalletContainer>
+              </$SettingContainer>
             )
           })}
         </$Vertical>
@@ -227,16 +227,6 @@ const getFormattedDate = (miliseconds: number): string => {
 }
 
 const WALLET_CONTAINER_HEIGHT = '40px'
-
-const $WalletContainer = styled.div`
-  background-color: ${`${COLORS.surpressedBackground}1A`};
-  border: none;
-  border-radius: 10px;
-  padding: 5px 10px;
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  height: ${WALLET_CONTAINER_HEIGHT};
-  box-shadow: 0px 3px 5px ${COLORS.surpressedBackground};
-`
 
 const $WalletContainerSkeleton = styled.div`
   border: none;

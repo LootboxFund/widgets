@@ -13,6 +13,8 @@ import MyLootboxes from './MyLootboxes'
 import Onboarding from './Onboarding'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $Link } from './common'
+import Settings from './Settings'
+import { Oopsies } from './common'
 
 const Profile = () => {
   const { user, logout } = useAuth()
@@ -24,9 +26,9 @@ const Profile = () => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <MyProfileError message={error?.message || ''} />
+    return <Oopsies title="An error occured" message={error?.message || ''} icon="🤕" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <MyProfileError message={data?.getMyProfile?.error?.message || ''} />
+    return <Oopsies title="An error occured" message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
   }
 
   const dividerWidth = screen === 'mobile' ? '100%' : '320px'
@@ -57,27 +59,12 @@ const Profile = () => {
         <$Divider width={dividerWidth} margin="0px auto 20px" />
       </$Vertical>
       <Onboarding />
+      <Settings />
       <Wallets />
       <MyLootboxes />
-      <br />
-      <br />
     </$Vertical>
   )
 }
-
-const MyProfileError = ({ message }: { message: string }) => {
-  return (
-    <$Vertical>
-      <$Manz>🤕 </$Manz>
-      <$h1>An error occured</$h1>
-      <$p>{message}</$p>
-    </$Vertical>
-  )
-}
-
-const $Manz = styled.span`
-  font-size: 3.5rem;
-`
 
 const ProfilePage = () => {
   return (

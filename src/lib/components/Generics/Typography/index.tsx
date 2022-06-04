@@ -49,7 +49,7 @@ export const $p = styled.p<{ textAlign?: 'center' | 'start' }>`
 export const $span = styled.span<{
   lineHeight?: string
   width?: string
-  textAlign?: 'center' | 'start'
+  textAlign?: 'center' | 'start' | 'end'
   color?: string
 }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};

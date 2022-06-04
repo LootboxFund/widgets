@@ -64,10 +64,7 @@ const Signup = (props: Props) => {
   const handleSignUpWithEmailAndPassword = async () => {
     setLoading(true)
     try {
-      if (passwordConfirmation !== password) {
-        throw new Error('Passwords do not match!')
-      }
-      await signUpWithEmailAndPassword(email, password)
+      await signUpWithEmailAndPassword(email, password, passwordConfirmation)
       props.onSignUpCallback(mode)
     } catch (err) {
       setErrorMessage(err?.message || 'An error occured!')
