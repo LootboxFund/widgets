@@ -218,6 +218,11 @@ export const useAuth = () => {
     return { signature: result, message }
   }
 
+  const logout = async (): Promise<void> => {
+    await auth.signOut()
+    setUser(null)
+  }
+
   return {
     user,
     signInWithWallet,
@@ -225,5 +230,6 @@ export const useAuth = () => {
     signInWithEmailAndPassword,
     signUpWithEmailAndPassword,
     connectWallet,
+    logout,
   }
 }

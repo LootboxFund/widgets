@@ -146,8 +146,8 @@ const Wallets = () => {
 
   const { user: userDB } = data.getMyProfile as GetMyProfileSuccess
   const connectText = userStateSnapshot.currentAccount
-    ? `Add ${truncateAddress(userStateSnapshot.currentAccount)}`
-    : 'Add Wallet'
+    ? `Add wallet ${truncateAddress(userStateSnapshot.currentAccount)}`
+    : 'Add wallet'
 
   const wallets = userDB.wallets || []
 

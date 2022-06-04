@@ -18,6 +18,7 @@ export const $Link = styled.a`
   color: #1abaff;
   font-style: italic;
   cursor: pointer;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export const Oopsies = ({
