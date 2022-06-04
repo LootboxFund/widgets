@@ -11,6 +11,7 @@ import { $Vertical } from 'lib/components/Generics'
 import { useState } from 'react'
 import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
+import { parseAuthError } from 'lib/utils/firebase'
 
 interface SignUpWalletProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -33,6 +34,7 @@ const SignupWallet = (props: SignUpWalletProps) => {
     setLoading(true)
     try {
       await signUpWithWallet(email)
+      setErrorMessage('')
       props.onChangeMode('login-wallet')
     } catch (err) {
       setErrorMessage(err?.message || 'An error occured!')
@@ -70,7 +72,7 @@ const SignupWallet = (props: SignUpWalletProps) => {
       ) : null}
 
       <$ChangeMode onClick={goToPasswordSignUp}>Or use a password</$ChangeMode>
-      {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }

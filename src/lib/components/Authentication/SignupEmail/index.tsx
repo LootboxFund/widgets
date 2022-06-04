@@ -9,6 +9,7 @@ import { $Vertical } from 'lib/components/Generics'
 import { useState } from 'react'
 import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
+import { parseAuthError } from 'lib/utils/firebase'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -38,6 +39,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
     setLoading(true)
     try {
       await signUpWithEmailAndPassword(email, password, passwordConfirmation)
+      setErrorMessage('')
       props.onChangeMode('login-password')
     } catch (err) {
       setErrorMessage(err?.message || 'An error occured!')
@@ -85,7 +87,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
         </$Button>
       </$Vertical>
       <$ChangeMode onClick={goToWalletSignup}>Or use your MetaMask wallet</$ChangeMode>
-      {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }
