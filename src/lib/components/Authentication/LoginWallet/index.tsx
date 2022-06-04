@@ -10,8 +10,9 @@ import LogRocket from 'logrocket'
 import { $Vertical } from 'lib/components/Generics'
 import { useState } from 'react'
 import { $ChangeMode, ModeOptions } from '../Shared'
-import { $Header, $ErrorMessage } from '../../Generics/Typography'
+import { $Header, $ErrorMessage, $p, $span } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
+import { truncateAddress } from 'lib/api/helpers'
 
 interface LoginWalletProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -47,21 +48,24 @@ const LoginWallet = (props: LoginWalletProps) => {
       <$Header>Login</$Header>
       {!isWalletConnected ? <WalletButton /> : null}
       {isWalletConnected ? (
-        <$Button
-          screen={screen}
-          onClick={handleLoginWithWallet}
-          backgroundColor={`${COLORS.trustBackground}C0`}
-          backgroundColorHover={`${COLORS.trustBackground}`}
-          color={COLORS.trustFontColor}
-          style={{
-            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-            fontWeight: TYPOGRAPHY.fontWeight.regular,
-            fontSize: TYPOGRAPHY.fontSize.large,
-          }}
-          disabled={loading}
-        >
-          <LoadingText loading={loading} text="Login with Wallet" color={COLORS.trustFontColor} />
-        </$Button>
+        <$Vertical spacing={2}>
+          <$Button
+            screen={screen}
+            onClick={handleLoginWithWallet}
+            backgroundColor={`${COLORS.trustBackground}C0`}
+            backgroundColorHover={`${COLORS.trustBackground}`}
+            color={COLORS.trustFontColor}
+            style={{
+              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+            }}
+            disabled={loading}
+          >
+            <LoadingText loading={loading} text="Login with Wallet" color={COLORS.trustFontColor} />
+          </$Button>
+          <$span textAlign="center">{truncateAddress(userStateSnapshot.currentAccount)}</$span>
+        </$Vertical>
       ) : null}
       <$ChangeMode onClick={changeToPasswordLogin}>Or use a password</$ChangeMode>
       {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}

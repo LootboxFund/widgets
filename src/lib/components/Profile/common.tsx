@@ -27,7 +27,7 @@ export const Oopsies = ({
   title,
 }: {
   icon: string
-  message: React.ReactElement | string
+  message?: React.ReactElement | string
   title: string
 }) => {
   return (
@@ -36,7 +36,16 @@ export const Oopsies = ({
         <$h1>{icon}</$h1>
         <$h2 style={{ marginLeft: '10px', paddingTop: '3px' }}>{title}</$h2>
       </$Horizontal>
-      <$p style={{ margin: `0px auto auto calc(${TYPOGRAPHY.fontSize.xxlarge} + 10px)` }}>{message}</$p>
+      {message && (
+        <$h3
+          style={{
+            margin: `0px auto auto calc(${TYPOGRAPHY.fontSize.xxlarge} + 10px)`,
+            color: `${COLORS.surpressedFontColor}ae`,
+          }}
+        >
+          {message}
+        </$h3>
+      )}
     </$Vertical>
   )
 }

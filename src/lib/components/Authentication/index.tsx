@@ -20,16 +20,16 @@ const Authentication = ({ initialMode }: AuthenticationProps) => {
     if (route === 'login-password' || route === 'login-wallet') {
       const destinationRoute = route === 'login-password' ? 'signup-password' : 'signup-wallet'
       return (
-        <$LightText>
+        <$span>
           Don't have an account? <$Link onClick={() => setRoute(destinationRoute)}>sign up</$Link>
-        </$LightText>
+        </$span>
       )
     } else if (route === 'signup-password' || route === 'signup-wallet') {
       const destinationRoute = route === 'signup-password' ? 'login-password' : 'login-wallet'
       return (
-        <$LightText>
+        <$span>
           Already have an account? <$Link onClick={() => setRoute(destinationRoute)}>log in</$Link>
-        </$LightText>
+        </$span>
       )
     }
     return ''
@@ -60,9 +60,9 @@ const Authentication = ({ initialMode }: AuthenticationProps) => {
         {route !== 'forgot-password' && route == 'login-password' && (
           <$PromptText>
             {
-              <$LightText style={{ cursor: 'pointer' }}>
+              <$span style={{ cursor: 'pointer' }}>
                 Forgot password? <$Link onClick={() => setRoute('forgot-password')}>click here</$Link>
-              </$LightText>
+              </$span>
             }
           </$PromptText>
         )}
@@ -83,12 +83,6 @@ const $Link = styled.span`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-style: italic;
   cursor: pointer;
-`
-
-const $LightText = styled.span`
-  color: ${COLORS.surpressedFontColor};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  font-size: ${TYPOGRAPHY.fontSize.medium};
 `
 
 export default Authentication

@@ -1,7 +1,7 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal, $span, $p, $h1, $h3 } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { EmptyResult, HiddenDescription, TournamentError, LootboxList, $SearchInput } from '../common'
+import { HiddenDescription, LootboxList, $SearchInput } from '../common'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -16,6 +16,7 @@ import { TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
+import { Oopsies } from 'lib/components/Profile/common'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -54,9 +55,9 @@ const ManageTournament = (props: ManageTournamentProps) => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <TournamentError message={error?.message || ''} />
+    return <Oopsies title="An error occured" icon="🤕" message={error?.message || ''} />
   } else if (data?.myTournament?.__typename === 'ResponseError') {
-    return <TournamentError message={data?.myTournament?.error?.message || ''} />
+    return <Oopsies title="An error occured" icon="🤕" message={data?.myTournament?.error?.message || ''} />
   }
 
   const { tournament } = data.myTournament as TournamentResponseSuccess
@@ -114,7 +115,15 @@ const ManageTournamentPage = () => {
     }
   })
 
-  return <AuthGuard>{tournamentId ? <ManageTournament tournamentId={tournamentId} /> : <EmptyResult />}</AuthGuard>
+  return (
+    <AuthGuard>
+      {tournamentId ? (
+        <ManageTournament tournamentId={tournamentId} />
+      ) : (
+        <Oopsies icon="🤷‍♂️" title="Tournament not found!" />
+      )}
+    </AuthGuard>
+  )
 }
 
 export default ManageTournamentPage

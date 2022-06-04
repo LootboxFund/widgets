@@ -21,7 +21,6 @@ import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
   sendEmailVerification,
-  fetchSignInMethodsForEmail,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'

@@ -91,32 +91,6 @@ export const HiddenDescription = ({ description, screen }: { description: string
   )
 }
 
-const $TournamentErrorContainer = styled.div`
-  text-align: center;
-`
-
-const $Manz = styled.span`
-  font-size: 3.5rem;
-`
-
-export const TournamentError = ({ message }: { message: string }) => {
-  return (
-    <$TournamentErrorContainer>
-      <$Manz>🤕 </$Manz>
-      <$h1>An error occured</$h1>
-      <$p>{message}</$p>
-    </$TournamentErrorContainer>
-  )
-}
-
-export const EmptyResult = () => {
-  return (
-    <div>
-      <$h1>🤷‍♂️ Tournament not found!</$h1>
-    </div>
-  )
-}
-
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxTournamentSnapshot) => void
   lootboxes: LootboxTournamentSnapshot[]

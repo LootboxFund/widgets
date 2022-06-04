@@ -10,10 +10,11 @@ import {
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import { $HideTings, HiddenDescription, TournamentError, EmptyResult, $SearchInput, LootboxList } from '../common'
+import { $HideTings, HiddenDescription, $SearchInput, LootboxList } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
+import { Oopsies } from 'lib/components/Profile/common'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -48,9 +49,9 @@ const PublicTournament = (props: PublicTournamentProps) => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <TournamentError message={error?.message || ''} />
+    return <Oopsies message={error?.message || ''} title="An error occured" icon="🤕" />
   } else if (data?.tournament?.__typename === 'ResponseError') {
-    return <TournamentError message={data?.tournament?.error?.message || ''} />
+    return <Oopsies message={data?.tournament?.error?.message || ''} title="An error occured" icon="🤕" />
   }
 
   const { tournament } = data.tournament as TournamentResponseSuccess
@@ -101,7 +102,11 @@ const PublicTournamentPage = () => {
     }
   })
 
-  return tournamentId ? <PublicTournament tournamentId={tournamentId} /> : <EmptyResult />
+  return tournamentId ? (
+    <PublicTournament tournamentId={tournamentId} />
+  ) : (
+    <Oopsies icon="🤷‍♂️" title="Tournament not found!" />
+  )
 }
 
 export default PublicTournamentPage
