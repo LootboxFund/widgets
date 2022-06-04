@@ -2,12 +2,13 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { $Vertical } from '../Generics'
+import { $span, $Vertical } from '../Generics'
 import { ModeOptions } from './Shared'
 import SignupEmail from './SignupEmail'
 import SignupWallet from './SignupWallet'
 import LoginWallet from './LoginWallet'
 import LoginEmail from './LoginEmail'
+import ResetPassword from './ResetPassword'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
@@ -53,8 +54,21 @@ const Authentication = ({ initialMode }: AuthenticationProps) => {
       {route === 'login-password' && <LoginEmail onChangeMode={setRoute} />}
       {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
       {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
+      {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}
 
-      <$PromptText>{renderSwitchRouteText()}</$PromptText>
+      <$Vertical spacing={4}>
+        {route !== 'forgot-password' && route == 'login-password' && (
+          <$PromptText>
+            {
+              <$LightText style={{ cursor: 'pointer' }}>
+                Forgot password? <$Link onClick={() => setRoute('forgot-password')}>click here</$Link>
+              </$LightText>
+            }
+          </$PromptText>
+        )}
+
+        <$PromptText>{renderSwitchRouteText()}</$PromptText>
+      </$Vertical>
     </$Vertical>
   )
 }
