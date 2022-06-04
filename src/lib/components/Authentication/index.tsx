@@ -3,39 +3,35 @@ import { useAuth } from 'lib/hooks/useAuth'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { $Vertical } from '../Generics'
-import Login from './Login'
-import Signup from './Signup'
+import { ModeOptions } from './Shared'
+import SignupEmail from './SignupEmail'
+import SignupWallet from './SignupWallet'
+import LoginWallet from './LoginWallet'
+import LoginEmail from './LoginEmail'
 
-const Authentication = () => {
-  const [route, setRoute] = useState<'login' | 'sign-up'>('sign-up')
-
-  const goToLogin = () => {
-    setRoute('login')
-  }
-
-  const goToSignup = () => {
-    setRoute('sign-up')
-  }
+interface AuthenticationProps {
+  initialMode?: ModeOptions
+}
+const Authentication = ({ initialMode }: AuthenticationProps) => {
+  const [route, setRoute] = useState<ModeOptions>(initialMode || 'login-wallet')
 
   const renderSwitchRouteText = () => {
-    if (route === 'login') {
+    if (route === 'login-password' || route === 'login-wallet') {
+      const destinationRoute = route === 'login-password' ? 'signup-password' : 'signup-wallet'
       return (
         <$LightText>
-          Don't have an account? <$Link onClick={goToSignup}>sign up</$Link>
+          Don't have an account? <$Link onClick={() => setRoute(destinationRoute)}>sign up</$Link>
         </$LightText>
       )
-    } else if (route === 'sign-up') {
+    } else if (route === 'signup-password' || route === 'signup-wallet') {
+      const destinationRoute = route === 'signup-password' ? 'login-password' : 'login-wallet'
       return (
         <$LightText>
-          Already have an account? <$Link onClick={goToLogin}>log in</$Link>
+          Already have an account? <$Link onClick={() => setRoute(destinationRoute)}>log in</$Link>
         </$LightText>
       )
     }
     return ''
-  }
-
-  const onSignUpCallback = (signupMode: 'password' | 'wallet') => {
-    setRoute('login')
   }
 
   return (
@@ -53,8 +49,11 @@ const Authentication = () => {
         boxSizing: 'border-box',
       }}
     >
-      {route === 'login' ? <Login /> : null}
-      {route === 'sign-up' ? <Signup onSignUpCallback={onSignUpCallback} /> : null}
+      {route === 'login-wallet' && <LoginWallet onChangeMode={setRoute} />}
+      {route === 'login-password' && <LoginEmail onChangeMode={setRoute} />}
+      {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
+      {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
+
       <$PromptText>{renderSwitchRouteText()}</$PromptText>
     </$Vertical>
   )

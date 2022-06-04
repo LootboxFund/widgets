@@ -8,7 +8,7 @@ import Authentication from './index'
 
 export default {
   title: 'Authentication',
-  component: Authentication,
+  component: <Authentication />,
 }
 
 const Template = () => {

@@ -18,3 +18,4 @@ export const $ChangeMode = styled.div`
   text-decoration-line: underline;
   color: #ababab;
 `
+export type ModeOptions = 'login-password' | 'login-wallet' | 'signup-password' | 'signup-wallet' | 'forgot-password'
