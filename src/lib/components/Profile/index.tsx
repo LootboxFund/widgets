@@ -56,7 +56,7 @@ const Profile = () => {
             </$p>
           </$Horizontal>
         )}
-        <$Divider width={dividerWidth} margin="0px auto 20px" />
+        <$Divider width={dividerWidth} margin="0px auto" />
       </$Vertical>
       <Onboarding />
       <Settings />

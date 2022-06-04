@@ -88,9 +88,9 @@ const Wallets = () => {
           </$Horizontal>
         </$WalletContainerSkeleton>
         <$Vertical spacing={4}>
-          {wallets.map((wallet) => {
+          {wallets.map((wallet, index) => {
             return (
-              <$SettingContainer>
+              <$SettingContainer key={`wallet-${index}`}>
                 <$Horizontal key={wallet.id} justifyContent="space-between">
                   <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">
                     {truncateAddress((wallet.address || '') as Address)}

@@ -21,6 +21,7 @@ import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
   sendEmailVerification,
+  fetchSignInMethodsForEmail,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -28,12 +29,12 @@ import { UserID } from 'lib/types'
 import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'
+import { throwInvalidPasswords } from 'lib/utils/password'
 
 interface FrontendUser {
   id: UserID
   email: string | null
   isEmailVerified: boolean
-  authProviders: string[]
 }
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
@@ -65,13 +66,11 @@ export const useAuth = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const authProviders = [user.providerId, ...user.providerData.map((provider) => provider.providerId)]
         const { uid, email } = user
         const userData: FrontendUser = {
           id: uid as UserID,
           email: email,
           isEmailVerified: user.emailVerified,
-          authProviders,
         }
         setUser(userData)
       } else {
@@ -235,6 +234,8 @@ export const useAuth = () => {
     setUser(null)
   }
 
+  // const updatePassword = async (password: string, newPassword: string): Promise<void> => {
+
   return {
     user,
     signInWithWallet,
@@ -244,37 +245,4 @@ export const useAuth = () => {
     connectWallet,
     logout,
   }
-}
-
-const throwInvalidPasswords = ({
-  password,
-  passwordConfirmation,
-}: {
-  password?: string
-  passwordConfirmation?: string
-}) => {
-  if (!password) {
-    throw new Error('Please enter a password')
-  }
-
-  // Some rules.... Lets say greater than or eqal 10 characters, with 1 number, and one upercase
-  const minLen = 10
-  if (password.length < minLen) {
-    throw new Error(`Password must be at least ${minLen} characters`)
-  }
-
-  const hasNumber = /\d/
-  if (!hasNumber.test(password)) {
-    throw new Error('Password must contain at least one number')
-  }
-
-  if (!passwordConfirmation) {
-    throw new Error('Please confirm your password')
-  }
-
-  if (password !== passwordConfirmation) {
-    throw new Error('Passwords do not match!')
-  }
-
-  return
 }
