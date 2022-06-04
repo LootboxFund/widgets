@@ -33,6 +33,7 @@ interface FrontendUser {
   id: UserID
   email: string | null
   isEmailVerified: boolean
+  authProviders: string[]
 }
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
@@ -64,8 +65,14 @@ export const useAuth = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        const authProviders = [user.providerId, ...user.providerData.map((provider) => provider.providerId)]
         const { uid, email } = user
-        const userData: FrontendUser = { id: uid as UserID, email: email, isEmailVerified: user.emailVerified }
+        const userData: FrontendUser = {
+          id: uid as UserID,
+          email: email,
+          isEmailVerified: user.emailVerified,
+          authProviders,
+        }
         setUser(userData)
       } else {
         setUser(null)
@@ -157,13 +164,18 @@ export const useAuth = () => {
     }
   }
 
-  const signUpWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
+  const signUpWithEmailAndPassword = async (
+    email: string,
+    password: string,
+    passwordConfirmation: string
+  ): Promise<void> => {
     if (!email) {
       throw new Error('Email is required')
     }
-    if (!password) {
-      throw new Error('Password is required')
-    }
+
+    // This will throw if the passwords are not valid
+    throwInvalidPasswords({ password, passwordConfirmation })
+
     const { data } = await signUpWithPasswordMutation({
       variables: {
         payload: {
@@ -232,4 +244,37 @@ export const useAuth = () => {
     connectWallet,
     logout,
   }
+}
+
+const throwInvalidPasswords = ({
+  password,
+  passwordConfirmation,
+}: {
+  password?: string
+  passwordConfirmation?: string
+}) => {
+  if (!password) {
+    throw new Error('Please enter a password')
+  }
+
+  // Some rules.... Lets say greater than or eqal 10 characters, with 1 number, and one upercase
+  const minLen = 10
+  if (password.length < minLen) {
+    throw new Error(`Password must be at least ${minLen} characters`)
+  }
+
+  const hasNumber = /\d/
+  if (!hasNumber.test(password)) {
+    throw new Error('Password must contain at least one number')
+  }
+
+  if (!passwordConfirmation) {
+    throw new Error('Please confirm your password')
+  }
+
+  if (password !== passwordConfirmation) {
+    throw new Error('Passwords do not match!')
+  }
+
+  return
 }
