@@ -14,7 +14,7 @@ import { $HideTings, HiddenDescription, $SearchInput, LootboxList } from '../com
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
-import { Oopsies } from 'lib/components/Profile/common'
+import { $Link, Oopsies } from 'lib/components/Profile/common'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -29,22 +29,6 @@ const PublicTournament = (props: PublicTournamentProps) => {
       id: props.tournamentId,
     },
   })
-
-  const Options = ({}) => {
-    const Option = ({ text, link }: { text: string; link: string }) => {
-      return (
-        <$span onClick={() => window.open(link)} style={{ cursor: 'pointer', marginRight: '15px' }}>
-          👉 {text}
-        </$span>
-      )
-    }
-    return (
-      <$Horizontal flexWrap>
-        <Option text="View Tournament" link={'google.com'} />
-        <Option text="Create Lootbox" link={'google.com'} />
-      </$Horizontal>
-    )
-  }
 
   if (loading) {
     return <Spinner />
@@ -68,26 +52,72 @@ const PublicTournament = (props: PublicTournamentProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$h3 style={{ marginBottom: '-4px' }}>TOURNAMENT</$h3>
-      <$h1>{tournament.title}</$h1>
-      <$Divider margin="0px 0px 20px 0px" />
-      <Options />
+      <$Vertical spacing={4}>
+        <$Vertical>
+          <$h1>{tournament.title}</$h1>
+          <$Divider margin="0px 0px 20px 0px" />
 
-      <HiddenDescription description={tournament.description} screen={screen} />
-      <$SearchInput
-        type="search"
-        placeholder="🔍 Search Lootboxes by Name or Address"
-        onChange={(e) => setSearchTerm(e.target.value || '')}
-      />
-      <LootboxList
-        lootboxes={filteredLootboxSnapshots || []}
-        screen={screen}
-        onClickLootbox={(lootbox) => {
-          lootbox &&
-            lootbox.address &&
-            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
-        }}
-      />
+          {(tournament.magicLink || tournament.tournamentLink) && (
+            <$Horizontal flexWrap>
+              {tournament.magicLink && (
+                <$span>
+                  👉{' '}
+                  <$Link
+                    color={'inherit'}
+                    fontStyle="italic"
+                    href={tournament.magicLink}
+                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    target="_blank"
+                  >
+                    Create Lootbox
+                  </$Link>
+                </$span>
+              )}
+
+              {tournament.tournamentLink ? (
+                <$span>
+                  👉{' '}
+                  <$Link
+                    color={'inherit'}
+                    fontStyle="italic"
+                    href={tournament.tournamentLink}
+                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    target="_blank"
+                  >
+                    Visit Tournament
+                  </$Link>
+                </$span>
+              ) : null}
+            </$Horizontal>
+          )}
+        </$Vertical>
+        <HiddenDescription description={tournament.description} screen={screen} />
+      </$Vertical>
+
+      <$Vertical spacing={4}>
+        <$SearchInput
+          type="search"
+          placeholder="🔍 Search Lootboxes by Name or Address"
+          onChange={(e) => setSearchTerm(e.target.value || '')}
+        />
+
+        <LootboxList
+          lootboxes={filteredLootboxSnapshots || []}
+          screen={screen}
+          onClickLootbox={(lootbox) => {
+            lootbox &&
+              lootbox.address &&
+              window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+          }}
+          templateAction={
+            tournament.magicLink
+              ? () => {
+                  window.open(`${tournament.magicLink}`)
+                }
+              : undefined
+          }
+        />
+      </$Vertical>
     </$Vertical>
   )
 }

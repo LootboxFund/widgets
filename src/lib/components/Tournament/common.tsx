@@ -4,7 +4,8 @@ import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
-import { $Horizontal, $p, $h1 } from '../Generics'
+import { $Horizontal, $p, $h1, $span, $Vertical, $h3 } from '../Generics'
+import { $Link, Oopsies } from '../Profile/common'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -31,7 +32,7 @@ const $DescriptionContainer = styled.div`
 export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
   const [isHidden, setIsHidden] = useState(true)
 
-  const truncate = screen === 'mobile' ? 350 : 500
+  const truncate = screen === 'mobile' ? 250 : 350
 
   return (
     <$DescriptionContainer>
@@ -41,7 +42,7 @@ export const HiddenDescription = ({ description, screen }: { description: string
             onClick={() => setIsHidden(!isHidden)}
             screen={screen}
             backgroundColor={COLORS.white}
-            color={`${COLORS.surpressedFontColor}80`}
+            color={`${COLORS.surpressedFontColor}5a`}
             style={{
               position: 'absolute',
               bottom: '0px',
@@ -59,13 +60,13 @@ export const HiddenDescription = ({ description, screen }: { description: string
           </$Button>
         ) : undefined}
       </$HideTings>
-      <$p>{isHidden ? description.slice(0, truncate) : description}</$p>
+      <$p whitespace="pre-line">{isHidden ? description.slice(0, truncate) : description}</$p>
       {!isHidden ? (
         <$Button
           onClick={() => setIsHidden(!isHidden)}
           screen={screen}
           backgroundColor={COLORS.white}
-          color={`${COLORS.surpressedFontColor}80`}
+          color={`${COLORS.surpressedFontColor}5a`}
           style={{
             position: 'absolute',
             bottom: '0px',
@@ -95,10 +96,28 @@ interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxTournamentSnapshot) => void
   lootboxes: LootboxTournamentSnapshot[]
   screen: ScreenSize
+  templateAction?: () => void
 }
-export const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) => {
+export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction }: LootboxListProps) => {
   return (
     <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+      {!!templateAction ? (
+        <$PlaceHolderLootboxListItem screen={screen} onClick={templateAction}>
+          <$Vertical justifyContent="center" height="100%" spacing={3}>
+            <$PlusIcon screen={screen} />
+            <$h3 color={`${COLORS.surpressedFontColor}ae`} textAlign="center">
+              CREATE NEW
+            </$h3>
+          </$Vertical>
+        </$PlaceHolderLootboxListItem>
+      ) : null}
+      {lootboxes.length === 0 ? (
+        <Oopsies
+          title="Join by creating a Lootbox!"
+          message={<$span>Looks like your the first one here! </$span>}
+          icon={'🎉'}
+        />
+      ) : null}
       {lootboxes.map((lootbox, index) => {
         return (
           <$LootboxThumbailContainer
@@ -116,11 +135,41 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListPr
   )
 }
 
+const $PlusIcon = styled.div<{ screen: ScreenSize }>`
+  width: 75px;
+  height: 75px;
+  background-color: ${COLORS.surpressedBackground}30;
+  border-radius: 50%;
+  margin: 0 auto;
+  text-align: center;
+
+  :before {
+    content: '+';
+    margin: auto;
+    font-size: 60px;
+    font-weight: ${TYPOGRAPHY.fontWeight.bold};
+    text-align: center;
+    color: ${COLORS.surpressedFontColor}ae;
+  }
+`
+
+const $PlaceHolderLootboxListItem = styled.div<{ screen: ScreenSize }>`
+  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '30%')};
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 24px;
+  background-color: ${COLORS.surpressedBackground}1a;
+  border-radius: 10px;
+  min-height: 300px;
+  box-shadow: 0px 4px 30px rgb(33 182 246 / 67%);
+`
+
 const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
   max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '30%')};
   width: 100%;
   cursor: pointer;
   margin-bottom: 24px;
+  border-radius: 10px;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.5));
 `
 

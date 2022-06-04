@@ -1,5 +1,5 @@
 import AuthGuard from '../../AuthGuard'
-import { $Vertical, $Divider, $Horizontal, $span, $p, $h1, $h3 } from '../../Generics'
+import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3 } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import { HiddenDescription, LootboxList, $SearchInput } from '../common'
 import {
@@ -16,7 +16,8 @@ import { TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
-import { Oopsies } from 'lib/components/Profile/common'
+import { $Link, Oopsies } from 'lib/components/Profile/common'
+import { COLORS } from '@wormgraph/helpers'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -35,23 +36,6 @@ const ManageTournament = (props: ManageTournamentProps) => {
     }
   )
 
-  const Options = ({}) => {
-    const Option = ({ text, link }: { text: string; link: string }) => {
-      return (
-        <$span onClick={() => window.open(link)} style={{ cursor: 'pointer', marginRight: '15px' }}>
-          👉 {text}
-        </$span>
-      )
-    }
-    return (
-      <$Horizontal flexWrap>
-        <Option text="Create Magic Link" link={'google.com'} />
-        <Option text="View Tournament" link={'google.com'} />
-        <Option text="Public View" link={'google.com'} />
-      </$Horizontal>
-    )
-  }
-
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
@@ -61,6 +45,9 @@ const ManageTournament = (props: ManageTournamentProps) => {
   }
 
   const { tournament } = data.myTournament as TournamentResponseSuccess
+  const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
+  // TODO: Fix typing!
+  const tournamentUrl = `${manifest.microfrontends.webflow.viewTournament}?tid=${tournament.id}`
 
   const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
     ? [
@@ -74,33 +61,138 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$h3 style={{ marginBottom: '-4px' }}>MANAGE</$h3>
-      <$h1>{tournament.title}</$h1>
-      <$Divider margin="0px 0px 20px 0px" />
-      <Options />
-      <HiddenDescription description={tournament.description} screen={screen} />
+      <$Vertical spacing={4}>
+        <$Vertical>
+          <$h3 style={{ marginBottom: '-10px' }}>MANAGE</$h3>
+          <$h1>{tournament.title}</$h1>
+          <$Divider margin="0px 0px 20px 0px" />
+          <$Horizontal flexWrap>
+            <$span>
+              👉{' '}
+              <$Link
+                color={'inherit'}
+                fontStyle="italic"
+                href={createLootboxUrl}
+                style={{ marginRight: '15px', textDecoration: 'none' }}
+                target="_blank"
+              >
+                Create Magic Link
+              </$Link>
+            </$span>
 
-      <$SearchInput
-        type="search"
-        placeholder="🔍 Search Lootboxes by Name or Address"
-        onChange={(e) => setSearchTerm(e.target.value || '')}
-      />
-      <LootboxList
-        lootboxes={filteredLootboxSnapshots || []}
-        screen={screen}
-        onClickLootbox={(lootbox) => {
-          lootbox &&
-            lootbox.address &&
-            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
-        }}
-      />
-      <$Divider margin="0px 0px 20px 0px" />
-      <$h3 style={{ marginBottom: '-4px' }}>EDIT</$h3>
-      <$h1>{tournament.title}</$h1>
+            {tournament.tournamentLink ? (
+              <$span>
+                👉{' '}
+                <$Link
+                  color={'inherit'}
+                  fontStyle="italic"
+                  href={tournament.tournamentLink}
+                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  target="_blank"
+                >
+                  Visit Tournament
+                </$Link>
+              </$span>
+            ) : (
+              <$span>
+                👉{' '}
+                <$Link
+                  color={'inherit'}
+                  fontStyle="italic"
+                  href={'#input-link'}
+                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                >
+                  Add Tournament Link
+                </$Link>
+              </$span>
+            )}
+
+            <$span>
+              👉{' '}
+              <$Link
+                color={'inherit'}
+                fontStyle="italic"
+                href={tournamentUrl}
+                style={{ marginRight: '15px', textDecoration: 'none' }}
+                target="_blank"
+              >
+                Public View
+              </$Link>
+            </$span>
+          </$Horizontal>
+        </$Vertical>
+
+        {!tournament.magicLink && (
+          <Oopsies
+            title="Add a Magic Link"
+            icon="🧙"
+            message={
+              <$span>
+                Magic Links help people sign up to your tournament by creating a special Lootbox with the settings you
+                choose! Confused?{' '}
+                <$Link
+                  fontStyle="italic"
+                  href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
+                  target="_blank"
+                >
+                  Learn more.
+                </$Link>
+                <br />
+                <br />
+                1) Create your Magic Link 👉{' '}
+                <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
+                  here
+                </$Link>
+                <br />
+                <br />
+                2) Update your tournament with the Magic Link{' '}
+                <$Link fontStyle="italic" href={'#input-magic'}>
+                  below
+                </$Link>{' '}
+                👇
+              </$span>
+            }
+          />
+        )}
+
+        <HiddenDescription description={tournament.description} screen={screen} />
+      </$Vertical>
+
+      {filteredLootboxSnapshots.length === 0 ? (
+        <Oopsies
+          title="No Lootboxes"
+          message={<$span>There are no Lootboxes associated to your tournament yet.</$span>}
+          icon={'🧐'}
+        />
+      ) : (
+        <$Vertical spacing={4}>
+          <$SearchInput
+            type="search"
+            placeholder="🔍 Search Lootboxes by Name or Address"
+            onChange={(e) => setSearchTerm(e.target.value || '')}
+          />
+          <LootboxList
+            lootboxes={filteredLootboxSnapshots || []}
+            screen={screen}
+            onClickLootbox={(lootbox) => {
+              lootbox &&
+                lootbox.address &&
+                window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+            }}
+            templateAction={
+              tournament.magicLink
+                ? () => {
+                    window.open(`${tournament.magicLink}`)
+                  }
+                : undefined
+            }
+          />
+        </$Vertical>
+      )}
+
+      <$Divider />
+      <$h3 style={{ fontStyle: 'italic' }}>Edit your Lootbox Tournament</$h3>
       <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
-      <br />
-      <br />
-      <br />
     </$Vertical>
   )
 }

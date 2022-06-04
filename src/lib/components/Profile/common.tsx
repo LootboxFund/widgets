@@ -14,11 +14,12 @@ export const $SearchInput = styled.input`
   height: 40px;
 `
 
-export const $Link = styled.a`
-  color: #1abaff;
+export const $Link = styled.a<{ fontStyle?: string; color?: string }>`
+  color: ${(props) => props.color || '#4fe2ff'};
   font-style: italic;
   cursor: pointer;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
+  ${(props) => props.fontStyle && `font-style: ${props.fontStyle};`}
 `
 
 export const Oopsies = ({

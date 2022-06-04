@@ -45,6 +45,7 @@ export const $Vertical = styled.div<{
   height?: string
   padding?: string
   maxWidth?: string
+  justifyContent?: string
 }>`
   display: flex;
   flex-direction: column;
@@ -53,6 +54,7 @@ export const $Vertical = styled.div<{
   ${(props) => props.height && `height: ${props.height};`};
   ${(props) => props.padding && `padding: ${props.padding};`}
   ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
+  ${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`}
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }

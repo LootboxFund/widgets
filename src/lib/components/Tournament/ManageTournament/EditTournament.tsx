@@ -73,10 +73,10 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     try {
       const payload: EditTournamentPayload = {
         id: tournamentId,
-        ...(tournamentPayload?.title && { title: tournamentPayload.title }),
-        ...(tournamentPayload?.description && { description: tournamentPayload.description }),
-        ...(tournamentPayload?.tournamentLink && { tournamentLink: tournamentPayload.tournamentLink }),
-        ...(tournamentPayload?.magicLink && { magicLink: tournamentPayload.magicLink }),
+        title: tournamentPayload.title,
+        description: tournamentPayload.description,
+        tournamentLink: tournamentPayload.tournamentLink,
+        magicLink: tournamentPayload.magicLink,
       }
 
       const { data } = await editTournament({
@@ -131,7 +131,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-link">External Link</$InputLabel>
+          <$InputLabel htmlFor="input-link">External Tournament Link</$InputLabel>
           <$InputMedium
             id="input-link"
             onChange={(e) => parseTournamentLink(e.target.value)}
@@ -148,23 +148,23 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
             rows={8}
           ></$TextAreaMedium>
         </$Vertical>
-
-        <$Button
-          screen={screen}
-          onClick={handleButtonClick}
-          backgroundColor={`${COLORS.trustBackground}C0`}
-          backgroundColorHover={`${COLORS.trustBackground}`}
-          color={COLORS.trustFontColor}
-          style={{
-            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-            fontWeight: TYPOGRAPHY.fontWeight.regular,
-            fontSize: TYPOGRAPHY.fontSize.large,
-            maxWidth: '240px',
-          }}
-          disabled={loading}
-        >
-          <LoadingText loading={loading} text="Edit Tournament" color={COLORS.trustFontColor} />
-        </$Button>
+        <div>
+          <$Button
+            screen={screen}
+            onClick={handleButtonClick}
+            backgroundColor={`${COLORS.trustBackground}C0`}
+            backgroundColorHover={`${COLORS.trustBackground}`}
+            color={COLORS.trustFontColor}
+            style={{
+              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+            }}
+            disabled={loading}
+          >
+            <LoadingText loading={loading} text="Save Changes" color={COLORS.trustFontColor} />
+          </$Button>
+        </div>
         {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}
       </$Vertical>
     </AuthGuard>

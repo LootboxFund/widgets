@@ -1,5 +1,4 @@
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { useAuth } from 'lib/hooks/useAuth'
+import { TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { $span, $Vertical } from '../Generics'
@@ -48,6 +47,7 @@ const Authentication = ({ initialMode }: AuthenticationProps) => {
         borderRadius: '21px',
         justifyContent: 'space-between',
         boxSizing: 'border-box',
+        margin: '0 auto',
       }}
     >
       {route === 'login-wallet' && <LoginWallet onChangeMode={setRoute} />}
