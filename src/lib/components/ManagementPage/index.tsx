@@ -11,6 +11,7 @@ import { readLootboxMetadata } from 'lib/api/storage'
 import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
 import { $Horizontal } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
+import BulkMint from 'lib/components/BulkMint'
 
 export interface ManagementPageProps {}
 
@@ -124,6 +125,14 @@ const ManagementPage = () => {
           lootboxType={lootboxType}
         />
       </div>
+      <br />
+      <br />
+      <BulkMint
+        lootboxAddress={lootboxAddress}
+        lootboxMetadata={lootboxMetadata}
+        network={network}
+        lootboxType={lootboxType}
+      />
     </div>
   )
 }
