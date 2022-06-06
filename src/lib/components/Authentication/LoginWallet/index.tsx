@@ -16,6 +16,7 @@ import { truncateAddress } from 'lib/api/helpers'
 
 interface LoginWalletProps {
   onChangeMode: (mode: ModeOptions) => void
+  onSignupSuccess?: () => void
 }
 const LoginWallet = (props: LoginWalletProps) => {
   const { signInWithWallet } = useAuth()
@@ -35,6 +36,7 @@ const LoginWallet = (props: LoginWalletProps) => {
     try {
       await signInWithWallet()
       setErrorMessage('')
+      props.onSignupSuccess && props.onSignupSuccess()
     } catch (err) {
       setErrorMessage(err?.message || 'An error occured!')
       LogRocket.captureException(err)

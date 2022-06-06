@@ -11,9 +11,10 @@ import ResetPassword from './ResetPassword'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
+  onSignupSuccess?: () => void
 }
-const Authentication = ({ initialMode }: AuthenticationProps) => {
-  const [route, setRoute] = useState<ModeOptions>(initialMode || 'login-wallet')
+const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) => {
+  const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
 
   const renderSwitchRouteText = () => {
     if (route === 'login-password' || route === 'login-wallet') {
@@ -50,8 +51,8 @@ const Authentication = ({ initialMode }: AuthenticationProps) => {
         margin: '0 auto',
       }}
     >
-      {route === 'login-wallet' && <LoginWallet onChangeMode={setRoute} />}
-      {route === 'login-password' && <LoginEmail onChangeMode={setRoute} />}
+      {route === 'login-wallet' && <LoginWallet onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} />}
+      {route === 'login-password' && <LoginEmail onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} />}
       {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
       {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
       {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}

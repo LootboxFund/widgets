@@ -12,6 +12,7 @@ import { parseAuthError } from 'lib/utils/firebase'
 
 interface LoginEmailProps {
   onChangeMode: (mode: ModeOptions) => void
+  onSignupSuccess?: () => void
 }
 const LoginEmail = (props: LoginEmailProps) => {
   const { signInWithEmailAndPassword } = useAuth()
@@ -38,6 +39,7 @@ const LoginEmail = (props: LoginEmailProps) => {
     try {
       await signInWithEmailAndPassword(email, password)
       setErrorMessage('')
+      props.onSignupSuccess && props.onSignupSuccess()
     } catch (err) {
       setErrorMessage(err?.message || 'An error occured!')
       LogRocket.captureException(err)
