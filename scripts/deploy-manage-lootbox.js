@@ -4,14 +4,14 @@ const app = new express()
 const storage = new Storage()
 const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
- 
+
 /**
  * CONSTANTS
  *
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/users/kangzeroo/Projects/Lootbox/widgets/iife/'
+const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
 
 console.log(`
 
