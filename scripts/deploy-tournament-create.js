@@ -44,9 +44,10 @@ const uploadFile = async ({ filename, semver, absPath }) => {
   process.exit()
 }
 
-const MyProfile = process.env.NODE_ENV === 'production' ? 'MyProfile.production.js' : 'MyProfile.js'
+const TournamentCreate =
+  process.env.NODE_ENV === 'production' ? 'TournamentCreate.production.js' : 'TournamentCreate.js'
 
-const fileNames = [MyProfile]
+const fileNames = [TournamentCreate]
 
 fileNames.map((filename) => {
   uploadFile({

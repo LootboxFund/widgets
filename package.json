@@ -69,6 +69,9 @@
     "deploy:sagan": "NODE_ENV=production node scripts/deploy-searchbar.js",
     "deploy:cassini": "NODE_ENV=production node scripts/deploy-authentication.js",
     "deploy:euler": "NODE_ENV=production node scripts/deploy-my-profile.js",
+    "deploy:bessel": "NODE_ENV=production node scripts/deploy-tournament-create.js",
+    "deploy:copernicus": "NODE_ENV=production node scripts/deploy-tournament-manage.js",
+    "deploy:halley": "NODE_ENV=production node scripts/deploy-tournament-public.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
