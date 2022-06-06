@@ -1,4 +1,5 @@
-import { Address, TicketID, ContractAddress, ITicketMetadata, ILootboxMetadata } from '@wormgraph/helpers'
+import { Address, TicketID } from '@wormgraph/helpers'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export interface ILootbox {
   address: Address | undefined
@@ -17,7 +18,7 @@ export interface ILootbox {
 export interface ITicket {
   id: TicketID | undefined
   // @TODO make this correct ITicketMetadata type
-  metadata: ILootboxMetadata | undefined
+  metadata: LootboxMetadata | undefined
 }
 
 export interface IDividend {

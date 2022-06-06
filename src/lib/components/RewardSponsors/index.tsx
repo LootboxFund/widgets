@@ -1,4 +1,4 @@
-import { Address, ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { Address, ContractAddress } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useEffect, useState } from 'react'
@@ -32,6 +32,7 @@ import {
 import ERC20ABI from 'lib/abi/erc20.json'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 import { InputDecimal } from 'lib/components/Generics/Input'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
   if (erc20Address === undefined) return false
@@ -44,7 +45,7 @@ export interface RewardSponsorsProps {
   lootboxAddress: ContractAddress
   lootboxType: LootboxType
   network: NetworkOption
-  lootboxMetadata: ILootboxMetadata
+  lootboxMetadata: LootboxMetadata
 }
 const RewardSponsors = (props: RewardSponsorsProps) => {
   const web3Utils = useWeb3Utils()

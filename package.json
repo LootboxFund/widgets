@@ -55,8 +55,9 @@
     "@graphql-codegen/typescript-resolvers": "^2.6.4"
   },
   "scripts": {
+    "codegen": "graphql-codegen --config codegen.yml",
     "watch": "rollup -c -w",
-    "build": "NODE_ENV=production rollup -c",
+    "build": "yarn codegen && NODE_ENV=production rollup -c",
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
     "build-storybook": "build-storybook",
@@ -69,8 +70,7 @@
     "deploy:cassini": "NODE_ENV=production node scripts/deploy-authentication.js",
     "deploy:euler": "NODE_ENV=production node scripts/deploy-my-profile.js",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
-    "sandbox": "surge --domain=https://______.surge.sh",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "sandbox": "surge --domain=https://______.surge.sh"
   },
   "dependencies": {
     "@apollo/client": "^3.6.5",

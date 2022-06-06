@@ -42,7 +42,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const isRedeemable = activeDividends && activeDividends.length > 0
 
   const downloadStamp = async () => {
-    if (!metadata) {
+    if (!metadata || !metadata?.lootboxCustomSchema) {
       console.error('Could not download stamp, no ticket metadata')
       return
     }

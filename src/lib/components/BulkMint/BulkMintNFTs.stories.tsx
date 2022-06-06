@@ -3,10 +3,11 @@ import BulkMint, { BulkMintProps } from 'lib/components/BulkMint'
 import Web3 from 'web3'
 import { useHtmlEthers, useHtmlWeb3 } from 'lib/api/useHtmlScript'
 import { initDApp } from 'lib/hooks/useWeb3Api'
-import { TicketID, ContractAddress, ITicketMetadata, ILootboxMetadata, BLOCKCHAINS } from '@wormgraph/helpers'
+import { TicketID, ContractAddress, ITicketMetadata, BLOCKCHAINS } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export default {
   title: 'BulkMint',
@@ -14,7 +15,7 @@ export default {
 }
 
 const Demo = (args: BulkMintProps) => {
-  const [ticketMetadata, setTicketMetadata] = useState<ILootboxMetadata>()
+  const [ticketMetadata, setTicketMetadata] = useState<LootboxMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
   useEffect(() => {
     initLogging()
@@ -45,6 +46,7 @@ const Demo = (args: BulkMintProps) => {
                 chainName: '',
               },
               lootbox: {
+                // @ts-ignore
                 address: '0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress,
                 transactionHash: '0xcabb31ad8063f85dedb6ac25cb9f8149b8041c243fb6fc847655fa6244b1d84e',
                 blockNumber: '0x1021d29',

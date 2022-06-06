@@ -1,6 +1,6 @@
 import react, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { COLORS, ITicketMetadata, ContractAddress, TicketID, ILootboxMetadata } from '@wormgraph/helpers'
+import { COLORS, ITicketMetadata, ContractAddress, TicketID } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import TicketCardUI from '../TicketCard/TicketCardUI'
 import NetworkText from 'lib/components/NetworkText'
@@ -28,6 +28,7 @@ import {
 import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
 import SemverIcon from 'lib/theme/icons/Semver.icon'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 const ethers = window.ethers ? window.ethers : ethersObj
 
@@ -36,7 +37,7 @@ export interface ManageLootboxProps {
   themeColor: string
   lootboxAddress: ContractAddress
   ticketID: TicketID
-  lootboxMetadata: ILootboxMetadata
+  lootboxMetadata: LootboxMetadata
   network: NetworkOption
   lootboxType: LootboxType
   scrollToRewardSponsors: () => void

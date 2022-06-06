@@ -1,7 +1,8 @@
-import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { proxy, subscribe } from 'valtio'
 import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import { getLootboxData } from 'lib/hooks/useContract'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export interface OnChainLootbox {
   name: string
@@ -18,7 +19,7 @@ export interface OnChainLootbox {
 
 export interface Lootbox {
   onChain?: OnChainLootbox
-  metadata?: ILootboxMetadata
+  metadata?: LootboxMetadata
 }
 
 export interface LootboxState {
@@ -35,7 +36,7 @@ export const loadLootbox = async (lootboxAddress: ContractAddress): Promise<Loot
   return lootboxState[lootboxAddress]
 }
 
-export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Promise<ILootboxMetadata | undefined> => {
+export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Promise<LootboxMetadata | undefined> => {
   if (lootboxState[lootboxAddress]?.metadata) {
     // Metadata already loaded
     return lootboxState[lootboxAddress].metadata
@@ -49,7 +50,7 @@ export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Prom
 }
 
 export const loadLootboxOnChainData = async (lootboxAddress: ContractAddress): Promise<OnChainLootbox | undefined> => {
-  let metadata: ILootboxMetadata | undefined = lootboxState[lootboxAddress]?.metadata
+  let metadata: LootboxMetadata | undefined = lootboxState[lootboxAddress]?.metadata
   if (!lootboxState[lootboxAddress]?.metadata) {
     try {
       metadata = await loadLootboxMetadata(lootboxAddress)

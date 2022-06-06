@@ -9,10 +9,11 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { BLOCKCHAINS, ContractAddress, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
+import { BLOCKCHAINS, ContractAddress } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import detectEthereumProvider from '@metamask/detect-provider'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
 
@@ -22,7 +23,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
-  const [metadata, setMetadata] = useState<ILootboxMetadata | undefined>()
+  const [metadata, setMetadata] = useState<LootboxMetadata | undefined>()
   const [loading, setLoading] = useState(true)
   const [hasMetaMask, setHasMetaMask] = useState(true)
 

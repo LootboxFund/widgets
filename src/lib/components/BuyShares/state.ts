@@ -173,7 +173,7 @@ export const purchaseLootboxShare = async () => {
           },
         ],
         lootboxCustomSchema: {
-          version: metadata?.lootboxCustomSchema.version || manifest.semver.id,
+          version: metadata?.lootboxCustomSchema?.version || manifest.semver.id,
           chain: {
             /** lootbox address */
             address: metadata?.lootboxCustomSchema?.chain?.address || '',

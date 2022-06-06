@@ -7,16 +7,17 @@ import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state
 import { userTicketState, loadUserTickets } from 'lib/components/UserTickets/state'
 import { getLootboxTicketId } from 'lib/hooks/useContract'
 import { initBuySharesState } from 'lib/components/BuyShares/state'
-import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { loadLootboxMetadata } from 'lib/state/lootbox.state'
 import LogRocket from 'logrocket'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export const onLoad = async (lootboxAddress: ContractAddress) => {
   ticketCardState.lootboxAddress = lootboxAddress
   userTicketState.lootboxAddress = lootboxAddress
 
-  let metadata: ILootboxMetadata | undefined = undefined
+  let metadata: LootboxMetadata | undefined = undefined
 
   try {
     metadata = await loadLootboxMetadata(lootboxAddress)
