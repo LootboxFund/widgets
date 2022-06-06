@@ -87,16 +87,16 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
 
   const loadBlockchainData = async () => {
     const [_reputationAddress] = await getLootboxIssuer(props.lootboxAddress)
-    console.log(`
-    
-    _reputationAddress: ${_reputationAddress}
+    // console.log(`
 
-    `)
+    // _reputationAddress: ${_reputationAddress}
+
+    // `)
     setReputationAddress(_reputationAddress)
     const nativeTokenPriceEther = await getPriceFeed(props.network.priceFeed as ContractAddress)
     const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
     setNativeTokenPrice(nativeTokenPrice)
-    console.log(`nativeTokenPrice = ${nativeTokenPrice}`)
+    // console.log(`nativeTokenPrice = ${nativeTokenPrice}`)
     const usdEq = new web3Utils.BN(
       web3Utils.toWei(
         nativeTokenPrice
@@ -264,7 +264,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           props.lootboxType,
           nativeRewardAmount.toString()
         )
-        console.log(`txHash = ${txHash}`)
+        // console.log(`txHash = ${txHash}`)
         setTransactionHash(txHash)
         setRewardSubmissionStatus('success')
         setRewardSponsorsStatusMessage('')
@@ -313,17 +313,17 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   }
 
   const generateValidationErrorMessages = () => {
-    console.log(`
-      
-    nativeRewardAmount.toString() = ${parseFloat(nativeRewardAmount.toString())}
-    erc20RewardAmount.toString() = ${parseFloat(erc20RewardAmount.toString())}
-    validateErc20(erc20Address) = ${validateErc20(erc20Address)}
+    // console.log(`
 
-    erc20Address = ${erc20Address}
+    // nativeRewardAmount.toString() = ${parseFloat(nativeRewardAmount.toString())}
+    // erc20RewardAmount.toString() = ${parseFloat(erc20RewardAmount.toString())}
+    // validateErc20(erc20Address) = ${validateErc20(erc20Address)}
 
-    `)
-    console.log(nativeRewardAmount)
-    console.log(erc20RewardAmount)
+    // erc20Address = ${erc20Address}
+
+    // `)
+    // console.log(nativeRewardAmount)
+    // console.log(erc20RewardAmount)
     if (!validateReceivingWallet(props.lootboxAddress)) {
       setRewardSponsorsStatusMessage('Lootbox Address is invalid')
       return

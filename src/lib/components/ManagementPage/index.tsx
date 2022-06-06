@@ -12,6 +12,8 @@ import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
 import { $Horizontal } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
 import BulkMint from 'lib/components/BulkMint'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
 
 export interface ManagementPageProps {}
 
@@ -21,6 +23,7 @@ const ManagementPage = () => {
   const [network, setNetwork] = useState<NetworkOption>()
   const [lootboxType, setLootboxType] = useState<LootboxType>()
   const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
+  const snapUserState = useSnapshot(userState)
 
   const refRewardSponsors = useRef<HTMLDivElement | null>(null)
 
@@ -45,8 +48,8 @@ const ManagementPage = () => {
           return identifyLootboxType(addr)
         })
         .then((data) => {
-          console.log('lootbox type...')
-          console.log(data)
+          // console.log('lootbox type...')
+          // console.log(data)
           const [lootboxType, isFundraising] = data
           setLootboxType(lootboxType)
           setIsActivelyFundraising(isFundraising)
@@ -69,10 +72,10 @@ const ManagementPage = () => {
     }
   }, [])
 
-  console.log(network)
-  console.log(lootboxAddress)
-  console.log(lootboxType)
-  console.log(lootboxMetadata)
+  // console.log(network)
+  // console.log(lootboxAddress)
+  // console.log(lootboxType)
+  // console.log(lootboxMetadata)
 
   if (!network || !lootboxAddress || !lootboxType || !lootboxMetadata) {
     if (lootboxMetadata && lootboxMetadata?.lootboxCustomSchema?.lootbox) {
@@ -127,12 +130,14 @@ const ManagementPage = () => {
       </div>
       <br />
       <br />
-      <BulkMint
-        lootboxAddress={lootboxAddress}
-        lootboxMetadata={lootboxMetadata}
-        network={network}
-        lootboxType={lootboxType}
-      />
+      <div style={snapUserState.currentAccount ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
+        <BulkMint
+          lootboxAddress={lootboxAddress}
+          lootboxMetadata={lootboxMetadata}
+          network={network}
+          lootboxType={lootboxType}
+        />
+      </div>
     </div>
   )
 }
