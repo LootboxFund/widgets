@@ -607,14 +607,14 @@ export const bulkMintNFTsContractCall = async (
   if (lootboxType === 'Escrow') {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
     const tx = await lootbox.connect(signer).bulkMintNFTs(receiverAddr, numToMint, {
-      value: amountToSpend,
+      value: amountToSpend.toString(),
     })
     await tx.wait()
     return tx.hash
   } else {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxInstantABI, signer)
     const tx = await lootbox.connect(signer).bulkMintNFTs(receiverAddr, numToMint, {
-      value: amountToSpend,
+      value: amountToSpend.toString(),
     })
     await tx.wait()
     return tx.hash

@@ -75,16 +75,17 @@ const Demo = (args: BulkMintProps) => {
             },
           })
           setNetwork({
-            name: 'Binance',
-            symbol: 'BNB',
-            themeColor: '#F0B90B',
-            chainIdHex: '0x61',
-            chainIdDecimal: '97',
+            name: 'Polygon',
+            symbol: 'MATIC',
+            themeColor: '#8F5AE8',
+            chainIdHex: '0x13881',
+            chainIdDecimal: '80001',
             isAvailable: true,
             isTestnet: true,
-            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FBNB.png?alt=media',
-            priceFeed: BLOCKCHAINS.BSC_MAINNET.priceFeedUSD as ContractAddress,
-            faucetUrl: 'https://testnet.binance.org/faucet-smart',
+            icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2FMATIC_COLORED.png?alt=media',
+            priceFeed: '0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada' as ContractAddress,
+            faucetUrl: 'https://faucet.polygon.technology/',
+            blockExplorerUrl: 'https://mumbai.polygonscan.com/',
           })
           // ------- Temp
         })
@@ -111,7 +112,7 @@ const Demo = (args: BulkMintProps) => {
   return (
     <BulkMint
       {...args}
-      lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress}
+      lootboxAddress={'0x2E0D27e76C53bE47775bdfbcf274F18d920C3B20' as ContractAddress}
       lootboxMetadata={ticketMetadata}
       network={network}
       lootboxType={'Escrow'}
