@@ -6,7 +6,9 @@ import { $Vertical } from '../../Generics'
 import {
   CreateTournamentPayload,
   CreateTournamentResponse,
+  CreateTournamentResponseSuccess,
   MutationCreateTournamentArgs,
+  Tournament,
 } from '../../../api/graphql/generated/types'
 import $Button from '../../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -15,9 +17,10 @@ import { CREATE_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
+import { manifest } from 'manifest'
 
 interface CreateTournamentProps {
-  onSuccessCallback?: () => void
+  onSuccessCallback?: (tournament: Tournament) => void
 }
 
 const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
@@ -73,7 +76,9 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
         throw new Error(data.createTournament.error.message)
       }
 
-      onSuccessCallback && onSuccessCallback()
+      const res = data.createTournament as CreateTournamentResponseSuccess
+
+      onSuccessCallback && onSuccessCallback(res.tournament)
     } catch (err) {
       LogRocket.captureException(err)
       setErrorMessage(err?.message || 'An error occured!')
@@ -158,4 +163,16 @@ export const $ChangeMode = styled.div`
   color: #ababab;
 `
 
-export default CreateTournament
+const CreateTournamentPage = () => {
+  const onTournamentCreated = (tournament: Tournament) => {
+    window.open(`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`, '_blank')
+  }
+
+  return (
+    <AuthGuard>
+      <CreateTournament onSuccessCallback={onTournamentCreated} />
+    </AuthGuard>
+  )
+}
+
+export default CreateTournamentPage

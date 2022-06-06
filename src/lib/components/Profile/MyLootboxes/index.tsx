@@ -56,11 +56,15 @@ const MyLootboxes = () => {
     }
   }
 
+  const navigateToLootbox = ({ address }: LootboxSnapshot) => {
+    window.open(`manifest.microfrontends.webflow.lootboxUrl?lootbox=${address}`, '_blank')
+  }
+
   return (
     <$Vertical spacing={4}>
       <$h1>My Lootboxes</$h1>
       {lootboxSnapshots.length > 0 ? (
-        <LootboxList lootboxes={lootboxSnapshots} screen={screen} />
+        <LootboxList lootboxes={lootboxSnapshots} screen={screen} onClickLootbox={navigateToLootbox} />
       ) : (
         <Oopsies
           title="We couldn't find your Lootbox"

@@ -46,8 +46,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   const { tournament } = data.myTournament as TournamentResponseSuccess
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
-  // TODO: Fix typing!
-  const tournamentUrl = `${manifest.microfrontends.webflow.viewTournament}?tid=${tournament.id}`
+  const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
   const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
     ? [
