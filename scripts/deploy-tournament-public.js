@@ -22,7 +22,7 @@ console.log(`
 
 const uploadFile = async ({ filename, semver, absPath }) => {
   // Uploads a local file to the bucket
-  const filepath = `widgets/${semver}/build-test/${filename}`
+  const filepath = `widgets/${semver}/build/${filename}`
   const localFilePath = `${absPath}${filename}`
   await storage.bucket(bucketName).upload(localFilePath, {
     destination: filepath,
@@ -44,10 +44,10 @@ const uploadFile = async ({ filename, semver, absPath }) => {
   process.exit()
 }
 
-const TournamentCreate =
-  process.env.NODE_ENV === 'production' ? 'TournamentCreate.production.js' : 'TournamentCreate.js'
+const TournamentPublic =
+  process.env.NODE_ENV === 'production' ? 'TournamentPublic.production.js' : 'TournamentPublic.js'
 
-const fileNames = [TournamentCreate]
+const fileNames = [TournamentPublic]
 
 fileNames.map((filename) => {
   uploadFile({
