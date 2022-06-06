@@ -6,3 +6,4 @@ umd
 /env
 /iife
 generated
+.npmrc
