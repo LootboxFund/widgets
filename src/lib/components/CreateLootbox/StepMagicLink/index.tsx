@@ -16,6 +16,7 @@ import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { $InputMedium } from '../StepCustomize'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import { v4 as uuidv4 } from 'uuid'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -33,7 +34,8 @@ export interface StepMagicLinkProps {
   themeColor: string | undefined
   campaignBio: string | undefined
   campaignWebsite: string | undefined
-  uploadImages: () => Promise<[string, string]>
+  uploadLogo: (submissionId: string) => Promise<string>
+  uploadCover: (submissionId: string) => Promise<string>
   selectedNetwork: NetworkOption | undefined
   stage: StepStage
   tournamentId?: string
@@ -89,16 +91,24 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     if (includeTournamentId && props.tournamentId) {
       queryParams.tournamentId = props.tournamentId
     }
-    try {
-      const [logoImage, coverImage] = await props.uploadImages()
-      if (includeLogoImage) {
+
+    const submissionId = uuidv4()
+
+    if (includeLogoImage) {
+      try {
+        const logoImage = await props.uploadLogo(submissionId)
         queryParams.logoImage = logoImage
+      } catch (err) {
+        LogRocket.captureException(err)
       }
-      if (includeCoverImage) {
+    }
+    if (includeCoverImage) {
+      try {
+        const coverImage = await props.uploadCover(submissionId)
         queryParams.coverImage = coverImage
+      } catch (err) {
+        LogRocket.captureException(err)
       }
-    } catch (err) {
-      LogRocket.captureException(err)
     }
 
     const magicLink = queryString.stringifyUrl({

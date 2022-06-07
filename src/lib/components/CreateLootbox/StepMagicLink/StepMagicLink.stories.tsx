@@ -32,7 +32,8 @@ const Demo = (args: StepMagicLinkProps) => {
       themeColor={undefined}
       campaignBio={undefined}
       campaignWebsite={undefined}
-      uploadImages={() => ['logoImage', 'coverImage']}
+      uploadLogo={async () => Promise.resolve('logoImage')}
+      uploadCover={async () => Promise.resolve('coverImage')}
       stage="in_progress"
       selectedNetwork={network}
     />
