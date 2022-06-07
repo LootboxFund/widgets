@@ -17,9 +17,6 @@ export const $Button = styled.button<{
   border-radius: 10px;
   flex: 1;
   ${(props) => props.justifyContent && `justify-content: ${props.justifyContent}`};
-  min-height: ${(props) => (props.screen === 'desktop' ? '40px' : '40px')};
-  max-height: ${(props) => (props.screen === 'desktop' ? '50px' : '0.35px')};
-  height: ${(props) => (props.screen === 'desktop' ? '40px' : '30px')};
   font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
   line-height: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};

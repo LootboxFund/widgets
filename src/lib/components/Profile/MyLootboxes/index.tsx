@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 import { GetMyProfileResponse, GetMyProfileSuccess, LootboxSnapshot } from 'lib/api/graphql/generated/types'
-import { $h1, $Horizontal, $p, $Vertical } from 'lib/components/Generics'
+import { $h1, $Horizontal, $p, $span, $Vertical } from 'lib/components/Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
@@ -57,12 +57,21 @@ const MyLootboxes = () => {
   }
 
   const navigateToLootbox = ({ address }: LootboxSnapshot) => {
-    window.open(`manifest.microfrontends.webflow.lootboxUrl?lootbox=${address}`, '_blank')
+    window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${address}`, '_blank')
+  }
+
+  const navigateToCreateLootbox = () => {
+    window.open(`${manifest.microfrontends.webflow.createPage}`, '_self')
   }
 
   return (
     <$Vertical spacing={4}>
-      <$h1>My Lootboxes</$h1>
+      <$Vertical>
+        <$h1>My Lootboxes</$h1>
+        <$span color="#ababab" style={{ cursor: 'pointer' }} onClick={navigateToCreateLootbox}>
+          Create a Lootbox
+        </$span>
+      </$Vertical>
       {lootboxSnapshots.length > 0 ? (
         <LootboxList lootboxes={lootboxSnapshots} screen={screen} onClickLootbox={navigateToLootbox} />
       ) : (

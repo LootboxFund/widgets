@@ -131,7 +131,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-link">External Tournament Link</$InputLabel>
+          <$InputLabel htmlFor="input-link">Link to Official Tournament</$InputLabel>
           <$InputMedium
             id="input-link"
             onChange={(e) => parseTournamentLink(e.target.value)}

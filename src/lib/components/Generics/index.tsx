@@ -42,6 +42,7 @@ export const $Vertical = styled.div<{
   spacing?: 1 | 2 | 3 | 4 | 5
   flex?: number
   width?: string
+  minWidth?: string
   height?: string
   padding?: string
   maxWidth?: string
@@ -55,6 +56,7 @@ export const $Vertical = styled.div<{
   ${(props) => props.padding && `padding: ${props.padding};`}
   ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
   ${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`}
+  ${(props) => props.minWidth && `min-width: ${props.minWidth};`}
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }

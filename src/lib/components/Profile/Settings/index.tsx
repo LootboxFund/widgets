@@ -9,9 +9,11 @@ import { useEffect, useState } from 'react'
 import { auth } from 'lib/api/firebase/app'
 import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from 'firebase/auth'
 import LogRocket from 'logrocket'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 const SettingsComponent = () => {
   const { user } = useAuth()
+  const { screen } = useWindowSize()
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false)
   const [passwordResetFormVisible, setPasswordResetFormVisible] = useState(false)
 
@@ -79,10 +81,10 @@ const SettingsComponent = () => {
       </$SettingContainer>
       <$SettingContainer>
         <$Horizontal justifyContent="flex-start" flexWrap>
-          <$span width="20%" lineHeight="40px">
+          <$span width={screen === 'mobile' ? '100%' : '20%'} lineHeight="40px">
             Password
           </$span>
-          <$span width="60%" lineHeight="40px">
+          <$span width={screen === 'mobile' ? '100%' : '60%'} lineHeight="40px">
             {isPasswordEnabled ? (
               <$span textAlign="start">******************</$span>
             ) : (
@@ -91,7 +93,7 @@ const SettingsComponent = () => {
               </$span>
             )}
           </$span>
-          <$span textAlign="end" width="20%" lineHeight="40px">
+          <$span textAlign="end" width={screen === 'mobile' ? '100%' : '20%'} lineHeight="40px">
             {isPasswordEnabled ? (
               <$Link style={{ fontStyle: 'normal' }} onClick={sendPasswordReset}>
                 reset password?

@@ -1,5 +1,5 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import AuthGuard from '../../AuthGuard'
 import { $Vertical } from '../../Generics'
@@ -18,6 +18,7 @@ import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
 import { manifest } from 'manifest'
+import { initDApp } from 'lib/hooks/useWeb3Api'
 
 interface CreateTournamentProps {
   onSuccessCallback?: (tournament: Tournament) => void
@@ -90,6 +91,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
       <$Vertical
         spacing={4}
         width="100%"
+        minWidth={screen === 'mobile' ? '100%' : '420px'}
         maxWidth="420px"
         padding="1.6rem"
         style={{
@@ -125,7 +127,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
           <$InputMedium
             onChange={(e) => parseTournamentLink(e.target.value)}
             value={tournamentPayload?.tournamentLink || ''}
-            placeholder="Link to Tournament"
+            placeholder="Link to Official Tournament"
             style={{
               color: `${COLORS.black}ca`,
             }}
@@ -164,8 +166,19 @@ export const $ChangeMode = styled.div`
 `
 
 const CreateTournamentPage = () => {
+  useEffect(() => {
+    const load = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+    }
+    load()
+  }, [])
+
   const onTournamentCreated = (tournament: Tournament) => {
-    window.open(`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`, '_blank')
+    window.open(`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`, '_self')
   }
 
   return (

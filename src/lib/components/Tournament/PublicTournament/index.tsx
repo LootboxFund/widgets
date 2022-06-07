@@ -15,6 +15,8 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
+import { initDApp } from 'lib/hooks/useWeb3Api'
+import { COLORS } from '@wormgraph/helpers'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -31,7 +33,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
   })
 
   if (loading) {
-    return <Spinner />
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
     return <Oopsies message={error?.message || ''} title="An error occured" icon="🤕" />
   } else if (data?.tournament?.__typename === 'ResponseError') {
@@ -51,7 +53,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
     : [...(tournament?.lootboxSnapshots || [])]
 
   return (
-    <$Vertical spacing={4}>
+    <$Vertical spacing={4} width="100%" maxWidth="1000px">
       <$Vertical spacing={4}>
         <$Vertical>
           <$h1>{tournament.title}</$h1>
@@ -88,6 +90,19 @@ const PublicTournament = (props: PublicTournamentProps) => {
                   </$Link>
                 </$span>
               ) : null}
+
+              <$span>
+                👉{' '}
+                <$Link
+                  color={'inherit'}
+                  fontStyle="italic"
+                  href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
+                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  target="_blank"
+                >
+                  Watch Tutorial
+                </$Link>
+              </$span>
             </$Horizontal>
           )}
         </$Vertical>
@@ -124,6 +139,17 @@ const PublicTournament = (props: PublicTournamentProps) => {
 
 const PublicTournamentPage = () => {
   const [tournamentId, setTournamentId] = useState<TournamentID>()
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+    }
+    load()
+  }, [])
 
   useEffect(() => {
     const tid = parseUrlParams('tid')

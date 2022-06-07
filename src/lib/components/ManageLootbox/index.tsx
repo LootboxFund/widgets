@@ -226,7 +226,12 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     !treasuryAddress ||
     !reputationAddress
   ) {
-    return <p>Loading data from Blockchain. This may take up to 1 minute...</p>
+    return (
+      <p>
+        Loading data from Blockchain. This may take up to 1 minute... if taking too long, please refresh the page. In
+        most cases, it's the blockchain network being slow.
+      </p>
+    )
   }
 
   const daysAgo = parseInt(calculateDaysBetween(deploymentDate).toFixed(0))

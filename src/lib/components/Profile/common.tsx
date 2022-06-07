@@ -2,8 +2,6 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import styled from 'styled-components'
 import { $p, $Vertical, $h3, $Horizontal, $h1, $h2 } from '../Generics'
 
-const BLUE = '#4fe2ff'
-
 export const $SearchInput = styled.input`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
@@ -15,7 +13,7 @@ export const $SearchInput = styled.input`
 `
 
 export const $Link = styled.a<{ fontStyle?: string; color?: string }>`
-  color: ${(props) => props.color || '#4fe2ff'};
+  color: ${(props) => props.color || '#2cb1ea'};
   font-style: italic;
   cursor: pointer;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
@@ -57,7 +55,6 @@ export const $SettingContainer = styled.div<{ disabled?: boolean }>`
   border-radius: 10px;
   padding: 5px 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
-  height: 40px;
   box-shadow: 0px 3px 5px ${COLORS.surpressedBackground};
 
   ${(props) => props.disabled && `cursor: not-allowed; box-shadow: none;`};

@@ -1,5 +1,5 @@
 import { TYPOGRAPHY } from '@wormgraph/helpers'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { $span, $Vertical } from '../Generics'
 import { ModeOptions } from './Shared'
@@ -8,6 +8,8 @@ import SignupWallet from './SignupWallet'
 import LoginWallet from './LoginWallet'
 import LoginEmail from './LoginEmail'
 import ResetPassword from './ResetPassword'
+import { initDApp } from 'lib/hooks/useWeb3Api'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
@@ -15,6 +17,18 @@ interface AuthenticationProps {
 }
 const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
+  const { screen } = useWindowSize()
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+    }
+    load()
+  }, [])
 
   const renderSwitchRouteText = () => {
     if (route === 'login-password' || route === 'login-wallet') {
@@ -39,6 +53,7 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
     <$Vertical
       spacing={4}
       width="100%"
+      minWidth={screen === 'mobile' ? '100%' : '380px'}
       maxWidth="380px"
       height="520px"
       padding="1.6rem"

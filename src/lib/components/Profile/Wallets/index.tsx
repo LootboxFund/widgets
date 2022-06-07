@@ -35,6 +35,7 @@ const Wallets = () => {
   const [connectErrorMessage, setConnectErrorMessage] = useState('')
   const userStateSnapshot = useSnapshot(userState)
   const [walletStatus, setWalletStatus] = useState<{ [key: Address]: { loading: boolean; errorMessage: string } }>({})
+  const [searchTerm, setSearchTerm] = useState('')
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
   const isMetamask = !!window.ethereum
@@ -150,6 +151,9 @@ const Wallets = () => {
     : 'Add wallet'
 
   const wallets = userDB.wallets || []
+  const filteredWallets = wallets.filter((wallet) => {
+    return wallet.address.toLowerCase().includes(searchTerm.toLowerCase())
+  })
 
   return (
     <$Vertical spacing={4}>
@@ -175,17 +179,22 @@ const Wallets = () => {
           }
         />
       ) : null}
-      {wallets.length > 0 ? (
-        <$Vertical spacing={4}>
-          <$SearchInput type="search" placeholder="🔍 Search by Address" />
-          <WalletsList wallets={wallets || []} />
-        </$Vertical>
-      ) : (
+      {wallets.length === 0 && (
         <Oopsies
           title="Add a wallet"
           message="Wallets are used to sign into your account. We also use them to find your Lootboxes. Try adding a MetaMask wallet, and use it to login."
           icon="🔐"
         />
+      )}
+      {wallets.length > 0 && (
+        <$Vertical spacing={4}>
+          <$SearchInput
+            type="search"
+            placeholder="🔍 Search by Address"
+            onChange={(e) => setSearchTerm(e.target.value || '')}
+          />
+          <WalletsList wallets={filteredWallets || []} />
+        </$Vertical>
       )}
       {!isWalletConnected ? (
         <div>

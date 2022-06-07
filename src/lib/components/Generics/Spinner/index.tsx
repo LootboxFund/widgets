@@ -5,14 +5,18 @@ import { $Horizontal } from '..'
 
 export const $Spinner = styled.div<{
   color?: string
+  size?: string
+  margin?: string
 }>`
-  width: 16px;
-  height: 16px;
+  width: ${(props) => props.size || '16px'};
+  height: ${(props) => props.size || '16px'};
   margin-right: 12px;
   border: 4px solid transparent;
   border-top-color: #ffffff;
   border-top-color: ${(props) => (props.color ? props.color : '#ffffff')};
   border-radius: 50%;
+  ${(props) => props.margin && `margin: ${props.margin};`}
+
   animation: button-loading-spinner 1s ease infinite;
 
   @keyframes button-loading-spinner {

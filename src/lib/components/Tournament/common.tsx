@@ -32,7 +32,7 @@ const $DescriptionContainer = styled.div`
 export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
   const [isHidden, setIsHidden] = useState(true)
 
-  const truncate = screen === 'mobile' ? 250 : 350
+  const truncate = screen === 'mobile' ? 300 : 550
 
   return (
     <$DescriptionContainer>
@@ -142,6 +142,9 @@ const $PlusIcon = styled.div<{ screen: ScreenSize }>`
   border-radius: 50%;
   margin: 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   :before {
     content: '+';

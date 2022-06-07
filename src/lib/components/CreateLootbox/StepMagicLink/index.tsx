@@ -14,6 +14,8 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import LogRocket from 'logrocket'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { $InputMedium } from '../StepCustomize'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -270,14 +272,11 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
           <br />
           {magicLink && (
             <$Vertical>
-              <input
-                value={magicLink}
-                style={{
-                  fontSize: TYPOGRAPHY.fontSize.large,
-                  fontFamily: TYPOGRAPHY.fontFamily.regular,
-                  color: COLORS.surpressedFontColor,
-                }}
-              ></input>
+              <$CopyableInput>
+                <$InputMedium style={{ width: '100%' }} disabled value={magicLink}></$InputMedium>
+                <CopyIcon text={magicLink} />
+              </$CopyableInput>
+
               <br />
               <span
                 style={{
@@ -335,5 +334,14 @@ const IncludeTerm = (props: IncludeTermProps) => {
     </div>
   )
 }
+
+const $CopyableInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  width: 100%;
+`
 
 export default StepMagicLink

@@ -1,7 +1,7 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3 } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { HiddenDescription, LootboxList, $SearchInput } from '../common'
+import { LootboxList, $SearchInput } from '../common'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -18,6 +18,7 @@ import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { COLORS } from '@wormgraph/helpers'
+import { initDApp } from 'lib/hooks/useWeb3Api'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -37,7 +38,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
   )
 
   if (loading) {
-    return <Spinner />
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
     return <Oopsies title="An error occured" icon="🤕" message={error?.message || ''} />
   } else if (data?.myTournament?.__typename === 'ResponseError') {
@@ -48,6 +49,8 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
   const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
+  const lootboxSnapshots = [...(tournament?.lootboxSnapshots || [])]
+
   const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
     ? [
         ...(tournament.lootboxSnapshots?.filter(
@@ -56,16 +59,16 @@ const ManageTournament = (props: ManageTournamentProps) => {
             snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
         ) || []),
       ]
-    : [...(tournament?.lootboxSnapshots || [])]
+    : [...lootboxSnapshots]
 
   return (
-    <$Vertical spacing={4}>
+    <$Vertical spacing={4} width="100%" maxWidth="1000px">
       <$Vertical spacing={4}>
         <$Vertical>
           <$h3 style={{ marginBottom: '-10px' }}>MANAGE</$h3>
           <$h1>{tournament.title}</$h1>
           <$Divider margin="0px 0px 20px 0px" />
-          <$Horizontal flexWrap>
+          <$Horizontal flexWrap style={{ paddingBottom: '15px' }}>
             <$span>
               👉{' '}
               <$Link
@@ -118,52 +121,66 @@ const ManageTournament = (props: ManageTournamentProps) => {
                 Public View
               </$Link>
             </$span>
+
+            <$span>
+              👉{' '}
+              <$Link
+                color={'inherit'}
+                fontStyle="italic"
+                href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
+                style={{ marginRight: '15px', textDecoration: 'none' }}
+                target="_blank"
+              >
+                Watch Tutorial
+              </$Link>
+            </$span>
           </$Horizontal>
         </$Vertical>
 
         {!tournament.magicLink && (
-          <Oopsies
-            title="Add a Magic Link"
-            icon="🧙"
-            message={
-              <$span>
-                Magic Links help people sign up to your tournament by creating a special Lootbox with the settings you
-                choose! Confused?{' '}
-                <$Link
-                  fontStyle="italic"
-                  href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
-                  target="_blank"
-                >
-                  Learn more.
-                </$Link>
-                <br />
-                <br />
-                1) Create your Magic Link 👉{' '}
-                <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
-                  here
-                </$Link>
-                <br />
-                <br />
-                2) Update your tournament with the Magic Link{' '}
-                <$Link fontStyle="italic" href={'#input-magic'}>
-                  below
-                </$Link>{' '}
-                👇
-              </$span>
-            }
-          />
+          <div style={{ paddingBottom: '15px' }}>
+            <Oopsies
+              title="Add a Magic Link"
+              icon="🧙"
+              message={
+                <$span>
+                  Magic Links help people sign up to your tournament by creating a special Lootbox with the settings you
+                  choose!
+                  <$Link
+                    fontStyle="italic"
+                    href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
+                    target="_blank"
+                  >
+                    Learn more.
+                  </$Link>
+                  <br />
+                  <br />
+                  1) Create a magic link for this exact tournament by 👉{' '}
+                  <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
+                    clicking here
+                  </$Link>
+                  <br />
+                  <br />
+                  2) Update your tournament with the Magic Link by 👉{' '}
+                  <$Link fontStyle="italic" href={'#input-magic'}>
+                    clicking here
+                  </$Link>{' '}
+                </$span>
+              }
+            />
+          </div>
         )}
-
-        <HiddenDescription description={tournament.description} screen={screen} />
       </$Vertical>
 
-      {filteredLootboxSnapshots.length === 0 ? (
+      {lootboxSnapshots.length === 0 && (
         <Oopsies
           title="No Lootboxes"
           message={<$span>There are no Lootboxes associated to your tournament yet.</$span>}
           icon={'🧐'}
         />
-      ) : (
+      )}
+
+      {lootboxSnapshots.length > 0 && (
         <$Vertical spacing={4}>
           <$SearchInput
             type="search"
@@ -198,6 +215,17 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
 const ManageTournamentPage = () => {
   const [tournamentId, setTournamentId] = useState<TournamentID>()
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+    }
+    load()
+  }, [])
 
   useEffect(() => {
     const tid = parseUrlParams('tid')

@@ -15,7 +15,7 @@ import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
-export const BASE_BUTTON_STYLE = { minHeight: '60px', height: '100px' }
+export const BASE_BUTTON_STYLE = { minHeight: '60px' }
 
 export interface BuyButtonProps {}
 const BuyButton = (props: BuyButtonProps) => {

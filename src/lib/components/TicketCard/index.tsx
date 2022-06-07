@@ -108,6 +108,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
             fontWeight: TYPOGRAPHY.fontWeight.regular,
             fontSize: TYPOGRAPHY.fontSize.large,
             cursor: 'default',
+            minHeight: '40px',
           }}
         ></$Button>
       )}
