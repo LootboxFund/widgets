@@ -80,7 +80,7 @@ const ShareOutput = (props: ShareOutputProps) => {
                 props.lootbox.name
               ) : (
                 <$FineText screen={screen} style={{ color: `${COLORS.surpressedFontColor}aa` }}>
-                  loading...
+                  loading
                 </$FineText>
               )}
             </$TokenSymbol>

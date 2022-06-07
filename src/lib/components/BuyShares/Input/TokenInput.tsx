@@ -55,7 +55,7 @@ const TokenInput = (props: TokenInputProps) => {
         >
           <$TokenSymbol screen={screen} padding={'10px'}>
             <$FineText screen={screen} style={{ color: `${COLORS.surpressedFontColor}aa` }}>
-              loading...
+              loading
             </$FineText>
           </$TokenSymbol>
         </$Button>
