@@ -50,11 +50,10 @@ const BulkMint = (props: BulkMintProps) => {
   }, [])
 
   const loadBlockchainData = async () => {
-    console.log('Loading blockchain data...')
     const nativeTokenPriceEther = await getPriceFeed(props.network.priceFeed as ContractAddress)
     const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
     setNativeTokenPrice(nativeTokenPrice)
-    console.log(`nativeTokenPrice = ${nativeTokenPrice}`)
+
     const usdEq = new web3Utils.BN(
       web3Utils.toWei(
         nativeTokenPrice
@@ -80,13 +79,6 @@ const BulkMint = (props: BulkMintProps) => {
   }
 
   const generateValidationErrorMessages = () => {
-    console.log(`
-      
-    numToMint = ${numToMint}
-    nativeRewardAmount = ${parseFloat(nativeRewardAmount)}
-    validateReceivingWallet(receiverAddrErr) = ${validateReceivingWallet(receiverAddrErr)}
-
-    `)
     if (!validateReceivingWallet(receiverAddrErr)) {
       setReceiverAddrErr('Receiving Address is not valid')
       return
@@ -110,9 +102,7 @@ const BulkMint = (props: BulkMintProps) => {
     setBulkMintSubmissionStatus('pending')
     setSubmitError('')
     try {
-      const feeAdjustedNativeRewardAmount = nativeRewardAmount
-        .multipliedBy(web3Utils.toBN('1000'))
-        .dividedBy(web3Utils.toBN('968'))
+      const feeAdjustedNativeRewardAmount = nativeRewardAmount.mul(web3Utils.toBN('1000')).div(web3Utils.toBN('968'))
 
       const txHash = await bulkMintNFTsContractCall(
         props.lootboxAddress,
@@ -121,13 +111,12 @@ const BulkMint = (props: BulkMintProps) => {
         feeAdjustedNativeRewardAmount,
         numToMint
       )
-      console.log(`txHash = ${txHash}`)
       setTransactionHash(txHash)
       setBulkMintSubmissionStatus('success')
       setSubmitError('')
       setTimeout(() => {
         setBulkMintSubmissionStatus('enabled')
-      }, 5000)
+      }, 10000)
     } catch (e) {
       console.log(e)
       setBulkMintSubmissionStatus('error')
