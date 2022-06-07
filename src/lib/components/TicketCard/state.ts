@@ -6,6 +6,7 @@ import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { ContractAddress } from '@wormgraph/helpers'
 import parseUrlParams from 'lib/utils/parseUrlParams'
+import { promiseChainDelay } from 'lib/utils/promise'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -70,7 +71,7 @@ export const loadDividends = async (ticketID: string) => {
   }
   const dividendFragments = await getTicketDividends(ticketCardState.lootboxAddress, ticketID)
   const nativeToken = getTokenFromList(NATIVE_ADDRESS)
-  const dividends: IDividend[] = await Promise.all(
+  const dividends: IDividend[] = await promiseChainDelay(
     dividendFragments.map(async (fragment) => {
       let symbol: string
       if (fragment.tokenAddress === NATIVE_ADDRESS) {

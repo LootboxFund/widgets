@@ -4,6 +4,7 @@ import { loadTicketData, ticketCardState } from 'lib/components/TicketCard/state
 import { userState } from 'lib/state/userState'
 import { buySharesState, loadInputTokenData, initBuySharesState } from '../BuyShares/state'
 import { Address, ContractAddress } from '@wormgraph/helpers'
+import { promiseChainDelay } from 'lib/utils/promise'
 
 export interface UserTicketsState {
   lootboxAddress: ContractAddress | undefined
@@ -23,7 +24,7 @@ subscribe(userState, () => {
 
 subscribe(buySharesState.lastTransaction, () => {
   if (buySharesState.lastTransaction.success) {
-    Promise.all([
+    promiseChainDelay([
       loadUserTickets(),
       loadInputTokenData(),
       userTicketState.lootboxAddress && initBuySharesState(userTicketState.lootboxAddress),

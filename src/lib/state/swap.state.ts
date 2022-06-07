@@ -8,6 +8,7 @@ import { Address } from '@wormgraph/helpers'
 import { ethers as ethersObj } from 'ethers'
 
 import detectEthereumProvider from '@metamask/detect-provider'
+import { promiseChainDelay } from 'lib/utils/promise'
 
 export type SwapRoute = '/swap' | '/search' | '/add' | '/customs' | '/settings'
 export type TokenPickerTarget = 'inputToken' | 'outputToken' | null
@@ -50,7 +51,7 @@ subscribe(swapState.outputToken, () => {
 const updateOutputTokenValues = async () => {
   if (swapState.outputToken.data?.priceOracle && swapState.inputToken.data?.priceOracle) {
     // get price of conversion rate and save to swapState
-    const [inputTokenPrice, outputTokenPrice] = await Promise.all([
+    const [inputTokenPrice, outputTokenPrice] = await promiseChainDelay([
       getPriceFeed(swapState.inputToken.data.priceOracle),
       getPriceFeed(swapState.outputToken.data.priceOracle),
     ])
