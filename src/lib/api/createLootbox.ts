@@ -281,6 +281,7 @@ export const createInstantLootbox = async (
             LogRocket.captureException(err)
           } finally {
             setSubmitStatus('success')
+            provider.removeAllListeners(filter)
           }
         }
       }
@@ -512,6 +513,7 @@ export const createEscrowLootbox = async (
             LogRocket.captureException(err)
           } finally {
             setSubmitStatus('success')
+            provider.removeAllListeners(filter)
           }
         }
       }
