@@ -47,7 +47,8 @@ const Onboarding = () => {
           title="Verify your email"
           message={
             <span>
-              You should have received an email from us. Check your spam folder. Can't find it?{' '}
+              You should have received an email from us. <mark>Check your spam folder.</mark> <br />
+              Can't find it?{' '}
               <$Link target="_blank" onClick={handleSendVerificationEmail} style={{ textDecoration: 'underline' }}>
                 Resend verification email.
               </$Link>

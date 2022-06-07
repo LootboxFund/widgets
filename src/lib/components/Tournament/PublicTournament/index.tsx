@@ -42,16 +42,6 @@ const PublicTournament = (props: PublicTournamentProps) => {
 
   const { tournament } = data.tournament as TournamentResponseSuccess
 
-  const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
-    ? [
-        ...(tournament.lootboxSnapshots?.filter(
-          (snapshot) =>
-            snapshot?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
-        ) || []),
-      ]
-    : [...(tournament?.lootboxSnapshots || [])]
-
   return (
     <$Vertical spacing={4} width="100%" maxWidth="1000px">
       <$Vertical spacing={4}>
@@ -69,7 +59,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
                     fontStyle="italic"
                     href={tournament.magicLink}
                     style={{ marginRight: '15px', textDecoration: 'none' }}
-                    target="_blank"
+                    target="_self"
                   >
                     Create Lootbox
                   </$Link>
@@ -108,31 +98,22 @@ const PublicTournament = (props: PublicTournamentProps) => {
         </$Vertical>
         <HiddenDescription description={tournament.description} screen={screen} />
       </$Vertical>
-
-      <$Vertical spacing={4}>
-        <$SearchInput
-          type="search"
-          placeholder="🔍 Search Lootboxes by Name or Address"
-          onChange={(e) => setSearchTerm(e.target.value || '')}
-        />
-
-        <LootboxList
-          lootboxes={filteredLootboxSnapshots || []}
-          screen={screen}
-          onClickLootbox={(lootbox) => {
-            lootbox &&
-              lootbox.address &&
-              window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
-          }}
-          templateAction={
-            tournament.magicLink
-              ? () => {
-                  window.open(`${tournament.magicLink}`)
-                }
-              : undefined
-          }
-        />
-      </$Vertical>
+      <LootboxList
+        lootboxes={tournament?.lootboxSnapshots || []}
+        screen={screen}
+        onClickLootbox={(lootbox) => {
+          lootbox &&
+            lootbox.address &&
+            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+        }}
+        templateAction={
+          tournament.magicLink
+            ? () => {
+                window.open(`${tournament.magicLink}`, '_self')
+              }
+            : undefined
+        }
+      />
     </$Vertical>
   )
 }

@@ -32,7 +32,15 @@ const $DescriptionContainer = styled.div`
 export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
   const [isHidden, setIsHidden] = useState(true)
 
-  const truncate = screen === 'mobile' ? 300 : 550
+  const truncate = screen === 'mobile' ? 250 : 550
+
+  if (description.length < 250) {
+    return (
+      <$DescriptionContainer>
+        <$p whitespace="pre-line">{description}</$p>
+      </$DescriptionContainer>
+    )
+  }
 
   return (
     <$DescriptionContainer>
@@ -99,39 +107,73 @@ interface LootboxListProps {
   templateAction?: () => void
 }
 export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction }: LootboxListProps) => {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
+    ? [
+        ...(lootboxes?.filter(
+          (snapshot) =>
+            snapshot?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+        ) || []),
+      ]
+    : [...(lootboxes || [])]
+
   return (
-    <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
-      {!!templateAction ? (
-        <$PlaceHolderLootboxListItem screen={screen} onClick={templateAction}>
-          <$Vertical justifyContent="center" height="100%" spacing={3}>
-            <$PlusIcon screen={screen} />
-            <$h3 color={`${COLORS.surpressedFontColor}ae`} textAlign="center">
-              CREATE NEW
-            </$h3>
-          </$Vertical>
-        </$PlaceHolderLootboxListItem>
-      ) : null}
-      {lootboxes.length === 0 ? (
-        <Oopsies
-          title="Join by creating a Lootbox!"
-          message={<$span>Looks like your the first one here! </$span>}
-          icon={'🎉'}
-        />
-      ) : null}
-      {lootboxes.map((lootbox, index) => {
-        return (
-          <$LootboxThumbailContainer
-            key={index}
-            screen={screen}
-            onClick={() => {
-              onClickLootbox && onClickLootbox(lootbox)
-            }}
-          >
-            <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
-          </$LootboxThumbailContainer>
-        )
-      })}
-    </$Horizontal>
+    <$Vertical spacing={4}>
+      {!!templateAction && screen === 'mobile' && (
+        <$Button
+          screen={screen}
+          onClick={templateAction}
+          style={{
+            height: '60px',
+            backgroundColor: `${COLORS.trustBackground}`,
+            color: `${COLORS.trustFontColor}`,
+            filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+          }}
+        >
+          Join the Tournament
+        </$Button>
+      )}
+      <$SearchInput
+        type="search"
+        placeholder="🔍 Search Lootboxes by Name or Address"
+        onChange={(e) => setSearchTerm(e.target.value || '')}
+      />
+      <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+        {!!templateAction && screen !== 'mobile' && (
+          <$PlaceHolderLootboxListItem screen={screen} onClick={templateAction}>
+            <$Vertical justifyContent="center" height="100%" spacing={3}>
+              <$PlusIcon screen={screen} />
+              <$h3 color={`${COLORS.surpressedFontColor}ae`} textAlign="center">
+                CREATE NEW
+              </$h3>
+            </$Vertical>
+          </$PlaceHolderLootboxListItem>
+        )}
+        {lootboxes.length === 0 ? (
+          <Oopsies
+            title="Join by creating a Lootbox!"
+            message={<$span>Looks like your the first one here! </$span>}
+            icon={'🎉'}
+          />
+        ) : null}
+        {filteredLootboxSnapshots.map((lootbox, index) => {
+          return (
+            <$LootboxThumbailContainer
+              key={index}
+              screen={screen}
+              onClick={() => {
+                onClickLootbox && onClickLootbox(lootbox)
+              }}
+            >
+              <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
+            </$LootboxThumbailContainer>
+          )
+        })}
+      </$Horizontal>
+    </$Vertical>
   )
 }
 

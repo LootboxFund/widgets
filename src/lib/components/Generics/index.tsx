@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export * from './Typography'
 
 interface HorizontalProps {
-  readonly justifyContent?: 'flex-start' | 'center' | 'space-evenly' | 'space-between' | 'flex-end'
+  readonly justifyContent?: 'flex-start' | 'center' | 'space-evenly' | 'space-between' | 'flex-end' | 'space-around'
   readonly verticalCenter?: boolean
   readonly baseline?: boolean
   readonly spacing?: 1 | 2 | 3 | 4 | 5

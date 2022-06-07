@@ -90,9 +90,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     <AuthGuard>
       <$Vertical
         spacing={4}
-        width="100%"
-        minWidth={screen === 'mobile' ? '100%' : '420px'}
-        maxWidth="420px"
+        width={screen == 'mobile' ? '100%' : '420px'}
         padding="1.6rem"
         style={{
           background: '#FFFFFF',

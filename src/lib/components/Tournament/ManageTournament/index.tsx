@@ -27,7 +27,6 @@ interface ManageTournamentProps {
 /** Manage Tournament Widget */
 const ManageTournament = (props: ManageTournamentProps) => {
   const { screen } = useWindowSize()
-  const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ myTournament: TournamentResponse }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
     {
@@ -51,16 +50,6 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   const lootboxSnapshots = [...(tournament?.lootboxSnapshots || [])]
 
-  const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
-    ? [
-        ...(tournament.lootboxSnapshots?.filter(
-          (snapshot) =>
-            snapshot?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
-        ) || []),
-      ]
-    : [...lootboxSnapshots]
-
   return (
     <$Vertical spacing={4} width="100%" maxWidth="1000px">
       <$Vertical spacing={4}>
@@ -74,9 +63,22 @@ const ManageTournament = (props: ManageTournamentProps) => {
               <$Link
                 color={'inherit'}
                 fontStyle="italic"
-                href={createLootboxUrl}
+                href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
                 style={{ marginRight: '15px', textDecoration: 'none' }}
                 target="_blank"
+              >
+                Watch Tutorial
+              </$Link>
+            </$span>
+
+            <$span>
+              👉{' '}
+              <$Link
+                color={'inherit'}
+                fontStyle="italic"
+                href={createLootboxUrl}
+                style={{ marginRight: '15px', textDecoration: 'none' }}
+                target="_self"
               >
                 Create Magic Link
               </$Link>
@@ -116,22 +118,9 @@ const ManageTournament = (props: ManageTournamentProps) => {
                 fontStyle="italic"
                 href={tournamentUrl}
                 style={{ marginRight: '15px', textDecoration: 'none' }}
-                target="_blank"
+                target="_self"
               >
                 Public View
-              </$Link>
-            </$span>
-
-            <$span>
-              👉{' '}
-              <$Link
-                color={'inherit'}
-                fontStyle="italic"
-                href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
-                style={{ marginRight: '15px', textDecoration: 'none' }}
-                target="_blank"
-              >
-                Watch Tutorial
               </$Link>
             </$span>
           </$Horizontal>
@@ -144,8 +133,8 @@ const ManageTournament = (props: ManageTournamentProps) => {
               icon="🧙"
               message={
                 <$span>
-                  Magic Links help people sign up to your tournament by creating a special Lootbox with the settings you
-                  choose!
+                  Magic Links help people sign up for your tournament by creating a special Lootbox with the settings
+                  you choose!{' '}
                   <$Link
                     fontStyle="italic"
                     href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
@@ -156,7 +145,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   <br />
                   <br />
                   1) Create a magic link for this exact tournament by 👉{' '}
-                  <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
+                  <$Link fontStyle="italic" href={createLootboxUrl} target="_self">
                     clicking here
                   </$Link>
                   <br />
@@ -181,29 +170,22 @@ const ManageTournament = (props: ManageTournamentProps) => {
       )}
 
       {lootboxSnapshots.length > 0 && (
-        <$Vertical spacing={4}>
-          <$SearchInput
-            type="search"
-            placeholder="🔍 Search Lootboxes by Name or Address"
-            onChange={(e) => setSearchTerm(e.target.value || '')}
-          />
-          <LootboxList
-            lootboxes={filteredLootboxSnapshots || []}
-            screen={screen}
-            onClickLootbox={(lootbox) => {
-              lootbox &&
-                lootbox.address &&
-                window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
-            }}
-            templateAction={
-              tournament.magicLink
-                ? () => {
-                    window.open(`${tournament.magicLink}`)
-                  }
-                : undefined
-            }
-          />
-        </$Vertical>
+        <LootboxList
+          lootboxes={lootboxSnapshots}
+          screen={screen}
+          onClickLootbox={(lootbox) => {
+            lootbox &&
+              lootbox.address &&
+              window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+          }}
+          templateAction={
+            tournament.magicLink
+              ? () => {
+                  window.open(`${tournament.magicLink}`, '_self')
+                }
+              : undefined
+          }
+        />
       )}
 
       <$Divider />

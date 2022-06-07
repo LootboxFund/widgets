@@ -39,32 +39,34 @@ const Profile = () => {
     <$Vertical spacing={5}>
       <$Vertical>
         <$h1 textAlign="center">Welcome, {pseudoUserName}</$h1>
-        <$Divider width={dividerWidth} margin="20px auto 0px" />
         {user && (
-          <$Horizontal justifyContent="center" spacing={5} flexWrap>
-            <$p>{user?.email} </$p>
-            <$p>
-              <$Link
-                onClick={logout}
-                style={{
-                  textAlign: 'center',
-                  textDecoration: 'none',
-                  fontStyle: 'normal',
-                  fontFamily: TYPOGRAPHY.fontFamily.regular,
-                }}
-              >
-                logout
-              </$Link>
-            </$p>
-          </$Horizontal>
+          <$Vertical>
+            <$Divider width={dividerWidth} margin="20px auto 20px" />
+            <$Horizontal justifyContent="center" flexWrap>
+              <$p style={{ margin: '0px 15px 0px 0px' }}>{user?.email} </$p>
+              <$p style={{ margin: '0px' }}>
+                <$Link
+                  onClick={logout}
+                  style={{
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    fontStyle: 'normal',
+                    fontFamily: TYPOGRAPHY.fontFamily.regular,
+                  }}
+                >
+                  logout
+                </$Link>
+              </$p>
+            </$Horizontal>
+            <$Divider width={dividerWidth} margin="20px auto 0px" />
+          </$Vertical>
         )}
-        <$Divider width={dividerWidth} margin="0px auto" />
       </$Vertical>
       <Onboarding />
       <Settings />
       <Wallets />
-      <MyLootboxes />
       <MyTournaments />
+      <MyLootboxes />
     </$Vertical>
   )
 }

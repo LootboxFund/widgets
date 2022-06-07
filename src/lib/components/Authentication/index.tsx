@@ -52,9 +52,7 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
   return (
     <$Vertical
       spacing={4}
-      width="100%"
-      minWidth={screen === 'mobile' ? '100%' : '380px'}
-      maxWidth="380px"
+      width={screen == 'mobile' ? '100%' : '420px'}
       height="520px"
       padding="1.6rem"
       style={{

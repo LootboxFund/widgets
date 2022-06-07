@@ -81,10 +81,10 @@ const SettingsComponent = () => {
       </$SettingContainer>
       <$SettingContainer>
         <$Horizontal justifyContent="flex-start" flexWrap>
-          <$span width={screen === 'mobile' ? '100%' : '20%'} lineHeight="40px">
+          <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
             Password
           </$span>
-          <$span width={screen === 'mobile' ? '100%' : '60%'} lineHeight="40px">
+          <$span width={screen === 'mobile' ? '65%' : '60%'} lineHeight="40px">
             {isPasswordEnabled ? (
               <$span textAlign="start">******************</$span>
             ) : (
@@ -93,7 +93,11 @@ const SettingsComponent = () => {
               </$span>
             )}
           </$span>
-          <$span textAlign="end" width={screen === 'mobile' ? '100%' : '20%'} lineHeight="40px">
+          <$span
+            textAlign={screen === 'mobile' ? 'start' : 'end'}
+            width={screen === 'mobile' ? '100%' : '20%'}
+            lineHeight="40px"
+          >
             {isPasswordEnabled ? (
               <$Link style={{ fontStyle: 'normal' }} onClick={sendPasswordReset}>
                 reset password?

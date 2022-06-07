@@ -5,8 +5,9 @@ import Spinner from 'lib/components/Generics/Spinner'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import styled from 'styled-components'
 import { GET_MY_WALLET_LOOTBOXES } from './api.gql'
-import { Oopsies, $Link } from '../common'
+import { Oopsies, $Link, $SearchInput } from '../common'
 import { manifest } from 'manifest'
+import { useState } from 'react'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -14,20 +15,39 @@ interface LootboxListProps {
   screen: ScreenSize
 }
 const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) => {
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filteredLootboxes: LootboxSnapshot[] = !!searchTerm
+    ? [
+        ...(lootboxes?.filter(
+          (snapshot) =>
+            snapshot?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            snapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+        ) || []),
+      ]
+    : [...(lootboxes || [])]
+
   return (
-    <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
-      {lootboxes.map((lootbox, index) => (
-        <$LootboxThumbailContainer
-          key={index}
-          screen={screen}
-          onClick={() => {
-            onClickLootbox && onClickLootbox(lootbox)
-          }}
-        >
-          <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
-        </$LootboxThumbailContainer>
-      ))}
-    </$Horizontal>
+    <$Vertical spacing={4}>
+      <$SearchInput
+        type="search"
+        placeholder="🔍 Search Lootboxes by Name or Address"
+        onChange={(e) => setSearchTerm(e.target.value || '')}
+      />
+      <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+        {filteredLootboxes.map((lootbox, index) => (
+          <$LootboxThumbailContainer
+            key={index}
+            screen={screen}
+            onClick={() => {
+              onClickLootbox && onClickLootbox(lootbox)
+            }}
+          >
+            <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
+          </$LootboxThumbailContainer>
+        ))}
+      </$Horizontal>
+    </$Vertical>
   )
 }
 
@@ -57,7 +77,7 @@ const MyLootboxes = () => {
   }
 
   const navigateToLootbox = ({ address }: LootboxSnapshot) => {
-    window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${address}`, '_blank')
+    window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${address}`, '_self')
   }
 
   const navigateToCreateLootbox = () => {
@@ -68,8 +88,10 @@ const MyLootboxes = () => {
     <$Vertical spacing={4}>
       <$Vertical>
         <$h1>My Lootboxes</$h1>
-        <$span color="#ababab" style={{ cursor: 'pointer' }} onClick={navigateToCreateLootbox}>
-          Create a Lootbox
+        <$span>
+          <$Link fontStyle="normal" style={{ marginBottom: '15px' }} onClick={navigateToCreateLootbox}>
+            Create a Lootbox
+          </$Link>
         </$span>
       </$Vertical>
       {lootboxSnapshots.length > 0 ? (
@@ -80,7 +102,7 @@ const MyLootboxes = () => {
           message={
             <span>
               Already made one? Then you need to add your wallet ☝️ Otherwise, you can{' '}
-              <$Link target="_blank" href={manifest.microfrontends.webflow.createPage}>
+              <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
                 create a Lootbox here.
               </$Link>
             </span>
@@ -98,5 +120,6 @@ const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
   cursor: pointer;
   margin-bottom: 24px;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.5));
+  overflow: hidden;
 `
 export default MyLootboxes
