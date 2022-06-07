@@ -1,15 +1,16 @@
-import { ContractAddress, ILootboxMetadata, ITicketMetadata, ITicketMetadataDeprecated } from '@wormgraph/helpers'
+import { ContractAddress, ITicketMetadataDeprecated } from '@wormgraph/helpers'
+import { LootboxMetadata } from '../api/graphql/generated/types'
 
 interface ExtendedTicketMetadataDeprecated {
   data: ITicketMetadataDeprecated
 }
 
-export const parseLootboxMetadata = (metadata: ILootboxMetadata| ExtendedTicketMetadataDeprecated): ILootboxMetadata => {
+export const parseLootboxMetadata = (metadata: LootboxMetadata | ExtendedTicketMetadataDeprecated): LootboxMetadata => {
   // @ts-ignore - because of the extended metadata
   if (metadata?.data != null) {
     // Deprecated metadata structure - needed for backwards compatibility
     const castedMetada = metadata as ExtendedTicketMetadataDeprecated
-    const coercedMetadata: ILootboxMetadata = {
+    const coercedMetadata: LootboxMetadata = {
       external_url: '', // Not used in FE
       description: castedMetada?.data?.description || '',
       name: castedMetada?.data?.name || '',
@@ -43,6 +44,7 @@ export const parseLootboxMetadata = (metadata: ILootboxMetadata| ExtendedTicketM
           lootboxThemeColor: castedMetada?.data?.lootbox?.lootboxThemeColor || '',
           transactionHash: castedMetada?.data?.lootbox?.transactionHash || '',
           blockNumber: castedMetada?.data?.lootbox?.blockNumber || '',
+          factory: '',
         },
         socials: {
           twitter: castedMetada?.data?.socials?.twitter || '',
@@ -61,6 +63,6 @@ export const parseLootboxMetadata = (metadata: ILootboxMetadata| ExtendedTicketM
     return coercedMetadata
   } else {
     // New metadata structure
-    return metadata as ILootboxMetadata
+    return metadata as LootboxMetadata
   }
 }

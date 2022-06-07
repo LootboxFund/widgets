@@ -50,7 +50,7 @@ const ShareOutput = (props: ShareOutputProps) => {
     const nativeFmt = new BN(nativeEstimate).dividedBy(new BN(10).pow(new BN(shareDecimals || 18))).toString()
     buySharesState.inputToken.quantity = nativeFmt
     // FE set input value
-    const el = document.getElementById("buy-share-input") as HTMLInputElement | undefined
+    const el = document.getElementById('buy-share-input') as HTMLInputElement | undefined
     if (el) {
       setTimeout(() => {
         // weird hack, don't know why, but need to wait a sec be rendered...
@@ -76,13 +76,29 @@ const ShareOutput = (props: ShareOutputProps) => {
             justifyContent="center"
           >
             <$TokenSymbol screen={screen} padding={'10px'}>
-              {props.lootbox?.name ? props.lootbox.name : <$FineText screen={screen} style={{color: `${COLORS.surpressedFontColor}aa`}}>loading...</$FineText>}
+              {props.lootbox?.name ? (
+                props.lootbox.name
+              ) : (
+                <$FineText screen={screen} style={{ color: `${COLORS.surpressedFontColor}aa` }}>
+                  loading
+                </$FineText>
+              )}
             </$TokenSymbol>
           </$Button>
-          <$TokenSymbol screen={screen} padding={'10px'} onClick={fillUpLootbox} style={{cursor: 'pointer', color: `${COLORS.trustBackground}ee`, textAlign: 'right', fontWeight: TYPOGRAPHY.fontWeight.regular}}>
-              max
+          <$TokenSymbol
+            screen={screen}
+            padding={'10px'}
+            onClick={fillUpLootbox}
+            style={{
+              cursor: 'pointer',
+              color: `${COLORS.trustBackground}ee`,
+              textAlign: 'right',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+            }}
+          >
+            max
           </$TokenSymbol>
-        
+
           {/* {sharePerUSD ? (
             <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right', whiteSpace: 'nowrap' }}>
               {`${sharePerUSD?.toExponential(1)?.toString()}`} Shares/USD

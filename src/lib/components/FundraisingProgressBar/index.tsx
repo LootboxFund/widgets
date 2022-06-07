@@ -110,7 +110,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
 
       const loadData = async (symb: string) => {
         if (lootboxStateSnapshot[lootbox as ContractAddress]?.onChain) {
-          const { sharesSoldMax, sharesSoldTarget, sharesSoldCount, sharePriceWei } = lootboxStateSnapshot[lootbox as ContractAddress].onChain as OnChainLootbox
+          const { sharesSoldMax, sharesSoldTarget, sharesSoldCount, sharePriceWei } = lootboxStateSnapshot[
+            lootbox as ContractAddress
+          ].onChain as OnChainLootbox
           const percentageFunded =
             sharesSoldCount && sharesSoldTarget
               ? new web3Utils.BN(sharesSoldCount)
@@ -128,7 +130,9 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
             .mul(new web3Utils.BN(sharePriceWei))
             .div(new web3Utils.BN('10').pow(new web3Utils.BN(18)))
 
-          const targetAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(targetAmountNativeBN, 'ether'))).toString()
+          const targetAmountNativeFmt = roundOff(
+            parseFloat(web3Utils.fromWei(targetAmountNativeBN, 'ether'))
+          ).toString()
           const maxAmountNativeFmt = roundOff(parseFloat(web3Utils.fromWei(maxAmountNativeBN, 'ether'))).toString()
 
           setTargetAmountNative(targetAmountNativeFmt)

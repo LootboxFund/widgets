@@ -4,8 +4,9 @@ import { loadLootboxMetadata } from 'lib/state/lootbox.state'
 import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
-import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import parseUrlParams from 'lib/utils/parseUrlParams'
+import { promiseChainDelay } from 'lib/utils/promise'
 
 type TicketCardRoutes = '/payout' | '/card'
 
@@ -35,12 +36,12 @@ export const generateStateID = (lootboxAddress: ContractAddress, ticketID: strin
 
 export const loadTicketData = async (ticketID: string) => {
   // HACK: read from url params if no lootbox in state for snappier loading
-  const lootboxAddress = ticketCardState?.lootboxAddress || parseUrlParams('lootbox') as ContractAddress
+  const lootboxAddress = ticketCardState?.lootboxAddress || (parseUrlParams('lootbox') as ContractAddress)
   if (!lootboxAddress) {
     return
   }
   const stateID = generateStateID(lootboxAddress, ticketID)
-  
+
   let metadata = undefined
   try {
     // @TODO make this readTicketMetadata
@@ -48,7 +49,7 @@ export const loadTicketData = async (ticketID: string) => {
   } catch (e) {
     console.error(e)
   }
-  
+
   const isNew = !ticketCardState.tickets[stateID]
   ticketCardState.tickets[stateID] = {
     route: isNew ? DEFAULT_ROUTE : ticketCardState.tickets[stateID].route,
@@ -70,7 +71,7 @@ export const loadDividends = async (ticketID: string) => {
   }
   const dividendFragments = await getTicketDividends(ticketCardState.lootboxAddress, ticketID)
   const nativeToken = getTokenFromList(NATIVE_ADDRESS)
-  const dividends: IDividend[] = await Promise.all(
+  const dividends: IDividend[] = await promiseChainDelay(
     dividendFragments.map(async (fragment) => {
       let symbol: string
       if (fragment.tokenAddress === NATIVE_ADDRESS) {

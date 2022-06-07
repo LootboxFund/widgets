@@ -52,25 +52,12 @@ import { manifest } from 'manifest'
 import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateLootbox/StepMagicLink'
 import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
-import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
+import { TournamentID } from 'lib/types'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 10 // base 2 - examples: 10 = 100%, 11 = 110%
 export const defaultFundraisingLimitMultiplierDecimal = 10
-
-const encodeImageURI = (imageURI: string) => {
-  const match = imageURI.match(`${LOOTBOX_ASSET_FOLDER}(.*)`)?.[0]
-  if (match) {
-    // remove ?alt=media
-    const parts = match.split('?')
-    const encoded = parts[0]
-    // const replace = `${encoded}`
-    var re = new RegExp(encoded, 'g')
-    return `${imageURI.replace(re, encodeURIComponent(encoded))}`
-  }
-  return imageURI
-}
 
 export interface CreateLootboxProps {}
 const CreateLootbox = (props: CreateLootboxProps) => {
@@ -104,6 +91,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [provider, loading] = useProvider()
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0
+  const [tournamentId, setTournamentId] = useState<string>('')
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
@@ -185,6 +173,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       const decodedCover = INITIAL_URL_PARAMS.coverImage
       tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
       prefilledFields.push(`Lootbox cover image is already set`)
+    }
+
+    if (INITIAL_URL_PARAMS.tournamentId) {
+      setTournamentId(INITIAL_URL_PARAMS.tournamentId)
+      prefilledFields.push(`Tournament ID is set`)
     }
 
     // @ts-ignore bullshit typing shit
@@ -423,6 +416,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          tournamentId: tournamentId as TournamentID,
         },
         socialState,
         snapUserState.network.currentNetworkIdHex
@@ -452,6 +446,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           paybackDate: paybackDate,
           downloaded,
           setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+          tournamentId: tournamentId as TournamentID,
         },
         socialState,
         snapUserState.network.currentNetworkIdHex
@@ -725,29 +720,30 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         themeColor={ticketState.themeColor as string}
         campaignBio={ticketState.biography as string}
         campaignWebsite={socialState.web}
-        uploadImages={async () => {
+        uploadLogo={async (submissionId: string) => {
           if (!ticketState.logoFile && !ticketState.logoUrl) {
             throw new Error('Logo not set')
           }
+          const imagePublicPath = ticketState.logoFile
+            ? await uploadLootboxLogo(submissionId, ticketState.logoFile)
+            : (ticketState.logoUrl as string)
 
+          return imagePublicPath
+        }}
+        uploadCover={async (submissionId: string) => {
           if (!ticketState.coverFile && !ticketState.coverUrl) {
             throw new Error('Cover not set')
           }
 
-          const submissionId = uuidv4()
-          const [imagePublicPath, backgroundPublicPath] = await Promise.all([
-            ticketState.logoFile
-              ? uploadLootboxLogo(submissionId, ticketState.logoFile)
-              : (ticketState.logoUrl as string),
-            ticketState.coverFile
-              ? uploadLootboxCover(submissionId, ticketState.coverFile)
-              : (ticketState.coverUrl as string),
-          ])
+          const coverPublicPath = ticketState.coverFile
+            ? await uploadLootboxCover(submissionId, ticketState.coverFile)
+            : (ticketState.coverUrl as string)
 
-          return [imagePublicPath, backgroundPublicPath]
+          return coverPublicPath
         }}
         stage="in_progress"
         selectedNetwork={network}
+        tournamentId={tournamentId}
       />
       <$Spacer></$Spacer>
     </$CreateLootbox>

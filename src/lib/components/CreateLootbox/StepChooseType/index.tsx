@@ -196,7 +196,8 @@ const $TypeTitle = styled.span`
 `
 
 const $NetworkOption = styled.button<{ isAvailable?: boolean; themeColor?: string; isSelected?: boolean }>`
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   padding: 8px 10px;
   flex: 1;
   display: flex;

@@ -27,7 +27,7 @@ const InfoText = () => {
   return (
     <$InfoTextContainer>
       <$HideTings isHidden={isHidden}>
-        {isHidden?
+        {isHidden ? (
           <$Button
             onClick={() => setIsHidden(!isHidden)}
             screen={screen}
@@ -43,22 +43,22 @@ const InfoText = () => {
               textDecoration: 'underline',
               fontStyle: 'italic',
               width: '100%',
-              background: 'transparent'
+              background: 'transparent',
             }}
           >
             Read More
           </$Button>
-        : undefined}
-        
+        ) : undefined}
       </$HideTings>
       <$Text>
         * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as{' '}
-        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Maximum</$Bold>. This entitles the
-        holder of this NFT to <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold>{' '}
-        deposited by the issuer. This {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the 
-        final amount of shares sold at the end of the Fundraising period. Lootbox takes a 3.2% fee of all investments in a Lootbox. 
-        There is no guarantee of a return, consult your financial advisor before investing. 
-        {!isHidden? 
+        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Maximum</$Bold>. This entitles
+        the holder of this NFT to{' '}
+        <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold> deposited by the issuer.
+        This {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the final amount of shares
+        sold at the end of the Fundraising period. Lootbox takes a 3.2% fee of all investments in a Lootbox. There is no
+        guarantee of a return, consult your financial advisor before investing.
+        {!isHidden ? (
           <span
             onClick={() => setIsHidden(!isHidden)}
             style={{
@@ -71,12 +71,12 @@ const InfoText = () => {
               textDecoration: 'underline',
               fontStyle: 'italic',
               paddingLeft: '30px',
-              cursor: 'pointer'
+              cursor: 'pointer',
             }}
           >
             hide
           </span>
-          :undefined}    
+        ) : undefined}
       </$Text>
     </$InfoTextContainer>
   )
@@ -120,11 +120,7 @@ const $HideTings = styled.div<{ isHidden: boolean }>`
     #ffffff 77.08%
   );`
       : 'none'};
-  display: ${(props) =>  
-      props.isHidden
-        ?'auto'
-        :'none'
-      };
+  display: ${(props) => (props.isHidden ? 'auto' : 'none')};
   };
 `
 

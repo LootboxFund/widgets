@@ -11,7 +11,9 @@ import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/h
 import { useProvider } from '../../hooks/useWeb3Api/index'
 import { BASE_BUTTON_STYLE } from '../BuyShares/BuyButton'
 
-export interface WalletButtonProps {}
+export interface WalletButtonProps {
+  style?: React.CSSProperties
+}
 const WalletButton = (props: WalletButtonProps) => {
   const snapUserState = useSnapshot(userState)
   const [provider] = useProvider()
@@ -71,6 +73,7 @@ const WalletButton = (props: WalletButtonProps) => {
           // fontWeight: 500,
           // fontSize: '1.2rem',
           ...BASE_BUTTON_STYLE,
+          ...(props.style ?? props.style),
         }}
       >
         Loading...
@@ -85,6 +88,7 @@ const WalletButton = (props: WalletButtonProps) => {
         backgroundColor={`${COLORS.trustBackground}80`}
         style={{
           ...BASE_BUTTON_STYLE,
+          ...(props.style ?? props.style),
         }}
       >
         Connected
@@ -99,6 +103,7 @@ const WalletButton = (props: WalletButtonProps) => {
         backgroundColor={`${COLORS.warningBackground}`}
         style={{
           ...BASE_BUTTON_STYLE,
+          ...(props.style ?? props.style),
         }}
       >
         Please install MetaMask
@@ -117,6 +122,7 @@ const WalletButton = (props: WalletButtonProps) => {
       backgroundColorHover={`${COLORS.dangerBackground}`}
       style={{
         ...BASE_BUTTON_STYLE,
+        ...(props.style ?? props.style),
       }}
     >
       Connect wallet

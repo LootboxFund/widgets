@@ -288,7 +288,10 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
               screen={screen}
             />
             <br />
-            <$Horizontal flexWrap={screen === 'mobile'}>
+            <$Horizontal
+              flexWrap={screen === 'mobile'}
+              style={{ flexDirection: screen === 'mobile' ? 'column' : 'row' }}
+            >
               <$Vertical>
                 {/* <$ColorPreview
                 

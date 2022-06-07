@@ -1,5 +1,5 @@
 import { proxy } from 'valtio'
-import { Address, Url, ChainIDHex, ChainIDDecimal } from '@wormgraph/helpers';
+import { Address, Url, ChainIDHex, ChainIDDecimal } from '@wormgraph/helpers'
 
 interface UserState {
   accounts: Address[]

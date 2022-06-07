@@ -40,7 +40,8 @@ export const stampNewLootbox = async (props: StampNewLootboxProps): Promise<stri
   }
   const headers = new Headers({
     'Content-Type': 'application/json',
-    secret: 'kjnlkvsjdnlkjsfnlvksjdnlksjdnvrjgnwoeirwhoqiwhqowncasljcnalsknaslkcnvlkdnlsdknscldksdjfnskdjfbksdjfbskdjqlwekjqwlekjqwlj',
+    secret:
+      'kjnlkvsjdnlkjsfnlvksjdnlksjdnvrjgnwoeirwhoqiwhqowncasljcnalsknaslkcnvlkdnlsdknscldksdjfnskdjfbksdjfbskdjqlwekjqwlekjqwlj',
   })
   try {
     const data = await fetch(manifest.cloudRun.containers.stampNewLootbox.fullRoute, {
@@ -68,11 +69,12 @@ interface StampNewTicketProps {
   lootboxAddress: ContractAddress
   chainIdHex: ChainIDHex
   numShares: string
-  metadata: ITicketMetadata 
+  metadata: ITicketMetadata
 }
 
 export const stampNewTicket = async (props: StampNewTicketProps): Promise<string> => {
-  const { backgroundImage, logoImage, themeColor, name, ticketID, lootboxAddress, chainIdHex, numShares, metadata } = props
+  const { backgroundImage, logoImage, themeColor, name, ticketID, lootboxAddress, chainIdHex, numShares, metadata } =
+    props
   const stampConfig = {
     backgroundImage,
     logoImage,
@@ -82,11 +84,12 @@ export const stampNewTicket = async (props: StampNewTicketProps): Promise<string
     lootboxAddress,
     chainIdHex,
     numShares,
-    metadata
+    metadata,
   }
   const headers = new Headers({
     'Content-Type': 'application/json',
-    secret: ';kdfng;dkjfgn;dkfjgnsldkjfna;sdaposdjpaokcpaoskpaosckapsocksdgnekrfnvlsdknalkdcnalsdgbrhejbgjrbkbakjsbaksjbksdjfs',
+    secret:
+      ';kdfng;dkjfgn;dkfjgnsldkjfna;sdaposdjpaokcpaoskpaosckapsocksdgnekrfnvlsdknalkdcnalsdgbrhejbgjrbkbakjsbaksjbksdjfs',
   })
   try {
     const data = await fetch(manifest.cloudRun.containers.stampNewTicket.fullRoute, {

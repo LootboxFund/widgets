@@ -8,6 +8,7 @@ import BN, { BigNumber } from 'bignumber.js'
 import { TokenData, Address, ContractAddress, ChainIDHex } from '@wormgraph/helpers'
 import { Contract, ethers as ethersObj } from 'ethers'
 import { getProvider } from '../useWeb3Api'
+import { promiseChainDelay } from 'lib/utils/promise'
 
 export interface IDividendFragment {
   tokenAddress: Address
@@ -86,6 +87,7 @@ export const getLootboxData = async (
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider(fallbackChain)
   const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, provider)
+
   const [
     name,
     symbol,
@@ -97,7 +99,8 @@ export const getLootboxData = async (
     variant,
     sharesSoldTarget,
     ticketPurchaseFee,
-  ] = await Promise.all([
+  ] = await promiseChainDelay([
+    // ] = await Promise.all([
     lootbox.name(),
     lootbox.symbol(),
     lootbox.sharePriceWei(),
@@ -217,7 +220,7 @@ export const identifyLootboxType = async (lootboxAddress: Address): Promise<[Loo
 
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
   console.log('Checking...')
-  const [lootboxType, isFundraising] = await Promise.all([lootbox.variant(), lootbox.isFundraising()])
+  const [lootboxType, isFundraising] = await promiseChainDelay([lootbox.variant(), lootbox.isFundraising()])
   console.log(`
     
   variant = ${lootboxType}
@@ -251,7 +254,7 @@ export const getLootboxEscrowManagementDetails = async (
     semver,
     symbol,
     sharePriceWei,
-  ] = await Promise.all([
+  ] = await promiseChainDelay([
     escrowLootbox.shareDecimals(),
     escrowLootbox.feeDecimals(),
     escrowLootbox.deploymentStartTime(),
@@ -405,7 +408,7 @@ export const getLootboxInstantManagementDetails = async (
     semver,
     symbol,
     sharePriceWei,
-  ] = await Promise.all([
+  ] = await promiseChainDelay([
     instantLootbox.shareDecimals(),
     instantLootbox.feeDecimals(),
     instantLootbox.deploymentStartTime(),
@@ -519,7 +522,7 @@ export const getLootboxIssuer = async (lootboxAddress: ContractAddress) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const lootbox = new ethers.Contract(lootboxAddress, LootboxPreknownABI, provider)
-  const [reputationAddress] = await Promise.all([lootbox.issuer()])
+  const reputationAddress = await lootbox.issuer()
   return [reputationAddress]
 }
 

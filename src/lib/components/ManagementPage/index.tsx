@@ -1,6 +1,6 @@
 import ManageLootbox from 'lib/components/ManageLootbox'
 import RewardSponsors from 'lib/components/RewardSponsors'
-import { Address, ContractAddress, ILootboxMetadata, ITicketMetadata, TicketID } from '@wormgraph/helpers'
+import { Address, ContractAddress, ITicketMetadata, TicketID } from '@wormgraph/helpers'
 import { useEffect, useRef, useState } from 'react'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { initLogging } from 'lib/api/logrocket'
@@ -12,6 +12,7 @@ import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
 import { $Horizontal } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
 import BulkMint from 'lib/components/BulkMint'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 
@@ -19,7 +20,7 @@ export interface ManagementPageProps {}
 
 const ManagementPage = () => {
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
-  const [lootboxMetadata, setLootboxMetadata] = useState<ILootboxMetadata>()
+  const [lootboxMetadata, setLootboxMetadata] = useState<LootboxMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
   const [lootboxType, setLootboxType] = useState<LootboxType>()
   const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
@@ -36,7 +37,7 @@ const ManagementPage = () => {
         .then(() => {
           return readLootboxMetadata(addr)
         })
-        .then((metadata: ILootboxMetadata) => {
+        .then((metadata: LootboxMetadata) => {
           if (!metadata || !metadata?.lootboxCustomSchema) {
             throw Error('No metadata found')
           }
@@ -77,7 +78,7 @@ const ManagementPage = () => {
   // console.log(lootboxType)
   // console.log(lootboxMetadata)
 
-  if (!network || !lootboxAddress || !lootboxType || !lootboxMetadata) {
+  if (!network || !lootboxAddress || !lootboxType || !lootboxMetadata || !lootboxMetadata?.lootboxCustomSchema) {
     if (lootboxMetadata && lootboxMetadata?.lootboxCustomSchema?.lootbox) {
       return (
         <section>

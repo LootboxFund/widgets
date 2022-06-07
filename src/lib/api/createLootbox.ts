@@ -4,12 +4,14 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
-import { Address, ChainIDHex, ContractAddress, convertHexToDecimal, ILootboxMetadata, ITicketMetadata } from '@wormgraph/helpers'
+import { Address, ChainIDHex, ContractAddress } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
+import { TournamentID } from 'lib/types'
+import { LootboxMetadata } from './graphql/generated/types'
 
 const SHARE_PRICE_WEI = '1000000000000' // HARDCODED FOR NOW
 const SHARE_PRICE_WEI_DECIMALS = '18' // HARDCODED FOR NOW
@@ -50,6 +52,7 @@ interface InstantLootboxArgs {
   paybackDate: string
   downloaded: boolean
   setDownloaded: (downloaded: boolean) => void
+  tournamentId?: TournamentID
 }
 const PRICE_PER_SHARE = 0.05
 interface LootboxSocials {
@@ -114,7 +117,7 @@ export const createInstantLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ILootboxMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+  const lootboxURI: LootboxMetadata = {
     image: '', // will be filled in by backend
     external_url: '', // will be filled in by backend
     description: args.biography,
@@ -141,7 +144,6 @@ export const createInstantLootbox = async (
         targetPaybackDate: new Date(args.paybackDate).valueOf(),
         transactionHash: '', // will be filled in by backend
         blockNumber: '', // will be filled in by backend
-
         name: args.name,
         description: args.biography,
         image: imagePublicPath,
@@ -150,6 +152,7 @@ export const createInstantLootbox = async (
         badgeImage: badgePublicPath || '',
         pricePerShare: SHARE_PRICE_WEI,
         lootboxThemeColor: args.lootboxThemeColor,
+        tournamentId: (args.tournamentId || '') as TournamentID, // TournamentID gets picked up in our backend event listeners
       },
 
       socials: {
@@ -255,21 +258,19 @@ export const createInstantLootbox = async (
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
           try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: chain.chainIdHex,
-                numShares,
-              }),
-            ])
+            const stampUrl = await stampNewLootbox({
+              // backgroundImage: ticketState.coverUrl as Url,
+              // logoImage: ticketState.logoUrl as Url,
+              logoImage: imagePublicPath,
+              backgroundImage: backgroundPublicPath,
+              badgeImage: badgePublicPath || '',
+              themeColor: args.lootboxThemeColor as string,
+              name: lootboxName,
+              ticketID,
+              lootboxAddress: lootbox,
+              chainIdHex: chain.chainIdHex,
+              numShares,
+            })
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
@@ -280,6 +281,7 @@ export const createInstantLootbox = async (
             LogRocket.captureException(err)
           } finally {
             setSubmitStatus('success')
+            provider.removeAllListeners(filter)
           }
         }
       }
@@ -340,7 +342,7 @@ export const createEscrowLootbox = async (
    * Instead, it gets filled in by our backend in an event listener. This causes weaker typing - be sure to coordinate this
    * with the backend @cloudfns repo
    */
-  const lootboxURI: ILootboxMetadata & { lootboxCustomSchema: { lootbox: { factory: ContractAddress } } } = {
+  const lootboxURI: LootboxMetadata = {
     image: '', // will be filled in by backend
     external_url: '', // will be filled in by backend
     description: args.biography,
@@ -376,6 +378,7 @@ export const createEscrowLootbox = async (
         badgeImage: badgePublicPath || '',
         pricePerShare: SHARE_PRICE_WEI,
         lootboxThemeColor: args.lootboxThemeColor,
+        tournamentId: (args.tournamentId || '') as TournamentID,
       },
 
       socials: {
@@ -487,21 +490,19 @@ export const createEscrowLootbox = async (
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
           try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: chain.chainIdHex,
-                numShares,
-              }),
-            ])
+            const stampUrl = await stampNewLootbox({
+              // backgroundImage: ticketState.coverUrl as Url,
+              // logoImage: ticketState.logoUrl as Url,
+              logoImage: imagePublicPath,
+              backgroundImage: backgroundPublicPath,
+              badgeImage: badgePublicPath || '',
+              themeColor: args.lootboxThemeColor as string,
+              name: lootboxName,
+              ticketID,
+              lootboxAddress: lootbox,
+              chainIdHex: chain.chainIdHex,
+              numShares,
+            })
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
@@ -512,6 +513,7 @@ export const createEscrowLootbox = async (
             LogRocket.captureException(err)
           } finally {
             setSubmitStatus('success')
+            provider.removeAllListeners(filter)
           }
         }
       }

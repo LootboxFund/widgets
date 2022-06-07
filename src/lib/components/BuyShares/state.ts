@@ -108,9 +108,11 @@ export const fillLootboxEstimate = () => {
     if (sharesAvailable.gt(new BN('0'))) {
       // From the shares available, calculate how much native token is needed to buy them by including the lootbox fee
       const nativeTokenWithoutFee = sharesAvailable.multipliedBy(new BN(sharePriceWei)).dividedBy(new BN(10).pow(18))
-      
-      const amountOfNativeTokenNeeded = nativeTokenWithoutFee.multipliedBy(new BN(10).pow(FEE_DECIMALS)).dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
-      return amountOfNativeTokenNeeded.toFixed(0, 1)  // Round down
+
+      const amountOfNativeTokenNeeded = nativeTokenWithoutFee
+        .multipliedBy(new BN(10).pow(FEE_DECIMALS))
+        .dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
+      return amountOfNativeTokenNeeded.toFixed(0, 1) // Round down
     }
   }
   return new BN('0')
@@ -128,67 +130,67 @@ export const purchaseLootboxShare = async () => {
 
   buySharesState.ui.isButtonLoading = true
   try {
-    // Get ticket id of the ticket to be purchased 
+    // Get ticket id of the ticket to be purchased
     const ticketId = await getLootboxTicketId(buySharesState.lootbox.address)
-    
+
     const transactionHash = await buyLootboxShares(
       buySharesState.lootbox.address,
       parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
     )
 
-    const shares = new BN(buySharesState.lootbox.quantity || "0").toFixed(2)
+    const shares = new BN(buySharesState.lootbox.quantity || '0').toFixed(2)
 
     // Stamp the ticket + write metadata
     const metadata = await loadLootboxMetadata(buySharesState.lootbox.address as ContractAddress)
 
     await stampNewTicket({
-      backgroundImage: metadata?.lootboxCustomSchema?.lootbox?.backgroundImage || "",
-      logoImage: metadata?.lootboxCustomSchema?.lootbox?.image || "",
-      themeColor: metadata?.lootboxCustomSchema?.lootbox?.backgroundColor || "",
-      name: buySharesState.lootbox.data.name || "",
+      backgroundImage: metadata?.lootboxCustomSchema?.lootbox?.backgroundImage || '',
+      logoImage: metadata?.lootboxCustomSchema?.lootbox?.image || '',
+      themeColor: metadata?.lootboxCustomSchema?.lootbox?.backgroundColor || '',
+      name: buySharesState.lootbox.data.name || '',
       ticketID: ticketId,
       lootboxAddress: buySharesState.lootbox.address as ContractAddress,
-      chainIdHex: userState.network.currentNetworkIdHex || "",
+      chainIdHex: userState.network.currentNetworkIdHex || '',
       numShares: shares,
       metadata: {
-          image: "", // the stamp - should get filled in by the backend
-          external_url: metadata?.external_url || '',
-          description: metadata?.description || '',
-          name: metadata?.name || '',
-          background_color: metadata?.background_color || '000000',
-          animation_url: metadata?.animation_url || '',
-          youtube_url: metadata?.youtube_url || '',
-          attributes: [
-            {
-              trait_type: 'Shares',
-              value: shares,
-              display_type: 'number'
-            },
-            {
-              trait_type: 'Ticket Number',
-              value: ticketId,
-              display_type: 'number'
-            },
-          ],
-          lootboxCustomSchema: {
-            version: metadata?.lootboxCustomSchema.version || manifest.semver.id,
-            chain: {
-              /** lootbox address */
-              address: metadata?.lootboxCustomSchema?.chain?.address || '',
-              chainIdHex: metadata?.lootboxCustomSchema?.chain?.chainIdHex || '',
-              chainName: metadata?.lootboxCustomSchema?.chain?.chainName || '',
-              chainIdDecimal: metadata?.lootboxCustomSchema?.chain?.chainIdDecimal || ''
-            },
-            lootbox: {
-              ticketNumber: Number(ticketId),
-              backgroundImage: metadata?.lootboxCustomSchema?.lootbox?.backgroundImage || "",
-              image: metadata?.lootboxCustomSchema?.lootbox?.image || "",
-              backgroundColor: metadata?.lootboxCustomSchema?.lootbox?.backgroundColor || "",
-              badgeImage: metadata?.lootboxCustomSchema?.lootbox?.badgeImage,
-              sharesInTicket: shares
-            },
-          }
-      }
+        image: '', // the stamp - should get filled in by the backend
+        external_url: metadata?.external_url || '',
+        description: metadata?.description || '',
+        name: metadata?.name || '',
+        background_color: metadata?.background_color || '000000',
+        animation_url: metadata?.animation_url || '',
+        youtube_url: metadata?.youtube_url || '',
+        attributes: [
+          {
+            trait_type: 'Shares',
+            value: shares,
+            display_type: 'number',
+          },
+          {
+            trait_type: 'Ticket Number',
+            value: ticketId,
+            display_type: 'number',
+          },
+        ],
+        lootboxCustomSchema: {
+          version: metadata?.lootboxCustomSchema?.version || manifest.semver.id,
+          chain: {
+            /** lootbox address */
+            address: metadata?.lootboxCustomSchema?.chain?.address || '',
+            chainIdHex: metadata?.lootboxCustomSchema?.chain?.chainIdHex || '',
+            chainName: metadata?.lootboxCustomSchema?.chain?.chainName || '',
+            chainIdDecimal: metadata?.lootboxCustomSchema?.chain?.chainIdDecimal || '',
+          },
+          lootbox: {
+            ticketNumber: Number(ticketId),
+            backgroundImage: metadata?.lootboxCustomSchema?.lootbox?.backgroundImage || '',
+            image: metadata?.lootboxCustomSchema?.lootbox?.image || '',
+            backgroundColor: metadata?.lootboxCustomSchema?.lootbox?.backgroundColor || '',
+            badgeImage: metadata?.lootboxCustomSchema?.lootbox?.badgeImage,
+            sharesInTicket: shares,
+          },
+        },
+      },
     })
 
     buySharesState.lastTransaction.success = true

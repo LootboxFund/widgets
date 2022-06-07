@@ -1,69 +1,70 @@
-import { ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { proxy, subscribe } from 'valtio'
 import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import { getLootboxData } from 'lib/hooks/useContract'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export interface OnChainLootbox {
-    name: string
-    symbol: string
-    sharePriceWei: string
-    sharesSoldCount: string
-    sharesSoldMax: string
-    sharesSoldTarget: string
-    ticketIdCounter: string
-    shareDecimals: string
-    variant: string
-    ticketPurchaseFee: string
+  name: string
+  symbol: string
+  sharePriceWei: string
+  sharesSoldCount: string
+  sharesSoldMax: string
+  sharesSoldTarget: string
+  ticketIdCounter: string
+  shareDecimals: string
+  variant: string
+  ticketPurchaseFee: string
 }
 
 export interface Lootbox {
-    onChain?: OnChainLootbox
-    metadata?: ILootboxMetadata
+  onChain?: OnChainLootbox
+  metadata?: LootboxMetadata
 }
 
 export interface LootboxState {
-    [key: ContractAddress]: Lootbox
+  [key: ContractAddress]: Lootbox
 }
 const lootboxSnapshot: LootboxState = {}
 
 export const lootboxState = proxy(lootboxSnapshot)
 
 export const loadLootbox = async (lootboxAddress: ContractAddress): Promise<Lootbox | undefined> => {
+  await loadLootboxMetadata(lootboxAddress)
+  await loadLootboxOnChainData(lootboxAddress)
 
-    await loadLootboxMetadata(lootboxAddress)
-    await loadLootboxOnChainData(lootboxAddress)
-
-    return lootboxState[lootboxAddress]
+  return lootboxState[lootboxAddress]
 }
 
-export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Promise<ILootboxMetadata | undefined> => {
+export const loadLootboxMetadata = async (lootboxAddress: ContractAddress): Promise<LootboxMetadata | undefined> => {
+  if (lootboxState[lootboxAddress]?.metadata) {
+    // Metadata already loaded
+    return lootboxState[lootboxAddress].metadata
+  }
 
-    if (lootboxState[lootboxAddress]?.metadata) {
-        // Metadata already loaded
-        return lootboxState[lootboxAddress].metadata
-    }
+  const metadata = await readLootboxMetadata(lootboxAddress)
 
-    const metadata = await readLootboxMetadata(lootboxAddress)
-    
-    lootboxState[lootboxAddress] = {...lootboxState[lootboxAddress], metadata}
+  lootboxState[lootboxAddress] = { ...lootboxState[lootboxAddress], metadata }
 
-    return metadata
+  return metadata
 }
 
 export const loadLootboxOnChainData = async (lootboxAddress: ContractAddress): Promise<OnChainLootbox | undefined> => {
-    
-    let metadata: ILootboxMetadata | undefined = lootboxState[lootboxAddress]?.metadata
-    if (!lootboxState[lootboxAddress]?.metadata) {
-        try {
-            metadata = await loadLootboxMetadata(lootboxAddress)
-        } catch (err) {
-            console.error('Could not load lootbox metadata!', metadata)
-        }
+  let metadata: LootboxMetadata | undefined = lootboxState[lootboxAddress]?.metadata
+  if (!lootboxState[lootboxAddress]?.metadata) {
+    try {
+      metadata = await loadLootboxMetadata(lootboxAddress)
+    } catch (err) {
+      console.error('Could not load lootbox metadata!', metadata)
     }
+  }
 
-    const onChainData: OnChainLootbox  = await getLootboxData(lootboxAddress, metadata?.lootboxCustomSchema?.chain?.chainIdHex)
+  const onChainData: OnChainLootbox = await getLootboxData(
+    lootboxAddress,
+    metadata?.lootboxCustomSchema?.chain?.chainIdHex
+  )
 
-    lootboxState[lootboxAddress] = {...lootboxState[lootboxAddress], onChain: {...onChainData}}
+  lootboxState[lootboxAddress] = { ...lootboxState[lootboxAddress], onChain: { ...onChainData } }
 
-    return onChainData
+  return onChainData
 }

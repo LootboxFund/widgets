@@ -43,7 +43,7 @@ const InteractWithLootbox = () => {
   )
 }
 
-const $TicketContainer = styled.section<{screen: ScreenSize}>`
+const $TicketContainer = styled.section<{ screen: ScreenSize }>`
   padding-top: 40px;
 `
 

@@ -1,4 +1,4 @@
-import { Address, ContractAddress, ILootboxMetadata } from '@wormgraph/helpers'
+import { Address, ContractAddress } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -22,11 +22,12 @@ import $Input, { InputDecimal } from '../Generics/Input'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import BigNumber from 'bignumber.js'
 import { bulkMintNFTsContractCall, getPriceFeed, LootboxType } from 'lib/hooks/useContract'
+import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
 export interface BulkMintProps {
   lootboxAddress: ContractAddress
   network: NetworkOption
-  lootboxMetadata: ILootboxMetadata
+  lootboxMetadata: LootboxMetadata
   lootboxType: LootboxType
 }
 const BulkMint = (props: BulkMintProps) => {

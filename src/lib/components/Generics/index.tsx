@@ -1,7 +1,9 @@
 import styled from 'styled-components'
 
+export * from './Typography'
+
 interface HorizontalProps {
-  readonly justifyContent?: 'flex-start' | 'center' | 'space-evenly' | 'space-between' | 'flex-end'
+  readonly justifyContent?: 'flex-start' | 'center' | 'space-evenly' | 'space-between' | 'flex-end' | 'space-around'
   readonly verticalCenter?: boolean
   readonly baseline?: boolean
   readonly spacing?: 1 | 2 | 3 | 4 | 5
@@ -40,8 +42,11 @@ export const $Vertical = styled.div<{
   spacing?: 1 | 2 | 3 | 4 | 5
   flex?: number
   width?: string
+  minWidth?: string
   height?: string
   padding?: string
+  maxWidth?: string
+  justifyContent?: string
 }>`
   display: flex;
   flex-direction: column;
@@ -49,16 +54,26 @@ export const $Vertical = styled.div<{
   ${(props) => props.width && `width: ${props.width};`};
   ${(props) => props.height && `height: ${props.height};`};
   ${(props) => props.padding && `padding: ${props.padding};`}
+  ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
+  ${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`}
+  ${(props) => props.minWidth && `min-width: ${props.minWidth};`}
   & > *:not(:last-child) {
     margin-bottom: ${(props) => props.spacing && `${SPACING_VALS[props.spacing - 1]}px`};
   }
 `
 
-export const $CardViewport = styled.div<{ margin?: string; width?: string; height?: string; maxWidth?: string }>`
+export const $CardViewport = styled.div<{
+  padding?: string
+  margin?: string
+  width?: string
+  height?: string
+  maxWidth?: string
+}>`
   width: ${(props) => (props.width ? props.width : '300px')};
   height: ${(props) => (props.height ? props.height : '600px')};
   ${(props) => props.maxWidth && `max-width: ${props.maxWidth};`}
   ${(props) => props.margin && `margin: ${props.margin};`}
+  ${(props) => props.padding && `padding: ${props.padding};`}
 `
 
 export const $ScrollVertical = styled.div<{ height?: string }>`
@@ -92,4 +107,10 @@ export const $Container = styled.section<{ screen: string | undefined }>`
   box-sizing: border-box;
   padding: ${(props) => (props.screen === 'mobile' ? '0px' : '20px')};
   box-shadow: ${(props) => (props.screen === 'mobile' ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.1)')};
+`
+export const $Divider = styled.div<{ margin?: string; width?: string }>`
+  margin: ${(props) => (props.margin ? props.margin : '20px 0px')};
+  height: 0px;
+  width: ${(props) => (props.width ? props.width : '100%')};
+  border-top: 1px solid rgba(0, 0, 0, 0.23);
 `

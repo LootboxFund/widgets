@@ -14,6 +14,9 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import LogRocket from 'logrocket'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { $InputMedium } from '../StepCustomize'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
+import { v4 as uuidv4 } from 'uuid'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -31,9 +34,11 @@ export interface StepMagicLinkProps {
   themeColor: string | undefined
   campaignBio: string | undefined
   campaignWebsite: string | undefined
-  uploadImages: () => Promise<[string, string]>
+  uploadLogo: (submissionId: string) => Promise<string>
+  uploadCover: (submissionId: string) => Promise<string>
   selectedNetwork: NetworkOption | undefined
   stage: StepStage
+  tournamentId?: string
 }
 const StepMagicLink = (props: StepMagicLinkProps) => {
   const { screen } = useWindowSize()
@@ -51,6 +56,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const [includeThemeColor, setIncludeThemeColor] = useState(true)
   const [includeCampaignBio, setIncludeCampaignBio] = useState(true)
   const [includeCampaignWebsite, setIncludeCampaignWebsite] = useState(true)
+  const [includeTournamentId, setIncludeTournamentId] = useState(true)
   const [loading, setLoading] = useState(false)
 
   const generateMagicLink = async () => {
@@ -82,16 +88,27 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
     if (includeCampaignWebsite) {
       queryParams.campaignWebsite = props.campaignWebsite
     }
-    try {
-      const [logoImage, coverImage] = await props.uploadImages()
-      if (includeLogoImage) {
+    if (includeTournamentId && props.tournamentId) {
+      queryParams.tournamentId = props.tournamentId
+    }
+
+    const submissionId = uuidv4()
+
+    if (includeLogoImage) {
+      try {
+        const logoImage = await props.uploadLogo(submissionId)
         queryParams.logoImage = logoImage
+      } catch (err) {
+        LogRocket.captureException(err)
       }
-      if (includeCoverImage) {
+    }
+    if (includeCoverImage) {
+      try {
+        const coverImage = await props.uploadCover(submissionId)
         queryParams.coverImage = coverImage
+      } catch (err) {
+        LogRocket.captureException(err)
       }
-    } catch (err) {
-      LogRocket.captureException(err)
     }
 
     const magicLink = queryString.stringifyUrl({
@@ -243,6 +260,13 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
               text={`Set the website in the Lootbox social links automatically`}
               locked={false}
             />
+            <IncludeTerm
+              slug="tournamentId"
+              checked={includeTournamentId}
+              onClick={setIncludeTournamentId}
+              text={`Set the tournament id to ${props.tournamentId}`}
+              locked={false}
+            />
             <br />
             <br />
             <$Button
@@ -258,14 +282,11 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
           <br />
           {magicLink && (
             <$Vertical>
-              <input
-                value={magicLink}
-                style={{
-                  fontSize: TYPOGRAPHY.fontSize.large,
-                  fontFamily: TYPOGRAPHY.fontFamily.regular,
-                  color: COLORS.surpressedFontColor,
-                }}
-              ></input>
+              <$CopyableInput>
+                <$InputMedium style={{ width: '100%' }} disabled value={magicLink}></$InputMedium>
+                <CopyIcon text={magicLink} />
+              </$CopyableInput>
+
               <br />
               <span
                 style={{
@@ -323,5 +344,14 @@ const IncludeTerm = (props: IncludeTermProps) => {
     </div>
   )
 }
+
+const $CopyableInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  width: 100%;
+`
 
 export default StepMagicLink

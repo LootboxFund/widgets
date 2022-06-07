@@ -55,6 +55,7 @@ export const extractURLState_CreateLootboxPage = () => {
     campaignBio: url.searchParams.get('campaignBio'),
     campaignWebsite: url.searchParams.get('campaignWebsite'),
     themeColor: url.searchParams.get('themeColor'),
+    tournamentId: url.searchParams.get('tournamentId'),
   }
   if (validNetworks.includes(params.network || '')) {
     INITIAL_FORM_STATE.stepNetwork = 'may_proceed'
