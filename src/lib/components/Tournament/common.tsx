@@ -4,7 +4,7 @@ import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
-import { $Horizontal, $p, $h1, $span, $Vertical, $h3 } from '../Generics'
+import { $Horizontal, $p, $h1, $span, $Vertical, $h3, $h2 } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
@@ -136,6 +136,7 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction 
           Join the Tournament
         </$Button>
       )}
+      <$h2>Teams in this Tournament</$h2>
       <$SearchInput
         type="search"
         placeholder="🔍 Search Lootboxes by Name or Address"

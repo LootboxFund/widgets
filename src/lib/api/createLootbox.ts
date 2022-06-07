@@ -258,21 +258,19 @@ export const createInstantLootbox = async (
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
           try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: chain.chainIdHex,
-                numShares,
-              }),
-            ])
+            const stampUrl = await stampNewLootbox({
+              // backgroundImage: ticketState.coverUrl as Url,
+              // logoImage: ticketState.logoUrl as Url,
+              logoImage: imagePublicPath,
+              backgroundImage: backgroundPublicPath,
+              badgeImage: badgePublicPath || '',
+              themeColor: args.lootboxThemeColor as string,
+              name: lootboxName,
+              ticketID,
+              lootboxAddress: lootbox,
+              chainIdHex: chain.chainIdHex,
+              numShares,
+            })
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
@@ -491,21 +489,19 @@ export const createEscrowLootbox = async (
           const ticketID = '0x'
           const numShares = ethers.utils.formatEther(maxSharesSold)
           try {
-            const [stampUrl] = await Promise.all([
-              stampNewLootbox({
-                // backgroundImage: ticketState.coverUrl as Url,
-                // logoImage: ticketState.logoUrl as Url,
-                logoImage: imagePublicPath,
-                backgroundImage: backgroundPublicPath,
-                badgeImage: badgePublicPath || '',
-                themeColor: args.lootboxThemeColor as string,
-                name: lootboxName,
-                ticketID,
-                lootboxAddress: lootbox,
-                chainIdHex: chain.chainIdHex,
-                numShares,
-              }),
-            ])
+            const stampUrl = await stampNewLootbox({
+              // backgroundImage: ticketState.coverUrl as Url,
+              // logoImage: ticketState.logoUrl as Url,
+              logoImage: imagePublicPath,
+              backgroundImage: backgroundPublicPath,
+              badgeImage: badgePublicPath || '',
+              themeColor: args.lootboxThemeColor as string,
+              name: lootboxName,
+              ticketID,
+              lootboxAddress: lootbox,
+              chainIdHex: chain.chainIdHex,
+              numShares,
+            })
             console.log(`Stamp URL: ${stampUrl}`)
             // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
             if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
