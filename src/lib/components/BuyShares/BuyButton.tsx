@@ -172,7 +172,7 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
         disabled
       >
-        Lootbox could not be loaded
+        Please try again later
       </$Button>
     )
   } else if (isInsufficientFunds) {

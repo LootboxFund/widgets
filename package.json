@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/widgets",
-  "version": "0.6.0-demo",
+  "version": "0.6.0-prod",
   "main": "lib/index.js",
   "browser": "lib/index.js",
   "author": "0xterran",
@@ -57,7 +57,7 @@
   "scripts": {
     "codegen": "graphql-codegen --config codegen.yml",
     "watch": "rollup -c -w",
-    "build": "yarn codegen && NODE_ENV=production rollup -c",
+    "build": "NODE_ENV=production rollup -c",
     "test": "jest --verbose --watch",
     "storybook": "start-storybook",
     "build-storybook": "build-storybook",
@@ -89,7 +89,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "0.1.10",
-    "@wormgraph/manifest": "0.3.77",
+    "@wormgraph/manifest": "0.3.84",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "ethers": "5.5.4",

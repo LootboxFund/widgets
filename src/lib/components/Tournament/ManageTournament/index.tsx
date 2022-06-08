@@ -78,7 +78,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                 fontStyle="italic"
                 href={createLootboxUrl}
                 style={{ marginRight: '15px', textDecoration: 'none' }}
-                target="_self"
+                target="_blank"
               >
                 Create Magic Link
               </$Link>
@@ -145,7 +145,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   <br />
                   <br />
                   1) Create a magic link for this exact tournament by 👉{' '}
-                  <$Link fontStyle="italic" href={createLootboxUrl} target="_self">
+                  <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
                     clicking here
                   </$Link>
                   <br />
