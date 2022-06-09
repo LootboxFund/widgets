@@ -27,6 +27,7 @@ export const $h1 = styled.h1<{ textAlign?: 'center' | 'start'; color?: string }>
 
 export const $h2 = styled.h2`
   font-size: ${TYPOGRAPHY.fontSize.xlarge};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${DARK_FONT_COLOR};
@@ -34,6 +35,7 @@ export const $h2 = styled.h2`
 
 export const $h3 = styled.h2<{ textAlign?: string; color?: string }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.large};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${COLORS.surpressedFontColor};
@@ -58,7 +60,7 @@ export const $span = styled.span<{
   color?: string
 }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};
-  line-height: ${(props) => props.lineHeight || TYPOGRAPHY.fontSize.xlarge};
+  line-height: ${(props) => props.lineHeight || TYPOGRAPHY.fontSize.large};
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${(props) => props.color || COLORS.surpressedFontColor}ce;
