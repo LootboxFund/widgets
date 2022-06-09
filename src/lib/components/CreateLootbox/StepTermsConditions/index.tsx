@@ -28,7 +28,7 @@ const TERMS: TermsFragment[] = [
   { slug: 'agreeVerify', text: 'I have verified my Reputation address & Treasury wallet is correct' },
 ]
 
-export type SubmitStatus = 'unsubmitted' | 'in_progress' | 'success' | 'failure'
+export type SubmitStatus = 'unsubmitted' | 'in_progress' | 'success' | 'failure' | 'pending_confirmation'
 export interface StepTermsConditionsProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -39,7 +39,7 @@ export interface StepTermsConditionsProps {
   reputationWallet: Address
   updateTreasuryWallet: (wallet: Address) => void
   allConditionsMet: boolean
-  onSubmit: () => void
+  onSubmit: () => Promise<void>
   setValidity: (bool: boolean) => void
   submitStatus: SubmitStatus
   goToLootboxAdminPage: () => string
@@ -104,9 +104,9 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
   const updateCheckbox = (slug: string, checked: any) => {
     props.updateTermsState(slug, checked)
   }
-  const submitWithCountdown = () => {
-    setTimeLeft(90)
-    props.onSubmit()
+  const submitWithCountdown = async () => {
+    await props.onSubmit() // Wait for the user to accept the transaction
+    setTimeLeft(120) // set the timer
   }
   const renderActionBar = () => {
     if (props.submitStatus === 'failure') {
@@ -114,7 +114,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         <CreateLootboxButton
           allConditionsMet={props.allConditionsMet}
           themeColor={COLORS.dangerFontColor}
-          onSubmit={props.onSubmit}
+          onSubmit={() => submitWithCountdown()}
           text="Failed, try again?"
         />
       )
@@ -132,6 +132,12 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
           {`...submitting (${timeLeft})`}
+        </$CreateLootboxButton>
+      )
+    } else if (props.submitStatus === 'pending_confirmation') {
+      return (
+        <$CreateLootboxButton allConditionsMet={false} disabled themeColor={COLORS.warningBackground}>
+          {`Confirm on MetaMask`}
         </$CreateLootboxButton>
       )
     }

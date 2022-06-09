@@ -145,8 +145,6 @@ const BuyButton = (props: BuyButtonProps) => {
         Lootbox not found
       </$Button>
     )
-  } else if (!isWalletConnected) {
-    return <WalletButton />
   } else if (isMetadataLoaded && isWrongChain) {
     return (
       <$Button
@@ -161,6 +159,8 @@ const BuyButton = (props: BuyButtonProps) => {
         Switch network
       </$Button>
     )
+  } else if (!isWalletConnected) {
+    return <WalletButton />
   } else if (!isLootboxLoaded) {
     return (
       <$Button

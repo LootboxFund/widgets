@@ -30,7 +30,9 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
   const [hasNonZeroTokens, setHasNonZeroToken] = useState<boolean>(false)
 
   useEffect(() => {
-    if (props.selectedNetwork && snapUserState.currentAccount) {
+    if (props.selectedNetwork && !snapUserState.currentAccount) {
+      setErrors(['Please connect you wallet by clicking the red button "Connect" above ☝️'])
+    } else if (props.selectedNetwork && snapUserState.currentAccount) {
       setErrors([' '])
       getUserBalanceOfNativeToken(snapUserState.currentAccount as Address)
         .then((balance) => {

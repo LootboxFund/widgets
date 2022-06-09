@@ -386,7 +386,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
-    setSubmitStatus('in_progress')
+    setSubmitStatus('pending_confirmation')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (!snapUserState?.network?.currentNetworkIdHex) {
       throw new Error('Network not set')
@@ -589,7 +589,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     <$CreateLootbox>
       {preconfigParams && preconfigParams.length > 0 && (
         <div style={{ width: '100%' }}>
-          <StepPrefillDisclaimer selectedNetwork={network} prefilledFields={preconfigParams} />
+          <StepPrefillDisclaimer
+            tournamentId={tournamentId as TournamentID | undefined}
+            selectedNetwork={network}
+            prefilledFields={preconfigParams}
+          />
           <$Spacer></$Spacer>
         </div>
       )}

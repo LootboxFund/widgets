@@ -75,7 +75,7 @@ export const createInstantLootbox = async (
   socials: LootboxSocials,
   chainIdHex: ChainIDHex
 ) => {
-  setSubmitStatus('in_progress')
+  setSubmitStatus('pending_confirmation')
   const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
   if (!chain) {
     throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
@@ -211,6 +211,8 @@ export const createInstantLootbox = async (
       JSON.stringify(lootboxURI) // string memory _data
     )
 
+    setSubmitStatus('in_progress')
+
     console.log(`Submitted lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
@@ -300,7 +302,7 @@ export const createEscrowLootbox = async (
   socials: LootboxSocials,
   chainIdHex: ChainIDHex
 ) => {
-  setSubmitStatus('in_progress')
+  setSubmitStatus('pending_confirmation')
 
   const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
   if (!chain) {
@@ -443,6 +445,8 @@ export const createEscrowLootbox = async (
       args.receivingWallet, //     address _treasury,
       JSON.stringify(lootboxURI) // string memory _data
     )
+    setSubmitStatus('in_progress')
+
     console.log(`Submitted escrow lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
