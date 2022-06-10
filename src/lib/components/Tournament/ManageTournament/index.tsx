@@ -19,6 +19,7 @@ import EditTournament from './EditTournament'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { COLORS } from '@wormgraph/helpers'
 import { initDApp } from 'lib/hooks/useWeb3Api'
+import { initLogging } from 'lib/api/logrocket'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -210,6 +211,7 @@ const ManageTournamentPage = () => {
   }, [])
 
   useEffect(() => {
+    initLogging()
     const tid = parseUrlParams('tid')
     if (tid) {
       setTournamentId(tid as TournamentID)

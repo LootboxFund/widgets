@@ -19,6 +19,7 @@ import { LoadingText } from '../../Generics/Spinner'
 import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
 import { manifest } from 'manifest'
 import { initDApp } from 'lib/hooks/useWeb3Api'
+import { initLogging } from 'lib/api/logrocket'
 
 interface CreateTournamentProps {
   onSuccessCallback?: (tournament: Tournament) => void
@@ -166,6 +167,7 @@ export const $ChangeMode = styled.div`
 const CreateTournamentPage = () => {
   useEffect(() => {
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {

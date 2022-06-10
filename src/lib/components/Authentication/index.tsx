@@ -10,6 +10,7 @@ import LoginEmail from './LoginEmail'
 import ResetPassword from './ResetPassword'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { initLogging } from 'lib/api/logrocket'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
@@ -21,6 +22,7 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
 
   useEffect(() => {
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {
