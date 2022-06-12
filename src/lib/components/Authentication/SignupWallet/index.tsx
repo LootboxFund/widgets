@@ -43,11 +43,6 @@ const SignupWallet = (props: SignUpWalletProps) => {
       setLoading(false)
     }
   }
-
-  const goToPasswordSignUp = () => {
-    props.onChangeMode('signup-password')
-  }
-
   return (
     <$Vertical spacing={4}>
       <$Header>Register</$Header>
@@ -71,7 +66,6 @@ const SignupWallet = (props: SignUpWalletProps) => {
         </$Button>
       ) : null}
 
-      <$ChangeMode onClick={goToPasswordSignUp}>Or use a password</$ChangeMode>
       {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )

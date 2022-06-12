@@ -2,7 +2,7 @@ import { TYPOGRAPHY } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { $span, $Vertical } from '../Generics'
-import { ModeOptions } from './Shared'
+import { $ChangeMode, ModeOptions } from './Shared'
 import SignupEmail from './SignupEmail'
 import SignupWallet from './SignupWallet'
 import LoginWallet from './LoginWallet'
@@ -49,6 +49,28 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
     return ''
   }
 
+  const renderSwitchInnerRouteText = () => {
+    if (route === 'login-password') {
+      return <$ChangeMode onClick={() => setRoute('login-wallet')}>Or use your wallet to sign in</$ChangeMode>
+    } else if (route === 'login-wallet') {
+      return <$ChangeMode onClick={() => setRoute('login-password')}>Or use a password</$ChangeMode>
+    } else if (route === 'signup-password') {
+      return <$ChangeMode onClick={() => setRoute('signup-wallet')}>Or use your MetaMask wallet</$ChangeMode>
+    } else if (route === 'signup-wallet') {
+      return (
+        <$ChangeMode
+          onClick={() => {
+            setRoute('signup-password')
+          }}
+        >
+          Or use a password
+        </$ChangeMode>
+      )
+    }
+
+    return null
+  }
+
   return (
     <$Vertical
       spacing={4}
@@ -71,27 +93,13 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
       {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}
 
       <$Vertical spacing={4}>
-        {route !== 'forgot-password' && route == 'login-password' && (
-          <$PromptText>
-            {
-              <$span style={{ cursor: 'pointer' }}>
-                Forgot password? <$Link onClick={() => setRoute('forgot-password')}>click here</$Link>
-              </$span>
-            }
-          </$PromptText>
-        )}
-
-        <$PromptText>{renderSwitchRouteText()}</$PromptText>
+        <$span textAlign="center">{renderSwitchInnerRouteText()}</$span>
+        <$span textAlign="center">{renderSwitchRouteText()}</$span>
       </$Vertical>
     </$Vertical>
   )
 }
 
-const $PromptText = styled.div`
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  text-align: center;
-`
 const $Link = styled.span`
   color: #1abaff;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
