@@ -257,34 +257,37 @@ export const createInstantLootbox = async (
           `)
           args.setLootboxAddress(lootbox)
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const stampUrl = await stampNewLootbox({
-              // backgroundImage: ticketState.coverUrl as Url,
-              // logoImage: ticketState.logoUrl as Url,
-              logoImage: imagePublicPath,
-              backgroundImage: backgroundPublicPath,
-              badgeImage: badgePublicPath || '',
-              themeColor: args.lootboxThemeColor as string,
-              name: lootboxName,
-              ticketID,
-              lootboxAddress: lootbox,
-              chainIdHex: chain.chainIdHex,
-              numShares,
-            })
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootbox}-lootbox`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-            provider.removeAllListeners(filter)
-          }
+          // const ticketID = '0x'
+          // const numShares = ethers.utils.formatEther(maxSharesSold)
+          // try {
+          //   const stampUrl = await stampNewLootbox({
+          //     // backgroundImage: ticketState.coverUrl as Url,
+          //     // logoImage: ticketState.logoUrl as Url,
+          //     logoImage: imagePublicPath,
+          //     backgroundImage: backgroundPublicPath,
+          //     badgeImage: badgePublicPath || '',
+          //     themeColor: args.lootboxThemeColor as string,
+          //     name: lootboxName,
+          //     ticketID,
+          //     lootboxAddress: lootbox,
+          //     chainIdHex: chain.chainIdHex,
+          //     numShares,
+          //   })
+          //   console.log(`Stamp URL: ${stampUrl}`)
+          //   // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+          //   if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+          //     await downloadFile(`${lootbox}-lootbox`, stampUrl)
+          //     args.setDownloaded(true)
+          //   }
+          // } catch (err) {
+          //   LogRocket.captureException(err)
+          // } finally {
+          //   setSubmitStatus('success')
+          //   provider.removeAllListeners(filter)
+          // }
+
+          setSubmitStatus('success')
+          provider.removeAllListeners(filter)
         }
       }
     })
@@ -491,34 +494,37 @@ export const createEscrowLootbox = async (
           `)
           args.setLootboxAddress(lootbox)
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const stampUrl = await stampNewLootbox({
-              // backgroundImage: ticketState.coverUrl as Url,
-              // logoImage: ticketState.logoUrl as Url,
-              logoImage: imagePublicPath,
-              backgroundImage: backgroundPublicPath,
-              badgeImage: badgePublicPath || '',
-              themeColor: args.lootboxThemeColor as string,
-              name: lootboxName,
-              ticketID,
-              lootboxAddress: lootbox,
-              chainIdHex: chain.chainIdHex,
-              numShares,
-            })
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootbox}-lootbox`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-            provider.removeAllListeners(filter)
-          }
+          // const ticketID = '0x'
+          // const numShares = ethers.utils.formatEther(maxSharesSold)
+          // try {
+          //   const stampUrl = await stampNewLootbox({
+          //     // backgroundImage: ticketState.coverUrl as Url,
+          //     // logoImage: ticketState.logoUrl as Url,
+          //     logoImage: imagePublicPath,
+          //     backgroundImage: backgroundPublicPath,
+          //     badgeImage: badgePublicPath || '',
+          //     themeColor: args.lootboxThemeColor as string,
+          //     name: lootboxName,
+          //     ticketID,
+          //     lootboxAddress: lootbox,
+          //     chainIdHex: chain.chainIdHex,
+          //     numShares,
+          //   })
+          //   console.log(`Stamp URL: ${stampUrl}`)
+          //   // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+          //   if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+          //     await downloadFile(`${lootbox}-lootbox`, stampUrl)
+          //     args.setDownloaded(true)
+          //   }
+          // } catch (err) {
+          //   LogRocket.captureException(err)
+          // } finally {
+          //   setSubmitStatus('success')
+          //   provider.removeAllListeners(filter)
+          // }
+
+          setSubmitStatus('success')
+          provider.removeAllListeners(filter)
         }
       }
     })
