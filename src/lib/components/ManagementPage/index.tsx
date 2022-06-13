@@ -1,20 +1,22 @@
 import ManageLootbox from 'lib/components/ManageLootbox'
 import RewardSponsors from 'lib/components/RewardSponsors'
-import { Address, ContractAddress, ITicketMetadata, TicketID } from '@wormgraph/helpers'
+import { Address, ChainIDHex, COLORS, ContractAddress, ITicketMetadata, TicketID } from '@wormgraph/helpers'
 import { useEffect, useRef, useState } from 'react'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { initLogging } from 'lib/api/logrocket'
-import { initDApp } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain, initDApp } from 'lib/hooks/useWeb3Api'
 import LogRocket from 'logrocket'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { readLootboxMetadata } from 'lib/api/storage'
 import { identifyLootboxType, LootboxType } from 'lib/hooks/useContract'
-import { $Horizontal } from 'lib/components/Generics'
+import { $Horizontal, $p } from 'lib/components/Generics'
 import WalletStatus from 'lib/components/WalletStatus'
 import BulkMint from 'lib/components/BulkMint'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
+import $Button from '../Generics/Button'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 export interface ManagementPageProps {}
 
@@ -25,6 +27,7 @@ const ManagementPage = () => {
   const [lootboxType, setLootboxType] = useState<LootboxType>()
   const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
   const snapUserState = useSnapshot(userState)
+  const { screen } = useWindowSize()
 
   const refRewardSponsors = useRef<HTMLDivElement | null>(null)
 
@@ -32,11 +35,8 @@ const ManagementPage = () => {
     const addr = parseUrlParams('lootbox') as ContractAddress
     setLootboxAddress(addr)
     initLogging()
-    if (window.ethereum && addr) {
-      initDApp()
-        .then(() => {
-          return readLootboxMetadata(addr)
-        })
+    if (addr) {
+      readLootboxMetadata(addr)
         .then((metadata: LootboxMetadata) => {
           if (!metadata || !metadata?.lootboxCustomSchema) {
             throw Error('No metadata found')
@@ -46,6 +46,12 @@ const ManagementPage = () => {
           if (network) {
             setNetwork(network)
           }
+        })
+        .catch((err) => LogRocket.captureException(err))
+    }
+    if (window.ethereum && addr) {
+      initDApp()
+        .then(() => {
           return identifyLootboxType(addr)
         })
         .then((data) => {
@@ -73,20 +79,44 @@ const ManagementPage = () => {
     }
   }, [])
 
-  // console.log(network)
-  // console.log(lootboxAddress)
-  // console.log(lootboxType)
-  // console.log(lootboxMetadata)
+  const switchChain = async (chainIdHex: ChainIDHex) => {
+    await addCustomEVMChain(chainIdHex)
+  }
 
   if (!network || !lootboxAddress || !lootboxType || !lootboxMetadata || !lootboxMetadata?.lootboxCustomSchema) {
     if (lootboxMetadata && lootboxMetadata?.lootboxCustomSchema?.lootbox) {
+      const targetChain = lootboxMetadata?.lootboxCustomSchema?.chain?.chainIdHex
       return (
         <section>
-          <WalletStatus targetNetwork={lootboxMetadata?.lootboxCustomSchema?.chain?.chainIdHex} />
+          {snapUserState.accounts.length === 0 && <$p>You need to connect your MetaMask wallet</$p>}
+          <WalletStatus targetNetwork={targetChain} />
+          {snapUserState?.network?.currentNetworkIdHex &&
+            targetChain &&
+            snapUserState?.network?.currentNetworkIdHex !== targetChain && (
+              <div>
+                <$p>Wrong Network, you need to switch to {lootboxMetadata?.lootboxCustomSchema?.chain?.chainName}</$p>
+                <$Button
+                  screen={screen}
+                  color={`${COLORS.dangerFontColor}90`}
+                  colorHover={COLORS.dangerFontColor}
+                  backgroundColor={`${COLORS.dangerBackground}80`}
+                  backgroundColorHover={`${COLORS.dangerBackground}`}
+                  onClick={() => switchChain(targetChain)}
+                  style={{
+                    minHeight: '50px',
+                    border: `1px solid ${COLORS.dangerFontColor}40`,
+                    fontWeight: 500,
+                    fontSize: '1.2rem',
+                  }}
+                >
+                  Switch network
+                </$Button>
+              </div>
+            )}
         </section>
       )
     }
-    return <p>{`Could not find metadata for Lootbox ${lootboxAddress}.`}</p>
+    return <$p>{`Could not find metadata for Lootbox ${lootboxAddress}.`}</$p>
   }
 
   return (
