@@ -65,11 +65,15 @@ const TokenInput = (props: TokenInputProps) => {
 
   const balance = snap.inputToken && snap.inputToken.balance ? (snap.inputToken.balance as string) : '0'
 
-  const quantity = snap.inputToken.quantity
+  const quantityWithFee = snap.inputToken.quantityWithLootboxFee
   const usdValue =
-    quantity && snap.inputToken?.data?.usdPrice
-      ? new BN(snap.inputToken.data.usdPrice).multipliedBy(new BN(quantity)).dividedBy(new BN(10).pow(USD_DECIMALS))
+    quantityWithFee && snap.inputToken?.data?.usdPrice
+      ? new BN(snap.inputToken.data.usdPrice)
+          .multipliedBy(new BN(quantityWithFee).dividedBy(new BN(10).pow(18)))
+          .dividedBy(new BN(10).pow(USD_DECIMALS))
       : '0'
+
+  const quantityWithFeeFmt = quantityWithFee && parseEth(quantityWithFee)
 
   return (
     <$TokenInput screen={screen}>
@@ -82,7 +86,10 @@ const TokenInput = (props: TokenInputProps) => {
             disabled={props.quantityDisabled || !snap.inputToken.data}
           />
           {usdValue ? (
-            <$FineText screen={screen}>{`Spend ${new BN(usdValue).decimalPlaces(2).toString()}`} USD</$FineText>
+            <$FineText screen={screen}>
+              {`Spend ${new BN(usdValue).decimalPlaces(2).toString()} USD`}
+              {quantityWithFee ? ` = ${quantityWithFeeFmt} ${props?.selectedToken?.symbol} (with fee)` : ''}{' '}
+            </$FineText>
           ) : null}
         </$Vertical>
         <$Vertical flex={1}>
