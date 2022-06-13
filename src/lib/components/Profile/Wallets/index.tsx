@@ -120,7 +120,6 @@ const Wallets = () => {
                         textAlign="center"
                         color={COLORS.dangerFontColor}
                         style={{ cursor: 'pointer' }}
-                        // onClick={() => handleRemoveWallet(wallet)}
                       >
                         remove
                       </$span>
