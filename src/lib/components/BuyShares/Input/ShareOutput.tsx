@@ -64,7 +64,7 @@ const ShareOutput = (props: ShareOutputProps) => {
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <$Input readOnly value={quantity} type="number" placeholder="0.00" screen={screen} min={0}></$Input>
-          <$FineText screen={screen}>{`Receive Shares (${percentageShares}%* of Earnings)`}</$FineText>
+          <$FineText screen={screen}>{`Receive Shares (${percentageShares}% of Earnings)`}</$FineText>
         </$Vertical>
         <$Vertical flex={1} spacing={2}>
           <$Button

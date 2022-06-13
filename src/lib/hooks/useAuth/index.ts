@@ -21,6 +21,11 @@ import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
   sendEmailVerification,
+  browserSessionPersistence,
+  browserLocalPersistence,
+  Persistence,
+  setPersistence as setPersistenceFirebase,
+  setPersistence,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -61,6 +66,18 @@ export const useAuth = () => {
     CONNECT_WALLET,
     { refetchQueries: [{ query: GET_MY_WALLETS }] }
   )
+
+  useEffect(() => {
+    const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
+      | 'session'
+      | 'local'
+
+    if (persistence === 'local') {
+      setPersistence(auth, browserLocalPersistence)
+    } else {
+      setPersistence(auth, browserSessionPersistence)
+    }
+  }, [])
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -148,6 +165,7 @@ export const useAuth = () => {
     if (!password) {
       throw new Error('Password is required')
     }
+
     const { user } = await signInWithEmailAndPasswordFirebase(auth, email, password)
 
     // Send email verification only once on login

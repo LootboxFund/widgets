@@ -18,4 +18,14 @@ export const $ChangeMode = styled.div`
   text-decoration-line: underline;
   color: #ababab;
 `
+
+export const $Checkbox = styled.input`
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
+`
+
 export type ModeOptions = 'login-password' | 'login-wallet' | 'signup-password' | 'signup-wallet' | 'forgot-password'

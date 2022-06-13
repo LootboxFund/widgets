@@ -4,11 +4,14 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import LogRocket from 'logrocket'
-import { $Vertical } from 'lib/components/Generics'
-import { useState } from 'react'
-import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
-import { $Header, $ErrorMessage } from '../../Generics/Typography'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import { ChangeEvent, ChangeEventHandler, useState } from 'react'
+import { $InputMedium, $ChangeMode, ModeOptions, $Checkbox } from '../Shared'
+import { $Header, $ErrorMessage, $span } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
+import { auth } from 'lib/api/firebase/app'
+import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
+import { $Link } from 'lib/components/Profile/common'
 
 interface LoginEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -21,6 +24,10 @@ const LoginEmail = (props: LoginEmailProps) => {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
+    | 'session'
+    | 'local'
+  const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)
@@ -28,10 +35,6 @@ const LoginEmail = (props: LoginEmailProps) => {
 
   const parsePassword = (inputPassword: string) => {
     setPassword(inputPassword)
-  }
-
-  const changeToWalletLogin = () => {
-    props.onChangeMode('login-wallet')
   }
 
   const handleLoginWithEmailAndPassword = async () => {
@@ -45,6 +48,20 @@ const LoginEmail = (props: LoginEmailProps) => {
       LogRocket.captureException(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const clickRememberMe = (e: ChangeEvent<HTMLInputElement>) => {
+    const newPersistenceChecked = e.target.checked
+    setPersistenceChecked(newPersistenceChecked)
+    if (newPersistenceChecked) {
+      setPersistence(auth, browserLocalPersistence)
+      localStorage.setItem('auth.persistence', 'local')
+      return
+    } else {
+      setPersistence(auth, browserSessionPersistence)
+      localStorage.setItem('auth.persistence', 'session')
+      return
     }
   }
 
@@ -75,7 +92,20 @@ const LoginEmail = (props: LoginEmailProps) => {
           <LoadingText loading={loading} text="Login" color={COLORS.trustFontColor} />
         </$Button>
       </$Vertical>
-      <$ChangeMode onClick={changeToWalletLogin}>Or use your wallet to sign in</$ChangeMode>
+      <$Horizontal spacing={2} flexWrap justifyContent="space-between">
+        <$span textAlign="start" style={{ display: 'flex', alignItems: 'center' }}>
+          <$Checkbox type="checkbox" checked={persistenceChecked} onChange={clickRememberMe} />
+          <$span style={{ verticalAlign: 'middle', display: 'inline-block' }}> Remember me</$span>
+        </$span>
+
+        <$Link
+          style={{ fontStyle: 'normal', display: 'flex', alignItems: 'center' }}
+          onClick={() => props.onChangeMode('forgot-password')}
+        >
+          Forgot password?
+        </$Link>
+      </$Horizontal>
+
       {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
