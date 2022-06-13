@@ -205,6 +205,7 @@ const Wallets = () => {
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               fontSize: TYPOGRAPHY.fontSize.large,
               boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
+              minHeight: 'unset',
             }}
           />
         </div>

@@ -10,6 +10,21 @@ export const $SearchInput = styled.input`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   height: 40px;
+  ::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: ${COLORS.surpressedFontColor}7a;
+    opacity: 1; /* Firefox */
+  }
+
+  :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: ${COLORS.surpressedFontColor}7a;
+  }
+
+  ::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: ${COLORS.surpressedFontColor}7a;
+  }
 `
 
 export const $Link = styled.a<{ fontStyle?: string; color?: string }>`
@@ -40,6 +55,7 @@ export const Oopsies = ({
           style={{
             margin: `0px auto auto calc(${TYPOGRAPHY.fontSize.xxlarge} + 10px)`,
             color: `${COLORS.surpressedFontColor}ae`,
+            fontWeight: TYPOGRAPHY.fontWeight.regular,
           }}
         >
           {message}
