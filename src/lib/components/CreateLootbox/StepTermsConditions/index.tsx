@@ -101,6 +101,11 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       })
     }
   }
+  useEffect(() => {
+    if (props.submitStatus === 'success') {
+      setTimeLeft(20) // set the timer
+    }
+  }, [props.submitStatus])
   const updateCheckbox = (slug: string, checked: any) => {
     props.updateTermsState(slug, checked)
   }
@@ -119,15 +124,28 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         />
       )
     } else if (props.submitStatus === 'success') {
-      return (
-        <$CreateLootboxButton
-          allConditionsMet={true}
-          onClick={() => window.open(props.goToLootboxAdminPage())}
-          themeColor={COLORS.successFontColor}
-        >
-          View Your Lootbox
-        </$CreateLootboxButton>
-      )
+      if (timeLeft && timeLeft > 0) {
+        return (
+          <$CreateLootboxButton
+            allConditionsMet={true}
+            onClick={() => window.open(props.goToLootboxAdminPage())}
+            themeColor={`${COLORS.trustBackground}50`}
+            disabled
+          >
+            {`...Lootbox almost ready (${timeLeft})`}
+          </$CreateLootboxButton>
+        )
+      } else {
+        return (
+          <$CreateLootboxButton
+            allConditionsMet={true}
+            onClick={() => window.open(props.goToLootboxAdminPage())}
+            themeColor={COLORS.successFontColor}
+          >
+            View Your Lootbox
+          </$CreateLootboxButton>
+        )
+      }
     } else if (props.submitStatus === 'in_progress') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
