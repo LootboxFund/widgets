@@ -88,7 +88,7 @@ const TokenInput = (props: TokenInputProps) => {
           {usdValue ? (
             <$FineText screen={screen}>
               {`Spend ${new BN(usdValue).decimalPlaces(2).toString()} USD`}
-              {quantityWithFee ? ` = ${quantityWithFeeFmt} ${props?.selectedToken?.symbol} (with fee)` : ''}{' '}
+              {quantityWithFee ? ` = ${quantityWithFeeFmt} ${props?.selectedToken?.symbol} with fee*` : ''}{' '}
             </$FineText>
           ) : null}
         </$Vertical>
