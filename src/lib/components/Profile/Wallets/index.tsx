@@ -23,6 +23,7 @@ import { useAuth } from 'lib/hooks/useAuth'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import WalletButton from 'lib/components/WalletButton'
+import PopConfirm from 'lib/components/Generics/PopConfirm'
 
 const Wallets = () => {
   const { screen } = useWindowSize()
@@ -112,16 +113,18 @@ const Wallets = () => {
                       <$Spinner color={`${COLORS.surpressedFontColor}ae`} style={{ textAlign: 'center' }} />
                     </$span>
                   ) : (
-                    <$span
-                      lineHeight={WALLET_CONTAINER_HEIGHT}
-                      width="30%"
-                      textAlign="center"
-                      color={COLORS.dangerFontColor}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => handleRemoveWallet(wallet)}
-                    >
-                      remove
-                    </$span>
+                    <PopConfirm onOk={() => handleRemoveWallet(wallet)} style={{ width: '30%', textAlign: 'center' }}>
+                      <$span
+                        lineHeight={WALLET_CONTAINER_HEIGHT}
+                        width="100%"
+                        textAlign="center"
+                        color={COLORS.dangerFontColor}
+                        style={{ cursor: 'pointer' }}
+                        // onClick={() => handleRemoveWallet(wallet)}
+                      >
+                        remove
+                      </$span>
+                    </PopConfirm>
                   )}
                 </$Horizontal>
                 {walletStatus[wallet.address as Address]?.errorMessage ? (

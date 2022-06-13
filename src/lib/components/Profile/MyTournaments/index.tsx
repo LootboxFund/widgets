@@ -42,12 +42,18 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
               </$span>
               <$Horizontal width="30%" key={tournament.id} justifyContent="center">
                 <$span lineHeight="40px" style={{ paddingRight: '15px' }}>
-                  <$Link href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`}>
+                  <$Link
+                    href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`}
+                    style={{ textDecoration: 'none', fontStyle: 'normal' }}
+                  >
                     view
                   </$Link>
                 </$span>
                 <$span lineHeight="40px">
-                  <$Link href={`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`}>
+                  <$Link
+                    href={`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`}
+                    style={{ textDecoration: 'none', fontStyle: 'normal' }}
+                  >
                     edit
                   </$Link>
                 </$span>
