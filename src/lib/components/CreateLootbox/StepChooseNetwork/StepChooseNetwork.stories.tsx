@@ -3,7 +3,6 @@ import StepChooseNetwork, { StepChooseNetworkProps } from 'lib/components/Create
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { NetworkOption } from '../state'
 
-
 export default {
   title: 'CreateLootbox Step - Choose Network',
   component: StepChooseNetwork,
@@ -11,15 +10,22 @@ export default {
 
 const Demo = (args: StepChooseNetworkProps) => {
   const [network, setNetwork] = useState<NetworkOption>()
-  const [stage, setStage] = useState<StepStage>("in_progress")
+  const [stage, setStage] = useState<StepStage>('in_progress')
   const selectNetwork = (network: NetworkOption) => {
-    console.log("Selecting network: ", network)
+    console.log('Selecting network: ', network)
     setNetwork(network)
-    setStage("may_proceed")
+    setStage('may_proceed')
   }
   return (
     <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseNetwork selectedNetwork={network} stage={stage} onSelectNetwork={selectNetwork} onNext={() => console.log("onNext")} setValidity={(bool: boolean) => console.log(bool)} />
+      <StepChooseNetwork
+        selectedNetwork={network}
+        stage={stage}
+        onSelectNetwork={selectNetwork}
+        onNext={() => console.log('onNext')}
+        setValidity={(bool: boolean) => console.log(bool)}
+        setDoesNetworkMatch={(bool: boolean) => console.log(bool)}
+      />
     </div>
   )
 }

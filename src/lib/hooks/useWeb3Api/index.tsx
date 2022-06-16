@@ -219,20 +219,7 @@ export const initDApp = async (fallbackChain?: ChainIDHex) => {
       userState.accounts = accounts
       userState.currentAccount = accounts[0]
     })
-    ;(metamask as any).on('networkChanged', async (networkId: string) => {
-      // const chainIdHex = convertDecimalToHex(networkId)
-      // const chainSlug = chainIdHexToSlug(chainIdHex)
-      // if (chainSlug) {
-      //   const blockchain = BLOCKCHAINS[chainSlug]
-      //   if (blockchain) {
-      //     updateStateToChain(blockchain)
-      //   } else {
-      //     clearStateToChain()
-      //   }
-      // } else {
-      //   const blockchain = BLOCKCHAINS[ChainSlugs.UNKNOWN]
-      //   updateStateToChain(BLOCKCHAINS.UNKNOWN)
-      // }
+    ;(metamask as any).on('chainChanged', async (networkId: string) => {
       window.location.reload()
     })
   }

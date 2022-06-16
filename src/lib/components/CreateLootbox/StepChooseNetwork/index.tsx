@@ -13,6 +13,8 @@ import { useSnapshot } from 'valtio'
 import { getUserBalanceOfNativeToken } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { Address } from '@wormgraph/helpers'
+import { getProvider } from 'lib/hooks/useWeb3Api'
+import LogRocket from 'logrocket'
 
 export interface StepChooseNetworkProps {
   stage: StepStage
@@ -20,6 +22,7 @@ export interface StepChooseNetworkProps {
   selectedNetwork?: NetworkOption
   onNext: () => void
   setValidity: (bool: boolean) => void
+  setDoesNetworkMatch: (bool: boolean) => void
 }
 
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
@@ -30,25 +33,41 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
   const [hasNonZeroTokens, setHasNonZeroToken] = useState<boolean>(false)
 
   useEffect(() => {
-    if (props.selectedNetwork && snapUserState.currentAccount) {
-      setErrors([' '])
-      getUserBalanceOfNativeToken(snapUserState.currentAccount as Address)
-        .then((balance) => {
-          if (balance === '0') {
-            setHasNonZeroToken(true)
+    if (props.selectedNetwork && !snapUserState.currentAccount) {
+      setErrors(['Please connect you wallet by clicking the red button "Connect" above ☝️'])
+    } else if (props.selectedNetwork && snapUserState.currentAccount) {
+      getProvider()
+        .then((data) => {
+          console.log('fetching network from provider', data)
+          return data.provider.detectNetwork()
+        })
+        .then((network) => {
+          if (network?.chainId?.toString() !== props.selectedNetwork?.chainIdDecimal) {
+            props.setDoesNetworkMatch(false)
             setErrors([
-              `You do not have any ${props?.selectedNetwork?.isTestnet ? 'testnet ' : ''}tokens! ${
-                props?.selectedNetwork?.faucetUrl ? 'Click the red button "Get Tokens" above ☝️' : ''
-              }`,
+              `You are on the wrong network! Please change your MetaMask network to "${props.selectedNetwork?.name}${
+                props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''
+              }".`,
             ])
           } else {
-            setHasNonZeroToken(false)
-            setErrors(undefined)
+            props.setDoesNetworkMatch(true)
+            getUserBalanceOfNativeToken(snapUserState.currentAccount as Address)
+              .then((balance) => {
+                if (balance === '0') {
+                  setHasNonZeroToken(true)
+                  setErrors([`You do not have any ${props?.selectedNetwork?.isTestnet ? 'testnet ' : ''}tokens!`])
+                } else {
+                  setErrors(undefined)
+                  setHasNonZeroToken(false)
+                }
+              })
+              .catch((err) => {
+                setHasNonZeroToken(false)
+              })
           }
         })
         .catch((err) => {
-          setHasNonZeroToken(false)
-          setErrors(undefined)
+          LogRocket.captureException(err)
         })
     }
   }, [props.selectedNetwork, snapUserState.currentAccount])
@@ -148,7 +167,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
                   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2FChest.png?alt=media'
                 }
               />
-              {hasNonZeroTokens && props?.selectedNetwork?.faucetUrl && (
+              {/* {hasNonZeroTokens && props?.selectedNetwork?.faucetUrl && (
                 <$Button
                   screen="mobile"
                   backgroundColorHover={`${COLORS.dangerBackground}75`}
@@ -170,7 +189,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
                 >
                   Get Tokens
                 </$Button>
-              )}
+              )} */}
             </div>
           </$Vertical>
         </$Wrapper>

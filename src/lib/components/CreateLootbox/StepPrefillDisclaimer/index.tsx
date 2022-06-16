@@ -5,10 +5,14 @@ import StepCard, { $StepHeading, $StepSubheading } from 'lib/components/CreateLo
 import { $Vertical } from 'lib/components/Generics'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
+import { TournamentID } from 'lib/types'
+import { $Link } from 'lib/components/Profile/common'
+import { manifest } from 'manifest'
 
 export interface StepPrefillDisclaimerProps {
   selectedNetwork?: NetworkOption | undefined
   prefilledFields: string[]
+  tournamentId?: TournamentID
 }
 const StepPrefillDisclaimer = (props: StepPrefillDisclaimerProps) => {
   return (
@@ -26,6 +30,21 @@ const StepPrefillDisclaimer = (props: StepPrefillDisclaimerProps) => {
             Creating this Lootbox is easy because you are using a magic link that pre-fills several fields for you.
             Please use the pre-sets and customize the rest.
           </$StepSubheading>
+          <br />
+          {props.tournamentId && (
+            <$StepSubheading>
+              <span>
+                You're part of a tournament! Visit the tournament page by clicking 👉{' '}
+                <$Link
+                  href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${props.tournamentId}`}
+                  target="_blank"
+                >
+                  here
+                </$Link>
+                .
+              </span>
+            </$StepSubheading>
+          )}
           <br />
           <$StepSubheading>{`The following ${props.prefilledFields.length} fields have been pre-filled:`}</$StepSubheading>
           <br />

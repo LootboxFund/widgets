@@ -18,6 +18,7 @@ import { Oopsies } from './common'
 import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import MyTournaments from './MyTournaments'
+import { initLogging } from 'lib/api/logrocket'
 
 const Profile = () => {
   const { user, logout } = useAuth()
@@ -74,6 +75,7 @@ const Profile = () => {
 const ProfilePage = () => {
   useEffect(() => {
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {

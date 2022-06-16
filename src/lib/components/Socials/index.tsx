@@ -23,7 +23,6 @@ const Socials = ({ lootbox }: SocialsProps) => {
   const [targetPaybackDateUnix, setTargetPaybackDateUnix] = useState(0)
   const [lootboxDescription, setLootboxDescription] = useState('')
   const [socials, setSocials] = useState<SocialsState>({
-    email: '',
     twitter: '',
     youtube: '',
     instagram: '',
@@ -43,7 +42,6 @@ const Socials = ({ lootbox }: SocialsProps) => {
           setTargetPaybackDateUnix(metadata?.lootboxCustomSchema?.lootbox?.targetPaybackDate || 0)
           setLootboxDescription(metadata?.lootboxCustomSchema?.lootbox.description || '')
           setSocials({
-            email: metadata?.lootboxCustomSchema?.socials?.email || '',
             twitter: metadata?.lootboxCustomSchema?.socials?.twitter || '',
             youtube: metadata?.lootboxCustomSchema?.socials?.youtube || '',
             instagram: metadata?.lootboxCustomSchema?.socials?.instagram || '',
@@ -84,7 +82,7 @@ const Socials = ({ lootbox }: SocialsProps) => {
         ) : undefined}
 
         <$SocialGridInputs screen={screen} style={{ paddingBottom: '20px' }}>
-          {SOCIALS.map((social) => {
+          {SOCIALS.filter((social) => social.slug !== 'email').map((social) => {
             return (
               <$Horizontal
                 key={social.slug}

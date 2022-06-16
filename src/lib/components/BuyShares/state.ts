@@ -30,6 +30,7 @@ export interface BuySharesState {
     quantity: string | undefined
     balance: string | undefined
     allowance: string | undefined
+    quantityWithLootboxFee: string | undefined
   }
   ui: {
     isButtonLoading: boolean
@@ -52,6 +53,7 @@ const buySharesSnapshot: BuySharesState = {
   inputToken: {
     data: undefined,
     quantity: undefined,
+    quantityWithLootboxFee: undefined, // This is quantity + lootbox fees
     balance: undefined,
     allowance: undefined,
   },
@@ -90,12 +92,18 @@ const updateLootboxQuantity = () => {
   ) {
     const inputTokenQuantity = new BN(buySharesState.inputToken.quantity).multipliedBy(new BN(10).pow(18))
 
-    const deductableFee = inputTokenQuantity.multipliedBy(
-      new BN(buySharesState.lootbox.data.ticketPurchaseFee).dividedBy(new BN(10).pow(FEE_DECIMALS))
-    )
+    // const deductableFee = inputTokenQuantity.multipliedBy(
+    //   new BN(buySharesState.lootbox.data.ticketPurchaseFee).dividedBy(new BN(10).pow(FEE_DECIMALS))
+    // )
+
+    const quantityWithLootboxFee = inputTokenQuantity
+      .multipliedBy(new BN(10).pow(FEE_DECIMALS))
+      .dividedBy(new BN(10).pow(FEE_DECIMALS).minus(buySharesState.lootbox.data.ticketPurchaseFee))
+
+    buySharesState.inputToken.quantityWithLootboxFee = quantityWithLootboxFee.toString()
 
     buySharesState.lootbox.quantity = inputTokenQuantity
-      .minus(deductableFee)
+      // .minus(deductableFee)
       .div(new BN(buySharesState.lootbox.data.sharePriceWei))
       .toString()
   }
@@ -109,10 +117,11 @@ export const fillLootboxEstimate = () => {
       // From the shares available, calculate how much native token is needed to buy them by including the lootbox fee
       const nativeTokenWithoutFee = sharesAvailable.multipliedBy(new BN(sharePriceWei)).dividedBy(new BN(10).pow(18))
 
-      const amountOfNativeTokenNeeded = nativeTokenWithoutFee
-        .multipliedBy(new BN(10).pow(FEE_DECIMALS))
-        .dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
-      return amountOfNativeTokenNeeded.toFixed(0, 1) // Round down
+      // const amountOfNativeTokenNeeded = nativeTokenWithoutFee
+      //   .multipliedBy(new BN(10).pow(FEE_DECIMALS))
+      //   .dividedBy(new BN(10).pow(FEE_DECIMALS).minus(ticketPurchaseFee))
+      // return amountOfNativeTokenNeeded.toFixed(0, 1) // Round down
+      return nativeTokenWithoutFee.toFixed(0, 1)
     }
   }
   return new BN('0')
@@ -122,7 +131,7 @@ export const purchaseLootboxShare = async () => {
   if (
     !buySharesState.lootbox.data ||
     !buySharesState.inputToken.data ||
-    !buySharesState.inputToken.quantity ||
+    !buySharesState.inputToken.quantityWithLootboxFee ||
     !buySharesState.lootbox?.address
   ) {
     return
@@ -135,7 +144,7 @@ export const purchaseLootboxShare = async () => {
 
     const transactionHash = await buyLootboxShares(
       buySharesState.lootbox.address,
-      parseWei(buySharesState.inputToken.quantity, buySharesState.inputToken.data.decimals)
+      buySharesState.inputToken.quantityWithLootboxFee.split('.')[0]
     )
 
     const shares = new BN(buySharesState.lootbox.quantity || '0').toFixed(2)

@@ -17,6 +17,7 @@ import { manifest } from 'manifest'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { COLORS } from '@wormgraph/helpers'
+import { initLogging } from 'lib/api/logrocket'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -123,6 +124,7 @@ const PublicTournamentPage = () => {
 
   useEffect(() => {
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {

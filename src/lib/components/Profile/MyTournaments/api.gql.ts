@@ -20,3 +20,22 @@ export const GET_MY_TOURNAMENTS = gql`
     }
   }
 `
+
+export const DELETE_TOURNAMENT = gql`
+  mutation DeleteTournament($id: ID!) {
+    deleteTournament(id: $id) {
+      ... on DeleteTournamentResponseSuccess {
+        tournament {
+          id
+          title
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

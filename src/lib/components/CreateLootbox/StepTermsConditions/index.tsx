@@ -28,7 +28,7 @@ const TERMS: TermsFragment[] = [
   { slug: 'agreeVerify', text: 'I have verified my Reputation address & Treasury wallet is correct' },
 ]
 
-export type SubmitStatus = 'unsubmitted' | 'in_progress' | 'success' | 'failure'
+export type SubmitStatus = 'unsubmitted' | 'in_progress' | 'success' | 'failure' | 'pending_confirmation'
 export interface StepTermsConditionsProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -39,7 +39,7 @@ export interface StepTermsConditionsProps {
   reputationWallet: Address
   updateTreasuryWallet: (wallet: Address) => void
   allConditionsMet: boolean
-  onSubmit: () => void
+  onSubmit: () => Promise<void>
   setValidity: (bool: boolean) => void
   submitStatus: SubmitStatus
   goToLootboxAdminPage: () => string
@@ -47,6 +47,7 @@ export interface StepTermsConditionsProps {
 const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const [timeElapsed, setTimeElapsed] = useState<number>(0)
   const initialErrors = {
     treasuryWallet: '',
   }
@@ -61,6 +62,17 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     }, 1000)
     return () => clearInterval(intervalId)
   }, [timeLeft])
+
+  useEffect(() => {
+    if (timeElapsed === 0) {
+      return
+    }
+    const intervalId = setInterval(() => {
+      setTimeElapsed(timeElapsed + 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeElapsed])
+
   const checkAddrValid = async (addr: string) => {
     const ethers = window.ethers ? window.ethers : ethersObj
     return ethers.utils.isAddress(addr)
@@ -101,12 +113,18 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       })
     }
   }
+  useEffect(() => {
+    if (props.submitStatus === 'success') {
+      setTimeElapsed(0)
+      setTimeLeft(20) // set the timer
+    }
+  }, [props.submitStatus])
   const updateCheckbox = (slug: string, checked: any) => {
     props.updateTermsState(slug, checked)
   }
-  const submitWithCountdown = () => {
-    setTimeLeft(90)
-    props.onSubmit()
+  const submitWithCountdown = async () => {
+    await props.onSubmit() // Wait for the user to accept the transaction
+    setTimeElapsed(1) // set the timer
   }
   const renderActionBar = () => {
     if (props.submitStatus === 'failure') {
@@ -114,24 +132,43 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         <CreateLootboxButton
           allConditionsMet={props.allConditionsMet}
           themeColor={COLORS.dangerFontColor}
-          onSubmit={props.onSubmit}
+          onSubmit={() => submitWithCountdown()}
           text="Failed, try again?"
         />
       )
     } else if (props.submitStatus === 'success') {
-      return (
-        <$CreateLootboxButton
-          allConditionsMet={true}
-          onClick={() => window.open(props.goToLootboxAdminPage())}
-          themeColor={COLORS.successFontColor}
-        >
-          View Your Lootbox
-        </$CreateLootboxButton>
-      )
+      if (timeLeft && timeLeft > 0) {
+        return (
+          <$CreateLootboxButton
+            allConditionsMet={true}
+            onClick={() => window.open(props.goToLootboxAdminPage())}
+            themeColor={`${COLORS.trustBackground}50`}
+            disabled
+          >
+            {`... Preparing your Lootbox (${timeLeft})`}
+          </$CreateLootboxButton>
+        )
+      } else {
+        return (
+          <$CreateLootboxButton
+            allConditionsMet={true}
+            onClick={() => window.open(props.goToLootboxAdminPage())}
+            themeColor={COLORS.successFontColor}
+          >
+            View Your Lootbox
+          </$CreateLootboxButton>
+        )
+      }
     } else if (props.submitStatus === 'in_progress') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
-          {`...submitting (${timeLeft})`}
+          {`... submitting (${timeElapsed})`}
+        </$CreateLootboxButton>
+      )
+    } else if (props.submitStatus === 'pending_confirmation') {
+      return (
+        <$CreateLootboxButton allConditionsMet={false} disabled themeColor={COLORS.warningBackground}>
+          {`Confirm on MetaMask`}
         </$CreateLootboxButton>
       )
     }
@@ -222,11 +259,11 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       </StepCard>
       {(props.submitStatus === 'in_progress' || props.submitStatus === 'success') && (
         <$TwitterAlert>
-          If submission is taking too long, check our 👉
+          Submission usually takes less than 3 minutes. If submission is taking too long, check our 👉
           <a href="https://twitter.com/LootboxAlerts" target="_blank" style={{ marginLeft: '5px', marginRight: '5px' }}>
             live Twitter feed
           </a>{' '}
-          to find your newly created Lootbox. Takes ~3 mins.
+          to find your newly created Lootbox.
         </$TwitterAlert>
       )}
     </$StepTermsConditions>

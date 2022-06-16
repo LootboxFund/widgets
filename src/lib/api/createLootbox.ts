@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
 import { Address, ChainIDHex, ContractAddress } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
-import { downloadFile, stampNewLootbox } from 'lib/api/stamp'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
@@ -75,7 +74,7 @@ export const createInstantLootbox = async (
   socials: LootboxSocials,
   chainIdHex: ChainIDHex
 ) => {
-  setSubmitStatus('in_progress')
+  setSubmitStatus('pending_confirmation')
   const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
   if (!chain) {
     throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
@@ -211,6 +210,8 @@ export const createInstantLootbox = async (
       JSON.stringify(lootboxURI) // string memory _data
     )
 
+    setSubmitStatus('in_progress')
+
     console.log(`Submitted lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
@@ -255,34 +256,37 @@ export const createInstantLootbox = async (
           `)
           args.setLootboxAddress(lootbox)
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const stampUrl = await stampNewLootbox({
-              // backgroundImage: ticketState.coverUrl as Url,
-              // logoImage: ticketState.logoUrl as Url,
-              logoImage: imagePublicPath,
-              backgroundImage: backgroundPublicPath,
-              badgeImage: badgePublicPath || '',
-              themeColor: args.lootboxThemeColor as string,
-              name: lootboxName,
-              ticketID,
-              lootboxAddress: lootbox,
-              chainIdHex: chain.chainIdHex,
-              numShares,
-            })
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootbox}-lootbox`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-            provider.removeAllListeners(filter)
-          }
+          // const ticketID = '0x'
+          // const numShares = ethers.utils.formatEther(maxSharesSold)
+          // try {
+          //   const stampUrl = await stampNewLootbox({
+          //     // backgroundImage: ticketState.coverUrl as Url,
+          //     // logoImage: ticketState.logoUrl as Url,
+          //     logoImage: imagePublicPath,
+          //     backgroundImage: backgroundPublicPath,
+          //     badgeImage: badgePublicPath || '',
+          //     themeColor: args.lootboxThemeColor as string,
+          //     name: lootboxName,
+          //     ticketID,
+          //     lootboxAddress: lootbox,
+          //     chainIdHex: chain.chainIdHex,
+          //     numShares,
+          //   })
+          //   console.log(`Stamp URL: ${stampUrl}`)
+          //   // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+          //   if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+          //     await downloadFile(`${lootbox}-lootbox`, stampUrl)
+          //     args.setDownloaded(true)
+          //   }
+          // } catch (err) {
+          //   LogRocket.captureException(err)
+          // } finally {
+          //   setSubmitStatus('success')
+          //   provider.removeAllListeners(filter)
+          // }
+
+          setSubmitStatus('success')
+          provider.removeAllListeners(filter)
         }
       }
     })
@@ -300,7 +304,7 @@ export const createEscrowLootbox = async (
   socials: LootboxSocials,
   chainIdHex: ChainIDHex
 ) => {
-  setSubmitStatus('in_progress')
+  setSubmitStatus('pending_confirmation')
 
   const chain = manifest.chains.find((chainRaw) => chainRaw.chainIdHex === chainIdHex)
   if (!chain) {
@@ -443,6 +447,8 @@ export const createEscrowLootbox = async (
       args.receivingWallet, //     address _treasury,
       JSON.stringify(lootboxURI) // string memory _data
     )
+    setSubmitStatus('in_progress')
+
     console.log(`Submitted escrow lootbox creation!`)
     const filter = {
       fromBlock: blockNum,
@@ -487,34 +493,37 @@ export const createEscrowLootbox = async (
           `)
           args.setLootboxAddress(lootbox)
 
-          const ticketID = '0x'
-          const numShares = ethers.utils.formatEther(maxSharesSold)
-          try {
-            const stampUrl = await stampNewLootbox({
-              // backgroundImage: ticketState.coverUrl as Url,
-              // logoImage: ticketState.logoUrl as Url,
-              logoImage: imagePublicPath,
-              backgroundImage: backgroundPublicPath,
-              badgeImage: badgePublicPath || '',
-              themeColor: args.lootboxThemeColor as string,
-              name: lootboxName,
-              ticketID,
-              lootboxAddress: lootbox,
-              chainIdHex: chain.chainIdHex,
-              numShares,
-            })
-            console.log(`Stamp URL: ${stampUrl}`)
-            // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
-            if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
-              await downloadFile(`${lootbox}-lootbox`, stampUrl)
-              args.setDownloaded(true)
-            }
-          } catch (err) {
-            LogRocket.captureException(err)
-          } finally {
-            setSubmitStatus('success')
-            provider.removeAllListeners(filter)
-          }
+          // const ticketID = '0x'
+          // const numShares = ethers.utils.formatEther(maxSharesSold)
+          // try {
+          //   const stampUrl = await stampNewLootbox({
+          //     // backgroundImage: ticketState.coverUrl as Url,
+          //     // logoImage: ticketState.logoUrl as Url,
+          //     logoImage: imagePublicPath,
+          //     backgroundImage: backgroundPublicPath,
+          //     badgeImage: badgePublicPath || '',
+          //     themeColor: args.lootboxThemeColor as string,
+          //     name: lootboxName,
+          //     ticketID,
+          //     lootboxAddress: lootbox,
+          //     chainIdHex: chain.chainIdHex,
+          //     numShares,
+          //   })
+          //   console.log(`Stamp URL: ${stampUrl}`)
+          //   // Do not download the stamp if on mobile browser - doing so will cause Metamask browser to crash
+          //   if (stampUrl && !args.downloaded && !checkMobileBrowser()) {
+          //     await downloadFile(`${lootbox}-lootbox`, stampUrl)
+          //     args.setDownloaded(true)
+          //   }
+          // } catch (err) {
+          //   LogRocket.captureException(err)
+          // } finally {
+          //   setSubmitStatus('success')
+          //   provider.removeAllListeners(filter)
+          // }
+
+          setSubmitStatus('success')
+          provider.removeAllListeners(filter)
         }
       }
     })

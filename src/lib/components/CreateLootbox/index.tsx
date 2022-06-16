@@ -96,6 +96,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
 
+  const [doesNetworkMatchProvider, setDoesNetworkMatchProvider] = useState(true)
+
   const initFromUrlParams = async () => {
     const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
     console.log('------- INITIAL_URL_PARAMS -------')
@@ -253,7 +255,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
   }
   const checkNetworkStepDone = () => {
-    return isWalletConnected && network && reputationWallet && reputationWallet.length > 0
+    return isWalletConnected && network && reputationWallet && reputationWallet.length > 0 && doesNetworkMatchProvider
   }
 
   // STEP 2: Choose Type
@@ -386,7 +388,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   }
 
   const createLootbox = async () => {
-    setSubmitStatus('in_progress')
+    setSubmitStatus('pending_confirmation')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (!snapUserState?.network?.currentNetworkIdHex) {
       throw new Error('Network not set')
@@ -589,7 +591,11 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     <$CreateLootbox>
       {preconfigParams && preconfigParams.length > 0 && (
         <div style={{ width: '100%' }}>
-          <StepPrefillDisclaimer selectedNetwork={network} prefilledFields={preconfigParams} />
+          <StepPrefillDisclaimer
+            tournamentId={tournamentId as TournamentID | undefined}
+            selectedNetwork={network}
+            prefilledFields={preconfigParams}
+          />
           <$Spacer></$Spacer>
         </div>
       )}
@@ -601,6 +607,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         }}
         onNext={() => refStepType.current?.scrollIntoView()}
         setValidity={(bool: boolean) => setValidity({ ...validity, stepNetwork: bool })}
+        setDoesNetworkMatch={(bool: boolean) => setDoesNetworkMatchProvider(bool)}
       />
       <$Spacer></$Spacer>
       <StepChooseType
@@ -683,6 +690,12 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         goToLootboxAdminPage={goToLootboxAdminPage}
       />
       <$Vertical style={{ marginTop: '20px' }}>
+        {!doesNetworkMatchProvider ? (
+          <$Horizontal flex={1} justifyContent="flex-start" verticalCenter>
+            <span style={{ marginRight: '10px' }}>⚠️</span>
+            <span style={{ fontFamily: 'sans-serif' }}>{`MetaMask is on the wrong network`}</span>
+          </$Horizontal>
+        ) : null}
         {Object.keys(validity)
           .filter((key: FormStep) => !validity[key])
           .map((key: FormStep) => {

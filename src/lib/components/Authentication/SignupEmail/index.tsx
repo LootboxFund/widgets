@@ -49,10 +49,6 @@ const SignupEmail = (props: SignUpEmailProps) => {
     }
   }
 
-  const goToWalletSignup = () => {
-    props.onChangeMode('signup-wallet')
-  }
-
   return (
     <$Vertical spacing={4}>
       <$Header>Register</$Header>
@@ -86,7 +82,6 @@ const SignupEmail = (props: SignUpEmailProps) => {
           <LoadingText loading={loading} text="Sign Up" color={COLORS.trustFontColor} />
         </$Button>
       </$Vertical>
-      <$ChangeMode onClick={goToWalletSignup}>Or use your MetaMask wallet</$ChangeMode>
       {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )

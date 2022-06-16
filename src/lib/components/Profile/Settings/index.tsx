@@ -64,7 +64,13 @@ const SettingsComponent = () => {
     <$Vertical spacing={4}>
       <$h1>Account Settings</$h1>
       <$SettingContainer disabled>
-        <$Horizontal justifyContent="flex-start" flexWrap>
+        <$Horizontal
+          justifyContent="flex-start"
+          flexWrap
+          style={{
+            paddingLeft: screen === 'mobile' ? '0px' : '8%',
+          }}
+        >
           <$span width="20%" lineHeight="40px">
             Email
           </$span>
@@ -80,11 +86,17 @@ const SettingsComponent = () => {
         </$Horizontal>
       </$SettingContainer>
       <$SettingContainer>
-        <$Horizontal justifyContent="flex-start" flexWrap>
+        <$Horizontal
+          justifyContent="flex-start"
+          flexWrap
+          style={{
+            paddingLeft: screen === 'mobile' ? '0px' : '8%',
+          }}
+        >
           <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
             Password
           </$span>
-          <$span width={screen === 'mobile' ? '65%' : '60%'} lineHeight="40px">
+          <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
             {isPasswordEnabled ? (
               <$span textAlign="start">******************</$span>
             ) : (
@@ -94,8 +106,8 @@ const SettingsComponent = () => {
             )}
           </$span>
           <$span
-            textAlign={screen === 'mobile' ? 'start' : 'end'}
-            width={screen === 'mobile' ? '100%' : '20%'}
+            textAlign={screen === 'mobile' ? 'start' : 'center'}
+            width={screen === 'mobile' ? '100%' : '30%'}
             lineHeight="40px"
           >
             {isPasswordEnabled ? (

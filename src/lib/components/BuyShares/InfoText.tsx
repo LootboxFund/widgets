@@ -6,6 +6,7 @@ import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import { useState } from 'react'
 import { $Button } from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { parseEth } from './helpers'
 
 const InfoText = () => {
   const snap = useSnapshot(buySharesState)
@@ -17,6 +18,9 @@ const InfoText = () => {
   const quantityFMT = new BN(quantity).toFixed(2)
   const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
+  const quantityWithFee = snap.inputToken?.quantityWithLootboxFee
+  const quantityWithFeeFmt = quantityWithFee ? parseEth(quantityWithFee) : '0'
+  const symbol = snap.inputToken?.data?.symbol
   const percentageShares =
     quantityBN && shareDecimals && sharesSoldMax ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100) : new BN(0)
 
@@ -51,13 +55,18 @@ const InfoText = () => {
         ) : undefined}
       </$HideTings>
       <$Text>
-        * {percentageShares.decimalPlaces(2).toString()}% of Earnings is calculated as{' '}
-        <$Bold>{quantityFMT} Shares</$Bold> out of <$Bold>{maxShares.toFixed(0)} Shares Maximum</$Bold>. This entitles
-        the holder of this NFT to{' '}
+        * Lootbox takes a <$Bold>3.2% fee</$Bold> of investments into a Lootbox. You are spending{' '}
+        <$Bold>
+          {quantityWithFeeFmt} {symbol || 'tokens'}
+        </$Bold>{' '}
+        for <$Bold>{quantityFMT} Shares</$Bold> of this Lootbox. You will also be charged a native gas fee for this
+        transaction which Lootbox does not control or receive. The holder of this NFT is entitled to{' '}
         <$Bold>{percentageShares.decimalPlaces(2).toString()}% of all Lootbox dividends</$Bold> deposited by the issuer.
-        This {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the final amount of shares
-        sold at the end of the Fundraising period. Lootbox takes a 3.2% fee of all investments in a Lootbox. There is no
-        guarantee of a return, consult your financial advisor before investing.
+        This is calculated as <$Bold>{quantityFMT} Shares</$Bold> out of{' '}
+        <$Bold>{maxShares.toFixed(0)} Maximum Shares</$Bold> available. This{' '}
+        {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the final amount of shares sold
+        at the end of the Fundraising period. There is no guarantee of a return, consult your financial advisor before
+        investing.
         {!isHidden ? (
           <span
             onClick={() => setIsHidden(!isHidden)}

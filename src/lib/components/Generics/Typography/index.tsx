@@ -58,10 +58,11 @@ export const $span = styled.span<{
   width?: string
   textAlign?: 'center' | 'start' | 'end'
   color?: string
+  bold?: boolean
 }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${(props) => props.lineHeight || TYPOGRAPHY.fontSize.large};
-  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-weight: ${(props) => (props.bold ? TYPOGRAPHY.fontWeight.bold : TYPOGRAPHY.fontWeight.regular)};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${(props) => props.color || COLORS.surpressedFontColor}ce;
   ${(props) => props.width && `width: ${props.width};`}
