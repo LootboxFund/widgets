@@ -10,6 +10,9 @@ export const EDIT_TOURNAMENT = gql`
           description
           tournamentLink
           magicLink
+          tournamentDate
+          prize
+          coverPhoto
         }
       }
       ... on ResponseError {
@@ -32,6 +35,9 @@ export const GET_MY_TOURNAMENT = gql`
           description
           tournamentLink
           magicLink
+          tournamentDate
+          prize
+          coverPhoto
           lootboxSnapshots {
             address
             name
