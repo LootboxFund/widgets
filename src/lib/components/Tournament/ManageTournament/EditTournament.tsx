@@ -2,7 +2,7 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import styled from 'styled-components'
 import AuthGuard from '../../AuthGuard'
-import { $Vertical } from '../../Generics'
+import { $Horizontal, $Vertical } from '../../Generics'
 import {
   EditTournamentPayload,
   EditTournamentResponse,
@@ -60,6 +60,21 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     })
   }
 
+  const parsePrize = (prize: string) => {
+    setTournamentPayload({
+      ...tournamentPayload,
+      prize,
+    })
+  }
+
+  const parseBattleDate = (battleDate: string) => {
+    const tournamentDate = new Date(battleDate).valueOf()
+    setTournamentPayload({
+      ...tournamentPayload,
+      tournamentDate,
+    })
+  }
+
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
       setErrorMessage('Title is required')
@@ -70,6 +85,11 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
       return
     }
 
+    if (!tournamentPayload.tournamentDate) {
+      setErrorMessage('Battle Date is required')
+      return
+    }
+
     try {
       const payload: EditTournamentPayload = {
         id: tournamentId,
@@ -77,6 +97,8 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         description: tournamentPayload.description,
         tournamentLink: tournamentPayload.tournamentLink,
         magicLink: tournamentPayload.magicLink,
+        tournamentDate: tournamentPayload.tournamentDate,
+        prize: tournamentPayload.prize,
       }
 
       const { data } = await editTournament({
@@ -129,6 +151,32 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
             value={tournamentPayload?.magicLink || ''}
           ></$InputMedium>
         </$Vertical>
+
+        <$Horizontal spacing={2}>
+          <$Vertical spacing={2} width="50%">
+            <$InputLabel htmlFor="input-battle-date">Battle Date</$InputLabel>
+            <$InputMedium
+              id="input-battle-date"
+              type="date"
+              onChange={(e) => parseBattleDate(e.target.value)}
+              value={
+                tournamentPayload?.tournamentDate
+                  ? new Date(tournamentPayload.tournamentDate)?.toISOString().split('T')[0]
+                  : ''
+              }
+            />
+          </$Vertical>
+
+          <$Vertical spacing={2} width="50%">
+            <$InputLabel htmlFor="input-prize">Prize</$InputLabel>
+            <$InputMedium
+              id="input-prize"
+              placeholder="e.g. $50 USD"
+              onChange={(e) => parsePrize(e.target.value)}
+              value={tournamentPayload?.prize ? tournamentPayload.prize : ''}
+            />
+          </$Vertical>
+        </$Horizontal>
 
         <$Vertical spacing={2}>
           <$InputLabel htmlFor="input-link">Link to Official Tournament</$InputLabel>

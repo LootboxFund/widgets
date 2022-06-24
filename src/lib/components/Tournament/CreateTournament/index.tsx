@@ -2,7 +2,7 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import AuthGuard from '../../AuthGuard'
-import { $Vertical } from '../../Generics'
+import { $h3, $Horizontal, $span, $Vertical } from '../../Generics'
 import {
   CreateTournamentPayload,
   CreateTournamentResponse,
@@ -17,6 +17,7 @@ import { CREATE_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
+import $Input, { InputDecimal } from '../../Generics/Input'
 import { manifest } from 'manifest'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
@@ -28,7 +29,11 @@ interface CreateTournamentProps {
 const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
-  const [tournamentPayload, setTournamentPayload] = useState<CreateTournamentPayload>({ title: '', description: '' })
+  const [tournamentPayload, setTournamentPayload] = useState<CreateTournamentPayload>({
+    title: '',
+    description: '',
+    tournamentDate: undefined,
+  })
   const [createTournament, { loading }] = useMutation<
     { createTournament: CreateTournamentResponse },
     MutationCreateTournamentArgs
@@ -55,6 +60,21 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     })
   }
 
+  const parseBattleDate = (battleDate: string) => {
+    const tournamentDate = new Date(battleDate).valueOf()
+    setTournamentPayload({
+      ...tournamentPayload,
+      tournamentDate,
+    })
+  }
+
+  const parsePrize = (prize: string) => {
+    setTournamentPayload({
+      ...tournamentPayload,
+      prize,
+    })
+  }
+
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
       setErrorMessage('Title is required')
@@ -62,6 +82,11 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     }
     if (!tournamentPayload.description) {
       setErrorMessage('Description is required')
+      return
+    }
+
+    if (!tournamentPayload.tournamentDate) {
+      setErrorMessage('Battle Date is required')
       return
     }
 
@@ -103,34 +128,66 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
         }}
       >
         <$Vertical spacing={4}>
-          <$Header>Create a Tournament</$Header>
-          <$InputMedium
-            onChange={(e) => parseTitle(e.target.value)}
-            value={tournamentPayload.title}
-            placeholder="Title"
-            style={{
-              color: `${COLORS.black}ca`,
-            }}
-          ></$InputMedium>
+          <$Header>Start a Tournament</$Header>
 
-          <$TextAreaMedium
-            onChange={(e) => parseDescription(e.target.value)}
-            value={tournamentPayload.description}
-            placeholder="Description"
-            rows={4}
-            style={{
-              color: `${COLORS.black}ca`,
-            }}
-          ></$TextAreaMedium>
+          <$Vertical spacing={2}>
+            <$span>Title</$span>
+            <$InputMedium
+              onChange={(e) => parseTitle(e.target.value)}
+              value={tournamentPayload.title}
+              style={{
+                color: `${COLORS.black}ca`,
+              }}
+            ></$InputMedium>
+          </$Vertical>
 
-          <$InputMedium
-            onChange={(e) => parseTournamentLink(e.target.value)}
-            value={tournamentPayload?.tournamentLink || ''}
-            placeholder="Link to Official Tournament"
-            style={{
-              color: `${COLORS.black}ca`,
-            }}
-          ></$InputMedium>
+          <$Vertical spacing={2}>
+            <$span>Description</$span>
+            <$TextAreaMedium
+              onChange={(e) => parseDescription(e.target.value)}
+              value={tournamentPayload.description}
+              rows={4}
+              style={{
+                color: `${COLORS.black}ca`,
+              }}
+            ></$TextAreaMedium>
+          </$Vertical>
+
+          <$Horizontal spacing={2}>
+            <$Vertical spacing={2} width="50%">
+              <$span>Battle Date</$span>
+              <$InputMedium
+                type="date"
+                placeholder="March 16th 2022"
+                onChange={(e) => parseBattleDate(e.target.value)}
+                style={{
+                  color: `${COLORS.black}ca`,
+                }}
+              />
+            </$Vertical>
+
+            <$Vertical spacing={2} width="50%">
+              <$span>Prize</$span>
+              <$InputMedium
+                placeholder="e.g. $50 USD"
+                onChange={(e) => parsePrize(e.target.value)}
+                style={{
+                  color: `${COLORS.black}ca`,
+                }}
+              />
+            </$Vertical>
+          </$Horizontal>
+
+          <$Vertical spacing={2}>
+            <$span>Link to Official Tournament</$span>
+            <$InputMedium
+              onChange={(e) => parseTournamentLink(e.target.value)}
+              value={tournamentPayload?.tournamentLink || ''}
+              style={{
+                color: `${COLORS.black}ca`,
+              }}
+            ></$InputMedium>
+          </$Vertical>
 
           <$Button
             screen={screen}

@@ -4,7 +4,10 @@ import { manifest } from 'manifest'
 import { auth } from '../firebase/app'
 
 const httpLink = createHttpLink({
-  uri: manifest.cloudRun.containers.lootboxServer.fullRoute || 'http://localhost:8080/graphql',
+  uri:
+    process.env.NODE_ENV === 'dev'
+      ? 'http://localhost:8080/graphql'
+      : manifest.cloudRun.containers.lootboxServer.fullRoute,
 })
 
 const authLink = setContext(async (_, { headers }) => {
