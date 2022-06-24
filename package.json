@@ -59,7 +59,7 @@
     "watch": "rollup -c -w",
     "build": "NODE_ENV=production rollup -c",
     "test": "jest --verbose --watch",
-    "storybook": "start-storybook",
+    "storybook": "NODE_ENV=dev start-storybook",
     "build-storybook": "build-storybook",
     "pipedream:sample:onLootboxUri": "node scripts/sample-lootboxUri.js",
     "deploy:prod": "NODE_ENV=production rollup -c && NODE_ENV=production node scripts/deploy-widgets.js",
