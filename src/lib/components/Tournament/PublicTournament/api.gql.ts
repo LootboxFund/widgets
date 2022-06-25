@@ -9,6 +9,7 @@ export const GET_TOURNAMENT = gql`
           description
           tournamentLink
           magicLink
+          coverPhoto
           lootboxSnapshots {
             address
             name

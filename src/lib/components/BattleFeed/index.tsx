@@ -183,6 +183,7 @@ const $BattleCardImage = styled.img<{ cardNumber: number }>`
   margin-left: -${(props) => props.cardNumber * 10}px;
   margin-top: ${(props) => props.cardNumber * 12}px;
   filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.25));
+  object-fit: contain;
 `
 
 export default BattleFeed
