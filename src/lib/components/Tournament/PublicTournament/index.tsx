@@ -10,7 +10,7 @@ import {
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import { $HideTings, HiddenDescription, $SearchInput, LootboxList } from '../common'
+import { $HideTings, HiddenDescription, $SearchInput, LootboxList, $TournamentCover } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
@@ -46,11 +46,13 @@ const PublicTournament = (props: PublicTournamentProps) => {
   return (
     <$Vertical spacing={4} width="100%" maxWidth="1000px">
       <$Vertical spacing={4}>
-        <$Vertical>
-          <$h1>{tournament.title}</$h1>
-          <$Divider margin="0px 0px 20px 0px" />
+        <$Vertical spacing={4}>
+          {tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
 
-          {(tournament.magicLink || tournament.tournamentLink) && (
+          <$Vertical>
+            <$h1>{tournament.title}</$h1>
+            <$Divider margin="0px 0px 20px 0px" />
+
             <$Horizontal flexWrap>
               {tournament.magicLink && (
                 <$span>
@@ -95,7 +97,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
                 </$Link>
               </$span>
             </$Horizontal>
-          )}
+          </$Vertical>
         </$Vertical>
         <HiddenDescription description={tournament.description} screen={screen} />
       </$Vertical>

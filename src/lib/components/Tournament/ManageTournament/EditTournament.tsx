@@ -15,7 +15,9 @@ import { EDIT_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { TournamentID } from 'lib/types'
-import { $ErrorMessage, $InputLabel, $InputMedium, $TextAreaMedium } from '../common'
+import { $ErrorMessage, $InputLabel, $InputMedium, $TextAreaMedium, $TournamentCover } from '../common'
+import { $CoverImage, $InputImage, $InputImageLabel } from '../CreateTournament'
+import { uploadTournamentCover } from 'lib/api/firebase/storage'
 
 interface EditTournamentProps {
   onSuccessCallback?: () => void
@@ -25,7 +27,9 @@ interface EditTournamentProps {
 
 const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditTournamentProps) => {
   const { screen } = useWindowSize()
+  const [loadingImageUpload, setLoadingImageUpload] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [localCoverPhoto, setLocalCoverPhoto] = useState<File | undefined>()
   const [tournamentPayload, setTournamentPayload] = useState<Omit<EditTournamentPayload, 'id'>>(initialState || {})
   const [editTournament, { loading }] = useMutation<
     { editTournament: EditTournamentResponse },
@@ -75,6 +79,28 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     })
   }
 
+  const parseCover = () => {
+    // @ts-ignore
+    const selectedFiles = document.getElementById('tournament-cover-uploader')?.files
+    if (selectedFiles?.length) {
+      const file = selectedFiles[0] as File
+
+      setLocalCoverPhoto(file)
+
+      // Display the image in the UI
+      const el = document.getElementById('tournament-cover-photo')
+
+      if (!el) {
+        console.error(`Could not find element`)
+        return
+      }
+
+      var url = URL.createObjectURL(file)
+      el.style.backgroundImage = 'url(' + url + ')'
+      return
+    }
+  }
+
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
       setErrorMessage('Title is required')
@@ -90,7 +116,11 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
       return
     }
 
+    setLoadingImageUpload(true)
+
     try {
+      const coverUrl = localCoverPhoto ? await uploadTournamentCover(localCoverPhoto) : undefined
+
       const payload: EditTournamentPayload = {
         id: tournamentId,
         title: tournamentPayload.title,
@@ -99,6 +129,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         magicLink: tournamentPayload.magicLink,
         tournamentDate: tournamentPayload.tournamentDate,
         prize: tournamentPayload.prize,
+        ...(coverUrl && { coverPhoto: coverUrl }),
       }
 
       const { data } = await editTournament({
@@ -113,10 +144,14 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         throw new Error(data.editTournament.error.message)
       }
 
+      setLocalCoverPhoto(undefined)
+
       onSuccessCallback && onSuccessCallback()
     } catch (err) {
       LogRocket.captureException(err)
       setErrorMessage(err?.message || 'An error occured!')
+    } finally {
+      setLoadingImageUpload(false)
     }
   }
 
@@ -178,6 +213,14 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
           </$Vertical>
         </$Horizontal>
 
+        <$Vertical>
+          <$InputImageLabel htmlFor="tournament-cover-uploader">
+            Edit Cover Photo (Landscape Recommended)
+          </$InputImageLabel>
+          <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
+          <$CoverImage id="tournament-cover-photo" display={localCoverPhoto ? 'block' : 'none'} />
+        </$Vertical>
+
         <$Vertical spacing={2}>
           <$InputLabel htmlFor="input-link">Link to Official Tournament</$InputLabel>
           <$InputMedium
@@ -208,9 +251,9 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               fontSize: TYPOGRAPHY.fontSize.large,
             }}
-            disabled={loading}
+            disabled={loadingImageUpload || loading}
           >
-            <LoadingText loading={loading} text="Save Changes" color={COLORS.trustFontColor} />
+            <LoadingText loading={loadingImageUpload || loading} text="Save Changes" color={COLORS.trustFontColor} />
           </$Button>
         </div>
         {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}

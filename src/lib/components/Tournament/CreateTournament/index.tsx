@@ -17,10 +17,10 @@ import { CREATE_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { $ErrorMessage, $Header, $InputMedium, $TextAreaMedium } from '../common'
-import $Input, { InputDecimal } from '../../Generics/Input'
 import { manifest } from 'manifest'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
+import { uploadTournamentCover } from 'lib/api/firebase/storage'
 
 interface CreateTournamentProps {
   onSuccessCallback?: (tournament: Tournament) => void
@@ -29,6 +29,7 @@ interface CreateTournamentProps {
 const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
+  const [localCoverPhoto, setLocalCoverPhoto] = useState<File | undefined>()
   const [tournamentPayload, setTournamentPayload] = useState<CreateTournamentPayload>({
     title: '',
     description: '',
@@ -75,6 +76,31 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     })
   }
 
+  const parseCover = () => {
+    // @ts-ignore
+    const selectedFiles = document.getElementById('tournament-cover-uploader')?.files
+    if (selectedFiles?.length) {
+      const file = selectedFiles[0] as File
+      console.log('file', file)
+
+      setLocalCoverPhoto(file)
+
+      // Display the image in the UI
+      const el = document.getElementById('tournament-cover-photo')
+
+      if (!el) {
+        console.error(`Could not find element`)
+        return
+      }
+
+      var url = URL.createObjectURL(file)
+      console.log('url', url)
+
+      el.style.backgroundImage = 'url(' + url + ')'
+      return
+    }
+  }
+
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
       setErrorMessage('Title is required')
@@ -91,9 +117,16 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     }
 
     try {
+      const coverUrl = localCoverPhoto ? await uploadTournamentCover(localCoverPhoto) : undefined
+      let payload = { ...tournamentPayload }
+
+      if (coverUrl) {
+        payload.coverPhoto = coverUrl
+      }
+
       const { data } = await createTournament({
         variables: {
-          payload: tournamentPayload,
+          payload,
         },
       })
 
@@ -116,7 +149,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     <AuthGuard>
       <$Vertical
         spacing={4}
-        width={screen == 'mobile' ? '100%' : '420px'}
+        width={screen == 'mobile' ? '100%' : '520px'}
         padding="1.6rem"
         style={{
           background: '#FFFFFF',
@@ -125,6 +158,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
           justifyContent: 'space-between',
           boxSizing: 'border-box',
           minHeight: '520px',
+          margin: '0 auto',
         }}
       >
         <$Vertical spacing={4}>
@@ -178,6 +212,14 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
             </$Vertical>
           </$Horizontal>
 
+          <$Vertical>
+            <$InputImageLabel htmlFor="tournament-cover-uploader">
+              {localCoverPhoto ? 'Change' : 'Add a'} Cover Photo (Landscape Recommended)
+            </$InputImageLabel>
+            <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
+            <$CoverImage id="tournament-cover-photo" display={localCoverPhoto ? 'block' : 'none'} />
+          </$Vertical>
+
           <$Vertical spacing={2}>
             <$span>Link to Official Tournament</$span>
             <$InputMedium
@@ -211,16 +253,6 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
   )
 }
 
-export const $ChangeMode = styled.div`
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  font-weight: ${TYPOGRAPHY.fontWeight.regular};
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-  cursor: pointer;
-  text-align: center;
-  text-decoration-line: underline;
-  color: #ababab;
-`
-
 const CreateTournamentPage = () => {
   useEffect(() => {
     const load = async () => {
@@ -244,5 +276,48 @@ const CreateTournamentPage = () => {
     </AuthGuard>
   )
 }
+
+export const $CoverImage = styled.div<{ display: string }>`
+  width: 100%;
+  height: 250px;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.2);
+  background-size: cover;
+  background-position: center;
+  display: ${(props) => props.display};
+  margin-top: 30px;
+`
+
+export const $ChangeMode = styled.div`
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  cursor: pointer;
+  text-align: center;
+  text-decoration-line: underline;
+  color: #ababab;
+`
+
+export const $InputImage = styled.input`
+  display: none;
+`
+
+export const $InputImageLabel = styled.label`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  color: ${COLORS.surpressedFontColor}ae;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+`
 
 export default CreateTournamentPage

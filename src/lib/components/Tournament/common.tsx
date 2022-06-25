@@ -279,3 +279,15 @@ export const $TextAreaMedium = styled.textarea`
     color: ${COLORS.black}ca;
   }
 `
+
+export const $TournamentCover = styled.img`
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+`
