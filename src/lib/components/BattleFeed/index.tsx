@@ -61,16 +61,22 @@ const BattleFeed = () => {
           return (
             <$BattleContainer key={`battle_${idx}`} screen={screen} onClick={() => goToTournamentPage(tourny)}>
               <$Horizontal height="100%" spacing={2}>
-                <$BattleCardsContainer width="45%">
+                <$BattleCardsContainer width="40%">
                   {tourny.lootboxSnapshots?.length ? (
                     tourny.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
                       return <$BattleCardImage src={snap.stampImage} cardNumber={idx2} />
                     })
                   ) : (
-                    <$BattleCardImage src={TEMPLATE_LOOTBOX_STAMP} cardNumber={0} />
+                    <$BattleCardImage
+                      src={TEMPLATE_LOOTBOX_STAMP}
+                      cardNumber={0}
+                      style={{
+                        maxWidth: '100%',
+                      }}
+                    />
                   )}
                 </$BattleCardsContainer>
-                <$Vertical width="65%">
+                <$Vertical width="60%">
                   {tourny.prize && (
                     <$Vertical>
                       <$span
