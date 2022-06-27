@@ -134,6 +134,8 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   cursor: pointer;
   background-position: center;
   position: relative;
+  min-height: 320px;
+  max-height: 320px;
 `
 
 export const $TicketRedeemContainer = styled.section`

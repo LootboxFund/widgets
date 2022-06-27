@@ -58,7 +58,7 @@ const RedeemButton = (props: RedeemButtonProps) => {
         backgroundColor={`${COLORS.surpressedBackground}15`}
         backgroundColorHover={`${COLORS.surpressedBackground}`}
         color={`${COLORS.surpressedFontColor}aa`}
-        style={{ minHeight: '60px', height: '100px' }}
+        style={{ minHeight: '60px', height: '60px', maxHeight: '60px' }}
       >
         REDEEM
       </$Button>
