@@ -623,3 +623,13 @@ export const bulkMintNFTsContractCall = async (
     return tx.hash
   }
 }
+
+export const transferNFTOwnership = async (ticketID: string, lootboxAddress: Address, ownerAddress: Address, receiverAddress: Address) => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const signer = await provider.getSigner()
+  const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
+  const res = await lootbox.connect(signer).transferFrom(ownerAddress, receiverAddress, ticketID)
+  await res.wait()
+  return res
+}
