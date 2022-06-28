@@ -26,6 +26,7 @@ export interface TicketCardWidgetProps {
   forceLoading?: boolean
   isDownloadLootbox?: boolean
   staticHeight?: string
+  allowNFTTransferUI?: boolean
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -160,7 +161,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
       {!!ticket ? (
         <>
-          {renderNFTTransferUI()}
+          {props.allowNFTTransferUI && renderNFTTransferUI()}
           <$Button
             onClick={downloadStamp}
             screen={screen}

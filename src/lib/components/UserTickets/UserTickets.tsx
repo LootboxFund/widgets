@@ -81,7 +81,7 @@ const UserTickets = (props: Props) => {
       <Wrapper>
         {tickets.map((ticketID, idx) => (
           <$TicketWrapper key={`${snap.lootboxAddress}-ticket-${ticketID}-${idx}`}>
-            <TicketCard ticketID={ticketID} isRedeemEnabled={true} onScrollToMint={props.onScrollToMint} staticHeight="320px"></TicketCard>
+            <TicketCard ticketID={ticketID} isRedeemEnabled={true} onScrollToMint={props.onScrollToMint} staticHeight="320px" allowNFTTransferUI></TicketCard>
           </$TicketWrapper>
         ))}
       </Wrapper>
