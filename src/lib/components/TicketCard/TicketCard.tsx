@@ -11,9 +11,10 @@ export interface TicketCardProps {
   ticketID: string | undefined
   onScrollToMint?: () => void
   forceLoading?: boolean // hack to show loading
+  staticHeight?: string;
 }
 
-const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps) => {
+const TicketCard = ({ ticketID, onScrollToMint, forceLoading, staticHeight }: TicketCardProps) => {
   const snap = useSnapshot(ticketCardState) as TicketCardState
   const stateID = ticketID && snap.lootboxAddress && generateStateID(snap.lootboxAddress as ContractAddress, ticketID)
   const ticket: ITicketFE | undefined =
@@ -37,6 +38,7 @@ const TicketCard = ({ ticketID, onScrollToMint, forceLoading }: TicketCardProps)
       onClick={() => {
         !ticket && onScrollToMint && onScrollToMint()
       }}
+      staticHeight={staticHeight}
     >
       <$LogoContainer padding={ticket ? '1.5rem 1.2rem 0' : undefined}>
         <$TicketLogo
@@ -123,7 +125,7 @@ export const $LogoContainer = styled.div<{ padding?: string }>`
   justify-content: center;
 `
 
-export const $TicketCardContainer = styled.section<{ backgroundColor?: string; backgroundImage?: string | undefined }>`
+export const $TicketCardContainer = styled.section<{ backgroundColor?: string; staticHeight?: string; backgroundImage?: string | undefined }>`
   ${BASE_CONTAINER}
   border: 0px solid transparent;
   border-radius: 20px;
@@ -134,12 +136,14 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; b
   cursor: pointer;
   background-position: center;
   position: relative;
-  /* min-height: 320px;
-  max-height: 320px; */
+  ${(props) => props.staticHeight ? `min-height: 320px` : ''};
+  ${(props) => props.staticHeight ? `max-height: 320px` : ''};
 `
 
-export const $TicketRedeemContainer = styled.section`
+export const $TicketRedeemContainer = styled.section<{ staticHeight?: string }>`
   ${BASE_CONTAINER}
+  ${(props) => props.staticHeight ? `min-height: 320px` : ''};
+  ${(props) => props.staticHeight ? `max-height: 320px` : ''};
   padding: 20px 20px 0px;
 `
 

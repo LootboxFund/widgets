@@ -12,6 +12,7 @@ import { $Sadge } from '../BuyShares/PurchaseComplete'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
+  staticHeight?: string
 }
 
 const ViewPayout = (props: ViewPayoutProps) => {
@@ -56,7 +57,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
   }
 
   return (
-    <$TicketRedeemContainer>
+    <$TicketRedeemContainer staticHeight={props.staticHeight}>
       <$Horizontal justifyContent="space-between">
         <$MinorHeading>{title}</$MinorHeading>
         <$XIcon onClick={() => sendToCardView()}>X</$XIcon>

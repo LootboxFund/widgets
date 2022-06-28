@@ -25,6 +25,7 @@ export interface TicketCardWidgetProps {
   onScrollToMint?: () => void
   forceLoading?: boolean
   isDownloadLootbox?: boolean
+  staticHeight?: string
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
@@ -152,9 +153,9 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   return (
     <$RootContainer>
       {ticket && ticket.route === '/payout' ? (
-        <ViewPayout ticketID={props.ticketID} />
+        <ViewPayout ticketID={props.ticketID} staticHeight={props.staticHeight} />
       ) : (
-        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} />
+        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} staticHeight={props.staticHeight} />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
       {!!ticket ? (
