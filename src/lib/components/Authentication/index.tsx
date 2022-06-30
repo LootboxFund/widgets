@@ -16,8 +16,9 @@ interface AuthenticationProps {
   initialMode?: ModeOptions
   onSignupSuccess?: () => void
   loginTitle?: string
+  width?: string
 }
-const Authentication = ({ initialMode, onSignupSuccess, loginTitle }: AuthenticationProps) => {
+const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
   const { screen } = useWindowSize()
 
@@ -77,7 +78,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle }: Authentica
   return (
     <$Vertical
       spacing={4}
-      width={screen == 'mobile' ? '100%' : '420px'}
+      width={width ? width : screen == 'mobile' ? '100%' : '420px'}
       height="520px"
       padding="1.6rem"
       style={{

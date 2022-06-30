@@ -1,4 +1,4 @@
-import { Address, ContractAddress } from '@wormgraph/helpers'
+import { Address, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -19,10 +19,12 @@ import {
   validateReceivingWallet,
 } from '../CreateLootbox/StepChooseFunding'
 import $Input, { InputDecimal } from '../Generics/Input'
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import BigNumber from 'bignumber.js'
 import { bulkMintNFTsContractCall, getPriceFeed, LootboxType } from 'lib/hooks/useContract'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import AuthGuard from '../AuthGuard'
+import CreatePartyBasket from '../PartyBasket/CreatePartyBasket'
 
 export interface BulkMintProps {
   lootboxAddress: ContractAddress
@@ -30,6 +32,7 @@ export interface BulkMintProps {
   lootboxMetadata: LootboxMetadata
   lootboxType: LootboxType
 }
+
 const BulkMint = (props: BulkMintProps) => {
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
@@ -187,6 +190,12 @@ const BulkMint = (props: BulkMintProps) => {
             </div>
           </$InputWrapper>
         </$Vertical>
+        <br />
+        <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
+          <AuthGuard loginTitle="Login to make a Party Basket">
+            <CreatePartyBasket lootboxAddress={props.lootboxAddress} network={props.network} />
+          </AuthGuard>
+        </$CreatePartyBasketContainer>
         <br />
         <$Vertical>
           <$StepSubheading>
@@ -366,4 +375,10 @@ const $RewardSponsorsButton = styled.button<{ themeColor?: string; allConditions
   padding: 20px;
 `
 
+const $CreatePartyBasketContainer = styled.div<{ themeColor: string; screen: ScreenSize }>`
+  background-color: ${(props) => `${props.themeColor}30`};
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  border-radius: 10px;
+  padding: 20px;
+`
 export default BulkMint
