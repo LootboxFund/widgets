@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 export const QUERY_BATTLE_FEED = gql`
-  query BattleFeed($first: Int, $after: ID) {
+  query BattleFeed($first: Int!, $after: ID) {
     battleFeed(first: $first, after: $after) {
       ... on BattleFeedResponseSuccess {
         totalCount
