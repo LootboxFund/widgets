@@ -1,10 +1,10 @@
 import Authentication from '../Authentication'
 import { useAuth } from 'lib/hooks/useAuth'
 
-const AuthGuard = ({ children }: { children: JSX.Element }): JSX.Element => {
+const AuthGuard = ({ children, loginTitle }: { children: JSX.Element; loginTitle?: string }): JSX.Element => {
   const { user } = useAuth()
   if (!user) {
-    return <Authentication initialMode="login-password" />
+    return <Authentication initialMode="login-password" loginTitle={loginTitle} />
   } else {
     return children
   }

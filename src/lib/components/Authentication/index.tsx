@@ -15,8 +15,9 @@ import { initLogging } from 'lib/api/logrocket'
 interface AuthenticationProps {
   initialMode?: ModeOptions
   onSignupSuccess?: () => void
+  loginTitle?: string
 }
-const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) => {
+const Authentication = ({ initialMode, onSignupSuccess, loginTitle }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
   const { screen } = useWindowSize()
 
@@ -88,8 +89,12 @@ const Authentication = ({ initialMode, onSignupSuccess }: AuthenticationProps) =
         margin: '0 auto',
       }}
     >
-      {route === 'login-wallet' && <LoginWallet onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} />}
-      {route === 'login-password' && <LoginEmail onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} />}
+      {route === 'login-wallet' && (
+        <LoginWallet onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} title={loginTitle} />
+      )}
+      {route === 'login-password' && (
+        <LoginEmail onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} title={loginTitle} />
+      )}
       {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
       {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
       {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}
