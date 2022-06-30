@@ -1,16 +1,8 @@
 import { ethers as ethersObj } from 'ethers'
-import { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
-import { v4 as uuidv4 } from 'uuid'
-import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
 import { Address, ChainIDHex, ContractAddress } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
-import LogRocket from 'logrocket'
-import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
-import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
 import PARTY_BASKET_FACTORY_ABI from 'lib/abi/PartyBasketFactory.json'
-import { TournamentID } from 'lib/types'
 import { CreatePartyBasketPayload, LootboxMetadata, MutationCreatePartyBasketArgs } from './graphql/generated/types'
 
 interface PartyBasketArgs {
@@ -66,7 +58,6 @@ export const createPartyBasket = async (
   }
   provider.on(filter, async (log) => {
     if (log !== undefined) {
-      console.log('hit log', log)
       const decodedLog = decodeEVMLog({
         eventName: 'PartyBasketCreated',
         log: log,
@@ -87,7 +78,6 @@ export const createPartyBasket = async (
         //   )`,
         keys: ['partyBasket', 'issuer', 'name', 'lootboxAddress'],
       })
-      console.log('decodedlog', decodedLog)
 
       const { partyBasket, issuer, name, lootboxAddress } = decodedLog as any
 
@@ -102,7 +92,6 @@ export const createPartyBasket = async (
           ---------------
           
           `)
-        console.log('calling callback')
         await onSuccessCallback({
           name: name,
           address: partyBasket,

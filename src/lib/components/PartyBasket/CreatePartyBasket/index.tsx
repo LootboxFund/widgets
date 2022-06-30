@@ -14,6 +14,7 @@ import { userState } from 'lib/state/userState'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
+import { GET_MY_PARTY_BASKETS } from '../ViewPartyBaskets/api.gql'
 import { CREATE_PARTY_BASKET } from './api.gql'
 
 type PartyBasketSubmissionStatus = 'pending' | 'success' | 'error' | 'ready'
@@ -35,7 +36,9 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
 
   const [provider, loading] = useProvider()
   const snapUserState = useSnapshot(userState)
-  const [createPartyBasketMutation] = useMutation(CREATE_PARTY_BASKET)
+  const [createPartyBasketMutation] = useMutation(CREATE_PARTY_BASKET, {
+    refetchQueries: [{ query: GET_MY_PARTY_BASKETS, variables: { address: props.lootboxAddress } }],
+  })
 
   const createPartyBasketCall = async () => {
     setPartyBasketSubmissionStatus({ status: 'pending' })
