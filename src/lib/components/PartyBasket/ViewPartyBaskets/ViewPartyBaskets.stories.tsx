@@ -12,12 +12,6 @@ export default {
 }
 
 const Demo = (args: ViewPartyBasketProps) => {
-  // const [address, setAddress] = useState()
-  // useEffect(() => {
-  //   const address =
-  //   setAddress(address || ('' as Address))
-  // }, [])
-
   return (
     <ApolloProvider client={client}>
       <ViewPartyBaskets {...args} network={NETWORK_OPTIONS[0]} lootboxAddress={parseUrlParams('lootbox') as Address} />{' '}

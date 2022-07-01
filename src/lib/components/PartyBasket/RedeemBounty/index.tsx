@@ -59,6 +59,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     chainIdHex,
     lootboxSnapshot,
     name: partyBasketName,
+    nftBountyValue,
   } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
 
   const { name: lootboxName } = lootboxSnapshot || {}
@@ -69,8 +70,16 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     <$RedeemBountyContainer>
       <$StepCard screen={screen} themeColor={network.themeColor}>
         <$Vertical spacing={4}>
-          <$Horizontal spacing={2} width="100%" flexWrap={screen === 'mobile'}>
-            <$Vertical width={screen === 'mobile' ? '100%' : '65%'} spacing={4}>
+          <$Horizontal spacing={4} width="100%" flexWrap={screen === 'mobile'}>
+            <$Vertical
+              width={screen === 'mobile' ? '100%' : '65%'}
+              spacing={4}
+              style={{
+                ...(screen === 'mobile' && {
+                  marginRight: '0px',
+                }),
+              }}
+            >
               <$Horizontal>
                 <$ManageLootboxHeading screen={screen}>Redeem Free NFT</$ManageLootboxHeading>
                 <HelpIcon tipID="partyBasket" />
@@ -88,8 +97,34 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                 dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
                 ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
               </$StepSubheading>
+
+              <$Vertical spacing={2}>
+                <$Horizontal spacing={2} justifyContent="space-between">
+                  <$Horizontal verticalCenter>
+                    <$StepSubheading>Max Earnings</$StepSubheading>
+                    <HelpIcon tipID="maxEarnings" />
+                    <ReactTooltip id="maxEarnings" place="right" effect="solid">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                      labore et dolore magna aliqua.
+                    </ReactTooltip>
+                  </$Horizontal>
+
+                  <$StepSubheading style={{ width: 'auto', whiteSpace: 'nowrap' }}>NFTs Available</$StepSubheading>
+                </$Horizontal>
+                <$EarningsContainer>
+                  <$EarningsText>{!!nftBountyValue ? nftBountyValue : 'Mystery Earnings'}</$EarningsText>
+                </$EarningsContainer>
+              </$Vertical>
             </$Vertical>
-            <$Vertical spacing={3} width={screen === 'mobile' ? '100%' : '35%'}>
+            <$Vertical
+              spacing={3}
+              width={screen === 'mobile' ? '100%' : '35%'}
+              style={{
+                ...(screen === 'mobile' && {
+                  marginTop: '24px',
+                }),
+              }}
+            >
               <div>{!!snapUserState?.currentAccount ? <NetworkText /> : <WalletButton />}</div>
               <$LootboxStampImage src={lootboxSnapshot?.stampImage || TEMPLATE_LOOTBOX_STAMP} />
               <$BasketButton screen={screen} themeColor="#373737" style={{ borderColor: '#37373715' }}>
@@ -183,6 +218,27 @@ const $LootboxStampImage = styled.img<{}>`
   max-height: 100%;
   object-fit: cover;
   border-radius: 10px;
+`
+
+const $EarningsContainer = styled.div<{}>`
+  width: 100%;
+  max-width: 418px;
+  height: 184px;
+
+  background: #f5f5f5;
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`
+
+const $EarningsText = styled.p<{}>`
+  text-align: center;
+  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  color: ${COLORS.surpressedFontColor};
 `
 
 export default RedeemBountyPage

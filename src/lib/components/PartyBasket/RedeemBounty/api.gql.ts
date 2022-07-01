@@ -26,6 +26,7 @@ export const GET_PARTY_BASKET_FOR_REDEMPTION = gql`
         partyBasket {
           address
           name
+          nftBountyValue
           lootboxSnapshot {
             name
             address
