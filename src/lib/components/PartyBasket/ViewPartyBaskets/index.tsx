@@ -44,8 +44,6 @@ const PartyBasketList = ({
     },
   })
 
-  console.log(data, error)
-
   const Baskets = ({ baskets }: { baskets: PartyBasket[] }) => {
     return (
       <$Vertical spacing={2}>
@@ -56,7 +54,7 @@ const PartyBasketList = ({
               themeColor={themeColor}
               screen={screen}
               onClick={() => {
-                const url = `${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.id}`
+                const url = `${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.address}`
                 console.log('open', url)
                 window.open(url, '_self')
               }}
