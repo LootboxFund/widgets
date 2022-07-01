@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { Address, COLORS } from '@wormgraph/helpers'
+import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import {
   GetMyProfileResponse,
   PartyBasket,
@@ -21,6 +21,10 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { GET_MY_PARTY_BASKETS } from './api.gql'
 import { manifest } from 'manifest'
+import CreatePartyBasket from '../CreatePartyBasket'
+import { $InputMedium } from 'lib/components/Tournament/common'
+import { truncateAddress } from 'lib/api/helpers'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 export interface ViewPartyBasketProps {
   network: NetworkOption
@@ -49,17 +53,19 @@ const PartyBasketList = ({
       <$Vertical spacing={2}>
         {baskets.length === 0 && <Oopsies title="You do not have any Party Baskets" icon="🧐" />}
         {baskets.map((basket) => (
-          <$Horizontal key={basket.id}>
-            <$BasketButton
-              themeColor={themeColor}
-              screen={screen}
-              onClick={() => {
-                const url = `${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.address}`
-                console.log('open', url)
-                window.open(url, '_self')
-              }}
+          <$BasketButton key={basket.id} themeColor={themeColor} screen={screen}>
+            <$Horizontal
+              spacing={2}
+              width="100%"
+              justifyContent="space-between"
+              flexWrap={screen === 'mobile'}
+              //   padding={screen === 'mobile' ? '20px auto' : 'auto'}
             >
               <$ManageLootboxHeading
+                onClick={() => {
+                  const url = `${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.address}`
+                  window.open(url, '_self')
+                }}
                 screen={screen}
                 style={{
                   color: themeColor,
@@ -68,12 +74,33 @@ const PartyBasketList = ({
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                   fontSize: '1.5rem',
+                  width: '100%',
+                  cursor: 'pointer',
                 }}
               >
                 {basket.name}
               </$ManageLootboxHeading>
-            </$BasketButton>
-          </$Horizontal>
+              <$Horizontal style={{ cursor: 'pointer' }}>
+                <$ManageLootboxHeading
+                  screen={screen}
+                  style={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    fontSize: '1.3rem',
+                    color: `${COLORS.surpressedFontColor}c5`,
+                    fontWeight: TYPOGRAPHY.fontWeight.regular,
+                    margin: 'auto 0px',
+                  }}
+                >
+                  {truncateAddress(basket.address as Address)}
+                </$ManageLootboxHeading>
+                <div style={{ margin: 'auto 0px' }}>
+                  <CopyIcon text={basket.address} width={30} />
+                </div>
+              </$Horizontal>
+            </$Horizontal>
+          </$BasketButton>
         ))}
       </$Vertical>
     )
@@ -115,45 +142,55 @@ const ViewPartyBaskets = (props: ViewPartyBasketProps) => {
   return (
     <$ViewPartyBaskets>
       <$StepCard screen={screen} themeColor={props.network.themeColor}>
-        <$Horizontal>
-          <$Vertical flex={4}>
-            <$Horizontal verticalCenter>
-              <$ManageLootboxHeading screen={screen}>Party Baskets</$ManageLootboxHeading>
-              <HelpIcon tipID="partyBaskets" />
-              <ReactTooltip id="partyBaskets" place="right" effect="solid">
-                If you would like access to this Party Basket feature, email us at support@lootbox.fund
-              </ReactTooltip>
-            </$Horizontal>
-            <br />
-            <$StepSubheading>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
+        <$Vertical spacing={4} width="100%">
+          <$Horizontal width="100%">
+            <$Vertical flex={4} width="100%">
+              <$Horizontal verticalCenter>
+                <$ManageLootboxHeading screen={screen}>Party Baskets</$ManageLootboxHeading>
+                <HelpIcon tipID="partyBaskets" />
+                <ReactTooltip id="partyBaskets" place="right" effect="solid">
+                  If you would like access to this Party Basket feature, email us at support@lootbox.fund
+                </ReactTooltip>
+              </$Horizontal>
               <br />
+              <$StepSubheading>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua.
+                <br />
+                <br />
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                consequat. Duis aute irure dolor in reprehenderit in voluptate
+              </$StepSubheading>
               <br />
-              Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat. Duis aute irure dolor in reprehenderit in voluptate
-            </$StepSubheading>
-            <br />
-            <AuthGuard loginTitle="Login to View Party Baskets">
-              <PartyBasketList
-                themeColor={props.network.themeColor}
-                screen={screen}
-                lootboxAddress={props.lootboxAddress}
-              />
+              <AuthGuard loginTitle="Login to View Party Baskets">
+                <PartyBasketList
+                  themeColor={props.network.themeColor}
+                  screen={screen}
+                  lootboxAddress={props.lootboxAddress}
+                />
+              </AuthGuard>
+            </$Vertical>
+            {screen === 'desktop' && (
+              <$Horizontal flex={1} justifyContent="flex-end">
+                <NetworkText />
+              </$Horizontal>
+            )}
+          </$Horizontal>
+
+          {/* <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
+            <AuthGuard loginTitle="Login to make a Party Basket">
+              <CreatePartyBasket lootboxAddress={props.lootboxAddress} network={props.network} />
             </AuthGuard>
-          </$Vertical>
-          {screen === 'desktop' && (
-            <$Horizontal flex={1} justifyContent="flex-end">
-              <NetworkText />
-            </$Horizontal>
-          )}
-        </$Horizontal>
+          </$CreatePartyBasketContainer> */}
+        </$Vertical>
       </$StepCard>
     </$ViewPartyBaskets>
   )
 }
 
-const $ViewPartyBaskets = styled.div``
+const $ViewPartyBaskets = styled.div`
+  width: 100%;
+`
 
 const $StepCard = styled.div<{
   themeColor: string
@@ -172,6 +209,13 @@ const $StepCard = styled.div<{
   font-family: sans-serif;
 `
 
+const $CreatePartyBasketContainer = styled.div<{ themeColor: string; screen: ScreenSize }>`
+  background-color: ${(props) => `${props.themeColor}30`};
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  border-radius: 10px;
+  padding: 20px;
+`
+
 const $BasketButton = styled.div<{
   themeColor: string
   screen: ScreenSize
@@ -188,7 +232,6 @@ const $BasketButton = styled.div<{
   flex-direction: row;
   justify-content: space-between;
   padding: 0px 20px;
-  cursor: pointer;
   margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
 `
 

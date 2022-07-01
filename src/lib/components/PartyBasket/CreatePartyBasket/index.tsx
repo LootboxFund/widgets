@@ -1,21 +1,23 @@
 import { useMutation } from '@apollo/client'
-import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { createPartyBasket } from 'lib/api/createPartyBasket'
 import { CreatePartyBasketPayload } from 'lib/api/graphql/generated/types'
 import { NetworkOption } from 'lib/api/network'
 import { $ErrorText } from 'lib/components/BuyShares/PurchaseComplete'
 import { $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
 import { $InputWrapper } from 'lib/components/CreateLootbox/StepChooseFunding'
-import { $Vertical } from 'lib/components/Generics'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import $Input from 'lib/components/Generics/Input'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useProvider } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
+import HelpIcon from 'lib/theme/icons/Help.icon'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { GET_MY_PARTY_BASKETS } from '../ViewPartyBaskets/api.gql'
 import { CREATE_PARTY_BASKET } from './api.gql'
+import ReactTooltip from 'react-tooltip'
 
 type PartyBasketSubmissionStatus = 'pending' | 'success' | 'error' | 'ready'
 interface PartyBasketSubmission {
@@ -23,7 +25,7 @@ interface PartyBasketSubmission {
   error?: string
 }
 interface CreatePartyBasketProps {
-  lootboxAddress: ContractAddress
+  lootboxAddress: Address
   network: NetworkOption
 }
 
@@ -33,6 +35,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
   const [partyBasketSubmissionStatus, setPartyBasketSubmissionStatus] = useState<PartyBasketSubmission>({
     status: 'ready',
   })
+  const [bountyPrize, setBountyPrize] = useState<string>('')
 
   const [provider, loading] = useProvider()
   const snapUserState = useSnapshot(userState)
@@ -59,7 +62,6 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
           admin: snapUserState.currentAccount,
         },
         async (data: CreatePartyBasketPayload) => {
-          console.log('writting to database', data)
           try {
             await createPartyBasketMutation({
               variables: {
@@ -70,6 +72,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
                   chainIdHex: data.chainIdHex,
                   lootboxAddress: data.lootboxAddress,
                   creatorAddress: data.creatorAddress,
+                  nftBountyValue: bountyPrize,
                 },
               },
             })
@@ -99,6 +102,28 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
               onChange={(e) => setPartyBasketName(e.target.value)}
               min="0"
               placeholder="Name your Party Basket"
+              screen={screen}
+              style={{ fontWeight: 'lighter' }}
+            />
+          </div>
+        </$InputWrapper>
+      </$Vertical>
+      <$Vertical>
+        <$Horizontal verticalCenter>
+          <$StepSubheading style={{ width: 'auto' }}>NFT Prize Value</$StepSubheading>
+          <HelpIcon tipID="bountyPrize" />
+          <ReactTooltip id="bountyPrize" place="right" effect="solid">
+            You determine how much
+          </ReactTooltip>
+        </$Horizontal>
+
+        <$InputWrapper screen={screen}>
+          <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+            <$Input
+              type="text"
+              value={bountyPrize}
+              onChange={(e) => setBountyPrize(e.target.value)}
+              placeholder="e.g. 150 SLP"
               screen={screen}
               style={{ fontWeight: 'lighter' }}
             />
