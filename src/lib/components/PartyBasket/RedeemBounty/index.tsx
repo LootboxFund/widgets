@@ -1,4 +1,4 @@
-import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import Spinner from 'lib/components/Generics/Spinner'
 import { addCustomEVMChain, getProvider, initDApp, useProvider } from 'lib/hooks/useWeb3Api'
@@ -37,6 +37,9 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { getWhitelistQuerySignature } from 'lib/utils/signatureMessage'
 import { redeemNFT } from 'lib/api/redeemNFT'
 import $Button from 'lib/components/Generics/Button'
+import UserTicketsSimple from 'lib/components/UserTickets/UserTicketsSimple'
+import { ticketCardState } from 'lib/components/TicketCard/state'
+import { truncateAddress } from 'lib/api/helpers'
 
 interface RedeemBountyProps {
   basketAddress: Address
@@ -68,6 +71,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
       address: props.basketAddress,
     },
   })
+  const [userTicketStatus, setUserTicketStatus] = useState<'loading' | 'success'>('success')
   // This is a mutation because it write a nonce to the database to avoid replay attacks
   const [getSignatures, { data: signatureData, loading: loadingSignatures }] = useMutation<
     { getWhitelistSignatures: GetPartyBasketResponse },
@@ -78,6 +82,15 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     { redeemSignature: RedeemSignatureResponse },
     MutationRedeemSignatureArgs
   >(MUTATION_REDEEM_SIGNATURE)
+
+  const _lootboxAddress = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket?.lootboxSnapshot
+    ?.address as ContractAddress | undefined
+
+  useEffect(() => {
+    if (_lootboxAddress) {
+      ticketCardState.lootboxAddress = _lootboxAddress
+    }
+  }, [_lootboxAddress])
 
   if (loading) {
     return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
@@ -100,7 +113,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     nftBountyValue,
   } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
 
-  const { name: lootboxName } = lootboxSnapshot || {}
+  const { name: lootboxName, address: lootboxAddress } = lootboxSnapshot || {}
 
   const network = NETWORK_OPTIONS.find((net) => net.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
@@ -188,6 +201,12 @@ const RedeemBounty = (props: RedeemBountyProps) => {
 
         setRedeemState({ status: 'success' })
         setAuthSignature(undefined)
+
+        // HACKY - force user tickets to reload
+        setUserTicketStatus('loading')
+        setTimeout(() => {
+          setUserTicketStatus('success')
+        }, 1500)
       } catch (err) {
         LogRocket.captureException(err)
         setRedeemState({ status: 'error', error: err?.data?.message || err?.message || 'An error occured!' })
@@ -198,7 +217,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   }
 
   return (
-    <$RedeemBountyContainer>
+    <$Vertical spacing={4}>
       <$StepCard screen={screen} themeColor={network.themeColor}>
         <$Vertical spacing={4}>
           <$Horizontal spacing={4} width="100%" flexWrap={screen === 'mobile'}>
@@ -319,7 +338,25 @@ const RedeemBounty = (props: RedeemBountyProps) => {
           )}
         </$Vertical>
       </$StepCard>
-    </$RedeemBountyContainer>
+      <br />
+      <br />
+      <$Horizontal>
+        <$ManageLootboxHeading screen={screen} style={{ fontFamily: TYPOGRAPHY.fontFamily.regular }}>
+          Your NFTs
+        </$ManageLootboxHeading>
+        <HelpIcon tipID="yourNfts" />
+        <ReactTooltip id="yourNfts" place="right" effect="solid">
+          There are the NFTs your wallet{' '}
+          {snapUserState.currentAccount ? `(${truncateAddress(snapUserState.currentAccount)})` : ''} owns from this
+          lootbox {lootboxAddress ? `(${truncateAddress(lootboxAddress as Address)})` : ''}.
+        </ReactTooltip>
+      </$Horizontal>
+      {userTicketStatus === 'success' ? (
+        <UserTicketsSimple lootboxAddress={lootboxAddress as Address | undefined} />
+      ) : (
+        <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
+      )}
+    </$Vertical>
   )
 }
 
