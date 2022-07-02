@@ -254,7 +254,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   }
 
   if (loading) {
-    return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error) {
     return <Oopsies title="Error loading Party Basket" message={error?.message || ''} icon="🤕" />
   } else if (data?.getPartyBasket?.__typename === 'ResponseError') {

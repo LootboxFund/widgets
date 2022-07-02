@@ -44,7 +44,12 @@ interface FrontendUser {
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 export const useAuth = () => {
-  const [user, setUser] = useState<FrontendUser | null>(null)
+  /**
+   * user = undefined -> unset (loading)
+   * user = null -> unauthenticated
+   * user = USER -> authenticated
+   */
+  const [user, setUser] = useState<FrontendUser | undefined | null>(undefined)
   const userStateSnapshot = useSnapshot(userState)
 
   const [signUpWithWalletMutation] = useMutation<
