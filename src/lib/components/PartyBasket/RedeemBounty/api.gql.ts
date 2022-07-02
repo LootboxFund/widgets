@@ -5,6 +5,7 @@ export const MUTATION_GET_WHITELIST_SIGNATURES = gql`
     getWhitelistSignatures(payload: $payload) {
       ... on GetWhitelistSignaturesResponseSuccess {
         signatures {
+          id
           signature
           isRedeemed
           nonce
@@ -25,6 +26,7 @@ export const GET_PARTY_BASKET_FOR_REDEMPTION = gql`
     getPartyBasket(address: $address) {
       ... on GetPartyBasketResponseSuccess {
         partyBasket {
+          id
           address
           name
           nftBountyValue
@@ -37,6 +39,19 @@ export const GET_PARTY_BASKET_FOR_REDEMPTION = gql`
           creatorId
         }
       }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export const MUTATION_REDEEM_SIGNATURE = gql`
+  mutation RedeemSignature($payload: RedeemSignaturePayload!) {
+    redeemSignature(payload: $payload) {
       ... on ResponseError {
         error {
           code

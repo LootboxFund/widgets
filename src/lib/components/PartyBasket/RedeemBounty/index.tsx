@@ -6,7 +6,11 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import LogRocket from 'logrocket'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
-import { MUTATION_GET_WHITELIST_SIGNATURES, GET_PARTY_BASKET_FOR_REDEMPTION } from './api.gql'
+import {
+  MUTATION_GET_WHITELIST_SIGNATURES,
+  GET_PARTY_BASKET_FOR_REDEMPTION,
+  MUTATION_REDEEM_SIGNATURE,
+} from './api.gql'
 import styled from 'styled-components'
 import { $ErrorMessage, $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
@@ -23,7 +27,9 @@ import {
   GetPartyBasketResponseSuccess,
   GetWhitelistSignaturesResponseSuccess,
   MutationGetWhitelistSignaturesArgs,
+  MutationRedeemSignatureArgs,
   QueryGetPartyBasketArgs,
+  RedeemSignatureResponse,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import { NETWORK_OPTIONS } from 'lib/api/network'
@@ -40,10 +46,16 @@ interface RedeemState {
   error?: string
 }
 
+interface AuthSignature {
+  message: string
+  signature: string
+}
+
 const RedeemBounty = (props: RedeemBountyProps) => {
   const [provider] = useProvider()
   const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
+  const [authSignature, setAuthSignature] = useState<AuthSignature | undefined>()
   const [redeemState, setRedeemState] = useState<RedeemState>({ status: 'signature' })
   const { data, loading, error } = useQuery<
     {
@@ -56,37 +68,50 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     },
   })
   // This is a mutation because it write a nonce to the database to avoid replay attacks
-  // const [getSignatures, { data: signatureData, loading: loadingSignatures, error: signaturesError }] = useMutation<
   const [getSignatures, { data: signatureData, loading: loadingSignatures }] = useMutation<
     { getWhitelistSignatures: GetPartyBasketResponse },
     MutationGetWhitelistSignaturesArgs
   >(MUTATION_GET_WHITELIST_SIGNATURES)
 
-  const handlePrimaryClick = async () => {
-    if (hasBountyToRedeem) {
-      const signature = validSignatures?.[0]
-      try {
-        if (!signature) {
-          throw new Error('You have no NFTs to redeem')
-        }
+  const [redeemSignature, { loading: loadingRedeemSignature }] = useMutation<
+    { redeemSignature: RedeemSignatureResponse },
+    MutationRedeemSignatureArgs
+  >(MUTATION_REDEEM_SIGNATURE)
 
-        // Redeem the NFT
-        await redeemNFT({
-          provider,
-          args: {
-            partyBasketAddress: props.basketAddress,
-            signature: signature.signature,
-            nonce: signature.nonce,
-          },
-          onSuccessCallback: async (data: any) => {
-            console.log('done')
-          },
-        })
-      } catch (err) {
-        LogRocket.captureException(err)
-        setRedeemState({ status: 'error', error: err?.data?.message || err?.message || 'An error occured!' })
-      }
-    } else if (redeemState.status === 'signature') {
+  if (loading) {
+    return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
+  } else if (error) {
+    return <Oopsies title="Error loading Party Basket" message={error?.message || ''} icon="🤕" />
+  } else if (data?.getPartyBasket?.__typename === 'ResponseError') {
+    return <Oopsies title="Error loading Party Basket" message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
+  }
+
+  const { signatures } =
+    (signatureData?.getWhitelistSignatures as GetWhitelistSignaturesResponseSuccess | undefined) || {}
+
+  const validSignatures = signatures?.filter((signature) => !signature?.isRedeemed) || []
+
+  const {
+    id: partyBasketId,
+    chainIdHex,
+    lootboxSnapshot,
+    name: partyBasketName,
+    nftBountyValue,
+  } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
+
+  const { name: lootboxName } = lootboxSnapshot || {}
+
+  const network = NETWORK_OPTIONS.find((net) => net.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
+
+  const hasBountyToRedeem = !!authSignature && validSignatures != undefined && validSignatures.length > 0
+  const noBountiesToRedeem = validSignatures != undefined && validSignatures.length === 0
+
+  const isLoadingState = loadingSignatures || loadingRedeemSignature || redeemState.status === 'loading'
+
+  const handlePrimaryClick = async () => {
+    if (redeemState.status === 'error') {
+      setRedeemState({ status: 'signature', error: undefined })
+    } else if (redeemState.status === 'signature' || noBountiesToRedeem) {
       try {
         const { metamask } = await getProvider()
 
@@ -96,6 +121,9 @@ const RedeemBounty = (props: RedeemBountyProps) => {
           currentAccount: snapUserState.currentAccount as Address,
           metamask,
         })
+
+        setAuthSignature({ message, signature })
+
         // Submit to the backend
         const { data } = await getSignatures({
           variables: {
@@ -117,39 +145,54 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         LogRocket.captureException(err)
         setRedeemState({ status: 'signature', error: err?.message || 'An error occured!' })
       }
+    } else if (hasBountyToRedeem && !!authSignature) {
+      const signature = validSignatures?.[0]
+      setRedeemState({ status: 'loading' })
+      try {
+        if (!signature) {
+          throw new Error('You have no NFTs to redeem')
+        }
+
+        // Redeem the NFT
+        const tx = await redeemNFT({
+          provider,
+          args: {
+            partyBasketAddress: props.basketAddress,
+            signature: signature.signature,
+            nonce: signature.nonce,
+          },
+        })
+
+        console.log('done', tx)
+
+        console.log('redeeming signature')
+        const { data } = await redeemSignature({
+          variables: {
+            payload: {
+              message: authSignature.message,
+              signedMessage: authSignature.signature,
+              partyBasketId,
+              signatureId: signature.id,
+            },
+          },
+        })
+
+        if (!data) {
+          throw new Error('An error occured!')
+        } else if (data?.redeemSignature?.__typename === 'ResponseError') {
+          throw new Error(data?.redeemSignature.error?.message)
+        }
+
+        setRedeemState({ status: 'success' })
+        setAuthSignature(undefined)
+      } catch (err) {
+        LogRocket.captureException(err)
+        setRedeemState({ status: 'error', error: err?.data?.message || err?.message || 'An error occured!' })
+      }
     } else {
       console.error('NOT IMPLEMENTED')
     }
   }
-
-  if (loading) {
-    return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
-  } else if (error) {
-    return <Oopsies title="Error loading Party Basket" message={error?.message || ''} icon="🤕" />
-  } else if (data?.getPartyBasket?.__typename === 'ResponseError') {
-    return <Oopsies title="Error loading Party Basket" message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
-  }
-
-  const { signatures } =
-    (signatureData?.getWhitelistSignatures as GetWhitelistSignaturesResponseSuccess | undefined) || {}
-
-  const validSignatures = signatures?.filter((signature) => !signature?.isRedeemed) || []
-
-  const {
-    chainIdHex,
-    lootboxSnapshot,
-    name: partyBasketName,
-    nftBountyValue,
-  } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
-
-  const { name: lootboxName } = lootboxSnapshot || {}
-
-  const network = NETWORK_OPTIONS.find((net) => net.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
-
-  const hasBountyToRedeem =
-    redeemState.status === 'success' && validSignatures != undefined && validSignatures.length > 0
-  const noBountiesToRedeem =
-    redeemState.status === 'success' && validSignatures != undefined && validSignatures.length === 0
 
   return (
     <$RedeemBountyContainer>
@@ -226,7 +269,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
             </$StepSubheading>
           )}
 
-          {redeemState.status === 'signature' && (
+          {redeemState.status === 'signature' && !hasBountyToRedeem && (
             <$StepSubheading>⚠️ Check for Redeemable NFTs using your MetaMask Wallet!</$StepSubheading>
           )}
 
@@ -250,19 +293,20 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                   : network.themeColor
               }
               onClick={handlePrimaryClick}
+              disabled={isLoadingState}
             >
               {redeemState.status === 'error'
-                ? 'Error Occured'
+                ? 'Error Occured, retry?'
                 : redeemState.status === 'signature'
                 ? 'Check for Redeemable NFTs'
-                : loadingSignatures || redeemState.status === 'loading'
+                : isLoadingState
                 ? 'Loading...'
                 : noBountiesToRedeem
-                ? 'No NFTs to redeem'
+                ? 'No NFTs to redeem, retry?'
                 : hasBountyToRedeem
                 ? 'Redeem NFT'
                 : redeemState.status === 'success'
-                ? 'Bounty Redeemed'
+                ? '✅ Bounty Redeemed'
                 : 'Redeem NFT'}
             </$RedeemNFTButton>
           )}
@@ -372,13 +416,13 @@ const $EarningsText = styled.p<{}>`
 `
 
 const $RedeemNFTButton = styled.button<{ themeColor?: string; disabled?: boolean }>`
-  background-color: ${(props) => (!props.disabled ? props.themeColor : `${props.themeColor}30`)};
+  background-color: ${(props) => (!props.disabled ? props.themeColor : `${props.themeColor}e0`)};
   min-height: 50px;
   border-radius: 10px;
   flex: 1;
   text-transform: uppercase;
   cursor: ${(props) => (!props.disabled ? 'pointer' : 'not-allowed')};
-  color: ${(props) => (!props.disabled ? COLORS.white : `${props.themeColor}40`)};
+  color: ${COLORS.white};
   font-weight: 600;
   font-size: 1.5rem;
   border: 0px;

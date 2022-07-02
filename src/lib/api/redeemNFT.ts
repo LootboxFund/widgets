@@ -10,9 +10,9 @@ interface RedeemNFTPayload {
     signature: string
     nonce: string
   }
-  onSuccessCallback: (data: any) => Promise<void>
+  //   onSuccessCallback: (data: any) => Promise<void>
 }
-export const redeemNFT = async ({ args, provider, onSuccessCallback }: RedeemNFTPayload) => {
+export const redeemNFT = async ({ args, provider }: RedeemNFTPayload): Promise<string> => {
   if (!provider) {
     throw new Error('No provider. Please login with MetaMask.')
   }
@@ -23,6 +23,8 @@ export const redeemNFT = async ({ args, provider, onSuccessCallback }: RedeemNFT
     throw new Error('Please login with MetaMask.')
   }
 
+  const blockNum = await provider.getBlockNumber()
+
   console.log(`
 
     Submitting redeemNFT transaction...
@@ -32,57 +34,18 @@ export const redeemNFT = async ({ args, provider, onSuccessCallback }: RedeemNFT
 
     currentAccount: ${currentAccount}
 
+    blockNum: ${blockNum}
+
   `)
 
   const partyBasket = new ethers.Contract(args.partyBasketAddress, PARTY_BASKET_ABI, signer)
 
   const tx = await partyBasket.redeemBounty(args.signature, args.nonce)
 
-  const blockNum = await provider.getBlockNumber()
+  console.log('transaction', tx)
+  console.log('waiting....')
 
-  const filter = {
-    fromBlock: blockNum,
-    address: partyBasket.address,
-    topics: [ethers.utils.solidityKeccak256(['string'], ['BountyRedeemed(address,address,address,uint256'])],
-  }
-
-  //   event BountyRedeemed(address bountyHolder, address indexed bountyReceiver, address indexed lootboxAddress, uint256 ticket);
-
-  provider.on(filter, async (log) => {
-    if (log !== undefined) {
-      const decodedLog = decodeEVMLog({
-        eventName: 'BountyRedeemed',
-        log: log,
-        abi: `
-            event BountyRedeemed(
-              address bountyHolder,
-              address indexed bountyReceiver,
-              address indexed lootboxAddress,
-              uint256 ticket
-            )`,
-        keys: ['bountyHolder', 'bountyReceiver', 'lootboxAddress', 'ticket'],
-      })
-
-      const { bountyHolder, bountyReceiver, lootboxAddress, ticket } = decodedLog as any
-
-      if (bountyHolder === args.partyBasketAddress && bountyReceiver === currentAccount) {
-        console.log(`
-          
-          ---- 🎉🎉🎉 ----
-          
-          Congratulations! You've redeemed your NFT!
-
-          Ticket: ${ticket}
-          Lootbox: ${lootboxAddress}
-          Party Basket Address: ${bountyHolder}
-  
-          ---------------
-          
-          `)
-        await onSuccessCallback({})
-        provider.removeAllListeners(filter)
-      }
-    }
-  })
   await tx.wait()
+
+  return tx.hash
 }
