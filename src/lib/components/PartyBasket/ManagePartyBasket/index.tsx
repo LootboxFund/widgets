@@ -34,6 +34,7 @@ import { $ErrorText } from 'lib/components/BuyShares/PurchaseComplete'
 import { ethers } from 'ethers'
 import { $InputMedium } from 'lib/components/Authentication/Shared'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import { manifest } from 'manifest'
 
 interface ManagePartyBasketProps {
   partyBasketAddress: Address
@@ -56,7 +57,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
   const [singleWhitelistState, setSingleWhitelistState] = useState<SingleWhitelistState>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
-  const snapUserState = useSnapshot(userState)
+  // const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
     getPartyBasket: GetPartyBasketResponse
@@ -65,9 +66,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       partyBasketAddress: props.partyBasketAddress,
     },
   })
-  //   const [createPartyBasketMutation] = useMutation(CREATE_PARTY_BASKET, {
-  //     refetchQueries: [{ query: GET_MY_PARTY_BASKETS, variables: { address: props.lootboxAddress } }],
-  //   })
   const [bulkWhitelistMutation, { loading: bulkWhitelistLoading }] = useMutation<
     {
       bulkWhitelist: BulkWhitelistResponse
@@ -241,6 +239,20 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     }
   }
 
+  const copyRedeemUrl = () => {
+    navigator.clipboard.writeText(
+      `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.partyBasketAddress}`
+    )
+    const el = document.getElementById('share-redeem-link')
+    if (el) {
+      console.log('el')
+      el.innerText = '✅ Copied to clipboard!'
+      setTimeout(() => {
+        el.innerText = 'Share Link to Redeem'
+      }, 2000)
+    }
+  }
+
   if (loading) {
     return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
   } else if (error) {
@@ -257,7 +269,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
 
   const chain = NETWORK_OPTIONS.find((c) => c.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
-  const { name: lootboxName } = lootboxSnapshot || {}
+  const { name: lootboxName, address: lootboxAddress } = lootboxSnapshot || {}
 
   const network = NETWORK_OPTIONS.find((network) => network.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
@@ -352,10 +364,16 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               </$StepSubheading>
             )}
 
-            <$BasketButton themeColor={chain.themeColor} screen={screen}>
+            <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
               Share Link to Redeem
             </$BasketButton>
-            <$BasketButton themeColor={chain.themeColor} screen={screen}>
+            <$BasketButton
+              themeColor={chain.themeColor}
+              screen={screen}
+              onClick={() =>
+                window.open(`${manifest.microfrontends.webflow.myFundraisersPage}?lootbox=${lootboxAddress}`, '_self')
+              }
+            >
               View Original Lootbox
             </$BasketButton>
             <br />
