@@ -3,7 +3,7 @@ import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { useEffect, useState } from 'react'
+import { BaseSyntheticEvent, SyntheticEvent, useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import Spinner from 'lib/components/Generics/Spinner'
 import { useMutation, useQuery } from '@apollo/client'
@@ -11,6 +11,7 @@ import { BULK_WHITELIST_MUTATION, GET_PARTY_BASKET } from './api.gql'
 import {
   BulkWhitelistPayload,
   BulkWhitelistResponse,
+  BulkWhitelistResponseSuccess,
   GetLootboxByAddressResponse,
   GetPartyBasketResponse,
   GetPartyBasketResponseSuccess,
@@ -24,11 +25,9 @@ import { $ManageLootboxHeading } from 'lib/components/ManageLootbox'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
-import NetworkText from 'lib/components/NetworkText'
 import { NETWORK_OPTIONS } from 'lib/api/network'
 import { $InputWrapper } from 'lib/components/CreateLootbox/StepChooseFunding'
 import $Input from 'lib/components/Generics/Input'
-import WalletButton from 'lib/components/WalletButton'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { $ErrorText } from 'lib/components/BuyShares/PurchaseComplete'
@@ -45,9 +44,18 @@ interface SingleWhitelistState {
   error?: string
 }
 
+interface BulkWhitelistState {
+  status: 'pending' | 'loading' | 'success' | 'error'
+  error?: string
+  partialErrors?: string[]
+}
+
+const CSV_UPLOAD_COLUMN_KEY = 'address'
+
 const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
   const [singleWhitelistState, setSingleWhitelistState] = useState<SingleWhitelistState>()
+  const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
@@ -67,27 +75,37 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     { payload: BulkWhitelistPayload }
   >(BULK_WHITELIST_MUTATION)
 
+  const validateAddress = (address?: Address): Address => {
+    if (!address) {
+      throw new Error('Please enter an address')
+    }
+
+    if (!ethers.utils.isAddress(address)) {
+      throw new Error('Please enter a valid address')
+    }
+
+    return address
+  }
+
   const singleWhitelistAction = async () => {
     try {
-      if (!whitelistAddress) {
-        throw new Error('Please enter an address')
-      }
-
-      if (!ethers.utils.isAddress(whitelistAddress)) {
-        throw new Error('Please enter a valid address')
-      }
+      const validatedAddress = validateAddress(whitelistAddress)
 
       const res = await bulkWhitelistMutation({
         variables: {
           payload: {
             partyBasketAddress: props.partyBasketAddress,
-            whitelistAddresses: [whitelistAddress],
+            whitelistAddresses: [validatedAddress],
           },
         },
       })
 
       if (res.data?.bulkWhitelist?.__typename === 'ResponseError') {
         throw new Error(res.data.bulkWhitelist.error?.message)
+      } else if ((res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors?.length) {
+        const errs = (res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors as string[]
+
+        throw new Error(errs[0] || 'An error occurred')
       }
       setSingleWhitelistState({ status: 'success', error: undefined })
       setTimeout(() => {
@@ -96,6 +114,130 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     } catch (err) {
       console.error(err)
       setSingleWhitelistState({ status: 'error', error: err?.message || 'An error occured!' })
+    }
+  }
+
+  const bulkWhitelistAction = async (addresses: Address[]) => {
+    if (addresses.length === 0) {
+      setBulkWhitelistState({ status: 'error', error: 'No addresses to process' })
+      return
+    }
+
+    const preprocessingErrors = addresses
+      .map((address, index) => {
+        try {
+          validateAddress(address)
+          return undefined
+        } catch (err) {
+          // Index + 2 because we start at index 0 & take header into account
+          return `(Row ${index + 2}) Error: ${err?.message || 'An error occured!'}`
+        }
+      })
+      .filter((err: string | undefined) => !!err)
+
+    if (preprocessingErrors.length > 0) {
+      setBulkWhitelistState({ status: 'error', error: `CSV Validation Errors\n${preprocessingErrors.join('\n')}` })
+      return
+    }
+
+    try {
+      const validatedAddresses = addresses.map(validateAddress)
+
+      const res = await bulkWhitelistMutation({
+        variables: {
+          payload: {
+            partyBasketAddress: props.partyBasketAddress,
+            whitelistAddresses: validatedAddresses,
+          },
+        },
+      })
+
+      if (res.data?.bulkWhitelist?.__typename === 'ResponseError') {
+        throw new Error(res.data.bulkWhitelist.error?.message)
+      } else if ((res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors?.length) {
+        const partialErrors: (string | null)[] = (res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors as (
+          | string
+          | null
+        )[]
+
+        const partialErrorsFmt: string[] = partialErrors
+          .map((err, index) => (err ? `(Row ${index}) Error: ${err}` : undefined))
+          .filter((e) => e != undefined) as string[]
+
+        // These are partial errors from the backend, indicating that we had a problem with these certain addresses
+        setBulkWhitelistState({
+          status: 'error',
+          error: undefined,
+          partialErrors: partialErrorsFmt,
+        })
+        return
+      }
+
+      setBulkWhitelistState({ status: 'success', error: undefined, partialErrors: undefined })
+      setTimeout(() => {
+        setBulkWhitelistState({ status: 'pending' })
+      }, 5000)
+    } catch (err) {
+      console.error(err)
+      setBulkWhitelistState({ status: 'error', error: err?.message || 'An error occured!' })
+    }
+  }
+
+  const processCsv = async (e: SyntheticEvent) => {
+    if (bulkWhitelistState?.status === 'loading') {
+      console.error('Upload already in process')
+      return
+    }
+    setBulkWhitelistState({ status: 'loading' })
+    // @ts-ignore
+    const selectedFiles = document.getElementById('csv-upload')?.files
+
+    if (selectedFiles?.length) {
+      const file = selectedFiles[0]
+
+      const reader = new FileReader()
+      reader.onload = async (e: ProgressEvent) => {
+        // @ts-ignore
+        const csv = e.target?.result as string | undefined
+        console.log(`
+        
+          CSV FILE UPLOAD 
+
+          ${csv}
+        
+        `)
+
+        const [header, ...rows] = csv?.split('\n') || []
+
+        // We assume a column named "address" in header
+        // Get the column index of "address" & use that to process
+        const addressIndex = header?.split(',').findIndex((col) => col.toLowerCase() === CSV_UPLOAD_COLUMN_KEY)
+
+        if (addressIndex == undefined || addressIndex === -1) {
+          setBulkWhitelistState({
+            status: 'error',
+            error: `No "${CSV_UPLOAD_COLUMN_KEY}" column found in uploaded CSV. Please fix your csv file by adding a column named "${CSV_UPLOAD_COLUMN_KEY}" with the desired addresses you want to whitelist & re-upload.`,
+          })
+          return
+        } else if (rows.length === 0) {
+          setBulkWhitelistState({
+            status: 'error',
+            error: 'No addresses found in uploaded CSV.',
+          })
+          return
+        }
+
+        const addresses = rows.map((row) => {
+          return row.trim().split(',')[addressIndex].trim() as Address
+        })
+
+        console.log('addresses from csv', addresses)
+
+        await bulkWhitelistAction(addresses)
+      }
+      reader.readAsText(file)
+    } else {
+      setBulkWhitelistState({ status: 'error', error: 'No file selected' })
     }
   }
 
@@ -224,7 +366,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   <ReactTooltip id="bulkWhitelist" place="right" effect="solid">
                     Upload a ".csv" file of addresses to whitelist.{' '}
                     <span style={{ fontWeight: TYPOGRAPHY.fontWeight.bold }}>
-                      The CSV file needs a column titled "address".
+                      The CSV file needs a column titled "{CSV_UPLOAD_COLUMN_KEY}".
                     </span>{' '}
                     These addresses will get whitelisted which will allow each address to pick up their own NFT (without
                     requiring you to send it to them). Whitelisting an addThis will allow yWhitelisting is a feature
@@ -233,10 +375,35 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   </ReactTooltip>
                 </$StepSubheading>
               </span>
-              <$BasketButton themeColor={chain.themeColor} screen={screen}>
+
+              <$CSVLabel htmlFor="csv-upload" themeColor={chain.themeColor} screen={screen}>
                 Upload CSV
-              </$BasketButton>
+              </$CSVLabel>
+              <input id="csv-upload" type="file" accept=".csv" onChange={processCsv} style={{ display: 'none' }} />
             </$Vertical>
+            {bulkWhitelistState?.status === 'loading' && (
+              <$StepSubheading style={{ display: 'inline' }}>
+                <Spinner color={`${COLORS.surpressedFontColor}ae`} size="30px" /> Processing...
+              </$StepSubheading>
+            )}
+
+            {bulkWhitelistState?.status === 'success' && (
+              <$StepSubheading style={{ display: 'inline' }}>✅ Successfully whitelisted!</$StepSubheading>
+            )}
+            {(bulkWhitelistState?.status === 'error' || bulkWhitelistState?.error) && (
+              <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                ❌ {bulkWhitelistState?.error || 'An error occured!'}
+              </$StepSubheading>
+            )}
+            {bulkWhitelistState?.partialErrors && (
+              <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                ⚠️{' '}
+                {`Partial Errors with Submission. Please re-whitelist the rows specified below.\n\n${bulkWhitelistState?.partialErrors?.join(
+                  '\n'
+                )}`}
+              </$StepSubheading>
+            )}
+
             <br />
             <$Vertical>
               <span>
@@ -338,6 +505,27 @@ const $StepCard = styled.div<{
   padding: ${(props) => (props.screen === 'desktop' ? '40px' : '20px')};
   max-width: 800px;
   font-family: sans-serif;
+`
+
+const $CSVLabel = styled.label<{ themeColor: string; screen: ScreenSize }>`
+  box-sizing: border-box;
+  width: 100%;
+  height: 62px;
+  line-height: 62px;
+  max-width: 420px;
+
+  background: #ffffff;
+  border: 1px solid ${(props) => props.themeColor};
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 0px 20px;
+  cursor: pointer;
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  font-size: ${(props) => (props.screen === 'mobile' ? TYPOGRAPHY.fontSize.large : TYPOGRAPHY.fontSize.xlarge)};
+  color: ${(props) => props.themeColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  text-align: center;
+  display: inline;
 `
 
 const $BasketButton = styled.div<{
