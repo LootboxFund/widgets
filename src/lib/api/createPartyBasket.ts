@@ -66,16 +66,8 @@ export const createPartyBasket = async (
             address indexed partyBasket,
             address indexed issuer,
             string name,
-            address lootboxAddress
+            address indexed lootboxAddress
           )`,
-        // TODO: lootboxAddress is indexed
-        //   abi: `
-        //   event PartyBasketCreated(
-        //     address indexed partyBasket,
-        //     address indexed issuer,
-        //     string name,
-        //     address indexed lootboxAddress
-        //   )`,
         keys: ['partyBasket', 'issuer', 'name', 'lootboxAddress'],
       })
 
