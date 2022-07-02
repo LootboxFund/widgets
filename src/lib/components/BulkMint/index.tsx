@@ -22,9 +22,12 @@ import $Input, { InputDecimal } from '../Generics/Input'
 import { useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import BigNumber from 'bignumber.js'
 import { bulkMintNFTsContractCall, getPriceFeed, LootboxType } from 'lib/hooks/useContract'
-import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import { GetLootboxByAddressResponse, LootboxMetadata, LootboxResponseSuccess } from 'lib/api/graphql/generated/types'
 import AuthGuard from '../AuthGuard'
 import CreatePartyBasket from '../PartyBasket/CreatePartyBasket'
+import { useQuery } from '@apollo/client'
+import { GET_MY_PARTY_BASKETS } from '../PartyBasket/ViewPartyBaskets/api.gql'
+import { truncateAddress } from 'lib/api/helpers'
 
 export interface BulkMintProps {
   lootboxAddress: ContractAddress
@@ -47,6 +50,7 @@ const BulkMint = (props: BulkMintProps) => {
   const [nativeRewardAmountErr, setNativeRewardAmountErr] = useState('')
   const [submitError, setSubmitError] = useState('')
   const [transactionHash, setTransactionHash] = useState('')
+  const [isCreatePartyBasketVisible, setIsCreatePartyBasketVisible] = useState(false)
 
   useEffect(() => {
     loadBlockchainData()
@@ -69,10 +73,23 @@ const BulkMint = (props: BulkMintProps) => {
     setNativeRewardUSD(usdEq)
   }
 
+  const { data } = useQuery<{
+    getLootboxByAddress: GetLootboxByAddressResponse
+  }>(GET_MY_PARTY_BASKETS, {
+    variables: {
+      address: props.lootboxAddress,
+    },
+  })
+
   const allConditionsMet = () => {
     return (
       nativeRewardAmount.toString() !== '0' && validateReceivingWallet(receiverAddr) && numToMint.toString() !== '0'
     )
+  }
+
+  const handlePartyBasketCreated = (partyBasket: Address) => {
+    setReceiverAddr(partyBasket)
+    setIsCreatePartyBasketVisible(false)
   }
 
   const calculateInputWidth = (amount: BigNumber) => {
@@ -133,10 +150,17 @@ const BulkMint = (props: BulkMintProps) => {
   if (!props.lootboxMetadata) {
     return null
   }
+
+  const partyBaskets = (data?.getLootboxByAddress as LootboxResponseSuccess)?.lootbox?.partyBaskets || []
+
+  const isBulkMintToPartyBasket = partyBaskets.some((basket) => basket.address === receiverAddr)
+
+  const opacity = isCreatePartyBasketVisible ? 0.4 : 1
+
   return (
     <$BulkMint>
       <$StepCard screen={screen} themeColor={props.network.themeColor}>
-        <$Horizontal>
+        <$Horizontal style={{ opacity }}>
           <$Vertical flex={2}>
             <$Horizontal verticalCenter>
               <$ManageLootboxHeading screen={screen}>Bulk Mint NFTs</$ManageLootboxHeading>
@@ -161,21 +185,54 @@ const BulkMint = (props: BulkMintProps) => {
         <br />
         <br />
         <$Vertical>
-          <$StepSubheading>
-            Receiver Address
-            <HelpIcon tipID="lootboxAddressReward" />
-            <ReactTooltip id="lootboxAddressReward" place="right" effect="solid">
-              {`This is where all the NFTs will be sent to. You can set it to a Metamask wallet and manually send NFTs to
+          <$Horizontal
+            justifyContent="space-between"
+            spacing={2}
+            flexWrap={screen === 'mobile'}
+            style={{
+              marginRight: screen === 'desktop' ? '50px' : '0px',
+            }}
+          >
+            <$StepSubheading>
+              Receiver Address
+              <HelpIcon tipID="lootboxAddressReward" />
+              <ReactTooltip id="lootboxAddressReward" place="right" effect="solid">
+                {`This is where all the NFTs will be sent to. You can set it to a Metamask wallet and manually send NFTs to
               fans. Or set it to a smart contract that will allow fans to redeem their gifted NFT themselves (saving you
               time & gas fees).`}
-            </ReactTooltip>
-            <span
-              onClick={() => navigator.clipboard.writeText(receiverAddr)}
-              style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+              </ReactTooltip>
+              <span
+                onClick={() => navigator.clipboard.writeText(receiverAddr)}
+                style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
+              >
+                Copy
+              </span>
+            </$StepSubheading>
+
+            <$StepSubheading
+              style={{
+                textAlign: 'right',
+                fontStyle: 'italic',
+                cursor: 'pointer',
+                display: 'inline-block',
+              }}
+              onClick={() => {
+                setIsCreatePartyBasketVisible(!isCreatePartyBasketVisible)
+              }}
             >
-              Copy
-            </span>
-          </$StepSubheading>
+              {isBulkMintToPartyBasket
+                ? '✅ Send to Party Basket'
+                : !!receiverAddr
+                ? '⚠️ You are not using a Party Basket'
+                : '👉 Create a Party Basket'}
+              <HelpIcon tipID="usePartyBasket" />
+              <ReactTooltip id="usePartyBasket" place="right" effect="solid">
+                {isBulkMintToPartyBasket
+                  ? "🎉 You are bulk minting to a party basket 🎉 Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves."
+                  : "We recommend you use a party basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves."}
+              </ReactTooltip>
+            </$StepSubheading>
+          </$Horizontal>
           <$InputWrapper screen={screen}>
             <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
               <$Input
@@ -186,149 +243,181 @@ const BulkMint = (props: BulkMintProps) => {
                 placeholder="Send all NFTs to this address..."
                 screen={screen}
                 style={{ fontWeight: 'lighter' }}
+                list="available-party-baskets"
               />
+
+              {partyBaskets.length > 0 && (
+                <datalist id="available-party-baskets">
+                  {partyBaskets.map((basket, idx) => {
+                    const basketName = basket.name
+                      ? `${basket.name.length > 20 ? basket.name.slice(0, 20) + '...' : basket.name}`
+                      : ''
+                    const optionValue = `${basketName} ${truncateAddress(basket.address as Address)}`
+
+                    return (
+                      <option key={`PartyOption${idx}`} label={optionValue} value={basket.address}>
+                        {optionValue}
+                      </option>
+                    )
+                  })}
+                </datalist>
+              )}
             </div>
           </$InputWrapper>
         </$Vertical>
-        <br />
-        <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
-          <AuthGuard loginTitle="Login to make a Party Basket">
-            <CreatePartyBasket lootboxAddress={props.lootboxAddress} network={props.network} />
-          </AuthGuard>
-        </$CreatePartyBasketContainer>
-        <br />
-        <$Vertical>
-          <$StepSubheading>
-            Total Spend
-            <HelpIcon tipID="withNativeToken" />
-            <ReactTooltip id="withNativeToken" place="right" effect="solid">
-              The total amount of native tokens you want to spend on bulk minting these NFTs. Each NFT will end up
-              receiving an equal portion of the total amount spent. For example, if you spend 1 BNB and set the quantity
-              to 5, then you'll mint 5 NFTs with 0.2 BNB spent on each. The last NFT may receive unnoticeably more or
-              less due to tiny rounding.
-            </ReactTooltip>
-          </$StepSubheading>
-          <$InputWrapper screen={screen}>
-            <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+
+        {isCreatePartyBasketVisible && (
+          <$Vertical>
+            <br />
+            <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
+              <AuthGuard loginTitle="Login to make a Party Basket">
+                <CreatePartyBasket
+                  lootboxAddress={props.lootboxAddress}
+                  network={props.network}
+                  successCallback={handlePartyBasketCreated}
+                />
+              </AuthGuard>
+            </$CreatePartyBasketContainer>
+          </$Vertical>
+        )}
+
+        <$Vertical style={{ opacity }}>
+          <br />
+          <$Vertical>
+            <$StepSubheading>
+              Total Spend
+              <HelpIcon tipID="withNativeToken" />
+              <ReactTooltip id="withNativeToken" place="right" effect="solid">
+                The total amount of native tokens you want to spend on bulk minting these NFTs. Each NFT will end up
+                receiving an equal portion of the total amount spent. For example, if you spend 1 BNB and set the
+                quantity to 5, then you'll mint 5 NFTs with 0.2 BNB spent on each. The last NFT may receive unnoticeably
+                more or less due to tiny rounding.
+              </ReactTooltip>
+            </$StepSubheading>
+            <$InputWrapper screen={screen}>
+              <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+                <div
+                  style={{
+                    flex: 9,
+                    width: 'auto',
+                    maxWidth: '200px',
+                    paddingLeft: '10px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                  }}
+                >
+                  {props.network && <$NetworkIcon size="medium" src={props.network.icon} />}
+                  <InputDecimal
+                    onChange={(e: string) => {
+                      const nativeAmt = web3Utils.toBN(web3Utils.toWei(e || '0'))
+                      setNativeRewardAmount(nativeAmt)
+                      const usdEq = new web3Utils.BN(
+                        web3Utils.toWei(
+                          nativeTokenPrice
+                            .multipliedBy(nativeAmt)
+                            .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+                            .toString(),
+                          'gwei'
+                        )
+                      ).div(new web3Utils.BN('100000000000000000'))
+                      setNativeRewardUSD(usdEq)
+                    }}
+                    width={calculateInputWidth(nativeRewardAmount)}
+                  />
+                  <$InputTranslationLight>{props.network?.symbol}</$InputTranslationLight>
+                </div>
+                <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
+                  <$InputTranslationHeavy>{`$${nativeRewardUSD} USD`}</$InputTranslationHeavy>
+                </div>
+              </div>
+            </$InputWrapper>
+          </$Vertical>
+          <br />
+          <$Vertical>
+            <$StepSubheading>
+              Total NFTs to Mint
+              <HelpIcon tipID="totalToMint" />
+              <ReactTooltip id="totalToMint" place="right" effect="solid">
+                The total number of NFTs to mint. Each NFT will end up receiving an equal portion of the total amount
+                spent. For example, if you spend 1 BNB and set the quantity to 5, then you'll mint 5 NFTs with 0.2 BNB
+                spent on each.
+              </ReactTooltip>
+            </$StepSubheading>
+            <$InputWrapper screen={screen} style={{ maxWidth: '600px' }}>
               <div
                 style={{
-                  flex: 9,
-                  width: 'auto',
-                  maxWidth: '200px',
-                  paddingLeft: '10px',
                   display: 'flex',
-                  flexDirection: 'row',
+                  flex: 1,
                   justifyContent: 'flex-start',
                   alignItems: 'center',
                 }}
               >
-                {props.network && <$NetworkIcon size="medium" src={props.network.icon} />}
-                <InputDecimal
-                  onChange={(e: string) => {
-                    const nativeAmt = web3Utils.toBN(web3Utils.toWei(e || '0'))
-                    setNativeRewardAmount(nativeAmt)
-                    const usdEq = new web3Utils.BN(
-                      web3Utils.toWei(
-                        nativeTokenPrice
-                          .multipliedBy(nativeAmt)
-                          .dividedBy(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
-                          .toString(),
-                        'gwei'
+                <$Input
+                  type="text"
+                  value={numToMint}
+                  onChange={(e) => {
+                    setNumToMint(parseInt(e.target.value) || 0)
+                    if (parseInt(e.target.value) > 100) {
+                      setNumToMintErr(
+                        'Be careful not to mint too many NFTs, as the profit share amount will get smaller'
                       )
-                    ).div(new web3Utils.BN('100000000000000000'))
-                    setNativeRewardUSD(usdEq)
+                    } else {
+                      setNumToMintErr('')
+                    }
                   }}
-                  width={calculateInputWidth(nativeRewardAmount)}
+                  min={0}
+                  screen={screen}
+                  style={{ fontWeight: 'lighter' }}
                 />
-                <$InputTranslationLight>{props.network?.symbol}</$InputTranslationLight>
               </div>
-              <div style={{ flex: 3, textAlign: 'right', paddingRight: '10px' }}>
-                <$InputTranslationHeavy>{`$${nativeRewardUSD} USD`}</$InputTranslationHeavy>
+            </$InputWrapper>
+            {numToMintErr && (
+              <div style={{ width: '100%', textAlign: 'left', padding: '10px' }}>
+                <$ErrorMessageMgmtPage status={'success'}>{numToMintErr}</$ErrorMessageMgmtPage>
               </div>
+            )}
+          </$Vertical>
+          <br />
+          <br />
+          <$RewardSponsorsButton
+            disabled={
+              !allConditionsMet() || bulkMintSubmissionStatus === 'pending' || bulkMintSubmissionStatus === 'success'
+            }
+            allConditionsMet={allConditionsMet()}
+            onClick={() => bulkMintNFTs()}
+            themeColor={
+              bulkMintSubmissionStatus === 'success'
+                ? COLORS.successFontColor
+                : bulkMintSubmissionStatus === 'pending'
+                ? `${props.network.themeColor}3A`
+                : props.network.themeColor
+            }
+          >
+            {bulkMintSubmissionStatus === 'pending'
+              ? 'SUBMITTING...'
+              : bulkMintSubmissionStatus === 'success'
+              ? 'BULK MINT SUCCESS'
+              : `BULK MINT NFTs`}
+          </$RewardSponsorsButton>
+          {submitError && (
+            <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+              <$ErrorMessageMgmtPage status={'error'}>{submitError}</$ErrorMessageMgmtPage>
             </div>
-          </$InputWrapper>
-        </$Vertical>
-        <br />
-        <$Vertical>
-          <$StepSubheading>
-            Total NFTs to Mint
-            <HelpIcon tipID="totalToMint" />
-            <ReactTooltip id="totalToMint" place="right" effect="solid">
-              The total number of NFTs to mint. Each NFT will end up receiving an equal portion of the total amount
-              spent. For example, if you spend 1 BNB and set the quantity to 5, then you'll mint 5 NFTs with 0.2 BNB
-              spent on each.
-            </ReactTooltip>
-          </$StepSubheading>
-          <$InputWrapper screen={screen} style={{ maxWidth: '600px' }}>
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-              }}
-            >
-              <$Input
-                type="text"
-                value={numToMint}
-                onChange={(e) => {
-                  setNumToMint(parseInt(e.target.value) || 0)
-                  if (parseInt(e.target.value) > 100) {
-                    setNumToMintErr('Be careful not to mint too many NFTs, as the profit share amount will get smaller')
-                  } else {
-                    setNumToMintErr('')
-                  }
-                }}
-                min={0}
-                screen={screen}
-                style={{ fontWeight: 'lighter' }}
-              />
-            </div>
-          </$InputWrapper>
-          {numToMintErr && (
-            <div style={{ width: '100%', textAlign: 'left', padding: '10px' }}>
-              <$ErrorMessageMgmtPage status={'success'}>{numToMintErr}</$ErrorMessageMgmtPage>
+          )}
+          {transactionHash && (
+            <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
+              <$ErrorMessageMgmtPage
+                status={'success'}
+                onClick={() => window.open(`${props.network.blockExplorerUrl}tx/${transactionHash}`, '_blank')}
+                style={{ cursor: 'pointer' }}
+              >
+                View Transaction Reciept
+              </$ErrorMessageMgmtPage>
             </div>
           )}
         </$Vertical>
-        <br />
-        <br />
-        <$RewardSponsorsButton
-          disabled={
-            !allConditionsMet() || bulkMintSubmissionStatus === 'pending' || bulkMintSubmissionStatus === 'success'
-          }
-          allConditionsMet={allConditionsMet()}
-          onClick={() => bulkMintNFTs()}
-          themeColor={
-            bulkMintSubmissionStatus === 'success'
-              ? COLORS.successFontColor
-              : bulkMintSubmissionStatus === 'pending'
-              ? `${props.network.themeColor}3A`
-              : props.network.themeColor
-          }
-        >
-          {bulkMintSubmissionStatus === 'pending'
-            ? 'SUBMITTING...'
-            : bulkMintSubmissionStatus === 'success'
-            ? 'BULK MINT SUCCESS'
-            : `BULK MINT NFTs`}
-        </$RewardSponsorsButton>
-        {submitError && (
-          <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
-            <$ErrorMessageMgmtPage status={'error'}>{submitError}</$ErrorMessageMgmtPage>
-          </div>
-        )}
-        {transactionHash && (
-          <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
-            <$ErrorMessageMgmtPage
-              status={'success'}
-              onClick={() => window.open(`${props.network.blockExplorerUrl}tx/${transactionHash}`, '_blank')}
-              style={{ cursor: 'pointer' }}
-            >
-              View Transaction Reciept
-            </$ErrorMessageMgmtPage>
-          </div>
-        )}
       </$StepCard>
     </$BulkMint>
   )

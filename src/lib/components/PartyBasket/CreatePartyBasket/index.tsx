@@ -27,6 +27,7 @@ interface PartyBasketSubmission {
 interface CreatePartyBasketProps {
   lootboxAddress: Address
   network: NetworkOption
+  successCallback?: (partyBasketAddress: Address) => void
 }
 
 const CreatePartyBasket = (props: CreatePartyBasketProps) => {
@@ -77,6 +78,9 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
               },
             })
             setPartyBasketSubmissionStatus({ status: 'success' })
+            if (props.successCallback) {
+              props.successCallback(data.address as Address)
+            }
           } catch (err) {
             console.error(err)
             setPartyBasketSubmissionStatus({ status: 'error', error: err?.message || '' })
