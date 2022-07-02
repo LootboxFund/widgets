@@ -607,6 +607,16 @@ export const bulkMintNFTsContractCall = async (
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()
+  console.log(`
+
+  ----- BULK MINT NFTs -----
+
+  lootboxAddress,              = ${lootboxAddress}
+  lootboxType,                  = ${lootboxType}
+  receiverAddr,                 = ${receiverAddr}
+  amountToSpend,                = ${amountToSpend}
+
+  `)
   if (lootboxType === 'Escrow') {
     const lootbox = new ethers.Contract(lootboxAddress, LootboxEscrowABI, signer)
     const tx = await lootbox.connect(signer).bulkMintNFTs(receiverAddr, numToMint, {
@@ -624,7 +634,12 @@ export const bulkMintNFTsContractCall = async (
   }
 }
 
-export const transferNFTOwnership = async (ticketID: string, lootboxAddress: Address, ownerAddress: Address, receiverAddress: Address) => {
+export const transferNFTOwnership = async (
+  ticketID: string,
+  lootboxAddress: Address,
+  ownerAddress: Address,
+  receiverAddress: Address
+) => {
   const ethers = window.ethers ? window.ethers : ethersObj
   const { provider } = await getProvider()
   const signer = await provider.getSigner()

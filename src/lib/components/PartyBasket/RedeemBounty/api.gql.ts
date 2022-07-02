@@ -7,6 +7,7 @@ export const MUTATION_GET_WHITELIST_SIGNATURES = gql`
         signatures {
           signature
           isRedeemed
+          nonce
         }
       }
       ... on ResponseError {

@@ -30,7 +30,7 @@ export const createPartyBasket = async (
   }
 
   if (!provider) {
-    throw new Error('No provider')
+    throw new Error('No provider. Please login with MetaMask.')
   }
 
   const blockNum = await provider.getBlockNumber()

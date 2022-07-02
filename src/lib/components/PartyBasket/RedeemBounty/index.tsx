@@ -1,14 +1,14 @@
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import Spinner from 'lib/components/Generics/Spinner'
-import { initDApp } from 'lib/hooks/useWeb3Api'
+import { getProvider, initDApp, useProvider } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import LogRocket from 'logrocket'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { MUTATION_GET_WHITELIST_SIGNATURES, GET_PARTY_BASKET_FOR_REDEMPTION } from './api.gql'
 import styled from 'styled-components'
-import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import { $ErrorMessage, $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
@@ -21,19 +21,30 @@ import { $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
 import {
   GetPartyBasketResponse,
   GetPartyBasketResponseSuccess,
+  GetWhitelistSignaturesResponseSuccess,
+  MutationGetWhitelistSignaturesArgs,
   QueryGetPartyBasketArgs,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import { NETWORK_OPTIONS } from 'lib/api/network'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { getWhitelistQuerySignature } from 'lib/utils/signatureMessage'
+import { redeemNFT } from 'lib/api/redeemNFT'
 
 interface RedeemBountyProps {
   basketAddress: Address
 }
 
+interface RedeemState {
+  status: 'loading' | 'success' | 'signature' | 'error'
+  error?: string
+}
+
 const RedeemBounty = (props: RedeemBountyProps) => {
+  const [provider] = useProvider()
   const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
+  const [redeemState, setRedeemState] = useState<RedeemState>({ status: 'signature' })
   const { data, loading, error } = useQuery<
     {
       getPartyBasket: GetPartyBasketResponse
@@ -45,7 +56,71 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     },
   })
   // This is a mutation because it write a nonce to the database to avoid replay attacks
-  const [getSignatures] = useMutation(MUTATION_GET_WHITELIST_SIGNATURES)
+  // const [getSignatures, { data: signatureData, loading: loadingSignatures, error: signaturesError }] = useMutation<
+  const [getSignatures, { data: signatureData, loading: loadingSignatures }] = useMutation<
+    { getWhitelistSignatures: GetPartyBasketResponse },
+    MutationGetWhitelistSignaturesArgs
+  >(MUTATION_GET_WHITELIST_SIGNATURES)
+
+  const handlePrimaryClick = async () => {
+    if (hasBountyToRedeem) {
+      const signature = validSignatures?.[0]
+      try {
+        if (!signature) {
+          throw new Error('You have no NFTs to redeem')
+        }
+
+        // Redeem the NFT
+        await redeemNFT({
+          provider,
+          args: {
+            partyBasketAddress: props.basketAddress,
+            signature: signature.signature,
+            nonce: signature.nonce,
+          },
+          onSuccessCallback: async (data: any) => {
+            console.log('done')
+          },
+        })
+      } catch (err) {
+        LogRocket.captureException(err)
+        setRedeemState({ status: 'error', error: err?.data?.message || err?.message || 'An error occured!' })
+      }
+    } else if (redeemState.status === 'signature') {
+      try {
+        const { metamask } = await getProvider()
+
+        // First get user signature
+        const { message, signature } = await getWhitelistQuerySignature({
+          partyBasketAddress: props.basketAddress,
+          currentAccount: snapUserState.currentAccount as Address,
+          metamask,
+        })
+        // Submit to the backend
+        const { data } = await getSignatures({
+          variables: {
+            payload: {
+              message,
+              signedMessage: signature,
+            },
+          },
+        })
+
+        if (!data) {
+          throw new Error('An error occured!')
+        } else if (data?.getWhitelistSignatures?.__typename === 'ResponseError') {
+          throw new Error(data?.getWhitelistSignatures.error?.message)
+        }
+
+        setRedeemState({ status: 'success', error: undefined })
+      } catch (err) {
+        LogRocket.captureException(err)
+        setRedeemState({ status: 'signature', error: err?.message || 'An error occured!' })
+      }
+    } else {
+      console.error('NOT IMPLEMENTED')
+    }
+  }
 
   if (loading) {
     return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
@@ -54,6 +129,11 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   } else if (data?.getPartyBasket?.__typename === 'ResponseError') {
     return <Oopsies title="Error loading Party Basket" message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
   }
+
+  const { signatures } =
+    (signatureData?.getWhitelistSignatures as GetWhitelistSignaturesResponseSuccess | undefined) || {}
+
+  const validSignatures = signatures?.filter((signature) => !signature?.isRedeemed) || []
 
   const {
     chainIdHex,
@@ -65,6 +145,11 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   const { name: lootboxName } = lootboxSnapshot || {}
 
   const network = NETWORK_OPTIONS.find((net) => net.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
+
+  const hasBountyToRedeem =
+    redeemState.status === 'success' && validSignatures != undefined && validSignatures.length > 0
+  const noBountiesToRedeem =
+    redeemState.status === 'success' && validSignatures != undefined && validSignatures.length === 0
 
   return (
     <$RedeemBountyContainer>
@@ -94,8 +179,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
 
               <$StepSubheading>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                dolore magna aliqua.
               </$StepSubheading>
 
               <$Vertical spacing={2}>
@@ -125,17 +209,63 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                 }),
               }}
             >
-              <div>{!!snapUserState?.currentAccount ? <NetworkText /> : <WalletButton />}</div>
+              <div>
+                {!!snapUserState?.currentAccount ? <NetworkText /> : <WalletButton style={{ width: '100%' }} />}
+              </div>
               <$LootboxStampImage src={lootboxSnapshot?.stampImage || TEMPLATE_LOOTBOX_STAMP} />
               <$BasketButton screen={screen} themeColor="#373737" style={{ borderColor: '#37373715' }}>
                 View Lootbox
               </$BasketButton>
             </$Vertical>
           </$Horizontal>
-
           <br />
 
-          <div>Button</div>
+          {hasBountyToRedeem && (
+            <$StepSubheading>
+              ✅ You have a free NFT available to redeem. Click the button 👇 to redeem!
+            </$StepSubheading>
+          )}
+
+          {redeemState.status === 'signature' && (
+            <$StepSubheading>⚠️ Check for Redeemable NFTs using your MetaMask Wallet!</$StepSubheading>
+          )}
+
+          {redeemState.status === 'success' && !hasBountyToRedeem && (
+            <$StepSubheading>❌ You do not have any NFTs to redeem. Please check again later.</$StepSubheading>
+          )}
+
+          {!!redeemState.error && <$StepSubheading>❌ {redeemState.error}</$StepSubheading>}
+
+          {!snapUserState.currentAccount ? (
+            <WalletButton />
+          ) : (
+            <$RedeemNFTButton
+              themeColor={
+                redeemState.status === 'error'
+                  ? COLORS.dangerBackground
+                  : redeemState.status === 'signature'
+                  ? COLORS.warningBackground
+                  : noBountiesToRedeem
+                  ? COLORS.dangerBackground
+                  : network.themeColor
+              }
+              onClick={handlePrimaryClick}
+            >
+              {redeemState.status === 'error'
+                ? 'Error Occured'
+                : redeemState.status === 'signature'
+                ? 'Check for Redeemable NFTs'
+                : loadingSignatures || redeemState.status === 'loading'
+                ? 'Loading...'
+                : noBountiesToRedeem
+                ? 'No NFTs to redeem'
+                : hasBountyToRedeem
+                ? 'Redeem NFT'
+                : redeemState.status === 'success'
+                ? 'Bounty Redeemed'
+                : 'Redeem NFT'}
+            </$RedeemNFTButton>
+          )}
         </$Vertical>
       </$StepCard>
     </$RedeemBountyContainer>
@@ -239,6 +369,21 @@ const $EarningsText = styled.p<{}>`
   line-height: ${TYPOGRAPHY.fontSize.xxlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   color: ${COLORS.surpressedFontColor};
+`
+
+const $RedeemNFTButton = styled.button<{ themeColor?: string; disabled?: boolean }>`
+  background-color: ${(props) => (!props.disabled ? props.themeColor : `${props.themeColor}30`)};
+  min-height: 50px;
+  border-radius: 10px;
+  flex: 1;
+  text-transform: uppercase;
+  cursor: ${(props) => (!props.disabled ? 'pointer' : 'not-allowed')};
+  color: ${(props) => (!props.disabled ? COLORS.white : `${props.themeColor}40`)};
+  font-weight: 600;
+  font-size: 1.5rem;
+  border: 0px;
+  padding: 20px;
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
 `
 
 export default RedeemBountyPage
