@@ -1,7 +1,7 @@
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import Spinner from 'lib/components/Generics/Spinner'
-import { getProvider, initDApp, useProvider } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain, getProvider, initDApp, useProvider } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import LogRocket from 'logrocket'
 import { useEffect, useState } from 'react'
@@ -36,6 +36,7 @@ import { NETWORK_OPTIONS } from 'lib/api/network'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { getWhitelistQuerySignature } from 'lib/utils/signatureMessage'
 import { redeemNFT } from 'lib/api/redeemNFT'
+import $Button from 'lib/components/Generics/Button'
 
 interface RedeemBountyProps {
   basketAddress: Address
@@ -107,6 +108,8 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   const noBountiesToRedeem = validSignatures != undefined && validSignatures.length === 0
 
   const isLoadingState = loadingSignatures || loadingRedeemSignature || redeemState.status === 'loading'
+
+  const isWrongChain = chainIdHex != undefined && chainIdHex !== snapUserState?.network?.currentNetworkIdHex
 
   const handlePrimaryClick = async () => {
     if (redeemState.status === 'error') {
@@ -281,6 +284,10 @@ const RedeemBounty = (props: RedeemBountyProps) => {
 
           {!snapUserState.currentAccount ? (
             <WalletButton />
+          ) : isWrongChain ? (
+            <$RedeemNFTButton themeColor={COLORS.warningBackground} onClick={() => addCustomEVMChain(chainIdHex)}>
+              Switch network
+            </$RedeemNFTButton>
           ) : (
             <$RedeemNFTButton
               themeColor={
