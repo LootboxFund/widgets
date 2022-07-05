@@ -25,6 +25,7 @@ import CreatePartyBasket from '../CreatePartyBasket'
 import { $InputMedium } from 'lib/components/Tournament/common'
 import { truncateAddress } from 'lib/api/helpers'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import { useState } from 'react'
 
 export interface ViewPartyBasketProps {
   network: NetworkOption
@@ -58,28 +59,16 @@ const PartyBasketList = ({
               spacing={2}
               width="100%"
               justifyContent="space-between"
-              flexWrap={screen === 'mobile'}
+              // flexWrap={screen === 'mobile'}
               //   padding={screen === 'mobile' ? '20px auto' : 'auto'}
             >
-              <$ManageLootboxHeading
-                onClick={() => {
-                  const url = `${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.address}`
-                  window.open(url, '_self')
-                }}
+              <$PartyBasketTitle
+                themeColor={themeColor}
                 screen={screen}
-                style={{
-                  color: themeColor,
-                  margin: 'auto 0px',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  textOverflow: 'ellipsis',
-                  fontSize: '1.5rem',
-                  width: '100%',
-                  cursor: 'pointer',
-                }}
+                href={`${manifest.microfrontends.webflow.basketManagePage}?basket=${basket.address}`}
               >
                 {basket.name}
-              </$ManageLootboxHeading>
+              </$PartyBasketTitle>
               <$Horizontal style={{ cursor: 'pointer' }}>
                 <$ManageLootboxHeading
                   screen={screen}
@@ -87,16 +76,19 @@ const PartyBasketList = ({
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis',
-                    fontSize: '1.3rem',
+                    fontSize: TYPOGRAPHY.fontSize.medium,
                     color: `${COLORS.surpressedFontColor}c5`,
                     fontWeight: TYPOGRAPHY.fontWeight.regular,
                     margin: 'auto 0px',
                   }}
                 >
-                  {truncateAddress(basket.address as Address)}
+                  {truncateAddress(
+                    basket.address as Address,
+                    screen === 'mobile' ? { suffixLength: 3, prefixLength: 3 } : undefined
+                  )}
                 </$ManageLootboxHeading>
                 <div style={{ margin: 'auto 0px' }}>
-                  <CopyIcon text={basket.address} width={30} />
+                  <CopyIcon text={basket.address} smallWidth={30} />
                 </div>
               </$Horizontal>
             </$Horizontal>
@@ -139,6 +131,8 @@ const PartyBasketList = ({
 const ViewPartyBaskets = (props: ViewPartyBasketProps) => {
   const { screen } = useWindowSize()
 
+  const [isCreatePartyBasketVisible, setIsCreatePartyBasketVisible] = useState(false)
+
   return (
     <$ViewPartyBaskets>
       <$StepCard screen={screen} themeColor={props.network.themeColor}>
@@ -177,11 +171,33 @@ const ViewPartyBaskets = (props: ViewPartyBasketProps) => {
             )}
           </$Horizontal>
 
-          {/* <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
-            <AuthGuard loginTitle="Login to make a Party Basket">
-              <CreatePartyBasket lootboxAddress={props.lootboxAddress} network={props.network} />
-            </AuthGuard>
-          </$CreatePartyBasketContainer> */}
+          <$StepSubheading
+            style={{
+              textAlign: 'left',
+              fontStyle: 'italic',
+              cursor: 'pointer',
+              display: 'inline-block',
+            }}
+            onClick={() => {
+              setIsCreatePartyBasketVisible(!isCreatePartyBasketVisible)
+            }}
+          >
+            {'👉 Create a Party Basket'}
+            <HelpIcon tipID="createPartyBasket" />
+            <ReactTooltip id="createPartyBasket" place="right" effect="solid">
+              We recommend you use a party basket to bulk mint NFTs to your fanbase. Party baskets allow you to
+              whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your
+              fanbase can redeem the bounties themselves.
+            </ReactTooltip>
+          </$StepSubheading>
+
+          {isCreatePartyBasketVisible && (
+            <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
+              <AuthGuard loginTitle="Login to make a Party Basket">
+                <CreatePartyBasket lootboxAddress={props.lootboxAddress} network={props.network} />
+              </AuthGuard>
+            </$CreatePartyBasketContainer>
+          )}
         </$Vertical>
       </$StepCard>
     </$ViewPartyBaskets>
@@ -223,7 +239,6 @@ const $BasketButton = styled.div<{
   box-sizing: border-box;
   width: 100%;
   height: 62px;
-
   background: #ffffff;
   border: 1px solid ${(props) => props.themeColor};
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -233,6 +248,25 @@ const $BasketButton = styled.div<{
   justify-content: space-between;
   padding: 0px 20px;
   margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+`
+
+const $PartyBasketTitle = styled.a<{
+  themeColor: string
+  screen: ScreenSize
+}>`
+  color: ${(props) => props.themeColor};
+  margin: auto 0px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15rem;
+  width: 10%;
+  cursor: pointer;
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  width: 100%;
+  text-decoration: none;
 `
 
 // export default <AuthGuard children={<ViewPartyBaskets />} />

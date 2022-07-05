@@ -52,6 +52,8 @@ interface BulkWhitelistState {
 }
 
 const CSV_UPLOAD_COLUMN_KEY = 'address'
+const exampleCSV =
+  'https://docs.google.com/spreadsheets/d/1eecK4uZB-9EVv2NGYUyOOXdZMUMwSW_Brq8FYttUUgE/edit?usp=sharing'
 
 const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
@@ -205,11 +207,11 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
         
         `)
 
-        const [header, ...rows] = csv?.split('\n') || []
+        const [header, ...rows] = csv?.split(/[\r]?\n/) || []
 
         // We assume a column named "address" in header
         // Get the column index of "address" & use that to process
-        const addressIndex = header?.split(',').findIndex((col) => col.toLowerCase() === CSV_UPLOAD_COLUMN_KEY)
+        const addressIndex = header?.split(',').findIndex((col) => col.trim().toLowerCase() === CSV_UPLOAD_COLUMN_KEY)
 
         if (addressIndex == undefined || addressIndex === -1) {
           setBulkWhitelistState({
@@ -364,22 +366,15 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               </$StepSubheading>
             )}
 
-            <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
-              Share Link to Redeem
-            </$BasketButton>
-            <$BasketButton
-              themeColor={chain.themeColor}
-              screen={screen}
-              onClick={() =>
-                window.open(`${manifest.microfrontends.webflow.myFundraisersPage}?lootbox=${lootboxAddress}`, '_self')
-              }
-            >
-              View Original Lootbox
-            </$BasketButton>
             <br />
             <$Vertical>
-              <span>
-                <$StepSubheading>
+              <$Horizontal>
+                <$StepSubheading
+                  style={{
+                    width: 'auto',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   Bulk Whitelist Address <HelpIcon tipID="bulkWhitelist" />
                   <ReactTooltip id="bulkWhitelist" place="right" effect="solid">
                     Upload a ".csv" file of addresses to whitelist.{' '}
@@ -392,13 +387,21 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                     and your Lootbox Bounty NFT will be transfered to them when they redeem it.
                   </ReactTooltip>
                 </$StepSubheading>
-              </span>
+                <$StepSubheadingExtra
+                  style={{ fontStyle: 'italic', textDecoration: 'underline' }}
+                  href={exampleCSV}
+                  target="_blank"
+                >
+                  View Sample CSV
+                </$StepSubheadingExtra>
+              </$Horizontal>
 
               <$CSVLabel htmlFor="csv-upload" themeColor={chain.themeColor} screen={screen}>
                 Upload CSV
               </$CSVLabel>
               <input id="csv-upload" type="file" accept=".csv" onChange={processCsv} style={{ display: 'none' }} />
             </$Vertical>
+
             {bulkWhitelistState?.status === 'loading' && (
               <$StepSubheading style={{ display: 'inline' }}>
                 <Spinner color={`${COLORS.surpressedFontColor}ae`} size="30px" /> Processing...
@@ -423,6 +426,19 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
             )}
 
             <br />
+
+            <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
+              🔗 Share Link to Redeem
+            </$BasketButton>
+            <$BasketLink
+              themeColor={chain.themeColor}
+              screen={screen}
+              href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`}
+            >
+              View Original Lootbox
+            </$BasketLink>
+
+            <br />
             <$Vertical>
               <span>
                 <$StepSubheading>
@@ -433,7 +449,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 </$StepSubheading>
               </span>
               <$BasketButton themeColor={chain.themeColor} screen={screen}>
-                Download Full List
+                Download CSV
               </$BasketButton>
             </$Vertical>
             <br />
@@ -508,6 +524,30 @@ export const onLoad = async (partyBasketAddress: Address) => {
   //   }
 }
 
+export const $PartyBasketHeading = styled.span<{ screen: ScreenSize }>`
+  font-size: ${(props) => (props.screen === 'desktop' ? '2.2rem' : '1.5rem')};
+  line-height: ${(props) => (props.screen === 'desktop' ? '2.4rem' : '1.7rem')};
+  font-weight: bold;
+  color: ${COLORS.black};
+`
+
+const $StepSubheadingExtra = styled.a`
+  font-style: italic;
+  text-decoration: underline;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  color: ${COLORS.surpressedFontColor};
+  width: 90%;
+  margin-bottom: 3px;
+  vertical-align: middle;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  word-break: break-word;
+`
+
 const $StepCard = styled.div<{
   themeColor: string
   boxShadow?: string
@@ -544,6 +584,32 @@ const $CSVLabel = styled.label<{ themeColor: string; screen: ScreenSize }>`
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   text-align: center;
   display: inline;
+`
+
+const $BasketLink = styled.a<{
+  themeColor: string
+  screen: ScreenSize
+}>`
+  box-sizing: border-box;
+  width: 100%;
+  height: 62px;
+  line-height: 62px;
+  max-width: 420px;
+
+  background: #ffffff;
+  border: 1px solid ${(props) => props.themeColor};
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 0px 20px;
+  cursor: pointer;
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  font-size: ${(props) => (props.screen === 'mobile' ? TYPOGRAPHY.fontSize.large : TYPOGRAPHY.fontSize.xlarge)};
+  color: ${(props) => props.themeColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  text-align: center;
+  display: inline;
+
+  text-decoration: none;
 `
 
 const $BasketButton = styled.div<{

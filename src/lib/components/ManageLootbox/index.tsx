@@ -370,17 +370,9 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                   Start sharing your Lootbox on social media for sponsors to buy NFTs. Watch the YouTube Tutorial.
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
-                  <$SmallerButton
-                    onClick={() =>
-                      window.open(
-                        `${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxAddress}`,
-                        '_blank'
-                      )
-                    }
-                    screen={screen}
-                  >
+                  <$LinkButton href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxAddress}`}>
                     View & Share Lootbox
-                  </$SmallerButton>
+                  </$LinkButton>
                 </$Horizontal>
               </$Vertical>
             </$Horizontal>
@@ -701,6 +693,30 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     </$StepCard>
   )
 }
+
+const $LinkButton = styled.a<{ themeColor?: string }>`
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 10px;
+  flex: 1;
+  display: flex;
+  border-radius: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px solid #cdcdcd;
+  cursor: pointer;
+  background-color: ${(props) => props.themeColor || '#ffffff'};
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: ${(props) => (props.themeColor ? COLORS.white : COLORS.surpressedFontColor)};
+  text-decoration: none;
+  box-sizing: border-box;
+`
 
 const $Spacer = styled.div<{}>`
   width: 100%;
