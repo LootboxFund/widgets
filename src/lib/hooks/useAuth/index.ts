@@ -72,7 +72,7 @@ export const useAuth = () => {
     { refetchQueries: [{ query: GET_MY_WALLETS }] }
   )
 
-  useEffect(() => {
+  const setAuthPersistence = () => {
     const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
       | 'session'
       | 'local'
@@ -82,7 +82,7 @@ export const useAuth = () => {
     } else {
       setPersistence(auth, browserSessionPersistence)
     }
-  }, [])
+  }
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -146,6 +146,8 @@ export const useAuth = () => {
       throw data.authenticateWallet.error
     }
 
+    setAuthPersistence()
+
     const { user } = await signInWithCustomToken(
       auth,
       (data.authenticateWallet as AuthenticateWalletResponseSuccess).token
@@ -171,10 +173,13 @@ export const useAuth = () => {
       throw new Error('Password is required')
     }
 
+    setAuthPersistence()
+
     const { user } = await signInWithEmailAndPasswordFirebase(auth, email, password)
 
     // Send email verification only once on login
     const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
+
     if (!user.emailVerified && !verificationEmailAlreadySent) {
       sendEmailVerification(user)
         .then(() => {
