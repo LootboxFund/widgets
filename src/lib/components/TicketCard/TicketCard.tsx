@@ -11,7 +11,7 @@ export interface TicketCardProps {
   ticketID: string | undefined
   onScrollToMint?: () => void
   forceLoading?: boolean // hack to show loading
-  staticHeight?: string;
+  staticHeight?: string
 }
 
 const TicketCard = ({ ticketID, onScrollToMint, forceLoading, staticHeight }: TicketCardProps) => {
@@ -125,7 +125,11 @@ export const $LogoContainer = styled.div<{ padding?: string }>`
   justify-content: center;
 `
 
-export const $TicketCardContainer = styled.section<{ backgroundColor?: string; staticHeight?: string; backgroundImage?: string | undefined }>`
+export const $TicketCardContainer = styled.section<{
+  backgroundColor?: string
+  staticHeight?: string
+  backgroundImage?: string | undefined
+}>`
   ${BASE_CONTAINER}
   border: 0px solid transparent;
   border-radius: 20px;
@@ -136,14 +140,14 @@ export const $TicketCardContainer = styled.section<{ backgroundColor?: string; s
   cursor: pointer;
   background-position: center;
   position: relative;
-  ${(props) => props.staticHeight ? `min-height: 320px` : ''};
-  ${(props) => props.staticHeight ? `max-height: 320px` : ''};
+  ${(props) => (props.staticHeight ? `min-height: 320px` : '')};
+  ${(props) => (props.staticHeight ? `max-height: 320px` : '')};
 `
 
 export const $TicketRedeemContainer = styled.section<{ staticHeight?: string }>`
   ${BASE_CONTAINER}
-  ${(props) => props.staticHeight ? `min-height: 320px` : ''};
-  ${(props) => props.staticHeight ? `max-height: 320px` : ''};
+  ${(props) => (props.staticHeight ? `min-height: 320px` : '')};
+  ${(props) => (props.staticHeight ? `max-height: 320px` : '')};
   padding: 20px 20px 0px;
 `
 

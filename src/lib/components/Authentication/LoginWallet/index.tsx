@@ -19,6 +19,7 @@ import { browserSessionPersistence, browserLocalPersistence, setPersistence } fr
 interface LoginWalletProps {
   onChangeMode: (mode: ModeOptions) => void
   onSignupSuccess?: () => void
+  title?: string
 }
 const LoginWallet = (props: LoginWalletProps) => {
   const { signInWithWallet } = useAuth()
@@ -63,7 +64,7 @@ const LoginWallet = (props: LoginWalletProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$Header>Login</$Header>
+      <$Header>{props.title || 'Login'}</$Header>
       {!isWalletConnected ? <WalletButton /> : null}
       {isWalletConnected ? (
         <$Vertical spacing={2}>

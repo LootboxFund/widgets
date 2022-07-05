@@ -14,7 +14,7 @@ import { useMutation } from '@apollo/client'
 import { auth } from 'lib/api/firebase/app'
 import { ethers } from 'ethers'
 import { userState } from 'lib/state/userState'
-import { generateSignatureMessage } from 'lib/utils/signatureMessage'
+import { generateAuthSignatureMessage } from 'lib/utils/signatureMessage'
 import { v4 as uuidv4 } from 'uuid'
 import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD, CONNECT_WALLET } from './api.gql'
 import {
@@ -44,7 +44,12 @@ interface FrontendUser {
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 export const useAuth = () => {
-  const [user, setUser] = useState<FrontendUser | null>(null)
+  /**
+   * user = undefined -> unset (loading)
+   * user = null -> unauthenticated
+   * user = USER -> authenticated
+   */
+  const [user, setUser] = useState<FrontendUser | undefined | null>(undefined)
   const userStateSnapshot = useSnapshot(userState)
 
   const [signUpWithWalletMutation] = useMutation<
@@ -237,7 +242,7 @@ export const useAuth = () => {
     }
 
     const checksumAddress = ethers.utils.getAddress(userStateSnapshot.currentAccount as unknown as string)
-    const message = generateSignatureMessage(checksumAddress as Address, uuidv4())
+    const message = generateAuthSignatureMessage(checksumAddress as Address, uuidv4())
     // @ts-ignore metamask is not typed...
     const result = await metamask.request({
       method: 'personal_sign',

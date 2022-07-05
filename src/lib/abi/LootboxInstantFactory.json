@@ -17,6 +17,11 @@
         "type": "address"
       },
       {
+        "internalType": "address",
+        "name": "_superstaff",
+        "type": "address"
+      },
+      {
         "internalType": "string",
         "name": "_baseTokenURI",
         "type": "string"
@@ -399,6 +404,32 @@
     "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "semver",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "superstaff",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

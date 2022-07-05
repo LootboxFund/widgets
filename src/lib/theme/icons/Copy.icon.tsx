@@ -5,17 +5,19 @@ const CopyIcon = ({
   text,
   fill = '#E5E5E5',
   tipID,
+  smallWidth,
 }: {
   width?: number
   text: string
   fill?: string
   tipID?: string
+  smallWidth?: number
 }) => {
   const [color, setColor] = useState(fill)
   return (
     <svg
-      width={width}
-      height={width}
+      width={smallWidth || width}
+      height={smallWidth || width}
       viewBox={`0 0 ${width} ${width}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

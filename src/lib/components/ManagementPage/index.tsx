@@ -17,6 +17,7 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import $Button from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import ViewPartyBaskets from '../PartyBasket/ViewPartyBaskets'
 
 export interface ManagementPageProps {}
 
@@ -169,6 +170,10 @@ const ManagementPage = () => {
           lootboxType={lootboxType}
         />
       </div>
+
+      <br />
+      <br />
+      <ViewPartyBaskets network={network} lootboxAddress={lootboxAddress} />
     </div>
   )
 }

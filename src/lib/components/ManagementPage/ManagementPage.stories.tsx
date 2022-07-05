@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ManagementPage, { ManagementPageProps } from 'lib/components/ManagementPage'
+import client from 'lib/api/graphql/client'
+import { ApolloProvider } from '@apollo/client'
 
 export default {
   title: 'Management Page',
@@ -7,7 +9,11 @@ export default {
 }
 
 const Template = (args: ManagementPageProps) => {
-  return <ManagementPage {...args} />
+  return (
+    <ApolloProvider client={client}>
+      <ManagementPage {...args} />
+    </ApolloProvider>
+  )
 }
 
 export const Basic = Template.bind({})

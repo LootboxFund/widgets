@@ -540,6 +540,102 @@ if (process.env.NODE_ENV === 'production') {
   BattleFeed.plugins.unshift(terser()) // enable minification
 }
 
+const PartyBasketManage = {
+  input: ['src/injects/PartyBasketManage/index.ts'],
+  output: {
+    file: process.env.NODE_ENV === 'production' ? 'iife/PartyBasketManage.production.js' : 'iife/PartyBasketManage.js',
+    format: 'iife',
+    sourcemap: true,
+    name: 'Lootbox',
+    inlineDynamicImports: true,
+    globals: {
+      'react-dom': 'ReactDOM',
+      'prop-types': 'PropTypes',
+      react: 'React',
+      callbackify: 'callbackify',
+      path: false,
+      fs: false,
+      os: false,
+      module: false,
+      util: false,
+      tty: false,
+      buffer: false,
+    },
+  },
+  plugins: [
+    commonjs({
+      // namedExports: {
+      // // This is needed because react/jsx-runtime exports jsx on the module export.
+      // // Without this mapping the transformed import import {jsx as _jsx} from 'react/jsx-runtime' will fail.
+      // 'react/jsx-runtime': ['jsx', 'jsxs'],
+      // },
+    }),
+    nodePolyfills(), // enable NodeJS polyfills
+    resolve({ preferBuiltins: true, browser: true }), // enable importing from node_modules
+    typescript(), // enable TypeScript
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      preventAssignment: true,
+    }),
+    svg(),
+    json(), // enable JSON
+    // globals(), // allows globals to be imported (process.env)
+    builtins(), // allows builtins to be imported via require/import
+  ],
+  external: ['react'],
+}
+if (process.env.NODE_ENV === 'production') {
+  PartyBasketManage.plugins.unshift(terser()) // enable minification
+}
+
+const PartyBasketRedeem = {
+  input: ['src/injects/PartyBasketRedeem/index.ts'],
+  output: {
+    file: process.env.NODE_ENV === 'production' ? 'iife/PartyBasketRedeem.production.js' : 'iife/PartyBasketRedeem.js',
+    format: 'iife',
+    sourcemap: true,
+    name: 'Lootbox',
+    inlineDynamicImports: true,
+    globals: {
+      'react-dom': 'ReactDOM',
+      'prop-types': 'PropTypes',
+      react: 'React',
+      callbackify: 'callbackify',
+      path: false,
+      fs: false,
+      os: false,
+      module: false,
+      util: false,
+      tty: false,
+      buffer: false,
+    },
+  },
+  plugins: [
+    commonjs({
+      // namedExports: {
+      // // This is needed because react/jsx-runtime exports jsx on the module export.
+      // // Without this mapping the transformed import import {jsx as _jsx} from 'react/jsx-runtime' will fail.
+      // 'react/jsx-runtime': ['jsx', 'jsxs'],
+      // },
+    }),
+    nodePolyfills(), // enable NodeJS polyfills
+    resolve({ preferBuiltins: true, browser: true }), // enable importing from node_modules
+    typescript(), // enable TypeScript
+    replace({
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      preventAssignment: true,
+    }),
+    svg(),
+    json(), // enable JSON
+    // globals(), // allows globals to be imported (process.env)
+    builtins(), // allows builtins to be imported via require/import
+  ],
+  external: ['react'],
+}
+if (process.env.NODE_ENV === 'production') {
+  PartyBasketRedeem.plugins.unshift(terser()) // enable minification
+}
+
 export default [
   CreateLootbox,
   InteractWithLootbox,
@@ -551,4 +647,6 @@ export default [
   TournamentManage,
   TournamentPublic,
   BattleFeed,
+  PartyBasketManage,
+  PartyBasketRedeem,
 ]

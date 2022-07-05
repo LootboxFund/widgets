@@ -2,29 +2,24 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_lootboxDao",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_ticketPurchaseFee",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_brokerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_superstaff",
-        "type": "address"
-      },
-      {
         "internalType": "string",
-        "name": "_baseTokenURI",
+        "name": "_name",
         "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_lootboxAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "whitelister",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -35,48 +30,30 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "lootboxName",
-        "type": "string"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
-        "name": "lootbox",
+        "name": "bountyHolder",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "issuer",
+        "name": "bountyReceiver",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "treasury",
+        "name": "lootboxAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "targetSharesSold",
+        "name": "ticket",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maxSharesSold",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "_data",
-        "type": "string"
       }
     ],
-    "name": "LootboxCreated",
+    "name": "BountyRedeemed",
     "type": "event"
   },
   {
@@ -208,12 +185,12 @@
   },
   {
     "inputs": [],
-    "name": "baseTokenURI",
+    "name": "DOMAIN_SEPARATOR",
     "outputs": [
       {
-        "internalType": "string",
+        "internalType": "bytes32",
         "name": "",
-        "type": "string"
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
@@ -221,59 +198,28 @@
   },
   {
     "inputs": [],
-    "name": "brokerAddress",
+    "name": "MINTER_TYPEHASH",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "bytes32",
         "name": "",
-        "type": "address"
+        "type": "bytes32"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_lootboxName",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_lootboxSymbol",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_targetSharesSold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_maxSharesSold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_treasury",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "_data",
-        "type": "string"
-      }
-    ],
-    "name": "createLootbox",
+    "inputs": [],
+    "name": "WHITELISTER_ROLE",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "_lootbox",
-        "type": "address"
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -339,7 +285,7 @@
   },
   {
     "inputs": [],
-    "name": "lootboxImplementation",
+    "name": "lootboxAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -348,6 +294,53 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -368,6 +361,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
+      }
+    ],
+    "name": "redeemBounty",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -420,19 +431,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "superstaff",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes4",
@@ -453,19 +451,6 @@
   },
   {
     "inputs": [],
-    "name": "ticketPurchaseFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "unpause",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -473,12 +458,12 @@
   },
   {
     "inputs": [],
-    "name": "viewLootboxes",
+    "name": "viewNFTs",
     "outputs": [
       {
-        "internalType": "bytes32[]",
+        "internalType": "uint256[]",
         "name": "",
-        "type": "bytes32[]"
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",

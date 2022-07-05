@@ -329,13 +329,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   )
 })
 
-export const $InputWrapper = styled.div<{ screen: ScreenSize }>`
+export const $InputWrapper = styled.div<{ screen: ScreenSize; marginRight?: string }>`
   background-color: #f1f1f1;
   display: flex;
   padding: 5px 10px;
   border-radius: 10px;
   margin-top: 5px;
-  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  margin-right: ${(props) => (props.marginRight ? props.marginRight : props.screen === 'desktop' ? '50px' : '0px')};
 `
 
 const $StepChooseFunding = styled.section<{}>`

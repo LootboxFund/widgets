@@ -1,16 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import ManagementPage from 'lib/components/ManagementPage'
+import ManagePartyBasket from 'lib/components/PartyBasket/ManagePartyBasket'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 
 export const inject = () => {
-  const targetInjectionPoint = document.getElementById('manage-lootbox')
+  const targetInjectionPoint = document.getElementById('party-basket-manage')
   ReactDOM.render(
     <React.StrictMode>
       <ApolloProvider client={client}>
-        <ManagementPage />
+        <ManagePartyBasket />
       </ApolloProvider>
     </React.StrictMode>,
     targetInjectionPoint

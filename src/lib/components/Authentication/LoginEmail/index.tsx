@@ -16,6 +16,7 @@ import { $Link } from 'lib/components/Profile/common'
 interface LoginEmailProps {
   onChangeMode: (mode: ModeOptions) => void
   onSignupSuccess?: () => void
+  title?: string
 }
 const LoginEmail = (props: LoginEmailProps) => {
   const { signInWithEmailAndPassword } = useAuth()
@@ -67,7 +68,7 @@ const LoginEmail = (props: LoginEmailProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$Header>Login</$Header>
+      <$Header>{props.title || 'Login'}</$Header>
       <$Vertical spacing={4}>
         <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email"></$InputMedium>
         <$InputMedium

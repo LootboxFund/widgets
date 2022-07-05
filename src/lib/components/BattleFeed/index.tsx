@@ -139,7 +139,9 @@ const BattleFeed = () => {
           )
         })}
       </$Horizontal>
-      {loading && <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />}
+      {loading && (
+        <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} size="50px" />
+      )}
       {pageInfo?.hasNextPage && (
         <div
           style={{

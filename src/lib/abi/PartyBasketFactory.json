@@ -3,28 +3,13 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_lootboxDao",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_ticketPurchaseFee",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_brokerAddress",
+        "name": "dao",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_superstaff",
+        "name": "_whitelister",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "_baseTokenURI",
-        "type": "string"
       }
     ],
     "stateMutability": "nonpayable",
@@ -34,15 +19,9 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "string",
-        "name": "lootboxName",
-        "type": "string"
-      },
-      {
         "indexed": true,
         "internalType": "address",
-        "name": "lootbox",
+        "name": "partyBasket",
         "type": "address"
       },
       {
@@ -52,31 +31,19 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "treasury",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "targetSharesSold",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maxSharesSold",
-        "type": "uint256"
-      },
-      {
         "indexed": false,
         "internalType": "string",
-        "name": "_data",
+        "name": "name",
         "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "lootboxAddress",
+        "type": "address"
       }
     ],
-    "name": "LootboxCreated",
+    "name": "PartyBasketCreated",
     "type": "event"
   },
   {
@@ -207,69 +174,28 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "baseTokenURI",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "brokerAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "string",
-        "name": "_lootboxName",
+        "name": "_name",
         "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_lootboxSymbol",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_targetSharesSold",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_maxSharesSold",
-        "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_treasury",
+        "name": "_lootboxAddress",
         "type": "address"
       },
       {
-        "internalType": "string",
-        "name": "_data",
-        "type": "string"
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
       }
     ],
-    "name": "createLootbox",
+    "name": "createPartyBasket",
     "outputs": [
       {
         "internalType": "address",
-        "name": "_lootbox",
+        "name": "partyBasket",
         "type": "address"
       }
     ],
@@ -332,19 +258,6 @@
         "internalType": "bool",
         "name": "",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lootboxImplementation",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -420,19 +333,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "superstaff",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "bytes4",
@@ -453,19 +353,6 @@
   },
   {
     "inputs": [],
-    "name": "ticketPurchaseFee",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "unpause",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -473,7 +360,7 @@
   },
   {
     "inputs": [],
-    "name": "viewLootboxes",
+    "name": "viewPartyBaskets",
     "outputs": [
       {
         "internalType": "bytes32[]",
