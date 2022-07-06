@@ -183,6 +183,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     }
   }
 
+  const clearFile = () => {
+    const input = document.getElementById('csv-upload') as any
+
+    if (input) {
+      input.value = null
+    }
+  }
+
   const processCsv = async (e: SyntheticEvent) => {
     if (bulkWhitelistState?.status === 'loading') {
       console.error('Upload already in process')
@@ -191,7 +199,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     setBulkWhitelistState({ status: 'loading' })
     // @ts-ignore
     const selectedFiles = document.getElementById('csv-upload')?.files
-
     if (selectedFiles?.length) {
       const file = selectedFiles[0]
 
@@ -231,8 +238,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           return row.trim().split(',')[addressIndex].trim() as Address
         })
 
-        console.log('addresses from csv', addresses)
-
         await bulkWhitelistAction(addresses)
       }
       reader.readAsText(file)
@@ -247,7 +252,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     )
     const el = document.getElementById('share-redeem-link')
     if (el) {
-      console.log('el')
       el.innerText = '✅ Copied to clipboard!'
       setTimeout(() => {
         el.innerText = 'Share Link to Redeem'
@@ -399,7 +403,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               <$CSVLabel htmlFor="csv-upload" themeColor={chain.themeColor} screen={screen}>
                 Upload CSV
               </$CSVLabel>
-              <input id="csv-upload" type="file" accept=".csv" onChange={processCsv} style={{ display: 'none' }} />
+              <input
+                id="csv-upload"
+                type="file"
+                accept=".csv"
+                onClick={clearFile}
+                onChange={processCsv}
+                style={{ display: 'none' }}
+              />
             </$Vertical>
 
             {bulkWhitelistState?.status === 'loading' && (
