@@ -13,6 +13,7 @@ import { useSnapshot } from 'valtio'
 import { getUserBalanceOfNativeToken } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { Address } from '@wormgraph/helpers'
+import { InitialUrlParams } from '../state'
 
 export interface StepChooseTypeProps {
   stage: StepStage
@@ -21,6 +22,7 @@ export interface StepChooseTypeProps {
   selectedType: LootboxType
   onNext: () => void
   setValidity: (bool: boolean) => void
+  initialUrlParams?: InitialUrlParams
 }
 
 export type LootboxType = 'escrow' | 'instant' | 'tournament'
@@ -66,6 +68,9 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
 
   const renderTypeOptions = () => {
     const selectType = (type: LootboxType) => {
+      if (!!props.initialUrlParams?.type) {
+        return // don't allow type to be changed if it's set in the url
+      }
       props.onSelectType(type)
       props.setValidity(true)
     }
@@ -77,7 +82,7 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
             themeColor={props.selectedNetwork?.themeColor}
             onClick={() => selectType(option.key)}
             key={option.key}
-            isAvailable={true}
+            isAvailable={!props.initialUrlParams?.type}
           >
             <$TypeIcon>{option.emoji}</$TypeIcon>
 
@@ -206,7 +211,7 @@ const $NetworkOption = styled.button<{ isAvailable?: boolean; themeColor?: strin
   align-items: center;
   justify-content: flex-start;
   border: 0.5px solid #cdcdcd;
-  ${(props) => props.isAvailable && 'cursor: pointer'};
+  ${(props) => (props.isAvailable ? 'cursor: pointer' : 'cursor: not-allowed')};
   ${(props) =>
     props.themeColor && props.isSelected
       ? `background-color: ${props.themeColor}`

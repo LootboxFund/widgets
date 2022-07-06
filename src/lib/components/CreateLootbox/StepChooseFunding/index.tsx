@@ -15,6 +15,7 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { ethers as ethersObj } from 'ethers'
 import { defaultFundraisingLimitMultiplier, defaultFundraisingLimitMultiplierDecimal } from '../index'
+import { InitialUrlParams } from '../state'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
   const web3Utils = useWeb3Utils()
@@ -36,7 +37,9 @@ export interface StepChooseFundingProps {
   setReceivingWallet: (addr: Address) => void
   setValidity: (bool: boolean) => void
   onNext: () => void
+  initialUrlParams?: InitialUrlParams
 }
+
 const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.RefObject<HTMLDivElement>) => {
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
@@ -73,6 +76,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       const width = projectedWidth > 200 ? 200 : projectedWidth
       return `${amount ? width : 100}px`
     }
+
     const onFundraisingTargetChange = (value: string | undefined) => {
       const valueBN = web3Utils.toBN(web3Utils.toWei(value || '0'))
       props.setFundraisingTarget(valueBN)
@@ -141,6 +145,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               <InputDecimal
                 initialValue={web3Utils.fromWei(props.fundraisingTarget, 'ether').toString()}
                 onChange={onFundraisingTargetChange}
+                disabled={!!props.initialUrlParams?.fundingTarget} // freeze if fundingTarget is set by magic link
                 width={calculateInputWidth(props.fundraisingTarget)}
               />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
@@ -218,6 +223,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               <InputDecimal
                 initialValue={web3Utils.fromWei(props.fundraisingLimit, 'ether').toString()}
                 onChange={onFundraisingLimitChange}
+                disabled={!!props.initialUrlParams?.fundingLimit} // freeze if fundingTarget is set by magic link
                 width={calculateInputWidth(props.fundraisingTarget)}
               />
               <$InputTranslationLight>{props.selectedNetwork?.symbol}</$InputTranslationLight>
@@ -273,6 +279,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             fontWeight="200"
             onChange={parseInput}
             placeholder="Funds will arrive here"
+            disabled={!!props.initialUrlParams?.receivingWallet}
           />
         </$InputWrapper>
       </$Vertical>
