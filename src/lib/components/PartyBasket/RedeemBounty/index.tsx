@@ -40,6 +40,7 @@ import $Button from 'lib/components/Generics/Button'
 import UserTicketsSimple from 'lib/components/UserTickets/UserTicketsSimple'
 import { ticketCardState } from 'lib/components/TicketCard/state'
 import { truncateAddress } from 'lib/api/helpers'
+import { manifest } from 'manifest'
 
 interface RedeemBountyProps {
   basketAddress: Address
@@ -58,6 +59,7 @@ interface AuthSignature {
 const RedeemBounty = (props: RedeemBountyProps) => {
   const [provider] = useProvider()
   const { screen } = useWindowSize()
+  const isMobile = screen === 'mobile'
   const snapUserState = useSnapshot(userState)
   const [authSignature, setAuthSignature] = useState<AuthSignature | undefined>()
   const [redeemState, setRedeemState] = useState<RedeemState>({ status: 'signature' })
@@ -113,7 +115,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     nftBountyValue,
   } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
 
-  const { name: lootboxName, address: lootboxAddress } = lootboxSnapshot || {}
+  const { name: lootboxName, address: lootboxAddress, description: lootboxDescription } = lootboxSnapshot || {}
 
   const network = NETWORK_OPTIONS.find((net) => net.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
@@ -216,9 +218,65 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     }
   }
 
+  const RedeemNFTComponent = () => {
+    return (
+      <$Vertical spacing={4}>
+        {hasBountyToRedeem && (
+          <$StepSubheading>✅ You have a free NFT available to redeem. Click the button 👇 to redeem!</$StepSubheading>
+        )}
+
+        {redeemState.status === 'signature' && !hasBountyToRedeem && (
+          <$StepSubheading>⚠️ Check for Redeemable NFTs using your MetaMask Wallet!</$StepSubheading>
+        )}
+
+        {redeemState.status === 'success' && !hasBountyToRedeem && (
+          <$StepSubheading>❌ You do not have any NFTs to redeem. Please check again later.</$StepSubheading>
+        )}
+
+        {!!redeemState.error && <$StepSubheading>❌ {redeemState.error}</$StepSubheading>}
+
+        {!snapUserState.currentAccount ? (
+          <WalletButton />
+        ) : isWrongChain ? (
+          <$RedeemNFTButton themeColor={COLORS.warningBackground} onClick={() => addCustomEVMChain(chainIdHex)}>
+            Switch network
+          </$RedeemNFTButton>
+        ) : (
+          <$RedeemNFTButton
+            themeColor={
+              redeemState.status === 'error'
+                ? COLORS.dangerBackground
+                : redeemState.status === 'signature'
+                ? COLORS.warningBackground
+                : noBountiesToRedeem
+                ? COLORS.dangerBackground
+                : network.themeColor
+            }
+            onClick={handlePrimaryClick}
+            disabled={isLoadingState}
+          >
+            {redeemState.status === 'error'
+              ? 'Error Occured, retry?'
+              : redeemState.status === 'signature'
+              ? 'Check for Redeemable NFTs'
+              : isLoadingState
+              ? 'Loading...'
+              : noBountiesToRedeem
+              ? 'No NFTs to redeem, retry?'
+              : hasBountyToRedeem
+              ? 'Redeem NFT'
+              : redeemState.status === 'success'
+              ? '✅ Bounty Redeemed'
+              : 'Redeem NFT'}
+          </$RedeemNFTButton>
+        )}
+      </$Vertical>
+    )
+  }
+
   return (
     <$Vertical spacing={4}>
-      <$StepCard screen={screen} themeColor={network.themeColor}>
+      <$StepCard screen={screen} themeColor={network.themeColor} style={{ margin: '0 auto' }}>
         <$Vertical spacing={4}>
           <$Horizontal spacing={4} width="100%" flexWrap={screen === 'mobile'}>
             <$Vertical
@@ -234,8 +292,8 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                 <$ManageLootboxHeading screen={screen}>Redeem Free NFT</$ManageLootboxHeading>
                 <HelpIcon tipID="partyBasket" />
                 <ReactTooltip id="partyBasket" place="right" effect="solid">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                  dolore magna aliqua.
+                  You can redeem FREE profit sharing NFTs if the Party Basket issuer has permitted you to do so. If you
+                  believe you are entitled to redeem an NFT, please contact the Party Basket issuer.
                 </ReactTooltip>
               </$Horizontal>
               <$StepSubheading>{`${lootboxName ? lootboxName + ', ' : ''}${
@@ -243,9 +301,12 @@ const RedeemBounty = (props: RedeemBountyProps) => {
               }`}</$StepSubheading>
 
               <$StepSubheading>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua.
+                {lootboxDescription && lootboxDescription?.length > 190
+                  ? `${lootboxDescription?.slice(0, 190)}...`
+                  : lootboxDescription || `Redeem a FREE Profit Sharing NFT from the Lootbox "${lootboxName}"`}
               </$StepSubheading>
+
+              {isMobile && <RedeemNFTComponent />}
 
               <$Vertical spacing={2}>
                 <$Horizontal spacing={2} justifyContent="space-between">
@@ -253,8 +314,9 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                     <$StepSubheading>Max Earnings</$StepSubheading>
                     <HelpIcon tipID="maxEarnings" />
                     <ReactTooltip id="maxEarnings" place="right" effect="solid">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                      labore et dolore magna aliqua.
+                      {!!nftBountyValue
+                        ? `The NFT you redeem has the chance of earning \"${nftBountyValue}\" according to the Party Basket issuer. There is no guarantee of a profit and please contact the Party Basket issuer if you have questions.`
+                        : 'The Party Basket issuer has not stated a maximum earnings value for this NFT. Please contact the Party Basket issuer if you have questions.'}
                     </ReactTooltip>
                   </$Horizontal>
 
@@ -278,69 +340,22 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                 {!!snapUserState?.currentAccount ? <NetworkText /> : <WalletButton style={{ width: '100%' }} />}
               </div>
               <$LootboxStampImage src={lootboxSnapshot?.stampImage || TEMPLATE_LOOTBOX_STAMP} />
-              <$BasketButton screen={screen} themeColor="#373737" style={{ borderColor: '#37373715' }}>
+              <$BasketLink
+                screen={screen}
+                themeColor="#373737"
+                style={{ borderColor: '#37373715' }}
+                href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxSnapshot?.address}`}
+                target="_blank"
+              >
                 View Lootbox
-              </$BasketButton>
+              </$BasketLink>
             </$Vertical>
           </$Horizontal>
           <br />
-
-          {hasBountyToRedeem && (
-            <$StepSubheading>
-              ✅ You have a free NFT available to redeem. Click the button 👇 to redeem!
-            </$StepSubheading>
-          )}
-
-          {redeemState.status === 'signature' && !hasBountyToRedeem && (
-            <$StepSubheading>⚠️ Check for Redeemable NFTs using your MetaMask Wallet!</$StepSubheading>
-          )}
-
-          {redeemState.status === 'success' && !hasBountyToRedeem && (
-            <$StepSubheading>❌ You do not have any NFTs to redeem. Please check again later.</$StepSubheading>
-          )}
-
-          {!!redeemState.error && <$StepSubheading>❌ {redeemState.error}</$StepSubheading>}
-
-          {!snapUserState.currentAccount ? (
-            <WalletButton />
-          ) : isWrongChain ? (
-            <$RedeemNFTButton themeColor={COLORS.warningBackground} onClick={() => addCustomEVMChain(chainIdHex)}>
-              Switch network
-            </$RedeemNFTButton>
-          ) : (
-            <$RedeemNFTButton
-              themeColor={
-                redeemState.status === 'error'
-                  ? COLORS.dangerBackground
-                  : redeemState.status === 'signature'
-                  ? COLORS.warningBackground
-                  : noBountiesToRedeem
-                  ? COLORS.dangerBackground
-                  : network.themeColor
-              }
-              onClick={handlePrimaryClick}
-              disabled={isLoadingState}
-            >
-              {redeemState.status === 'error'
-                ? 'Error Occured, retry?'
-                : redeemState.status === 'signature'
-                ? 'Check for Redeemable NFTs'
-                : isLoadingState
-                ? 'Loading...'
-                : noBountiesToRedeem
-                ? 'No NFTs to redeem, retry?'
-                : hasBountyToRedeem
-                ? 'Redeem NFT'
-                : redeemState.status === 'success'
-                ? '✅ Bounty Redeemed'
-                : 'Redeem NFT'}
-            </$RedeemNFTButton>
-          )}
+          {!isMobile && <RedeemNFTComponent />}
         </$Vertical>
       </$StepCard>
-      <br />
-      <br />
-      <$Horizontal>
+      <$Horizontal style={{ marginTop: '50px' }}>
         <$ManageLootboxHeading screen={screen} style={{ fontFamily: TYPOGRAPHY.fontFamily.regular }}>
           Your NFTs
         </$ManageLootboxHeading>
@@ -386,8 +401,6 @@ export const onLoad = async (partyBasketAddress: Address) => {
   }
 }
 
-const $RedeemBountyContainer = styled.div``
-
 const $StepCard = styled.div<{
   themeColor: string
   boxShadow?: string
@@ -403,6 +416,35 @@ const $StepCard = styled.div<{
   padding: ${(props) => (props.screen === 'desktop' ? '40px' : '20px')};
   max-width: 800px;
   font-family: sans-serif;
+`
+
+const $BasketLink = styled.a<{
+  themeColor: string
+  screen: ScreenSize
+}>`
+  box-sizing: border-box;
+  width: 100%;
+  height: 62px;
+  line-height: 62px;
+  max-width: 420px;
+  text-decoration: none;
+
+  background: #ffffff;
+  border: 1px solid ${(props) => props.themeColor};
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 0px 20px;
+  cursor: pointer;
+  margin-right: ${(props) => (props.screen === 'desktop' ? '50px' : '0px')};
+  font-size: ${(props) => (props.screen === 'mobile' ? TYPOGRAPHY.fontSize.large : TYPOGRAPHY.fontSize.xlarge)};
+  color: ${(props) => props.themeColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  text-align: center;
+  display: inline;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const $BasketButton = styled.div<{

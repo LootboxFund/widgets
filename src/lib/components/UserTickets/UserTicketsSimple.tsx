@@ -96,7 +96,7 @@ const UserTicketsSimple = (props: Props) => {
             <TicketCard
               ticketID={ticketID?.toString()}
               isRedeemEnabled={true}
-              staticHeight="320px"
+              // staticHeight="320px"
               allowNFTTransferUI
             ></TicketCard>
           </$TicketWrapper>
