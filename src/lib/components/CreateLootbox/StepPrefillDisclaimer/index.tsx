@@ -46,7 +46,7 @@ const StepPrefillDisclaimer = (props: StepPrefillDisclaimerProps) => {
             </$StepSubheading>
           )}
           <br />
-          <$StepSubheading>{`The following ${props.prefilledFields.length} fields have been pre-filled:`}</$StepSubheading>
+          <$StepSubheading>{`The following ${props.prefilledFields.length} fields have been pre-filled and cannot be edited:`}</$StepSubheading>
           <br />
           {props.prefilledFields.map((desc, index) => (
             <$StepSubheading key={index}>

@@ -34,6 +34,7 @@ export const GET_PARTY_BASKET_FOR_REDEMPTION = gql`
             name
             address
             stampImage
+            description
           }
           chainIdHex
           creatorId

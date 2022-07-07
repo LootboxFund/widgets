@@ -14,7 +14,7 @@ import $Button from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { manifest } from '../../../manifest'
 import { checkMobileBrowser } from 'lib/api/createLootbox'
-import { $Horizontal, $Vertical } from 'lib/components/Generics';
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import $Spinner from '../Generics/Spinner'
 import { transferNFTOwnership } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
@@ -33,7 +33,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const { screen } = useWindowSize()
   const [showTransferUI, setShowTransferUI] = useState(false)
   const [receiverAddress, setReceiverAddress] = useState<Address>()
-  const [transferStatus, setTransferStatus] = useState<"none" | "pending" | "success" | "failure">("none")
+  const [transferStatus, setTransferStatus] = useState<'none' | 'pending' | 'success' | 'failure'>('none')
   const snapUserState = useSnapshot(userState)
   const currentUserAddress = snapUserState.currentAccount
   const snap = useSnapshot(ticketCardState)
@@ -105,29 +105,63 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
     }
     if (showTransferUI) {
       const renderLoadingButton = () => {
-        if (transferStatus === "pending") {
+        if (transferStatus === 'pending') {
           return <$Spinner color={COLORS.surpressedFontColor}></$Spinner>
-        } else if (transferStatus === "success") {
+        } else if (transferStatus === 'success') {
           return <span>✅</span>
-        } else if (transferStatus === "failure") {
+        } else if (transferStatus === 'failure') {
           return <span>⛔️</span>
         } else {
-          return <button onClick={() => transferNFT(props.ticketID)} style={{ cursor: canSend ? 'pointer' : 'not-allowed',  border: '0px solid white' }}>Send</button>
+          return (
+            <button
+              onClick={() => transferNFT(props.ticketID)}
+              style={{ cursor: canSend ? 'pointer' : 'not-allowed', border: '0px solid white' }}
+            >
+              Send
+            </button>
+          )
         }
       }
       return (
         <section style={{ backgroundColor: `${COLORS.surpressedBackground}2A`, padding: '5px', borderRadius: '5px' }}>
-          <$Horizontal style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', fontFamily: 'sans-serif', color: COLORS.surpressedFontColor }}>
+          <$Horizontal
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              fontFamily: 'sans-serif',
+              color: COLORS.surpressedFontColor,
+            }}
+          >
             <span>{`Transfer #${props.ticketID}`}</span>
-            <span onClick={() => {
-              setShowTransferUI(false)
-              setTransferStatus('none')
-            }} style={{ cursor: 'pointer', fontSize: '0.8rem' }}>cancel</span>
+            <span
+              onClick={() => {
+                setShowTransferUI(false)
+                setTransferStatus('none')
+              }}
+              style={{ cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              cancel
+            </span>
           </$Horizontal>
           <$Horizontal>
-            <input placeholder="Address of Receiver" onChange={(e) => setReceiverAddress(e.target.value as Address)} value={receiverAddress} style={{ padding: '5px', marginTop: '15px', flex: 1, border: '0px solid white' }}></input>
-            <div style={{ marginTop: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '50px' }}>
-             {renderLoadingButton()}
+            <input
+              placeholder="Address of Receiver"
+              onChange={(e) => setReceiverAddress(e.target.value as Address)}
+              value={receiverAddress}
+              style={{ padding: '5px', marginTop: '15px', flex: 1, border: '0px solid white' }}
+            ></input>
+            <div
+              style={{
+                marginTop: '15px',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '50px',
+              }}
+            >
+              {renderLoadingButton()}
             </div>
           </$Horizontal>
         </section>
@@ -135,18 +169,18 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
     }
     return (
       <$Button
-          onClick={() => setShowTransferUI(true)}
-          screen={screen}
-          backgroundColor={COLORS.white}
-          color={`${COLORS.surpressedFontColor}80`}
-          style={{
-            border: 'none',
-            boxShadow: 'none',
-            fontWeight: TYPOGRAPHY.fontWeight.regular,
-            fontSize: TYPOGRAPHY.fontSize.medium,
-          }}
-        >
-          Transfer Ownership
+        onClick={() => setShowTransferUI(true)}
+        screen={screen}
+        backgroundColor={COLORS.white}
+        color={`${COLORS.surpressedFontColor}80`}
+        style={{
+          border: 'none',
+          boxShadow: 'none',
+          fontWeight: TYPOGRAPHY.fontWeight.regular,
+          fontSize: TYPOGRAPHY.fontSize.medium,
+        }}
+      >
+        Transfer Ownership
       </$Button>
     )
   }
@@ -156,7 +190,12 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
       {ticket && ticket.route === '/payout' ? (
         <ViewPayout ticketID={props.ticketID} staticHeight={props.staticHeight} />
       ) : (
-        <TicketCard ticketID={props.ticketID} onScrollToMint={props.onScrollToMint} forceLoading={props.forceLoading} staticHeight={props.staticHeight} />
+        <TicketCard
+          ticketID={props.ticketID}
+          onScrollToMint={props.onScrollToMint}
+          forceLoading={props.forceLoading}
+          staticHeight={props.staticHeight}
+        />
       )}
       {props.isRedeemEnabled && <RedeemButton ticketID={props.ticketID} isRedeemable={isRedeemable as boolean} />}
       {!!ticket ? (
@@ -173,7 +212,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               fontSize: TYPOGRAPHY.fontSize.medium,
               marginTop: '-5px',
-              padding: '0px'
+              padding: '0px',
             }}
           >
             Download Image
@@ -190,7 +229,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
             fontWeight: TYPOGRAPHY.fontWeight.regular,
             fontSize: TYPOGRAPHY.fontSize.large,
             cursor: 'default',
-            minHeight: '40px',
+            minHeight: '70px',
           }}
         ></$Button>
       )}

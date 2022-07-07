@@ -148,12 +148,19 @@ const ViewPartyBaskets = (props: ViewPartyBasketProps) => {
               </$Horizontal>
               <br />
               <$StepSubheading>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua.
+                These are your Party Baskets for this Lootbox. Party Baskets hold onto Lootbox NFTs and allow you to
+                "whitelist" specific wallets, giving them special permission to redeem one of the NFTs from the Party
+                Basket for free.
                 <br />
                 <br />
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                consequat. Duis aute irure dolor in reprehenderit in voluptate
+                This is an advanced feature. We recommend watching the tutorial video about it{' '}
+                <a
+                  style={{ textDecoration: 'none', display: 'contents' }}
+                  href="https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC"
+                  target="_blank"
+                >
+                  here.
+                </a>
               </$StepSubheading>
               <br />
               <AuthGuard loginTitle="Login to View Party Baskets">

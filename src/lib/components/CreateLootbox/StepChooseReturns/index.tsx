@@ -12,6 +12,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { LootboxType } from '../StepChooseType'
+import { InitialUrlParams } from '../state'
 
 export const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
 export const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
@@ -26,6 +27,7 @@ export interface StepChooseReturnsProps {
   basisPoints: number
   setBasisPoints: (basisPoints: number) => void
   onNext: () => void
+  initialUrlParams?: InitialUrlParams
 }
 const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.RefObject<HTMLDivElement>) => {
   const web3Utils = useWeb3Utils()
@@ -159,6 +161,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
                   screen={screen}
                   width={calculateInputWidth()}
                   onWheel={(e) => e.currentTarget.blur()}
+                  disabled={!!props.initialUrlParams?.returnsTarget}
                 />
                 <$InputTranslationLight>%</$InputTranslationLight>
               </div>
@@ -233,6 +236,7 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
               screen={'mobile'}
               fontWeight="200"
               onChange={parseInput}
+              disabled={!!props.initialUrlParams?.returnsDate}
             />
           </$InputWrapper>
         </div>

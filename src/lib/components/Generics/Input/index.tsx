@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
 
-export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWeight?: string }>`
+export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWeight?: string; disabled?: boolean }>`
   flex: 1;
   height: ${(props) => (props.screen === 'desktop' ? '50px' : '40px')};
   padding: ${(props) => (props.screen === 'desktop' ? '10px' : '5px 10px')};
@@ -26,6 +26,7 @@ export const $Input = styled.input<{ screen: ScreenSize; width?: string; fontWei
     -webkit-appearance: none;
     margin: 0;
   }
+  ${(props) => props.disabled && 'cursor: not-allowed;'}
 `
 
 interface InputDecimalProps {

@@ -54,6 +54,7 @@ import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 import { TournamentID } from 'lib/types'
+import { InitialUrlParams } from './state'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 10 // base 2 - examples: 10 = 100%, 11 = 110%
@@ -97,6 +98,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
 
   const [doesNetworkMatchProvider, setDoesNetworkMatchProvider] = useState(true)
+
+  const [initialUrlParams, setInitialUrlParams] = useState<InitialUrlParams | undefined>()
 
   const initFromUrlParams = async () => {
     const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
@@ -187,6 +190,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     setLoadedUrlParams(true)
     setPreconfigParams(prefilledFields)
+    setInitialUrlParams({ ...INITIAL_URL_PARAMS })
   }
 
   type FormStep =
@@ -618,6 +622,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         onSelectType={setFundingType}
         onNext={() => refStepFunding.current?.scrollIntoView()}
         setValidity={(bool: boolean) => console.log(bool)}
+        initialUrlParams={initialUrlParams}
       />
       <$Spacer></$Spacer>
       {loadedUrlParams && (
@@ -634,6 +639,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
           stage={stage.stepFunding}
           setValidity={(bool: boolean) => setValidity({ ...validity, stepFunding: bool })}
           onNext={() => refStepReturns.current?.scrollIntoView()}
+          initialUrlParams={initialUrlParams}
         />
       )}
 
@@ -650,6 +656,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         stage={stage.stepReturns}
         setValidity={(bool: boolean) => setValidity({ ...validity, stepReturns: bool })}
         onNext={() => refStepCustomize.current?.scrollIntoView()}
+        initialUrlParams={initialUrlParams}
       />
       <$Spacer></$Spacer>
       <StepCustomize
@@ -688,6 +695,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         submitStatus={submitStatus}
         onSubmit={() => createLootbox()}
         goToLootboxAdminPage={goToLootboxAdminPage}
+        initialUrlParams={initialUrlParams}
       />
       <$Vertical style={{ marginTop: '20px' }}>
         {!doesNetworkMatchProvider ? (

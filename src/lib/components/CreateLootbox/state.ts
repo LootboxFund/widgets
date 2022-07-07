@@ -22,6 +22,22 @@ export interface InitialFormValidityCreateLootbox {
   stepSocials: boolean
   stepTerms: boolean
 }
+export interface InitialUrlParams {
+  network: string | null
+  type: string | null
+  fundingTarget: string | null
+  fundingLimit: string | null
+  receivingWallet: string | null
+  returnsTarget: string | null
+  returnsDate: string | null
+  logoImage: string | null
+  coverImage: string | null
+  campaignBio: string | null
+  campaignWebsite: string | null
+  themeColor: string | null
+  tournamentId: string | null
+}
+
 export const extractURLState_CreateLootboxPage = () => {
   const url = new URL(window.location.href)
   const INITIAL_FORM_STATE: InitialFormStateCreateLootbox = {
@@ -42,7 +58,7 @@ export const extractURLState_CreateLootboxPage = () => {
     stepSocials: false,
     stepTerms: false,
   }
-  const params = {
+  const params: InitialUrlParams = {
     network: url.searchParams.get('network'),
     type: url.searchParams.get('type'),
     fundingTarget: url.searchParams.get('fundingTarget'),

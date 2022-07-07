@@ -52,14 +52,13 @@ interface BulkWhitelistState {
 }
 
 const CSV_UPLOAD_COLUMN_KEY = 'address'
-const exampleCSV =
+export const exampleCSV =
   'https://docs.google.com/spreadsheets/d/1eecK4uZB-9EVv2NGYUyOOXdZMUMwSW_Brq8FYttUUgE/edit?usp=sharing'
 
 const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
   const [singleWhitelistState, setSingleWhitelistState] = useState<SingleWhitelistState>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
-  // const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
     getPartyBasket: GetPartyBasketResponse
@@ -183,6 +182,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     }
   }
 
+  const clearFile = () => {
+    const input = document.getElementById('csv-upload') as any
+
+    if (input) {
+      input.value = null
+    }
+  }
+
   const processCsv = async (e: SyntheticEvent) => {
     if (bulkWhitelistState?.status === 'loading') {
       console.error('Upload already in process')
@@ -191,7 +198,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     setBulkWhitelistState({ status: 'loading' })
     // @ts-ignore
     const selectedFiles = document.getElementById('csv-upload')?.files
-
     if (selectedFiles?.length) {
       const file = selectedFiles[0]
 
@@ -231,8 +237,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           return row.trim().split(',')[addressIndex].trim() as Address
         })
 
-        console.log('addresses from csv', addresses)
-
         await bulkWhitelistAction(addresses)
       }
       reader.readAsText(file)
@@ -247,7 +251,6 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     )
     const el = document.getElementById('share-redeem-link')
     if (el) {
-      console.log('el')
       el.innerText = '✅ Copied to clipboard!'
       setTimeout(() => {
         el.innerText = 'Share Link to Redeem'
@@ -285,8 +288,8 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 <$ManageLootboxHeading screen={screen}>{lootboxName}</$ManageLootboxHeading>
                 <HelpIcon tipID="partyBasket" />
                 <ReactTooltip id="partyBasket" place="right" effect="solid">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                  dolore magna aliqua.
+                  This is your Party Basket for "{lootboxName}". You can bulk mint NFTs to this contract address, and
+                  then bulk whitelist people (with a CSV upload) to pick them up for FREE (AKA: Redeem a bounty)!
                 </ReactTooltip>
               </$Horizontal>
             )}
@@ -298,12 +301,17 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           </$Vertical>
 
           <$StepSubheading>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua.
+            This is your Party Basket for "{lootboxName}". Party Baskets hold onto Lootbox NFTs and allow you to
+            "whitelist" specific wallets, giving them special permission to redeem an NFT from the Party Basket for
+            free.
             <br />
             <br />
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            Duis aute irure dolor in reprehenderit in voluptate
+            Bulk whitelisting will grant a large number of wallets a free NFT to redeem. You can use a CSV file (like{' '}
+            <a href={exampleCSV} target="_blank" style={{ display: 'contents' }}>
+              this one
+            </a>
+            ), and then you can upload it by clicking the button below. Your Party Basket will need to have Lootbox NFTs
+            in it (by bulk minting) in order for your followers to be able to redeem one.
           </$StepSubheading>
           <$Vertical spacing={3}>
             <$Vertical>
@@ -399,7 +407,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               <$CSVLabel htmlFor="csv-upload" themeColor={chain.themeColor} screen={screen}>
                 Upload CSV
               </$CSVLabel>
-              <input id="csv-upload" type="file" accept=".csv" onChange={processCsv} style={{ display: 'none' }} />
+              <input
+                id="csv-upload"
+                type="file"
+                accept=".csv"
+                onClick={clearFile}
+                onChange={processCsv}
+                style={{ display: 'none' }}
+              />
             </$Vertical>
 
             {bulkWhitelistState?.status === 'loading' && (

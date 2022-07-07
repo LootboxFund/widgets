@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip'
 import { ethers as ethersObj } from 'ethers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import { InitialUrlParams } from '../state'
 
 export interface TermsFragment {
   slug: string
@@ -43,6 +44,7 @@ export interface StepTermsConditionsProps {
   setValidity: (bool: boolean) => void
   submitStatus: SubmitStatus
   goToLootboxAdminPage: () => string
+  initialUrlParams?: InitialUrlParams
 }
 const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: React.RefObject<HTMLDivElement>) => {
   const { screen } = useWindowSize()
@@ -251,6 +253,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
               <$InputMedium
                 onChange={(e) => updateTreasury(e.target.value as Address)}
                 value={props.treasuryWallet}
+                disabled={!!props.initialUrlParams?.receivingWallet}
               ></$InputMedium>
               <CopyIcon text={props.treasuryWallet} />
             </$CopyableInput>
@@ -301,7 +304,7 @@ export const $TermOfService = styled.span`
   margin-top: 2px;
 `
 
-const $InputMedium = styled.input`
+const $InputMedium = styled.input<{ disbaled?: boolean }>`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;
@@ -310,6 +313,7 @@ const $InputMedium = styled.input`
   flex: 1;
   margin-right: 20px;
   height: 40px;
+  ${(props) => props.disabled && 'cursor: not-allowed;'}
 `
 
 const $CopyableInput = styled.div`
