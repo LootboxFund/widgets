@@ -8,6 +8,7 @@ import { GET_MY_WALLET_LOOTBOXES } from './api.gql'
 import { Oopsies, $Link, $SearchInput } from '../common'
 import { manifest } from 'manifest'
 import { useState } from 'react'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -43,7 +44,7 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
               onClickLootbox && onClickLootbox(lootbox)
             }}
           >
-            <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
+            <img alt={lootbox.name} src={lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP} width="100%" />
           </$LootboxThumbailContainer>
         ))}
       </$Horizontal>

@@ -6,6 +6,7 @@ import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
 import { $Horizontal, $p, $h1, $span, $Vertical, $h3, $h2 } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -169,7 +170,7 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction 
                 onClickLootbox && onClickLootbox(lootbox)
               }}
             >
-              <img alt={lootbox.address} src={lootbox.stampImage} width="100%" />
+              <img alt={lootbox.name} src={lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP} width="100%" />
             </$LootboxThumbailContainer>
           )
         })}

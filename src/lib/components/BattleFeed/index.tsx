@@ -171,7 +171,7 @@ const $BattleContainer = styled.div<{ screen: ScreenSize }>`
   background: #ffffff;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
   border-radius: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   padding: 26px;
   box-sizing: border-box;
   cursor: pointer;
