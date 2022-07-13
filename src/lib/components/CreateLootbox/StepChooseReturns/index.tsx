@@ -13,9 +13,12 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { LootboxType } from '../StepChooseType'
 import { InitialUrlParams } from '../state'
+import { FormattedMessage } from 'react-intl'
 
 export const validateReturnTarget = (returnTarget: number) => returnTarget && returnTarget > 0
-export const validatePaybackPeriod = (payback: string | undefined) => payback && new Date(payback) > new Date()
+export const validatePaybackPeriod = (payback: string | undefined) => {
+  return payback && new Date(payback) > new Date()
+}
 export interface StepChooseReturnsProps {
   stage: StepStage
   selectedNetwork?: NetworkOption
@@ -33,7 +36,10 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
   const web3Utils = useWeb3Utils()
   const { screen } = useWindowSize()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
-  const initialErrors = {
+  const initialErrors: {
+    returnTarget: string | React.ReactElement
+    paybackDate: string | React.ReactElement
+  } = {
     returnTarget: '',
     paybackDate: '',
   }
@@ -114,7 +120,13 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
       } else {
         setErrors({
           ...errors,
-          returnTarget: 'Target return must be greater than zero',
+          returnTarget: (
+            <FormattedMessage
+              id="createLootbox.stepChooseReturns.returnTargetError"
+              defaultMessage="Target return must be greater than zero"
+              description="Error message when target return is less than zero"
+            />
+          ),
         })
         props.setValidity(false)
       }
@@ -123,20 +135,32 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
       <$Horizontal alignItems="flex-end">
         <$BigIcon>🌓</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <$Horizontal justifyContent="space-between" style={{ marginRight: '50px' }}>
+          <$Horizontal justifyContent="space-between" style={{ marginRight: screen === 'mobile' ? '0px' : '50px' }}>
             <$StepSubheading>
-              Target Return
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.returnTarget.title"
+                defaultMessage="Target Return"
+                description="Title for target return step in Create lootbox"
+              />
               <HelpIcon tipID="targetReturn" />
               <ReactTooltip id="targetReturn" place="right" effect="solid">
-                This target is shown to investors but is not a guranteed return. You decide how much this is, based on
-                your knowlege of the oppourtunity you are pursuing. A 10% target return on 10 ETH investment means you
-                intend to reward investors 11 ETH. Typically your obligation to reward investors ends when you hit your
-                target return.
+                <FormattedMessage
+                  id="createLootbox.stepChooseReturns.returnTarget.tooltip"
+                  defaultMessage="This target is shown to investors but is not a guranteed return. You decide how much this is, based on your knowlege of the oppourtunity you are pursuing. A 10% target return on 10 ETH investment means you intend to reward investors 11 ETH. Typically your obligation to reward investors ends when you hit your target return."
+                  description="Tooltip for users when they are selecting a return target for their Lootbox"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading
               style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
-            >{`USD $${calculateEquivalentUSDPrice()} Original`}</$StepSubheading>
+            >
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.returnTarget.usdEquivalent"
+                defaultMessage="USD ${usdPrice} Original"
+                values={{ usdPrice: calculateEquivalentUSDPrice()?.toString() }}
+                description="This shows the user how much USD value they want to raise from their Lootbox. Original means that they originally want to raise x amount. It is used in contrast with the amount of money they will owe to investors. "
+              />
+            </$StepSubheading>
           </$Horizontal>
           <$InputWrapper screen={screen}>
             <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -175,9 +199,16 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
                   justifyContent: 'flex-end',
                 }}
               >
-                <$InputTranslationHeavy>{`+$${calculateEquivalentUSDPriceDiff(
-                  props.basisPoints
-                )} Profit`}</$InputTranslationHeavy>
+                <$InputTranslationHeavy>
+                  <FormattedMessage
+                    id="createLootbox.stepChooseReturns.returnTarget.investorProfit"
+                    defaultMessage="+${investorProfit} Profit"
+                    description="This is the amount of money the user will need to accumulate to pay back investors in USD profit."
+                    values={{
+                      investorProfit: calculateEquivalentUSDPriceDiff(props.basisPoints)?.toString(),
+                    }}
+                  />
+                </$InputTranslationHeavy>
               </div>
             </div>
           </$InputWrapper>
@@ -206,7 +237,13 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
       } else if (!validPayback) {
         setErrors({
           ...errors,
-          paybackDate: 'Target payback date must be in the future',
+          paybackDate: (
+            <FormattedMessage
+              id="createLootbox.stepChooseReturns.paybackDateError"
+              defaultMessage="Target payback date must be in the future"
+              description="Error message when target payback date is in the past"
+            />
+          ),
         })
         props.setValidity(false)
       }
@@ -215,18 +252,33 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
       <$Horizontal alignItems="flex-end">
         <$BigIcon>⏳</$BigIcon>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-          <$Horizontal justifyContent="space-between" style={{ marginRight: '50px' }}>
+          <$Horizontal justifyContent="space-between" style={{ marginRight: screen === 'mobile' ? '0px' : '50px' }}>
             <$StepSubheading>
-              {`Payout in ${calculatePayoutDays(props.paybackDate)} Days`}
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.paybackPeriod.title"
+                defaultMessage="Payout in {payoutDays} Days"
+                description="Title for payback period step in Create lootbox"
+                values={{ payoutDays: calculatePayoutDays(props.paybackDate) }}
+              />
               <HelpIcon tipID="payoutDate" />
               <ReactTooltip id="payoutDate" place="right" effect="solid">
-                This is shown to investors as an end date they should expect to receive their profits. You can reward
-                investors any time, this payout date is just an estimate. Be honest and realistic with your estimate.
+                <FormattedMessage
+                  id="createLootbox.stepChooseReturns.paybackPeriod.tooltip"
+                  defaultMessage="This is shown to investors as an end date they should expect to receive their profits. You can reward investors any time, this payout date is just an estimate. Be honest and realistic with your estimate."
+                  description="Tooltip for users when they are selecting a payback period for their Lootbox"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$StepSubheading
               style={{ textAlign: 'right', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
-            >{`$${calculateEquivalentUSDPrice(props.basisPoints)} Total`}</$StepSubheading>
+            >
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.paybackPeriod.totalValue"
+                defaultMessage="${usdPrice} Total"
+                values={{ usdPrice: calculateEquivalentUSDPrice(props.basisPoints)?.toString() }}
+                description="This shows the user how much total value they must raise in USD."
+              />
+            </$StepSubheading>
           </$Horizontal>
           <$InputWrapper screen={screen}>
             <$Input
@@ -255,15 +307,26 @@ const StepChooseReturns = forwardRef((props: StepChooseReturnsProps, ref: React.
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>
-              4. How will your reward your investors?
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.title"
+                defaultMessage="4. How will your reward your investors?"
+                description="Title for the step in CreateLootbox where the user can determine how much they will reward their investors"
+              />
               <HelpIcon tipID="stepReturns" />
               <ReactTooltip id="stepReturns" place="right" effect="solid">
-                Treat your investors like your fans. The more you reward them, the more they will trust and support you.
+                <FormattedMessage
+                  id="createLootbox.stepChooseReturns.tooltip"
+                  defaultMessage="Treat your investors like your fans. The more you reward them, the more they will trust and support you."
+                  description="Tooltip for users when they are selecting a payback period for their Lootbox"
+                />
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Lootbox is not a loan. You decide when and how much you want to reward your investors. Good performance
-              improves your on-chain reputation, helping you fundraise more in the future.
+              <FormattedMessage
+                id="createLootbox.stepChooseReturns.subtitle"
+                defaultMessage="Lootbox is not a loan. You decide when and how much you want to reward your investors. Good performance improves your on-chain reputation, helping you fundraise more in the future."
+                description="Subtitle for the step in CreateLootbox where the user can determine how much they will reward their investors"
+              />
             </$StepSubheading>
             <br />
             <br />

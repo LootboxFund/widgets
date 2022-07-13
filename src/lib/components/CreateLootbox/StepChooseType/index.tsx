@@ -14,6 +14,7 @@ import { getUserBalanceOfNativeToken } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { Address } from '@wormgraph/helpers'
 import { InitialUrlParams } from '../state'
+import { FormattedMessage } from 'react-intl'
 
 export interface StepChooseTypeProps {
   stage: StepStage
@@ -31,27 +32,85 @@ export const LOOTBOX_TYPE_OPTIONS = [
     key: 'escrow' as LootboxType,
     emoji: '🎁',
     title: 'Escrow',
-    bio: 'Use this if you have a target amount to fundraise. You can only access the money if you hit your target goal.',
-    idealFor: 'Most Gamers, Guilds & Asset Purchases',
-    helpText: 'An Escrow Lootbox is best when you need a minimum amount of funds ready before you start playing.',
+    // <FormattedMessage
+    //   id="createLootbox.stepChooseType.escrow.title"
+    //   defaultMessage="Escrow"
+    //   description='"Escrow" Lootbox is a type of Lootbox. People cannot pay fundraisers until their funding goal is met.'
+    // />
+    bio: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.escrow.bio"
+        defaultMessage="Use this if you have a target amount to fundraise. You can only access the money if you hit your target goal."
+        description='This explains what an "Escrow" Lootbox is.'
+      />
+    ),
+    idealFor: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.escrow.idealFor"
+        defaultMessage="Most Gamers, Guilds & Asset Purchases."
+        description="This explains who can benefit the most from an Escrow Lootbox."
+      />
+    ),
+    helpText: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.escrow.helpText"
+        defaultMessage="An Escrow Lootbox is best when you need a minimum amount of funds ready before you start playing."
+        description="Shown to users who are confused about what an Escrow Lootbox is."
+      />
+    ),
   },
   {
     key: 'instant' as LootboxType,
     emoji: '🎉',
     title: 'Instant',
-    bio: 'Use this if you want to instantly get the money and continue fundraising while you play.',
-    idealFor: 'Streamers, Dungeon Crawls, Continous Spending',
-    helpText:
-      'An Instant Lootbox is best for when you do not know how much money you need, and the requirements may change as you play.',
+    bio: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.instant.bio"
+        defaultMessage="Use this if you want to instantly get the money and continue fundraising while you play."
+        description='This explains what an "Instant" Lootbox is.'
+      />
+    ),
+    idealFor: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.instant.idealFor"
+        defaultMessage="Streamers, Dungeon Crawls, Continous Spending"
+        description="This explains who can benefit the most from an Instant Lootbox."
+      />
+    ),
+
+    helpText: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.instant.helpText"
+        defaultMessage="An Instant Lootbox is best for when you do not know how much money you need, and the requirements may change as you play."
+        description="Shown to users who are confused about what an Instant Lootbox is."
+      />
+    ),
   },
   {
     key: 'tournament' as LootboxType,
     emoji: '⚔️',
     title: 'Tournament',
-    bio: 'Use this if you want to participate in an ESports Tournament with a set buy-in. Acts like Escrow.',
-    idealFor: 'Casual & Competitive ESports',
-    helpText:
-      'ESports Tournaments have set buy-in price, such as $10 per player. Use a Tournament Lootbox to fundraise your buy-in and share profits with your sponsors.',
+    bio: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.tournament.bio"
+        defaultMessage="Use this if you want to participate in an ESports Tournament with a set buy-in. Acts like Escrow."
+        description='This explains what a "Tournament" Lootbox is. It is actually under the hood the same as an escrow Lootbox.'
+      />
+    ),
+    idealFor: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.tournament.idealFor"
+        defaultMessage="Casual & Competitive ESports"
+        description="This explains who can benefit the most from a Tournament Lootbox."
+      />
+    ),
+    helpText: (
+      <FormattedMessage
+        id="createLootbox.stepChooseType.tournament.helpText"
+        defaultMessage="ESports Tournaments have set buy-in price, such as $10 per player. Use a Tournament Lootbox to fundraise your buy-in and share profits with your sponsors."
+        description="Help text for users who are confused about Tournament Lootbox"
+      />
+    ),
   },
 ]
 
@@ -108,18 +167,31 @@ const StepChooseType = forwardRef((props: StepChooseTypeProps, ref: React.RefObj
         <$Wrapper screen={screen}>
           <$Vertical flex={1}>
             <$StepHeading>
-              2. Choose Lootbox Type
+              <FormattedMessage
+                id="create.lootbox.step.type.heading"
+                defaultMessage="2. Choose Lootbox Type"
+                description="Header for the step to choose the lootbox type when creating a Lootbox"
+              />
               <HelpIcon tipID="stepNetwork" />
               <ReactTooltip id="stepNetwork" place="right" effect="solid">
-                Choose a Lootbox type based on your use case. Read the descriptions of each type to find which is right
-                for you.
+                <FormattedMessage
+                  id="create.lootbox.step.type.heading.help"
+                  defaultMessage="Choose a Lootbox type based on your use case. Read the descriptions of each type to find which is right for you."
+                  description="Help message for users when creating a Lootbox at the second step"
+                />
               </ReactTooltip>
             </$StepHeading>
-            <$StepSubheading>Use the default option “Escrow” if you don’t know which to pick.</$StepSubheading>
+            <$StepSubheading>
+              <FormattedMessage
+                id="create.lootbox.step.type.subheading"
+                defaultMessage="Use the default option “Escrow” if you don’t know which to pick."
+                description="Help message for users when creating a Lootbox at the second step"
+              />
+            </$StepSubheading>
             <br />
             {renderTypeOptions()}
           </$Vertical>
-          <$Vertical flex={1} style={{ justifyContent: 'flex-end' }}>
+          <$Vertical flex={1} style={{ justifyContent: 'center' }}>
             <div
               style={
                 isMobile

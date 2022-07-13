@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Horizontal, $Container, $Vertical } from '../Generics'
 import { $SocialGridInputs, $SocialLogo, $InputMedium } from '../CreateLootbox/StepSocials'
-import { SOCIALS } from 'lib/hooks/constants'
+import { getSocials } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { useIntl } from 'react-intl'
 
 interface SocialsProps {
   lootbox: ContractAddress | undefined
@@ -17,6 +18,8 @@ interface SocialsState {
 }
 
 const Socials = ({ lootbox }: SocialsProps) => {
+  const intl = useIntl()
+  const SOCIALS = getSocials(intl)
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [basisPointsReturnTarget, setBasisPointsReturnTarget] = useState('0')

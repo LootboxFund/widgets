@@ -3,6 +3,7 @@ import { truncateAddress } from 'lib/api/helpers'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import react from 'react'
+import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 
@@ -18,7 +19,15 @@ const NetworkText = (props: NetworkTextProps) => {
   }
   return (
     <$NetworkText style={{ flex: 2 }}>
-      <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+      <b>
+        <FormattedMessage
+          id="networktext.title"
+          defaultMessage="Network"
+          description='"Network" meaning the blockchain network the user is connected to'
+        />
+        {':'}
+      </b>{' '}
+      {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
         onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
         style={{ cursor: 'pointer' }}

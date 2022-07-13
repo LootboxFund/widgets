@@ -16,6 +16,8 @@ import ReactTooltip from 'react-tooltip'
 import { ethers as ethersObj } from 'ethers'
 import { defaultFundraisingLimitMultiplier, defaultFundraisingLimitMultiplierDecimal } from '../index'
 import { InitialUrlParams } from '../state'
+import { FormattedMessage } from 'react-intl'
+import React from 'react'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
   const web3Utils = useWeb3Utils()
@@ -44,7 +46,11 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const { screen } = useWindowSize()
-  const initialErrors = {
+  const initialErrors: {
+    fundraisingTarget: string | React.ReactElement
+    fundraisingLimit: string | React.ReactElement
+    receivingWallet: string | React.ReactElement
+  } = {
     fundraisingTarget: '',
     fundraisingLimit: '',
     receivingWallet: '',
@@ -99,7 +105,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       } else {
         setErrors({
           ...errors,
-          fundraisingTarget: 'Fundraising target must be greater than zero',
+          fundraisingTarget: (
+            <FormattedMessage
+              id="createLootbox.stepChooseFunding.invalidFundraisingTarget"
+              defaultMessage="Fundraising target must be greater than zero"
+              description="Validation failure in creating lootbox. Fundraising target must be greater than zero."
+            />
+          ),
         })
         props.setValidity(false)
       }
@@ -110,20 +122,37 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
         <$StepSubheading>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
             <div>
-              Target Fundraising Amount
+              <FormattedMessage
+                id="createLootbox.stepChooseFunding.fundraisingTarget.title"
+                defaultMessage="Target Fundraising Amount"
+                description="Title for input field where user can input their fundraising target (i.e. 10 ETH)"
+              />
               <HelpIcon tipID="fundraisingTarget" />
               <ReactTooltip id="fundraisingTarget" place="right" effect="solid">
-                We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in
-                the value of the native token. You will receive the money right away, regardless of whether you hit your
-                fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your
-                fundraising target.
+                <FormattedMessage
+                  id="createLootbox.stepChooseFunding.fundraisingTarget.tooltip"
+                  defaultMessage="We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the value of the native token. You will receive the money right away, regardless of whether you hit your fundraising target."
+                  description="Tooltip for input field where user can input their fundraising target"
+                />
               </ReactTooltip>
             </div>
             <span
               onClick={() => setShowMaxInput(!showMaxInput)}
               style={{ cursor: 'pointer', textDecoration: 'underline' }}
             >
-              {showMaxInput ? `Hide` : `Show`} Max Limit
+              {showMaxInput ? (
+                <FormattedMessage
+                  id="createLootbox.stepChooseFunding.fundraisingTarget.hideMax"
+                  defaultMessage="Hide Max Limit"
+                  description="Toggle for user to hide a field for Max Limit of Lootbox"
+                />
+              ) : (
+                <FormattedMessage
+                  id="createLootbox.stepChooseFunding.fundraisingTarget.showMax"
+                  defaultMessage="Show Max Limit"
+                  description="Toggle for user to show a field for Max Limit of Lootbox"
+                />
+              )}
             </span>
           </div>
         </$StepSubheading>
@@ -196,13 +225,20 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       <$Vertical>
         {ref && <div ref={ref}></div>}
         <$StepSubheading>
-          Max Fundraising Limit
+          <FormattedMessage
+            id="createLootbox.stepChooseFunding.maxFundraisingLimit.title"
+            defaultMessage="Max Fundraising Limit"
+            description="Title for input field where user can input their maximum fundraising limit (i.e. 11 ETH)"
+          />
           <HelpIcon tipID="fundraisingLimit" />
           <ReactTooltip id="fundraisingLimit" place="right" effect="solid">
-            We recommend you set a fundraising target slightly higher than what you need in case of fluctuations in the
-            value of the native token. You will receive the money right away, regardless of whether you hit your
-            fundraising target. The maximum amount of money your Lootbox will be able to raise is 1.1x your fundraising
-            target.
+            <FormattedMessage
+              id="createLootbox.stepChooseFunding.maxFundraisingLimit.tooltip"
+              defaultMessage="We recommend you set a maximum fundraising target slightly higher than what you need in case of fluctuations in the
+              value of the native token. You will receive the money right away, regardless of whether you hit your
+              fundraising target."
+              description="Tooltip for input field where user can input their maximum fundraising limit"
+            />
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -265,11 +301,26 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     return (
       <$Vertical>
         <$StepSubheading>
-          {props.type === 'tournament' ? `Tournament Wallet` : `Receiving Wallet`}
+          {props.type === 'tournament' ? (
+            <FormattedMessage
+              id="create.lootbox.step.fundraising.tournamentWallet"
+              defaultMessage="Tournament Wallet"
+              description="Input form title for the receiving wallet in tournament, which is called 'Tournament' wallet."
+            />
+          ) : (
+            <FormattedMessage
+              id="create.lootbox.step.fundraising.receivingWallet"
+              defaultMessage="Receiving Wallet"
+              description="Input form title for the receiving wallet, which is called 'Receiving' wallet."
+            />
+          )}
           <HelpIcon tipID="receivingWallet" />
           <ReactTooltip id="receivingWallet" place="right" effect="solid">
-            This address will receive the money right away. We highly recommend you use a MultiSig wallet if you are a
-            team. Our YouTube channel has tutorials on how to set up a MultiSig.
+            <FormattedMessage
+              id="create.lootbox.step.fundraising.receivingWallet.tooltip"
+              defaultMessage="This address will receive the money right away. We highly recommend you use a MultiSig wallet if you are a team. Our YouTube channel has tutorials on how to set up a MultiSig."
+              description="Tooltip for input field where user can input their receiving/tournament wallet"
+            />
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -296,16 +347,27 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
         <$Horizontal flex={1}>
           <$Vertical flex={3}>
             <$StepHeading>
-              3. How much money do you need?
+              <FormattedMessage
+                id="create.lootbox.step.funding.helpText"
+                defaultMessage="3. How much money do you need?"
+                description="Header for step 3: How much money do you need? (Step in creating a Lootbox)"
+              />
+
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
-                We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching
-                videos on our YouTube channel teaching best practices on how to fundraise.
+                <FormattedMessage
+                  id="create.lootbox.step.funding.helpText"
+                  defaultMessage="We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching videos on our YouTube channel teaching best practices on how to fundraise."
+                  description="Help text for step 3: how much money do you need?"
+                />
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              We recommend you start with a small amount that is easy to deliver a profit on. You can make unlimited
-              Lootboxes for anything you want.
+              <FormattedMessage
+                id="create.lootbox.step.funding.subheading"
+                defaultMessage="We recommend you start with a small amount that is easy to deliver a profit on. You can make unlimited Lootboxes for anything you want."
+                description="Extra help message for users regarding step 3"
+              />
             </$StepSubheading>
             <br />
             <br />

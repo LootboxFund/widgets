@@ -6,6 +6,7 @@ import { $CardViewport } from '../Generics'
 import Web3 from 'web3'
 import { onLoad } from './'
 import { ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
 
 export default {
   title: 'InteractWithLootbox',
@@ -27,7 +28,9 @@ const Template = () => {
 
   return (
     <$CardViewport margin="0 auto" width="100%" height="550px" maxWidth="940px">
-      <InteractWithLootbox />
+      <LocalizationWrapper>
+        <InteractWithLootbox />
+      </LocalizationWrapper>
     </$CardViewport>
   )
 }

@@ -10,6 +10,8 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
 import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex, ChainIDHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from '../WalletButton/constants'
 
 export interface WalletStatusProps {
   targetNetwork?: ChainIDHex
@@ -18,6 +20,8 @@ const WalletStatus = (props: WalletStatusProps) => {
   const snapUserState = useSnapshot(userState)
   const [provider] = useProvider()
   const { screen } = useWindowSize()
+  const intl = useIntl()
+  const words = getWords(intl)
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
 
@@ -56,8 +60,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           }
         }
       }
-      
-      
+
       setStatus('success')
     } else {
       setStatus('error')
@@ -83,7 +86,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Loading...
+        {words.loading}
       </$Button>
     )
   } else if (status === 'success') {
@@ -100,7 +103,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Connected
+        {words.connected}
       </$Button>
     )
   } else if (status === 'error') {
@@ -117,7 +120,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1rem',
         }}
       >
-        Please install MetaMask
+        {words.metamask}
       </$Button>
     )
   } else if (status === 'network') {
@@ -139,7 +142,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Connect Wallet
+        {words.connect}
       </$Button>
     </div>
   )
