@@ -19,19 +19,23 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import MyTournaments from './MyTournaments'
 import { initLogging } from 'lib/api/logrocket'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 const Profile = () => {
   const { user, logout } = useAuth()
   const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_PROFILE)
   const { screen } = useWindowSize()
+  const words = useWords()
+
   const pseudoUserName = user?.email?.split('@')[0] || 'Human'
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
-    return <Oopsies title="An error occured" message={error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <Oopsies title="An error occured" message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
   }
 
   const dividerWidth = screen === 'mobile' ? '100%' : '320px'
@@ -39,7 +43,13 @@ const Profile = () => {
   return (
     <$Vertical spacing={5}>
       <$Vertical>
-        <$h1 textAlign="center">Welcome, {pseudoUserName}</$h1>
+        <$h1 textAlign="center">
+          <FormattedMessage
+            id="profile.welcomeUserMessage"
+            defaultMessage="Welcome, {userName}"
+            values={{ userName: pseudoUserName }}
+          />
+        </$h1>
         {user && (
           <$Vertical>
             <$Divider width={dividerWidth} margin="20px auto 20px" />
@@ -53,9 +63,10 @@ const Profile = () => {
                     textDecoration: 'none',
                     fontStyle: 'normal',
                     fontFamily: TYPOGRAPHY.fontFamily.regular,
+                    textTransform: 'lowercase',
                   }}
                 >
-                  logout
+                  {words.logout}
                 </$Link>
               </$p>
             </$Horizontal>

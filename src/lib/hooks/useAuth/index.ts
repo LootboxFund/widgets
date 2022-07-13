@@ -215,7 +215,7 @@ export const useAuth = () => {
     }
 
     // This will throw if the passwords are not valid
-    throwInvalidPasswords({ password, passwordConfirmation })
+    throwInvalidPasswords(intl, { password, passwordConfirmation })
 
     const { data } = await signUpWithPasswordMutation({
       variables: {

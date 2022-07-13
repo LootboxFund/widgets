@@ -140,6 +140,85 @@ const useWords = () => {
     description: 'Prompt to user to connect their MetaMask wallet to the website',
   })
 
+  const logout = intl.formatMessage({
+    id: 'generic.logout',
+    defaultMessage: 'Logout',
+    description: 'User action to logout of our website',
+  })
+
+  const address = intl.formatMessage({
+    id: 'generic.address',
+    defaultMessage: 'Address',
+    description:
+      'This is a blockchain address, usually a Metamask wallet address. (i.e. user has 0x1234567890123456789012345678901234567890 address)',
+  })
+
+  const remove = intl.formatMessage({
+    id: 'generic.remove',
+    defaultMessage: 'Remove',
+    description: 'Generic user action to remove something',
+  })
+
+  const wallets = intl.formatMessage({
+    id: 'generic.wallets',
+    defaultMessage: 'Wallets',
+    description: 'A wallet is a cryptocurrency wallet, similar to an "address"',
+  })
+
+  const search = intl.formatMessage({
+    id: 'generic.search',
+    defaultMessage: 'Search',
+    description: 'Generic user action to search for something',
+  })
+
+  const addWallet = intl.formatMessage({
+    id: 'generic.addWallet',
+    defaultMessage: 'Add wallet',
+    description: 'Generic user action to add a crypto wallet to our website. This is done by connecting metamask.',
+  })
+
+  const areYouSure = intl.formatMessage({
+    id: 'generic.areYouSure',
+    defaultMessage: 'Are you sure?',
+    description: 'Generic user action to confirm something',
+  })
+
+  const yes = intl.formatMessage({
+    id: 'generic.yes',
+    defaultMessage: 'Yes',
+    description: 'Indicating "yes" or "ok" (positive)',
+  })
+
+  const no = intl.formatMessage({
+    id: 'generic.no',
+    defaultMessage: 'No',
+    description: 'Indicating "no" or "cancel" (negative)',
+  })
+
+  const edit = intl.formatMessage({
+    id: 'generic.edit',
+    defaultMessage: 'Edit',
+    description: 'Generic user action to edit something',
+  })
+
+  const view = intl.formatMessage({
+    id: 'generic.view',
+    defaultMessage: 'View',
+    description: 'Generic user action to view something',
+  })
+
+  const searchLootboxesByNameOrAddress = intl.formatMessage({
+    id: 'generic.searchLootboxesByNameOrAddress',
+    defaultMessage: 'Search Lootboxes by Name or Address',
+    description: 'Generic user action to search for Lootboxes by name or the smart contract address.',
+  })
+
+  const createALootbox = intl.formatMessage({
+    id: 'generic.createALootbox',
+    defaultMessage: 'Create a Lootbox',
+    description: 'User action to create a Lootbox',
+  })
+
   return {
     cancel,
     back,
@@ -164,6 +243,19 @@ const useWords = () => {
     resetPassword,
     connected,
     connectWallet,
+    logout,
+    address,
+    remove,
+    wallets,
+    search,
+    addWallet,
+    areYouSure,
+    yes,
+    no,
+    edit,
+    view,
+    searchLootboxesByNameOrAddress,
+    createALootbox,
   }
 }
 

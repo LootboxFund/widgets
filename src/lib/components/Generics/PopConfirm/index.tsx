@@ -1,4 +1,5 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import useWords from 'lib/hooks/useWords'
 import LogRocket from 'logrocket'
 import { useState } from 'react'
 import styled from 'styled-components'
@@ -13,6 +14,7 @@ interface PopConfirmProps {
 export const PopConfirm = ({ children, onOk, ...rest }: PopConfirmProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [loading, setLoading] = useState(false)
+  const words = useWords()
 
   const toggleVisibility = () => {
     setIsVisible(!isVisible)
@@ -33,12 +35,12 @@ export const PopConfirm = ({ children, onOk, ...rest }: PopConfirmProps) => {
   const ConfirmModal = () => {
     return (
       <$ConfirmModalContainer>
-        <$span bold>Are you sure?</$span>
+        <$span bold>{words.areYouSure}</$span>
         <br />
         <$Horizontal spacing={2}>
-          <$NoButton>No</$NoButton>
+          <$NoButton>{words.no}</$NoButton>
           <$YesButton disabled={loading} onClick={handleOk}>
-            Yes
+            {words.yes}
           </$YesButton>
         </$Horizontal>
       </$ConfirmModalContainer>

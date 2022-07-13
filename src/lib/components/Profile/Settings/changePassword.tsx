@@ -9,6 +9,8 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { throwInvalidPasswords } from 'lib/utils/password'
 import { EmailAuthProvider } from 'firebase/auth'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface ChangePasswordProps {
   /**
@@ -25,6 +27,26 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const intl = useIntl()
+  const words = useWords()
+
+  const notSignedInMessage = intl.formatMessage({
+    id: 'profile.settings.notSignedInMessage',
+    defaultMessage: 'You are not signed in!',
+    description: 'Error message shown to user when they are not signed in',
+  })
+
+  const noEmailFoundForUser = intl.formatMessage({
+    id: 'profile.settings.noEmailFoundForUser',
+    defaultMessage: 'No email found for this user',
+    description: 'Error message shown to user when they do not have an email address',
+  })
+
+  const savePassword = intl.formatMessage({
+    id: 'profile.settings.savePassword',
+    defaultMessage: 'Save password',
+    description: 'Button to save the password',
+  })
 
   const parsePassword = (inputPassword: string) => {
     setPassword(inputPassword)
@@ -37,14 +59,14 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
   const handlePasswordChangeRequest = async () => {
     try {
       if (!auth.currentUser) {
-        throw new Error('You are not signed in!')
+        throw new Error(notSignedInMessage)
       }
       if (!auth.currentUser?.email) {
-        throw new Error('No email found for this user')
+        throw new Error(noEmailFoundForUser)
       }
-      throwInvalidPasswords({ password, passwordConfirmation })
+      throwInvalidPasswords(intl, { password, passwordConfirmation })
     } catch (err) {
-      setErrorMessage(err?.message || 'An error occured. Please try again later.')
+      setErrorMessage(err?.message || `${words.anErrorOccured}. ${words.pleaseTryAgainLater}.`)
       return
     }
 
@@ -56,7 +78,7 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
         onSuccessCallback && onSuccessCallback()
         setErrorMessage('')
       } catch (err) {
-        setErrorMessage(err?.message || 'An error occured. Please try again later.')
+        setErrorMessage(err?.message || `${words.anErrorOccured}. ${words.pleaseTryAgainLater}.`)
       } finally {
         setLoading(false)
         return
@@ -66,11 +88,17 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
 
   return (
     <$Vertical spacing={3}>
-      <$h3 style={{ fontSize: TYPOGRAPHY.fontSize.large }}>Add a Password</$h3>
+      <$h3 style={{ fontSize: TYPOGRAPHY.fontSize.large }}>
+        <FormattedMessage
+          id="profile.settings.changePassword.title"
+          defaultMessage="Add a Password"
+          description="Title for the page that allows a user to add a password"
+        />
+      </$h3>
       <$InputMedium
         onChange={(e) => parsePassword(e.target.value)}
         value={password}
-        placeholder="password"
+        placeholder={words.password}
         type="password"
         style={{
           boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
@@ -79,7 +107,7 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
       <$InputMedium
         onChange={(e) => parsePasswordConfirmation(e.target.value)}
         value={passwordConfirmation}
-        placeholder="confirm password"
+        placeholder={words.confirmPassword}
         type="password"
         style={{
           boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
@@ -99,7 +127,7 @@ const ChangePassword = ({ mode, onSuccessCallback }: ChangePasswordProps) => {
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="Save password" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text={savePassword} color={COLORS.trustFontColor} />
         </$Button>
       </div>
 

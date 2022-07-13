@@ -10,12 +10,16 @@ import { auth } from 'lib/api/firebase/app'
 import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from 'firebase/auth'
 import LogRocket from 'logrocket'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 const SettingsComponent = () => {
   const { user } = useAuth()
   const { screen } = useWindowSize()
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false)
   const [passwordResetFormVisible, setPasswordResetFormVisible] = useState(false)
+  const intl = useIntl()
+  const words = useWords()
 
   const [passwordResetStatus, setPasswordResetStatus] = useState<'loading' | 'email-sent' | 'error' | 'pending'>(
     'pending'
@@ -60,9 +64,27 @@ const SettingsComponent = () => {
     setNewPasswordStatus('success')
   }
 
+  const passwordNotSetText = intl.formatMessage({
+    id: 'profile.settings.passwordNotSet',
+    defaultMessage: 'Password not set!',
+    description: 'Message displayed when the user does not have a password.',
+  })
+
+  const newPasswordText = intl.formatMessage({
+    id: 'profile.settings.newPassword',
+    defaultMessage: 'New password',
+    description: 'Message displayed when the user clicks to make a new password.',
+  })
+
   return (
     <$Vertical spacing={4}>
-      <$h1>Account Settings</$h1>
+      <$h1>
+        <FormattedMessage
+          id="profile.settings.title"
+          defaultMessage="Account Settings"
+          description="Title for the account settings page. Here users can change their password, email, etc."
+        />
+      </$h1>
       <$SettingContainer disabled>
         <$Horizontal
           justifyContent="flex-start"
@@ -72,14 +94,14 @@ const SettingsComponent = () => {
           }}
         >
           <$span width="20%" lineHeight="40px">
-            Email
+            {words.email}
           </$span>
           <$span width="80%" lineHeight="40px">
             {user?.email ? (
               <$span>{user?.email}</$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
-                Password not set!
+                {`${passwordNotSetText}!`}
               </$span>
             )}
           </$span>
@@ -94,14 +116,14 @@ const SettingsComponent = () => {
           }}
         >
           <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
-            Password
+            {words.password}
           </$span>
           <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
             {isPasswordEnabled ? (
               <$span textAlign="start">******************</$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
-                Password not set ⛔️
+                {`${passwordNotSetText} ⛔️`}
               </$span>
             )}
           </$span>
@@ -112,28 +134,44 @@ const SettingsComponent = () => {
           >
             {isPasswordEnabled ? (
               <$Link style={{ fontStyle: 'normal' }} onClick={sendPasswordReset}>
-                reset password?
+                {`${words.resetPassword.toLowerCase()}?`}
               </$Link>
             ) : (
-              <$Link style={{ fontStyle: 'normal' }} onClick={handleNewPassword}>
-                {passwordResetFormVisible ? '👇 close' : 'new password'}
+              <$Link style={{ fontStyle: 'normal', textTransform: 'lowercase' }} onClick={handleNewPassword}>
+                {passwordResetFormVisible ? `👇 ${words.hide}` : newPasswordText}
               </$Link>
             )}
           </$span>
         </$Horizontal>
       </$SettingContainer>
       {passwordResetStatus === 'email-sent' && (
-        <$span textAlign="end">✅ A password reset email was sent to your email.</$span>
+        <$span textAlign="end">
+          ✅{' '}
+          <FormattedMessage
+            id="profile.settings.passwordResetEmailSent"
+            defaultMessage="A password reset email was sent to your email."
+            description="Message displayed when the user clicks to make a new password."
+          />
+        </$span>
       )}
       {passwordResetStatus === 'error' && (
         <$span color={COLORS.dangerFontColor} textAlign="end">
-          An error occured sending a password reset email. Please try again later.
+          {words.anErrorOccured}. {words.pleaseTryAgainLater}.
         </$span>
       )}
       {passwordResetFormVisible && (
         <ChangePassword mode={'create-password'} onSuccessCallback={passwordResetFormSuccessCallback} />
       )}
-      {newPasswordStatus === 'success' && <$span textAlign="end">✅ Password was added to your account.</$span>}
+      {newPasswordStatus === 'success' && (
+        <$span textAlign="end">
+          ✅{' '}
+          <FormattedMessage
+            id="profile.settings.newPasswordSuccess"
+            defaultMessage="Password was added to your account."
+            description="Message displayed after a user successfully makes a new password."
+          />
+        </$span>
+      )}
     </$Vertical>
   )
 }
