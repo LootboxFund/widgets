@@ -1,6 +1,7 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
+import { getWords } from 'lib/api/words'
 import { $ErrorMessage, $h1, $span, $Vertical } from 'lib/components/Generics'
 import $Button from 'lib/components/Generics/Button'
 import { Oopsies } from 'lib/components/Profile/common'
@@ -8,6 +9,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseAuthError } from 'lib/utils/firebase'
 import LogRocket from 'logrocket'
 import { useState } from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 import { $InputMedium, ModeOptions } from '../Shared'
 
 interface ResetPasswordProps {
@@ -17,6 +19,8 @@ const ResetPassword = (props: ResetPasswordProps) => {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'loading' | 'error' | 'success' | 'pending'>('pending')
   const { screen } = useWindowSize()
+  const intl = useIntl()
+  const words = getWords(intl)
 
   const parseEmail = (email: string) => {
     setEmail(email)
@@ -40,8 +44,8 @@ const ResetPassword = (props: ResetPasswordProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$h1>Reset Password</$h1>
-      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email" />
+      <$h1 style={{ textTransform: 'capitalize' }}>{words.resetPassword}</$h1>
+      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder={words.email} />
       <$Button
         screen={screen}
         onClick={handlePasswordResetRequest}
@@ -55,16 +59,27 @@ const ResetPassword = (props: ResetPasswordProps) => {
         }}
         disabled={status === 'loading'}
       >
-        Send password reset email
+        <FormattedMessage
+          id="auth.resetPassword.button"
+          defaultMessage="Send password reset email"
+          description="Button text where a user clicks to reset their password. This will send an email to them with a password reset link."
+        />
       </$Button>
       {status === 'error' ? (
-        <$ErrorMessage>{parseAuthError('An error occured! Please try again later.')}</$ErrorMessage>
+        <$ErrorMessage>{parseAuthError(intl, 'An error occured! Please try again later.')}</$ErrorMessage>
       ) : null}
       {status === 'success' ? (
-        <$span>✅ A password reset email was sent to your email! Check your spam folder.</$span>
+        <$span>
+          ✅{' '}
+          <FormattedMessage
+            id="auth.resetPassword.emailSuccess"
+            defaultMessage="A password reset email was sent to your email! Check your spam folder."
+            description="Message displayed when a user successfully gets a password reset email in their inbox."
+          />
+        </$span>
       ) : null}
       <$span onClick={navBack} style={{ cursor: 'pointer' }}>
-        👈 Go back
+        👈 {words.back}
       </$span>
     </$Vertical>
   )

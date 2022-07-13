@@ -12,6 +12,8 @@ import { useState } from 'react'
 import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
+import { getWords } from 'lib/api/words'
+import { useIntl } from 'react-intl'
 
 interface SignUpWalletProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -23,6 +25,14 @@ const SignupWallet = (props: SignUpWalletProps) => {
   const userStateSnapshot = useSnapshot(userState)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const intl = useIntl()
+  const words = getWords(intl)
+
+  const walletSignUpText = intl.formatMessage({
+    id: 'auth.signup.wallet.text',
+    defaultMessage: 'Wallet Sign Up',
+    description: 'Button text where a user clicks to sign up using their Metamask wallet',
+  })
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
 
@@ -37,7 +47,7 @@ const SignupWallet = (props: SignUpWalletProps) => {
       setErrorMessage('')
       props.onChangeMode('login-wallet')
     } catch (err) {
-      setErrorMessage(err?.message || 'An error occured!')
+      setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     } finally {
       setLoading(false)
@@ -45,8 +55,8 @@ const SignupWallet = (props: SignUpWalletProps) => {
   }
   return (
     <$Vertical spacing={4}>
-      <$Header>Register</$Header>
-      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email" />
+      <$Header>{words.register}</$Header>
+      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder={words.email} />
       {!isWalletConnected ? <WalletButton /> : null}
       {isWalletConnected ? (
         <$Button
@@ -62,11 +72,11 @@ const SignupWallet = (props: SignUpWalletProps) => {
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="Wallet Sign Up" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text={walletSignUpText} color={COLORS.trustFontColor} />
         </$Button>
       ) : null}
 
-      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }

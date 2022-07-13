@@ -12,6 +12,8 @@ import { parseAuthError } from 'lib/utils/firebase'
 import { auth } from 'lib/api/firebase/app'
 import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
 import { $Link } from 'lib/components/Profile/common'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 interface LoginEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -29,6 +31,8 @@ const LoginEmail = (props: LoginEmailProps) => {
     | 'session'
     | 'local'
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
+  const intl = useIntl()
+  const words = getWords(intl)
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)
@@ -45,7 +49,7 @@ const LoginEmail = (props: LoginEmailProps) => {
       setErrorMessage('')
       props.onSignupSuccess && props.onSignupSuccess()
     } catch (err) {
-      setErrorMessage(err?.message || 'An error occured!')
+      setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     } finally {
       setLoading(false)
@@ -68,13 +72,17 @@ const LoginEmail = (props: LoginEmailProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$Header>{props.title || 'Login'}</$Header>
+      <$Header>{props.title || words.login}</$Header>
       <$Vertical spacing={4}>
-        <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email"></$InputMedium>
+        <$InputMedium
+          onChange={(e) => parseEmail(e.target.value)}
+          value={email}
+          placeholder={words.email}
+        ></$InputMedium>
         <$InputMedium
           onChange={(e) => parsePassword(e.target.value)}
           value={password}
-          placeholder="password"
+          placeholder={words.password}
           type="password"
         ></$InputMedium>
         <$Button
@@ -90,24 +98,28 @@ const LoginEmail = (props: LoginEmailProps) => {
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="Login" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text={words.login} color={COLORS.trustFontColor} />
         </$Button>
       </$Vertical>
       <$Horizontal spacing={2} flexWrap justifyContent="space-between">
         <$span textAlign="start" style={{ display: 'flex', alignItems: 'center' }}>
           <$Checkbox type="checkbox" checked={persistenceChecked} onChange={clickRememberMe} />
-          <$span style={{ verticalAlign: 'middle', display: 'inline-block' }}> Remember me</$span>
+          <$span style={{ verticalAlign: 'middle', display: 'inline-block' }}> {words.rememberMe}</$span>
         </$span>
 
         <$Link
           style={{ fontStyle: 'normal', display: 'flex', alignItems: 'center' }}
           onClick={() => props.onChangeMode('forgot-password')}
         >
-          Forgot password?
+          <FormattedMessage
+            id="auth.login.forgotPassword"
+            defaultMessage="Forgot password?"
+            description="Allows the user to reset their password"
+          />
         </$Link>
       </$Horizontal>
 
-      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }

@@ -15,6 +15,8 @@ import { parseAuthError } from 'lib/utils/firebase'
 import { truncateAddress } from 'lib/api/helpers'
 import { auth } from 'lib/api/firebase/app'
 import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
+import { useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 interface LoginWalletProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -22,6 +24,7 @@ interface LoginWalletProps {
   title?: string
 }
 const LoginWallet = (props: LoginWalletProps) => {
+  const intl = useIntl()
   const { signInWithWallet } = useAuth()
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
@@ -31,6 +34,7 @@ const LoginWallet = (props: LoginWalletProps) => {
     | 'session'
     | 'local'
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
+  const words = getWords(intl)
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
 
@@ -62,9 +66,15 @@ const LoginWallet = (props: LoginWalletProps) => {
     }
   }
 
+  const loginWithWallet = intl.formatMessage({
+    id: 'auth.method.loginWithWallet',
+    defaultMessage: 'Login with Wallet',
+    description: 'Button text for user to login using their MetaMask wallet instead of their email and password',
+  })
+
   return (
     <$Vertical spacing={4}>
-      <$Header>{props.title || 'Login'}</$Header>
+      <$Header>{props.title || words.login}</$Header>
       {!isWalletConnected ? <WalletButton /> : null}
       {isWalletConnected ? (
         <$Vertical spacing={2}>
@@ -81,15 +91,17 @@ const LoginWallet = (props: LoginWalletProps) => {
             }}
             disabled={loading}
           >
-            <LoadingText loading={loading} text="Login with Wallet" color={COLORS.trustFontColor} />
+            <LoadingText loading={loading} text={loginWithWallet} color={COLORS.trustFontColor} />
           </$Button>
-          {/* <$span textAlign="center">{truncateAddress(userStateSnapshot.currentAccount)}</$span> */}
         </$Vertical>
       ) : null}
       <$Horizontal spacing={2} flexWrap justifyContent="space-between">
         <$span textAlign="start">
           <$Checkbox type="checkbox" checked={persistenceChecked} onChange={clickRememberMe} />
-          <$span style={{ verticalAlign: 'middle', marginBottom: '10px', display: 'inline-block' }}> Remember me</$span>
+          <$span style={{ verticalAlign: 'middle', marginBottom: '10px', display: 'inline-block' }}>
+            {' '}
+            {words.rememberMe}
+          </$span>
         </$span>
         {isWalletConnected ? (
           <$span textAlign="end" style={{ display: 'inline-block', verticalAlign: 'middle', marginTop: '5px' }}>
@@ -97,7 +109,7 @@ const LoginWallet = (props: LoginWalletProps) => {
           </$span>
         ) : null}
       </$Horizontal>
-      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }

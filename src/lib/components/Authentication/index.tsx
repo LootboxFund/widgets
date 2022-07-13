@@ -11,6 +11,8 @@ import ResetPassword from './ResetPassword'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { initLogging } from 'lib/api/logrocket'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
@@ -21,6 +23,20 @@ interface AuthenticationProps {
 const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
   const { screen } = useWindowSize()
+  const intl = useIntl()
+  const words = getWords(intl)
+
+  const orUsePassword = intl.formatMessage({
+    id: 'auth.method.orUsePassword',
+    defaultMessage: 'Or use a password',
+    description: 'Hyperlink message to user allowing them to signin / signup with a password',
+  })
+
+  const orUseMetamaskWallet = intl.formatMessage({
+    id: 'auth.method.orUseMetamaskWallet',
+    defaultMessage: 'Or use your MetaMask wallet',
+    description: 'Hyperlink message to user allowing them to signin / signup with using their Metamask wallet',
+  })
 
   useEffect(() => {
     const load = async () => {
@@ -34,32 +50,41 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
     load()
   }, [])
 
-  const renderSwitchRouteText = () => {
+  const renderSwitchRouteText = (): React.ReactElement | null => {
     if (route === 'login-password' || route === 'login-wallet') {
       const destinationRoute = route === 'login-password' ? 'signup-password' : 'signup-wallet'
       return (
-        <$span>
-          Don't have an account? <$Link onClick={() => setRoute(destinationRoute)}>sign up</$Link>
-        </$span>
+        <FormattedMessage
+          id="auth.link.switchToSignup"
+          defaultMessage="Don't have an account? {signUpHyperlink}"
+          values={{
+            signUpHyperlink: <$Link onClick={() => setRoute(destinationRoute)}>{words.signUp}</$Link>,
+          }}
+          description="Message to user allowing them to switch to signup with nested hyperlink"
+        />
       )
     } else if (route === 'signup-password' || route === 'signup-wallet') {
       const destinationRoute = route === 'signup-password' ? 'login-password' : 'login-wallet'
       return (
-        <$span>
-          Already have an account? <$Link onClick={() => setRoute(destinationRoute)}>log in</$Link>
-        </$span>
+        <FormattedMessage
+          id="auth.link.switchToLogin"
+          defaultMessage="Already have an account? {loginHyperlink}"
+          values={{
+            loginHyperlink: <$Link onClick={() => setRoute(destinationRoute)}>{words.login}</$Link>,
+          }}
+        />
       )
     }
-    return ''
+    return null
   }
 
   const renderSwitchInnerRouteText = () => {
     if (route === 'login-password') {
-      return <$ChangeMode onClick={() => setRoute('login-wallet')}>Or use your wallet to sign in</$ChangeMode>
+      return <$ChangeMode onClick={() => setRoute('login-wallet')}>{orUseMetamaskWallet}</$ChangeMode>
     } else if (route === 'login-wallet') {
-      return <$ChangeMode onClick={() => setRoute('login-password')}>Or use a password</$ChangeMode>
+      return <$ChangeMode onClick={() => setRoute('login-password')}>{orUsePassword}</$ChangeMode>
     } else if (route === 'signup-password') {
-      return <$ChangeMode onClick={() => setRoute('signup-wallet')}>Or use your MetaMask wallet</$ChangeMode>
+      return <$ChangeMode onClick={() => setRoute('signup-wallet')}>{orUseMetamaskWallet}</$ChangeMode>
     } else if (route === 'signup-wallet') {
       return (
         <$ChangeMode
@@ -67,7 +92,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
             setRoute('signup-password')
           }}
         >
-          Or use a password
+          {orUsePassword}
         </$ChangeMode>
       )
     }

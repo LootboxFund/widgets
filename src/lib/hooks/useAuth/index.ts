@@ -34,6 +34,8 @@ import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'
 import { throwInvalidPasswords } from 'lib/utils/password'
+import { useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 interface FrontendUser {
   id: UserID
@@ -51,6 +53,7 @@ export const useAuth = () => {
    */
   const [user, setUser] = useState<FrontendUser | undefined | null>(undefined)
   const userStateSnapshot = useSnapshot(userState)
+  const intl = useIntl()
 
   const [signUpWithWalletMutation] = useMutation<
     { createUserWithWallet: CreateUserResponse },
@@ -71,6 +74,18 @@ export const useAuth = () => {
     CONNECT_WALLET,
     { refetchQueries: [{ query: GET_MY_WALLETS }] }
   )
+
+  const words = getWords(intl)
+  const emailIsRequiredText = intl.formatMessage({
+    id: 'auth.emailIsRequired',
+    defaultMessage: 'Email is required',
+    description: 'Error message when user tries to sign up without an email',
+  })
+  const passwordIsRequiredText = intl.formatMessage({
+    id: 'auth.passwordIsRequired',
+    defaultMessage: 'Password is required',
+    description: 'Error message when user tries to sign up without a password',
+  })
 
   const setAuthPersistence = () => {
     const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
@@ -107,7 +122,7 @@ export const useAuth = () => {
 
   const signUpWithWallet = async (email: string): Promise<void> => {
     if (!email) {
-      throw new Error('Email is required')
+      throw new Error(emailIsRequiredText)
     }
 
     const { signature, message } = await getSignature()
@@ -122,7 +137,7 @@ export const useAuth = () => {
     })
 
     if (!data) {
-      throw new Error('An error occured!')
+      throw new Error(words.anErrorOccured)
     } else if (data?.createUserWithWallet?.__typename === 'ResponseError') {
       throw new Error(data.createUserWithWallet.error.message)
     }
@@ -141,7 +156,7 @@ export const useAuth = () => {
     })
 
     if (!data) {
-      throw new Error('Server error')
+      throw new Error(words.anErrorOccured)
     } else if (data?.authenticateWallet.__typename === 'ResponseError') {
       throw data.authenticateWallet.error
     }
@@ -167,10 +182,10 @@ export const useAuth = () => {
 
   const signInWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
     if (!email) {
-      throw new Error('Email is required')
+      throw new Error(emailIsRequiredText)
     }
     if (!password) {
-      throw new Error('Password is required')
+      throw new Error(passwordIsRequiredText)
     }
 
     setAuthPersistence()
@@ -196,7 +211,7 @@ export const useAuth = () => {
     passwordConfirmation: string
   ): Promise<void> => {
     if (!email) {
-      throw new Error('Email is required')
+      throw new Error(emailIsRequiredText)
     }
 
     // This will throw if the passwords are not valid
@@ -211,7 +226,7 @@ export const useAuth = () => {
       },
     })
     if (!data) {
-      throw new Error('An error occured!')
+      throw new Error(words.anErrorOccured)
     } else if (data?.createUserWithPassword?.__typename === 'ResponseError') {
       throw new Error(data.createUserWithPassword.error.message)
     }
@@ -230,7 +245,7 @@ export const useAuth = () => {
     })
 
     if (!data) {
-      throw new Error('Server error')
+      throw new Error(words.anErrorOccured)
     } else if (data?.connectWallet.__typename === 'ResponseError') {
       throw data.connectWallet.error
     }
@@ -240,10 +255,10 @@ export const useAuth = () => {
     const { metamask } = await getProvider()
 
     if (!userStateSnapshot.currentAccount) {
-      throw new Error('Please connect your wallet with MetaMask')
+      throw new Error(words.connectWalletToMetamask)
     }
     if (!metamask) {
-      throw new Error(`Please install MetaMask`)
+      throw new Error(words.pleaseInstallMetamask)
     }
 
     const checksumAddress = ethers.utils.getAddress(userStateSnapshot.currentAccount as unknown as string)
