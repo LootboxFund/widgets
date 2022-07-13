@@ -11,6 +11,7 @@ import BuyShares from '../BuyShares/BuyShares'
 import $Button from '../Generics/Button'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { manifest } from '../../../manifest'
+import { FormattedMessage } from 'react-intl'
 
 const InteractWithLootbox = () => {
   const ref = useRef<HTMLDivElement | null>(null)
@@ -37,7 +38,11 @@ const InteractWithLootbox = () => {
         color={COLORS.surpressedFontColor}
         backgroundColor={COLORS.white}
       >
-        Manage Lootbox
+        <FormattedMessage
+          id="interactWithLootbox.manageLootbox.button"
+          defaultMessage="Manage Lootbox"
+          description='Button prompt leading to the "Manage" Lootbox page (AKA: "Edit" lootbox page)'
+        />
       </$ButtonLink>
     </$Vertical>
   )

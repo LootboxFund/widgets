@@ -7,12 +7,16 @@ import { useState } from 'react'
 import { $Button } from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from './helpers'
+import { useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 const InfoText = () => {
+  const intl = useIntl()
   const snap = useSnapshot(buySharesState)
   const { screen } = useWindowSize()
   const [isHidden, setIsHidden] = useState(true)
 
+  const words = getWords(intl)
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
   const quantityFMT = new BN(quantity).toFixed(2)
@@ -27,6 +31,60 @@ const InfoText = () => {
   const maxShares = snap.lootbox.data?.sharesSoldMax
     ? new BN(snap.lootbox.data?.sharesSoldMax).div(new BN(10).pow(snap.lootbox.data.shareDecimals || 18))
     : new BN(0)
+
+  const feeText = intl.formatMessage({
+    id: 'buyShares.feeText',
+    defaultMessage: 'fee',
+    description: 'Lootbox takes a fee from investments into a Lootbox. This is the fee.',
+  })
+
+  const percentage = percentageShares.decimalPlaces(2).toString()
+
+  const lootboxPercentageText = intl.formatMessage(
+    {
+      id: 'buyShares.lootboxPercentageText',
+      defaultMessage: '{percentage}% of all Lootbox dividends',
+      description: "The percentage of the Lootbox's earnings that can be redeemed from an NFT.",
+    },
+    {
+      percentage,
+    }
+  )
+
+  const maxSharesText = intl.formatMessage(
+    {
+      id: 'buyShares.maxSharesText',
+      defaultMessage: '{maxShares} Maximum Shares',
+      description: 'The maximum number of shares that can be sold in a Lootbox.',
+    },
+    {
+      maxShares: maxShares.toFixed(0),
+    }
+  )
+
+  const disclaimerText = intl.formatMessage(
+    {
+      id: 'buyShares.disclaimer',
+      defaultMessage: `* Lootbox takes a {feeText} of investments into a Lootbox. You are spending {tokenQuantityText} for {sharesText} of this Lootbox. You will also be charged a native gas fee for this transaction which Lootbox does not control or receive. The holder of this NFT is entitled to {lootboxPercentageText} deposited by the issuer. This is calculated as {sharesText} out of {maxSharesText} available. This {lootboxPercentageValue}% may be different, depending on the final amount of shares sold at the end of the Fundraising period. There is no guarantee of a return, consult your financial advisor before investing.`,
+      description: '',
+    },
+    {
+      feeText: <$Bold>3.2% {feeText}</$Bold>,
+      tokenQuantityText: (
+        <$Bold>
+          {quantityWithFeeFmt} {symbol || 'tokens'}
+        </$Bold>
+      ),
+      sharesText: (
+        <$Bold>
+          {quantityFMT} {words.shares}
+        </$Bold>
+      ),
+      lootboxPercentageText: <$Bold>{lootboxPercentageText}</$Bold>,
+      maxSharesText: <$Bold>{maxSharesText}</$Bold>,
+      lootboxPercentageValue: percentage,
+    }
+  )
 
   return (
     <$InfoTextContainer>
@@ -48,14 +106,17 @@ const InfoText = () => {
               fontStyle: 'italic',
               width: '100%',
               background: 'transparent',
+              textTransform: 'capitalize',
             }}
           >
-            Read More
+            {words.readMore}
           </$Button>
         ) : undefined}
       </$HideTings>
       <$Text>
-        * Lootbox takes a <$Bold>3.2% fee</$Bold> of investments into a Lootbox. You are spending{' '}
+        {disclaimerText}
+
+        {/* * Lootbox takes a <$Bold>3.2% fee</$Bold> of investments into a Lootbox. You are spending{' '}
         <$Bold>
           {quantityWithFeeFmt} {symbol || 'tokens'}
         </$Bold>{' '}
@@ -66,7 +127,8 @@ const InfoText = () => {
         <$Bold>{maxShares.toFixed(0)} Maximum Shares</$Bold> available. This{' '}
         {percentageShares.decimalPlaces(2).toString()}% may be different, depending on the final amount of shares sold
         at the end of the Fundraising period. There is no guarantee of a return, consult your financial advisor before
-        investing.
+        investing. */}
+
         {!isHidden ? (
           <span
             onClick={() => setIsHidden(!isHidden)}
@@ -83,7 +145,7 @@ const InfoText = () => {
               cursor: 'pointer',
             }}
           >
-            hide
+            {words.hide}
           </span>
         ) : undefined}
       </$Text>

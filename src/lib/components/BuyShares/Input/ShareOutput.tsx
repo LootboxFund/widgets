@@ -9,40 +9,27 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { $TokenInput, $FineText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 export interface ShareOutputProps {
   lootbox?: ILootbox
 }
 
 const ShareOutput = (props: ShareOutputProps) => {
+  const intl = useIntl()
   const snap = useSnapshot(buySharesState) as BuySharesState
   const { screen } = useWindowSize()
-  // const [isSoldOut, setIsSoldOut] = useState(false)
-
-  // useEffect(() => {
-  //   const nativeEstimate = fillLootboxEstimate()
-  //   if (nativeEstimate.eq(new BN('0'))) {
-  //     console.log('is sold out', nativeEstimate.toString())
-  //     setIsSoldOut(true)
-  //   }
-  // }, [snap?.lootbox?.data?.sharesSoldCount])
-
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
   const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
+  const words = getWords(intl)
 
   const percentageShares =
     quantityBN && shareDecimals && sharesSoldMax
       ? quantityBN.dividedBy(sharesSoldMax).multipliedBy(100).toFixed(2)
       : new BN(0).toString()
-
-  // const sharePerUSD =
-  //   snap?.lootbox?.data?.sharePriceWei && snap?.inputToken?.data?.usdPrice
-  //     ? new BN(snap.lootbox.data.sharePriceWei)
-  //         .multipliedBy(new BN(10).pow(USD_DECIMALS))
-  //         .div(new BN(snap.inputToken.data.usdPrice))
-  //     : undefined
 
   const fillUpLootbox = () => {
     const nativeEstimate = fillLootboxEstimate()
@@ -64,7 +51,14 @@ const ShareOutput = (props: ShareOutputProps) => {
       <$Horizontal flex={1}>
         <$Vertical flex={screen === 'desktop' ? 3 : 2}>
           <$Input readOnly value={quantity} type="number" placeholder="0.00" screen={screen} min={0}></$Input>
-          <$FineText screen={screen}>{`Receive Shares (${percentageShares}% of Earnings)`}</$FineText>
+          <$FineText screen={screen}>
+            <FormattedMessage
+              id="buyShares.shareOutput.percentEarnings"
+              defaultMessage="Receive Shares ({percentEarnings}% of Earnings)"
+              values={{ percentEarnings: percentageShares }}
+              description='How many "shares" a user will buy from a Lootbox. Shares are considered a portion of the Lootbox`s earnings which allows a user to share the Lootboxes / gamers profits.'
+            />
+          </$FineText>
         </$Vertical>
         <$Vertical flex={1} spacing={2}>
           <$Button
@@ -80,7 +74,7 @@ const ShareOutput = (props: ShareOutputProps) => {
                 props.lootbox.name
               ) : (
                 <$FineText screen={screen} style={{ color: `${COLORS.surpressedFontColor}aa` }}>
-                  loading
+                  {words.loading}
                 </$FineText>
               )}
             </$TokenSymbol>
@@ -96,7 +90,11 @@ const ShareOutput = (props: ShareOutputProps) => {
               fontWeight: TYPOGRAPHY.fontWeight.regular,
             }}
           >
-            max
+            <FormattedMessage
+              id="buyShares.shareOutput.fillUpLootbox"
+              defaultMessage="max"
+              description="Hyperlink text that allows a user to buy the exact full amount offered in a Lootbox."
+            />
           </$TokenSymbol>
 
           {/* {sharePerUSD ? (

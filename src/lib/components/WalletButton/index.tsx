@@ -12,6 +12,7 @@ import { useProvider } from '../../hooks/useWeb3Api/index'
 import { BASE_BUTTON_STYLE } from '../BuyShares/BuyButton'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { getWords } from './constants'
+import { getWords as getGenericWords } from 'lib/api/words'
 
 export interface WalletButtonProps {
   style?: React.CSSProperties
@@ -23,6 +24,7 @@ const WalletButton = (props: WalletButtonProps) => {
   const intl = useIntl()
 
   const words = getWords(intl)
+  const genericWords = getGenericWords(intl)
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
 
@@ -77,11 +79,12 @@ const WalletButton = (props: WalletButtonProps) => {
           // border: `1px solid ${COLORS.warningBackground}40`,
           // fontWeight: 500,
           // fontSize: '1.2rem',
+          textTransform: 'uppercase',
           ...BASE_BUTTON_STYLE,
           ...(props.style ?? props.style),
         }}
       >
-        {words.loading}
+        {genericWords.loading}...
       </$Button>
     )
   } else if (status === 'success') {
@@ -111,7 +114,7 @@ const WalletButton = (props: WalletButtonProps) => {
           ...(props.style ?? props.style),
         }}
       >
-        {words.metamask}
+        {genericWords.pleaseInstallMetamask}
       </$Button>
     )
   } else if (status === 'network') {

@@ -12,6 +12,7 @@ import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex, ChainIDHex } from '
 import { useProvider } from '../../hooks/useWeb3Api/index'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { getWords } from '../WalletButton/constants'
+import { getWords as getGenericWords } from 'lib/api/words'
 
 export interface WalletStatusProps {
   targetNetwork?: ChainIDHex
@@ -22,6 +23,7 @@ const WalletStatus = (props: WalletStatusProps) => {
   const { screen } = useWindowSize()
   const intl = useIntl()
   const words = getWords(intl)
+  const genericWords = getGenericWords(intl)
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
 
@@ -86,7 +88,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        {words.loading}
+        {genericWords.loading}
       </$Button>
     )
   } else if (status === 'success') {
@@ -120,7 +122,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1rem',
         }}
       >
-        {words.metamask}
+        {genericWords.pleaseInstallMetamask}
       </$Button>
     )
   } else if (status === 'network') {

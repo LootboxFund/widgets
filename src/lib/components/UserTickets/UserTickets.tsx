@@ -10,6 +10,7 @@ import RightChevronIcon from 'lib/theme/icons/Right.icon'
 import LeftChevronIcon from 'lib/theme/icons/Left.icon'
 import { $BuySharesHeaderSubTitle, $BuySharesHeaderTitle } from '../BuyShares/Header'
 import { buySharesState } from '../BuyShares/state'
+import { FormattedMessage } from 'react-intl'
 
 const TICKET_PAGINATION = 3
 
@@ -75,7 +76,13 @@ const UserTickets = (props: Props) => {
   return (
     <$Vertical height="100%" width="100%">
       <$Vertical padding={screen === 'mobile' || screen === 'tablet' ? '0px 0px 20px 0px' : '0px 0px 20px 75px'}>
-        <$BuySharesHeaderTitle>REDEEM PROFIT SHARING</$BuySharesHeaderTitle>
+        <$BuySharesHeaderTitle style={{ textTransform: 'uppercase' }}>
+          <FormattedMessage
+            id="userTickets.title"
+            defaultMessage="Redeem Profit Sharing NFTs"
+            description="Prompt for user to redeem their Lootbox NFTs in exchange for money"
+          />
+        </$BuySharesHeaderTitle>
         {subheader ? <$BuySharesHeaderSubTitle>{subheader}</$BuySharesHeaderSubTitle> : undefined}
       </$Vertical>
       <Wrapper>

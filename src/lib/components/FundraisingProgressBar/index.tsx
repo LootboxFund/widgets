@@ -6,13 +6,13 @@ import { $Vertical, $Horizontal } from '../Generics'
 import HelpIcon from '../../theme/icons/Help.icon'
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { getLootboxData, getPriceFeedRaw } from 'lib/hooks/useContract'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS } from '@wormgraph/helpers'
 import { buySharesState } from '../BuyShares/state'
 import { lootboxState, OnChainLootbox } from 'lib/state/lootbox.state'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export interface FundraisingProgressBarProps {
   percentageFunded: number
@@ -42,7 +42,15 @@ export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
               }}
             >
               {/* {`${props.percentageFunded > 100 ? 100 : props.percentageFunded}% Funded`} */}
-              {`${props.percentageFunded}% Funded`}
+              {/* {`${props.percentageFunded}% Funded`} */}
+              <FormattedMessage
+                id="fundraisingProgressBar.percentageFunded"
+                defaultMessage="{percentageFunded}% Funded"
+                description="Percentage of the lootbox that has been funded (funded means when people invest into someones Lootbox with cryptocurrency)"
+                values={{
+                  percentageFunded: props.percentageFunded,
+                }}
+              />
             </span>
           </$Horizontal>
           <$Horizontal>
@@ -54,7 +62,15 @@ export const FundraisingProgressBar = (props: FundraisingProgressBarProps) => {
                 textAlign: screen === 'mobile' ? 'end' : 'start',
               }}
             >
-              {`${props.targetAmountNative} ${props.networkSymbol} Goal`}
+              <FormattedMessage
+                id="fundraisingProgressBar.goalText"
+                defaultMessage="{targetAmount} {symbol} Goal"
+                description="The amount of crypto currency the gamer wishes to fundraise (i.e. '10 ETH Goal'"
+                values={{
+                  targetAmount: props.targetAmountNative,
+                  symbol: props.networkSymbol,
+                }}
+              />
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
@@ -91,11 +107,17 @@ const ProgressBar = ({ progress, themeColor }: { progress: number; themeColor: s
 }
 
 const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBar) => {
+  const intl = useIntl()
   const web3Utils = useWeb3Utils()
   const [percentageFunded, setPercentageFunded] = useState(0)
   const [targetAmountNative, setTargetAmountNative] = useState('0')
   const [networkSymbol, setNetworkSymbol] = useState('')
-  const [wtfMessage, setWTFMessage] = useState('This is the target funding goal of the gamer.')
+  const targetFundingGoalTemplateMessage = intl.formatMessage({
+    id: 'fundraisingBar.help.template',
+    defaultMessage: 'This is the target funding goal of the gamer.',
+    description: 'Template message for user displayed with the Lootbox fundraising goals',
+  })
+  const [wtfMessage, setWTFMessage] = useState(targetFundingGoalTemplateMessage)
   const userStateSnapshot = useSnapshot(userState)
   const buySharesStateSnapshot = useSnapshot(buySharesState)
   const lootboxStateSnapshot = useSnapshot(lootboxState)
@@ -137,7 +159,21 @@ const LootboxFundraisingProgressBar = ({ lootbox }: LootboxFundraisingProgressBa
 
           setTargetAmountNative(targetAmountNativeFmt)
 
-          const wtfBro = `${targetAmountNativeFmt} ${symb} is the target funding goal of this lootbox. The maximum capacity of this lootbox is ${maxAmountNativeFmt} ${symb}. So far, this lootbox has raised ${percentageFunded}% of its funding goal.`
+          const wtfBro = intl.formatMessage(
+            {
+              id: 'lootbox.wtf.bro',
+              defaultMessage:
+                '{targetAmountNumber} {symbol} is the target funding goal of this lootbox. The maximum capacity of this lootbox is {maxAmount} {symbol}. So far, this lootbox has raised {percentageFunded}% of its funding goal.',
+              description: "Help message for the lootbox's funding goal. ",
+            },
+            {
+              targetAmountNumber: targetAmountNativeFmt,
+              symbol: symb,
+              maxAmount: maxAmountNativeFmt,
+              percentageFunded: percentageFunded,
+            }
+          )
+
           // const wtfBro = `${maxAmountNativeFmt} ${symb} goal is calculated as \n${parseFloat(
           //   web3Utils.fromWei(sharesSoldTarget, 'ether')
           // ).toFixed(2)} target shares multiplied by a share price of ${web3Utils.fromWei(

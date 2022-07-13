@@ -1,14 +1,17 @@
 import { Address } from '@wormgraph/helpers'
 import { truncateAddress } from 'lib/api/helpers'
+import { getWords } from 'lib/api/words'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import react from 'react'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 
 export interface NetworkTextProps {}
 const NetworkText = (props: NetworkTextProps) => {
+  const intl = useIntl()
+  const words = getWords(intl)
   const snapUserState = useSnapshot(userState)
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
@@ -20,11 +23,7 @@ const NetworkText = (props: NetworkTextProps) => {
   return (
     <$NetworkText style={{ flex: 2 }}>
       <b>
-        <FormattedMessage
-          id="networktext.title"
-          defaultMessage="Network"
-          description='"Network" meaning the blockchain network the user is connected to'
-        />
+        {words.network}
         {':'}
       </b>{' '}
       {snapUserState.network.currentNetworkDisplayName}{' '}

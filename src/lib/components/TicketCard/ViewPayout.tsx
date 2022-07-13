@@ -8,7 +8,7 @@ import { $Horizontal } from 'lib/components/Generics'
 import { loadDividends } from './state'
 import { ContractAddress, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { IDividend } from 'lib/types'
-import { $Sadge } from '../BuyShares/PurchaseComplete'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export interface ViewPayoutProps {
   ticketID: string | undefined
@@ -17,12 +17,25 @@ export interface ViewPayoutProps {
 
 const ViewPayout = (props: ViewPayoutProps) => {
   const snap = useSnapshot(ticketCardState)
+  const intl = useIntl()
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID] && snap.tickets[stateID]
   const dividends = ticket && (ticket.dividends as IDividend[])
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
-  const title = activeDividends?.length ? 'COLLECT NEW DIVIDENDS' : 'NO NEW DIVIDENDS'
+  const collectDividendsText = intl.formatMessage({
+    id: 'ticketCard.viewPayout.collectDividendsText',
+    defaultMessage: 'Collect New Dividends',
+    description:
+      'Header indicating that a user can collect dividends from a Lootbox. This means, they can get money from it.',
+  })
+  const noDividendsText = intl.formatMessage({
+    id: 'ticketCard.viewPayout.noDividendsText',
+    defaultMessage: 'No New Dividends',
+    description: 'Header indicating that a user has no dividends to collect from a Lootbox.',
+  })
+
+  const title = activeDividends?.length ? collectDividendsText : noDividendsText
 
   useEffect(() => {
     if (props.ticketID) {
@@ -50,7 +63,11 @@ const ViewPayout = (props: ViewPayoutProps) => {
         <$NoDividendIcon>🧐</$NoDividendIcon>
         <br />
         <$NoDividendText>
-          The gamer has not deposited any earnings yet. Come back later to claim your rewards.
+          <FormattedMessage
+            id="ticketCard.viewPayout.subHeader.noDividends"
+            defaultMessage="The gamer has not deposited any earnings yet. Come back later to claim your rewards."
+            description="Text displayed when the Lootbox owner has not deposited any earnings yet and so, the investor cannot redeem anything from their profit share NFTs."
+          />
         </$NoDividendText>
       </$NoDividendContainer>
     )
@@ -126,6 +143,8 @@ export const $MinorHeading = styled.span`
 
   color: #000000;
   padding: 0px 0px 0px 20px;
+
+  text-transform: uppercase;
 `
 
 const $XIcon = styled.span`

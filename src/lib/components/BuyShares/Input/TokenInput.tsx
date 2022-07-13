@@ -10,6 +10,8 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from '../helpers'
 import { $TokenInput, $FineText, $CoinIcon, $TokenSymbol } from './shared'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 export interface TokenInputProps {
   selectedToken?: TokenDataFE
@@ -20,6 +22,8 @@ export interface TokenInputProps {
 
 const TokenInput = (props: TokenInputProps) => {
   const snap = useSnapshot(buySharesState)
+  const intl = useIntl()
+  const words = getWords(intl)
   const { screen } = useWindowSize()
 
   const setQuantity = (quantity: string | undefined) => {
@@ -55,7 +59,7 @@ const TokenInput = (props: TokenInputProps) => {
         >
           <$TokenSymbol screen={screen} padding={'10px'}>
             <$FineText screen={screen} style={{ color: `${COLORS.surpressedFontColor}aa` }}>
-              loading
+              {words.loading}
             </$FineText>
           </$TokenSymbol>
         </$Button>
@@ -87,15 +91,33 @@ const TokenInput = (props: TokenInputProps) => {
           />
           {usdValue ? (
             <$FineText screen={screen}>
-              {`Spend ${new BN(usdValue).decimalPlaces(2).toString()} USD`}
-              {quantityWithFee ? ` = ${quantityWithFeeFmt} ${props?.selectedToken?.symbol} with fee*` : ''}{' '}
+              <FormattedMessage
+                id="buyShares.tokenInput.input.subheader"
+                defaultMessage="Spend {usdAmount} USD{feeText}"
+                values={{
+                  usdAmount: new BN(usdValue).decimalPlaces(2).toString(),
+                  feeText: quantityWithFee ? (
+                    <FormattedMessage
+                      id="buyShares.tokenInput.input.feeText"
+                      defaultMessage=" = {tokenAmount} {symbol} with fee*"
+                      description="Fee calculation when buying profit sharing NFT. The '*' asterix is needed to show that there is more information below."
+                      values={{
+                        tokenAmount: quantityWithFeeFmt,
+                        symbol: snap.inputToken.data?.symbol || 'Tokens',
+                      }}
+                    />
+                  ) : (
+                    ''
+                  ),
+                }}
+              />
             </$FineText>
           ) : null}
         </$Vertical>
         <$Vertical flex={1}>
           <Button />
           <$FineText screen={screen} style={{ marginTop: '10px', textAlign: 'right' }}>
-            {parseEth(balance)} Balance
+            {parseEth(balance)} {words.balance}
           </$FineText>
         </$Vertical>
       </$Horizontal>

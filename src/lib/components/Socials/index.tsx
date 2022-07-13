@@ -7,7 +7,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 interface SocialsProps {
   lootbox: ContractAddress | undefined
@@ -74,12 +74,36 @@ const Socials = ({ lootbox }: SocialsProps) => {
     <$Container screen={screen}>
       <$Vertical spacing={2}>
         <$Vertical spacing={1}>
-          <$TargetReturnHeader>{formattedROI}% Target Return</$TargetReturnHeader>
-          <$PaybackDateSubHeader>In {diffDays < 0 ? 0 : diffDays} days</$PaybackDateSubHeader>
+          <$TargetReturnHeader>
+            <FormattedMessage
+              id="socials.targetReturn"
+              defaultMessage="{returnPercentage}% Target Return"
+              description="Percentage return on investment that investors can expect to receive from a lootbox"
+              values={{
+                returnPercentage: formattedROI,
+              }}
+            />
+          </$TargetReturnHeader>
+          <$PaybackDateSubHeader>
+            <FormattedMessage
+              id="socials.paybackDate"
+              defaultMessage="In {nDaysLeft} days"
+              description="Date when the lootbox will be paid back to the investor. Just assume its plural."
+              values={{
+                nDaysLeft: diffDays < 0 ? 0 : diffDays,
+              }}
+            />
+          </$PaybackDateSubHeader>
         </$Vertical>
         {lootboxDescription ? (
           <$Vertical spacing={1}>
-            <$AboutLootboxHeader>About this Lootbox</$AboutLootboxHeader>
+            <$AboutLootboxHeader>
+              <FormattedMessage
+                id="socials.aboutLootbox"
+                defaultMessage="About this Lootbox"
+                description="Header for the Lootbox description section"
+              />
+            </$AboutLootboxHeader>
             <$LootboxDescription>{lootboxDescription}</$LootboxDescription>
           </$Vertical>
         ) : undefined}

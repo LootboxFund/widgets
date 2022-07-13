@@ -18,6 +18,8 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import $Spinner from '../Generics/Spinner'
 import { transferNFTOwnership } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from 'lib/api/words'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
@@ -30,6 +32,7 @@ export interface TicketCardWidgetProps {
 }
 
 const TicketCardWidget = (props: TicketCardWidgetProps) => {
+  const intl = useIntl()
   const { screen } = useWindowSize()
   const [showTransferUI, setShowTransferUI] = useState(false)
   const [receiverAddress, setReceiverAddress] = useState<Address>()
@@ -40,6 +43,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
+  const words = getWords(intl)
 
   useEffect(() => {
     if (props.ticketID) {
@@ -51,6 +55,12 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const metadata = ticket && ticket.data.metadata
   const activeDividends = dividends && dividends.filter((dividend) => !dividend.isRedeemed)
   const isRedeemable = activeDividends && activeDividends.length > 0
+
+  const addressOfReceiverText = intl.formatMessage({
+    id: 'ticketCard.addressOfReceiver',
+    defaultMessage: 'Address of Receiver',
+    description: 'Prompt for the user to enter an address for the recipient of the Lootbox NFT they want to transfer',
+  })
 
   const downloadStamp = async () => {
     if (!metadata || !metadata?.lootboxCustomSchema) {
@@ -117,7 +127,11 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               onClick={() => transferNFT(props.ticketID)}
               style={{ cursor: canSend ? 'pointer' : 'not-allowed', border: '0px solid white' }}
             >
-              Send
+              <FormattedMessage
+                id="ticketCard.transferNFT.send"
+                defaultMessage="Send"
+                description="Button text to send an NFT to another person"
+              />
             </button>
           )
         }
@@ -133,7 +147,14 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               color: COLORS.surpressedFontColor,
             }}
           >
-            <span>{`Transfer #${props.ticketID}`}</span>
+            <span>
+              <FormattedMessage
+                id="ticketCard.transferNFT.title"
+                defaultMessage="Transfer #{ticketId}"
+                description="Title of the transfer component where a user can send their Lootbox NFT to another person"
+                values={{ ticketId: `${props.ticketID}` || '' }}
+              />
+            </span>
             <span
               onClick={() => {
                 setShowTransferUI(false)
@@ -141,12 +162,12 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               }}
               style={{ cursor: 'pointer', fontSize: '0.8rem' }}
             >
-              cancel
+              {words.cancel}
             </span>
           </$Horizontal>
           <$Horizontal>
             <input
-              placeholder="Address of Receiver"
+              placeholder={addressOfReceiverText}
               onChange={(e) => setReceiverAddress(e.target.value as Address)}
               value={receiverAddress}
               style={{ padding: '5px', marginTop: '15px', flex: 1, border: '0px solid white' }}
@@ -180,7 +201,11 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
           fontSize: TYPOGRAPHY.fontSize.medium,
         }}
       >
-        Transfer Ownership
+        <FormattedMessage
+          id="ticketCard.transferNFT.button.text"
+          defaultMessage="Transfer Ownership"
+          description="Button text to transfer an NFT to another person"
+        />
       </$Button>
     )
   }
@@ -215,7 +240,11 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
               padding: '0px',
             }}
           >
-            Download Image
+            <FormattedMessage
+              id="ticketCard.downloadStamp.button.text"
+              defaultMessage="Download Image"
+              description="Button text to download an image of the Lootbox NFT"
+            />
           </$Button>
         </>
       ) : (
