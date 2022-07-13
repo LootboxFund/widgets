@@ -10,8 +10,8 @@ import BN from 'bignumber.js'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { parseEth } from '../helpers'
 import { $TokenInput, $FineText, $CoinIcon, $TokenSymbol } from './shared'
-import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface TokenInputProps {
   selectedToken?: TokenDataFE
@@ -22,8 +22,7 @@ export interface TokenInputProps {
 
 const TokenInput = (props: TokenInputProps) => {
   const snap = useSnapshot(buySharesState)
-  const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
   const { screen } = useWindowSize()
 
   const setQuantity = (quantity: string | undefined) => {

@@ -10,9 +10,7 @@ import NetworkText from 'lib/components/NetworkText'
 import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
 import { BASE_BUTTON_STYLE } from '../BuyShares/BuyButton'
-import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from './constants'
-import { getWords as getGenericWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 export interface WalletButtonProps {
   style?: React.CSSProperties
@@ -21,10 +19,7 @@ const WalletButton = (props: WalletButtonProps) => {
   const snapUserState = useSnapshot(userState)
   const [provider] = useProvider()
   const { screen } = useWindowSize()
-  const intl = useIntl()
-
-  const words = getWords(intl)
-  const genericWords = getGenericWords(intl)
+  const words = useWords()
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
 
@@ -84,7 +79,7 @@ const WalletButton = (props: WalletButtonProps) => {
           ...(props.style ?? props.style),
         }}
       >
-        {genericWords.loading}...
+        {words.loading}...
       </$Button>
     )
   } else if (status === 'success') {
@@ -114,7 +109,7 @@ const WalletButton = (props: WalletButtonProps) => {
           ...(props.style ?? props.style),
         }}
       >
-        {genericWords.pleaseInstallMetamask}
+        {words.pleaseInstallMetamask}
       </$Button>
     )
   } else if (status === 'network') {
@@ -133,7 +128,7 @@ const WalletButton = (props: WalletButtonProps) => {
         ...(props.style ?? props.style),
       }}
     >
-      {words.connect}
+      {words.connectWallet}
     </$Button>
   )
 }

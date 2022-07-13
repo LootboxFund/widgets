@@ -12,7 +12,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { initLogging } from 'lib/api/logrocket'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
@@ -24,7 +24,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
   const { screen } = useWindowSize()
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const orUsePassword = intl.formatMessage({
     id: 'auth.method.orUsePassword',

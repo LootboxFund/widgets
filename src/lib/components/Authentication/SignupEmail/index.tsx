@@ -11,7 +11,7 @@ import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
 import { useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -25,7 +25,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
   const [password, setPassword] = useState<string>('')
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>('')
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)

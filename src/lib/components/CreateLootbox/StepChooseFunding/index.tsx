@@ -16,7 +16,7 @@ import ReactTooltip from 'react-tooltip'
 import { ethers as ethersObj } from 'ethers'
 import { defaultFundraisingLimitMultiplier, defaultFundraisingLimitMultiplierDecimal } from '../index'
 import { InitialUrlParams } from '../state'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import React from 'react'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
@@ -46,6 +46,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const { screen } = useWindowSize()
+  const intl = useIntl()
   const initialErrors: {
     fundraisingTarget: string | React.ReactElement
     fundraisingLimit: string | React.ReactElement
@@ -57,6 +58,13 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
   }
   const [errors, setErrors] = useState(initialErrors)
   const [showMaxInput, setShowMaxInput] = useState(false)
+
+  const fundsWillArriveHereText = intl.formatMessage({
+    id: 'createLootbox.fundsWillArriveHere',
+    defaultMessage: 'Funds will arrive here',
+    description:
+      'Text in an input element, where the user can enter the metamask wallet address where funds will arrive',
+  })
 
   useEffect(() => {
     getLatestPrice()
@@ -329,7 +337,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
             screen={'mobile'}
             fontWeight="200"
             onChange={parseInput}
-            placeholder="Funds will arrive here"
+            placeholder={fundsWillArriveHereText}
             disabled={!!props.initialUrlParams?.receivingWallet}
           />
         </$InputWrapper>

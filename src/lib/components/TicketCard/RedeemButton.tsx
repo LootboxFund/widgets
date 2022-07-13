@@ -9,7 +9,7 @@ import { ticketCardState, generateStateID, redeemTicket } from './state'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { ContractAddress } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
@@ -22,7 +22,7 @@ const RedeemButton = (props: RedeemButtonProps) => {
   const snapUser = useSnapshot(userState)
   const [loading, setLoading] = useState(false)
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const isWalletConnected = snapUser.accounts.length > 0
   const stateID =

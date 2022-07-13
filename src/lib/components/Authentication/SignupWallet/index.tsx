@@ -12,7 +12,7 @@ import { useState } from 'react'
 import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 import { useIntl } from 'react-intl'
 
 interface SignUpWalletProps {
@@ -26,7 +26,7 @@ const SignupWallet = (props: SignUpWalletProps) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const walletSignUpText = intl.formatMessage({
     id: 'auth.signup.wallet.text',

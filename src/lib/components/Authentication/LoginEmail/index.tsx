@@ -13,7 +13,7 @@ import { auth } from 'lib/api/firebase/app'
 import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
 import { $Link } from 'lib/components/Profile/common'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 interface LoginEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -32,7 +32,7 @@ const LoginEmail = (props: LoginEmailProps) => {
     | 'local'
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)

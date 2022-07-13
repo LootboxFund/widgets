@@ -16,7 +16,7 @@ import { truncateAddress } from 'lib/api/helpers'
 import { auth } from 'lib/api/firebase/app'
 import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
 import { useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 interface LoginWalletProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -34,7 +34,7 @@ const LoginWallet = (props: LoginWalletProps) => {
     | 'session'
     | 'local'
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
-  const words = getWords(intl)
+  const words = useWords()
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
 

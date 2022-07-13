@@ -1,17 +1,15 @@
 import { Address } from '@wormgraph/helpers'
 import { truncateAddress } from 'lib/api/helpers'
-import { getWords } from 'lib/api/words'
 import { userState } from 'lib/state/userState'
 import { COLORS } from 'lib/theme'
 import react from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
+import useWords from 'lib/hooks/useWords'
 
 export interface NetworkTextProps {}
 const NetworkText = (props: NetworkTextProps) => {
-  const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
   const snapUserState = useSnapshot(userState)
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {

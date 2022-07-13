@@ -9,22 +9,21 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { $TokenInput, $FineText, $TokenSymbol } from './shared'
 import { ILootbox } from 'lib/types'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
-import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface ShareOutputProps {
   lootbox?: ILootbox
 }
 
 const ShareOutput = (props: ShareOutputProps) => {
-  const intl = useIntl()
   const snap = useSnapshot(buySharesState) as BuySharesState
   const { screen } = useWindowSize()
   const shareDecimals = snap.lootbox.data?.shareDecimals
   const quantity: string = snap.lootbox.quantity || '0'
   const sharesSoldMax = snap.lootbox?.data?.sharesSoldMax
   const quantityBN = quantity && shareDecimals && new BN(quantity).multipliedBy(new BN(10).pow(shareDecimals))
-  const words = getWords(intl)
+  const words = useWords()
 
   const percentageShares =
     quantityBN && shareDecimals && sharesSoldMax

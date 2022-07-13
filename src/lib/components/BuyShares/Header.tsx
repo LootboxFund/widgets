@@ -8,16 +8,14 @@ import { truncateAddress } from 'lib/api/helpers'
 import { Address, BLOCKCHAINS } from '@wormgraph/helpers'
 import { $Vertical, $Horizontal } from '../Generics'
 import { buySharesState } from './state'
-import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {
-  // const { screen } = useWindowSize()
-  const intl = useIntl()
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
-  const words = getWords(intl)
+  const words = useWords()
 
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {

@@ -1,6 +1,8 @@
-import { IntlShape } from 'react-intl'
+import { useIntl } from 'react-intl'
 
-export const getWords = (intl: IntlShape) => {
+const useWords = () => {
+  const intl = useIntl()
+
   const cancel = intl.formatMessage({
     id: 'generic.cancel',
     defaultMessage: 'Cancel',
@@ -126,6 +128,18 @@ export const getWords = (intl: IntlShape) => {
     description: 'User action to reset their password',
   })
 
+  const connected = intl.formatMessage({
+    id: 'walletButton.connected',
+    defaultMessage: 'Connected',
+    description: 'Button text metamask is connected',
+  })
+
+  const connectWallet = intl.formatMessage({
+    id: 'wallet-button.connect-wallet',
+    defaultMessage: 'Connect Wallet',
+    description: 'Prompt to user to connect their MetaMask wallet to the website',
+  })
+
   return {
     cancel,
     back,
@@ -148,5 +162,9 @@ export const getWords = (intl: IntlShape) => {
     register,
     confirmPassword,
     resetPassword,
+    connected,
+    connectWallet,
   }
 }
+
+export default useWords

@@ -35,7 +35,7 @@ import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'
 import { throwInvalidPasswords } from 'lib/utils/password'
 import { useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 interface FrontendUser {
   id: UserID
@@ -75,7 +75,7 @@ export const useAuth = () => {
     { refetchQueries: [{ query: GET_MY_WALLETS }] }
   )
 
-  const words = getWords(intl)
+  const words = useWords()
   const emailIsRequiredText = intl.formatMessage({
     id: 'auth.emailIsRequired',
     defaultMessage: 'Email is required',

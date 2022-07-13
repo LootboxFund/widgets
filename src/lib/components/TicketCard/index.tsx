@@ -19,7 +19,7 @@ import $Spinner from '../Generics/Spinner'
 import { transferNFTOwnership } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 export interface TicketCardWidgetProps {
   ticketID: string | undefined
@@ -43,7 +43,7 @@ const TicketCardWidget = (props: TicketCardWidgetProps) => {
   const stateID =
     snap.lootboxAddress && props.ticketID && generateStateID(snap.lootboxAddress as ContractAddress, props.ticketID)
   const ticket = stateID && snap.tickets[stateID]
-  const words = getWords(intl)
+  const words = useWords()
 
   useEffect(() => {
     if (props.ticketID) {

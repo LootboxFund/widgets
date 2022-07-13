@@ -15,7 +15,7 @@ import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px' }
 
@@ -29,7 +29,7 @@ const BuyButton = (props: BuyButtonProps) => {
   const [loading, setLoading] = useState(true)
   const [hasMetaMask, setHasMetaMask] = useState(true)
   const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   useEffect(() => {
     if (snapBuySharesState.lootbox.address) {

@@ -9,15 +9,14 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
-  const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const goToBuySharesComponent = () => (buySharesState.route = '/buyShares')
   const getBscScanUrl = (): string | undefined => {

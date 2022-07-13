@@ -1,15 +1,13 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
-import { getWords } from 'lib/api/words'
+import useWords from 'lib/hooks/useWords'
 import { $ErrorMessage, $h1, $span, $Vertical } from 'lib/components/Generics'
 import $Button from 'lib/components/Generics/Button'
-import { Oopsies } from 'lib/components/Profile/common'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { parseAuthError } from 'lib/utils/firebase'
 import LogRocket from 'logrocket'
 import { useState } from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import { $InputMedium, ModeOptions } from '../Shared'
 
 interface ResetPasswordProps {
@@ -19,8 +17,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'loading' | 'error' | 'success' | 'pending'>('pending')
   const { screen } = useWindowSize()
-  const intl = useIntl()
-  const words = getWords(intl)
+  const words = useWords()
 
   const parseEmail = (email: string) => {
     setEmail(email)
@@ -66,7 +63,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
         />
       </$Button>
       {status === 'error' ? (
-        <$ErrorMessage>{parseAuthError(intl, 'An error occured! Please try again later.')}</$ErrorMessage>
+        <$ErrorMessage>{`${words.anErrorOccured}! ${words.pleaseTryAgainLater}.`}</$ErrorMessage>
       ) : null}
       {status === 'success' ? (
         <$span>
