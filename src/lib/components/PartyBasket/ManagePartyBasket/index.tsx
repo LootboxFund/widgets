@@ -415,7 +415,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               <span>
                 <$StepSubheading>
                   <FormattedMessage
-                    id="partyBasket.manage.bulkWhitelisting.header"
+                    id="partyBasket.manage.bulkWhitelisting.address.header"
                     defaultMessage="Whitelist Address"
                     description='Title for whitelisting section. "Whitelist" means to give someone permission to get a free Lootbox NFT from your Party Basket'
                   />

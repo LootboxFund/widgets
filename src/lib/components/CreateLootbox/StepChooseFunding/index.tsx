@@ -356,7 +356,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
           <$Vertical flex={3}>
             <$StepHeading>
               <FormattedMessage
-                id="create.lootbox.step.funding.helpText"
+                id="create.lootbox.step.funding.helpTextTitle"
                 defaultMessage="3. How much money do you need?"
                 description="Header for step 3: How much money do you need? (Step in creating a Lootbox)"
               />
@@ -364,7 +364,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               <HelpIcon tipID="stepFunding" />
               <ReactTooltip id="stepFunding" place="right" effect="solid">
                 <FormattedMessage
-                  id="create.lootbox.step.funding.helpText"
+                  id="create.lootbox.step.funding.helpTextMessage"
                   defaultMessage="We cannot guarantee you will be able to fundraise your target amount. Maximize your chances by watching videos on our YouTube channel teaching best practices on how to fundraise."
                   description="Help text for step 3: how much money do you need?"
                 />

@@ -16,6 +16,7 @@ import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import LogRocket from 'logrocket'
 import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface StepChooseNetworkProps {
   stage: StepStage
@@ -27,6 +28,7 @@ export interface StepChooseNetworkProps {
 }
 
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
+  const words = useWords()
   const { screen } = useWindowSize()
   const isMobile = screen === 'tablet' || screen === 'mobile'
   const snapUserState = useSnapshot(userState)
@@ -53,17 +55,9 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
           if (network?.chainId?.toString() !== props.selectedNetwork?.chainIdDecimal) {
             props.setDoesNetworkMatch(false)
             setErrors([
-              <FormattedMessage
-                id="createLootbox.stepChooseNetwork.error.networkMismatch"
-                defaultMessage='You are on the wrong network! Please change your MetaMask network to "{networkName}".'
-                // defaultMessage={`You are on the wrong network! Please change your MetaMask network to "${props.selectedNetwork?.name}${
-                //   props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''
-                // }".`}
-                description="Error message when the user is on the wrong network"
-                values={{
-                  networkName: `${props.selectedNetwork?.name}${props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''}`,
-                }}
-              />,
+              `${words.wrongNetworkPleaseChangeTo} "${props.selectedNetwork?.name}${
+                props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''
+              }"`,
             ])
           } else {
             props.setDoesNetworkMatch(true)
