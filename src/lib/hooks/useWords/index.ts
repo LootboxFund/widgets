@@ -204,7 +204,7 @@ const useWords = () => {
   const view = intl.formatMessage({
     id: 'generic.view',
     defaultMessage: 'View',
-    description: 'Generic user action to view something',
+    description: 'Generic user action to view something, (i.e. "view Lootbox")',
   })
 
   const searchLootboxesByNameOrAddress = intl.formatMessage({
@@ -280,6 +280,12 @@ const useWords = () => {
     description: 'Generic user action to click something. In a sentence like: "Navigate to profile by clicking here"',
   })
 
+  const clickHere = intl.formatMessage({
+    id: 'generic.clickHere',
+    defaultMessage: 'Click here',
+    description: 'Generic user action to click something. In a sentence like: "Click here to navigate to profile"',
+  })
+
   const learnMore = intl.formatMessage({
     id: 'generic.learnMore',
     defaultMessage: 'Learn more',
@@ -290,6 +296,55 @@ const useWords = () => {
     id: 'generic.notFound',
     defaultMessage: 'Not found',
     description: 'Generic user action to not find something',
+  })
+
+  const partyBasket = intl.formatMessage({
+    id: 'generic.partyBasket',
+    defaultMessage: 'Party basket',
+    description:
+      'This is the name of a piece of software we use to manage Lootbox bounties. In sentence: "You can redeem a Lootbox NFT from your tournament`s party basket"',
+  })
+
+  const submitting = intl.formatMessage({
+    id: 'generic.submitting',
+    defaultMessage: 'Submitting',
+    description: 'Text indicating that something is submitting',
+  })
+
+  const success = intl.formatMessage({
+    id: 'generic.success',
+    defaultMessage: 'Success',
+    description: 'Generic text indicate a success',
+  })
+
+  const createAPartyBasket = intl.formatMessage({
+    id: 'generic.createAPartyBasket',
+    defaultMessage: 'Create a party basket',
+    description: 'User action to create a party basket',
+  })
+
+  const error = intl.formatMessage({
+    id: 'generic.error',
+    defaultMessage: 'Error',
+    description: 'Generic text indicating an error or a problem',
+  })
+
+  const copiedToClipBoard = intl.formatMessage({
+    id: 'generic.copiedToClipBoard',
+    defaultMessage: 'Copied to clipboard',
+    description: 'Generic text indicating that something has been copied to the clipboard',
+  })
+
+  const add = intl.formatMessage({
+    id: 'generic.add',
+    defaultMessage: 'Add',
+    description: 'text indicating to add something to something else',
+  })
+
+  const processing = intl.formatMessage({
+    id: 'generic.processing',
+    defaultMessage: 'Processing',
+    description: 'Generic text indicating that something is processing',
   })
 
   return {
@@ -341,6 +396,15 @@ const useWords = () => {
     clickingHere,
     learnMore,
     notFound,
+    partyBasket,
+    clickHere,
+    submitting,
+    success,
+    createAPartyBasket,
+    error,
+    copiedToClipBoard,
+    add,
+    processing,
   }
 }
 
