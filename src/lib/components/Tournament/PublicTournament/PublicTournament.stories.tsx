@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
+import LocalizationWrapper from 'lib/components/Internationalization/LocalizationWrapper'
 
 export default {
   title: 'PublicTournament',
@@ -24,9 +25,11 @@ const Template = () => {
 
   return (
     <ApolloProvider client={client}>
-      <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
-        <PublicTournament />
-      </$CardViewport>
+      <LocalizationWrapper>
+        <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
+          <PublicTournament />
+        </$CardViewport>
+      </LocalizationWrapper>
     </ApolloProvider>
   )
 }

@@ -213,10 +213,83 @@ const useWords = () => {
     description: 'Generic user action to search for Lootboxes by name or the smart contract address.',
   })
 
-  const createALootbox = intl.formatMessage({
-    id: 'generic.createALootbox',
+  const createLootbox = intl.formatMessage({
+    id: 'generic.createLootbox',
     defaultMessage: 'Create a Lootbox',
     description: 'User action to create a Lootbox',
+  })
+
+  const title = intl.formatMessage({
+    id: 'generic.title',
+    defaultMessage: 'Title',
+    description: 'Title of a Lootbox or an esports tournament etc',
+  })
+
+  const description = intl.formatMessage({
+    id: 'generic.description',
+    defaultMessage: 'Description',
+    description: 'Description of something, mainly used as a header for a text input for example.',
+  })
+
+  const magicLink = intl.formatMessage({
+    id: 'generic.magicLink',
+    defaultMessage: 'Magic link',
+    description: 'Magic link is a special URL link that lets users create a Lootbox with predefined fields.',
+  })
+
+  const createMagicLink = intl.formatMessage({
+    id: 'generic.createMagicLink',
+    defaultMessage: 'Create magic link',
+    description: 'User action to create a magic link',
+  })
+
+  const battleDate = intl.formatMessage({
+    id: 'generic.battleDate',
+    defaultMessage: 'Battle date',
+    description: 'Date of an online esports tournament battle or 1v1',
+  })
+
+  const prize = intl.formatMessage({
+    id: 'generic.prize',
+    defaultMessage: 'Prize',
+    description:
+      'Prize of an online esports tournament battle or 1v1, usually in crypto currency, but can also be fiat currency or anything else for that matter',
+  })
+
+  const manage = intl.formatMessage({
+    id: 'generic.manage',
+    defaultMessage: 'Manage',
+    description: 'Generic user action to manage something (AKA. edit something)',
+  })
+
+  const watchTutorial = intl.formatMessage({
+    id: 'generic.watchTutorial',
+    defaultMessage: 'Watch tutorial',
+    description: 'User prompt to watch a tutorial video',
+  })
+
+  const createNew = intl.formatMessage({
+    id: 'generic.createNew',
+    defaultMessage: 'Create new',
+    description: 'Generic user action to create a new something',
+  })
+
+  const clickingHere = intl.formatMessage({
+    id: 'generic.clickingHere',
+    defaultMessage: 'Clicking here',
+    description: 'Generic user action to click something. In a sentence like: "Navigate to profile by clicking here"',
+  })
+
+  const learnMore = intl.formatMessage({
+    id: 'generic.learnMore',
+    defaultMessage: 'Learn more',
+    description: 'Generic user action to learn more about something',
+  })
+
+  const notFound = intl.formatMessage({
+    id: 'generic.notFound',
+    defaultMessage: 'Not found',
+    description: 'Generic user action to not find something',
   })
 
   return {
@@ -255,7 +328,19 @@ const useWords = () => {
     edit,
     view,
     searchLootboxesByNameOrAddress,
-    createALootbox,
+    createLootbox,
+    title,
+    description,
+    magicLink,
+    battleDate,
+    prize,
+    manage,
+    watchTutorial,
+    createMagicLink,
+    createNew,
+    clickingHere,
+    learnMore,
+    notFound,
   }
 }
 

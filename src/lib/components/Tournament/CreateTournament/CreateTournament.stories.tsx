@@ -5,6 +5,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
 import CreateTournament from './index'
+import LocalizationWrapper from 'lib/components/Internationalization/LocalizationWrapper'
 
 export default {
   title: 'CreateTournament',
@@ -25,9 +26,11 @@ const Template = () => {
 
   return (
     <ApolloProvider client={client}>
-      <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-        <CreateTournament />
-      </$CardViewport>
+      <LocalizationWrapper>
+        <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
+          <CreateTournament />
+        </$CardViewport>
+      </LocalizationWrapper>
     </ApolloProvider>
   )
 }

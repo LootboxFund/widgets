@@ -108,7 +108,7 @@ const MyLootboxes = () => {
         </$h1>
         <$span>
           <$Link fontStyle="normal" style={{ marginBottom: '15px' }} onClick={navigateToCreateLootbox}>
-            {words.createALootbox}
+            {words.createLootbox}
           </$Link>
         </$span>
       </$Vertical>
@@ -125,7 +125,7 @@ const MyLootboxes = () => {
               values={{
                 createLootboxHyperLink: (
                   <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
-                    {words.createALootbox}
+                    {words.createLootbox}
                   </$Link>
                 ),
               }}

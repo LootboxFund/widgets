@@ -20,6 +20,9 @@ import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { COLORS } from '@wormgraph/helpers'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { tournamentWords as getTournamentWords } from '../common'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -27,6 +30,8 @@ interface ManageTournamentProps {
 
 /** Manage Tournament Widget */
 const ManageTournament = (props: ManageTournamentProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{ myTournament: TournamentResponse }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
@@ -37,12 +42,19 @@ const ManageTournament = (props: ManageTournamentProps) => {
     }
   )
 
+  const tournamentWords = getTournamentWords(intl)
+  const noLootboxesText = intl.formatMessage({
+    id: 'tournament.manage.noLootboxes.text',
+    defaultMessage: 'No Lootboxes',
+    description: 'Text when no Lootboxes were found',
+  })
+
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
-    return <Oopsies title="An error occured" icon="🤕" message={error?.message || ''} />
+    return <Oopsies title={words.anErrorOccured} icon="🤕" message={error?.message || ''} />
   } else if (data?.myTournament?.__typename === 'ResponseError') {
-    return <Oopsies title="An error occured" icon="🤕" message={data?.myTournament?.error?.message || ''} />
+    return <Oopsies title={words.anErrorOccured} icon="🤕" message={data?.myTournament?.error?.message || ''} />
   }
 
   const { tournament } = data.myTournament as TournamentResponseSuccess
@@ -57,7 +69,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
         <$Vertical spacing={4}>
           {tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
           <$Vertical>
-            <$h3 style={{ marginBottom: '-10px' }}>MANAGE</$h3>
+            <$h3 style={{ marginBottom: '-10px', textTransform: 'uppercase' }}>{words.manage}</$h3>
             <$h1>{tournament.title}</$h1>
             <$Divider margin="0px 0px 20px 0px" />
             <$Horizontal flexWrap style={{ paddingBottom: '15px' }}>
@@ -67,10 +79,10 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   color={'inherit'}
                   fontStyle="italic"
                   href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
-                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                   target="_blank"
                 >
-                  Watch Tutorial
+                  {words.watchTutorial}
                 </$Link>
               </$span>
 
@@ -80,10 +92,10 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   color={'inherit'}
                   fontStyle="italic"
                   href={createLootboxUrl}
-                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                   target="_blank"
                 >
-                  Create Magic Link
+                  {words.createMagicLink}
                 </$Link>
               </$span>
 
@@ -94,10 +106,10 @@ const ManageTournament = (props: ManageTournamentProps) => {
                     color={'inherit'}
                     fontStyle="italic"
                     href={tournament.tournamentLink}
-                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                     target="_blank"
                   >
-                    Visit Tournament
+                    {tournamentWords.visitTournament}
                   </$Link>
                 </$span>
               ) : (
@@ -107,9 +119,13 @@ const ManageTournament = (props: ManageTournamentProps) => {
                     color={'inherit'}
                     fontStyle="italic"
                     href={'#input-link'}
-                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                   >
-                    Add Tournament Link
+                    <FormattedMessage
+                      id="tournament.edit.addTournamentLink"
+                      defaultMessage="Add tournament link"
+                      description="Prompt to user to add a hyperlink URL to the tournament's official page. I.e. might be a streaming website etc."
+                    />
                   </$Link>
                 </$span>
               )}
@@ -120,10 +136,14 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   color={'inherit'}
                   fontStyle="italic"
                   href={tournamentUrl}
-                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                   target="_self"
                 >
-                  Public View
+                  <FormattedMessage
+                    id="tournament.edit.publicView"
+                    defaultMessage="Public View"
+                    description="Hyperlink to navigate to the public page of an esports tournament"
+                  />
                 </$Link>
               </$span>
             </$Horizontal>
@@ -133,31 +153,60 @@ const ManageTournament = (props: ManageTournamentProps) => {
         {!tournament.magicLink && (
           <div style={{ paddingBottom: '15px' }}>
             <Oopsies
-              title="Add a Magic Link"
+              // title="Add a Magic Link"
+              title={words.createMagicLink}
               icon="🧙"
               message={
                 <$span>
-                  Magic Links help people sign up for your tournament by creating a special Lootbox with the settings
-                  you choose!{' '}
-                  <$Link
-                    fontStyle="italic"
-                    href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
-                    target="_blank"
-                  >
-                    Learn more.
-                  </$Link>
+                  <FormattedMessage
+                    id="tournament.edit.createMagicLink.help"
+                    defaultMessage="Magic Links help people sign up for your tournament by creating a special Lootbox with the settings you choose! {learnMoreHyperLink}"
+                    description="Help text for the user to create a magic link"
+                    values={{
+                      learnMoreHyperLink: (
+                        <$Link
+                          fontStyle="italic"
+                          href={'https://www.youtube.com/channel/UCC1o25acjSJSx64gCtYqdSA'}
+                          target="_blank"
+                        >
+                          {words.learnMore}.
+                        </$Link>
+                      ),
+                    }}
+                  />
                   <br />
                   <br />
-                  1) Create a magic link for this exact tournament by 👉{' '}
-                  <$Link fontStyle="italic" href={createLootboxUrl} target="_blank">
-                    clicking here
-                  </$Link>
+                  <FormattedMessage
+                    id="tournament.edit.createMagicLink.help.step1"
+                    defaultMessage="1) Create a magic link for this exact tournament by 👉 {hyperlink}"
+                    description="Help text for the user to create a magic link"
+                    values={{
+                      hyperlink: (
+                        <$Link
+                          fontStyle="italic"
+                          href={createLootboxUrl}
+                          target="_blank"
+                          style={{ textTransform: 'lowercase' }}
+                        >
+                          {words.clickingHere}
+                        </$Link>
+                      ),
+                    }}
+                  />
                   <br />
                   <br />
-                  2) Update your tournament with the Magic Link by 👉{' '}
-                  <$Link fontStyle="italic" href={'#input-magic'}>
-                    clicking here
-                  </$Link>{' '}
+                  <FormattedMessage
+                    id="tournament.edit.createMagicLink.help.step2"
+                    defaultMessage="2) Update your tournament with the Magic Link by 👉 {hyperlink}"
+                    description=""
+                    values={{
+                      hyperlink: (
+                        <$Link fontStyle="italic" href={'#input-magic'} style={{ textTransform: 'lowercase' }}>
+                          {words.clickingHere}
+                        </$Link>
+                      ),
+                    }}
+                  />
                 </$span>
               }
             />
@@ -167,8 +216,14 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
       {lootboxSnapshots.length === 0 && (
         <Oopsies
-          title="No Lootboxes"
-          message={<$span>There are no Lootboxes associated to your tournament yet.</$span>}
+          title={noLootboxesText}
+          message={
+            <FormattedMessage
+              id="tournament.edit.noLootboxes.message"
+              defaultMessage="There are no Lootboxes associated to your tournament yet."
+              description="When there are no Lootboxes in a tournament"
+            />
+          }
           icon={'🧐'}
         />
       )}
@@ -193,7 +248,13 @@ const ManageTournament = (props: ManageTournamentProps) => {
       )}
 
       <$Divider />
-      <$h3 style={{ fontStyle: 'italic' }}>Edit your Lootbox Tournament</$h3>
+      <$h3 style={{ fontStyle: 'italic' }}>
+        <FormattedMessage
+          id="tournament.edit.editTournament.title"
+          defaultMessage="Edit your Lootbox Tournament"
+          description="Title for the section to edit a Lootbox esports tournament"
+        />
+      </$h3>
       <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
     </$Vertical>
   )
@@ -201,6 +262,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
 const ManageTournamentPage = () => {
   const [tournamentId, setTournamentId] = useState<TournamentID>()
+  const words = useWords()
 
   useEffect(() => {
     const load = async () => {
@@ -226,7 +288,7 @@ const ManageTournamentPage = () => {
       {tournamentId ? (
         <ManageTournament tournamentId={tournamentId} />
       ) : (
-        <Oopsies icon="🤷‍♂️" title="Tournament not found!" />
+        <Oopsies icon="🤷‍♂️" title={`${words.notFound}!`} />
       )}
     </AuthGuard>
   )

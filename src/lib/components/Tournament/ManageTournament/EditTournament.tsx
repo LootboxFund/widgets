@@ -18,6 +18,9 @@ import { TournamentID } from 'lib/types'
 import { $ErrorMessage, $InputLabel, $InputMedium, $TextAreaMedium, $TournamentCover } from '../common'
 import { $CoverImage, $InputImage, $InputImageLabel } from '../CreateTournament'
 import { uploadTournamentCover } from 'lib/api/firebase/storage'
+import { useIntl } from 'react-intl'
+import { tournamentWords as getTournamentWords } from '../common'
+import useWords from 'lib/hooks/useWords'
 
 interface EditTournamentProps {
   onSuccessCallback?: () => void
@@ -35,6 +38,15 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     { editTournament: EditTournamentResponse },
     MutationEditTournamentArgs
   >(EDIT_TOURNAMENT)
+  const words = useWords()
+  const intl = useIntl()
+  const tournamentWords = getTournamentWords(intl)
+
+  const saveChangesText = intl.formatMessage({
+    id: 'tournament.manage.saveChanges',
+    defaultMessage: 'Save Changes',
+    description: 'Button text to save changes to a tournament',
+  })
 
   const parseTitle = (title: string) => {
     setTournamentPayload({
@@ -103,16 +115,16 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
 
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
-      setErrorMessage('Title is required')
+      setErrorMessage(tournamentWords.titleRequired)
       return
     }
     if (!tournamentPayload.description) {
-      setErrorMessage('Description is required')
+      setErrorMessage(tournamentWords.descriptionRequired)
       return
     }
 
     if (!tournamentPayload.tournamentDate) {
-      setErrorMessage('Battle Date is required')
+      setErrorMessage(tournamentWords.startDateRequired)
       return
     }
 
@@ -139,7 +151,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
       })
 
       if (!data) {
-        throw new Error('An error occured!')
+        throw new Error(words.anErrorOccured)
       } else if (data?.editTournament?.__typename === 'ResponseError') {
         throw new Error(data.editTournament.error.message)
       }
@@ -149,7 +161,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
       onSuccessCallback && onSuccessCallback()
     } catch (err) {
       LogRocket.captureException(err)
-      setErrorMessage(err?.message || 'An error occured!')
+      setErrorMessage(err?.message || words.anErrorOccured)
     } finally {
       setLoadingImageUpload(false)
     }
@@ -169,17 +181,17 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         }}
       >
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-title">Title</$InputLabel>
+          <$InputLabel htmlFor="input-title">{words.title}</$InputLabel>
           <$InputMedium
             id="input-title"
             onChange={(e) => parseTitle(e.target.value)}
             value={tournamentPayload.title || ''}
-            placeholder="ex. My Awesome Tournament"
+            placeholder={tournamentWords.titlePlaceholder}
           ></$InputMedium>
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-magic">Lootbox Magic Link</$InputLabel>
+          <$InputLabel htmlFor="input-magic">Lootbox {words.magicLink}</$InputLabel>
           <$InputMedium
             id="input-magic"
             onChange={(e) => parseMagicLink(e.target.value)}
@@ -189,7 +201,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
 
         <$Horizontal spacing={2}>
           <$Vertical spacing={2} width="50%">
-            <$InputLabel htmlFor="input-battle-date">Battle Date</$InputLabel>
+            <$InputLabel htmlFor="input-battle-date">{words.battleDate}</$InputLabel>
             <$InputMedium
               id="input-battle-date"
               type="date"
@@ -203,10 +215,10 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
           </$Vertical>
 
           <$Vertical spacing={2} width="50%">
-            <$InputLabel htmlFor="input-prize">Prize</$InputLabel>
+            <$InputLabel htmlFor="input-prize">{words.prize}</$InputLabel>
             <$InputMedium
               id="input-prize"
-              placeholder="e.g. $50 USD"
+              placeholder={tournamentWords.prizePlaceholder}
               onChange={(e) => parsePrize(e.target.value)}
               value={tournamentPayload?.prize ? tournamentPayload.prize : ''}
             />
@@ -215,14 +227,14 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
 
         <$Vertical>
           <$InputImageLabel htmlFor="tournament-cover-uploader">
-            Edit Cover Photo (Landscape Recommended)
+            {tournamentWords.editCoverPhoto} ({tournamentWords.landscapeRecommended})
           </$InputImageLabel>
           <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
           <$CoverImage id="tournament-cover-photo" display={localCoverPhoto ? 'block' : 'none'} />
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-link">Link to Official Tournament</$InputLabel>
+          <$InputLabel htmlFor="input-link">{tournamentWords.linkToOfficalTournament}</$InputLabel>
           <$InputMedium
             id="input-link"
             onChange={(e) => parseTournamentLink(e.target.value)}
@@ -231,7 +243,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-descr">Description</$InputLabel>
+          <$InputLabel htmlFor="input-descr">{words.description}</$InputLabel>
           <$TextAreaMedium
             id="input-descr"
             onChange={(e) => parseDescription(e.target.value)}
@@ -253,7 +265,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
             }}
             disabled={loadingImageUpload || loading}
           >
-            <LoadingText loading={loadingImageUpload || loading} text="Save Changes" color={COLORS.trustFontColor} />
+            <LoadingText loading={loadingImageUpload || loading} text={saveChangesText} color={COLORS.trustFontColor} />
           </$Button>
         </div>
         {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}

@@ -21,6 +21,9 @@ import { manifest } from 'manifest'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
 import { uploadTournamentCover } from 'lib/api/firebase/storage'
+import { tournamentWords as getTournamentWords } from '../common'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface CreateTournamentProps {
   onSuccessCallback?: (tournament: Tournament) => void
@@ -39,6 +42,9 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     { createTournament: CreateTournamentResponse },
     MutationCreateTournamentArgs
   >(CREATE_TOURNAMENT)
+  const words = useWords()
+  const intl = useIntl()
+  const tournamentWords = getTournamentWords(intl)
 
   const parseTitle = (title: string) => {
     setTournamentPayload({
@@ -103,16 +109,16 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
 
   const handleButtonClick = async () => {
     if (!tournamentPayload.title) {
-      setErrorMessage('Title is required')
+      setErrorMessage(tournamentWords.titleRequired)
       return
     }
     if (!tournamentPayload.description) {
-      setErrorMessage('Description is required')
+      setErrorMessage(tournamentWords.descriptionRequired)
       return
     }
 
     if (!tournamentPayload.tournamentDate) {
-      setErrorMessage('Battle Date is required')
+      setErrorMessage(tournamentWords.startDateRequired)
       return
     }
 
@@ -131,7 +137,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
       })
 
       if (!data) {
-        throw new Error('An error occured!')
+        throw new Error(words.anErrorOccured)
       } else if (data?.createTournament?.__typename === 'ResponseError') {
         throw new Error(data.createTournament.error.message)
       }
@@ -141,7 +147,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
       onSuccessCallback && onSuccessCallback(res.tournament)
     } catch (err) {
       LogRocket.captureException(err)
-      setErrorMessage(err?.message || 'An error occured!')
+      setErrorMessage(err?.message || words.anErrorOccured)
     }
   }
 
@@ -162,13 +168,14 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
         }}
       >
         <$Vertical spacing={4}>
-          <$Header>Start a Tournament</$Header>
+          <$Header>{tournamentWords.createTournament}</$Header>
 
           <$Vertical spacing={2}>
-            <$span>Title</$span>
+            <$span>{words.title}</$span>
             <$InputMedium
               onChange={(e) => parseTitle(e.target.value)}
               value={tournamentPayload.title}
+              placeholder={tournamentWords.titlePlaceholder}
               style={{
                 color: `${COLORS.black}ca`,
               }}
@@ -176,7 +183,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
           </$Vertical>
 
           <$Vertical spacing={2}>
-            <$span>Description</$span>
+            <$span>{words.description}</$span>
             <$TextAreaMedium
               onChange={(e) => parseDescription(e.target.value)}
               value={tournamentPayload.description}
@@ -189,7 +196,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
 
           <$Horizontal spacing={2}>
             <$Vertical spacing={2} width="50%">
-              <$span>Battle Date</$span>
+              <$span>{words.battleDate}</$span>
               <$InputMedium
                 type="date"
                 placeholder="March 16th 2022"
@@ -201,9 +208,9 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
             </$Vertical>
 
             <$Vertical spacing={2} width="50%">
-              <$span>Prize</$span>
+              <$span>{words.prize}</$span>
               <$InputMedium
-                placeholder="e.g. $50 USD"
+                placeholder={tournamentWords.prizePlaceholder}
                 onChange={(e) => parsePrize(e.target.value)}
                 style={{
                   color: `${COLORS.black}ca`,
@@ -214,14 +221,15 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
 
           <$Vertical>
             <$InputImageLabel htmlFor="tournament-cover-uploader">
-              {localCoverPhoto ? 'Change' : 'Add a'} Cover Photo (Landscape Recommended)
+              {localCoverPhoto ? tournamentWords.editCoverPhoto : tournamentWords.addCoverPhoto} (
+              {tournamentWords.landscapeRecommended})
             </$InputImageLabel>
             <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
             <$CoverImage id="tournament-cover-photo" display={localCoverPhoto ? 'block' : 'none'} />
           </$Vertical>
 
           <$Vertical spacing={2}>
-            <$span>Link to Official Tournament</$span>
+            <$span>{tournamentWords.linkToOfficalTournament}</$span>
             <$InputMedium
               onChange={(e) => parseTournamentLink(e.target.value)}
               value={tournamentPayload?.tournamentLink || ''}
@@ -244,7 +252,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
             }}
             disabled={loading}
           >
-            <LoadingText loading={loading} text="Create a Tournament" color={COLORS.trustFontColor} />
+            <LoadingText loading={loading} text={tournamentWords.createTournament} color={COLORS.trustFontColor} />
           </$Button>
           {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}
         </$Vertical>
