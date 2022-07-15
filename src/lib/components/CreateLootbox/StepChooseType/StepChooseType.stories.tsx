@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import StepChooseType, { LootboxType, StepChooseTypeProps } from 'lib/components/CreateLootbox/StepChooseType'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Choose Type',
@@ -27,16 +28,18 @@ const Demo = (args: StepChooseTypeProps) => {
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseType
-        selectedType={lootboxType}
-        selectedNetwork={network}
-        stage={stage}
-        onSelectType={selectType}
-        onNext={() => console.log('onNext')}
-        setValidity={(bool: boolean) => console.log(bool)}
-      />
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepChooseType
+          selectedType={lootboxType}
+          selectedNetwork={network}
+          stage={stage}
+          onSelectType={selectType}
+          onNext={() => console.log('onNext')}
+          setValidity={(bool: boolean) => console.log(bool)}
+        />
+      </div>
+    </LocalizationWrapper>
   )
 }
 

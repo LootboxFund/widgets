@@ -10,6 +10,7 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import Web3 from 'web3'
 import { Address, convertHexToDecimal } from '@wormgraph/helpers'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Terms',
@@ -120,23 +121,25 @@ const Demo = (args: StepTermsConditionsProps) => {
     }
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepTermsConditions
-        setValidity={(valid: boolean) => {}}
-        allConditionsMet={stage === 'may_proceed'}
-        termsState={termsState}
-        updateTermsState={updateTermsState}
-        selectedNetwork={network}
-        stage={stage}
-        reputationWallet={reputationWallet}
-        treasuryWallet={treasuryWallet}
-        updateTreasuryWallet={setTreasuryWallet}
-        onNext={() => console.log('onNext')}
-        submitStatus={submitStatus}
-        onSubmit={() => createLootbox()}
-        goToLootboxAdminPage={() => 'goToLootboxAdminPage'}
-      />
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepTermsConditions
+          setValidity={(valid: boolean) => {}}
+          allConditionsMet={stage === 'may_proceed'}
+          termsState={termsState}
+          updateTermsState={updateTermsState}
+          selectedNetwork={network}
+          stage={stage}
+          reputationWallet={reputationWallet}
+          treasuryWallet={treasuryWallet}
+          updateTreasuryWallet={setTreasuryWallet}
+          onNext={() => console.log('onNext')}
+          submitStatus={submitStatus}
+          onSubmit={() => createLootbox()}
+          goToLootboxAdminPage={() => 'goToLootboxAdminPage'}
+        />
+      </div>
+    </LocalizationWrapper>
   )
 }
 

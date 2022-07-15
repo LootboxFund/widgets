@@ -6,6 +6,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initBuySharesState, buySharesState } from './state'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'BuyShares',
@@ -30,9 +31,11 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-      <BuyShares />
-    </$CardViewport>
+    <LocalizationWrapper>
+      <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
+        <BuyShares />
+      </$CardViewport>
+    </LocalizationWrapper>
   )
 }
 

@@ -3,6 +3,7 @@ import StepCustomize, { StepCustomizeProps } from 'lib/components/CreateLootbox/
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import BN from 'bignumber.js'
 import useHtmlScript, { useHtmlFirebaseStorage } from 'lib/api/useHtmlScript'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Customize',
@@ -51,17 +52,19 @@ const Demo = (args: StepCustomizeProps) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepCustomize
-        setValidity={(valid: boolean) => {}}
-        ticketState={ticketState}
-        updateTicketState={updateTicketState}
-        selectedNetwork={network}
-        stage={stage}
-        fundraisingTarget={new BN('10000000000000000000')}
-        onNext={() => console.log('onNext')}
-      />
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepCustomize
+          setValidity={(valid: boolean) => {}}
+          ticketState={ticketState}
+          updateTicketState={updateTicketState}
+          selectedNetwork={network}
+          stage={stage}
+          fundraisingTarget={new BN('10000000000000000000')}
+          onNext={() => console.log('onNext')}
+        />
+      </div>
+    </LocalizationWrapper>
   )
 }
 

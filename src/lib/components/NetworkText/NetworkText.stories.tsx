@@ -1,6 +1,6 @@
 import React from 'react'
 import NetworkText, { NetworkTextProps } from 'lib/components/NetworkText'
-
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'NetworkText',
@@ -8,7 +8,9 @@ export default {
 }
 
 const Demo = (args: NetworkTextProps) => (
-  <NetworkText {...args} />
+  <LocalizationWrapper>
+    <NetworkText {...args} />
+  </LocalizationWrapper>
 )
 
 export const Basic = Demo.bind({})

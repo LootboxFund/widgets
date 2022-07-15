@@ -1,21 +1,21 @@
 import React from 'react'
 import StepCard, { StepCardProps } from 'lib/components/CreateLootbox/StepCard'
-
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'StepCard',
   component: StepCard,
-  stage: {
-
-  }
+  stage: {},
 }
 
 const Demo = (args: StepCardProps) => (
-  <div style={{ width: '760px', height: '600px' }}>
-    <StepCard themeColor='#F0B90B' stage={"completed"} onNext={() => console.log("onNext")} errors={[]}>
-      <h1 style={{fontFamily: "sans-serif"}}>Hello World</h1>
-    </StepCard>
-  </div>
+  <LocalizationWrapper>
+    <div style={{ width: '760px', height: '600px' }}>
+      <StepCard themeColor="#F0B90B" stage={'completed'} onNext={() => console.log('onNext')} errors={[]}>
+        <h1 style={{ fontFamily: 'sans-serif' }}>Hello World</h1>
+      </StepCard>
+    </div>
+  </LocalizationWrapper>
 )
 
 export const Basic = Demo.bind({})

@@ -7,6 +7,7 @@ import { loadTicketData, ticketCardState } from './state'
 import Web3 from 'web3'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'TicketCard',
@@ -33,9 +34,11 @@ const Template = () => {
   }, [])
 
   return (
-    <$CardViewport width="340px">
-      <TicketCard ticketID={ticketID} isRedeemEnabled={true} />
-    </$CardViewport>
+    <LocalizationWrapper>
+      <$CardViewport width="340px">
+        <TicketCard ticketID={ticketID} isRedeemEnabled={true} />
+      </$CardViewport>
+    </LocalizationWrapper>
   )
 }
 
