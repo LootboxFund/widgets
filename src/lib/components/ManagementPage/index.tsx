@@ -18,10 +18,14 @@ import { useSnapshot } from 'valtio'
 import $Button from '../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import ViewPartyBaskets from '../PartyBasket/ViewPartyBaskets'
+import useWords from 'lib/hooks/useWords'
+import { useIntl } from 'react-intl'
 
 export interface ManagementPageProps {}
 
 const ManagementPage = () => {
+  const intl = useIntl()
+  const words = useWords()
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [lootboxMetadata, setLootboxMetadata] = useState<LootboxMetadata>()
   const [network, setNetwork] = useState<NetworkOption>()
@@ -29,8 +33,14 @@ const ManagementPage = () => {
   const [isActivelyFundraising, setIsActivelyFundraising] = useState<boolean>(true)
   const snapUserState = useSnapshot(userState)
   const { screen } = useWindowSize()
-
   const refRewardSponsors = useRef<HTMLDivElement | null>(null)
+
+  const noMetadataFound = intl.formatMessage({
+    id: 'lootbox.manage.noMetadataFound',
+    defaultMessage: 'No metadata found',
+    description:
+      'Error message when we couldnt find metadata for a lootbox. Metadata is like auciliary data for a lootbox that is not stored on the blockchain.',
+  })
 
   useEffect(() => {
     const addr = parseUrlParams('lootbox') as ContractAddress
@@ -40,7 +50,7 @@ const ManagementPage = () => {
       readLootboxMetadata(addr)
         .then((metadata: LootboxMetadata) => {
           if (!metadata || !metadata?.lootboxCustomSchema) {
-            throw Error('No metadata found')
+            throw Error(noMetadataFound)
           }
           setLootboxMetadata(metadata)
           const network = matchNetworkByHex(metadata?.lootboxCustomSchema?.chain?.chainIdHex)
@@ -72,7 +82,7 @@ const ManagementPage = () => {
       })
       setTimeout(() => {
         if (!window.ethereum) {
-          alert('Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app')
+          alert(words.pleaseInstallMetamaskChromeExtension)
         } else {
           initDApp().catch((err) => LogRocket.captureException(err))
         }
@@ -89,13 +99,15 @@ const ManagementPage = () => {
       const targetChain = lootboxMetadata?.lootboxCustomSchema?.chain?.chainIdHex
       return (
         <section>
-          {snapUserState.accounts.length === 0 && <$p>You need to connect your MetaMask wallet</$p>}
+          {snapUserState.accounts.length === 0 && <$p>{words.connectWalletToMetamask}</$p>}
           <WalletStatus targetNetwork={targetChain} />
           {snapUserState?.network?.currentNetworkIdHex &&
             targetChain &&
             snapUserState?.network?.currentNetworkIdHex !== targetChain && (
               <div>
-                <$p>Wrong Network, you need to switch to {lootboxMetadata?.lootboxCustomSchema?.chain?.chainName}</$p>
+                <$p>
+                  {words.wrongNetworkPleaseChangeTo} {lootboxMetadata?.lootboxCustomSchema?.chain?.chainName}
+                </$p>
                 <$Button
                   screen={screen}
                   color={`${COLORS.dangerFontColor}90`}
@@ -110,14 +122,14 @@ const ManagementPage = () => {
                     fontSize: '1.2rem',
                   }}
                 >
-                  Switch network
+                  {words.switchNetwork}
                 </$Button>
               </div>
             )}
         </section>
       )
     }
-    return <$p>{`Could not find metadata for Lootbox ${lootboxAddress}.`}</$p>
+    return <$p>{`${noMetadataFound} for ${lootboxAddress}.`}</$p>
   }
 
   return (

@@ -45,6 +45,13 @@ const useWords = () => {
     description: 'Button text prompting user to install metamask',
   })
 
+  const pleaseInstallMetamaskChromeExtension = intl.formatMessage({
+    id: 'generic.pleaseInstallMetamaskChromeExtension',
+    defaultMessage: 'Please install MetaMask to use this app. Use the Chrome extension or Metamask mobile app.',
+    description:
+      'Error message shown to user when they do not have the metamask extension installed. We suggest using a chrome extension.',
+  })
+
   const switchNetwork = intl.formatMessage({
     id: 'generic.switchNetwork',
     defaultMessage: 'Switch network',
@@ -213,6 +220,13 @@ const useWords = () => {
     description: 'Generic user action to search for Lootboxes by name or the smart contract address.',
   })
 
+  const contractAddress = intl.formatMessage({
+    id: 'generic.contractAddress',
+    defaultMessage: 'Contract address',
+    description:
+      'This is a blockchain smart contract address, (i.e. smart contract has address 0x1234567890123456789012345678901234567890)',
+  })
+
   const createLootbox = intl.formatMessage({
     id: 'generic.createLootbox',
     defaultMessage: 'Create a Lootbox',
@@ -305,6 +319,13 @@ const useWords = () => {
       'This is the name of a piece of software we use to manage Lootbox bounties. In sentence: "You can redeem a Lootbox NFT from your tournament`s party basket"',
   })
 
+  const partyBaskets = intl.formatMessage({
+    id: 'generic.partyBaskets',
+    defaultMessage: 'Party baskets',
+    description:
+      'Plural, This is the name of a piece of software we use to manage Lootbox bounties. In sentence: "You can redeem a Lootbox NFT from your tournament`s party basket"',
+  })
+
   const submitting = intl.formatMessage({
     id: 'generic.submitting',
     defaultMessage: 'Submitting',
@@ -319,7 +340,7 @@ const useWords = () => {
 
   const createAPartyBasket = intl.formatMessage({
     id: 'generic.createAPartyBasket',
-    defaultMessage: 'Create a party basket',
+    defaultMessage: 'Create a Party Basket',
     description: 'User action to create a party basket',
   })
 
@@ -345,6 +366,119 @@ const useWords = () => {
     id: 'generic.processing',
     defaultMessage: 'Processing',
     description: 'Generic text indicating that something is processing',
+  })
+
+  const wrongNetworkPleaseChangeTo = intl.formatMessage({
+    id: 'generic.wrongNetworkPleaseChangeTo',
+    defaultMessage: 'You are on the wrong network! Please change your MetaMask network to',
+    description:
+      'Text indicating you are on the wrong blockchain network. This is not a full sentence, we will show a target network immediately after. For example, "Please change your MetaMask network to (ETHEREUM)"',
+  })
+
+  const pleaseRefreshThePage = intl.formatMessage({
+    id: 'generic.pleaseRefreshThePage',
+    defaultMessage: 'Please refresh the page',
+    description: 'Text asking user if they can refresh the browser page.',
+  })
+
+  const funded = intl.formatMessage({
+    id: 'generic.funded',
+    defaultMessage: 'Funded',
+    description: 'Generic text indicating that something has been funded (aka. received investment)',
+  })
+
+  const goal = intl.formatMessage({
+    id: 'generic.goal',
+    defaultMessage: 'Goal',
+    description: 'Generic text indicating that something has a goal',
+  })
+
+  const rewards = intl.formatMessage({
+    id: 'generic.rewards',
+    defaultMessage: 'Rewards',
+    description: 'Plural form of "reward"',
+  })
+
+  const version = intl.formatMessage({
+    id: 'generic.version',
+    defaultMessage: 'Version',
+    description: 'Generic text indicating the version of something (i.e. software version of "1.0.0")',
+  })
+
+  const minted = intl.formatMessage({
+    id: 'generic.minted',
+    defaultMessage: 'Minted',
+    description: 'Word indicating that an NFT on the blockchain has been created',
+  })
+
+  const copy = intl.formatMessage({
+    id: 'generic.copy',
+    defaultMessage: 'Copy',
+    description: 'Generic text indicating to copy something',
+  })
+
+  const viewOnBlockExplorer = intl.formatMessage({
+    id: 'generic.viewOnBlockExplorer',
+    defaultMessage: 'View on block explorer',
+    description:
+      'Generic text indicating to view a smart contract or transaction on a block explorer (like bscscan.com)',
+  })
+
+  const receivingWallet = intl.formatMessage({
+    id: 'generic.receivingWallet',
+    defaultMessage: 'Receiving wallet',
+    description: 'Text indicating the address of a wallet to receive something (like a crypto payment)',
+  })
+
+  const receiverAddress = intl.formatMessage({
+    id: 'generic.receivingAddress',
+    defaultMessage: 'Receiver address',
+    description:
+      'Text indicating the address of a wallet to receive something (like a crypto payment), synonymous to "receiving wallet',
+  })
+
+  const reputationAddress = intl.formatMessage({
+    id: 'generic.reputationAddress',
+    defaultMessage: 'Reputation address',
+    description: 'Text indicating the address that the gamer want to link their reputation to',
+  })
+
+  const testnet = intl.formatMessage({
+    id: 'generic.testnet',
+    defaultMessage: 'Testnet',
+    description:
+      '"Testnet" is a blockchain specifically for testing purposes. Testnets are used to test features with fake money.',
+  })
+
+  const rewardSponsors = intl.formatMessage({
+    id: 'generic.rewardSponsors',
+    defaultMessage: 'Reward sponsors',
+    description: 'Title which means you can reward your sponsors with crypto!',
+  })
+
+  const viewTransactionReceipt = intl.formatMessage({
+    id: 'generic.viewTransactionReceipt',
+    defaultMessage: 'View transaction reciept',
+    description: 'Text indicating to view the transaction receipt',
+  })
+
+  const bulkMintNFTs = intl.formatMessage({
+    id: 'generic.bulkMintNFTs',
+    defaultMessage: 'Bulk mint NFTs',
+    description: 'Text indicating to bulk mint NFTs',
+  })
+
+  const loginToMakePartyBasket = intl.formatMessage({
+    id: 'generics.loginToMakePartyBasket',
+    defaultMessage: 'Login to make a Party Basket',
+    description: 'User prompt indicating that the user should login to make a Party Basket.',
+  })
+
+  const partyBasketInformation = intl.formatMessage({
+    id: 'generics.partyBasketInformation',
+    defaultMessage:
+      "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
+    description: 'Tooltip for creating a Party Basket',
   })
 
   return {
@@ -405,6 +539,27 @@ const useWords = () => {
     copiedToClipBoard,
     add,
     processing,
+    pleaseInstallMetamaskChromeExtension,
+    wrongNetworkPleaseChangeTo,
+    pleaseRefreshThePage,
+    funded,
+    goal,
+    rewards,
+    version,
+    minted,
+    copy,
+    viewOnBlockExplorer,
+    receivingWallet,
+    reputationAddress,
+    testnet,
+    rewardSponsors,
+    contractAddress,
+    viewTransactionReceipt,
+    bulkMintNFTs,
+    receiverAddress,
+    partyBaskets,
+    loginToMakePartyBasket,
+    partyBasketInformation,
   }
 }
 

@@ -8,6 +8,7 @@ import { NetworkOption } from 'lib/api/network'
 import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
 
 export default {
   title: 'BulkMint',
@@ -112,13 +113,15 @@ const Demo = (args: BulkMintProps) => {
     return 'Loading...'
   }
   return (
-    <BulkMint
-      {...args}
-      lootboxAddress={'0x2E0D27e76C53bE47775bdfbcf274F18d920C3B20' as ContractAddress}
-      lootboxMetadata={ticketMetadata}
-      network={network}
-      lootboxType={'Escrow'}
-    />
+    <LocalizationWrapper>
+      <BulkMint
+        {...args}
+        lootboxAddress={'0x2E0D27e76C53bE47775bdfbcf274F18d920C3B20' as ContractAddress}
+        lootboxMetadata={ticketMetadata}
+        network={network}
+        lootboxType={'Escrow'}
+      />
+    </LocalizationWrapper>
   )
 }
 

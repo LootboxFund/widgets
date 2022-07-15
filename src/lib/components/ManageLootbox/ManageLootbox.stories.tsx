@@ -7,6 +7,7 @@ import { TicketID, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
+import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
 
 export default {
   title: 'Manage Lootbox',
@@ -98,15 +99,17 @@ const Template = (args: ManageLootboxProps) => {
     return 'Loading...'
   }
   return (
-    <ManageLootbox
-      {...args}
-      themeColor={'#F0B90B'}
-      lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress}
-      ticketID={'0' as TicketID}
-      ticketMetadata={ticketMetadata}
-      network={network}
-      lootboxType={'Escrow'}
-    />
+    <LocalizationWrapper>
+      <ManageLootbox
+        {...args}
+        themeColor={'#F0B90B'}
+        lootboxAddress={'0x3E03B9891a935E7CCeBcE0c6499Bb443e2972B0a' as ContractAddress}
+        ticketID={'0' as TicketID}
+        ticketMetadata={ticketMetadata}
+        network={network}
+        lootboxType={'Escrow'}
+      />
+    </LocalizationWrapper>
   )
 }
 

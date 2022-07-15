@@ -18,6 +18,7 @@ import { defaultFundraisingLimitMultiplier, defaultFundraisingLimitMultiplierDec
 import { InitialUrlParams } from '../state'
 import { FormattedMessage, useIntl } from 'react-intl'
 import React from 'react'
+import useWords from 'lib/hooks/useWords'
 
 export const validateFundraisingTarget = (fundraisingTarget: BigNumber) => {
   const web3Utils = useWeb3Utils()
@@ -43,6 +44,7 @@ export interface StepChooseFundingProps {
 }
 
 const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.RefObject<HTMLDivElement>) => {
+  const words = useWords()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const { screen } = useWindowSize()
@@ -65,6 +67,17 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
     description:
       'Text in an input element, where the user can enter the metamask wallet address where funds will arrive',
   })
+
+  const receivingWalletErrorText = intl.formatMessage(
+    {
+      id: 'createLootbox.receivingWalletError',
+      defaultMessage: 'Invalid Receiving Wallet, check if the address is compatible with {networkName}.',
+      description: 'Error message when the user enters an invalid receiving wallet address',
+    },
+    {
+      networkName: props.selectedNetwork?.name || 'NETWORK',
+    }
+  )
 
   useEffect(() => {
     getLatestPrice()
@@ -290,7 +303,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
       if (!validReceiver) {
         setErrors({
           ...errors,
-          receivingWallet: `Invalid Receiving Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`,
+          receivingWallet: receivingWalletErrorText,
         })
         props.setValidity(false)
       } else if (validFundraiser && validReceiver) {
@@ -316,11 +329,7 @@ const StepChooseFunding = forwardRef((props: StepChooseFundingProps, ref: React.
               description="Input form title for the receiving wallet in tournament, which is called 'Tournament' wallet."
             />
           ) : (
-            <FormattedMessage
-              id="create.lootbox.step.fundraising.receivingWallet"
-              defaultMessage="Receiving Wallet"
-              description="Input form title for the receiving wallet, which is called 'Receiving' wallet."
-            />
+            words.receivingWallet
           )}
           <HelpIcon tipID="receivingWallet" />
           <ReactTooltip id="receivingWallet" place="right" effect="solid">

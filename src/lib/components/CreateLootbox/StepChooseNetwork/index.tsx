@@ -56,7 +56,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
             props.setDoesNetworkMatch(false)
             setErrors([
               `${words.wrongNetworkPleaseChangeTo} "${props.selectedNetwork?.name}${
-                props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''
+                props.selectedNetwork?.isTestnet ? ` (${words.testnet})` : ''
               }"`,
             ])
           } else {
@@ -70,7 +70,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
                       id="createLootbox.stepChooseNetwork.error.noTokens"
                       defaultMessage="You do not have any {networkType}tokens!"
                       description="Error message when the user has no tokens"
-                      values={{ networkType: props.selectedNetwork?.isTestnet ? 'Testnet ' : '' }}
+                      values={{ networkType: props.selectedNetwork?.isTestnet ? `${words.testnet} ` : '' }}
                     />,
                   ])
                 } else {
@@ -116,13 +116,7 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
                   {network.name}
                 </$NetworkName>
                 <$ComingSoon isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}>
-                  {network.isTestnet && (
-                    <FormattedMessage
-                      id="create.lootbox.step.choose.network.testnet"
-                      defaultMessage="Testnet"
-                      description='"Testnet" is a blockchain specifically for testing purposes. Testnets are used to test features with fake money.'
-                    />
-                  )}
+                  {network.isTestnet && words.testnet}
                 </$ComingSoon>
               </$Horizontal>
             ) : (
