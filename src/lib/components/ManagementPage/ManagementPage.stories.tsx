@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ManagementPage, { ManagementPageProps } from 'lib/components/ManagementPage'
 import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'Management Page',

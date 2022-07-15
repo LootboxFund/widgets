@@ -1,6 +1,6 @@
 import React from 'react'
 import SearchBar, { TemplateProps } from 'lib/components/SearchBar'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'SearchBar',

@@ -6,7 +6,7 @@ import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
 import Authentication from './index'
 import { manifest } from 'manifest'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'Authentication',

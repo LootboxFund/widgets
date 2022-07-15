@@ -8,7 +8,7 @@ import { NetworkOption } from 'lib/api/network'
 import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'BulkMint',

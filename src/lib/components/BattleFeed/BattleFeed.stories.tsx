@@ -7,7 +7,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ContractAddress } from '@wormgraph/helpers'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'BattleFeed',

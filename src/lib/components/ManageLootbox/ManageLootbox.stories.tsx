@@ -7,7 +7,7 @@ import { TicketID, ContractAddress, ITicketMetadata } from '@wormgraph/helpers'
 import { NetworkOption } from 'lib/api/network'
 import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'Manage Lootbox',

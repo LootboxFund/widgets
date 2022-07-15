@@ -5,7 +5,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import Profile from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'Profile',

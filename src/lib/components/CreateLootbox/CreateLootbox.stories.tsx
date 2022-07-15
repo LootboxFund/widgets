@@ -3,7 +3,7 @@ import CreateLootbox, { CreateLootboxProps } from 'lib/components/CreateLootbox'
 import Web3 from 'web3'
 import { useHtmlEthers, useHtmlWeb3 } from 'lib/api/useHtmlScript'
 import { initDApp } from 'lib/hooks/useWeb3Api'
-import LocalizationWrapper from 'lib/components/Internationalization/LocalizationWrapper'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'Create Lootbox',

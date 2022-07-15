@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
-import LocalizationWrapper from 'lib/components/Internationalization/LocalizationWrapper'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'ManagePartyBasket',

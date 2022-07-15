@@ -6,7 +6,7 @@ import { $CardViewport } from '../Generics'
 import Web3 from 'web3'
 import { onLoad } from './'
 import { ContractAddress } from '@wormgraph/helpers'
-import LocalizationWrapper from '../Internationalization/LocalizationWrapper'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'InteractWithLootbox',

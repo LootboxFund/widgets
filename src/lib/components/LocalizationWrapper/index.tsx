@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import {
-  useIntl,
-  IntlProvider,
-  FormattedMessage,
-  FormattedDate,
-  FormattedTime,
-  FormattedRelativeTime,
-  FormattedNumber,
-  FormattedList,
-} from 'react-intl'
+import { IntlProvider } from 'react-intl'
 
 // TODO put in @helpers
 type Locale = 'en' | 'fr'
 
-let initLocale: Locale = 'fr'
+let initLocale: Locale = 'en'
 
 if (navigator.language === 'fr') {
   initLocale = 'fr'
@@ -45,15 +36,13 @@ const loadMessages = async (locale: Locale) => {
 
 type LocalizationWrapperProps = { children: JSX.Element }
 
-const LocalizationWrapper = ({ children, ...rest }: LocalizationWrapperProps) => {
+const LocalizationWrapper = ({ children }: LocalizationWrapperProps) => {
   const [locale, setLocale] = useState(initLocale)
   const [messages, setMessages] = useState<{ [key: string]: any } | null>(null)
 
   useEffect(() => {
     loadMessages(locale).then((messages) => setMessages(messages.default))
   }, [locale])
-
-  console.log('messages loaded', messages)
 
   return messages ? (
     <IntlProvider locale={locale} messages={messages}>
