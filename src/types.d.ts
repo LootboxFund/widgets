@@ -6,6 +6,7 @@ declare global {
   interface Window {
     web3: any
     ethers: typeof ethers
+    Weglot: any
     // ethereum: any
   }
 }
