@@ -1,3 +1,5 @@
+import React from 'react'
+
 export * from './lootbox'
 
 export interface SocialFragment {

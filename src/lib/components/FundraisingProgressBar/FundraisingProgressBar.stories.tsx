@@ -2,6 +2,7 @@ import react, { useEffect } from 'react'
 import { FundraisingProgressBar, FundraisingProgressBarProps } from '../FundraisingProgressBar'
 import { $CardViewport } from '../Generics'
 import { COLORS } from 'lib/theme'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 const props = {
   percentageFunded: 80,
@@ -17,9 +18,11 @@ export default {
 
 const Template = (args: FundraisingProgressBarProps) => {
   return (
-    <$CardViewport width="100vw" maxWidth="600px">
-      <FundraisingProgressBar {...args} />
-    </$CardViewport>
+    <LocalizationWrapper>
+      <$CardViewport width="100vw" maxWidth="600px">
+        <FundraisingProgressBar {...args} />
+      </$CardViewport>
+    </LocalizationWrapper>
   )
 }
 

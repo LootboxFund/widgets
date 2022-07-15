@@ -18,6 +18,9 @@ import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { COLORS } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
+import useWords from 'lib/hooks/useWords'
+import { tournamentWords as getTournamentWords } from '../common'
+import { useIntl } from 'react-intl'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -25,6 +28,8 @@ interface PublicTournamentProps {
 
 /** Public Tournament Widget */
 const PublicTournament = (props: PublicTournamentProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const { screen } = useWindowSize()
   const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
@@ -32,6 +37,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
       id: props.tournamentId,
     },
   })
+  const tournamentWords = getTournamentWords(intl)
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -61,10 +67,10 @@ const PublicTournament = (props: PublicTournamentProps) => {
                     color={'inherit'}
                     fontStyle="italic"
                     href={tournament.magicLink}
-                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                     target="_self"
                   >
-                    Create Lootbox
+                    {words.createLootbox}
                   </$Link>
                 </$span>
               )}
@@ -76,10 +82,10 @@ const PublicTournament = (props: PublicTournamentProps) => {
                     color={'inherit'}
                     fontStyle="italic"
                     href={tournament.tournamentLink}
-                    style={{ marginRight: '15px', textDecoration: 'none' }}
+                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                     target="_blank"
                   >
-                    Visit Tournament
+                    {tournamentWords.visitTournament}
                   </$Link>
                 </$span>
               ) : null}
@@ -90,10 +96,10 @@ const PublicTournament = (props: PublicTournamentProps) => {
                   color={'inherit'}
                   fontStyle="italic"
                   href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
-                  style={{ marginRight: '15px', textDecoration: 'none' }}
+                  style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                   target="_blank"
                 >
-                  Watch Tutorial
+                  {words.watchTutorial}
                 </$Link>
               </$span>
             </$Horizontal>
@@ -123,6 +129,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
 
 const PublicTournamentPage = () => {
   const [tournamentId, setTournamentId] = useState<TournamentID>()
+  const words = useWords()
 
   useEffect(() => {
     const load = async () => {
@@ -146,7 +153,7 @@ const PublicTournamentPage = () => {
   return tournamentId ? (
     <PublicTournament tournamentId={tournamentId} />
   ) : (
-    <Oopsies icon="🤷‍♂️" title="Tournament not found!" />
+    <Oopsies icon="🤷‍♂️" title={`${words.notFound}!`} />
   )
 }
 

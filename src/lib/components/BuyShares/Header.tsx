@@ -8,12 +8,14 @@ import { truncateAddress } from 'lib/api/helpers'
 import { Address, BLOCKCHAINS } from '@wormgraph/helpers'
 import { $Vertical, $Horizontal } from '../Generics'
 import { buySharesState } from './state'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface BuySharesHeaderProps {}
 const BuySharesHeader = (props: BuySharesHeaderProps) => {
-  // const { screen } = useWindowSize()
   const snapUserState = useSnapshot(userState)
   const snapBuySharesState = useSnapshot(buySharesState)
+  const words = useWords()
 
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
@@ -38,14 +40,20 @@ const BuySharesHeader = (props: BuySharesHeaderProps) => {
       <$Horizontal>
         <$Icon>🎁</$Icon>
         <$Vertical>
-          <$BuySharesHeaderTitle>Mint your Profit Sharing NFT</$BuySharesHeaderTitle>
+          <$BuySharesHeaderTitle>
+            <FormattedMessage
+              id="buyShares.header.title"
+              defaultMessage="Mint your Profit Sharing NFT"
+              description="Title of the Buy Shares component. Minting is the act of creating a Lootbox NFT on the blockchain."
+            />
+          </$BuySharesHeaderTitle>
           {subHeader ? <$BuySharesHeaderSubTitle>{subHeader}</$BuySharesHeaderSubTitle> : undefined}
         </$Vertical>
       </$Horizontal>
 
       <>
         <$NetworkText style={{ flex: 2 }}>
-          <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+          <b>{words.network}:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
           <span
             onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
             style={{ cursor: 'pointer' }}

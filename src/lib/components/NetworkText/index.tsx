@@ -5,9 +5,11 @@ import { COLORS } from 'lib/theme'
 import react from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
+import useWords from 'lib/hooks/useWords'
 
 export interface NetworkTextProps {}
 const NetworkText = (props: NetworkTextProps) => {
+  const words = useWords()
   const snapUserState = useSnapshot(userState)
   const renderTinyAccount = () => {
     if (snapUserState.currentAccount) {
@@ -18,7 +20,11 @@ const NetworkText = (props: NetworkTextProps) => {
   }
   return (
     <$NetworkText style={{ flex: 2 }}>
-      <b>Network:</b> {snapUserState.network.currentNetworkDisplayName}{' '}
+      <b>
+        {words.network}
+        {':'}
+      </b>{' '}
+      {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
         onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
         style={{ cursor: 'pointer' }}

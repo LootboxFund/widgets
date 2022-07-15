@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from 'lib/theme'
 import CheckIcon from 'lib/theme/icons/Check.icon'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { FormattedMessage } from 'react-intl'
 
 export type StepStage = 'not_yet' | 'in_progress' | 'may_proceed' | 'completed'
 export interface StepCardProps {
@@ -11,12 +12,20 @@ export interface StepCardProps {
   children: React.ReactNode
   customActionBar?: () => React.ReactNode
   onNext: () => void
-  errors?: string[]
+  errors?: (string | React.ReactElement)[]
 }
+
 const StepCard = (props: StepCardProps) => {
   const totalErrors = (props.errors || []).filter((e) => e).length
   const themeColor = props.themeColor || COLORS.surpressedFontColor
   const { screen } = useWindowSize()
+  const completed = (
+    <FormattedMessage
+      id="step.card.completed"
+      defaultMessage="COMPLETED"
+      description="When a user has finished a step, it shows this message."
+    />
+  )
   const renderStepButton = () => {
     if (totalErrors > 0) {
       return (
@@ -40,7 +49,7 @@ const StepCard = (props: StepCardProps) => {
           clickable
           onClick={props.onNext}
         >
-          <span style={{ fontSize: '1.2rem', marginRight: '5px' }}>✔</span> COMPLETED
+          <span style={{ fontSize: '1.2rem', marginRight: '5px' }}>✔</span> {completed}
         </$StepButton>
       )
     }
@@ -52,7 +61,7 @@ const StepCard = (props: StepCardProps) => {
           clickable
           onClick={props.onNext}
         >
-          <CheckIcon width={20} /> COMPLETED
+          <CheckIcon width={20} /> {completed}
         </$StepButton>
       )
     }

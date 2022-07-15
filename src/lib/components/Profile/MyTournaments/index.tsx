@@ -12,12 +12,16 @@ import $Button from 'lib/components/Generics/Button'
 import PopConfirm from 'lib/components/Generics/PopConfirm'
 import Spinner, { $Spinner } from 'lib/components/Generics/Spinner'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
 import { useState } from 'react'
+import { FormattedMessage, useIntl } from 'react-intl'
 import { $Link, $SearchInput, $SettingContainer, Oopsies } from '../common'
 import { DELETE_TOURNAMENT, GET_MY_TOURNAMENTS } from './api.gql'
 
 const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
+  const words = useWords()
+  const intl = useIntl()
   const [searchTerm, setSearchTerm] = useState('')
   const { screen } = useWindowSize()
   const [deleteTournament] = useMutation<{ deleteTournament: DeleteTournamentResponse }, MutationDeleteTournamentArgs>(
@@ -30,6 +34,12 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
     [key: string]: { loading: boolean; errorMessage: string }
   }>({})
 
+  const searchTournamentsByName = intl.formatMessage({
+    id: 'profile.tournaments.searchTournamentsByName',
+    defaultMessage: 'Search Tournaments by Name',
+    description: 'User can search their esports tournaments by name',
+  })
+
   const filteredTournaments: Tournament[] = !!searchTerm
     ? [...(tournaments?.filter((snapshot) => snapshot?.title.toLowerCase().includes(searchTerm.toLowerCase())) || [])]
     : [...(tournaments || [])]
@@ -41,7 +51,10 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
       if (data?.deleteTournament?.__typename === 'ResponseError') {
         setTournamentStatus({
           ...tournamentStatus,
-          [tournament.id]: { loading: false, errorMessage: data.deleteTournament.error.message || 'An error occured!' },
+          [tournament.id]: {
+            loading: false,
+            errorMessage: data.deleteTournament.error.message || `${words.anErrorOccured}!`,
+          },
         })
       } else {
         setTournamentStatus({ ...tournamentStatus, [tournament.id]: { loading: false, errorMessage: '' } })
@@ -49,7 +62,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
     } catch (error) {
       setTournamentStatus({
         ...tournamentStatus,
-        [tournament.id]: { loading: false, errorMessage: error.message || 'An error occured!' },
+        [tournament.id]: { loading: false, errorMessage: error.message || `${words.anErrorOccured}!` },
       })
     }
   }
@@ -58,7 +71,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
     <$Vertical spacing={4}>
       <$SearchInput
         type="search"
-        placeholder="🔍 Search Tournaments by Name"
+        placeholder={`🔍 ${searchTournamentsByName}`}
         onChange={(e) => setSearchTerm(e.target.value || '')}
       />
       {filteredTournaments.map((tournament, index) => {
@@ -84,17 +97,17 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
                 <$span lineHeight="40px" style={{ paddingRight: '15px' }}>
                   <$Link
                     href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`}
-                    style={{ textDecoration: 'none', fontStyle: 'normal' }}
+                    style={{ textDecoration: 'none', fontStyle: 'normal', textTransform: 'lowercase' }}
                   >
-                    view
+                    {words.view}
                   </$Link>
                 </$span>
                 <$span lineHeight="40px" style={{ paddingRight: '15px' }}>
                   <$Link
                     href={`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`}
-                    style={{ textDecoration: 'none', fontStyle: 'normal' }}
+                    style={{ textDecoration: 'none', fontStyle: 'normal', textTransform: 'lowercase' }}
                   >
-                    edit
+                    {words.edit}
                   </$Link>
                 </$span>
                 {tournamentStatus[tournament.id]?.loading ? (
@@ -106,9 +119,9 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
                       width="100%"
                       textAlign="center"
                       color={COLORS.dangerFontColor}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', textTransform: 'lowercase' }}
                     >
-                      remove
+                      {words.remove}
                     </$span>
                   </PopConfirm>
                 )}
@@ -122,6 +135,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
 }
 
 const MyTournaments = () => {
+  const words = useWords()
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_TOURNAMENTS)
 
@@ -132,9 +146,9 @@ const MyTournaments = () => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <Oopsies message={error?.message || ''} icon="🤕" title="Error loading Tournaments" />
+    return <Oopsies message={error?.message || ''} icon="🤕" title={words.anErrorOccured} />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <Oopsies message={data?.getMyProfile?.error?.message || ''} icon="🤕" title="Error loading Tournaments" />
+    return <Oopsies message={data?.getMyProfile?.error?.message || ''} icon="🤕" title={words.anErrorOccured} />
   }
 
   const tournaments = (data?.getMyProfile as GetMyProfileSuccess)?.user?.tournaments || []
@@ -142,7 +156,13 @@ const MyTournaments = () => {
   return (
     <$Vertical spacing={4}>
       <$Vertical>
-        <$h1>My Tournaments</$h1>
+        <$h1>
+          <FormattedMessage
+            id="profile.tournaments.myTournaments"
+            defaultMessage="My Tournaments"
+            description="Section heading displaying users esport tournaments they made"
+          />
+        </$h1>
         <TournamentList tournaments={tournaments} />
       </$Vertical>
       <div>
@@ -158,7 +178,11 @@ const MyTournaments = () => {
             boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
           }}
         >
-          New Tournament
+          <FormattedMessage
+            id="profile.tournaments.newTournament"
+            defaultMessage="New Tournament"
+            description="Button text to create a new tournament"
+          />
         </$Button>
       </div>
     </$Vertical>

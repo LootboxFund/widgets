@@ -9,11 +9,13 @@ import { buySharesState, purchaseLootboxShare } from './state'
 import { parseWei } from './helpers'
 import BN from 'bignumber.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { BLOCKCHAINS, ContractAddress } from '@wormgraph/helpers'
+import { ContractAddress } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import { readLootboxMetadata, readTicketMetadata } from 'lib/api/storage'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export const BASE_BUTTON_STYLE = { minHeight: '60px' }
 
@@ -26,6 +28,8 @@ const BuyButton = (props: BuyButtonProps) => {
   const [metadata, setMetadata] = useState<LootboxMetadata | undefined>()
   const [loading, setLoading] = useState(true)
   const [hasMetaMask, setHasMetaMask] = useState(true)
+  const intl = useIntl()
+  const words = useWords()
 
   useEffect(() => {
     if (snapBuySharesState.lootbox.address) {
@@ -75,6 +79,31 @@ const BuyButton = (props: BuyButtonProps) => {
   const isMetadataLoaded = !!metadata
   const isLootboxLoaded = Object.keys(snapBuySharesState?.lootbox?.data || {}).length > 0
 
+  const insufficientFundsText = intl.formatMessage({
+    id: 'buyShares.insufficientFunds',
+    defaultMessage: 'Insufficient funds',
+    description: 'When a user does not have enough crypto currency (AKA: they have no money)',
+  })
+  const soldOutText = intl.formatMessage({
+    id: 'buyShares.soldOut',
+    defaultMessage: 'Lootbox is sold out!',
+    description: 'When a Lootbox has already sold all of the shares available',
+  })
+  const sharesRemainingText = intl.formatMessage(
+    {
+      id: 'buyShares.sharesRemaining',
+      defaultMessage: 'Only {sharesRemaining} shares left',
+      description: 'Message telling the user how many shares are left to purchase in a Lootbox',
+    },
+    { sharesRemaining: sharesRemainingFmt }
+  )
+
+  const buyLootboxText = intl.formatMessage({
+    id: 'buyShares.buyLootbox',
+    defaultMessage: 'Buy Lootbox',
+    description: 'Prompt for a user to buy a profit sharing NFT from a Lootbox',
+  })
+
   useEffect(() => {
     detectEthereumProvider({ mustBeMetaMask: true })
       .then((data) => {
@@ -112,7 +141,7 @@ const BuyButton = (props: BuyButtonProps) => {
           ...BASE_BUTTON_STYLE,
         }}
       >
-        Please install MetaMask
+        {words.pleaseInstallMetamask}
       </$Button>
     )
   }
@@ -128,7 +157,7 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ ...BASE_BUTTON_STYLE, fontWeight: TYPOGRAPHY.fontWeight.regular }}
         disabled
       >
-        <LoadingText loading={true} text="Loading" color={`${COLORS.surpressedFontColor}80`} />
+        <LoadingText loading={true} text={words.loading} color={`${COLORS.surpressedFontColor}80`} />
       </$Button>
     )
   } else if (!snapBuySharesState.lootbox.address) {
@@ -142,7 +171,11 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ ...BASE_BUTTON_STYLE }}
         disabled
       >
-        Lootbox not found
+        <FormattedMessage
+          id="buyShares.buyButton.noLootbox"
+          defaultMessage="Lootbox not found"
+          description="Displayed when we could not find the Lootbox"
+        />
       </$Button>
     )
   } else if (isMetadataLoaded && isWrongChain) {
@@ -156,7 +189,7 @@ const BuyButton = (props: BuyButtonProps) => {
         onClick={switchChain}
         style={{ ...BASE_BUTTON_STYLE }}
       >
-        Switch network
+        {words.switchNetwork}
       </$Button>
     )
   } else if (!isWalletConnected) {
@@ -172,16 +205,16 @@ const BuyButton = (props: BuyButtonProps) => {
         style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
         disabled
       >
-        Please try again later
+        {words.pleaseTryAgainLater}
       </$Button>
     )
   } else if (isInsufficientFunds) {
-    return <SuppressedButton txt={'Insufficient funds'}></SuppressedButton>
+    return <SuppressedButton txt={insufficientFundsText}></SuppressedButton>
   } else if (isInputAmountValid && !withinMaxShares) {
     if (sharesRemaining.eq(new BN('0'))) {
-      return <SuppressedButton txt={`Lootbox sold out!`}></SuppressedButton>
+      return <SuppressedButton txt={soldOutText}></SuppressedButton>
     } else {
-      return <SuppressedButton txt={`Only ${sharesRemainingFmt} shares left`}></SuppressedButton>
+      return <SuppressedButton txt={sharesRemainingText}></SuppressedButton>
     }
   } else if (isInputAmountValid) {
     return (
@@ -195,10 +228,15 @@ const BuyButton = (props: BuyButtonProps) => {
           ...BASE_BUTTON_STYLE,
           filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
           boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+          textTransform: 'uppercase',
         }}
         disabled={snapBuySharesState.ui.isButtonLoading}
       >
-        <LoadingText loading={snapBuySharesState.ui.isButtonLoading} text="BUY LOOTBOX" color={COLORS.trustFontColor} />
+        <LoadingText
+          loading={snapBuySharesState.ui.isButtonLoading}
+          text={buyLootboxText}
+          color={COLORS.trustFontColor}
+        />
       </$Button>
     )
   }
@@ -209,7 +247,11 @@ const BuyButton = (props: BuyButtonProps) => {
       color={`${COLORS.surpressedFontColor}80`}
       style={{ cursor: 'not-allowed', ...BASE_BUTTON_STYLE }}
     >
-      Enter an amount
+      <FormattedMessage
+        id="buyShares.buyButton.buttonPrompt"
+        defaultMessage="Enter an amount"
+        description="Input text for a user to enter an amount of crypto currency to buy from Lootbox"
+      />
     </$Button>
   )
 }

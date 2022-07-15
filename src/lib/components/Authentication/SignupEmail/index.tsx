@@ -10,6 +10,8 @@ import { useState } from 'react'
 import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
 import { $Header, $ErrorMessage } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
+import { useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -22,6 +24,8 @@ const SignupEmail = (props: SignUpEmailProps) => {
   const [loading, setLoading] = useState(false)
   const [password, setPassword] = useState<string>('')
   const [passwordConfirmation, setPasswordConfirmation] = useState<string>('')
+  const intl = useIntl()
+  const words = useWords()
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)
@@ -42,7 +46,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
       setErrorMessage('')
       props.onChangeMode('login-password')
     } catch (err) {
-      setErrorMessage(err?.message || 'An error occured!')
+      setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     } finally {
       setLoading(false)
@@ -51,19 +55,19 @@ const SignupEmail = (props: SignUpEmailProps) => {
 
   return (
     <$Vertical spacing={4}>
-      <$Header>Register</$Header>
-      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder="email" />
+      <$Header>{words.register}</$Header>
+      <$InputMedium onChange={(e) => parseEmail(e.target.value)} value={email} placeholder={words.email} />
       <$Vertical spacing={4}>
         <$InputMedium
           onChange={(e) => parsePassword(e.target.value)}
           value={password}
-          placeholder="password"
+          placeholder={words.password}
           type="password"
         ></$InputMedium>
         <$InputMedium
           onChange={(e) => parsePasswordConfirmation(e.target.value)}
           value={passwordConfirmation}
-          placeholder="confirm password"
+          placeholder={words.confirmPassword}
           type="password"
         ></$InputMedium>
         <$Button
@@ -79,10 +83,10 @@ const SignupEmail = (props: SignUpEmailProps) => {
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="Sign Up" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text={words.signUp} color={COLORS.trustFontColor} />
         </$Button>
       </$Vertical>
-      {errorMessage ? <$ErrorMessage>{parseAuthError(errorMessage)}</$ErrorMessage> : null}
+      {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )
 }

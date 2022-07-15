@@ -41,6 +41,8 @@ import UserTicketsSimple from 'lib/components/UserTickets/UserTicketsSimple'
 import { ticketCardState } from 'lib/components/TicketCard/state'
 import { truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 interface RedeemBountyProps {
   basketAddress: Address
@@ -57,6 +59,8 @@ interface AuthSignature {
 }
 
 const RedeemBounty = (props: RedeemBountyProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const [provider] = useProvider()
   const { screen } = useWindowSize()
   const isMobile = screen === 'mobile'
@@ -85,6 +89,49 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     MutationRedeemSignatureArgs
   >(MUTATION_REDEEM_SIGNATURE)
 
+  const noNFTsToRedeemText = intl.formatMessage({
+    id: 'bounty.redeem.noNFTsToRedeem.text',
+    defaultMessage: 'You have no NFTs to redeem',
+    description: 'Text displayed when there are no NFTs (non-fungible tokens) to redeem',
+  })
+
+  const redeemNFTText = intl.formatMessage({
+    id: 'bounty.redeem.redeemNFT.text',
+    defaultMessage: 'Redeem NFT',
+    description: 'Text displayed when the user can redeem an NFT',
+  })
+
+  const checkForRedeemableNFTsText = intl.formatMessage({
+    id: 'bounty.redeem.checkForRedeemableNFTs.text',
+    defaultMessage: 'Check for redeemable NFTs',
+    description: 'Text displayed when the user can check for redeemable NFTs',
+  })
+
+  const bountyRedeemedMessage = intl.formatMessage({
+    id: 'bounty.redeem.bountyRedeemed.message',
+    defaultMessage: 'Bounty redeemed',
+    description:
+      'Message displayed when the user has successfully redeemed a bounty (aka: received a free Lootbox NFT)',
+  })
+
+  const errorRetryText = intl.formatMessage({
+    id: 'bounty.redeem.errorRetry.text',
+    defaultMessage: 'Error occured, retry?',
+    description: 'Text displayed when the user has an error redeeming a bounty',
+  })
+
+  const noNFTsRetry = intl.formatMessage({
+    id: 'bounty.redeem.noNFTsRetry.text',
+    defaultMessage: 'No NFTs to redeem, retry?',
+    description: 'When the user does not have an NFT to redeem, they can retry it to check again.',
+  })
+
+  const unknownEarningText = intl.formatMessage({
+    id: 'bounty.redeem.unknownEarning.text',
+    defaultMessage: 'Mystery ROI',
+    description: 'Text displayed when we do not know the potential ROI (Return on Investment) of the NFT',
+  })
+
   const _lootboxAddress = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket?.lootboxSnapshot
     ?.address as ContractAddress | undefined
 
@@ -97,9 +144,9 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   if (loading) {
     return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
   } else if (error) {
-    return <Oopsies title="Error loading Party Basket" message={error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.getPartyBasket?.__typename === 'ResponseError') {
-    return <Oopsies title="Error loading Party Basket" message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
   }
 
   const { signatures } =
@@ -125,6 +172,17 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   const isLoadingState = loadingSignatures || loadingRedeemSignature || redeemState.status === 'loading'
 
   const isWrongChain = chainIdHex != undefined && chainIdHex !== snapUserState?.network?.currentNetworkIdHex
+
+  const redeemFromLootboxText = intl.formatMessage(
+    {
+      id: 'bounty.redeem.redeemFromLootbox.text',
+      defaultMessage: 'Redeem a FREE Profit Sharing NFT from the Lootbox "{lootboxName}"',
+      description: 'Text displayed when the user can redeem from a Lootbox',
+    },
+    {
+      lootboxName: lootboxName || 'mystery',
+    }
+  )
 
   const handlePrimaryClick = async () => {
     if (redeemState.status === 'error') {
@@ -153,7 +211,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         })
 
         if (!data) {
-          throw new Error('An error occured!')
+          throw new Error(`${words.anErrorOccured}!`)
         } else if (data?.getWhitelistSignatures?.__typename === 'ResponseError') {
           throw new Error(data?.getWhitelistSignatures.error?.message)
         }
@@ -161,14 +219,14 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         setRedeemState({ status: 'success', error: undefined })
       } catch (err) {
         LogRocket.captureException(err)
-        setRedeemState({ status: 'signature', error: err?.message || 'An error occured!' })
+        setRedeemState({ status: 'signature', error: err?.message || `${words.anErrorOccured}!` })
       }
     } else if (hasBountyToRedeem && !!authSignature) {
       const signature = validSignatures?.[0]
       setRedeemState({ status: 'loading' })
       try {
         if (!signature) {
-          throw new Error('You have no NFTs to redeem')
+          throw new Error(noNFTsToRedeemText)
         }
 
         // Redeem the NFT
@@ -196,7 +254,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         })
 
         if (!data) {
-          throw new Error('An error occured!')
+          throw new Error(`${words.anErrorOccured}!`)
         } else if (data?.redeemSignature?.__typename === 'ResponseError') {
           throw new Error(data?.redeemSignature.error?.message)
         }
@@ -211,7 +269,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         }, 1500)
       } catch (err) {
         LogRocket.captureException(err)
-        setRedeemState({ status: 'error', error: err?.data?.message || err?.message || 'An error occured!' })
+        setRedeemState({ status: 'error', error: err?.data?.message || err?.message || `${words.anErrorOccured}!` })
       }
     } else {
       console.error('NOT IMPLEMENTED')
@@ -222,15 +280,36 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     return (
       <$Vertical spacing={4}>
         {hasBountyToRedeem && (
-          <$StepSubheading>✅ You have a free NFT available to redeem. Click the button 👇 to redeem!</$StepSubheading>
+          <$StepSubheading>
+            ✅{' '}
+            <FormattedMessage
+              id="bounty.redeem.promptText"
+              defaultMessage="You have a free NFT available to redeem. Click the button 👇 to redeem!"
+              description="Text displayed when user has a free NFT to redeem"
+            />
+          </$StepSubheading>
         )}
 
         {redeemState.status === 'signature' && !hasBountyToRedeem && (
-          <$StepSubheading>⚠️ Check for Redeemable NFTs using your MetaMask Wallet!</$StepSubheading>
+          <$StepSubheading>
+            ⚠️{' '}
+            <FormattedMessage
+              id="bounty.redeem.checkForBountiesText"
+              defaultMessage="Check for Redeemable NFTs using your MetaMask Wallet!"
+              description="Prompt for user to check if they have any NFTs to redeem"
+            />
+          </$StepSubheading>
         )}
 
         {redeemState.status === 'success' && !hasBountyToRedeem && (
-          <$StepSubheading>❌ You do not have any NFTs to redeem. Please check again later.</$StepSubheading>
+          <$StepSubheading>
+            ❌{' '}
+            <FormattedMessage
+              id="bounty.redeem.noBountiesText"
+              defaultMessage="You do not have any NFTs to redeem. Please check again later."
+              description="Text displayed when user has no NFTs to redeem"
+            />
+          </$StepSubheading>
         )}
 
         {!!redeemState.error && <$StepSubheading>❌ {redeemState.error}</$StepSubheading>}
@@ -239,7 +318,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
           <WalletButton />
         ) : isWrongChain ? (
           <$RedeemNFTButton themeColor={COLORS.warningBackground} onClick={() => addCustomEVMChain(chainIdHex)}>
-            Switch network
+            {words.switchNetwork}
           </$RedeemNFTButton>
         ) : (
           <$RedeemNFTButton
@@ -256,18 +335,18 @@ const RedeemBounty = (props: RedeemBountyProps) => {
             disabled={isLoadingState}
           >
             {redeemState.status === 'error'
-              ? 'Error Occured, retry?'
+              ? errorRetryText
               : redeemState.status === 'signature'
-              ? 'Check for Redeemable NFTs'
+              ? checkForRedeemableNFTsText
               : isLoadingState
-              ? 'Loading...'
+              ? `${words.loading}...`
               : noBountiesToRedeem
-              ? 'No NFTs to redeem, retry?'
+              ? noNFTsRetry
               : hasBountyToRedeem
-              ? 'Redeem NFT'
+              ? redeemNFTText
               : redeemState.status === 'success'
-              ? '✅ Bounty Redeemed'
-              : 'Redeem NFT'}
+              ? `✅ ${bountyRedeemedMessage}`
+              : redeemNFTText}
           </$RedeemNFTButton>
         )}
       </$Vertical>
@@ -289,21 +368,30 @@ const RedeemBounty = (props: RedeemBountyProps) => {
               }}
             >
               <$Horizontal>
-                <$ManageLootboxHeading screen={screen}>Redeem Free NFT</$ManageLootboxHeading>
+                <$ManageLootboxHeading screen={screen}>
+                  <FormattedMessage
+                    id="bounty.redeem.title"
+                    defaultMessage="Redeem Free NFT"
+                    description="Title for the redeem NFT screen"
+                  />
+                </$ManageLootboxHeading>
                 <HelpIcon tipID="partyBasket" />
                 <ReactTooltip id="partyBasket" place="right" effect="solid">
-                  You can redeem FREE profit sharing NFTs if the Party Basket issuer has permitted you to do so. If you
-                  believe you are entitled to redeem an NFT, please contact the Party Basket issuer.
+                  <FormattedMessage
+                    id="bounty.redeem.partyBasketTooltip"
+                    defaultMessage="You can redeem FREE profit sharing NFTs if the Party Basket issuer has permitted you to do so. If you believe you are entitled to redeem an NFT, please contact the Party Basket issuer."
+                    description="Tooltip that explains how bounty redeeming works."
+                  />
                 </ReactTooltip>
               </$Horizontal>
               <$StepSubheading>{`${lootboxName ? lootboxName + ', ' : ''}${
-                partyBasketName || 'Party Basket'
+                partyBasketName || words.partyBasket
               }`}</$StepSubheading>
 
               <$StepSubheading>
                 {lootboxDescription && lootboxDescription?.length > 190
                   ? `${lootboxDescription?.slice(0, 190)}...`
-                  : lootboxDescription || `Redeem a FREE Profit Sharing NFT from the Lootbox "${lootboxName}"`}
+                  : lootboxDescription || redeemFromLootboxText}
               </$StepSubheading>
 
               {isMobile && <RedeemNFTComponent />}
@@ -314,16 +402,32 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                     <$StepSubheading>Max Earnings</$StepSubheading>
                     <HelpIcon tipID="maxEarnings" />
                     <ReactTooltip id="maxEarnings" place="right" effect="solid">
-                      {!!nftBountyValue
-                        ? `The NFT you redeem has the chance of earning \"${nftBountyValue}\" according to the Party Basket issuer. There is no guarantee of a profit and please contact the Party Basket issuer if you have questions.`
-                        : 'The Party Basket issuer has not stated a maximum earnings value for this NFT. Please contact the Party Basket issuer if you have questions.'}
+                      {!!nftBountyValue ? (
+                        <FormattedMessage
+                          id="bounty.redeem.bountyValueTooltip"
+                          defaultMessage='The NFT you redeem has the chance of earning "{bountyValue}" according to the Party Basket issuer. There is no guarantee of a profit and please contact the Party Basket issuer if you have questions.'
+                          description="Indicates how much money the user can get from a Lootbox NFT"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="bounty.redeem.bountyValueTooltipNoValue"
+                          defaultMessage="The Party Basket issuer has not stated a maximum earnings value for this NFT. Please contact the Party Basket issuer if you have questions."
+                          description="Message indicating that the user does not know how much potential winnings they can make by using the Lootbox NFT bounty."
+                        />
+                      )}
                     </ReactTooltip>
                   </$Horizontal>
 
-                  <$StepSubheading style={{ width: 'auto', whiteSpace: 'nowrap' }}>NFTs Available</$StepSubheading>
+                  <$StepSubheading style={{ width: 'auto', whiteSpace: 'nowrap' }}>
+                    <FormattedMessage
+                      id="bounty.redeem.nftsAvailable"
+                      defaultMessage="NFTs Available"
+                      description="Text indicating that user has NFTs avaioable to redeem"
+                    />
+                  </$StepSubheading>
                 </$Horizontal>
                 <$EarningsContainer>
-                  <$EarningsText>{!!nftBountyValue ? nftBountyValue : 'Mystery Earnings'}</$EarningsText>
+                  <$EarningsText>{!!nftBountyValue ? nftBountyValue : unknownEarningText}</$EarningsText>
                 </$EarningsContainer>
               </$Vertical>
             </$Vertical>
@@ -347,7 +451,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                 href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxSnapshot?.address}`}
                 target="_blank"
               >
-                View Lootbox
+                {words.view} Lootbox
               </$BasketLink>
             </$Vertical>
           </$Horizontal>
@@ -357,13 +461,23 @@ const RedeemBounty = (props: RedeemBountyProps) => {
       </$StepCard>
       <$Horizontal style={{ marginTop: '50px' }}>
         <$ManageLootboxHeading screen={screen} style={{ fontFamily: TYPOGRAPHY.fontFamily.regular }}>
-          Your NFTs
+          <FormattedMessage
+            id="bounty.myNFTs.title"
+            defaultMessage="Your NFTs"
+            description="Title for the My NFTs screen"
+          />
         </$ManageLootboxHeading>
         <HelpIcon tipID="yourNfts" />
         <ReactTooltip id="yourNfts" place="right" effect="solid">
-          There are the NFTs your wallet{' '}
-          {snapUserState.currentAccount ? `(${truncateAddress(snapUserState.currentAccount)})` : ''} owns from this
-          lootbox {lootboxAddress ? `(${truncateAddress(lootboxAddress as Address)})` : ''}.
+          <FormattedMessage
+            id="bounty.myNFTs.tooltip"
+            defaultMessage="These are the NFTs your wallet {walletAddress} owns from this lootbox {lootboxAddress}."
+            description="Tooltip that explains how My NFTs works."
+            values={{
+              lootboxAddress: lootboxAddress ? `(${truncateAddress(lootboxAddress as Address)})` : '',
+              walletAddress: snapUserState.currentAccount ? `(${truncateAddress(snapUserState.currentAccount)})` : '',
+            }}
+          />
         </ReactTooltip>
       </$Horizontal>
       {userTicketStatus === 'success' ? (

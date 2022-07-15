@@ -6,6 +6,8 @@ import LogRocket from 'logrocket'
 import { useState } from 'react'
 import { $Link, Oopsies } from '../common'
 import { COLORS } from '@wormgraph/helpers'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 const Onboarding = () => {
   const { user } = useAuth()
@@ -13,6 +15,20 @@ const Onboarding = () => {
   const isEmailVerified = user?.isEmailVerified
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [errorSendingEmail, setErrorSendingEmail] = useState(false)
+  const intl = useIntl()
+  const words = useWords()
+
+  const verifyEmailHeader = intl.formatMessage({
+    id: 'profile.onboarding.verifyEmailHeader',
+    defaultMessage: 'Verify your email',
+    description: 'Header for onboarding step. Part of onboarding is a user needs to verify their email address.',
+  })
+
+  const learnHeader = intl.formatMessage({
+    id: 'profile.onboarding.learnHeader',
+    defaultMessage: 'Learn about Lootbox',
+    description: 'Header for onboarding step. Part of onboarding is a user needs to learn how to use Lootbox.',
+  })
 
   if (isEmailVerified && isOnboardYoutube) {
     return null
@@ -40,23 +56,54 @@ const Onboarding = () => {
 
   return (
     <$Vertical spacing={4}>
-      <$h1>You're almost set up...</$h1>
+      <$h1>
+        <FormattedMessage
+          id="profile.onboarding.title"
+          defaultMessage="You're almost set up..."
+          description="This is the header of the user onboarding section. They will have to complete a few steps before this message disappears."
+        />
+      </$h1>
       {!isEmailVerified ? (
         <Oopsies
           icon="📧"
-          title="Verify your email"
+          title={verifyEmailHeader}
           message={
             <span>
-              You should have received an email from us. <mark>Check your spam folder.</mark> <br />
-              Can't find it?{' '}
-              <$Link target="_blank" onClick={handleSendVerificationEmail} style={{ textDecoration: 'underline' }}>
-                Resend verification email.
-              </$Link>
+              <FormattedMessage
+                id="profile.onboarding.verifyEmailText"
+                defaultMessage="You should have received an email from us. {checkSpamFolderText}{newlineCharacter}Can't find it? {resendVerificationEmail}"
+                description="This is the message that tells the user to verify their email address."
+                values={{
+                  checkSpamFolderText: (
+                    <mark>
+                      <FormattedMessage
+                        id="profile.onboarding.checkSpamFolderText"
+                        defaultMessage="Check your spam folder."
+                        description="This is the text that tells the user to check their spam folder."
+                      />
+                    </mark>
+                  ),
+                  newlineCharacter: <br />,
+                  resendVerificationEmail: (
+                    <$Link
+                      target="_blank"
+                      onClick={handleSendVerificationEmail}
+                      style={{ textDecoration: 'underline' }}
+                    >
+                      <FormattedMessage
+                        id="profile.onboarding.resendVerificationEmailLink"
+                        defaultMessage="Resend verification email."
+                        description="This is the link that will send the user a verification email."
+                      />
+                    </$Link>
+                  ),
+                }}
+              />
               {isEmailSent && ' ✅'}
               {errorSendingEmail && (
                 <span style={{ fontStyle: 'italic', color: `${COLORS.surpressedFontColor}77` }}>
                   {' '}
-                  There was an error sending the email. Please try again later.
+                  {words.anErrorOccured}. {words.pleaseTryAgainLater}.
                 </span>
               )}
             </span>
@@ -67,18 +114,28 @@ const Onboarding = () => {
       {!isOnboardYoutube ? (
         <Oopsies
           icon="👨‍🎓"
-          title="Learn about Lootbox"
+          title={learnHeader}
           message={
-            <span>
-              Start off by checking out our youtube channel. Find us here 👉{' '}
-              <$Link
-                target="_blank"
-                onClick={handleYoutubeClick}
-                href="https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC"
-              >
-                Getting started with Lootbox.
-              </$Link>
-            </span>
+            <FormattedMessage
+              id="profile.onboarding.learnText"
+              defaultMessage="Start off by checking out our youtube channel. Find us here 👉 {lootboxYoutubeLink}"
+              description="This is the message that tells the user to learn about Lootbox via our Youtube channel."
+              values={{
+                lootboxYoutubeLink: (
+                  <$Link
+                    target="_blank"
+                    onClick={handleYoutubeClick}
+                    href="https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC"
+                  >
+                    <FormattedMessage
+                      id="profile.onboarding.lootboxYoutubeLink"
+                      defaultMessage="Getting started with Lootbox."
+                      description="This is the link that will take the user to the Youtube channel."
+                    />
+                  </$Link>
+                ),
+              }}
+            />
           }
         />
       ) : null}

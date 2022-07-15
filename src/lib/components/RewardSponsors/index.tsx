@@ -33,6 +33,8 @@ import ERC20ABI from 'lib/abi/erc20.json'
 import { ScreenSize } from '../../hooks/useScreenSize/index'
 import { InputDecimal } from 'lib/components/Generics/Input'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export const validateErc20 = (erc20Address: ContractAddress | undefined) => {
   if (erc20Address === undefined) return false
@@ -66,6 +68,33 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const [approvalReceived, setApprovalReceived] = useState(false)
   const [erc20Name, setErc20TokenName] = useState('ERC20')
   const { screen } = useWindowSize()
+  const intl = useIntl()
+  const words = useWords()
+
+  const requesting = intl.formatMessage({
+    id: 'lootbox.manage.rewardSponsors.requesting',
+    defaultMessage: 'Requesting',
+    description:
+      'AKA pending, or loading. Waiting for a software response from a server, or waiting to confirm a transaction in metamask for example',
+  })
+
+  const transferApproved = intl.formatMessage({
+    id: 'lootbox.manage.rewardSponsors.transferApproved',
+    defaultMessage: 'Transfer approved',
+    description: 'Successfully approved transfer of erc20 tokens via metamask',
+  })
+
+  const approveTransfer = intl.formatMessage({
+    id: 'lootbox.manage.rewardSponsors.approveTransfer',
+    defaultMessage: 'Approve transfer',
+    description: 'Prompt for user to approve a transfer in they metamask wallet',
+  })
+
+  const depositSuccess = intl.formatMessage({
+    id: 'lootbox.manage.rewardSponsors.depositSuccess',
+    defaultMessage: 'Deposit success',
+    description: 'Successfully deposited native tokens',
+  })
 
   useEffect(() => {
     generateValidationErrorMessages()
@@ -88,11 +117,6 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
 
   const loadBlockchainData = async () => {
     const [_reputationAddress] = await getLootboxIssuer(props.lootboxAddress)
-    // console.log(`
-
-    // _reputationAddress: ${_reputationAddress}
-
-    // `)
     setReputationAddress(_reputationAddress)
     const nativeTokenPriceEther = await getPriceFeed(props.network.priceFeed as ContractAddress)
     const nativeTokenPrice = nativeTokenPriceEther.multipliedBy(new BigNumber('10').pow('8'))
@@ -125,14 +149,22 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     return (
       <$Vertical>
         <$StepSubheading>
-          Reward with Native Token
+          <FormattedMessage
+            id="createLootbox.rewardSponsors.native.title"
+            defaultMessage="Reward with Native Token"
+            description="Title for Reward Sponsor section. Native Token here refers to a native blockchain token, like Ethereum."
+          />
           <HelpIcon tipID="withNativeToken" />
           <ReactTooltip id="withNativeToken" place="right" effect="solid">
-            {`Reward your sponsors with the same native token originally used to fund your Lootbox. In this case it would be ${
-              props.network.symbol
-            } on ${props.network.name}${
-              props.network.isTestnet && ' (Testnet)'
-            }. It is totally up to you which method you use to reward sponsors. ERC20 tokens are also supported.`}
+            <FormattedMessage
+              id="createLootbox.rewardSponsors.native.tip"
+              defaultMessage="Reward your sponsors with the same native token originally used to fund your Lootbox. In this case it would be {networkSymbol} on {networkName}. It is totally up to you which method you use to reward sponsors. ERC20 tokens are also supported."
+              description="Tooltip message for reward sponsors section"
+              values={{
+                networkSymbol: props.network.symbol,
+                networkName: `${props.network.name}${props.network.isTestnet && ` (${words.testnet})`}`,
+              }}
+            />
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -182,25 +214,27 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     return (
       <$Vertical>
         <$StepSubheading>
-          ERC20 Contract Address
+          <span style={{ textTransform: 'capitalize' }}>ERC20 {words.contractAddress}</span>
           <HelpIcon tipID="withErc20Token" />
           <ReactTooltip id="withErc20Token" place="right" effect="solid">
-            Enter the contract address of the ERC20 Token you'd like to transfer. You can get the official contract
-            address by finding it on CoinMarketCap or CoinGecko. Deposits in ERC20 reqiure a two step process of first
-            approving the amount, and then the actual transfer.
+            <FormattedMessage
+              id="createLootbox.rewardSponsors.erc20.tip"
+              defaultMessage="Enter the contract address of the ERC20 Token you'd like to transfer. You can get the official contract address by finding it on CoinMarketCap or CoinGecko. Deposits in ERC20 reqiure a two step process of first approving the amount, and then the actual transfer."
+              description="Tooltip message for reward sponsors section"
+            />
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(erc20Address as string)}
             style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            Copy
+            {words.copy}
           </span>
           <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
           <span
             onClick={() => window.open(`${props.network.blockExplorerUrl}address/${erc20Address}`, '_blank')}
             style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            View on Block Explorer
+            {words.viewOnBlockExplorer}
           </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -215,13 +249,18 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         </$InputWrapper>
         <br />
         <$StepSubheading>
-          Amount of ERC20 Token
+          <FormattedMessage
+            id="createLootbox.rewardSponsors.erc20.amount"
+            defaultMessage="Amount of ERC20 Token"
+            description="Title indicating how much of an ERC20 token (like ethereum) they want to use."
+          />
           <HelpIcon tipID="withNativeToken" />
           <ReactTooltip id="withNativeToken" place="right" effect="solid">
-            Enter the amount of ERC20 Token you'd like to transfer. This number is expressed in the tokens decimals, so
-            1 USDX = 18 decimals while 1 USDY may be 6 decimals. You can verify the decimals by viewing the contract on
-            a Block Explorer. If you do not understand what this means, please refer to the EVM documentation. Note that
-            your Metamask wallet also shows units in the tokens decimals, so you can use the same units in your wallet.
+            <FormattedMessage
+              id="createLootbox.rewardSponsors.erc20.amount.tip"
+              defaultMessage="Enter the amount of ERC20 Token you'd like to transfer. This number is expressed in the tokens decimals, so 1 USDX = 18 decimals while 1 USDY may be 6 decimals. You can verify the decimals by viewing the contract on a Block Explorer. If you do not understand what this means, please refer to the EVM documentation. Note that your Metamask wallet also shows units in the tokens decimals, so you can use the same units in your wallet."
+              description="Tooltip message for reward sponsors section"
+            />
           </ReactTooltip>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -362,10 +401,10 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         }
       >
         {rewardSubmissionStatus === 'pending'
-          ? 'SUBMITTING...'
+          ? words.submitting
           : rewardSubmissionStatus === 'success'
-          ? 'DEPOSIT SUCCESS'
-          : `REWARD SPONSORS`}
+          ? depositSuccess
+          : words.rewardSponsors}
       </$RewardSponsorsButton>
     )
   }
@@ -390,7 +429,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       }, 2000)
     } catch (e) {
       setApprovalSubmissionStatus('error')
-      setApprovalStatusMessage(e.data.message)
+      setApprovalStatusMessage(e?.data?.message || words.anErrorOccured)
       setTimeout(() => {
         setApprovalSubmissionStatus('enabled')
       }, 5000)
@@ -415,10 +454,10 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
           }
         >
           {approvalSubmissionStatus === 'pending'
-            ? 'REQUESTING...'
+            ? `${requesting}...`
             : approvalSubmissionStatus === 'success'
-            ? 'TRANSFER APPROVED'
-            : `APPROVE TRANSFER`}
+            ? transferApproved
+            : approveTransfer}
         </$RewardSponsorsButton>
       )
     }
@@ -436,10 +475,10 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         }
       >
         {rewardSubmissionStatus === 'pending'
-          ? 'SUBMITTING...'
+          ? words.submitting
           : rewardSubmissionStatus === 'success'
-          ? 'DEPOSIT SUCCESS'
-          : `REWARD SPONSORS`}
+          ? depositSuccess
+          : words.rewardSponsors}
       </$RewardSponsorsButton>
     )
   }
@@ -449,18 +488,25 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       <$Horizontal>
         <$Vertical flex={2}>
           <$Horizontal verticalCenter>
-            <$ManageLootboxHeading screen={screen}>Reward Sponsors</$ManageLootboxHeading>
+            <$ManageLootboxHeading screen={screen} style={{ textTransform: 'capitalize' }}>
+              {words.rewardSponsors}
+            </$ManageLootboxHeading>
             <HelpIcon tipID="rewardSponsors" />
             <ReactTooltip id="rewardSponsors" place="right" effect="solid">
-              Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Deposited amounts can be
-              redeemed by all sponsors who own an NFT ticket purchased from your Lootbox. Each NFT ticket will redeem
-              its proportioal share of earnings based on its number of shares purchased vs total shares sold.
+              <FormattedMessage
+                id="lootbox.manage.rewardSponsors.tooltip2"
+                defaultMessage="Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Deposited amounts can be redeemed by all sponsors who own an NFT ticket purchased from your Lootbox. Each NFT ticket will redeem its proportioal share of earnings based on its number of shares purchased vs total shares sold."
+                description="Info tooltip for the reards sponsors step"
+              />
             </ReactTooltip>
           </$Horizontal>
           <$SubtitleDepositTitle>{`Deposit Earnings back into Lootbox (${props.lootboxMetadata.name})`}</$SubtitleDepositTitle>
           <$StepSubheading>
-            Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Rewards can only be
-            redeemed if they own an NFT ticket minted from your Lootbox.
+            <FormattedMessage
+              id="lootbox.manage.rewardSponsors.subheading"
+              defaultMessage="Reward your sponsors by depositing native or ERC20 tokens back into this Lootbox. Rewards can only be redeemed if they own an NFT ticket minted from your Lootbox."
+              description="Subheading for the rewards sponsors step"
+            />
           </$StepSubheading>
         </$Vertical>
         {screen === 'desktop' && (
@@ -471,10 +517,18 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       </$Horizontal>
       <$Vertical style={{ marginTop: '40px' }}>
         <$StepSubheading>
-          Pick Reward Method
+          <FormattedMessage
+            id="lootbox.manage.rewardSponsors.pickRewardMethod.subheading"
+            defaultMessage="Pick Reward Method"
+            description="Subheading for the Pick Rewards section. This can wither be an ERC20 token or the native token."
+          />
           <HelpIcon tipID="rewardMethod" />
           <ReactTooltip id="rewardMethod" place="right" effect="solid">
-            Anyone can deposit rewards into your Lootbox. You can choose to deposit native tokens or any ERC20 token.
+            <FormattedMessage
+              id="lootbox.manage.rewardSponsors.pickRewardMethod.tooltip"
+              defaultMessage="Anyone can deposit rewards into your Lootbox. You can choose to deposit native tokens or any ERC20 token."
+              description="Info tooltip for the pick reward method step"
+            />
           </ReactTooltip>
         </$StepSubheading>
         {props.network?.icon && props.network?.symbol && (
@@ -506,27 +560,31 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
       </$Vertical>
       <$Vertical style={{ marginTop: '20px' }}>
         <$StepSubheading>
-          Lootbox Address
+          Lootbox {words.address}
           <HelpIcon tipID="lootboxAddressReward" />
           <ReactTooltip id="lootboxAddressReward" place="right" effect="solid">
-            {`Every Lootbox has its own smart contract address. This Lootbox is on ${props.network.name}${
-              props.network.isTestnet && ' Testnet'
-            } with contract address ${
-              props.lootboxAddress
-            }. You can verify all details you see on this UI by viewing it on a Block Explorer.`}
+            <FormattedMessage
+              id="lootbox.manage.rewardSponsors.lootboxAddress.tooltip"
+              defaultMessage="Every Lootbox has its own smart contract address. This Lootbox is on {networkName} with contract address {lootboxAddress}. You can verify all details you see on this UI by viewing it on a Block Explorer."
+              description="Tooltip for Lootbox information section"
+              values={{
+                networkName: `${props.network.name}${props.network.isTestnet && ` (${words.testnet})`}`,
+                lootboxAddress: props.lootboxAddress,
+              }}
+            />
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
             style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            Copy
+            {words.copy}
           </span>
           <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
           <span
             onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
             style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            View on Block Explorer
+            {words.viewOnBlockExplorer}
           </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -542,30 +600,27 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
         </$InputWrapper>
         <br />
         <$StepSubheading>
-          Reputation Address
+          <span style={{ textTransform: 'capitalize' }}>{words.reputationAddress}</span>
           <HelpIcon tipID="reputationAddressReward" />
           <ReactTooltip id="reputationAddressReward" place="right" effect="solid">
-            This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides a
-            good return on investment for sponsors, this reputatioin address will be associated with that good on-chain
-            performance. Likewise, this wallet will be associated with bad performance if this Lootbox does poorly. But
-            don't worry too much about bad performance, as its more important that there is ample history of Lootboxes
-            created by this reputation address. Owning an address with a good reputation is a valuable asset that will
-            help you in future fundraising. However, sponsors should not rely solely on on-chain performance history, as
-            anyone can just send funds to their own Lootbox to make it look like good performance. Always check their
-            social media (off-chain reputation) as well to get the full picture.
+            <FormattedMessage
+              id="lootbox.manage.rewardSponsors.reputationAddress.tooltip"
+              defaultMessage="This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides a good return on investment for sponsors, this reputatioin address will be associated with that good on-chain performance. Likewise, this wallet will be associated with bad performance if this Lootbox does poorly. But don't worry too much about bad performance, as its more important that there is ample history of Lootboxes created by this reputation address. Owning an address with a good reputation is a valuable asset that will help you in future fundraising. However, sponsors should not rely solely on on-chain performance history, as anyone can just send funds to their own Lootbox to make it look like good performance. Always check their social media (off-chain reputation) as well to get the full picture."
+              description="Tooltip for Lootbox reputation address section"
+            />
           </ReactTooltip>
           <span
             onClick={() => navigator.clipboard.writeText(reputationAddress as string)}
             style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            Copy
+            {words.copy}
           </span>
           <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
           <span
             onClick={() => window.open(`${props.network.blockExplorerUrl}address/${erc20Address}`, '_blank')}
             style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
           >
-            View on Block Explorer
+            {words.viewOnBlockExplorer}
           </span>
         </$StepSubheading>
         <$InputWrapper screen={screen}>
@@ -618,9 +673,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             <$ErrorMessageMgmtPage
               status={'success'}
               onClick={() => window.open(`${props.network.blockExplorerUrl}tx/${transactionHash}`, '_blank')}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', textTransform: 'capitalize' }}
             >
-              View Transaction Reciept
+              {words.viewTransactionReceipt}
             </$ErrorMessageMgmtPage>
           </div>
         )}

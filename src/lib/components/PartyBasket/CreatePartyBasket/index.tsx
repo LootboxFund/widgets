@@ -18,6 +18,8 @@ import { useSnapshot } from 'valtio'
 import { GET_MY_PARTY_BASKETS } from '../ViewPartyBaskets/api.gql'
 import { CREATE_PARTY_BASKET } from './api.gql'
 import ReactTooltip from 'react-tooltip'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 type PartyBasketSubmissionStatus = 'pending' | 'success' | 'error' | 'ready'
 interface PartyBasketSubmission {
@@ -31,6 +33,8 @@ interface CreatePartyBasketProps {
 }
 
 const CreatePartyBasket = (props: CreatePartyBasketProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const { screen } = useWindowSize()
   const [partyBasketName, setPartyBasketName] = useState('')
   const [partyBasketSubmissionStatus, setPartyBasketSubmissionStatus] = useState<PartyBasketSubmission>({
@@ -44,15 +48,27 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
     refetchQueries: [{ query: GET_MY_PARTY_BASKETS, variables: { address: props.lootboxAddress } }],
   })
 
+  const enterPartyBasketNameText = intl.formatMessage({
+    id: 'partyBasket.create.form.enterPartyBasketName',
+    defaultMessage: 'Please enter a name for your party basket',
+    description: 'Error text when user tries making Party Basket without a name',
+  })
+
+  const nameYourPartyBasketText = intl.formatMessage({
+    id: 'partyBasket.create.form.nameYourPartyBasket',
+    defaultMessage: 'Name your Party Basket',
+    description: 'Placeholder label for Party Basket name input',
+  })
+
   const createPartyBasketCall = async () => {
     setPartyBasketSubmissionStatus({ status: 'pending' })
     try {
       if (!partyBasketName) {
-        throw new Error('Please enter a name for your party basket')
+        throw new Error(enterPartyBasketNameText)
       }
 
       if (!snapUserState?.network?.currentNetworkIdHex || !snapUserState.currentAccount) {
-        throw new Error('Please connect your wallet')
+        throw new Error(words.connectWalletToMetamask)
       }
 
       await createPartyBasket(
@@ -97,7 +113,13 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
   return (
     <$Vertical spacing={4}>
       <$Vertical>
-        <$StepSubheading>Party Basket Name</$StepSubheading>
+        <$StepSubheading style={{ textTransform: 'capitalize' }}>
+          <FormattedMessage
+            id="partyBasket.create.form.name.title"
+            defaultMessage="Party basket name"
+            description="Input text for Party Basket Name field in form"
+          />
+        </$StepSubheading>
         <$InputWrapper screen={screen}>
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <$Input
@@ -105,7 +127,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
               value={partyBasketName}
               onChange={(e) => setPartyBasketName(e.target.value)}
               min="0"
-              placeholder="Name your Party Basket"
+              placeholder={nameYourPartyBasketText}
               screen={screen}
               style={{ fontWeight: 'lighter' }}
             />
@@ -114,10 +136,20 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
       </$Vertical>
       <$Vertical>
         <$Horizontal verticalCenter>
-          <$StepSubheading style={{ width: 'auto' }}>NFT Prize Value</$StepSubheading>
+          <$StepSubheading style={{ width: 'auto', textTransform: 'capitalize' }}>
+            <FormattedMessage
+              id="partyBasket.create.form.prize.title"
+              defaultMessage="NFT prize value"
+              description="Input text for NFT Prize Value field"
+            />
+          </$StepSubheading>
           <HelpIcon tipID="bountyPrize" />
           <ReactTooltip id="bountyPrize" place="right" effect="solid">
-            You determine how much
+            <FormattedMessage
+              id="partyBasket.create.form.prize.tooltip"
+              defaultMessage='You determine how much each NFT bounty will be worth. You can specify crypto currencies like "10 Matic" or fiat like "$10 USD"'
+              description="Tooltip for NFT Prize Value field"
+            />
           </ReactTooltip>
         </$Horizontal>
 
@@ -142,37 +174,54 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
           textDecorationThickness: 'from-font',
         }}
       >
-        ⚠️ IMPORTANT ⚠️ Please Read
+        <FormattedMessage
+          id="partyBasket.create.form.disclaimer.title"
+          defaultMessage="{icon} IMPORTANT {icon} Please Read"
+          description="Disclaimer title for Party Basket creation form"
+          values={{
+            icon: '⚠️',
+          }}
+        />
       </$StepSubheading>
 
       <span>
-        <$StepSubheading style={{ display: 'inline' }}>Click here 👉 </$StepSubheading>
+        <$StepSubheading style={{ display: 'inline' }}>{words.clickHere} 👉 </$StepSubheading>
 
         <$StepSubheading
           style={{
             fontWeight: TYPOGRAPHY.fontWeight.bold,
             textDecoration: 'underline',
             textDecorationThickness: 'from-font',
+            fontStyle: 'italic',
             display: 'inline',
             cursor: 'pointer',
+            textTransform: 'capitalize',
           }}
           onClick={() => {
             window.open('https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC', '__blank')
           }}
         >
-          Watch Party Basket Tutorial
+          <FormattedMessage
+            id="partyBasket.create.form.disclaimer.link"
+            defaultMessage="Watch Party Basket tutorial"
+            description="Hyperlink to watch tutorial videos about Party Basket"
+          />
         </$StepSubheading>
       </span>
 
       <$StepSubheading>
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-        aute irure dolor in reprehenderit in voluptate
+        <FormattedMessage
+          id="partyBasket.create.form.disclaimer.text"
+          defaultMessage="You are creating a Party Basket on the blockchain. Use Party Baskets to hold onto your bulk minted NFTs which you can then give away for free or for completing bounties."
+          description="Disclaimer text for Party Basket creation form"
+        />
       </$StepSubheading>
 
       <$CreatePartyBasketButton
         disabled={partyBasketSubmissionStatus.status === 'pending' || partyBasketSubmissionStatus.status === 'success'}
         allConditionsMet={true}
         onClick={createPartyBasketCall}
+        style={{ textTransform: 'uppercase' }}
         themeColor={
           partyBasketSubmissionStatus.status === 'success'
             ? COLORS.successFontColor
@@ -182,10 +231,10 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
         }
       >
         {partyBasketSubmissionStatus.status === 'pending'
-          ? 'SUBMITTING...'
+          ? `${words.submitting}...`
           : partyBasketSubmissionStatus.status === 'success'
-          ? 'SUCCESS'
-          : `CREATE PARTY BASKET`}
+          ? words.success
+          : words.createAPartyBasket}
       </$CreatePartyBasketButton>
       {partyBasketSubmissionStatus.status === 'error' && partyBasketSubmissionStatus.error && (
         <$ErrorText>{partyBasketSubmissionStatus.error}</$ErrorText>

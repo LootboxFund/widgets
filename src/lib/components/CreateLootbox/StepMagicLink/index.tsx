@@ -17,6 +17,8 @@ import { LoadingText } from 'lib/components/Generics/Spinner'
 import { $InputMedium } from '../StepCustomize'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { v4 as uuidv4 } from 'uuid'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { getWords } from '../constants'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -58,6 +60,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const [includeCampaignWebsite, setIncludeCampaignWebsite] = useState(true)
   const [includeTournamentId, setIncludeTournamentId] = useState(true)
   const [loading, setLoading] = useState(false)
+  const intl = useIntl()
 
   const generateMagicLink = async () => {
     setLoading(true)
@@ -124,6 +127,41 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   }
   const chainSlug = chainIdHexToSlug(props.network) as ChainSlugs
   const blockchain = BLOCKCHAINS[chainSlug] as ChainInfo
+
+  const {
+    magicNetworkText,
+    magicLootboxTypeText,
+    magicFundingTargetText,
+    magicFundingLimitText,
+    magicReceivingWalletText,
+    magicReturnsTargetText,
+    magicReturnsDateText,
+    magicLogoImageText,
+    magicCoverImageText,
+    magicThemeColorText,
+    magicCampaignBioText,
+    magicCampaignWebsiteText,
+    magicTournamentIdText,
+  } = getWords({
+    intl,
+    blockchain: {
+      chainName: blockchain.chainName,
+      nativeSymbol: blockchain.nativeCurrency.symbol,
+    },
+    lootboxType: props.type ? `${props.type.charAt(0).toUpperCase() + props.type.slice(1)}` : '',
+    returnDate: props.returnsDate || '',
+    returnsTarget: ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString(),
+    receivingWallet: props.receivingWallet || '',
+    fundingLimit: parseFloat(ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()).toFixed(4),
+    fundingTarget: parseFloat(ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()).toFixed(4),
+  })
+
+  const generateMagicLinkButtonPrompt = intl.formatMessage({
+    id: 'createLootbox.stepMagicLink.generateMagicLinkButtonPrompt',
+    defaultMessage: 'Generate',
+    description: 'Button prompt to "generate" (AKA. "create") a magic link for a Lootbox',
+  })
+
   if (!showMagicLinkGenerate) {
     return (
       <$StepMagicLink>
@@ -136,7 +174,11 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
             color={`${COLORS.surpressedFontColor}70`}
             style={{ paddingLeft: '20px', paddingRight: '20px', fontWeight: TYPOGRAPHY.fontWeight.regular }}
           >
-            Create magic link
+            <FormattedMessage
+              id="createLootbox.stepMagicLink.generateMagicLink.createButton"
+              defaultMessage="Create magic link"
+              description="Button text to create a magic link. A magic link is a URL link (like www.lootbox.fund/xyz) that allows a user to create a Lootbox in 1 simple step"
+            />
           </$Button>
         </div>
       </$StepMagicLink>
@@ -147,15 +189,26 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
       <StepCard themeColor={props.selectedNetwork?.themeColor} stage={props.stage} onNext={() => {}} errors={[]}>
         <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           <$StepHeading>
-            Create Magic Link
+            <FormattedMessage
+              id="createLootbox.stepMagicLink.generateMagicLink.header"
+              defaultMessage="Create Magic Link"
+              description="Header for the component that handles creating a magic link. A magic link is a URL link (like www.lootbox.fund/xyz) that allows a user to create a Lootbox in 1 simple step"
+            />
             <HelpIcon tipID="stepNetwork" />
             <ReactTooltip id="stepNetwork" place="right" effect="solid">
-              Choose a Lootbox type based on your use case. Read the descriptions of each type to find which is right
-              for you.
+              <FormattedMessage
+                id="createLootbox.stepMagicLink.generateMagicLink.tooltip"
+                defaultMessage="Create a magic link and share it with your community. Magic links easily allow anyone to create a Lootbox according to the settings you choose."
+                description="Tool tip help message for the magic link section"
+              />
             </ReactTooltip>
           </$StepHeading>
           <$StepSubheading>
-            Easily allow anyone to create a Lootbox according to the settings you choose.
+            <FormattedMessage
+              id="createLootbox.stepMagicLink.generateMagicLink.subheader"
+              defaultMessage="Easily allow anyone to create a Lootbox according to the settings you choose."
+              description="Sub header for the component that handles creating a magic link."
+            />
           </$StepSubheading>
           <br />
           <br />
@@ -168,14 +221,14 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
                 setIncludeFundingTarget(bool)
                 setIncludeFundingLimit(bool)
               }}
-              text={`Set network to ${blockchain.chainName}`}
+              text={magicNetworkText}
               locked={false}
             />
             <IncludeTerm
               slug="type"
               checked={includeType}
               onClick={setIncludeType}
-              text={`Set Lootbox type to ${props.type}`}
+              text={magicLootboxTypeText}
               locked={false}
             />
             <IncludeTerm
@@ -186,9 +239,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
                 setIncludeFundingTarget(bool)
                 setIncludeFundingLimit(bool)
               }}
-              text={`Set funding target to ${parseFloat(
-                ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()
-              ).toFixed(4)} ${blockchain.nativeCurrency.symbol}`}
+              text={magicFundingTargetText}
               locked={includeNetwork ? true : false}
             />
             <IncludeTerm
@@ -199,72 +250,70 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
                 setIncludeFundingTarget(bool)
                 setIncludeFundingLimit(bool)
               }}
-              text={`Set funding limit to ${parseFloat(
-                ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()
-              ).toFixed(4)} ${blockchain.nativeCurrency.symbol}`}
+              text={magicFundingLimitText}
               locked={includeNetwork ? true : false}
             />
             <IncludeTerm
               slug="receivingWallet"
               checked={includeReceivingWallet}
               onClick={setIncludeReceivingWallet}
-              text={`Set receiving wallet to ${props.receivingWallet}`}
+              text={magicReceivingWalletText}
               locked={false}
             />
             <IncludeTerm
               slug="returnsTarget"
               checked={includeReturnsTarget}
               onClick={setIncludeReturnsTarget}
-              text={`Set returns target to ${ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString()}%`}
+              text={magicReturnsTargetText}
               locked={false}
             />
             <IncludeTerm
               slug="returnsDate"
               checked={includeReturnsDate}
               onClick={setIncludeReturnsDate}
-              text={`Set returns date to ${props.returnsDate}`}
+              text={magicReturnsDateText}
               locked={false}
             />
             <IncludeTerm
               slug="logo"
               checked={includeLogoImage}
               onClick={setIncludeLogoImage}
-              text={`Set logo image automatically`}
+              text={magicLogoImageText}
               locked={false}
             />
             <IncludeTerm
               slug="cover"
               checked={includeCoverImage}
               onClick={setIncludeCoverImage}
-              text={`Set cover image automatically`}
+              text={magicCoverImageText}
               locked={false}
             />
             <IncludeTerm
               slug="themeColor"
               checked={includeThemeColor}
               onClick={setIncludeThemeColor}
-              text={`Set theme color automatically`}
+              text={magicThemeColorText}
               locked={false}
             />
             <IncludeTerm
               slug="campaignBio"
               checked={includeCampaignBio}
               onClick={setIncludeCampaignBio}
-              text={`Set the Lootbox description automatically`}
+              text={magicCampaignBioText}
               locked={false}
             />
             <IncludeTerm
               slug="campaignWebsite"
               checked={includeCampaignWebsite}
               onClick={setIncludeCampaignWebsite}
-              text={`Set the website in the Lootbox social links automatically`}
+              text={magicCampaignWebsiteText}
               locked={false}
             />
             <IncludeTerm
               slug="tournamentId"
               checked={includeTournamentId}
               onClick={setIncludeTournamentId}
-              text={`Set the tournament id to ${props.tournamentId}`}
+              text={magicTournamentIdText}
               locked={false}
             />
             <br />
@@ -276,7 +325,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
               color={COLORS.trustFontColor}
               backgroundColor={COLORS.trustBackground}
             >
-              <LoadingText loading={loading} text="Generate" color={COLORS.trustFontColor} />
+              <LoadingText loading={loading} text={generateMagicLinkButtonPrompt} color={COLORS.trustFontColor} />
             </$Button>
           </$Vertical>
           <br />
@@ -295,7 +344,11 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
                   color: COLORS.surpressedFontColor,
                 }}
               >
-                Copy the link above ☝️ and send it to the person you want to create a Lootbox for.
+                <FormattedMessage
+                  id="createLootbox.stepMagicLink.generateMagicLink.copy"
+                  defaultMessage="Copy the link above ☝️ and send it to the person you want to create a Lootbox for."
+                  description="Prompt for the user to copy the magic link, which is visually shown above (hence the finger upwards)"
+                />
               </span>
             </$Vertical>
           )}

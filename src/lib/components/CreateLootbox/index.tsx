@@ -4,7 +4,6 @@ import {
   initDApp,
   updateStateToChain,
   useUserInfo,
-  useEthers,
   useWeb3Utils,
   useProvider,
   addCustomEVMChain,
@@ -12,7 +11,6 @@ import {
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import {
   extractURLState_CreateLootboxPage,
   InitialFormStateCreateLootbox,
@@ -39,7 +37,7 @@ import StepCustomize, {
 } from 'lib/components/CreateLootbox/StepCustomize'
 import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
-import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
+import { matchNetworkByHex, NetworkOption, NETWORK_OPTIONS } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
 import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
@@ -55,6 +53,8 @@ import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 import { TournamentID } from 'lib/types'
 import { InitialUrlParams } from './state'
+import { getWords } from './constants'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 // Multiplies the fundraisingTarget by this value
 export const defaultFundraisingLimitMultiplier = 10 // base 2 - examples: 10 = 100%, 11 = 110%
@@ -93,6 +93,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const web3Utils = useWeb3Utils()
   const isWalletConnected = snapUserState.accounts.length > 0
   const [tournamentId, setTournamentId] = useState<string>('')
+  const intl = useIntl()
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
@@ -109,51 +110,78 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
     let tempStateObject = {}
 
+    const networkOption: NetworkOption = INITIAL_URL_PARAMS.network
+      ? matchNetworkByHex(INITIAL_URL_PARAMS.network) || NETWORK_OPTIONS[0]
+      : (NETWORK_OPTIONS[0] as NetworkOption)
+
+    const {
+      magicNetworkText,
+      magicLootboxTypeText,
+      magicFundingTargetText,
+      magicFundingLimitText,
+      magicReceivingWalletText,
+      magicReturnsTargetText,
+      magicReturnsDateText,
+      magicLogoImageText,
+      magicCoverImageText,
+      magicThemeColorText,
+      magicCampaignBioText,
+      magicCampaignWebsiteText,
+      magicTournamentIdText,
+    } = getWords({
+      intl,
+      blockchain: {
+        chainName: networkOption.name,
+        nativeSymbol: networkOption.symbol,
+      },
+      lootboxType: INITIAL_URL_PARAMS.type
+        ? `${INITIAL_URL_PARAMS.type.charAt(0).toUpperCase() + INITIAL_URL_PARAMS.type.slice(1)}`
+        : '',
+      returnDate: INITIAL_URL_PARAMS.returnsDate || '',
+      returnsTarget: ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString(),
+      receivingWallet: INITIAL_URL_PARAMS.receivingWallet || '',
+      fundingLimit: parseFloat(
+        ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()
+      ).toFixed(4),
+      fundingTarget: parseFloat(
+        ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()
+      ).toFixed(4),
+    })
+
     if (INITIAL_URL_PARAMS.network && validNetworks.includes(INITIAL_URL_PARAMS.network || '')) {
       const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network)
       if (networkOption) {
         setNetwork(networkOption)
-        prefilledFields.push(`Network set to ${networkOption.name}`)
+        prefilledFields.push(magicNetworkText)
       }
     }
     if (INITIAL_URL_PARAMS.type && validTypes.includes(INITIAL_URL_PARAMS.type || '')) {
       setFundingType(INITIAL_URL_PARAMS.type as LootboxType)
-      prefilledFields.push(`Funding type set to ${INITIAL_URL_PARAMS.type}`)
+      prefilledFields.push(magicLootboxTypeText)
     }
     if (INITIAL_URL_PARAMS.fundingTarget && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingTarget))) {
-      console.log(`Setting funding target... ${INITIAL_URL_PARAMS.fundingTarget}`)
       setFundraisingTarget(web3Utils.toBN(INITIAL_URL_PARAMS.fundingTarget))
       const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
-      prefilledFields.push(
-        `Funding target set to ${parseFloat(
-          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()
-        ).toFixed(4)} ${networkOption?.symbol}`
-      )
+      prefilledFields.push(magicFundingTargetText)
     }
     if (INITIAL_URL_PARAMS.fundingLimit && !isNaN(parseFloat(INITIAL_URL_PARAMS.fundingLimit))) {
       setFundraisingLimit(web3Utils.toBN(INITIAL_URL_PARAMS.fundingLimit))
       const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network || '')
-      prefilledFields.push(
-        `Funding limit set to ${parseFloat(
-          ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()
-        ).toFixed(4)} ${networkOption?.symbol}`
-      )
+      prefilledFields.push(magicFundingLimitText)
     }
     if (INITIAL_URL_PARAMS.receivingWallet) {
       setReceivingWallet(INITIAL_URL_PARAMS.receivingWallet as Address)
-      prefilledFields.push(`Receiving wallet set to ${INITIAL_URL_PARAMS.receivingWallet}`)
+      prefilledFields.push(magicReceivingWalletText)
     }
     if (INITIAL_URL_PARAMS.returnsTarget && !isNaN(parseInt(INITIAL_URL_PARAMS.returnsTarget))) {
       setBasisPoints(parseInt(INITIAL_URL_PARAMS.returnsTarget))
-      prefilledFields.push(
-        `Returns target set to ${ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString()}%`
-      )
+      prefilledFields.push(magicReturnsTargetText)
     }
     if (INITIAL_URL_PARAMS.returnsDate) {
       const paybackDate = new Date(INITIAL_URL_PARAMS.returnsDate)
       if (INITIAL_URL_PARAMS.returnsDate && paybackDate instanceof Date && !isNaN(paybackDate.getTime())) {
         setPaybackDate(INITIAL_URL_PARAMS.returnsDate)
-        prefilledFields.push(`Returns date set to ${INITIAL_URL_PARAMS.returnsDate}`)
+        prefilledFields.push(magicReturnsDateText)
       }
     }
     if (INITIAL_URL_PARAMS.themeColor) {
@@ -161,28 +189,28 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     }
     if (INITIAL_URL_PARAMS.campaignWebsite) {
       updateSocialState('web', INITIAL_URL_PARAMS.campaignWebsite)
-      prefilledFields.push(`Lootbox website for more info set to "${INITIAL_URL_PARAMS.campaignWebsite}"`)
+      prefilledFields.push(magicCampaignWebsiteText)
     }
     if (INITIAL_URL_PARAMS.campaignBio) {
       tempStateObject = { ...tempStateObject, biography: INITIAL_URL_PARAMS.campaignBio }
-      prefilledFields.push(`Lootbox description is already set`)
+      prefilledFields.push(magicCampaignBioText)
     }
     if (INITIAL_URL_PARAMS.logoImage) {
       // const decodedLogo = encodeImageURI(INITIAL_URL_PARAMS.logoImage)
       const decodedLogo = INITIAL_URL_PARAMS.logoImage
       tempStateObject = { ...tempStateObject, logoUrl: decodedLogo }
-      prefilledFields.push(`Lootbox logo image is already set`)
+      prefilledFields.push(magicLogoImageText)
     }
     if (INITIAL_URL_PARAMS.coverImage) {
       // const decodedCover = encodeImageURI(INITIAL_URL_PARAMS.coverImage)
       const decodedCover = INITIAL_URL_PARAMS.coverImage
       tempStateObject = { ...tempStateObject, coverUrl: decodedCover }
-      prefilledFields.push(`Lootbox cover image is already set`)
+      prefilledFields.push(magicCoverImageText)
     }
 
     if (INITIAL_URL_PARAMS.tournamentId) {
       setTournamentId(INITIAL_URL_PARAMS.tournamentId)
-      prefilledFields.push(`Tournament ID is set`)
+      prefilledFields.push(magicTournamentIdText)
     }
 
     // @ts-ignore bullshit typing shit
@@ -701,7 +729,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
         {!doesNetworkMatchProvider ? (
           <$Horizontal flex={1} justifyContent="flex-start" verticalCenter>
             <span style={{ marginRight: '10px' }}>⚠️</span>
-            <span style={{ fontFamily: 'sans-serif' }}>{`MetaMask is on the wrong network`}</span>
+            <span style={{ fontFamily: 'sans-serif' }}>
+              <FormattedMessage
+                id="createLootbox.networkMismatch"
+                defaultMessage="MetaMask is on the wrong network"
+                description="Error text when user is on the wrong blockchain network"
+              />
+            </span>
           </$Horizontal>
         ) : null}
         {Object.keys(validity)
@@ -710,7 +744,16 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             return (
               <$Horizontal flex={1} justifyContent="flex-start" verticalCenter>
                 <span style={{ marginRight: '10px' }}>⚠️</span>
-                <span style={{ fontFamily: 'sans-serif' }}>{`${key.replace('step', '')} not completed`}</span>
+                <span style={{ fontFamily: 'sans-serif' }}>
+                  <FormattedMessage
+                    id={`createLootbox.invalidStep`}
+                    defaultMessage="{key} is invalid"
+                    description="Error text when a step in create lootbox flow is invalid or incomplete"
+                    values={{
+                      key: key.replace('step', ''),
+                    }}
+                  />
+                </span>
               </$Horizontal>
             )
           })}
@@ -723,7 +766,13 @@ const CreateLootbox = (props: CreateLootboxProps) => {
             style={{ cursor: 'pointer' }}
           >
             <span style={{ marginRight: '10px' }}>⚠️</span>
-            <span style={{ fontFamily: 'sans-serif', textDecoration: 'underline' }}>{`Wallet not connected`}</span>
+            <span style={{ fontFamily: 'sans-serif', textDecoration: 'underline' }}>
+              <FormattedMessage
+                id="createLootbox.connectWallet"
+                defaultMessage="Wallet not connected"
+                description="Error message when metamask wallet is not connected to website"
+              />
+            </span>
           </$Horizontal>
         ) : null}
       </$Vertical>

@@ -5,6 +5,7 @@ import Web3 from 'web3'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { BigNumber } from 'bignumber.js'
 import { Address, ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Choose Funding',
@@ -37,33 +38,35 @@ const Demo = (args: StepChooseFundingProps) => {
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseFunding
-        selectedNetwork={network}
-        type={fundType}
-        fundraisingLimit={fundraisingLimit}
-        fundraisingTarget={fundraisingTarget}
-        setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
-        setFundraisingTarget={(amount: BigNumber) => setFundraisingTarget(amount)}
-        receivingWallet={receivingWallet}
-        setReceivingWallet={(addr: Address) => setReceivingWallet(addr)}
-        stage={stage}
-        setValidity={(valid: boolean) => {}}
-        onNext={() => console.log('onNext')}
-      />
-      <button
-        onClick={() => {
-          if (fundType === 'escrow') {
-            setFundType('instant')
-          } else {
-            setFundType('escrow')
-          }
-        }}
-        style={{ marginTop: '50px' }}
-      >
-        Toggle Fund Type
-      </button>
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepChooseFunding
+          selectedNetwork={network}
+          type={fundType}
+          fundraisingLimit={fundraisingLimit}
+          fundraisingTarget={fundraisingTarget}
+          setFundraisingLimit={(limit: BigNumber) => setFundraisingLimit(limit)}
+          setFundraisingTarget={(amount: BigNumber) => setFundraisingTarget(amount)}
+          receivingWallet={receivingWallet}
+          setReceivingWallet={(addr: Address) => setReceivingWallet(addr)}
+          stage={stage}
+          setValidity={(valid: boolean) => {}}
+          onNext={() => console.log('onNext')}
+        />
+        <button
+          onClick={() => {
+            if (fundType === 'escrow') {
+              setFundType('instant')
+            } else {
+              setFundType('escrow')
+            }
+          }}
+          style={{ marginTop: '50px' }}
+        >
+          Toggle Fund Type
+        </button>
+      </div>
+    </LocalizationWrapper>
   )
 }
 

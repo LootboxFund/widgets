@@ -15,6 +15,8 @@ import { userState } from 'lib/state/userState'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import LogRocket from 'logrocket'
+import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface StepChooseNetworkProps {
   stage: StepStage
@@ -26,15 +28,23 @@ export interface StepChooseNetworkProps {
 }
 
 const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.RefObject<HTMLDivElement>) => {
+  const words = useWords()
   const { screen } = useWindowSize()
   const isMobile = screen === 'tablet' || screen === 'mobile'
   const snapUserState = useSnapshot(userState)
-  const [errors, setErrors] = useState<string[] | undefined>(undefined)
+  const [errors, setErrors] = useState<(string | React.ReactElement)[] | undefined>(undefined)
   const [hasNonZeroTokens, setHasNonZeroToken] = useState<boolean>(false)
 
   useEffect(() => {
     if (props.selectedNetwork && !snapUserState.currentAccount) {
-      setErrors(['Please connect you wallet by clicking the red button "Connect" above ☝️'])
+      setErrors([
+        <FormattedMessage
+          id="createLootbox.stepChooseNetwork.noAccount"
+          key="noAccount"
+          defaultMessage='Please connect your wallet by clicking the red button "Connect" above ☝️'
+          description="Error message when no account is selected"
+        />,
+      ])
     } else if (props.selectedNetwork && snapUserState.currentAccount) {
       getProvider()
         .then((data) => {
@@ -45,9 +55,9 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
           if (network?.chainId?.toString() !== props.selectedNetwork?.chainIdDecimal) {
             props.setDoesNetworkMatch(false)
             setErrors([
-              `You are on the wrong network! Please change your MetaMask network to "${props.selectedNetwork?.name}${
-                props.selectedNetwork?.isTestnet ? ' (Testnet)' : ''
-              }".`,
+              `${words.wrongNetworkPleaseChangeTo} "${props.selectedNetwork?.name}${
+                props.selectedNetwork?.isTestnet ? ` (${words.testnet})` : ''
+              }"`,
             ])
           } else {
             props.setDoesNetworkMatch(true)
@@ -55,7 +65,14 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
               .then((balance) => {
                 if (balance === '0') {
                   setHasNonZeroToken(true)
-                  setErrors([`You do not have any ${props?.selectedNetwork?.isTestnet ? 'testnet ' : ''}tokens!`])
+                  setErrors([
+                    <FormattedMessage
+                      id="createLootbox.stepChooseNetwork.error.noTokens"
+                      defaultMessage="You do not have any {networkType}tokens!"
+                      description="Error message when the user has no tokens"
+                      values={{ networkType: props.selectedNetwork?.isTestnet ? `${words.testnet} ` : '' }}
+                    />,
+                  ])
                 } else {
                   setErrors(undefined)
                   setHasNonZeroToken(false)
@@ -99,13 +116,19 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
                   {network.name}
                 </$NetworkName>
                 <$ComingSoon isSelected={props.selectedNetwork?.chainIdHex === network.chainIdHex}>
-                  {network.isTestnet && 'Testnet'}
+                  {network.isTestnet && words.testnet}
                 </$ComingSoon>
               </$Horizontal>
             ) : (
               <$Horizontal flex={1} justifyContent="space-between">
                 <$NetworkName>{network.name}</$NetworkName>
-                <$ComingSoon>Coming Soon</$ComingSoon>
+                <$ComingSoon>
+                  <FormattedMessage
+                    id="create.lootbox.step.network.heading.comming-soon"
+                    defaultMessage="Coming Soon"
+                    description="Text shown to user when a new network is not yet available with our systems yet"
+                  />
+                </$ComingSoon>
               </$Horizontal>
             )}
           </$NetworkOption>
@@ -125,16 +148,27 @@ const StepChooseNetwork = forwardRef((props: StepChooseNetworkProps, ref: React.
         <$Wrapper screen={screen}>
           <$Vertical flex={2}>
             <$StepHeading>
-              1. Choose your Network
+              <FormattedMessage
+                id="create.lootbox.step.network.heading"
+                defaultMessage="1. Choose your Network"
+                description="Header for the step to choose the network when creating a Lootbox"
+              />
               <HelpIcon tipID="stepNetwork" />
               <ReactTooltip id="stepNetwork" place="right" effect="solid">
-                The network you choose should be the same blockchain as the game you intend to play. You may bridge
-                money across chains after funding, if needed.
+                <FormattedMessage
+                  id="create.lootbox.step.network.heading.help"
+                  defaultMessage="The network you choose should be the same blockchain as the game you intend to play. You may bridge money across chains after funding, if needed."
+                  description="Help message for users when creating a Lootbox"
+                />
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Your Investors will send you money in the native token. Profits can be shared as any ERC20 token on that
-              blockchain.
+              <FormattedMessage
+                id="create.lootbox.step.network.subheading"
+                defaultMessage="Your Investors will send you money in the native token. Profits can be shared as any ERC20 token on that
+                blockchain."
+                description="Subheader for the step to choose the network when creating a Lootbox"
+              />
             </$StepSubheading>
             <br />
             {renderNetworkOptions()}

@@ -5,6 +5,7 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import Profile from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'Profile',
@@ -25,11 +26,13 @@ const Template = () => {
 
   return (
     <ApolloProvider client={client}>
-      <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
-        <Profile />
-        <br />
-        <br />
-      </$CardViewport>
+      <LocalizationWrapper>
+        <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
+          <Profile />
+          <br />
+          <br />
+        </$CardViewport>
+      </LocalizationWrapper>
     </ApolloProvider>
   )
 }

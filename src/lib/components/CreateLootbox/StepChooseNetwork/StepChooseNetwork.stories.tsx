@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import StepChooseNetwork, { StepChooseNetworkProps } from 'lib/components/CreateLootbox/StepChooseNetwork'
 import { StepStage } from 'lib/components/CreateLootbox/StepCard'
-import { NetworkOption } from '../state'
+import { NetworkOption } from 'lib/api/network'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Choose Network',
@@ -17,16 +18,18 @@ const Demo = (args: StepChooseNetworkProps) => {
     setStage('may_proceed')
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseNetwork
-        selectedNetwork={network}
-        stage={stage}
-        onSelectNetwork={selectNetwork}
-        onNext={() => console.log('onNext')}
-        setValidity={(bool: boolean) => console.log(bool)}
-        setDoesNetworkMatch={(bool: boolean) => console.log(bool)}
-      />
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepChooseNetwork
+          selectedNetwork={network}
+          stage={stage}
+          onSelectNetwork={selectNetwork}
+          onNext={() => console.log('onNext')}
+          setValidity={(bool: boolean) => console.log(bool)}
+          setDoesNetworkMatch={(bool: boolean) => console.log(bool)}
+        />
+      </div>
+    </LocalizationWrapper>
   )
 }
 

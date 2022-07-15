@@ -29,6 +29,9 @@ import { calculateDaysBetween, truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
 import SemverIcon from 'lib/theme/icons/Semver.icon'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
+import { FormattedMessage, useIntl } from 'react-intl'
+import { useManageLootboxWords } from './words'
+import useWords from 'lib/hooks/useWords'
 
 const ethers = window.ethers ? window.ethers : ethersObj
 
@@ -44,6 +47,9 @@ export interface ManageLootboxProps {
 }
 const ManageLootbox = (props: ManageLootboxProps) => {
   const { screen } = useWindowSize()
+  const intl = useIntl()
+  const words = useWords()
+  const manageWords = useManageLootboxWords()
 
   const [fundedAmountNative, setFundedAmountNative] = useState('0')
   const [fundedAmountUSD, setFundedAmountUSD] = useState('0')
@@ -70,6 +76,19 @@ const ManageLootbox = (props: ManageLootboxProps) => {
 
   const [refundButtonState, setRefundButtonState] = useState<ManagementButtonState>('enabled')
   const [refundButtonMessage, setRefundButtonMessage] = useState('')
+
+  const endFundraisingText = intl.formatMessage({
+    id: 'lootbox.manage.endFundraising',
+    defaultMessage: 'End fundraising',
+    description: 'Action to end Lootbox fundraising',
+  })
+
+  const refundSponsorsText = intl.formatMessage({
+    id: 'lootbox.manage.refundSponsors',
+    defaultMessage: 'Refund sponsors',
+    description:
+      'Action to refund Lootbox sponsors - this means paying them back for the amount they invested in a Lootbox',
+  })
 
   const loadBlockchainData = async () => {
     if (props.lootboxType === 'Instant') {
@@ -170,12 +189,10 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     try {
       await endFundraisingPeriodCall(props.lootboxAddress, props.lootboxType)
       setEndFundraisingButtonState('success')
-      setEndFundraisingButtonMessage(
-        'Fundraising period successfully ended. You may now reward sponsors. Please refresh the page.'
-      )
+      setEndFundraisingButtonMessage(`${manageWords.fundraisingPeriodSuccessfullyEnded} ${words.pleaseRefreshThePage}.`)
     } catch (e) {
       setEndFundraisingButtonState('error')
-      setEndFundraisingButtonMessage(e.data.message)
+      setEndFundraisingButtonMessage(e?.data?.message || words.anErrorOccured)
       setTimeout(() => {
         setEndFundraisingButtonState('enabled')
       }, 2000)
@@ -188,32 +205,15 @@ const ManageLootbox = (props: ManageLootboxProps) => {
     try {
       await refundFundraiserCall(props.lootboxAddress, props.lootboxType)
       setRefundButtonState('success')
-      setRefundButtonMessage('Fundraising period successfully ended. You may now reward sponsors.')
+      setRefundButtonMessage(manageWords.fundraisingPeriodSuccessfullyEnded)
     } catch (e) {
       setRefundButtonState('error')
-      setRefundButtonMessage(e.data.message)
+      setRefundButtonMessage(e?.data?.message || words.anErrorOccured)
       setTimeout(() => {
         setRefundButtonState('enabled')
       }, 2000)
     }
   }
-
-  // console.log(`
-
-  // !props.network.themeColor  = ${props.network.themeColor}
-  // !fundedAmountNative = ${fundedAmountNative}
-  // !fundedAmountUSD    = ${fundedAmountUSD}
-  // !fundedAmountShares = ${fundedAmountShares}
-  // !targetAmountNative = ${targetAmountNative}
-  // !targetAmountUSD    = ${targetAmountUSD}
-  // !targetAmountShares = ${targetAmountShares}
-  // !maxAmountUSD       = ${maxAmountUSD}
-  // !maxAmountShares    = ${maxAmountShares}
-  // !deploymentDate     = ${deploymentDate}
-  // !treasuryAddress    = ${treasuryAddress}
-  // !reputationAddress  = ${reputationAddress}
-
-  // `)
 
   if (
     !props.network.themeColor ||
@@ -228,8 +228,11 @@ const ManageLootbox = (props: ManageLootboxProps) => {
   ) {
     return (
       <p>
-        Loading data from Blockchain. This may take up to 1 minute... if taking too long, please refresh the page. In
-        most cases, it's the blockchain network being slow.
+        <FormattedMessage
+          id="lootbox.manage.slowNetworkMessage"
+          defaultMessage="Loading data from Blockchain. This may take up to 1 minute... if taking too long, please refresh the page. In most cases, it's the blockchain network being slow."
+          description="Message shown to users when the blockchain might be slow and they should wait for it to load."
+        />
       </p>
     )
   }
@@ -249,7 +252,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 marginRight: '10px',
               }}
             >
-              {`${percentageFunded}% Funded`}
+              {`${percentageFunded}% ${words.funded}`}
             </span>
             <span
               style={{
@@ -270,16 +273,21 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 fontWeight: 'bold',
               }}
             >
-              {`${ethers.utils.formatUnits(targetAmountNative, '18')} ${props.network.symbol} Goal`}
+              {`${ethers.utils.formatUnits(targetAmountNative, '18')} ${props.network.symbol} ${words.goal}`}
             </span>
             <HelpIcon tipID="fundingGoal" />
             <ReactTooltip id="fundingGoal" place="right" effect="solid">
-              {`This Lootbox has a goal of selling ${targetAmountShares} shares for a target value of approx ${ethers.utils.formatUnits(
-                targetAmountNative,
-                '18'
-              )} ${
-                props.network.symbol
-              } equal to $${targetAmountUSD} at todays prices. The max amount of shares for sale is ${maxAmountShares}.`}
+              <FormattedMessage
+                id="lootbox.manage.fundingGoalTooltip"
+                defaultMessage="This Lootbox has a goal of selling {numShares} shares for a target value of approx {sharesValue} equal to ${usdValue} at todays prices. The max amount of shares for sale is {maxShares}"
+                description="Tooltip for the funding goal"
+                values={{
+                  numShares: targetAmountShares,
+                  sharesValue: `${ethers.utils.formatUnits(targetAmountNative, '18')} ${props.network.symbol}`,
+                  usdValue: targetAmountUSD,
+                  maxShares: maxAmountShares,
+                }}
+              />
             </ReactTooltip>
           </$Horizontal>
         </$Horizontal>
@@ -297,28 +305,50 @@ const ManageLootbox = (props: ManageLootboxProps) => {
             <$ManageLootboxHeading screen={screen}>{props.lootboxMetadata.name}</$ManageLootboxHeading>
             <HelpIcon tipID="lootboxTitle" />
             <ReactTooltip id="lootboxTitle" place="right" effect="solid">
-              {`This is the human-friendly name of the Lootbox, but the real name is its contract address ${props.lootboxAddress}. When sponsors buy from this Lootbox and receive it in their wallet, it will have the symbol ${lootboxSymbol} with 0 decimals. If sponsors want to transfer their NFT to another wallet, they will need to use OpenZeppelin Defender as Metamask does not support all ERC721 transfers. The tutorial for this can be found on the LootboxFund YouTube channel.`}
+              <FormattedMessage
+                id="lootbox.manage.lootboxTitleTooltip"
+                defaultMessage="This is the human-friendly name of the Lootbox, but the real name is its contract address {lootboxAddress}. When sponsors buy from this Lootbox and receive it in their wallet, it will have the symbol {lootboxSymbol} with 0 decimals. If sponsors want to transfer their NFT to another wallet, they will need to use OpenZeppelin Defender as Metamask does not support all ERC721 transfers. The tutorial for this can be found on the LootboxFund YouTube channel."
+                description="Tooltip for the Lootbox title"
+                values={{
+                  lootboxAddress: props.lootboxAddress,
+                  lootboxSymbol: lootboxSymbol,
+                }}
+              />
             </ReactTooltip>
           </$Horizontal>
-          <$Datestamp>{`Created ${daysAgo} day${daysAgo === 1 ? '' : 's'} ago (${new Date(
-            deploymentDate
-          ).toLocaleDateString('en-us', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })})`}</$Datestamp>
+          <$Datestamp>
+            <FormattedMessage
+              id="lootbox.manage.deployed.ago"
+              defaultMessage="Created {daysAgo} days ago ({dateString})"
+              description="Text for how long ago in days the smart contract was deployed"
+              values={{
+                daysAgo,
+                dateString: new Date(deploymentDate).toLocaleDateString('en-us', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                }),
+              }}
+            />
+          </$Datestamp>
           <$StepSubheading>
             <div style={{ display: 'inline-block' }}>
-              <span>This is the public control panel for Lootbox </span>
+              <FormattedMessage
+                id="lootbox.manage.controlPanel.title"
+                defaultMessage="This is the public control panel for Lootbox"
+                description="Title for the public control panel"
+              />{' '}
               <span
                 onClick={() =>
                   window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')
                 }
                 style={{ textDecoration: 'underline', fontStyle: 'italic', cursor: 'pointer' }}
-              >{`${truncateAddress(props.lootboxAddress)}`}</span>
-              <span>
-                . It is made for the Lootbox creator but anyone can use it. Watch this Youtube Tutorial to learn how.
-              </span>
+              >{`${truncateAddress(props.lootboxAddress)}.`}</span>
+              <FormattedMessage
+                id="lootbox.manage.controlPanel.description"
+                defaultMessage="It is made for the Lootbox creator but anyone can use it. Watch this Youtube Tutorial to learn how."
+                description="Description for the public control panel"
+              />
             </div>
           </$StepSubheading>
           <$Vertical style={{ marginTop: '20px' }}>
@@ -327,17 +357,25 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <$NextStepTitle>1. Create Lootbox</$NextStepTitle>
+                  <$NextStepTitle>1. {words.createLootbox}</$NextStepTitle>
                   <HelpIcon tipID="createLootbox" />
                   <ReactTooltip id="createLootbox" place="right" effect="solid">
-                    You've already completed this step if you're on this Manage Lootbox page. If you want to create
-                    another, click the button below or visit https://lootbox.fund/create
+                    <FormattedMessage
+                      id="lootbox.manage.createLootboxTooltip"
+                      defaultMessage="You've already completed this step if you're on this Manage Lootbox page. If you want to create another, click the button below or visit https://lootbox.fund/create"
+                      description="Tooltip for the lootbox control panel section"
+                    />
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  {`Publish your Lootbox to ${props.network.name}${
-                    props.network.isTestnet ? ' Testnet' : ''
-                  }. You cannot change your funding goal after publishing.`}
+                  <FormattedMessage
+                    id="lootbox.manage.createLootbox.description"
+                    defaultMessage="Publish your Lootbox to {networkName}. You cannot change your funding goal after publishing."
+                    description="Description for the step where you can create another Lootbox."
+                    values={{
+                      networkName: `${props.network.name}${props.network.isTestnet ? ` ${words.testnet}` : ''}`,
+                    }}
+                  />
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
                   <$SmallerButton
@@ -345,8 +383,15 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                       window.open(manifest.microfrontends.webflow.createPage, '_blank')
                     }}
                     screen={screen}
+                    style={{
+                      textTransform: 'capitalize',
+                    }}
                   >
-                    Create Another
+                    <FormattedMessage
+                      id="lootbox.manage.createLootbox.button"
+                      defaultMessage="Create another"
+                      description="Button to create another Lootbox"
+                    />
                   </$SmallerButton>
                 </$Horizontal>
               </$Vertical>
@@ -358,20 +403,37 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               <$Checkmark>✅</$Checkmark>
               <$Vertical>
                 <$Horizontal>
-                  <$NextStepTitle>2. Actively Promoting</$NextStepTitle>
+                  <$NextStepTitle>
+                    2.{' '}
+                    <FormattedMessage
+                      id="lootbox.manage.promote.title"
+                      defaultMessage="Actively promoting"
+                      description="Title for the step where Lootbox is being actively promoted."
+                    />
+                  </$NextStepTitle>
                   <HelpIcon tipID="activelyPromote" />
                   <ReactTooltip id="activelyPromote" place="right" effect="solid">
-                    There is no such thing as free money. If you want sponsors, you need to earn their trust and
-                    recognition by promoting your Lootbox on social media. If you want to learn how to do proper
-                    fundraising, watch our Bootcamp Series on the LootboxFund YouTube channel.
+                    <FormattedMessage
+                      id="lootbox.manage.promote.tooltip"
+                      defaultMessage="There is no such thing as free money. If you want sponsors, you need to earn their trust and recognition by promoting your Lootbox on social media. If you want to learn how to do proper fundraising, watch our Bootcamp Series on the LootboxFund YouTube channel."
+                      description="Tooltip for the promote step in Lootbox control panel section"
+                    />
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Start sharing your Lootbox on social media for sponsors to buy NFTs. Watch the YouTube Tutorial.
+                  <FormattedMessage
+                    id="lootbox.manage.promote.description"
+                    defaultMessage="Start sharing your Lootbox on social media for sponsors to buy NFTs. Watch the YouTube Tutorial."
+                    description="Description for the step where you can promote your Lootbox."
+                  />
                 </$StepSubheading>
                 <$Horizontal verticalCenter>
                   <$LinkButton href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxAddress}`}>
-                    View & Share Lootbox
+                    <FormattedMessage
+                      id="lootbox.manage.promote.button"
+                      defaultMessage="View & Share Lootbox"
+                      description="Button to view and share your Lootbox"
+                    />
                   </$LinkButton>
                 </$Horizontal>
               </$Vertical>
@@ -384,28 +446,41 @@ const ManageLootbox = (props: ManageLootboxProps) => {
               <$Vertical>
                 <$Horizontal>
                   <$NextStepTitle>
-                    {isActivelyFundraising ? `3. Finish Fundraising` : `3. Finished Fundraising`}
+                    3.{' '}
+                    {isActivelyFundraising ? (
+                      <FormattedMessage
+                        id="lootbox.manage.finishFund.title1"
+                        defaultMessage="Finish Fundraising"
+                        description="Title for the step where you can finish fundraising."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="lootbox.manage.finishFund.title2"
+                        defaultMessage="Finished Fundraising"
+                        description="Title for the step where you already have finished fundraising"
+                      />
+                    )}
                   </$NextStepTitle>
                   <HelpIcon tipID="finishFundraising" />
                   <ReactTooltip id="finishFundraising" place="right" effect="solid">
-                    In an Escrow Lootbox, you may only collect your fundraised amounts if the target funding is hit. You
-                    may exceed the target funding, but only up to the max amount of shares available for sale. Click the
-                    "End Fundraising" button will send the funds to your receiving wallet. If you can't hit your funding
-                    goal, you may refund sponsors, which simply deposits the funds back into the Lootbox for sponsors to
-                    redeem (the funds will not automatically be sent to their wallet, you must tell them to redeem it by
-                    email or social media). Only the issuer of the Lootbox can offer a refund, but after 30 days anyone
-                    can force a refund if the target has not been hit. If you created an Instant Lootbox instead, then
-                    the funds get instantly sent to your receiving wallet and there is no refund (you would need to
-                    manually deposit funds back). Before you can deposit funds back, you need to end the fundraising.
+                    <FormattedMessage
+                      id="lootbox.manage.finishFund.tooltip"
+                      defaultMessage={`In an Escrow Lootbox, you may only collect your fundraised amounts if the target funding is hit. You may exceed the target funding, but only up to the max amount of shares available for sale. Click the "End Fundraising" button will send the funds to your receiving wallet. If you can't hit your funding goal, you may refund sponsors, which simply deposits the funds back into the Lootbox for sponsors to redeem (the funds will not automatically be sent to their wallet, you must tell them to redeem it by email or social media). Only the issuer of the Lootbox can offer a refund, but after 30 days anyone can force a refund if the target has not been hit. If you created an Instant Lootbox instead, then the funds get instantly sent to your receiving wallet and there is no refund (you would need to manually deposit funds back). Before you can deposit funds back, you need to end the fundraising.`}
+                      description="Tooltip for the finish fundraising step in Lootbox control panel section"
+                    />
                   </ReactTooltip>
                 </$Horizontal>
                 <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                  Only collect the money if the funding target is hit. Otherwise refund the sponsors.
+                  <FormattedMessage
+                    id="lootbox.manage.finishFund.description"
+                    defaultMessage="Only collect the money if the funding target is hit. Otherwise refund the sponsors."
+                    description="Description for the step where you can finish fundraising."
+                  />
                 </$StepSubheading>
                 <$Vertical style={isActivelyFundraising ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                   <$SmallerButton
                     screen={screen}
-                    style={{ position: 'relative' }}
+                    style={{ position: 'relative', textTransform: 'capitalize' }}
                     themeColor={props.network?.themeColor}
                     onClick={() => endFundraisingPeriod()}
                     disabled={endFundraisingButtonState !== 'enabled'}
@@ -413,7 +488,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                     {props.network?.icon && (
                       <$NetworkIcon src={props.network.icon} style={{ left: '10px', position: 'absolute' }} />
                     )}
-                    {endFundraisingButtonState === 'pending' ? 'Pending...' : `End Fundraising`}
+                    {endFundraisingButtonState === 'pending' ? `${words.loading}...` : endFundraisingText}
                   </$SmallerButton>
                   {endFundraisingButtonMessage && (
                     <$ErrorMessageMgmtPage status={endFundraisingButtonState}>
@@ -424,6 +499,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 <$Vertical style={isActivelyFundraising ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                   <div style={props.lootboxType === 'Escrow' ? {} : { opacity: 0.2, cursor: 'not-allowed' }}>
                     <$SmallerButton
+                      style={{ textTransform: 'capitalize' }}
                       onClick={() => {
                         if (props.lootboxType === 'Escrow') {
                           refundSponsors()
@@ -431,7 +507,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                       }}
                       screen={screen}
                     >
-                      {refundButtonState === 'pending' ? 'Pending...' : `Refund Sponsors`}
+                      {refundButtonState === 'pending' ? `${words.loading}...` : refundSponsorsText}
                     </$SmallerButton>
                     {refundButtonMessage && (
                       <$ErrorMessageMgmtPage status={refundButtonState}>{refundButtonMessage}</$ErrorMessageMgmtPage>
@@ -448,25 +524,40 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
                 <$Vertical>
                   <$Horizontal>
-                    <$NextStepTitle>4. Play & Earn</$NextStepTitle>
+                    <$NextStepTitle style={{ textTransform: 'capitalize' }}>
+                      4.{' '}
+                      <FormattedMessage
+                        id="lootbox.manage.playAndEarn.title"
+                        defaultMessage="Play & earn"
+                        description="Title which means you can play crypto games and earn money from doing it!"
+                      />
+                    </$NextStepTitle>
                     <HelpIcon tipID="playAndEarn" />
                     <ReactTooltip id="playAndEarn" place="right" effect="solid">
-                      Now that you've received the funds, you can go play and earn. It is good practice to update your
-                      sponsors on social media so that they know what you are doing with the money, and so that other
-                      people can see you as a professional. Make sure you also include #LootboxFund or tag us, so that
-                      people can understand what is going on. If they do not understand its a Lootbox, you will miss out
-                      on future potential sponsors.
+                      <FormattedMessage
+                        id="lootbox.manage.playAndEarn.tooltip"
+                        defaultMessage={`Now that you've received the funds, you can go play and earn. It is good practice to update your sponsors on social media so that they know what you are doing with the money, and so that other people can see you as a professional. Make sure you also include #LootboxFund or tag us, so that people can understand what is going on. If they do not understand its a Lootbox, you will miss out on future potential sponsors.`}
+                        description="Tooltip for the play and earn step in Lootbox control panel section"
+                      />
                     </ReactTooltip>
                   </$Horizontal>
                   <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                    Play the crypto games you fundraised for. Update your sponsors with news if any. Tag @LootboxFund
+                    <FormattedMessage
+                      id="lootbox.manage.playAndEarn.description"
+                      defaultMessage="Play the crypto games you fundraised for. Update your sponsors with news if any. Tag @LootboxFund"
+                      description="Description for the step where you can play and earn in Lootbox control panel."
+                    />
                   </$StepSubheading>
                   <$Horizontal verticalCenter>
                     <$SmallerButton
                       onClick={() => window.open('https://twitter.com/LootboxFund', '_blank')}
                       screen={screen}
                     >
-                      Tweet Updates to Sponsors
+                      <FormattedMessage
+                        id="lootbox.manage.playAndEarn.twitter"
+                        defaultMessage="Tweet Updates to Sponsors"
+                        description="Twitter button for the play and earn step in Lootbox control panel section"
+                      />
                     </$SmallerButton>
                   </$Horizontal>
                 </$Vertical>
@@ -480,26 +571,35 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                 <$Checkmark>{payoutsMade > 0 ? '✅' : '☑️'}</$Checkmark>
                 <$Vertical>
                   <$Horizontal>
-                    <$NextStepTitle>5. Reward Sponsors</$NextStepTitle>
+                    <$NextStepTitle style={{ textTransform: 'capitalize' }}>5. {words.rewardSponsors}</$NextStepTitle>
                     <HelpIcon tipID="rewardSponsorsMgmt" />
                     <ReactTooltip id="rewardSponsorsMgmt" place="right" effect="solid">
-                      If you have earned a profit, you can reward your sponsors by depositing earnings back into your
-                      Lootbox for sponsors to redeem. Anyone can deposit into your Lootbox, which allows a friend or
-                      stranger to assist you too. Make sure you make a social media post about it so that sponsors and
-                      strangers can see your success. This will help you in future fundraising. Be sure to use
-                      #LootboxFund or tag us, so that they are not confused and understand what is going on.
+                      <FormattedMessage
+                        id="lootbox.manage.rewardSponsors.tooltip1"
+                        defaultMessage={`If you have earned a profit, you can reward your sponsors by depositing earnings back into your Lootbox for sponsors to redeem. Anyone can deposit into your Lootbox, which allows a friend or stranger to assist you too. Make sure you make a social media post about it so that sponsors and strangers can see your success. This will help you in future fundraising. Be sure to use #LootboxFund or tag us, so that they are not confused and understand what is going on.`}
+                        description="Tooltip for the reward sponsors step in Lootbox control panel section"
+                      />
                     </ReactTooltip>
                   </$Horizontal>
                   <$StepSubheading style={{ margin: '5px 0px 10px 0px' }}>
-                    Share your crypto earnings with sponsors. Anyone can deposit earnings.
+                    <FormattedMessage
+                      id="lootbox.manage.rewardSponsors.description"
+                      defaultMessage="Share your crypto earnings with sponsors. Anyone can deposit earnings."
+                      description="Description for the step where you can reward your sponsors in Lootbox control panel."
+                    />
                   </$StepSubheading>
                   <$Horizontal verticalCenter>
                     <$SmallerButton
                       onClick={() => props.scrollToRewardSponsors()}
                       screen={screen}
                       themeColor={props.network?.themeColor}
+                      style={{ textTransform: 'capitalize' }}
                     >
-                      Deposit Earnings
+                      <FormattedMessage
+                        id="lootbox.manage.rewardSponsors.button"
+                        defaultMessage="Deposit earnings"
+                        description="Button for the reward sponsors step in Lootbox control panel section by depositing crypto back into your own lootbox. Earnings refers to yield from playoing a crypto game"
+                      />
                     </$SmallerButton>
                   </$Horizontal>
                   <$Horizontal verticalCenter>
@@ -508,8 +608,13 @@ const ManageLootbox = (props: ManageLootboxProps) => {
                         window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')
                       }
                       screen={screen}
+                      style={{ textTransform: 'capitalize' }}
                     >
-                      View Deposit History
+                      <FormattedMessage
+                        id="lootbox.manage.rewardSponsors.viewDepositHistory"
+                        defaultMessage="View deposit history"
+                        description="Button for the reward sponsors step in Lootbox control panel section by viewing the deposit history of your lootbox"
+                      />
                     </$SmallerButton>
                   </$Horizontal>
                 </$Vertical>
@@ -579,27 +684,38 @@ const ManageLootbox = (props: ManageLootboxProps) => {
       <$Vertical style={screen === 'desktop' ? { padding: '40px' } : { padding: '0px', marginTop: '80px' }}>
         <$Vertical style={{ marginBottom: '20px' }}>
           <$StepSubheading>
-            Lootbox Address
+            Lootbox {words.address}
             <HelpIcon tipID="lootboxAddress" />
             <ReactTooltip id="lootboxAddress" place="right" effect="solid">
-              {`Every Lootbox has its own smart contract address. This Lootbox is on ${props.network.name}${
-                props.network.isTestnet && ' Testnet'
-              } with contract address ${
-                props.lootboxAddress
-              }. You can verify all details you see on this UI by viewing it on a Block Explorer.`}
+              <FormattedMessage
+                id="lootbox.manage.lootboxAddress.tooltip"
+                defaultMessage={`
+                Every Lootbox has its own smart contract address. This Lootbox is on {networkName} with contract address {lootboxAddress}. You can verify all details you see on this UI by viewing it on a Block Explorer.`}
+                description="Tooltip for the lootbox address section in Lootbox control panel section"
+                values={{
+                  networkName: `${props.network.name}${props.network.isTestnet && ` ${words.testnet}`}`,
+                  lootboxAddress: props.lootboxAddress,
+                }}
+              />
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(props.lootboxAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
-              Copy
+              {words.copy}
             </span>
             <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
             <span
               onClick={() => window.open(`${props.network.blockExplorerUrl}address/${props.lootboxAddress}`, '_blank')}
-              style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
+              style={{
+                fontStyle: 'italic',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                marginLeft: '5px',
+                textTransform: 'capitalize',
+              }}
             >
-              View on Block Explorer
+              {words.viewOnBlockExplorer}
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -613,26 +729,27 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical style={{ marginBottom: '20px' }}>
           <$StepSubheading>
-            Receiving Wallet
+            {words.receivingWallet}
             <HelpIcon tipID="treasuryAddress" />
             <ReactTooltip id="treasuryAddress" place="right" effect="solid">
-              The receiving wallet is where the funds raised by this Lootbox will go. This may be the original issuer's
-              wallet, or it may be an ESports Tournament Wallet, or another smart contract destination. Make sure that
-              the receiving wallet matches what you expected/intended. Anyone can create a Lootbox and style it to look
-              like any other Lootbox, so always check that the receiving wallet is correct.
+              <FormattedMessage
+                id="lootbox.manage.treasuryAddress.tooltip"
+                defaultMessage="The receiving wallet is where the funds raised by this Lootbox will go. This may be the original issuer's wallet, or it may be an ESports Tournament Wallet, or another smart contract destination. Make sure that the receiving wallet matches what you expected/intended. Anyone can create a Lootbox and style it to look like any other Lootbox, so always check that the receiving wallet is correct."
+                description="Tooltip for the receiving wallet section in Lootbox control panel section"
+              />
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(treasuryAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
-              Copy
+              {words.copy}
             </span>
             <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
             <span
               onClick={() => window.open(`${props.network.blockExplorerUrl}address/${treasuryAddress}`, '_blank')}
               style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
             >
-              View on Block Explorer
+              {words.viewOnBlockExplorer}
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -641,30 +758,27 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical style={{ marginBottom: '20px' }}>
           <$StepSubheading>
-            Reputation Address
+            {words.reputationAddress}
             <HelpIcon tipID="reputationAddress" />
             <ReactTooltip id="reputationAddress" place="right" effect="solid">
-              This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides
-              a good return on investment for sponsors, this reputatioin address will be associated with that good
-              on-chain performance. Likewise, this wallet will be associated with bad performance if this Lootbox does
-              poorly. But don't worry too much about bad performance, as its more important that there is ample history
-              of Lootboxes created by this reputation address. Owning an address with a good reputation is a valuable
-              asset that will help you in future fundraising. However, sponsors should not rely solely on on-chain
-              performance history, as anyone can just send funds to their own Lootbox to make it look like good
-              performance. Always check their social media (off-chain reputation) as well to get the full picture.
+              <FormattedMessage
+                id="lootbox.manage.reputationAddress.tooltip"
+                defaultMessage="This is the address that will receive recognition for this Lootbox's performance. If this Lootbox provides a good return on investment for sponsors, this reputatioin address will be associated with that good on-chain performance. Likewise, this wallet will be associated with bad performance if this Lootbox does poorly. But don't worry too much about bad performance, as its more important that there is ample history of Lootboxes created by this reputation address. Owning an address with a good reputation is a valuable asset that will help you in future fundraising. However, sponsors should not rely solely on on-chain performance history, as anyone can just send funds to their own Lootbox to make it look like good performance. Always check their social media (off-chain reputation) as well to get the full picture."
+                description="Tooltip message for the reputation address"
+              />
             </ReactTooltip>
             <span
               onClick={() => navigator.clipboard.writeText(reputationAddress)}
               style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
             >
-              Copy
+              {words.copy}
             </span>
             <span style={{ fontSize: '0.8rem', marginLeft: '5px' }}>{` | `}</span>
             <span
               onClick={() => window.open(`${props.network.blockExplorerUrl}address/${reputationAddress}`, '_blank')}
               style={{ fontStyle: 'italic', cursor: 'pointer', fontSize: '0.8rem', marginLeft: '5px' }}
             >
-              View on Block Explorer
+              {words.viewOnBlockExplorer}
             </span>
           </$StepSubheading>
           <$InputWrapper screen={screen}>
@@ -673,20 +787,26 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical>
           <$StepSubheading style={{ marginBottom: '10px' }}>
-            Advanced Settings
+            <FormattedMessage
+              id="lootbox.manage.advanced.title"
+              defaultMessage="Advanced"
+              description="Title for the advanced section in Lootbox control panel section"
+            />
             <HelpIcon tipID="advancedSettings" />
             <ReactTooltip id="advancedSettings" place="right" effect="solid">
-              This Lootbox management page handles 90% of use cases. If you need access to the full Lootbox controls,
-              you will need to import this contract into OpenZeppelin Defender and interact with the blockchain
-              directly. The most likely reason why you would need to use Advanced Controls is if you accidentally trap
-              tokens in your Lootbox and need to rescue them (tokens get trapped if you just send them to the Lootbox
-              address directly. always use the UI to reward sponsors instead of sending tokens directly. trapped tokens
-              can be rescued easily but its a hassle). A full tutorial on Advanced Controls can be found on the
-              LootboxFund YouTube Channel.
+              <FormattedMessage
+                id="lootbox.manage.advanced.tooltip"
+                defaultMessage="This Lootbox management page handles 90% of use cases. If you need access to the full Lootbox controls, you will need to import this contract into OpenZeppelin Defender and interact with the blockchain directly. The most likely reason why you would need to use Advanced Controls is if you accidentally trap tokens in your Lootbox and need to rescue them (tokens get trapped if you just send them to the Lootbox address directly. always use the UI to reward sponsors instead of sending tokens directly. trapped tokens can be rescued easily but its a hassle). A full tutorial on Advanced Controls can be found on the LootboxFund YouTube Channel."
+                description="Tooltip message for the advanced section in Lootbox control panel section"
+              />
             </ReactTooltip>
           </$StepSubheading>
           <$SmallerButton screen={screen} onClick={() => window.open('https://youtu.be/o2J4M3ESdOo?t=138', '_blank')}>
-            Launch OZ Defender
+            <FormattedMessage
+              id="lootbox.manage.advanced.button"
+              defaultMessage="Launch OZ Defender"
+              description="Button to launch the OZ Defender tutorial. OZ Defender refers to advanced software you can use to manage your Loorbox (defender.openzeppelin.com)"
+            />
           </$SmallerButton>
         </$Vertical>
       </$Vertical>
@@ -749,6 +869,7 @@ const $NextStepTitle = styled.span`
   font-size: 1rem;
   color: ${COLORS.surpressedFontColor};
   font-weight: bold;
+  texttransform: capitalize;
 `
 
 const $Datestamp = styled.span`
@@ -797,10 +918,26 @@ const TotalFunded = ({
           <$StatLabel>{networkSymbol}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
-          <$Datestamp style={{ margin: '5px 0px' }}>Total Funded</$Datestamp>
+          <$Datestamp style={{ margin: '5px 0px' }}>
+            <FormattedMessage
+              id="lootbox.manage.totalFunded.title"
+              defaultMessage="Total Funded"
+              description="Title for total amount of crypto funded by a Lootbox"
+            />
+          </$Datestamp>
           <HelpIcon tipID="totalFunded" />
           <ReactTooltip id="totalFunded" place="right" effect="solid">
-            {`This Lootbox has a goal of selling ${targetAmountShares} shares purchased in ${networkSymbol}. So far, ${fundedAmountShares} shares have been sold. The max amount of shares for sale is ${maxAmountShares}.`}
+            <FormattedMessage
+              id="lootbox.manage.totalFunded.tooltip"
+              defaultMessage="This Lootbox has a goal of selling {targetAmountShares} shares purchased in {networkSymbol}. So far, {fundedAmountShares} shares have been sold. The max amount of shares for sale is {maxAmountShares}."
+              description='Tooltip for total amount of crypto funded by a Lootbox. We talk about "shares" like "shares in a company" analogously with buying "profit sharing shares or NFTs" from a Lootbox'
+              values={{
+                targetAmountShares,
+                networkSymbol,
+                fundedAmountShares,
+                maxAmountShares,
+              }}
+            />
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -823,21 +960,29 @@ const $StatLabel = styled.span`
 `
 
 const TicketsMinted = ({ fill, mintedCount }: { fill: string; mintedCount: number }) => {
+  const words = useWords()
   return (
     <$Horizontal verticalCenter style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
           <$StatFigure>{mintedCount}</$StatFigure>
-          <$StatLabel>minted</$StatLabel>
+          <$StatLabel>{words.minted}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
-          <$Datestamp style={{ margin: '5px 0px' }}>Sold NFT Tickets</$Datestamp>
+          <$Datestamp style={{ margin: '5px 0px' }}>
+            <FormattedMessage
+              id="lootbox.manage.ticketsMinted.title"
+              defaultMessage="Sold NFT Tickets"
+              description="Title for total amount of tickets minted/sold by a Lootbox"
+            />
+          </$Datestamp>
           <HelpIcon tipID="soldNFTTickets" />
           <ReactTooltip id="soldNFTTickets" place="right" effect="solid">
-            The number of NFT tickets sold by this Lootbox. One sponsor may own multiple NFT tickets and they may be
-            traded to new owners. Each NFT ticket may contain a different number of shares. If you would like to see the
-            total number of unique sponsors owned by this Lootbox, import this contract into OpenZeppelin Defender
-            (Advanced Settings). A full tutorial can be found on the LootboxFund YouTube Channel.
+            <FormattedMessage
+              id="lootbox.manage.ticketsMinted.tooltip"
+              defaultMessage="The number of NFT tickets sold by this Lootbox. One sponsor may own multiple NFT tickets and they may be traded to new owners. Each NFT ticket may contain a different number of shares. If you would like to see the total number of unique sponsors owned by this Lootbox, import this contract into OpenZeppelin Defender (Advanced Settings). A full tutorial can be found on the LootboxFund YouTube Channel."
+              description="Tooltip for the number of NFT tickets sold by a Lootbox."
+            />
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -847,22 +992,29 @@ const TicketsMinted = ({ fill, mintedCount }: { fill: string; mintedCount: numbe
 }
 
 const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number }) => {
+  const words = useWords()
   return (
     <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
         <$Horizontal justifyContent="flex-end" alignItems="center" style={{ marginRight: '25px' }}>
           <$StatFigure>{payoutsMade}</$StatFigure>
-          <$StatLabel>Rewards</$StatLabel>
+          <$StatLabel>{words.rewards}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
-          <$Datestamp style={{ margin: '5px 0px' }}>Deposits Made</$Datestamp>
+          <$Datestamp style={{ margin: '5px 0px' }}>
+            <FormattedMessage
+              id="lootbox.manage.payoutsMade.title"
+              defaultMessage="Deposits Made"
+              description="Title for total amount of crypto payed back to investors by a Lootbox"
+            />
+          </$Datestamp>
           <HelpIcon tipID="depositsMade" />
           <ReactTooltip id="depositsMade" place="right" effect="solid">
-            The number of times a deposit was put into this Lootbox. Each deposit is a payout reward for sponsors to
-            redeem. Only sponsors who own an NFT ticket from this Lootbox can redeem their proportinal share of
-            deposited rewards. Anyone can deposit into a Lootbox. If you would like to see the total number of unique
-            addresses who deposited into this Lootbox, import this contract into OpenZeppelin Defender (Advanced
-            Settings). A full tutorial can be found on the LootboxFund YouTube Channel.
+            <FormattedMessage
+              id="lootbox.manage.payoutsMade.tooltip"
+              defaultMessage="The number of times a deposit was put into this Lootbox. Each deposit is a payout reward for sponsors to redeem. Only sponsors who own an NFT ticket from this Lootbox can redeem their proportinal share of deposited rewards. Anyone can deposit into a Lootbox. If you would like to see the total number of unique addresses who deposited into this Lootbox, import this contract into OpenZeppelin Defender (Advanced Settings). A full tutorial can be found on the LootboxFund YouTube Channel."
+              description="Tooltip for total amount of crypto payed back to investors by a Lootbox"
+            />
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -872,6 +1024,7 @@ const PayoutsMade = ({ fill, payoutsMade }: { fill: string; payoutsMade: number 
 }
 
 const SemverStat = ({ fill, semver }: { fill: string; semver: string }) => {
+  const words = useWords()
   return (
     <$Horizontal alignItems="flex-end" style={{ marginTop: '20px' }}>
       <$Vertical style={{ marginRight: '10px' }}>
@@ -880,15 +1033,14 @@ const SemverStat = ({ fill, semver }: { fill: string; semver: string }) => {
           <$StatLabel>{semver}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter justifyContent="flex-end">
-          <$Datestamp style={{ margin: '5px 0px' }}>Version</$Datestamp>
+          <$Datestamp style={{ margin: '5px 0px' }}>{words.version}</$Datestamp>
           <HelpIcon tipID="versionSemver" />
           <ReactTooltip id="versionSemver" place="right" effect="solid">
-            This is the version of the LootboxFund smart contract which you can use to determine its features available.
-            The Lootbox team is continously improving this technology and future Lootboxes will have a different version
-            number. While future Lootbox versions are not guaranteed to be backwards compatible, you can always access
-            past Lootboxes as we freeze the cloud infrastructure that provides this UI. Furthermore, if this UI ever
-            becomes unavailable, you can always use OpenZeppelin Defender to interact with the smart contract directly
-            as it is forever available on the blockchain.
+            <FormattedMessage
+              id="lootbox.manage.versionSemver.tooltip"
+              defaultMessage="This is the version of the LootboxFund smart contract which you can use to determine its features available. The Lootbox team is continously improving this technology and future Lootboxes will have a different version number. While future Lootbox versions are not guaranteed to be backwards compatible, you can always access past Lootboxes as we freeze the cloud infrastructure that provides this UI. Furthermore, if this UI ever becomes unavailable, you can always use OpenZeppelin Defender to interact with the smart contract directly as it is forever available on the blockchain."
+              description="Tooltip for the section showing the Lootbox version"
+            />
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>
@@ -905,14 +1057,20 @@ const LootboxTypeStat = ({ fill, lootboxType }: { fill: string; lootboxType: Loo
           <$StatLabel>{lootboxType}</$StatLabel>
         </$Horizontal>
         <$Horizontal verticalCenter>
-          <$Datestamp style={{ margin: '5px 0px' }}>Lootbox Type</$Datestamp>
+          <$Datestamp style={{ margin: '5px 0px' }}>
+            <FormattedMessage
+              id="lootbox.manage.lootboxType.title"
+              defaultMessage="Lootbox Type"
+              description="Title for the type of section that show what Lootbox type it is"
+            />
+          </$Datestamp>
           <HelpIcon tipID="lootboxType" />
           <ReactTooltip id="lootboxType" place="right" effect="solid">
-            There are two types of Lootboxes, Escrow & Instant. Most Lootboxes are Escrow type, which means it has a
-            target fundraising amount and the funds can only be accessed when that target is hit, otherwise the money is
-            refunded back to sponsors. In comparison, an Instant Lootbox will transfer raised funds immediately to the
-            receiving wallet without waiting, and refunds must be done manually by the issuer of the Lootbox (the
-            reputation address). For more info, check out the LootboxFund YouTube channel.
+            <FormattedMessage
+              id="lootbox.manage.lootboxType.tooltip"
+              defaultMessage="There are two types of Lootboxes, Escrow & Instant. Most Lootboxes are Escrow type, which means it has a target fundraising amount and the funds can only be accessed when that target is hit, otherwise the money is refunded back to sponsors. In comparison, an Instant Lootbox will transfer raised funds immediately to the receiving wallet without waiting, and refunds must be done manually by the issuer of the Lootbox (the reputation address). For more info, check out the LootboxFund YouTube channel."
+              description="description of each lootbox type"
+            />
           </ReactTooltip>
         </$Horizontal>
       </$Vertical>

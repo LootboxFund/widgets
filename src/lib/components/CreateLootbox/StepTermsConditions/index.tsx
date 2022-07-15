@@ -11,22 +11,45 @@ import { ethers as ethersObj } from 'ethers'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { InitialUrlParams } from '../state'
+import { FormattedMessage } from 'react-intl'
+import React from 'react'
 
 export interface TermsFragment {
   slug: string
-  text: string
+  text: string | React.ReactElement
   href?: string
 }
 const TERMS: TermsFragment[] = [
   {
     slug: 'agreeEthics',
-    text: 'I agree to conduct business ethically & professionally as a fiduciary to my investors and fellow gamers.',
+    text: (
+      <FormattedMessage
+        id="step.terms.agreeEthics"
+        defaultMessage="I agree to conduct business ethically & professionally as a fiduciary to my investors and fellow gamers."
+        description="Checkbox where we make sure the user agrees to our terms of service"
+      />
+    ),
   },
   {
     slug: 'agreeLiability',
-    text: 'I agree to the Lootbox Terms & Conditions and release Lootbox DAO from any liability as a permissionless protocol.',
+    text: (
+      <FormattedMessage
+        id="step.terms.tos"
+        defaultMessage="I agree to the Lootbox Terms & Conditions and release Lootbox DAO from any liability as a permissionless protocol."
+        description="Checkbox where we make sure the user agrees to our terms of service"
+      />
+    ),
   },
-  { slug: 'agreeVerify', text: 'I have verified my Reputation address & Treasury wallet is correct' },
+  {
+    slug: 'agreeVerify',
+    text: (
+      <FormattedMessage
+        id="step.terms.verify"
+        defaultMessage="I have verified my Reputation address & Treasury wallet is correct"
+        description="Checkbox where we make sure the user agrees to our terms of service"
+      />
+    ),
+  },
 ]
 
 export type SubmitStatus = 'unsubmitted' | 'in_progress' | 'success' | 'failure' | 'pending_confirmation'
@@ -50,7 +73,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
   const { screen } = useWindowSize()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [timeElapsed, setTimeElapsed] = useState<number>(0)
-  const initialErrors = {
+  const initialErrors: { treasuryWallet: string | React.ReactElement } = {
     treasuryWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
@@ -79,6 +102,16 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     const ethers = window.ethers ? window.ethers : ethersObj
     return ethers.utils.isAddress(addr)
   }
+  const invalidTreasuryWalletMessage = (
+    <FormattedMessage
+      id="step.terms.invalidTreasuryWallet"
+      defaultMessage="Invalid Treasury Wallet, check if the address is compatible with {networkName}"
+      description="Error message shown to user when they enter an invalid treasury wallet"
+      values={{
+        networkName: props.selectedNetwork?.name || '',
+      }}
+    />
+  )
   useEffect(() => {
     checkAddrValid(props.treasuryWallet).then((valid) => {
       if (valid && props.termsState.agreeVerify && props.termsState.agreeEthics && props.termsState.agreeLiability) {
@@ -87,7 +120,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         props.setValidity(false)
         setErrors({
           ...errors,
-          treasuryWallet: `Invalid Treasury Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`,
+          treasuryWallet: invalidTreasuryWalletMessage,
         })
       }
     })
@@ -111,7 +144,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       props.setValidity(false)
       setErrors({
         ...errors,
-        treasuryWallet: `Invalid Treasury Wallet, check if the address is compatible with ${props.selectedNetwork?.name}`,
+        treasuryWallet: invalidTreasuryWalletMessage,
       })
     }
   }
@@ -135,7 +168,13 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           allConditionsMet={props.allConditionsMet}
           themeColor={COLORS.dangerFontColor}
           onSubmit={() => submitWithCountdown()}
-          text="Failed, try again?"
+          text={
+            <FormattedMessage
+              id="step.terms.submit.failed"
+              defaultMessage="Failed, try again?"
+              description="Failure message shown to user when create Lootbox fails"
+            />
+          }
         />
       )
     } else if (props.submitStatus === 'success') {
@@ -147,7 +186,14 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
             themeColor={`${COLORS.trustBackground}50`}
             disabled
           >
-            {`... Preparing your Lootbox (${timeLeft})`}
+            <FormattedMessage
+              id="step.terms.submit.success-preparing"
+              defaultMessage="... Preparing your Lootbox ({timeLeft})"
+              description="Success message shown to user when create Lootbox succeeds"
+              values={{
+                timeLeft: timeLeft,
+              }}
+            />
           </$CreateLootboxButton>
         )
       } else {
@@ -157,20 +203,33 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
             onClick={() => window.open(props.goToLootboxAdminPage())}
             themeColor={COLORS.successFontColor}
           >
-            View Your Lootbox
+            <FormattedMessage
+              id="step.terms.submit.success"
+              defaultMessage="View Your Lootbox"
+              description="Success message shown to user when create Lootbox succeeds"
+            />
           </$CreateLootboxButton>
         )
       }
     } else if (props.submitStatus === 'in_progress') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
-          {`... submitting (${timeElapsed})`}
+          <FormattedMessage
+            id="step.terms.submit.pending-submissino"
+            defaultMessage="... submitting ({timeElapsed})"
+            description="Message shown to user when they are waiting for they Lootbox to be made"
+            values={{ timeElapsed: timeElapsed }}
+          />
         </$CreateLootboxButton>
       )
     } else if (props.submitStatus === 'pending_confirmation') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={COLORS.warningBackground}>
-          {`Confirm on MetaMask`}
+          <FormattedMessage
+            id="step.terms.submit.metamask-confirmation"
+            defaultMessage="Confirm on MetaMask"
+            description="Message shown to user when they need to confirm the transaction on MetaMask"
+          />
         </$CreateLootboxButton>
       )
     }
@@ -179,7 +238,13 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         allConditionsMet={props.allConditionsMet}
         themeColor={props.selectedNetwork?.themeColor}
         onSubmit={() => submitWithCountdown()}
-        text="Create Lootbox"
+        text={
+          <FormattedMessage
+            id="step.terms.submit.create"
+            defaultMessage="Create Lootbox"
+            description="Message shown to user when they can create a Lootbox"
+          />
+        }
       />
     )
   }
@@ -199,7 +264,13 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
         errors={Object.values(errors)}
       >
         <$Vertical flex={1}>
-          <$StepHeading>{`7. Terms & Conditions`}</$StepHeading>
+          <$StepHeading>
+            <FormattedMessage
+              id="createLootbox.step.terms.title"
+              defaultMessage="7. Terms & Conditions"
+              description="Title of the Terms and Conditions step. This is the seventh step of the creation"
+            />
+          </$StepHeading>
           <br />
           {TERMS.map((term) => {
             return (
@@ -226,11 +297,18 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           <br />
           <$Vertical>
             <$StepSubheading>
-              Reputation Address (Locked to Current User)
+              <FormattedMessage
+                id="createLootbox.step.terms.reputationAddress"
+                defaultMessage="Reputation Address (Locked to Current User)"
+                description="Title of the Reputation Address field - this is a MetaMask wallet address, which is locked to the current user that is signed in Via metamask"
+              />
               <HelpIcon tipID="reputationWallet" />
               <ReactTooltip id="reputationWallet" place="right" effect="solid">
-                Your wallet address has an on-chain reputation based on how consistently you pay back profits to
-                investors. A good reputation helps future fundraising, and even allows you to sponsor a friend.
+                <FormattedMessage
+                  id="createLootbox.step.terms.reputationWallet.tooltip"
+                  defaultMessage="Your wallet address has an on-chain reputation based on how consistently you pay back profits to investors. A good reputation helps future fundraising, and even allows you to sponsor a friend."
+                  description="Tooltip for the Reputation Address field"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$CopyableInput>
@@ -242,11 +320,18 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           <br />
           <$Vertical>
             <$StepSubheading>
-              Treasury Wallet (Receives Funds)
+              <FormattedMessage
+                id="createLootbox.step.terms.treasuryAddress"
+                defaultMessage="Treasury Wallet (Receives Funds)"
+                description="Title of the Treasury Address field - this is a MetaMask wallet address"
+              />
               <HelpIcon tipID="treasuryWallet" />
               <ReactTooltip id="treasuryWallet" place="right" effect="solid">
-                This wallet address is where the funds from your Lootbox will be deposited. Double check that this
-                address is correct.
+                <FormattedMessage
+                  id="createLootbox.step.terms.treasuryWallet.tooltip"
+                  defaultMessage="This wallet address is where the funds from your Lootbox will be deposited. Double check that this address is correct."
+                  description="Tooltip for the Treasury Address field"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$CopyableInput>
@@ -262,11 +347,11 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
       </StepCard>
       {(props.submitStatus === 'in_progress' || props.submitStatus === 'success') && (
         <$TwitterAlert>
-          Submission usually takes less than 3 minutes. If submission is taking too long, check our 👉
-          <a href="https://twitter.com/LootboxAlerts" target="_blank" style={{ marginLeft: '5px', marginRight: '5px' }}>
-            live Twitter feed
-          </a>{' '}
-          to find your newly created Lootbox.
+          <FormattedMessage
+            id="createLootbox.step.terms.createLootboxMessage"
+            defaultMessage="Do not refresh this page. Submission usually takes less than 3 minutes. Please be patient, sometimes the blockchain is slow!"
+            description="Help message showed to users when they are waiting for the Lootbox to be made"
+          />
         </$TwitterAlert>
       )}
     </$StepTermsConditions>
@@ -338,7 +423,7 @@ interface CreateLootboxButtonProps {
   allConditionsMet: boolean
   themeColor?: string
   onSubmit: () => void
-  text: string
+  text: string | React.ReactElement
 }
 export const CreateLootboxButton = (props: CreateLootboxButtonProps) => {
   return (

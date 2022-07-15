@@ -1,9 +1,8 @@
 import AuthGuard from 'lib/components/AuthGuard'
-import LogRocket from 'logrocket'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { BaseSyntheticEvent, SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import Spinner from 'lib/components/Generics/Spinner'
 import { useMutation, useQuery } from '@apollo/client'
@@ -12,10 +11,8 @@ import {
   BulkWhitelistPayload,
   BulkWhitelistResponse,
   BulkWhitelistResponseSuccess,
-  GetLootboxByAddressResponse,
   GetPartyBasketResponse,
   GetPartyBasketResponseSuccess,
-  MutationBulkWhitelistArgs,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import styled from 'styled-components'
@@ -28,13 +25,12 @@ import { $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
 import { NETWORK_OPTIONS } from 'lib/api/network'
 import { $InputWrapper } from 'lib/components/CreateLootbox/StepChooseFunding'
 import $Input from 'lib/components/Generics/Input'
-import { userState } from 'lib/state/userState'
-import { useSnapshot } from 'valtio'
 import { $ErrorText } from 'lib/components/BuyShares/PurchaseComplete'
 import { ethers } from 'ethers'
-import { $InputMedium } from 'lib/components/Authentication/Shared'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { manifest } from 'manifest'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface ManagePartyBasketProps {
   partyBasketAddress: Address
@@ -56,6 +52,8 @@ export const exampleCSV =
   'https://docs.google.com/spreadsheets/d/1eecK4uZB-9EVv2NGYUyOOXdZMUMwSW_Brq8FYttUUgE/edit?usp=sharing'
 
 const ManagePartyBasket = (props: ManagePartyBasketProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
   const [singleWhitelistState, setSingleWhitelistState] = useState<SingleWhitelistState>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
@@ -74,13 +72,87 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     { payload: BulkWhitelistPayload }
   >(BULK_WHITELIST_MUTATION)
 
+  const pleaseEnterValidAddressText = intl.formatMessage({
+    id: 'partyBasket.manage.pleaseEnterAddress',
+    defaultMessage: 'Please enter a valid address',
+    description: 'Prompt to user to ask them to enter a valid crypto currency wallet address (i.e. 0x12312k3jnkdfjsn)',
+  })
+
+  const noAddressToProcessText = intl.formatMessage({
+    id: 'partyBasket.manage.noAddressToProcess',
+    defaultMessage: 'No addresses to process',
+    description: 'Error message when there is no crypto wallet address to process',
+  })
+
+  const csvValidationErrorHeader = intl.formatMessage({
+    id: 'partyBasket.manage.csvValidationErrorHeader',
+    defaultMessage: 'CSV Validation Errors',
+    description:
+      'Error message when the user uploads a CSV file that is not valid. After this, a list of errors is displayed.',
+  })
+
+  const csvRequirementText = intl.formatMessage(
+    {
+      id: 'partyBasket.manage.csvRequirement',
+      defaultMessage: 'The CSV file needs a column titled "{csvKey}".',
+      description:
+        'text indicating a requirement for the CSV file that the user can upload. It needs a specific column that is passed in as a variable.',
+    },
+    {
+      csvKey: CSV_UPLOAD_COLUMN_KEY,
+    }
+  )
+
+  const rowText = intl.formatMessage({
+    id: 'partyBasket.manage.rowText',
+    defaultMessage: 'Row',
+    description: 'Text for a row number of a CSV file',
+  })
+
+  const missingAddressColumnErrorMessage = intl.formatMessage(
+    {
+      id: 'partyBasket.manage.missingAddressColumnErrorMessage',
+      defaultMessage:
+        'No "{csvKey}" column found in uploaded CSV. Please fix your csv file by adding a column named "{csvKey}" with the desired addresses you want to whitelist & re-upload.',
+      description: 'Error message when the user uploads a CSV file that is missing a specific column name.',
+    },
+    {
+      csvKey: CSV_UPLOAD_COLUMN_KEY,
+    }
+  )
+
+  const noFileSelectedText = intl.formatMessage({
+    id: 'partyBasket.manage.noFileSelectedText',
+    defaultMessage: 'No file selected',
+    description: 'Error message when the user has not selected a file to upload',
+  })
+
+  const shareLinkToRedeemText = intl.formatMessage({
+    id: 'partyBasket.manage.shareLinkToRedeemText',
+    defaultMessage: 'Share link to redeem',
+    description: 'Text for a link to share that allows one to redeem a Lootbox NFT',
+  })
+
+  const successfullyWhitelisted = intl.formatMessage({
+    id: 'partyBasket.manage.successfullyWhitelisted',
+    defaultMessage: 'Successfully whitelisted',
+    description: 'Text for a successful whitelist',
+  })
+
+  const partialErrorsMessage = intl.formatMessage({
+    id: 'partyBasket.manage.partialErrorsMessage.prefix',
+    defaultMessage: 'Partial Errors with Submission. Please re-whitelist the rows specified below',
+    description:
+      'Error message when partial errors happened with bulk whitelisting submission. We display a list of errors after this message.',
+  })
+
   const validateAddress = (address?: Address): Address => {
     if (!address) {
-      throw new Error('Please enter an address')
+      throw new Error(pleaseEnterValidAddressText)
     }
 
     if (!ethers.utils.isAddress(address)) {
-      throw new Error('Please enter a valid address')
+      throw new Error(pleaseEnterValidAddressText)
     }
 
     return address
@@ -104,7 +176,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       } else if ((res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors?.length) {
         const errs = (res.data?.bulkWhitelist as BulkWhitelistResponseSuccess)?.errors as string[]
 
-        throw new Error(errs[0] || 'An error occurred')
+        throw new Error(errs[0] || words.anErrorOccured)
       }
       setSingleWhitelistState({ status: 'success', error: undefined })
       setTimeout(() => {
@@ -112,13 +184,13 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       }, 2000)
     } catch (err) {
       console.error(err)
-      setSingleWhitelistState({ status: 'error', error: err?.message || 'An error occured!' })
+      setSingleWhitelistState({ status: 'error', error: err?.message || `${words.anErrorOccured}!` })
     }
   }
 
   const bulkWhitelistAction = async (addresses: Address[]) => {
     if (addresses.length === 0) {
-      setBulkWhitelistState({ status: 'error', error: 'No addresses to process' })
+      setBulkWhitelistState({ status: 'error', error: noAddressToProcessText })
       return
     }
 
@@ -129,13 +201,16 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           return undefined
         } catch (err) {
           // Index + 2 because we start at index 0 & take header into account
-          return `(Row ${index + 2}) Error: ${err?.message || 'An error occured!'}`
+          return `(${rowText} ${index + 2}) ${words.error}: ${err?.message || `${words.anErrorOccured}!`}`
         }
       })
       .filter((err: string | undefined) => !!err)
 
     if (preprocessingErrors.length > 0) {
-      setBulkWhitelistState({ status: 'error', error: `CSV Validation Errors\n${preprocessingErrors.join('\n')}` })
+      setBulkWhitelistState({
+        status: 'error',
+        error: `${csvValidationErrorHeader}\n${preprocessingErrors.join('\n')}`,
+      })
       return
     }
 
@@ -160,7 +235,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
         )[]
 
         const partialErrorsFmt: string[] = partialErrors
-          .map((err, index) => (err ? `(Row ${index}) Error: ${err}` : undefined))
+          .map((err, index) => (err ? `(${rowText} ${index}) ${words.error}: ${err}` : undefined))
           .filter((e) => e != undefined) as string[]
 
         // These are partial errors from the backend, indicating that we had a problem with these certain addresses
@@ -178,7 +253,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       }, 5000)
     } catch (err) {
       console.error(err)
-      setBulkWhitelistState({ status: 'error', error: err?.message || 'An error occured!' })
+      setBulkWhitelistState({ status: 'error', error: err?.message || `${words.error}!` })
     }
   }
 
@@ -222,13 +297,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
         if (addressIndex == undefined || addressIndex === -1) {
           setBulkWhitelistState({
             status: 'error',
-            error: `No "${CSV_UPLOAD_COLUMN_KEY}" column found in uploaded CSV. Please fix your csv file by adding a column named "${CSV_UPLOAD_COLUMN_KEY}" with the desired addresses you want to whitelist & re-upload.`,
+            // error: `No "${CSV_UPLOAD_COLUMN_KEY}" column found in uploaded CSV. Please fix your csv file by adding a column named "${CSV_UPLOAD_COLUMN_KEY}" with the desired addresses you want to whitelist & re-upload.`,
+            error: missingAddressColumnErrorMessage,
           })
           return
         } else if (rows.length === 0) {
           setBulkWhitelistState({
             status: 'error',
-            error: 'No addresses found in uploaded CSV.',
+            error: noAddressToProcessText,
           })
           return
         }
@@ -241,7 +317,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       }
       reader.readAsText(file)
     } else {
-      setBulkWhitelistState({ status: 'error', error: 'No file selected' })
+      setBulkWhitelistState({ status: 'error', error: noFileSelectedText })
     }
   }
 
@@ -251,9 +327,9 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     )
     const el = document.getElementById('share-redeem-link')
     if (el) {
-      el.innerText = '✅ Copied to clipboard!'
+      el.innerText = `✅ ${words.copiedToClipBoard}!`
       setTimeout(() => {
-        el.innerText = 'Share Link to Redeem'
+        el.innerText = shareLinkToRedeemText
       }, 2000)
     }
   }
@@ -288,8 +364,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 <$ManageLootboxHeading screen={screen}>{lootboxName}</$ManageLootboxHeading>
                 <HelpIcon tipID="partyBasket" />
                 <ReactTooltip id="partyBasket" place="right" effect="solid">
-                  This is your Party Basket for "{lootboxName}". You can bulk mint NFTs to this contract address, and
-                  then bulk whitelist people (with a CSV upload) to pick them up for FREE (AKA: Redeem a bounty)!
+                  <FormattedMessage
+                    id="partyBasket.manage.helpTooltip"
+                    defaultMessage='This is your Party Basket for "{lootboxName}". You can bulk mint NFTs to this contract address, and then bulk whitelist people (with a CSV upload) to pick them up for FREE (AKA: Redeem a bounty)!'
+                    description="Information message about the Party Basket"
+                    values={{
+                      lootboxName: lootboxName,
+                    }}
+                  />
                 </ReactTooltip>
               </$Horizontal>
             )}
@@ -301,27 +383,49 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           </$Vertical>
 
           <$StepSubheading>
-            This is your Party Basket for "{lootboxName}". Party Baskets hold onto Lootbox NFTs and allow you to
-            "whitelist" specific wallets, giving them special permission to redeem an NFT from the Party Basket for
-            free.
+            <FormattedMessage
+              id="partyBasket.manage.partyBasketDescription"
+              defaultMessage='This is your Party Basket for "{lootboxName}". Party Baskets hold onto Lootbox NFTs and allow you to "whitelist" specific wallets, giving them special permission to redeem an NFT from the Party Basket for free.'
+              description="Information message about the Party Basket"
+              values={{
+                lootboxName: lootboxName,
+              }}
+            />
             <br />
             <br />
-            Bulk whitelisting will grant a large number of wallets a free NFT to redeem. You can use a CSV file (like{' '}
-            <a href={exampleCSV} target="_blank" style={{ display: 'contents' }}>
-              this one
-            </a>
-            ), and then you can upload it by clicking the button below. Your Party Basket will need to have Lootbox NFTs
-            in it (by bulk minting) in order for your followers to be able to redeem one.
+            <FormattedMessage
+              id="partyBasket.manage.bulkWhitelistingDescription"
+              defaultMessage="Bulk whitelisting will grant a large number of wallets a free NFT to redeem. You can use a CSV file (like {hyperlink}), and then you can upload it by clicking the button below. Your Party Basket will need to have Lootbox NFTs in it (by bulk minting) in order for your followers to be able to redeem one."
+              description="Information message about bulk whitelisting. Bulk whitelisting allows you to give a large number of users permission to get a free Lootbox NFT from a Party Basket"
+              values={{
+                hyperlink: (
+                  <a href={exampleCSV} target="_blank" style={{ display: 'contents', textTransform: 'lowercase' }}>
+                    <FormattedMessage
+                      id="partyBasket.manage.helpHyperlink"
+                      defaultMessage="This one"
+                      description="This is a hyperlink to an example google drive file they can use"
+                    />
+                  </a>
+                ),
+              }}
+            />
           </$StepSubheading>
           <$Vertical spacing={3}>
             <$Vertical>
               <span>
                 <$StepSubheading>
-                  Whitelist Address <HelpIcon tipID="whitelistAddress" />
+                  <FormattedMessage
+                    id="partyBasket.manage.bulkWhitelisting.address.header"
+                    defaultMessage="Whitelist Address"
+                    description='Title for whitelisting section. "Whitelist" means to give someone permission to get a free Lootbox NFT from your Party Basket'
+                  />
+                  <HelpIcon tipID="whitelistAddress" />
                   <ReactTooltip id="whitelistAddress" place="right" effect="solid">
-                    Whitelisting is a feature that allows give away an NFT for free. The address you specify will be
-                    able to redeem this ONE TIME, and your Lootbox Bounty NFT will be transfered to them when they
-                    redeem it.
+                    <FormattedMessage
+                      id="partyBasket.manage.bulkWhitelisting.description"
+                      defaultMessage="Whitelisting is a feature that allows give away an NFT for free. The address you specify will be able to redeem this ONE TIME, and your Lootbox Bounty NFT will be transfered to them when they redeem it."
+                      description="Paragraph descibing what whitelisting is."
+                    />
                   </ReactTooltip>
                 </$StepSubheading>
               </span>
@@ -357,9 +461,10 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                       color: '#ffffff',
                       margin: 'auto 0px',
                       fontSize: '1.5rem',
+                      textTransform: 'uppercase',
                     }}
                   >
-                    {bulkWhitelistLoading ? 'LOADING' : 'ADD'}
+                    {bulkWhitelistLoading ? words.loading : words.add}
                   </$ManageLootboxHeading>
                 </$AddWhitelistButton>
               </$Horizontal>
@@ -370,7 +475,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
             )}
             {singleWhitelistState?.status === 'success' && (
               <$StepSubheading style={{ textAlign: 'center', display: 'inline' }}>
-                ✅ Successfully whitelisted!
+                ✅ {successfullyWhitelisted}!
               </$StepSubheading>
             )}
 
@@ -383,16 +488,23 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  Bulk Whitelist Address <HelpIcon tipID="bulkWhitelist" />
+                  <FormattedMessage
+                    id="partyBasket.manage.bulkWhitelisting.header"
+                    defaultMessage="Bulk Whitelist Address"
+                    description="Title for bulk whitelisting section."
+                  />
+                  <HelpIcon tipID="bulkWhitelist" />
                   <ReactTooltip id="bulkWhitelist" place="right" effect="solid">
-                    Upload a ".csv" file of addresses to whitelist.{' '}
-                    <span style={{ fontWeight: TYPOGRAPHY.fontWeight.bold }}>
-                      The CSV file needs a column titled "{CSV_UPLOAD_COLUMN_KEY}".
-                    </span>{' '}
-                    These addresses will get whitelisted which will allow each address to pick up their own NFT (without
-                    requiring you to send it to them). Whitelisting an addThis will allow yWhitelisting is a feature
-                    that allows give away an NFT for free. The address you specify will be able to redeem this ONE TIME,
-                    and your Lootbox Bounty NFT will be transfered to them when they redeem it.
+                    <FormattedMessage
+                      id="partyBasket.manage.bulkWhitelisting.descriptionTooltip"
+                      defaultMessage='Upload a ".csv" file of addresses to whitelist. {csvRequirementText}. These addresses will get whitelisted which will allow each address to pick up their own NFT (without requiring you to send it to them). Whitelisting an addThis will allow yWhitelisting is a feature that allows give away an NFT for free. The address you specify will be able to redeem this ONE TIME, and your Lootbox Bounty NFT will be transfered to them when they redeem it.'
+                      description=""
+                      values={{
+                        csvRequirementText: (
+                          <span style={{ fontWeight: TYPOGRAPHY.fontWeight.bold }}>{csvRequirementText}</span>
+                        ),
+                      }}
+                    />
                   </ReactTooltip>
                 </$StepSubheading>
                 <$StepSubheadingExtra
@@ -400,12 +512,20 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   href={exampleCSV}
                   target="_blank"
                 >
-                  View Sample CSV
+                  <FormattedMessage
+                    id="partyBasket.manage.viewExampleCSV.button"
+                    defaultMessage="View Sample CSV"
+                    description="Button to view an example CSV file"
+                  />
                 </$StepSubheadingExtra>
               </$Horizontal>
 
               <$CSVLabel htmlFor="csv-upload" themeColor={chain.themeColor} screen={screen}>
-                Upload CSV
+                <FormattedMessage
+                  id="partyBasket.manage.bulkWhitelisting.uploadCSVText"
+                  defaultMessage="Upload CSV"
+                  description="Label for CSV upload button"
+                />
               </$CSVLabel>
               <input
                 id="csv-upload"
@@ -419,61 +539,81 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
 
             {bulkWhitelistState?.status === 'loading' && (
               <$StepSubheading style={{ display: 'inline' }}>
-                <Spinner color={`${COLORS.surpressedFontColor}ae`} size="30px" /> Processing...
+                <Spinner color={`${COLORS.surpressedFontColor}ae`} size="30px" /> {words.processing}...
               </$StepSubheading>
             )}
 
             {bulkWhitelistState?.status === 'success' && (
-              <$StepSubheading style={{ display: 'inline' }}>✅ Successfully whitelisted!</$StepSubheading>
+              <$StepSubheading style={{ display: 'inline' }}>✅ {successfullyWhitelisted}!</$StepSubheading>
             )}
             {(bulkWhitelistState?.status === 'error' || bulkWhitelistState?.error) && (
               <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
-                ❌ {bulkWhitelistState?.error || 'An error occured!'}
+                ❌ {bulkWhitelistState?.error || `${words.anErrorOccured}!`}
               </$StepSubheading>
             )}
             {bulkWhitelistState?.partialErrors && (
               <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
-                ⚠️{' '}
-                {`Partial Errors with Submission. Please re-whitelist the rows specified below.\n\n${bulkWhitelistState?.partialErrors?.join(
-                  '\n'
-                )}`}
+                ⚠️ {`${partialErrorsMessage}.\n\n${bulkWhitelistState?.partialErrors?.join('\n')}`}
               </$StepSubheading>
             )}
 
             <br />
 
             <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
-              🔗 Share Link to Redeem
+              🔗 {shareLinkToRedeemText}
             </$BasketButton>
             <$BasketLink
               themeColor={chain.themeColor}
               screen={screen}
               href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`}
             >
-              View Original Lootbox
+              {words.view} Lootbox
             </$BasketLink>
 
             <br />
             <$Vertical>
               <span>
                 <$StepSubheading>
-                  View All Whitelisted Wallets <HelpIcon tipID="allWhite" />
+                  <FormattedMessage
+                    id="partyBasket.manage.viewWhitelistedWallets.header"
+                    defaultMessage="View All Whitelisted Wallets"
+                    description="Title for whitelisted wallets section."
+                  />
+
+                  <HelpIcon tipID="allWhite" />
                   <ReactTooltip id="allWhite" place="right" effect="solid">
-                    Download a .csv file that contains a list of all the whitelisted addresses for this Party Box.
+                    <FormattedMessage
+                      id="partyBasket.manage.viewWhitelistedWallets.descriptionTooltip"
+                      defaultMessage="Download a .csv file that contains a list of all the whitelisted addresses for this Party Box."
+                      description="Tooltip for whitelisted wallets section"
+                    />
                   </ReactTooltip>
                 </$StepSubheading>
               </span>
               <$BasketButton themeColor={chain.themeColor} screen={screen}>
-                Download CSV
+                <FormattedMessage
+                  id="partyBasket.manage.viewWhitelistedWallets.button"
+                  defaultMessage="Download CSV"
+                  description="Button to download a CSV file of all whitelisted addresses"
+                />
               </$BasketButton>
             </$Vertical>
             <br />
             <$Vertical>
               <span>
                 <$StepSubheading>
-                  Party Basket Address <HelpIcon tipID="pbAddr" />
+                  <FormattedMessage
+                    id="partyBasket.manage.details.address"
+                    defaultMessage="Party Basket Address"
+                    description="Header for the Party Basket address section"
+                  />
+                  <HelpIcon tipID="pbAddr" />
                   <ReactTooltip id="pbAddr" place="right" effect="solid">
-                    The smart contract address for your Party Basket.
+                    <FormattedMessage
+                      id="partyBasket.manage.details.address.descriptionTooltip"
+                      defaultMessage="This is the address of the Party Basket. It is a smart contract on the blockchain."
+                      description="Tooltip for the Party Basket address section"
+                    />
                   </ReactTooltip>
                 </$StepSubheading>
               </span>

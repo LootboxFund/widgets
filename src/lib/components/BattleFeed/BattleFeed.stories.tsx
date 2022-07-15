@@ -7,6 +7,7 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { ContractAddress } from '@wormgraph/helpers'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
+import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
   title: 'BattleFeed',
@@ -27,9 +28,11 @@ const Template = () => {
 
   return (
     <ApolloProvider client={client}>
-      <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-        <BattleFeed />
-      </$CardViewport>
+      <LocalizationWrapper>
+        <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
+          <BattleFeed />
+        </$CardViewport>
+      </LocalizationWrapper>
     </ApolloProvider>
   )
 }

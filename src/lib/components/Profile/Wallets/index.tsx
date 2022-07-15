@@ -24,8 +24,11 @@ import { useSnapshot } from 'valtio'
 import { userState } from 'lib/state/userState'
 import WalletButton from 'lib/components/WalletButton'
 import PopConfirm from 'lib/components/Generics/PopConfirm'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 const Wallets = () => {
+  const intl = useIntl()
   const { screen } = useWindowSize()
   const { connectWallet } = useAuth()
   const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_WALLETS)
@@ -37,6 +40,20 @@ const Wallets = () => {
   const userStateSnapshot = useSnapshot(userState)
   const [walletStatus, setWalletStatus] = useState<{ [key: Address]: { loading: boolean; errorMessage: string } }>({})
   const [searchTerm, setSearchTerm] = useState('')
+  const words = useWords()
+
+  const walletsHelpText = intl.formatMessage({
+    id: 'profile.wallets.helpText',
+    defaultMessage:
+      'Wallets are used to sign into your account. We also use them to find your Lootboxes. Try adding a MetaMask wallet, and use it to login.',
+    description: 'Help message for users who do not have a wallet associated to their account',
+  })
+
+  const searchByAddressText = intl.formatMessage({
+    id: 'profile.wallets.searchByAddressText',
+    defaultMessage: 'Search by address',
+    description: 'Search by a Lootbox smart contract address - this is placeholder in input field',
+  })
 
   const isWalletConnected = !!userStateSnapshot.currentAccount
   const isMetamask = !!window.ethereum
@@ -48,7 +65,10 @@ const Wallets = () => {
       if (data?.removeWallet?.__typename === 'ResponseError') {
         setWalletStatus({
           ...walletStatus,
-          [wallet.address]: { loading: false, errorMessage: data.removeWallet.error.message || 'An error occured!' },
+          [wallet.address]: {
+            loading: false,
+            errorMessage: data.removeWallet.error.message || `${words.anErrorOccured}!`,
+          },
         })
       } else {
         setWalletStatus({ ...walletStatus, [wallet.address]: { loading: false, errorMessage: '' } })
@@ -57,7 +77,7 @@ const Wallets = () => {
       console.log(error)
       setWalletStatus({
         ...walletStatus,
-        [wallet.address]: { loading: false, errorMessage: error.message || 'An error occured!' },
+        [wallet.address]: { loading: false, errorMessage: error.message || `${words.anErrorOccured}!` },
       })
     }
   }
@@ -67,7 +87,7 @@ const Wallets = () => {
     try {
       await connectWallet()
     } catch (err) {
-      setConnectErrorMessage(err?.message || 'An error occured!')
+      setConnectErrorMessage(err?.message || `${words.anErrorOccured}!`)
     } finally {
       setConnectLoading(false)
     }
@@ -78,12 +98,26 @@ const Wallets = () => {
       <$Vertical>
         <$WalletContainerSkeleton>
           <$Horizontal justifyContent="space-between">
-            <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">
-              {'address'}
+            <$span
+              lineHeight={WALLET_CONTAINER_HEIGHT}
+              width="30%"
+              textAlign="center"
+              style={{ textTransform: 'lowercase' }}
+            >
+              {words.address}
             </$span>
             {screen !== 'mobile' ? (
-              <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">
-                {'date created'}
+              <$span
+                lineHeight={WALLET_CONTAINER_HEIGHT}
+                width="30%"
+                textAlign="center"
+                style={{ textTransform: 'lowercase' }}
+              >
+                <FormattedMessage
+                  id="profile.wallets.dateCreated"
+                  defaultMessage="Date created"
+                  description="Text indicating when a particular thing was created"
+                />
               </$span>
             ) : null}
             <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center"></$span>
@@ -119,16 +153,18 @@ const Wallets = () => {
                         width="100%"
                         textAlign="center"
                         color={COLORS.dangerFontColor}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', textTransform: 'lowercase' }}
                       >
-                        remove
+                        {words.remove}
                       </$span>
                     </PopConfirm>
                   )}
                 </$Horizontal>
                 {walletStatus[wallet.address as Address]?.errorMessage ? (
                   <div style={{ padding: '15px 0px' }}>
-                    <$ErrorMessage>{walletStatus[wallet.address as Address]?.errorMessage}</$ErrorMessage>
+                    <$ErrorMessage>{`${words.anErrorOccured}: ${
+                      walletStatus[wallet.address as Address]?.errorMessage
+                    }`}</$ErrorMessage>
                   </div>
                 ) : null}
               </$SettingContainer>
@@ -142,15 +178,15 @@ const Wallets = () => {
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <Oopsies message={error?.message || ''} icon="🤕" title="Error loading Wallets" />
+    return <Oopsies message={error?.message || ''} icon="🤕" title={words.anErrorOccured} />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <Oopsies message={data?.getMyProfile?.error?.message || ''} icon="🤕" title="Error loading Wallets" />
+    return <Oopsies message={data?.getMyProfile?.error?.message || ''} icon="🤕" title={words.anErrorOccured} />
   }
 
   const { user: userDB } = data.getMyProfile as GetMyProfileSuccess
   const connectText = userStateSnapshot.currentAccount
-    ? `Add wallet ${truncateAddress(userStateSnapshot.currentAccount)}`
-    : 'Add wallet'
+    ? `${words.addWallet} ${truncateAddress(userStateSnapshot.currentAccount)}`
+    : words.addWallet
 
   const wallets = userDB.wallets || []
   const filteredWallets = wallets.filter((wallet) => {
@@ -160,39 +196,45 @@ const Wallets = () => {
   return (
     <$Vertical spacing={4}>
       <$h1 id="Wallets">
-        Wallets <HelpIcon tipID="Wallets" />
+        {words.wallets} <HelpIcon tipID="Wallets" />
       </$h1>
       <ReactTooltip id="Wallets" place="right" effect="solid">
-        Wallets are used as an alternative login to your account. They also help us find your data like your Lootboxes.
-        You need to have installed MetaMask to use this feature.
+        <FormattedMessage
+          id="profile.wallets.help"
+          defaultMessage="Wallets are used as an alternative login to your account. They also help us find your data like your Lootboxes. You need to have installed MetaMask to use this feature."
+          description="Help text for the Wallets section in the user profile"
+        />
       </ReactTooltip>
       {!isMetamask ? (
         <Oopsies
           icon="🦊"
-          title="MetaMask not detected!"
+          title={words.pleaseInstallMetamask}
           message={
-            <span>
-              Your MetaMask wallet is used as your web3 identity. You will need one to interact with the blockchain. You
-              can{' '}
-              <$Link target="_blank" href="https://metamask.io/download/">
-                download MetaMask here.
-              </$Link>
-            </span>
+            <FormattedMessage
+              id="profile.wallets.pleaseInstallMetamask"
+              defaultMessage="Your MetaMask wallet is used as your web3 identity. You will need one to interact with the blockchain. You can {downloadMetamaskLink}."
+              description="Help message for MetaMask not installed"
+              values={{
+                downloadMetamaskLink: (
+                  <$Link target="_blank" href="https://metamask.io/download/">
+                    <FormattedMessage
+                      id="profile.wallets.downloadMetamask"
+                      defaultMessage="download MetaMask here"
+                      description="Hyper link to download MetaMask"
+                    />
+                  </$Link>
+                ),
+              }}
+            />
           }
         />
       ) : null}
-      {wallets.length === 0 && (
-        <Oopsies
-          title="Add a wallet"
-          message="Wallets are used to sign into your account. We also use them to find your Lootboxes. Try adding a MetaMask wallet, and use it to login."
-          icon="🔐"
-        />
-      )}
+      {wallets.length === 0 && <Oopsies title={words.addWallet} message={walletsHelpText} icon="🔐" />}
       {wallets.length > 0 && (
         <$Vertical spacing={4}>
           <$SearchInput
             type="search"
-            placeholder="🔍 Search by Address"
+            placeholder={`🔍 ${searchByAddressText}`}
             onChange={(e) => setSearchTerm(e.target.value || '')}
           />
           <WalletsList wallets={filteredWallets || []} />

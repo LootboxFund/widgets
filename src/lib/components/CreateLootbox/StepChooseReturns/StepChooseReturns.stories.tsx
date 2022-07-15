@@ -4,6 +4,7 @@ import { StepStage } from 'lib/components/CreateLootbox/StepCard'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { ContractAddress } from '@wormgraph/helpers'
 import { BigNumber } from 'ethers'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'CreateLootbox Step - Choose Returns',
@@ -37,21 +38,23 @@ const Demo = (args: StepChooseReturnsProps) => {
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
   }
   return (
-    <div style={{ width: '760px', height: '600px' }}>
-      <StepChooseReturns
-        setValidity={(valid: boolean) => {}}
-        selectedNetwork={network}
-        fundraisingTarget={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
-        basisPoints={returnTarget}
-        setBasisPoints={(basisPoints: number) => setReturnTarget(basisPoints)}
-        // @ts-ignore
-        setPayoutUSDPrice={(payout?: BigNumber) => undefined}
-        paybackDate={paybackDate}
-        setPaybackDate={(date: string) => date && setPaybackDate(date)}
-        stage={stage}
-        onNext={() => console.log('onNext')}
-      />
-    </div>
+    <LocalizationWrapper>
+      <div style={{ width: '760px', height: '600px' }}>
+        <StepChooseReturns
+          setValidity={(valid: boolean) => {}}
+          selectedNetwork={network}
+          fundraisingTarget={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
+          basisPoints={returnTarget}
+          setBasisPoints={(basisPoints: number) => setReturnTarget(basisPoints)}
+          // @ts-ignore
+          setPayoutUSDPrice={(payout?: BigNumber) => undefined}
+          paybackDate={paybackDate}
+          setPaybackDate={(date: string) => date && setPaybackDate(date)}
+          stage={stage}
+          onNext={() => console.log('onNext')}
+        />
+      </div>
+    </LocalizationWrapper>
   )
 }
 

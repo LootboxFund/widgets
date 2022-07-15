@@ -13,6 +13,7 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import { checkIfValidUrl } from 'lib/api/helpers'
+import { FormattedMessage } from 'react-intl'
 
 const INITAL_LOGO =
   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media'
@@ -68,7 +69,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
       setNativeTokenPrice(nativeTokenPrice)
     }
   }
-  const initialErrors = {
+  const initialErrors: {
+    name: string | React.ReactElement
+    symbol: string | React.ReactElement
+    biography: string | React.ReactElement
+    lootboxThemeColor: string | React.ReactElement
+    logoUrl: string | React.ReactElement
+    coverUrl: string | React.ReactElement
+    badgeUrl: string | React.ReactElement
+    logoFile: string | React.ReactElement
+    coverFile: string | React.ReactElement
+    badgeFile: string | React.ReactElement
+  } = {
     name: '',
     symbol: '',
     biography: '',
@@ -91,7 +103,16 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (valid) {
       if (!validateLogoFile(props.ticketState.logoFile as File) && !validateLogo(props.ticketState.logoUrl as string)) {
         valid = false
-        setErrors({ ...errors, logoFile: 'Please upload a logo image' })
+        setErrors({
+          ...errors,
+          logoFile: (
+            <FormattedMessage
+              id="createLootbox.stepCustomize.logoFile.error"
+              defaultMessage="Please upload a logo image"
+              description="Error message for user if they forgot to upload a logo file (image file)"
+            />
+          ),
+        })
       }
       if (
         !validateCoverFile(props.ticketState.coverFile as File) &&
@@ -100,7 +121,13 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         valid = false
         setErrors({
           ...errors,
-          coverFile: 'Please upload a cover photo',
+          coverFile: (
+            <FormattedMessage
+              id="createLootbox.stepCustomize.coverFile.error"
+              defaultMessage="Please upload a cover photo"
+              description="Error message for user if they forgot to upload a cover file (image file)"
+            />
+          ),
         })
       }
     }
@@ -134,25 +161,57 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (slug === 'name') {
       setErrors({
         ...errors,
-        name: validateName(value as string) ? '' : 'Name cannot be empty',
+        name: validateName(value as string) ? (
+          ''
+        ) : (
+          <FormattedMessage
+            id="createLootbox.stepCustomize.name.error"
+            defaultMessage="Name cannot be empty"
+            description="Error message for user if they forgot to enter a name for their Lootbox"
+          />
+        ),
       })
     }
     if (slug === 'symbol') {
       setErrors({
         ...errors,
-        symbol: validateSymbol(value as string) ? '' : 'Symbol cannot be empty',
+        symbol: validateSymbol(value as string) ? (
+          ''
+        ) : (
+          <FormattedMessage
+            id="createLootbox.stepCustomize.symbol.error"
+            defaultMessage="Symbol cannot be empty"
+            description="Error message for user if they forgot to enter a symbol for their Lootbox"
+          />
+        ),
       })
     }
     if (slug === 'biography') {
       setErrors({
         ...errors,
-        biography: validateBiography(value as string) ? '' : 'Biography must be at least 12 characters',
+        biography: validateBiography(value as string) ? (
+          ''
+        ) : (
+          <FormattedMessage
+            id="createLootbox.stepCustomize.biography.error"
+            defaultMessage="Biography must be at least 12 characters"
+            description="Error message for user if they forgot to enter a valid biography for their Lootbox"
+          />
+        ),
       })
     }
     if (slug === 'lootboxThemeColor') {
       setErrors({
         ...errors,
-        lootboxThemeColor: validateThemeColor(value as string) ? '' : 'Theme color must be a valid hex color',
+        lootboxThemeColor: validateThemeColor(value as string) ? (
+          ''
+        ) : (
+          <FormattedMessage
+            id="createLootbox.stepCustomize.themeColor.error"
+            defaultMessage="Theme color must be a valid hex color"
+            description="Error message for user if they forgot to enter a valid themecolor which should be HEX format (i.e. #fefefe)"
+          />
+        ),
       })
     }
   }
@@ -222,25 +281,42 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
         >
           <$Vertical flex={isMobile ? 1 : 0.55}>
             <$StepHeading>
-              <span>5. Customize NFT Ticket</span>
+              <FormattedMessage
+                id="createLootbox.customizeTicket.title"
+                defaultMessage="5. Customize NFT Ticket"
+                description="Header for 5th step in creating a Lootbox"
+              />
               <HelpIcon tipID="stepCustomize" />
               <ReactTooltip id="stepCustomize" place="right" effect="solid">
-                Finally, an NFT that's actually useful 😂
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.subHeading"
+                  defaultMessage="Finally, an NFT that's actually useful 😂"
+                  description="Sub-header for 5th step in creating a Lootbox"
+                />
               </ReactTooltip>
             </$StepHeading>
             <$StepSubheading>
-              Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you
-              deposit earnings back into the Lootbox.
+              <FormattedMessage
+                id="createLootbox.customizeTicket.subHeading2"
+                defaultMessage="Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox."
+                description="Sub-header for 5th step in creating a Lootbox"
+              />
             </$StepSubheading>
             <br />
             <br />
             <$StepSubheading>
-              <span>Lootbox Name</span>
+              <FormattedMessage
+                id="createLootbox.customizeTicket.inputName"
+                defaultMessage="Lootbox Name"
+                description="Label for name input in 5th step in creating a Lootbox - this is a name for the Lootbox"
+              />
               <HelpIcon tipID="lootboxName" />
               <ReactTooltip id="lootboxName" place="right" effect="solid">
-                The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that
-                you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to
-                reduce confusion.
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.inputName.toolTip"
+                  defaultMessage="The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce confusion."
+                  description="Tooltip for name input in 5th step in creating a Lootbox"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -250,10 +326,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             />
             <br />
             <$StepSubheading>
-              <span>Ticket Symbol</span>
+              <FormattedMessage
+                id="createLootbox.customizeTicket.inputSymbol"
+                defaultMessage="Lootbox Symbol"
+                description="Label for symbol input in 5th step in creating a Lootbox - this is a symbol for the Lootbox"
+              />
               <HelpIcon tipID="ticketSymbol" />
               <ReactTooltip id="ticketSymbol" place="right" effect="solid">
-                Set a shortname for your NFT Tickets to be displayed in Metamask. Max 9 characters.
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.inputSymbol.tooltip"
+                  defaultMessage="Set a shortname for your NFT Tickets to be displayed in Metamask. Max 9 characters."
+                  description="tooltip for people who might be confused about what this field is"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$InputMedium
@@ -263,10 +347,18 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
             />
             <br />
             <$StepSubheading>
-              <span>Biography</span>
+              <FormattedMessage
+                id="createLootbox.customizeTicket.inputBiography"
+                defaultMessage="Biography"
+                description="Label for biography input. This is a field the user can input a description of their Lootbox."
+              />
               <HelpIcon tipID="ticketBiography" />
               <ReactTooltip id="ticketBiography" place="right" effect="solid">
-                Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for.
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.inputBiography.tooltip"
+                  defaultMessage="Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for."
+                  description="tooltip for people who might be confused about what the Lootbox biography field is"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$TextAreaMedium
@@ -301,7 +393,14 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="logo-uploader">
-                    {props.ticketState.logoFile || props.ticketState.logoUrl ? '✅' : '⚠️  Upload'} Logo
+                    <FormattedMessage
+                      id="createLootbox.customizeTicket.inputLogo.prompt"
+                      defaultMessage="{icon} Upload Logo"
+                      description="Label for input field for Lootbox logo (image file)"
+                      values={{
+                        icon: props.ticketState.logoFile || props.ticketState.logoUrl ? '✅' : '⚠️',
+                      }}
+                    />
                   </$InputImageLabel>
                   <$InputImage
                     type="file"
@@ -313,7 +412,14 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="cover-uploader">
-                    {props.ticketState.coverFile || props.ticketState.coverUrl ? '✅' : '⚠️  Upload'} Cover
+                    <FormattedMessage
+                      id="createLootbox.customizeTicket.inputCover.prompt"
+                      defaultMessage="{icon} Upload Cover"
+                      description="Label for input field for Lootbox cover file (image file)"
+                      values={{
+                        icon: props.ticketState.coverFile || props.ticketState.coverUrl ? '✅' : '⚠️',
+                      }}
+                    />
                   </$InputImageLabel>
                   <$InputImage
                     type="file"

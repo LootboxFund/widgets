@@ -2,6 +2,7 @@ import { TokenData, Address } from '@wormgraph/helpers'
 import { manifest } from '../../manifest'
 import { SocialFragment } from 'lib/types'
 import { ScreenSize } from './useScreenSize'
+import { IntlShape, useIntl } from 'react-intl'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
@@ -160,67 +161,136 @@ export const tokenMap: Record<string, TokenDataFE[]> = {
   '0x89': POLYGON_MAINNET_FULL_TOKEN_LIST,
 }
 
-export const SOCIALS: SocialFragment[] = [
-  {
-    slug: 'email',
-    name: 'Email',
-    placeholder: 'Email',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
-  },
-  {
-    slug: 'twitter',
-    name: 'Twitter',
-    placeholder: 'Twitter',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
-  },
-  {
-    slug: 'youtube',
-    name: 'YouTube',
-    placeholder: 'YouTube 1 min Intro Video',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
-  },
-  {
-    slug: 'instagram',
-    name: 'Instagram',
-    placeholder: 'Instagram',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
-  },
-  {
-    slug: 'tiktok',
-    name: 'Tiktok',
-    placeholder: 'Tiktok',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftiktok.png?alt=media',
-  },
-  {
-    slug: 'facebook',
-    name: 'Facebook',
-    placeholder: 'Facebook',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
-  },
-  {
-    slug: 'discord',
-    name: 'Discord',
-    placeholder: 'Discord Server',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
-  },
-  {
-    slug: 'snapchat',
-    name: 'Snapchat',
-    placeholder: 'Snapchat',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fsnapchat.png?alt=media',
-  },
-  {
-    slug: 'twitch',
-    name: 'Twitch',
-    placeholder: 'Twitch',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
-  },
-  {
-    slug: 'web',
-    name: 'Website',
-    placeholder: 'Website',
-    icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
-  },
-]
+export const getSocials = (intl: IntlShape): SocialFragment[] => {
+  const email = intl.formatMessage({ id: 'socials.email.name', defaultMessage: 'Email' })
+  const twitter = intl.formatMessage({ id: 'socials.twitter.name', defaultMessage: 'Twitter' })
+
+  return [
+    {
+      slug: 'email',
+      name: email,
+      placeholder: email,
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Femail.png?alt=media',
+    },
+    {
+      slug: 'twitter',
+      name: twitter,
+      placeholder: twitter,
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
+    },
+    {
+      slug: 'youtube',
+      name: intl.formatMessage({
+        id: 'socials.youtube.name',
+        defaultMessage: 'YouTube',
+        description: 'Socials Input field for Youtube',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.youtube.placeholder',
+        defaultMessage: 'YouTube 1 min Intro Video',
+        description: 'Placeholder for youtube input field. Users should make a 1 minute intro video.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
+    },
+    {
+      slug: 'instagram',
+      name: intl.formatMessage({
+        id: 'socials.instagram.name',
+        defaultMessage: 'Instagram',
+        description: 'Name for Instagram input field.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.instagram.placeholder',
+        defaultMessage: 'Instagram',
+        description: 'Placeholder for Instagram input field.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Finstagram.png?alt=media',
+    },
+    {
+      slug: 'tiktok',
+      name: intl.formatMessage({
+        id: 'socials.tiktok.name',
+        defaultMessage: 'Tiktok',
+        description: 'Name for Tiktok input field.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.tiktok.placeholder',
+        defaultMessage: 'Tiktok',
+        description: 'Placeholder for Tiktok input field.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftiktok.png?alt=media',
+    },
+    {
+      slug: 'facebook',
+      name: intl.formatMessage({
+        id: 'socials.facebook.name',
+        defaultMessage: 'Facebook',
+        description: 'Name for input field for Facebook field.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.facebook.placeholder',
+        defaultMessage: 'Facebook',
+        description: 'Placeholder for Facebook input field.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
+    },
+    {
+      slug: 'discord',
+      name: intl.formatMessage({
+        id: 'socials.discord.name',
+        defaultMessage: 'Discord',
+        description: 'Name for Discord input field.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.discord.placeholder',
+        defaultMessage: 'Discord Server',
+        description: 'Placeholder for Discord input field.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
+    },
+    {
+      slug: 'snapchat',
+      name: intl.formatMessage({
+        id: 'socials.snapchat.name',
+        defaultMessage: 'Snapchat',
+        description: 'Input field name for snapchat.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.snapchat.placeholder',
+        defaultMessage: 'Snapchat',
+        description: 'Placeholder for Snapchat input field.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fsnapchat.png?alt=media',
+    },
+    {
+      slug: 'twitch',
+      name: intl.formatMessage({
+        id: 'socials.twitch.name',
+        defaultMessage: 'Twitch',
+        description: 'Input field name for Twitch.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.twitch.placeholder',
+        defaultMessage: 'Twitch',
+        description: 'Input field placeholder for Twitch.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
+    },
+    {
+      slug: 'web',
+      name: intl.formatMessage({
+        id: 'socials.web.name',
+        defaultMessage: 'Website',
+        description: 'Input field name for user website.',
+      }),
+      placeholder: intl.formatMessage({
+        id: 'socials.web.placeholder',
+        defaultMessage: 'Website',
+        description: 'Input field placeholder for user website.',
+      }),
+      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fweb.png?alt=media',
+    },
+  ]
+}
 
 export const smallScreens: ScreenSize[] = ['mobile', 'tablet']

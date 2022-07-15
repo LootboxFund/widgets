@@ -9,6 +9,8 @@ import { Oopsies, $Link, $SearchInput } from '../common'
 import { manifest } from 'manifest'
 import { useState } from 'react'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import useWords from 'lib/hooks/useWords'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -17,6 +19,7 @@ interface LootboxListProps {
 }
 const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) => {
   const [searchTerm, setSearchTerm] = useState('')
+  const words = useWords()
 
   const filteredLootboxes: LootboxSnapshot[] = !!searchTerm
     ? [
@@ -32,7 +35,7 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
     <$Vertical spacing={4}>
       <$SearchInput
         type="search"
-        placeholder="🔍 Search Lootboxes by Name or Address"
+        placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
         onChange={(e) => setSearchTerm(e.target.value || '')}
       />
       <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
@@ -53,17 +56,25 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
 }
 
 const MyLootboxes = () => {
+  const words = useWords()
+  const intl = useIntl()
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
     getMyProfile: GetMyProfileResponse
   }>(GET_MY_WALLET_LOOTBOXES)
 
+  const couldNotFindLootboxText = intl.formatMessage({
+    id: 'profile.lootboxes.couldNotFindLootbox',
+    defaultMessage: "We couldn't find your Lootbox",
+    description: 'Message displayed when the user does not have any lootboxes.',
+  })
+
   if (loading) {
     return <Spinner />
   } else if (error || !data) {
-    return <Oopsies title="Error loading Lootboxes" message={error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
-    return <Oopsies title="Error loading Lootboxes" message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
   }
 
   const lootboxSnapshots: LootboxSnapshot[] = []
@@ -88,10 +99,16 @@ const MyLootboxes = () => {
   return (
     <$Vertical spacing={4}>
       <$Vertical>
-        <$h1>My Lootboxes</$h1>
+        <$h1>
+          <FormattedMessage
+            id="profile.lootboxes.title"
+            defaultMessage="My Lootboxes"
+            description="Title for the user's Lootboxes section where they can browse the lootboxes they make"
+          />
+        </$h1>
         <$span>
           <$Link fontStyle="normal" style={{ marginBottom: '15px' }} onClick={navigateToCreateLootbox}>
-            Create a Lootbox
+            {words.createLootbox}
           </$Link>
         </$span>
       </$Vertical>
@@ -99,14 +116,20 @@ const MyLootboxes = () => {
         <LootboxList lootboxes={lootboxSnapshots} screen={screen} onClickLootbox={navigateToLootbox} />
       ) : (
         <Oopsies
-          title="We couldn't find your Lootbox"
+          title={couldNotFindLootboxText}
           message={
-            <span>
-              Already made one? Then you need to add your wallet ☝️ Otherwise, you can{' '}
-              <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
-                create a Lootbox here.
-              </$Link>
-            </span>
+            <FormattedMessage
+              id="profile.lootboxes.noLootboxes"
+              defaultMessage="Already made one? Then you need to add your wallet ☝️ Otherwise, you can {createLootboxHyperLink}."
+              description="Message when the user has no Lootboxes listed on their page. There is a button shown above to add their wallet, which will help them find their lootboxes."
+              values={{
+                createLootboxHyperLink: (
+                  <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
+                    {words.createLootbox}
+                  </$Link>
+                ),
+              }}
+            />
           }
           icon="🧐"
         />

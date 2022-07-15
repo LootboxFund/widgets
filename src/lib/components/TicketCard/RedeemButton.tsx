@@ -8,6 +8,8 @@ import WalletButton from '../WalletButton'
 import { ticketCardState, generateStateID, redeemTicket } from './state'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { ContractAddress } from '@wormgraph/helpers'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface RedeemButtonProps {
   ticketID: string | undefined
@@ -19,6 +21,8 @@ const RedeemButton = (props: RedeemButtonProps) => {
   const snap = useSnapshot(ticketCardState)
   const snapUser = useSnapshot(userState)
   const [loading, setLoading] = useState(false)
+  const intl = useIntl()
+  const words = useWords()
 
   const isWalletConnected = snapUser.accounts.length > 0
   const stateID =
@@ -50,6 +54,12 @@ const RedeemButton = (props: RedeemButtonProps) => {
     }
   }
 
+  const redeemText = intl.formatMessage({
+    id: 'ticketCard.redeemButton.text',
+    defaultMessage: 'Redeem',
+    description: 'Button prompt for a user to redeem their Lootbox NFT - which means, get money from it.',
+  })
+
   if (!props.ticketID) {
     return (
       <$Button
@@ -58,9 +68,9 @@ const RedeemButton = (props: RedeemButtonProps) => {
         backgroundColor={`${COLORS.surpressedBackground}15`}
         backgroundColorHover={`${COLORS.surpressedBackground}`}
         color={`${COLORS.surpressedFontColor}aa`}
-        style={{ minHeight: '60px', height: '60px', maxHeight: '60px' }}
+        style={{ minHeight: '60px', height: '60px', maxHeight: '60px', textTransform: 'uppercase' }}
       >
-        REDEEM
+        {redeemText}
       </$Button>
     )
   } else if (ticket?.route === '/payout') {
@@ -73,10 +83,10 @@ const RedeemButton = (props: RedeemButtonProps) => {
           backgroundColor={`${COLORS.surpressedBackground}15`}
           backgroundColorHover={`${COLORS.surpressedBackground}`}
           color={`${COLORS.surpressedFontColor}aa`}
-          style={{ minHeight: '60px', height: '100px' }}
+          style={{ minHeight: '60px', height: '100px', textTransform: 'uppercase' }}
           onClick={toggleRoute}
         >
-          BACK
+          {words.back}
         </$Button>
       )
     } else {
@@ -92,10 +102,11 @@ const RedeemButton = (props: RedeemButtonProps) => {
             height: '100px',
             filter: 'drop-shadow(0px 4px 30px rgba(0, 178, 255, 0.5))',
             boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+            textTransform: 'uppercase',
           }}
           disabled={loading}
         >
-          <LoadingText loading={loading} text="REDEEM" color={COLORS.trustFontColor} />
+          <LoadingText loading={loading} text={redeemText} color={COLORS.trustFontColor} />
         </$Button>
       )
     }
@@ -114,7 +125,11 @@ const RedeemButton = (props: RedeemButtonProps) => {
           boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
         }}
       >
-        View Payout
+        <FormattedMessage
+          id="ticketCard.redeemButton.maintext"
+          defaultMessage="View Payout"
+          description="Button prompt for a user to view how much money they can redeem from their Lootbox NFT"
+        />
       </$Button>
     )
   }

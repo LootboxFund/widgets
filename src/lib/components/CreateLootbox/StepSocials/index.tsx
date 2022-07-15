@@ -9,7 +9,8 @@ import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { ScreenSize } from '../../../hooks/useScreenSize/index'
-import { SOCIALS } from 'lib/hooks/constants'
+import { getSocials } from 'lib/hooks/constants'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 export interface StepSocialsProps {
   stage: StepStage
@@ -20,8 +21,20 @@ export interface StepSocialsProps {
   setValidity: (bool: boolean) => void
 }
 const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HTMLDivElement>) => {
+  const intl = useIntl()
   const { screen } = useWindowSize()
-  const initialErrors = {
+  const initialErrors: {
+    twitter: string | React.ReactElement
+    facebook: string | React.ReactElement
+    instagram: string | React.ReactElement
+    youtube: string | React.ReactElement
+    email: string | React.ReactElement
+    tiktok: string | React.ReactElement
+    discord: string | React.ReactElement
+    snapchat: string | React.ReactElement
+    twitch: string | React.ReactElement
+    web: string | React.ReactElement
+  } = {
     twitter: '',
     email: '',
     instagram: '',
@@ -33,6 +46,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
     twitch: '',
     web: '',
   }
+  const SOCIALS = getSocials(intl)
   const [errors, setErrors] = useState(initialErrors)
 
   const parseInput = (slug: string, value: string) => {
@@ -41,13 +55,25 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
-          email: 'Invalid email',
+          email: (
+            <FormattedMessage
+              id="step.socials.email.invalid"
+              defaultMessage="Invalid email"
+              description="When a user enters an invalid email address, this message is shown."
+            />
+          ),
         })
         props.setValidity(false)
       } else if (value.length === 0) {
         setErrors({
           ...errors,
-          email: 'Email is mandatory',
+          email: (
+            <FormattedMessage
+              id="step.socials.email.empty"
+              defaultMessage="Email is mandatory"
+              description="When a user does not enter an email address, this message is shown."
+            />
+          ),
         })
       } else {
         setErrors({
@@ -59,7 +85,13 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
     } else if (!props.socialState.email) {
       setErrors({
         ...errors,
-        email: 'Email is mandatory',
+        email: (
+          <FormattedMessage
+            id="step.socials.email.empty2"
+            defaultMessage="Email is mandatory"
+            description="When a user does not enter an email address, this message is shown."
+          />
+        ),
       })
       props.setValidity(false)
     } else {
@@ -78,16 +110,26 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       >
         <$Vertical flex={1}>
           <$StepHeading>
-            6. Contact Information
+            <FormattedMessage
+              id="createLootbox.step.socials.heading"
+              defaultMessage="6. Contact Information"
+              description="The heading of the social media step (AKA contact information step)"
+            />
             <HelpIcon tipID="stepSocials" />
             <ReactTooltip id="stepSocials" place="right" effect="solid">
-              Having public profiles is important for building trust with investors.
+              <FormattedMessage
+                id="createLootbox.step.socials.tooltip"
+                defaultMessage="Having public profiles is important for building trust with investors."
+                description="The tooltip for the social media step (AKA contact information step)"
+              />
             </ReactTooltip>
           </$StepHeading>
           <$StepSubheading>
-            Email is mandatory. Twitter is important for easy public communication with your investors. We also highly
-            recommend you film a 1 minute self-introduction YouTube video and paste the link here (it helps build
-            trust).
+            <FormattedMessage
+              id="createLootbox.step.socials.subheading"
+              defaultMessage="Email is mandatory. Twitter is important for easy public communication with your investors. We also highly recommend you film a 1 minute self-introduction YouTube video and paste the link here (it helps build trust)."
+              description="The subheading of the social media step"
+            />
           </$StepSubheading>
           <br />
           <br />

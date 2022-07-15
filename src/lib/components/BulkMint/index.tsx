@@ -28,6 +28,8 @@ import CreatePartyBasket from '../PartyBasket/CreatePartyBasket'
 import { useQuery } from '@apollo/client'
 import { GET_MY_PARTY_BASKETS } from '../PartyBasket/ViewPartyBaskets/api.gql'
 import { truncateAddress } from 'lib/api/helpers'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface BulkMintProps {
   lootboxAddress: ContractAddress
@@ -37,6 +39,8 @@ export interface BulkMintProps {
 }
 
 const BulkMint = (props: BulkMintProps) => {
+  const intl = useIntl()
+  const words = useWords()
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState(web3Utils.toBN(0))
@@ -81,6 +85,68 @@ const BulkMint = (props: BulkMintProps) => {
     },
   })
 
+  const receivingAddressNotValid = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.receiverAddressNotValid',
+    defaultMessage: 'Receiver address is not valid',
+    description: 'Error message when the receiver address is not a valid wallet address',
+  })
+
+  const enterAmountOfNativeTokensToDeposit = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.enterAmountOfNativeTokens',
+    defaultMessage: 'Enter an amount of native token to deposit',
+    description: 'User prompt indicating to enter an amount of native blockchain tokens. (i.e. Ethereum or Bitcoin).',
+  })
+
+  const enterAmountOfNFTsToMint = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.enterAmountOfNFTs',
+    defaultMessage: 'Enter a number of NFTs to mint',
+    description: 'User prompt indicating to enter an amount of NFTs to mint.',
+  })
+
+  const sendToPartyBasket = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.sendToPartyBasket',
+    defaultMessage: 'Send to Party Basket',
+    description:
+      'Button to send NFTs to a Party Basket. A Party Basket is just a smart contract that can hold onto bulk minted Lootbox NFTs.',
+  })
+
+  const notUsingPartyBasket = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.notUsingPartyBasket',
+    defaultMessage: 'You are not using a Party Basket',
+    description: 'User prompt indicating that the user is not using a Party Basket.',
+  })
+
+  const usingPartyBasketHelp = intl.formatMessage(
+    {
+      id: 'lootbox.manage.bulkMint.usingPartyBasketHelp',
+      defaultMessage:
+        "{icon} You are bulk minting to a party basket {icon} Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
+      description: 'User prompt indicating that the user is using a Party Basket.',
+    },
+    {
+      icon: '🎉',
+    }
+  )
+
+  const bulkMintCaution = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.caution',
+    defaultMessage: 'Be careful not to mint too many NFTs, as the profit share amount will get smaller',
+    description:
+      'Warning message to user indicating that the user should not bulk mint too many NFTs because then the price of each will be too low.',
+  })
+
+  const sendAllNFTsToAddress = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.sendAllNFTsToPartyBasket',
+    defaultMessage: 'Send all NFTs to this address',
+    description: 'Message confirming address to send NFTs to',
+  })
+
+  const bulkMintSuccess = intl.formatMessage({
+    id: 'lootbox.manage.bulkMint.success',
+    defaultMessage: 'Bulk mint success',
+    description: 'Message indicating that bulk minting was successful',
+  })
+
   const allConditionsMet = () => {
     return (
       nativeRewardAmount.toString() !== '0' && validateReceivingWallet(receiverAddr) && numToMint.toString() !== '0'
@@ -100,15 +166,15 @@ const BulkMint = (props: BulkMintProps) => {
 
   const generateValidationErrorMessages = () => {
     if (!validateReceivingWallet(receiverAddrErr)) {
-      setReceiverAddrErr('Receiving Address is not valid')
+      setReceiverAddrErr(receivingAddressNotValid)
       return
     }
     if (nativeRewardAmount.toString() === '0') {
-      setNativeRewardAmountErr('Enter an amount of native token to deposit')
+      setNativeRewardAmountErr(enterAmountOfNativeTokensToDeposit)
       return
     }
     if (numToMint.toString() === '0') {
-      setNumToMintErr('Enter a number of NFTs to mint')
+      setNumToMintErr(enterAmountOfNFTsToMint)
       return
     }
     return
@@ -163,17 +229,25 @@ const BulkMint = (props: BulkMintProps) => {
         <$Horizontal style={{ opacity }}>
           <$Vertical flex={2}>
             <$Horizontal verticalCenter>
-              <$ManageLootboxHeading screen={screen}>Bulk Mint NFTs</$ManageLootboxHeading>
+              <$ManageLootboxHeading screen={screen} style={{ textTransform: 'capitalize' }}>
+                {words.bulkMintNFTs}
+              </$ManageLootboxHeading>
               <HelpIcon tipID="rewardSponsors" />
               <ReactTooltip id="rewardSponsors" place="right" effect="solid">
-                If you would like access to this Bulk Mint feature, email us at support@lootbox.fund
+                <FormattedMessage
+                  id="lootbox.manage.bulkMint.rewardSponsors.tooltip"
+                  defaultMessage="If you would like access to this Bulk Mint feature, email us at support@lootbox.fund"
+                  description="Tooltip for the reward sponsors button"
+                />
               </ReactTooltip>
             </$Horizontal>
             <br />
             <$StepSubheading>
-              Supercharge your fanbase by gifting them your Lootbox NFTs. This is a great way to incentivize engagement
-              from your community by rewarding them a share of your gamer earnings. Only available for Lootbox Exclusive
-              Partners.
+              <FormattedMessage
+                id="lootbox.manage.bulkMint.rewardSponsors.information"
+                defaultMessage="Supercharge your fanbase by gifting them your Lootbox NFTs. This is a great way to incentivize engagement from your community by rewarding them a share of your gamer earnings. Only available for Lootbox Exclusive Partners."
+                description="Intormation sectino about what bulk minting means. Bulk minting is minting ALOT of NFTs at one time. This helps save gas."
+              />
             </$StepSubheading>
           </$Vertical>
           {screen === 'desktop' && (
@@ -193,19 +267,21 @@ const BulkMint = (props: BulkMintProps) => {
               marginRight: screen === 'desktop' ? '50px' : '0px',
             }}
           >
-            <$StepSubheading>
-              Receiver Address
+            <$StepSubheading style={{ textTransform: 'capitalize' }}>
+              {words.receiverAddress}
               <HelpIcon tipID="lootboxAddressReward" />
               <ReactTooltip id="lootboxAddressReward" place="right" effect="solid">
-                {`This is where all the NFTs will be sent to. You can set it to a Metamask wallet and manually send NFTs to
-              fans. Or set it to a smart contract that will allow fans to redeem their gifted NFT themselves (saving you
-              time & gas fees).`}
+                <FormattedMessage
+                  id="lootbox.manage.bulkMint.receiverAddress.tooltip"
+                  defaultMessage="This is where all the NFTs will be sent to. You can set it to a Metamask wallet and manually send NFTs to fans. Or set it to a smart contract that will allow fans to redeem their gifted NFT themselves (saving you time & gas fees)."
+                  description="Tooltip for the receiver address in the bulk mint section"
+                />
               </ReactTooltip>
               <span
                 onClick={() => navigator.clipboard.writeText(receiverAddr)}
                 style={{ fontStyle: 'italic', cursor: 'copy', fontSize: '0.8rem', marginLeft: '5px' }}
               >
-                Copy
+                {words.copy}
               </span>
             </$StepSubheading>
 
@@ -221,15 +297,13 @@ const BulkMint = (props: BulkMintProps) => {
               }}
             >
               {isBulkMintToPartyBasket
-                ? '✅ Send to Party Basket'
+                ? `✅ ${sendToPartyBasket}`
                 : !!receiverAddr
-                ? '⚠️ You are not using a Party Basket'
-                : '👉 Create a Party Basket'}
+                ? `⚠️ ${notUsingPartyBasket}`
+                : `👉 ${words.createAPartyBasket}`}
               <HelpIcon tipID="usePartyBasket" />
               <ReactTooltip id="usePartyBasket" place="right" effect="solid">
-                {isBulkMintToPartyBasket
-                  ? "🎉 You are bulk minting to a party basket 🎉 Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves."
-                  : "We recommend you use a party basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves."}
+                {isBulkMintToPartyBasket ? usingPartyBasketHelp : words.partyBasketInformation}
               </ReactTooltip>
             </$StepSubheading>
           </$Horizontal>
@@ -240,7 +314,7 @@ const BulkMint = (props: BulkMintProps) => {
                 value={receiverAddr}
                 onChange={(e) => setReceiverAddr(e.target.value)}
                 min="0"
-                placeholder="Send all NFTs to this address..."
+                placeholder={`${sendAllNFTsToAddress}...`}
                 screen={screen}
                 style={{ fontWeight: 'lighter' }}
                 list="available-party-baskets"
@@ -270,7 +344,7 @@ const BulkMint = (props: BulkMintProps) => {
           <$Vertical>
             <br />
             <$CreatePartyBasketContainer themeColor={props.network.themeColor} screen={screen}>
-              <AuthGuard loginTitle="Login to make a Party Basket">
+              <AuthGuard loginTitle={words.loginToMakePartyBasket}>
                 <CreatePartyBasket
                   lootboxAddress={props.lootboxAddress}
                   network={props.network}
@@ -284,14 +358,19 @@ const BulkMint = (props: BulkMintProps) => {
         <$Vertical style={{ opacity }}>
           <br />
           <$Vertical>
-            <$StepSubheading>
-              Total Spend
+            <$StepSubheading style={{ textTransform: 'capitalize' }}>
+              <FormattedMessage
+                id="lootbox.manage.bulkMint.totalSpendTitle"
+                defaultMessage="Total spend"
+                description="Total amount of native tokens the user will spend bulk minting Lootbox NFTs"
+              />
               <HelpIcon tipID="withNativeToken" />
               <ReactTooltip id="withNativeToken" place="right" effect="solid">
-                The total amount of native tokens you want to spend on bulk minting these NFTs. Each NFT will end up
-                receiving an equal portion of the total amount spent. For example, if you spend 1 BNB and set the
-                quantity to 5, then you'll mint 5 NFTs with 0.2 BNB spent on each. The last NFT may receive unnoticeably
-                more or less due to tiny rounding.
+                <FormattedMessage
+                  id="lootbox.manage.bulkMint.totalSpend.tooltip"
+                  defaultMessage="The total amount of native tokens you want to spend on bulk minting these NFTs. Each NFT will end up receiving an equal portion of the total amount spent. For example, if you spend 1 BNB and set the quantity to 5, then you'll mint 5 NFTs with 0.2 BNB spent on each. The last NFT may receive unnoticeably more or less due to tiny rounding."
+                  description="Tooltip for the total spend section"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$InputWrapper screen={screen}>
@@ -336,13 +415,19 @@ const BulkMint = (props: BulkMintProps) => {
           </$Vertical>
           <br />
           <$Vertical>
-            <$StepSubheading>
-              Total NFTs to Mint
+            <$StepSubheading style={{ textTransform: 'capitalize' }}>
+              <FormattedMessage
+                id="lootbox.manage.bulkMint.totalNFTsToMint"
+                defaultMessage="Total NFTs to mint"
+                description="Total amount of NFTs the user will mint during bulk minting"
+              />
               <HelpIcon tipID="totalToMint" />
               <ReactTooltip id="totalToMint" place="right" effect="solid">
-                The total number of NFTs to mint. Each NFT will end up receiving an equal portion of the total amount
-                spent. For example, if you spend 1 BNB and set the quantity to 5, then you'll mint 5 NFTs with 0.2 BNB
-                spent on each.
+                <FormattedMessage
+                  id="lootbox.manage.bulkMint.totalNFTs.tooltip"
+                  defaultMessage="The total number of NFTs to mint. Each NFT will end up receiving an equal portion of the total amount spent. For example, if you spend 1 BNB and set the quantity to 5, then you'll mint 5 NFTs with 0.2 BNB spent on each."
+                  description="Tooltip for the total spend section describing it"
+                />
               </ReactTooltip>
             </$StepSubheading>
             <$InputWrapper screen={screen} style={{ maxWidth: '600px' }}>
@@ -360,9 +445,7 @@ const BulkMint = (props: BulkMintProps) => {
                   onChange={(e) => {
                     setNumToMint(parseInt(e.target.value) || 0)
                     if (parseInt(e.target.value) > 100) {
-                      setNumToMintErr(
-                        'Be careful not to mint too many NFTs, as the profit share amount will get smaller'
-                      )
+                      setNumToMintErr(bulkMintCaution)
                     } else {
                       setNumToMintErr('')
                     }
@@ -396,10 +479,10 @@ const BulkMint = (props: BulkMintProps) => {
             }
           >
             {bulkMintSubmissionStatus === 'pending'
-              ? 'SUBMITTING...'
+              ? `${words.submitting}...`
               : bulkMintSubmissionStatus === 'success'
-              ? 'BULK MINT SUCCESS'
-              : `BULK MINT NFTs`}
+              ? bulkMintSuccess
+              : words.bulkMintNFTs}
           </$RewardSponsorsButton>
           {submitError && (
             <div style={{ width: '100%', textAlign: 'center', padding: '10px' }}>
@@ -413,7 +496,7 @@ const BulkMint = (props: BulkMintProps) => {
                 onClick={() => window.open(`${props.network.blockExplorerUrl}tx/${transactionHash}`, '_blank')}
                 style={{ cursor: 'pointer' }}
               >
-                View Transaction Reciept
+                {words.viewTransactionReceipt}
               </$ErrorMessageMgmtPage>
             </div>
           )}
@@ -440,14 +523,6 @@ const $StepCard = styled.div<{
   padding: ${(props) => (props.screen === 'desktop' ? '40px' : '20px')};
   max-width: 800px;
   font-family: sans-serif;
-`
-
-const $SubtitleDepositTitle = styled.span`
-  font-size: 0.9rem;
-  font-weight: lighter;
-  font-style: italic;
-  color: ${COLORS.surpressedFontColor};
-  margin: 10px 0px 10px 0px;
 `
 
 const $RewardSponsorsButton = styled.button<{ themeColor?: string; allConditionsMet: boolean }>`

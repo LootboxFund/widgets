@@ -1,6 +1,7 @@
 import React from 'react'
 import StepMagicLink, { StepMagicLinkProps } from 'lib/components/CreateLootbox/StepMagicLink'
 import { ContractAddress } from '@wormgraph/helpers'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export default {
   title: 'StepMagicLink',
@@ -19,24 +20,26 @@ const Demo = (args: StepMagicLinkProps) => {
     priceFeed: '0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526' as ContractAddress,
   }
   return (
-    <StepMagicLink
-      network="0x61"
-      type={undefined}
-      fundingTarget={undefined}
-      fundingLimit={undefined}
-      receivingWallet={undefined}
-      returnsTarget={undefined}
-      returnsDate={undefined}
-      logoImage={undefined}
-      coverImage={undefined}
-      themeColor={undefined}
-      campaignBio={undefined}
-      campaignWebsite={undefined}
-      uploadLogo={async () => Promise.resolve('logoImage')}
-      uploadCover={async () => Promise.resolve('coverImage')}
-      stage="in_progress"
-      selectedNetwork={network}
-    />
+    <LocalizationWrapper>
+      <StepMagicLink
+        network="0x61"
+        type={undefined}
+        fundingTarget={undefined}
+        fundingLimit={undefined}
+        receivingWallet={undefined}
+        returnsTarget={undefined}
+        returnsDate={undefined}
+        logoImage={undefined}
+        coverImage={undefined}
+        themeColor={undefined}
+        campaignBio={undefined}
+        campaignWebsite={undefined}
+        uploadLogo={async () => Promise.resolve('logoImage')}
+        uploadCover={async () => Promise.resolve('coverImage')}
+        stage="in_progress"
+        selectedNetwork={network}
+      />
+    </LocalizationWrapper>
   )
 }
 export const Basic = Demo.bind({})

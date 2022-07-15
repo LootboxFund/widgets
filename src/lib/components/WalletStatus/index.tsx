@@ -2,7 +2,7 @@ import react, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import $Button from 'lib/components/Generics/Button'
 import { COLORS } from 'lib/theme'
-import { updateStateToChain, useUserInfo, useEthers } from 'lib/hooks/useWeb3Api'
+import { updateStateToChain, useUserInfo } from 'lib/hooks/useWeb3Api'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { addCustomEVMChain } from 'lib/hooks/useWeb3Api'
@@ -10,6 +10,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
 import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex, ChainIDHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
+import useWords from 'lib/hooks/useWords'
 
 export interface WalletStatusProps {
   targetNetwork?: ChainIDHex
@@ -18,6 +19,7 @@ const WalletStatus = (props: WalletStatusProps) => {
   const snapUserState = useSnapshot(userState)
   const [provider] = useProvider()
   const { screen } = useWindowSize()
+  const words = useWords()
 
   const [status, setStatus] = useState<'ready' | 'loading' | 'success' | 'error' | 'network'>('ready')
 
@@ -56,8 +58,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           }
         }
       }
-      
-      
+
       setStatus('success')
     } else {
       setStatus('error')
@@ -83,7 +84,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Loading...
+        {words.loading}
       </$Button>
     )
   } else if (status === 'success') {
@@ -100,7 +101,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Connected
+        {words.connected}
       </$Button>
     )
   } else if (status === 'error') {
@@ -117,7 +118,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1rem',
         }}
       >
-        Please install MetaMask
+        {words.pleaseInstallMetamask}
       </$Button>
     )
   } else if (status === 'network') {
@@ -139,7 +140,7 @@ const WalletStatus = (props: WalletStatusProps) => {
           fontSize: '1.2rem',
         }}
       >
-        Connect Wallet
+        {words.connectWallet}
       </$Button>
     </div>
   )

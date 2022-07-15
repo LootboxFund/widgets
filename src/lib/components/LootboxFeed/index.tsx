@@ -16,8 +16,10 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import styled from 'styled-components'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
+import useWords from 'lib/hooks/useWords'
 
 const LootboxFeed = () => {
+  const words = useWords()
   const { screen } = useWindowSize()
   const [lootboxes, setLootboxes] = useState<LootboxSnapshot[]>([])
   const [lastLootbox, setLastLootbox] = useState<null | string>(null)
@@ -35,9 +37,9 @@ const LootboxFeed = () => {
   )
 
   if (error) {
-    return <Oopsies title="Error loading Lootbox Feed" message={error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.lootboxFeed?.__typename === 'ResponseError') {
-    return <Oopsies title="Error loading Lootbox Feed" message={data?.lootboxFeed?.error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={data?.lootboxFeed?.error?.message || ''} icon="🤕" />
   }
 
   const { pageInfo } = (data?.lootboxFeed as LootboxFeedResponseSuccess) || {}
@@ -79,9 +81,10 @@ const LootboxFeed = () => {
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               color: COLORS.trustFontColor,
               backgroundColor: COLORS.trustBackground,
+              textTransform: 'capitalize',
             }}
           >
-            See More
+            {words.seeMore}
           </$Button>
         </div>
       )}

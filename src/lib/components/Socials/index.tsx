@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Horizontal, $Container, $Vertical } from '../Generics'
 import { $SocialGridInputs, $SocialLogo, $InputMedium } from '../CreateLootbox/StepSocials'
-import { SOCIALS } from 'lib/hooks/constants'
+import { getSocials } from 'lib/hooks/constants'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface SocialsProps {
   lootbox: ContractAddress | undefined
@@ -17,6 +19,9 @@ interface SocialsState {
 }
 
 const Socials = ({ lootbox }: SocialsProps) => {
+  const intl = useIntl()
+  const words = useWords()
+  const SOCIALS = getSocials(intl)
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
   const [basisPointsReturnTarget, setBasisPointsReturnTarget] = useState('0')
@@ -71,12 +76,27 @@ const Socials = ({ lootbox }: SocialsProps) => {
     <$Container screen={screen}>
       <$Vertical spacing={2}>
         <$Vertical spacing={1}>
-          <$TargetReturnHeader>{formattedROI}% Target Return</$TargetReturnHeader>
-          <$PaybackDateSubHeader>In {diffDays < 0 ? 0 : diffDays} days</$PaybackDateSubHeader>
+          <$TargetReturnHeader>
+            <FormattedMessage
+              id="socials.targetReturn"
+              defaultMessage="{returnPercentage}% Target Return"
+              description="Percentage return on investment that investors can expect to receive from a lootbox"
+              values={{
+                returnPercentage: formattedROI,
+              }}
+            />
+          </$TargetReturnHeader>
+          <$PaybackDateSubHeader>{words.inDays(diffDays < 0 ? 0 : diffDays)}</$PaybackDateSubHeader>
         </$Vertical>
         {lootboxDescription ? (
           <$Vertical spacing={1}>
-            <$AboutLootboxHeader>About this Lootbox</$AboutLootboxHeader>
+            <$AboutLootboxHeader>
+              <FormattedMessage
+                id="socials.aboutLootbox"
+                defaultMessage="About this Lootbox"
+                description="Header for the Lootbox description section"
+              />
+            </$AboutLootboxHeader>
             <$LootboxDescription>{lootboxDescription}</$LootboxDescription>
           </$Vertical>
         ) : undefined}

@@ -8,12 +8,16 @@ import { userState } from 'lib/state/userState'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useSnapshot } from 'valtio'
 import { BLOCKCHAINS, chainIdHexToSlug } from '@wormgraph/helpers'
+import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 export interface PurchaseCompleteProps {}
 const PurchaseComplete = (props: PurchaseCompleteProps) => {
   const { screen } = useWindowSize()
   const snap = useSnapshot(buySharesState)
   const snapUserState = useSnapshot(userState)
+  const words = useWords()
+
   const goToBuySharesComponent = () => (buySharesState.route = '/buyShares')
   const getBscScanUrl = (): string | undefined => {
     if (!snap.lastTransaction.hash) {
@@ -46,14 +50,19 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
 
   const ViewOnBSCScan = () => (
     <$BlueLinkLink href={bscScanUrl} target="_blank">
-      View on {getBscScanName()}
+      <FormattedMessage
+        id="buyShares.purchaseComplete.viewOnBlockExplorer"
+        defaultMessage="View on {blockExplorerName}"
+        description="Hyperlink for user to click to view a transaction on a block explorer."
+        values={{ blockExplorerName: getBscScanName() }}
+      />
     </$BlueLinkLink>
   )
 
   const ErrorSection = () => (
     <$Vertical style={{ minHeight: '150px', justifyContent: 'center' }}>
       <$Sadge>🤕</$Sadge>
-      <$ErrorText style={{ fontWeight: 'bold' }}>An Error Occured!</$ErrorText>
+      <$ErrorText style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>{words.anErrorOccured}!</$ErrorText>
       {snap.lastTransaction.failureMessage && <$ErrorText>{snap.lastTransaction.failureMessage}</$ErrorText>}
       {bscScanUrl && <ViewOnBSCScan />}
     </$Vertical>
@@ -77,9 +86,9 @@ const PurchaseComplete = (props: PurchaseCompleteProps) => {
         backgroundColorHover={`${COLORS.warningBackground}ae`}
         color={`${COLORS.warningFontColor}`}
         colorHover={COLORS.white}
-        style={{ height: '100px', minHeight: '60px' }}
+        style={{ height: '100px', minHeight: '60px', textTransform: 'capitalize' }}
       >
-        Back
+        {words.back}
       </$Button>
     </$Vertical>
   )
