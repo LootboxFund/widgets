@@ -13,12 +13,12 @@ if (navigator.language === 'fr') {
 const loadMessages = async (locale: Locale) => {
   console.log('loading messages', locale)
   switch (locale) {
-    case 'fr':
-      return import('lib/lang/fr.json')
+    // case 'fr':
+    //   return import('lib/lang/compiled/fr.json')
     case 'en':
-      return import('lib/lang/en.json')
+      return import('lib/lang/compiled/en.json')
     default:
-      return import('lib/lang/en.json')
+      return import('lib/lang/compiled/en.json')
   }
 }
 
