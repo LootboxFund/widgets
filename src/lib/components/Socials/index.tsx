@@ -8,6 +8,7 @@ import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { FormattedMessage, useIntl } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 interface SocialsProps {
   lootbox: ContractAddress | undefined
@@ -19,6 +20,7 @@ interface SocialsState {
 
 const Socials = ({ lootbox }: SocialsProps) => {
   const intl = useIntl()
+  const words = useWords()
   const SOCIALS = getSocials(intl)
   const { screen } = useWindowSize()
   const web3Utils = useWeb3Utils()
@@ -84,16 +86,7 @@ const Socials = ({ lootbox }: SocialsProps) => {
               }}
             />
           </$TargetReturnHeader>
-          <$PaybackDateSubHeader>
-            <FormattedMessage
-              id="socials.paybackDate"
-              defaultMessage="In {nDaysLeft} days"
-              description="Date when the lootbox will be paid back to the investor. Just assume its plural."
-              values={{
-                nDaysLeft: diffDays < 0 ? 0 : diffDays,
-              }}
-            />
-          </$PaybackDateSubHeader>
+          <$PaybackDateSubHeader>{words.inDays(diffDays < 0 ? 0 : diffDays)}</$PaybackDateSubHeader>
         </$Vertical>
         {lootboxDescription ? (
           <$Vertical spacing={1}>

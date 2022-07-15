@@ -16,8 +16,12 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import styled from 'styled-components'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
+import useWords from 'lib/hooks/useWords'
+import { useIntl } from 'react-intl'
 
 const BattleFeed = () => {
+  const words = useWords()
+  const intl = useIntl()
   const { screen } = useWindowSize()
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [lastTournament, setLastTournament] = useState<null | string>(null)
@@ -34,10 +38,22 @@ const BattleFeed = () => {
     }
   )
 
+  const startsToday = intl.formatMessage({
+    id: 'battleFeed.msg.startsToday',
+    defaultMessage: 'Starts today',
+    description: 'Text indicating a tournament or something starts today',
+  })
+
+  const battleFinished = intl.formatMessage({
+    id: 'battleFeed.msg.battleFinished',
+    defaultMessage: 'Battle finished',
+    description: 'Text indicating a tournament is finished',
+  })
+
   if (error) {
-    return <Oopsies title="Error loading Battle Feed" message={error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.battleFeed?.__typename === 'ResponseError') {
-    return <Oopsies title="Error loading Battle Feed" message={data?.battleFeed?.error?.message || ''} icon="🤕" />
+    return <Oopsies title={words.anErrorOccured} message={data?.battleFeed?.error?.message || ''} icon="🤕" />
   }
 
   const { edges, pageInfo } = (data?.battleFeed as BattleFeedResponseSuccess) || {}
@@ -86,7 +102,7 @@ const BattleFeed = () => {
                           fontStyle: 'italic',
                         }}
                       >
-                        win
+                        {words.prize}
                       </$span>
                       <$span
                         style={{
@@ -128,9 +144,10 @@ const BattleFeed = () => {
                         color: `${COLORS.surpressedFontColor}5f`,
                         fontSize: TYPOGRAPHY.fontSize.small,
                         fontStyle: 'italic',
+                        textTransform: 'lowercase',
                       }}
                     >
-                      {daysDiff > 0 ? `in ${daysDiff} days` : daysDiff === 0 ? 'starts today' : 'battle finished'}
+                      {daysDiff > 0 ? words.inDays(daysDiff) : daysDiff === 0 ? startsToday : battleFinished}
                     </$span>
                   )}
                 </$Vertical>
@@ -155,9 +172,10 @@ const BattleFeed = () => {
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               color: COLORS.trustFontColor,
               backgroundColor: COLORS.trustBackground,
+              transform: 'capitalize',
             }}
           >
-            See More
+            {words.seeMore}
           </$Button>
         </div>
       )}

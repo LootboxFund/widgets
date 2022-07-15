@@ -481,6 +481,31 @@ const useWords = () => {
     description: 'Tooltip for creating a Party Basket',
   })
 
+  const win = intl.formatMessage({
+    id: 'generic.win',
+    defaultMessage: 'Win',
+    description: 'Indicating to win something like a challenge',
+  })
+
+  const inDays = (nDays: number): string => {
+    return intl.formatMessage(
+      {
+        id: 'socials.paybackDate',
+        defaultMessage: 'In {nDays} days',
+        description: 'Date countdown. For example, "In 3 days, the tournament starts"',
+      },
+      {
+        nDays,
+      }
+    )
+  }
+
+  const seeMore = intl.formatMessage({
+    id: 'generic.seeMore',
+    defaultMessage: 'See more',
+    description: 'Text indicating to see more',
+  })
+
   return {
     cancel,
     back,
@@ -560,6 +585,9 @@ const useWords = () => {
     partyBaskets,
     loginToMakePartyBasket,
     partyBasketInformation,
+    win,
+    inDays,
+    seeMore,
   }
 }
 
