@@ -4,13 +4,16 @@ import ReactDOM from 'react-dom'
 import AuthenticationPage from 'lib/components/Authentication/Authentication.page'
 import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
+import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
 export const inject = () => {
   const targetInjectionPoint = document.getElementById('authentication')
   ReactDOM.render(
     <React.StrictMode>
       <ApolloProvider client={client}>
-        <AuthenticationPage />
+        <LocalizationWrapper>
+          <AuthenticationPage />
+        </LocalizationWrapper>
       </ApolloProvider>
     </React.StrictMode>,
     targetInjectionPoint
