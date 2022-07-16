@@ -882,6 +882,7 @@ const $Datestamp = styled.span`
 
 export const $ManageLootboxHeading = styled.span<{ screen: ScreenSize }>`
   font-size: ${(props) => (props.screen === 'desktop' ? '2.2rem' : '1.5rem')};
+  line-height: ${(props) => (props.screen === 'desktop' ? '2.5rem' : '1.8rem')};
   font-weight: bold;
   color: ${COLORS.black};
 `
