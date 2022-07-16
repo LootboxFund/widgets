@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import QuickCreate, { QuickCreateProps } from 'lib/components/QuickCreate'
 import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 
