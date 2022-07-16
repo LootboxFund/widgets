@@ -372,6 +372,8 @@
   "profile.wallets.pleaseInstallMetamask": "Your MetaMask wallet is used as your web3 identity. You will need one to interact with the blockchain. You can {downloadMetamaskLink}.",
   "profile.wallets.searchByAddressText": "Search by address",
   "profile.welcomeUserMessage": "Welcome, {userName}",
+  "signatures.loginMessage": "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
+  "signatures.whitelistMessage": "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
   "socials.aboutLootbox": "About this Lootbox",
   "socials.discord.name": "Discord",
   "socials.discord.placeholder": "Discord Server",

@@ -34,15 +34,17 @@ import {
 import { Oopsies } from 'lib/components/Profile/common'
 import { NETWORK_OPTIONS } from 'lib/api/network'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import { getWhitelistQuerySignature } from 'lib/utils/signatureMessage'
+import { generateWhitelistQueryMessage } from 'lib/utils/signatureMessage'
 import { redeemNFT } from 'lib/api/redeemNFT'
 import $Button from 'lib/components/Generics/Button'
 import UserTicketsSimple from 'lib/components/UserTickets/UserTicketsSimple'
 import { ticketCardState } from 'lib/components/TicketCard/state'
 import { truncateAddress } from 'lib/api/helpers'
 import { manifest } from 'manifest'
-import useWords from 'lib/hooks/useWords'
+import useWords, { useSignatures } from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
+import { ethers } from 'ethers'
+import { v4 as uuidv4 } from 'uuid'
 
 interface RedeemBountyProps {
   basketAddress: Address
@@ -61,6 +63,7 @@ interface AuthSignature {
 const RedeemBounty = (props: RedeemBountyProps) => {
   const intl = useIntl()
   const words = useWords()
+  const signatureWords = useSignatures()
   const [provider] = useProvider()
   const { screen } = useWindowSize()
   const isMobile = screen === 'mobile'
@@ -191,11 +194,26 @@ const RedeemBounty = (props: RedeemBountyProps) => {
       try {
         const { metamask } = await getProvider()
 
-        // First get user signature
-        const { message, signature } = await getWhitelistQuerySignature({
-          partyBasketAddress: props.basketAddress,
-          currentAccount: snapUserState.currentAccount as Address,
-          metamask,
+        if (!snapUserState.currentAccount) {
+          throw new Error(words.connectWalletToMetamask)
+        }
+        if (!metamask) {
+          throw new Error(words.pleaseInstallMetamask)
+        }
+
+        const checksumAddress = ethers.utils.getAddress(snapUserState.currentAccount as unknown as string)
+
+        const message = generateWhitelistQueryMessage(
+          signatureWords.whitelistMessage,
+          checksumAddress as Address,
+          props.basketAddress,
+          uuidv4()
+        )
+
+        // @ts-ignore metamask is not typed...
+        const signature = await metamask.request({
+          method: 'personal_sign',
+          params: [message, snapUserState.currentAccount],
         })
 
         setAuthSignature({ message, signature })

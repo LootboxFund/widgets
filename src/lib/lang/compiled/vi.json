@@ -372,6 +372,8 @@
   "profile.wallets.pleaseInstallMetamask": "Ví MetaMask của bạn được sử dụng làm danh tính web3 của bạn. Bạn sẽ cần một cái để tương tác với blockchain. Bạn có thể {downloadMetamaskLink}.",
   "profile.wallets.searchByAddressText": "Tìm kiếm theo địa chỉ",
   "profile.welcomeUserMessage": "Chào mừng, {userName}",
+  "signatures.loginMessage": "Chào mừng! Ký tên vào tin nhắn này để đăng nhập vào Lootbox. Việc này không tốn bất cứ chi phí nào và không mất phí xăng.",
+  "signatures.whitelistMessage": "Ký tên vào tin nhắn này để xem bạn có thể đổi NFT MIỄN PHÍ từ Lootbox hay không! Việc này không tốn bất cứ chi phí nào và không mất phí xăng.",
   "socials.aboutLootbox": "Giới thiệu về Lootbox này",
   "socials.discord.name": "Discord",
   "socials.discord.placeholder": "Discord Server",
