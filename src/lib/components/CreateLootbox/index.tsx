@@ -53,7 +53,7 @@ import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
 import { TournamentID } from 'lib/types'
 import { InitialUrlParams } from './state'
-import { getWords } from './constants'
+import { useMagicWords } from './constants'
 import { FormattedMessage, useIntl } from 'react-intl'
 
 // Multiplies the fundraisingTarget by this value
@@ -102,6 +102,8 @@ const CreateLootbox = (props: CreateLootboxProps) => {
 
   const [initialUrlParams, setInitialUrlParams] = useState<InitialUrlParams | undefined>()
 
+  const magicWords = useMagicWords()
+
   const initFromUrlParams = async () => {
     const { INITIAL_URL_PARAMS } = extractURLState_CreateLootboxPage()
     console.log('------- INITIAL_URL_PARAMS -------')
@@ -115,38 +117,36 @@ const CreateLootbox = (props: CreateLootboxProps) => {
       : (NETWORK_OPTIONS[0] as NetworkOption)
 
     const {
-      magicNetworkText,
-      magicLootboxTypeText,
-      magicFundingTargetText,
-      magicFundingLimitText,
-      magicReceivingWalletText,
-      magicReturnsTargetText,
-      magicReturnsDateText,
       magicLogoImageText,
       magicCoverImageText,
       magicThemeColorText,
       magicCampaignBioText,
       magicCampaignWebsiteText,
       magicTournamentIdText,
-    } = getWords({
-      intl,
-      blockchain: {
-        chainName: networkOption.name,
-        nativeSymbol: networkOption.symbol,
-      },
-      lootboxType: INITIAL_URL_PARAMS.type
+    } = magicWords
+
+    const magicNetworkText = magicWords.magicNetworkText(networkOption.name)
+    const magicLootboxTypeText = magicWords.magicLootboxTypeText(
+      INITIAL_URL_PARAMS.type
         ? `${INITIAL_URL_PARAMS.type.charAt(0).toUpperCase() + INITIAL_URL_PARAMS.type.slice(1)}`
-        : '',
-      returnDate: INITIAL_URL_PARAMS.returnsDate || '',
-      returnsTarget: ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString(),
-      receivingWallet: INITIAL_URL_PARAMS.receivingWallet || '',
-      fundingLimit: parseFloat(
-        ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()
-      ).toFixed(4),
-      fundingTarget: parseFloat(
-        ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()
-      ).toFixed(4),
-    })
+        : ''
+    )
+    const magicFundingTargetText = magicWords.magicFundingTargetText(
+      parseFloat(ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingTarget || '0', '18').toString()).toFixed(4),
+      networkOption.symbol
+    )
+
+    const magicFundingLimitText = magicWords.magicFundingLimitText(
+      parseFloat(ethers.utils.formatUnits(INITIAL_URL_PARAMS.fundingLimit || '0', '18').toString()).toFixed(4),
+      networkOption.symbol
+    )
+
+    const magicReceivingWalletText = magicWords.magicReceivingWalletText(INITIAL_URL_PARAMS.receivingWallet || '')
+
+    const magicReturnsTargetText = magicWords.magicReturnsTargetText(
+      ethers.utils.formatUnits(INITIAL_URL_PARAMS.returnsTarget || '0', '2').toString()
+    )
+    const magicReturnsDateText = magicWords.magicReturnsDateText(INITIAL_URL_PARAMS.returnsDate || '')
 
     if (INITIAL_URL_PARAMS.network && validNetworks.includes(INITIAL_URL_PARAMS.network || '')) {
       const networkOption = matchNetworkByHex(INITIAL_URL_PARAMS.network)

@@ -18,7 +18,7 @@ import { $InputMedium } from '../StepCustomize'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { v4 as uuidv4 } from 'uuid'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { getWords } from '../constants'
+import { useMagicWords } from '../constants'
 
 export const validNetworks = NETWORK_OPTIONS.map(({ chainIdHex }) => chainIdHex)
 export const validTypes = ['escrow', 'instant', 'tournament']
@@ -61,6 +61,7 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const [includeTournamentId, setIncludeTournamentId] = useState(true)
   const [loading, setLoading] = useState(false)
   const intl = useIntl()
+  const magicWords = useMagicWords()
 
   const generateMagicLink = async () => {
     setLoading(true)
@@ -129,32 +130,35 @@ const StepMagicLink = (props: StepMagicLinkProps) => {
   const blockchain = BLOCKCHAINS[chainSlug] as ChainInfo
 
   const {
-    magicNetworkText,
-    magicLootboxTypeText,
-    magicFundingTargetText,
-    magicFundingLimitText,
-    magicReceivingWalletText,
-    magicReturnsTargetText,
-    magicReturnsDateText,
     magicLogoImageText,
     magicCoverImageText,
     magicThemeColorText,
     magicCampaignBioText,
     magicCampaignWebsiteText,
     magicTournamentIdText,
-  } = getWords({
-    intl,
-    blockchain: {
-      chainName: blockchain.chainName,
-      nativeSymbol: blockchain.nativeCurrency.symbol,
-    },
-    lootboxType: props.type ? `${props.type.charAt(0).toUpperCase() + props.type.slice(1)}` : '',
-    returnDate: props.returnsDate || '',
-    returnsTarget: ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString(),
-    receivingWallet: props.receivingWallet || '',
-    fundingLimit: parseFloat(ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()).toFixed(4),
-    fundingTarget: parseFloat(ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()).toFixed(4),
-  })
+  } = magicWords
+
+  const magicNetworkText = magicWords.magicNetworkText(blockchain.chainName)
+
+  const magicLootboxTypeText = magicWords.magicLootboxTypeText(
+    props.type ? `${props.type.charAt(0).toUpperCase() + props.type.slice(1)}` : ''
+  )
+  const magicFundingTargetText = magicWords.magicFundingTargetText(
+    parseFloat(ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()).toFixed(4),
+    blockchain.nativeCurrency.symbol
+  )
+
+  const magicFundingLimitText = magicWords.magicFundingLimitText(
+    parseFloat(ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()).toFixed(4),
+    blockchain.nativeCurrency.symbol
+  )
+
+  const magicReceivingWalletText = magicWords.magicReceivingWalletText(props.receivingWallet || '')
+
+  const magicReturnsTargetText = magicWords.magicReturnsTargetText(
+    ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString()
+  )
+  const magicReturnsDateText = magicWords.magicReturnsDateText(props.returnsDate || '')
 
   const generateMagicLinkButtonPrompt = intl.formatMessage({
     id: 'createLootbox.stepMagicLink.generateMagicLinkButtonPrompt',

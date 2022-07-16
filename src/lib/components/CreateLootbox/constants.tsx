@@ -1,114 +1,101 @@
-import { ChainInfo } from '@wormgraph/helpers'
-import { ethers } from 'ethers'
-import { IntlShape, useIntl } from 'react-intl'
+import { Address, ChainInfo } from '@wormgraph/helpers'
+import { useIntl } from 'react-intl'
 import { LootboxType } from './StepChooseType'
 
-interface BlockChainWords {
-  chainName: string
-  nativeSymbol: string
-}
+export const useMagicWords = () => {
+  const intl = useIntl()
 
-export const getWords = ({
-  intl,
-  blockchain,
-  lootboxType,
-  returnDate,
-  returnsTarget,
-  receivingWallet,
-  fundingLimit,
-  fundingTarget,
-}: {
-  intl: IntlShape
-  blockchain: BlockChainWords
-  lootboxType: LootboxType | string
-  returnDate: string
-  returnsTarget: string
-  receivingWallet: string
-  fundingLimit: string
-  fundingTarget: string
-}) => {
-  const magicNetworkText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.network',
-      defaultMessage: 'Network set to {network}',
-      description: 'Checklist item, displaying that the blockchain network has been already set when making a Lootbox',
-    },
-    { network: blockchain.chainName }
-  )
+  const magicNetworkText = (chainName: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.network',
+        defaultMessage: 'Network set to {network}',
+        description:
+          'Checklist item, displaying that the blockchain network has been already set when making a Lootbox',
+      },
+      // { network: blockchain.chainName }
+      { network: chainName }
+    )
 
-  const magicLootboxTypeText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.type',
-      defaultMessage: 'Funding type set to {type}',
-      description: 'Checklist item, displaying that the lootbox type has been already set when making a Lootbox',
-    },
-    {
-      type: lootboxType,
-    }
-  )
+  const magicLootboxTypeText = (lootboxType: LootboxType | string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.type',
+        defaultMessage: 'Funding type set to {type}',
+        description: 'Checklist item, displaying that the lootbox type has been already set when making a Lootbox',
+      },
+      {
+        type: lootboxType,
+      }
+    )
 
-  const magicFundingTargetText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.fundingTarget',
-      defaultMessage: 'Funding target set to {fundingTarget} {currency}',
-      description:
-        'Checklist item, displaying that the funding target has been already set when making a Lootbox. This is someithing like "10 ETH"',
-    },
-    {
-      //   fundingTarget: parseFloat(ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()).toFixed(4),
-      fundingTarget: fundingTarget,
-      currency: blockchain.nativeSymbol,
-    }
-  )
+  const magicFundingTargetText = (fundingTarget: string, nativeSymbol: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.fundingTarget',
+        defaultMessage: 'Funding target set to {fundingTarget} {currency}',
+        description:
+          'Checklist item, displaying that the funding target has been already set when making a Lootbox. This is someithing like "10 ETH"',
+      },
+      {
+        //   fundingTarget: parseFloat(ethers.utils.formatUnits(props.fundingTarget || '0', '18').toString()).toFixed(4),
+        fundingTarget: fundingTarget,
+        currency: nativeSymbol,
+      }
+    )
 
-  const magicFundingLimitText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.fundingLimit',
-      defaultMessage: 'Funding limit set to {fundingLimit} {currency}',
-      description:
-        'Checklist item, displaying that the funding limit has been already set when making a Lootbox. (Funding limit is different than funding target)',
-    },
-    {
-      //   fundingLimit: parseFloat(ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()).toFixed(4),
-      fundingLimit: fundingLimit,
-      currency: blockchain.nativeSymbol,
-    }
-  )
+  const magicFundingLimitText = (fundingLimit: string, nativeSymbol: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.fundingLimit',
+        defaultMessage: 'Funding limit set to {fundingLimit} {currency}',
+        description:
+          'Checklist item, displaying that the funding limit has been already set when making a Lootbox. (Funding limit is different than funding target)',
+      },
+      {
+        //   fundingLimit: parseFloat(ethers.utils.formatUnits(props.fundingLimit || '0', '18').toString()).toFixed(4),
+        fundingLimit: fundingLimit,
+        currency: nativeSymbol,
+      }
+    )
 
-  const magicReceivingWalletText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.receivingWallet',
-      defaultMessage: 'Receiving wallet set to {receivingWallet}',
-      description: 'Checklist item, displaying that the receiving wallet has been already set when making a Lootbox',
-    },
-    {
-      receivingWallet: receivingWallet,
-    }
-  )
+  const magicReceivingWalletText = (receivingWallet: Address | string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.receivingWallet',
+        defaultMessage: 'Receiving wallet set to {receivingWallet}',
+        description: 'Checklist item, displaying that the receiving wallet has been already set when making a Lootbox',
+      },
+      {
+        receivingWallet: receivingWallet,
+      }
+    )
 
-  const magicReturnsTargetText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.returnsTarget',
-      defaultMessage: 'Returns target set to {returnsTarget}%',
-      description:
-        'Checklist item, displaying that the returns target has been already set when making a Lootbox. This is a percentage.',
-    },
-    {
-      //   returnsTarget: ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString(),
-      returnsTarget: returnsTarget,
-    }
-  )
+  const magicReturnsTargetText = (returnsTarget: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.returnsTarget',
+        defaultMessage: 'Returns target set to {returnsTarget}%',
+        description:
+          'Checklist item, displaying that the returns target has been already set when making a Lootbox. This is a percentage.',
+      },
+      {
+        //   returnsTarget: ethers.utils.formatUnits(props.returnsTarget || '0', '2').toString(),
+        returnsTarget: returnsTarget,
+      }
+    )
 
-  const magicReturnsDateText = intl.formatMessage(
-    {
-      id: 'createLootbox.stepMagicLink.returnsDate',
-      defaultMessage: 'Returns date set to {returnsDate}',
-      description: 'Checklist item, displaying that the returns date has been already set when making a Lootbox.',
-    },
-    {
-      returnsDate: returnDate,
-    }
-  )
+  const magicReturnsDateText = (returnsDate: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.stepMagicLink.returnsDate',
+        defaultMessage: 'Returns date set to {returnsDate}',
+        description: 'Checklist item, displaying that the returns date has been already set when making a Lootbox.',
+      },
+      {
+        returnsDate: returnsDate,
+      }
+    )
 
   const magicLogoImageText = intl.formatMessage({
     id: 'createLootbox.stepMagicLink.logoImage',

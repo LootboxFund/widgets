@@ -615,4 +615,5 @@ export const useSignatures = () => {
     whitelistMessage,
   }
 }
+
 export default useWords
