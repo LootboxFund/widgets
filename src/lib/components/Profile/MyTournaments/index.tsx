@@ -94,7 +94,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
                 key={tournament.id}
                 justifyContent={screen === 'mobile' ? 'flex-start' : 'center'}
               >
-                <$span lineHeight="40px" style={{ paddingRight: '15px' }}>
+                <$span lineHeight="40px" style={{ paddingRight: '15px', whiteSpace: 'nowrap' }}>
                   <$Link
                     href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`}
                     style={{ textDecoration: 'none', fontStyle: 'normal', textTransform: 'lowercase' }}
@@ -102,7 +102,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
                     {words.view}
                   </$Link>
                 </$span>
-                <$span lineHeight="40px" style={{ paddingRight: '15px' }}>
+                <$span lineHeight="40px" style={{ paddingRight: '15px', whiteSpace: 'nowrap' }}>
                   <$Link
                     href={`${manifest.microfrontends.webflow.tournamentManagePage}?tid=${tournament.id}`}
                     style={{ textDecoration: 'none', fontStyle: 'normal', textTransform: 'lowercase' }}
@@ -119,7 +119,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
                       width="100%"
                       textAlign="center"
                       color={COLORS.dangerFontColor}
-                      style={{ cursor: 'pointer', textTransform: 'lowercase' }}
+                      style={{ cursor: 'pointer', textTransform: 'lowercase', whiteSpace: 'nowrap' }}
                     >
                       {words.remove}
                     </$span>

@@ -160,19 +160,27 @@ const ViewPartyBaskets = (props: ViewPartyBasketProps) => {
               </$Horizontal>
               <br />
               <$StepSubheading>
-                These are your Party Baskets for this Lootbox. Party Baskets hold onto Lootbox NFTs and allow you to
-                "whitelist" specific wallets, giving them special permission to redeem one of the NFTs from the Party
-                Basket for free.
+                <FormattedMessage
+                  id="lootbox.manage.viewPartyBaskets.partyBaskets.description"
+                  defaultMessage='These are your Party Baskets for this Lootbox. Party Baskets hold onto Lootbox NFTs and allow you to "whitelist" specific wallets, giving them special permission to redeem one of the NFTs from the Party Basket for free.'
+                />
                 <br />
                 <br />
-                This is an advanced feature. We recommend watching the tutorial video about it{' '}
-                <a
-                  style={{ textDecoration: 'none', display: 'contents' }}
-                  href="https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC"
-                  target="_blank"
-                >
-                  here.
-                </a>
+                <FormattedMessage
+                  id="lootbox.manage.viewPartyBaskets.partyBaskets.create"
+                  defaultMessage="This is an advanced feature. We recommend watching the tutorial video about it by {href}."
+                  values={{
+                    href: (
+                      <a
+                        style={{ textDecoration: 'none', display: 'contents' }}
+                        href="https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC"
+                        target="_blank"
+                      >
+                        {words.clickingHere}
+                      </a>
+                    ),
+                  }}
+                />
               </$StepSubheading>
               <br />
               <AuthGuard loginTitle="Login to View Party Baskets">

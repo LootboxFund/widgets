@@ -35,7 +35,7 @@ import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'
 import { throwInvalidPasswords } from 'lib/utils/password'
 import { useIntl } from 'react-intl'
-import useWords from 'lib/hooks/useWords'
+import useWords, { useSignatures } from 'lib/hooks/useWords'
 
 interface FrontendUser {
   id: UserID
@@ -54,6 +54,7 @@ export const useAuth = () => {
   const [user, setUser] = useState<FrontendUser | undefined | null>(undefined)
   const userStateSnapshot = useSnapshot(userState)
   const intl = useIntl()
+  const signatureWords = useSignatures()
 
   const [signUpWithWalletMutation] = useMutation<
     { createUserWithWallet: CreateUserResponse },
@@ -262,7 +263,7 @@ export const useAuth = () => {
     }
 
     const checksumAddress = ethers.utils.getAddress(userStateSnapshot.currentAccount as unknown as string)
-    const message = generateAuthSignatureMessage(checksumAddress as Address, uuidv4())
+    const message = generateAuthSignatureMessage(signatureWords.loginMessage, checksumAddress as Address, uuidv4())
     // @ts-ignore metamask is not typed...
     const result = await metamask.request({
       method: 'personal_sign',

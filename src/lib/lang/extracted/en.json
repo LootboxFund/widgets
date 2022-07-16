@@ -1217,6 +1217,12 @@
     "defaultMessage": "Party Baskets allow your community to redeem NFT bounties on their own, so you don't need to send it to them! You can bulk whitelist addresses for a Party Basket by clicking here.",
     "description": "Tooltip explaining what a Party Basket does"
   },
+  "lootbox.manage.viewPartyBaskets.partyBaskets.create": {
+    "defaultMessage": "This is an advanced feature. We recommend watching the tutorial video about it by {href}."
+  },
+  "lootbox.manage.viewPartyBaskets.partyBaskets.description": {
+    "defaultMessage": "These are your Party Baskets for this Lootbox. Party Baskets hold onto Lootbox NFTs and allow you to \"whitelist\" specific wallets, giving them special permission to redeem one of the NFTs from the Party Basket for free."
+  },
   "lootbox.manage.viewPartyBaskets.partyBaskets.tooltip": {
     "defaultMessage": "If you would like access to this Party Basket feature, email us at support@lootbox.fund",
     "description": "Tooltip explaining what a Party Basket is"
@@ -1479,6 +1485,14 @@
   },
   "profile.welcomeUserMessage": {
     "defaultMessage": "Welcome, {userName}"
+  },
+  "signatures.loginMessage": {
+    "defaultMessage": "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
+    "description": "Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message."
+  },
+  "signatures.whitelistMessage": {
+    "defaultMessage": "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
+    "description": "Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message"
   },
   "socials.aboutLootbox": {
     "defaultMessage": "About this Lootbox",

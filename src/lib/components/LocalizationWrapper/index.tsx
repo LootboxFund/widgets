@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react'
 import { IntlProvider } from 'react-intl'
 
 // TODO put in @helpers
-type Locale = 'en' | 'fr'
+type Locale = 'en' | 'vi'
 
 let initLocale: Locale = 'en'
 
-if (navigator.language === 'fr') {
-  initLocale = 'fr'
+if (navigator.language === 'vi') {
+  initLocale = 'vi'
 }
 
 const loadMessages = async (locale: Locale) => {
-  console.log('loading messages', locale)
   switch (locale) {
-    // case 'fr':
-    //   return import('lib/lang/compiled/fr.json')
+    case 'vi':
+      return import('lib/lang/compiled/vi.json')
     case 'en':
       return import('lib/lang/compiled/en.json')
     default:
@@ -39,6 +38,19 @@ type LocalizationWrapperProps = { children: JSX.Element }
 const LocalizationWrapper = ({ children }: LocalizationWrapperProps) => {
   const [locale, setLocale] = useState(initLocale)
   const [messages, setMessages] = useState<{ [key: string]: any } | null>(null)
+
+  useEffect(() => {
+    // Checks Weglot, which sets the language via Webflow
+    if (window && window?.Weglot) {
+      window.Weglot.on('languageChanged', (newLang: string, _oldLang: string) => {
+        setLocale(newLang?.toLowerCase() as Locale)
+      })
+    }
+
+    return () => {
+      window && window?.Weglot && window.Weglot.off('languageChanged')
+    }
+  }, [])
 
   useEffect(() => {
     loadMessages(locale).then((messages) => setMessages(messages.default))

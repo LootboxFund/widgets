@@ -42,9 +42,9 @@ const PublicTournament = (props: PublicTournamentProps) => {
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
-    return <Oopsies message={error?.message || ''} title="An error occured" icon="🤕" />
+    return <Oopsies message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   } else if (data?.tournament?.__typename === 'ResponseError') {
-    return <Oopsies message={data?.tournament?.error?.message || ''} title="An error occured" icon="🤕" />
+    return <Oopsies message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
   const { tournament } = data.tournament as TournamentResponseSuccess

@@ -591,4 +591,28 @@ const useWords = () => {
   }
 }
 
+export const useSignatures = () => {
+  const intl = useIntl()
+
+  const loginMessage = intl.formatMessage({
+    id: 'signatures.loginMessage',
+    defaultMessage:
+      "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message.',
+  })
+
+  const whitelistMessage = intl.formatMessage({
+    id: 'signatures.whitelistMessage',
+    defaultMessage:
+      "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message',
+  })
+
+  return {
+    loginMessage,
+    whitelistMessage,
+  }
+}
 export default useWords
