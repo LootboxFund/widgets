@@ -11,14 +11,29 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { TicketCardCandyWrapper } from 'lib/components/TicketCard/TicketCard'
 import { checkIfValidEmail, checkIfValidUrl } from 'lib/api/helpers'
 import { getSocials } from 'lib/hooks/constants'
+import { BigNumber } from 'bignumber.js'
 import { $SocialLogo } from '../CreateLootbox/StepSocials'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import $Button from '../Generics/Button'
 import Spinner from '../Generics/Spinner'
+import { NetworkOption } from 'lib/api/network'
+import { LootboxType } from 'lib/hooks/useContract'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
+import { createEscrowLootbox } from 'lib/api/createLootbox'
+import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
+import { useProvider } from 'lib/hooks/useWeb3Api'
+import { TournamentID } from '../../types/index'
+import { manifest } from '../../../manifest'
 
 export interface QuickCreateProps {
   tournamentName: string
-  themeColor: string
+  receivingWallet: Address
+  network: NetworkOption
+  fundraisingTarget: BigNumber
+  fundraisingLimit: BigNumber
+  // fundingType: LootboxType // only accepts escrow type
+  tournamentId: TournamentID
 }
 const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File; badgeFile?: File } = {
   name: '',
@@ -49,8 +64,13 @@ const QuickCreate = (props: QuickCreateProps) => {
   const { screen } = useWindowSize()
   const [ticketState, setTicketState] = useState(INITIAL_TICKET)
   const [themeColor, setThemeColor] = useState('')
-  const [submitStatus, setSubmitStatus] = useState<'unsubmitted' | 'loading' | 'error' | 'success'>('unsubmitted')
+  const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
+  const [provider, loading] = useProvider()
+  const [downloaded, setDownloaded] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const intl = useIntl()
+  const snapUserState = useSnapshot(userState)
+  const reputationWallet = (snapUserState.currentAccount || '') as Address
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const initialErrors: {
     name: string | React.ReactElement
@@ -79,7 +99,29 @@ const QuickCreate = (props: QuickCreateProps) => {
     email: '',
     submit: '',
   }
-  const INITIAL_SOCIALS: { [key: string]: any } = {
+  type socialKeys =
+    | 'twitter'
+    | 'email'
+    | 'instagram'
+    | 'tiktok'
+    | 'facebook'
+    | 'discord'
+    | 'youtube'
+    | 'snapchat'
+    | 'twitch'
+    | 'web'
+  const INITIAL_SOCIALS: {
+    twitter: string
+    email: string
+    instagram: string
+    tiktok: string
+    facebook: string
+    discord: string
+    youtube: string
+    snapchat: string
+    twitch: string
+    web: string
+  } = {
     twitter: '',
     email: '',
     instagram: '',
@@ -312,41 +354,41 @@ const QuickCreate = (props: QuickCreateProps) => {
   }
 
   const joinTournament = async () => {
-    setSubmitStatus('loading')
-    setTimeout(() => {
-      setSubmitStatus('success')
-      setErrors({
-        ...errors,
-        name: '',
-        // symbol: '',
-        biography: '',
-        lootboxThemeColor: '',
-        logoFile: '',
-        coverFile: '',
-        badgeFile: '',
-        logoUrl: '',
-        coverUrl: '',
-        submit: '',
-      })
-    }, 2000)
-    setTimeout(() => {
-      setSubmitStatus('error')
-      setErrors({
-        ...errors,
-        name: '',
-        // symbol: '',
-        biography: '',
-        lootboxThemeColor: '',
-        logoFile: '',
-        coverFile: '',
-        badgeFile: '',
-        logoUrl: '',
-        coverUrl: '',
-        submit: 'Submit Error',
-      })
-    }, 4000)
+    const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    console.log(snapUserState)
+    if (!snapUserState?.network?.currentNetworkIdHex) {
+      throw new Error('Network not set')
+    }
+    console.log(`Generating Escrow/Tournament Lootbox...`)
+    await createEscrowLootbox(
+      provider,
+      setSubmitStatus,
+      {
+        name: ticketState.name as string,
+        symbol: (ticketState.name as string).toUpperCase().replace(' ', ''),
+        biography: ticketState.biography as string,
+        lootboxThemeColor: ticketState.lootboxThemeColor as string,
+        logoFile: ticketState.logoFile as File,
+        coverFile: ticketState.coverFile as File,
+        logoUrl: ticketState.logoUrl as string,
+        coverUrl: ticketState.coverUrl as string,
+        badgeFile: ticketState.badgeFile as File,
+        fundraisingTarget: props.fundraisingTarget as BigNumber,
+        fundraisingTargetMax: props.fundraisingLimit as BigNumber,
+        receivingWallet: current as Address,
+        currentAccount: current as Address,
+        setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+        basisPoints: 1000, // hardcoded
+        returnAmountTarget: '0',
+        paybackDate: new Date().toString(),
+        downloaded,
+        setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+        tournamentId: props.tournamentId as TournamentID,
+      },
+      socialState,
+      snapUserState.network.currentNetworkIdHex
+    )
   }
-
   const renderButton = () => {
     const validProceed =
       !errors.name &&
@@ -358,12 +400,12 @@ const QuickCreate = (props: QuickCreateProps) => {
       ticketState.coverFile &&
       ticketState.logoFile &&
       ticketState.biography
-    if (submitStatus === 'loading') {
+    if (submitStatus === 'in_progress') {
       return (
         <$Button
           screen={screen}
-          backgroundColor={`${props.themeColor}30`}
-          backgroundColorHover={props.themeColor}
+          backgroundColor={`${props.network.themeColor}30`}
+          backgroundColorHover={props.network.themeColor}
           color={COLORS.white}
           style={{
             boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
@@ -375,10 +417,11 @@ const QuickCreate = (props: QuickCreateProps) => {
           disabled={true}
         >
           <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
+          Submitting
         </$Button>
       )
     }
-    if (submitStatus === 'success') {
+    if (submitStatus === 'success' && lootboxAddress) {
       return (
         <$Button
           screen={screen}
@@ -392,18 +435,21 @@ const QuickCreate = (props: QuickCreateProps) => {
             padding: '15px',
             borderRadius: '5px',
           }}
+          onClick={() =>
+            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`, '_blank')
+          }
         >
-          SUCCESSFULLY JOINED!
+          SUCCESS! VIEW LOOTBOX
         </$Button>
       )
     }
-    if (submitStatus === 'error') {
+    if (submitStatus === 'failure') {
       return (
         <$Button
           screen={screen}
           onClick={() => joinTournament()}
           backgroundColor={COLORS.dangerFontColor}
-          backgroundColorHover={props.themeColor}
+          backgroundColorHover={props.network.themeColor}
           color={COLORS.white}
           style={{
             boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
@@ -417,12 +463,33 @@ const QuickCreate = (props: QuickCreateProps) => {
         </$Button>
       )
     }
+    if (submitStatus === 'pending_confirmation') {
+      return (
+        <$Button
+          screen={screen}
+          backgroundColor={`${props.network.themeColor}30`}
+          backgroundColorHover={props.network.themeColor}
+          color={COLORS.white}
+          style={{
+            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+            fontWeight: TYPOGRAPHY.fontWeight.bold,
+            fontSize: TYPOGRAPHY.fontSize.large,
+            padding: '15px',
+            borderRadius: '5px',
+          }}
+          disabled={true}
+        >
+          <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
+          Pending Confirmation
+        </$Button>
+      )
+    }
     return (
       <$Button
         screen={screen}
         onClick={() => joinTournament()}
-        backgroundColor={validProceed ? props.themeColor : `${props.themeColor}30`}
-        backgroundColorHover={props.themeColor}
+        backgroundColor={validProceed ? props.network.themeColor : `${props.network.themeColor}30`}
+        backgroundColorHover={props.network.themeColor}
         color={COLORS.white}
         style={{
           boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
@@ -547,7 +614,7 @@ const QuickCreate = (props: QuickCreateProps) => {
                 <$SocialLogo src={social.icon} />
                 <$InputMedium
                   style={{ width: '100%' }}
-                  value={socialState[social.slug]}
+                  value={socialState[social.slug as socialKeys]}
                   onChange={(e) => parseSocial(social.slug, e.target.value)}
                   placeholder={social.placeholder}
                 ></$InputMedium>
@@ -657,8 +724,12 @@ const QuickCreate = (props: QuickCreateProps) => {
           <$Vertical justifyContent="center">
             {Object.values(errors)
               .filter((e) => e)
-              .map((err) => {
-                return <p style={{ color: COLORS.dangerFontColor, fontFamily: 'sans-serif' }}>{err}</p>
+              .map((err, index) => {
+                return (
+                  <p key={index} style={{ color: COLORS.dangerFontColor, fontFamily: 'sans-serif' }}>
+                    {err}
+                  </p>
+                )
               })}
           </$Vertical>
         </$Horizontal>

@@ -4,20 +4,80 @@ import { $Vertical, $Horizontal } from 'lib/components/Generics'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import { FormattedMessage } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
-import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import $Button from 'lib/components/Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
+import { NetworkOption } from 'lib/api/network'
+import { LootboxType } from 'lib/hooks/useContract'
+import { userState } from 'lib/state/userState'
+import { useSnapshot } from 'valtio'
+import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
+import { TournamentID } from 'lib/types'
+import { createEscrowLootbox } from 'lib/api/createLootbox'
+import { useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import BigNumber from 'bignumber.js'
 
 export interface RepeatCreateProps {
   tournamentName: string
   themeColor: string
+  network: NetworkOption
+  fundraisingTarget: string
+  fundraisingLimit: string
+  fundingType: LootboxType
+  tournamentId: TournamentID
+}
+const INITIAL_TICKET: Record<string, string | number> & { logoFile?: File; coverFile?: File; badgeFile?: File } = {
+  name: '',
+  symbol: '',
+  biography: '',
+  lootboxThemeColor: '#000000',
+  // logoFile?: File
+  // coverFile?: File
+  // badgeFile?: File
 }
 const RepeatCreate = (props: RepeatCreateProps) => {
   const { screen } = useWindowSize()
-  const [submitStatus, setSubmitStatus] = useState<'unsubmitted' | 'loading' | 'error' | 'success'>('unsubmitted')
+  const snapUserState = useSnapshot(userState)
+  const [downloaded, setDownloaded] = useState(false)
+  const [provider, loading] = useProvider()
+  const web3Utils = useWeb3Utils()
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const [chosenLootbox, setChosenLootbox] = useState<Address>()
   const [errorMessages, setErrorMessages] = useState<string[]>([])
+  const [ticketState, setTicketState] = useState(INITIAL_TICKET)
+  const [receivingWallet, setReceivingWallet] = useState<Address | undefined>(
+    (snapUserState.currentAccount || undefined) as Address
+  )
+  const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
+  const reputationWallet = (snapUserState.currentAccount || '') as Address
+
+  const [fundraisingTarget, setFundraisingTarget] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const [fundraisingLimit, setFundraisingLimit] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
+  const INITIAL_SOCIALS: {
+    twitter: string
+    email: string
+    instagram: string
+    tiktok: string
+    facebook: string
+    discord: string
+    youtube: string
+    snapchat: string
+    twitch: string
+    web: string
+  } = {
+    twitter: '',
+    email: '',
+    instagram: '',
+    tiktok: '',
+    facebook: '',
+    discord: '',
+    youtube: '',
+    snapchat: '',
+    twitch: '',
+    web: '',
+  }
+  const [socialState, setSocialState] = useState(INITIAL_SOCIALS)
   const pastLootboxes = [
     {
       chain: {
@@ -56,18 +116,43 @@ const RepeatCreate = (props: RepeatCreateProps) => {
     },
   ]
   const joinTournament = async () => {
-    setSubmitStatus('loading')
-    setTimeout(() => {
-      setSubmitStatus('success')
-      setErrorMessages([])
-    }, 2000)
-    setTimeout(() => {
-      setSubmitStatus('error')
-      setErrorMessages(['Something went wrong'])
-    }, 4000)
+    setSubmitStatus('in_progress')
+    const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
+    if (!snapUserState?.network?.currentNetworkIdHex) {
+      throw new Error('Network not set')
+    }
+    console.log(`Generating Escrow/Tournament Lootbox...`)
+    await createEscrowLootbox(
+      provider,
+      setSubmitStatus,
+      {
+        name: ticketState.name as string,
+        symbol: ticketState.symbol as string,
+        biography: ticketState.biography as string,
+        lootboxThemeColor: ticketState.lootboxThemeColor as string,
+        logoFile: ticketState.logoFile as File,
+        coverFile: ticketState.coverFile as File,
+        logoUrl: ticketState.logoUrl as string,
+        coverUrl: ticketState.coverUrl as string,
+        badgeFile: ticketState.badgeFile as File,
+        fundraisingTarget: fundraisingTarget as BigNumber,
+        fundraisingTargetMax: fundraisingLimit as BigNumber,
+        receivingWallet: receivingWallet as Address,
+        currentAccount: current as Address,
+        setLootboxAddress: (address: ContractAddress) => setLootboxAddress(address),
+        basisPoints: 1000, // hardcoded
+        returnAmountTarget: '0',
+        paybackDate: new Date().toString(),
+        downloaded,
+        setDownloaded: (downloaded: boolean) => setDownloaded(downloaded),
+        tournamentId: props.tournamentId as TournamentID,
+      },
+      socialState,
+      snapUserState.network.currentNetworkIdHex
+    )
   }
   const renderButton = () => {
-    if (submitStatus === 'loading') {
+    if (submitStatus === 'in_progress') {
       return (
         <$Button
           screen={screen}
@@ -84,6 +169,7 @@ const RepeatCreate = (props: RepeatCreateProps) => {
           disabled={true}
         >
           <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
+          Submitting
         </$Button>
       )
     }
@@ -106,7 +192,30 @@ const RepeatCreate = (props: RepeatCreateProps) => {
         </$Button>
       )
     }
-    if (submitStatus === 'error') {
+    if (submitStatus === 'pending_confirmation') {
+      return (
+        <$Button
+          screen={screen}
+          backgroundColor={`${props.themeColor}30`}
+          backgroundColorHover={props.themeColor}
+          color={COLORS.white}
+          style={{
+            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+            fontWeight: TYPOGRAPHY.fontWeight.bold,
+            fontSize: TYPOGRAPHY.fontSize.large,
+            padding: '15px',
+            borderRadius: '5px',
+          }}
+          disabled={true}
+        >
+          <$Horizontal justifyContent="center">
+            <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
+            Pending Confirmation
+          </$Horizontal>
+        </$Button>
+      )
+    }
+    if (submitStatus === 'failure') {
       return (
         <$Button
           screen={screen}
@@ -179,6 +288,7 @@ const RepeatCreate = (props: RepeatCreateProps) => {
                 themeColor={props.themeColor}
                 blurred={blurred}
                 chosen={chosenLootbox === lootbox.chain.address}
+                key={lootbox.chain.address}
               >
                 <img
                   src={lootbox.image}
