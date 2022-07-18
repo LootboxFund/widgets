@@ -4,6 +4,7 @@ import { GET_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { TournamentID } from 'lib/types'
+import Modal from 'react-modal'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -21,6 +22,7 @@ import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { tournamentWords as getTournamentWords } from '../common'
 import { useIntl } from 'react-intl'
+import QuickCreate from 'lib/components/QuickCreate'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -31,6 +33,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
   const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
     variables: {
@@ -118,11 +121,22 @@ const PublicTournament = (props: PublicTournamentProps) => {
         templateAction={
           tournament.magicLink
             ? () => {
-                window.open(`${tournament.magicLink}`, '_self')
+                setCreateModalOpen(true)
+                // window.open(`${tournament.magicLink}`, '_self')
               }
             : undefined
         }
       />
+      <Modal
+        isOpen={createModalOpen}
+        onAfterOpen={() => console.log('onAfterOpen')}
+        onRequestClose={() => setCreateModalOpen(false)}
+        contentLabel="Create Lootbox Modal"
+      >
+        <h2>Hello</h2>
+        <button onClick={() => setCreateModalOpen(false)}>close</button>
+        <div>I am a modal</div>
+      </Modal>
     </$Vertical>
   )
 }

@@ -25,8 +25,7 @@ export const $HideTings = styled.div<{ isHidden: boolean }>`
   );`
       : 'none'};
   display: ${(props) => (props.isHidden ? 'auto' : 'none')};
-  };
-  `
+`
 
 const $DescriptionContainer = styled.div`
   position: relative;

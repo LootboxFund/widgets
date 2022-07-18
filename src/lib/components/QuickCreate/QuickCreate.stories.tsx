@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import QuickCreate, { QuickCreateProps } from 'lib/components/QuickCreate'
 import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 import { ContractAddress } from '@wormgraph/helpers'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import Modal from 'react-modal'
 
 export default {
   title: 'QuickCreate',
@@ -23,17 +24,51 @@ const network = {
 }
 const Demo = (args: QuickCreateProps) => {
   const web3Utils = useWeb3Utils()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   return (
-    <LocalizationWrapper>
-      <QuickCreate
-        {...args}
-        tournamentName={'3PG Axie Tournament'}
-        network={network}
-        fundraisingLimit={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
-        fundraisingTarget={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
-      />
-    </LocalizationWrapper>
+    <div>
+      <LocalizationWrapper>
+        <QuickCreate
+          {...args}
+          tournamentName={'3PG Axie Tournament'}
+          network={network}
+          fundraisingLimit={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
+          fundraisingTarget={web3Utils.toBN(web3Utils.toWei('1', 'ether'))}
+        />
+      </LocalizationWrapper>
+      <button onClick={() => setCreateModalOpen(true)}>Open Modal</button>
+      <Modal
+        isOpen={createModalOpen}
+        onAfterOpen={() => console.log('onAfterOpen')}
+        onRequestClose={() => setCreateModalOpen(false)}
+        style={customStyles}
+        contentLabel="Create Lootbox Modal"
+      >
+        <h2>Hello</h2>
+        <button onClick={() => setCreateModalOpen(false)}>close</button>
+        <div>I am a modal</div>
+      </Modal>
+    </div>
   )
+}
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+  overlay: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+  },
 }
 
 export const Basic = Demo.bind({})

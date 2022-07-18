@@ -40,6 +40,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
   }
 
   const handleSignUpWithEmailAndPassword = async () => {
+    console.log('handleSignUpWithEmailAndPassword...')
     setLoading(true)
     try {
       await signUpWithEmailAndPassword(email, password, passwordConfirmation)

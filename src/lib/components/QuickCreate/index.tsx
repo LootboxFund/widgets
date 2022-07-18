@@ -15,9 +15,7 @@ import { BigNumber } from 'bignumber.js'
 import { $SocialLogo } from '../CreateLootbox/StepSocials'
 import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import $Button from '../Generics/Button'
-import Spinner from '../Generics/Spinner'
 import { NetworkOption } from 'lib/api/network'
-import { LootboxType } from 'lib/hooks/useContract'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { createEscrowLootbox } from 'lib/api/createLootbox'
@@ -66,6 +64,8 @@ const QuickCreate = (props: QuickCreateProps) => {
   const [themeColor, setThemeColor] = useState('')
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [provider, loading] = useProvider()
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const [timeElapsed, setTimeElapsed] = useState<number>(0)
   const [downloaded, setDownloaded] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const intl = useIntl()
@@ -136,6 +136,32 @@ const QuickCreate = (props: QuickCreateProps) => {
   const [socialState, setSocialState] = useState(INITIAL_SOCIALS)
   const SOCIALS = getSocials(intl)
   const [errors, setErrors] = useState(initialErrors)
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setTimeLeft(null)
+    }
+    if (!timeLeft) return
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeLeft])
+
+  useEffect(() => {
+    if (timeElapsed === 0) {
+      return
+    }
+    const intervalId = setInterval(() => {
+      setTimeElapsed(timeElapsed + 1)
+    }, 1000)
+    return () => clearInterval(intervalId)
+  }, [timeElapsed])
+  useEffect(() => {
+    if (submitStatus === 'success') {
+      setTimeElapsed(0)
+      setTimeLeft(20) // set the timer
+    }
+  }, [submitStatus])
   const updateTicketState = (slug: string, value: string | number) => {
     setTicketState({ ...ticketState, [slug]: value })
   }
@@ -354,6 +380,7 @@ const QuickCreate = (props: QuickCreateProps) => {
   }
 
   const joinTournament = async () => {
+    setTimeElapsed(1) // set the timer
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     console.log(snapUserState)
     if (!snapUserState?.network?.currentNetworkIdHex) {
@@ -416,32 +443,70 @@ const QuickCreate = (props: QuickCreateProps) => {
           }}
           disabled={true}
         >
-          <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
-          Submitting
+          <FormattedMessage
+            id="step.terms.submit.pending-submissino"
+            defaultMessage="... submitting ({timeElapsed})"
+            description="Message shown to user when they are waiting for they Lootbox to be made"
+            values={{ timeElapsed: timeElapsed }}
+          />
         </$Button>
       )
     }
     if (submitStatus === 'success' && lootboxAddress) {
-      return (
-        <$Button
-          screen={screen}
-          backgroundColor={COLORS.successFontColor}
-          backgroundColorHover={COLORS.successFontColor}
-          color={COLORS.white}
-          style={{
-            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-            fontWeight: TYPOGRAPHY.fontWeight.bold,
-            fontSize: TYPOGRAPHY.fontSize.large,
-            padding: '15px',
-            borderRadius: '5px',
-          }}
-          onClick={() =>
-            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`, '_blank')
-          }
-        >
-          SUCCESS! VIEW LOOTBOX
-        </$Button>
-      )
+      if (timeLeft && timeLeft > 0) {
+        return (
+          <$Button
+            screen={screen}
+            backgroundColor={COLORS.successFontColor}
+            backgroundColorHover={COLORS.successFontColor}
+            color={COLORS.white}
+            style={{
+              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+              fontWeight: TYPOGRAPHY.fontWeight.bold,
+              fontSize: TYPOGRAPHY.fontSize.large,
+              padding: '15px',
+              borderRadius: '5px',
+            }}
+            onClick={() =>
+              window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`, '_blank')
+            }
+          >
+            <FormattedMessage
+              id="step.terms.submit.success-preparing"
+              defaultMessage="... Preparing your Lootbox ({timeLeft})"
+              description="Success message shown to user when create Lootbox succeeds"
+              values={{
+                timeLeft: timeLeft,
+              }}
+            />
+          </$Button>
+        )
+      } else {
+        return (
+          <$Button
+            screen={screen}
+            backgroundColor={COLORS.successFontColor}
+            backgroundColorHover={COLORS.successFontColor}
+            color={COLORS.white}
+            style={{
+              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+              fontWeight: TYPOGRAPHY.fontWeight.bold,
+              fontSize: TYPOGRAPHY.fontSize.large,
+              padding: '15px',
+              borderRadius: '5px',
+            }}
+            onClick={() =>
+              window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`, '_blank')
+            }
+          >
+            <FormattedMessage
+              id="step.terms.submit.success"
+              defaultMessage="View Your Lootbox"
+              description="Success message shown to user when create Lootbox succeeds"
+            />
+          </$Button>
+        )
+      }
     }
     if (submitStatus === 'failure') {
       return (
@@ -459,7 +524,11 @@ const QuickCreate = (props: QuickCreateProps) => {
             borderRadius: '5px',
           }}
         >
-          FAILURE! TRY AGAIN?
+          <FormattedMessage
+            id="step.terms.submit.failed"
+            defaultMessage="Failed, try again?"
+            description="Failure message shown to user when create Lootbox fails"
+          />
         </$Button>
       )
     }
@@ -479,8 +548,11 @@ const QuickCreate = (props: QuickCreateProps) => {
           }}
           disabled={true}
         >
-          <Spinner color={`${COLORS.surpressedFontColor}ae`} size="15px" margin="auto" />
-          Pending Confirmation
+          <FormattedMessage
+            id="step.terms.submit.metamask-confirmation"
+            defaultMessage="Confirm on MetaMask"
+            description="Message shown to user when they need to confirm the transaction on MetaMask"
+          />
         </$Button>
       )
     }
@@ -500,194 +572,227 @@ const QuickCreate = (props: QuickCreateProps) => {
         }}
         disabled={!validProceed}
       >
-        JOIN TOURNAMENT
+        <FormattedMessage
+          id="quickCreateLootbox.singleStep.button.joinTournament"
+          defaultMessage="Join Tournament"
+          description="Submit button to quick create Lootbox and join a tournament"
+        />
       </$Button>
     )
   }
 
   return (
     <$QuickCreate>
-      <div
-        style={
-          isMobile
-            ? {
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                paddingBottom: '20px',
-                flex: 1,
-                width: '100%',
-              }
-            : {
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-              }
-        }
+      <$Horizontal
+        justifyContent="center"
+        verticalCenter
+        style={{
+          backgroundColor: props.network.themeColor,
+          color: COLORS.white,
+          marginBottom: '20px',
+          padding: '20px',
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          borderRadius: '15px 15px 0px 0px',
+        }}
       >
-        <$Vertical flex={isMobile ? 1 : 0.55}>
-          <$StepHeading>
-            <FormattedMessage
-              id="createLootbox.customizeTicket.title"
-              defaultMessage="5. Customize NFT Ticket"
-              description="Header for 5th step in creating a Lootbox"
-            />
-            <HelpIcon tipID="stepCustomize" />
-            <ReactTooltip id="stepCustomize" place="right" effect="solid">
+        <FormattedMessage
+          id="quickCreateLootbox.singleStep.heading"
+          defaultMessage="Join Lootbox Tournament"
+          values={{ tournamentName: props.tournamentName }}
+          description="Header for quickly creating a Lootbox to join a tournament"
+        />
+      </$Horizontal>
+      <$InnerLining>
+        <div
+          style={
+            isMobile
+              ? {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  paddingBottom: '20px',
+                  flex: 1,
+                  width: '100%',
+                }
+              : {
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                }
+          }
+        >
+          <$Vertical flex={isMobile ? 1 : 0.55}>
+            <$StepHeading>
               <FormattedMessage
-                id="createLootbox.customizeTicket.subHeading"
-                defaultMessage="Finally, an NFT that's actually useful 😂"
-                description="Sub-header for 5th step in creating a Lootbox"
+                id="quickCreateLootbox.singleStep.heading"
+                defaultMessage="Join Lootbox Tournament"
+                values={{ tournamentName: props.tournamentName }}
+                description="Header for quickly creating a Lootbox to join a tournament"
               />
-            </ReactTooltip>
-          </$StepHeading>
-          <$StepSubheading>
-            <FormattedMessage
-              id="createLootbox.customizeTicket.subHeading2"
-              defaultMessage="Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox."
-              description="Sub-header for 5th step in creating a Lootbox"
-            />
-          </$StepSubheading>
-          <br />
-          <br />
-          <$StepSubheading>
-            <FormattedMessage
-              id="createLootbox.customizeTicket.inputName"
-              defaultMessage="Lootbox Name"
-              description="Label for name input in 5th step in creating a Lootbox - this is a name for the Lootbox"
-            />
-            <HelpIcon tipID="lootboxName" />
-            <ReactTooltip id="lootboxName" place="right" effect="solid">
+              <HelpIcon tipID="quickCreateLootboxHeader" />
+              <ReactTooltip id="quickCreateLootboxHeader" place="right" effect="solid">
+                <FormattedMessage
+                  id="quickCreateLootbox.singleStep.headingTooltip"
+                  defaultMessage="Quickly create a Lootbox by joining a tournament with its predefined settings."
+                  description="Info tooltip for quickly creating a Lootbox"
+                />
+              </ReactTooltip>
+            </$StepHeading>
+            <$StepSubheading>
               <FormattedMessage
-                id="createLootbox.customizeTicket.inputName.toolTip"
-                defaultMessage="The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce confusion."
-                description="Tooltip for name input in 5th step in creating a Lootbox"
+                id="quickCreateLootbox.singleStep.subheadingDescription"
+                defaultMessage="Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox."
+                description="Info statement about quickly creating a Lootbox"
               />
-            </ReactTooltip>
-          </$StepSubheading>
-          <$InputMedium maxLength={30} onChange={(e) => parseInput('name', e.target.value)} value={ticketState.name} />
-          <br />
-          <$StepSubheading>
-            <FormattedMessage
-              id="createLootbox.customizeTicket.inputBiography"
-              defaultMessage="Biography"
-              description="Label for biography input. This is a field the user can input a description of their Lootbox."
-            />
-            <HelpIcon tipID="ticketBiography" />
-            <ReactTooltip id="ticketBiography" place="right" effect="solid">
+            </$StepSubheading>
+            <br />
+            <br />
+            <$StepSubheading>
               <FormattedMessage
-                id="createLootbox.customizeTicket.inputBiography.tooltip"
-                defaultMessage="Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for."
-                description="tooltip for people who might be confused about what the Lootbox biography field is"
+                id="createLootbox.customizeTicket.inputName"
+                defaultMessage="Lootbox Name"
+                description="Label for name input creating a Lootbox - this is a name for the Lootbox"
               />
-            </ReactTooltip>
-          </$StepSubheading>
-          <$TextAreaMedium
-            onChange={(e) => parseInput('biography', e.target.value)}
-            value={ticketState.biography}
-            rows={6}
-            maxLength={500}
-          />
-          <br />
-          <br />
-          <$StepSubheading>
-            <FormattedMessage
-              id="createLootbox.customizeTicket.inputBiography"
-              defaultMessage="Biography"
-              description="Label for biography input. This is a field the user can input a description of their Lootbox."
+              <HelpIcon tipID="lootboxName" />
+              <ReactTooltip id="lootboxName" place="right" effect="solid">
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.inputName.toolTip"
+                  defaultMessage="The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce confusion."
+                  description="Tooltip for name input in creating a Lootbox"
+                />
+              </ReactTooltip>
+            </$StepSubheading>
+            <$InputMedium
+              maxLength={30}
+              onChange={(e) => parseInput('name', e.target.value)}
+              value={ticketState.name}
             />
-            <HelpIcon tipID="ticketBiography" />
-            <ReactTooltip id="ticketBiography" place="right" effect="solid">
+            <br />
+            <$StepSubheading>
               <FormattedMessage
-                id="createLootbox.customizeTicket.inputBiography.tooltip"
-                defaultMessage="Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for."
-                description="tooltip for people who might be confused about what the Lootbox biography field is"
+                id="createLootbox.customizeTicket.inputBiography"
+                defaultMessage="Biography"
+                description="Label for biography input. This is a field the user can input a description of their Lootbox."
               />
-            </ReactTooltip>
-          </$StepSubheading>
-          {SOCIALS.filter((s) => ['email', 'discord', 'twitch', 'facebook'].includes(s.slug)).map((social) => {
-            return (
-              <$Horizontal
-                key={social.slug}
-                style={screen === 'mobile' ? { marginBottom: '10px' } : { marginTop: '10px' }}
-              >
-                <$SocialLogo src={social.icon} />
-                <$InputMedium
-                  style={{ width: '100%' }}
-                  value={socialState[social.slug as socialKeys]}
-                  onChange={(e) => parseSocial(social.slug, e.target.value)}
-                  placeholder={social.placeholder}
-                ></$InputMedium>
-              </$Horizontal>
-            )
-          })}
-        </$Vertical>
-        <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
-          <TicketCardCandyWrapper
-            backgroundImage={(ticketState.coverUrl as string) || INITIAL_COVER}
-            logoImage={(ticketState.logoUrl as string) || INITAL_LOGO}
-            badgeImage={ticketState.badgeUrl as string}
-            themeColor={ticketState.lootboxThemeColor as string}
-            name={ticketState.name as string}
-            screen={screen}
-          />
-          <br />
-          <$Horizontal flexWrap={screen === 'mobile'} style={{ flexDirection: screen === 'mobile' ? 'column' : 'row' }}>
-            <$Vertical>
-              {/* <$ColorPreview
+              <HelpIcon tipID="ticketBiography" />
+              <ReactTooltip id="ticketBiography" place="right" effect="solid">
+                <FormattedMessage
+                  id="createLootbox.customizeTicket.inputBiography.tooltip"
+                  defaultMessage="Write a 3-5 sentence introduction of yourself"
+                  description="tooltip for people who might be confused about what the Lootbox biography field is"
+                />
+              </ReactTooltip>
+            </$StepSubheading>
+            <$TextAreaMedium
+              onChange={(e) => parseInput('biography', e.target.value)}
+              value={ticketState.biography}
+              rows={6}
+              maxLength={500}
+            />
+            <br />
+            <br />
+            <$StepSubheading>
+              <FormattedMessage
+                id="quickCreateLootbox.singleStep.socials"
+                defaultMessage="Socials"
+                description="Label for user socials so that tournament organizers and fans can contact or follow them."
+              />
+              <HelpIcon tipID="ticketSocials" />
+              <ReactTooltip id="ticketSocials" place="right" effect="solid">
+                <FormattedMessage
+                  id="quickCreateLootbox.singleStep.socials.tooltip"
+                  defaultMessage="Provide your teams social media so that tournament organizers and fans can contact or follow you."
+                  description="Tooltip for socials section in Quick Create Lootbox"
+                />
+              </ReactTooltip>
+            </$StepSubheading>
+            {SOCIALS.filter((s) => ['email', 'discord', 'twitch', 'facebook'].includes(s.slug)).map((social) => {
+              return (
+                <$Horizontal
+                  key={social.slug}
+                  style={screen === 'mobile' ? { marginBottom: '10px' } : { marginTop: '10px' }}
+                >
+                  <$SocialLogo src={social.icon} />
+                  <$InputMedium
+                    style={{ width: '100%' }}
+                    value={socialState[social.slug as socialKeys]}
+                    onChange={(e) => parseSocial(social.slug, e.target.value)}
+                    placeholder={social.placeholder}
+                  ></$InputMedium>
+                </$Horizontal>
+              )
+            })}
+          </$Vertical>
+          <$Vertical flex={isMobile ? 1 : 0.45} style={isMobile ? { flexDirection: 'column-reverse' } : undefined}>
+            <TicketCardCandyWrapper
+              backgroundImage={(ticketState.coverUrl as string) || INITIAL_COVER}
+              logoImage={(ticketState.logoUrl as string) || INITAL_LOGO}
+              badgeImage={ticketState.badgeUrl as string}
+              themeColor={ticketState.lootboxThemeColor as string}
+              name={ticketState.name as string}
+              screen={screen}
+            />
+            <br />
+            <$Horizontal
+              flexWrap={screen === 'mobile'}
+              style={{ flexDirection: screen === 'mobile' ? 'column' : 'row' }}
+            >
+              <$Vertical>
+                {/* <$ColorPreview
                 
                     color={ticketState.lootboxThemeColor as string}
                     onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
                   /> */}
-              <br />
-              <$Vertical>
-                <$InputImageLabel htmlFor="logo-uploader">
-                  <FormattedMessage
-                    id="createLootbox.customizeTicket.inputLogo.prompt"
-                    defaultMessage="{icon} Upload Logo"
-                    description="Label for input field for Lootbox logo (image file)"
-                    values={{
-                      icon: ticketState.logoFile || ticketState.logoUrl ? '✅' : '⚠️',
-                    }}
+                <br />
+                <$Vertical>
+                  <$InputImageLabel htmlFor="logo-uploader">
+                    <FormattedMessage
+                      id="createLootbox.customizeTicket.inputLogo.prompt"
+                      defaultMessage="{icon} Upload Logo"
+                      description="Label for input field for Lootbox logo (image file)"
+                      values={{
+                        icon: ticketState.logoFile || ticketState.logoUrl ? '✅' : '⚠️',
+                      }}
+                    />
+                  </$InputImageLabel>
+                  <$InputImage
+                    type="file"
+                    id="logo-uploader"
+                    accept="image/*"
+                    onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
                   />
-                </$InputImageLabel>
-                <$InputImage
-                  type="file"
-                  id="logo-uploader"
-                  accept="image/*"
-                  onChange={() => onImageInputChange('logo-uploader', 'logoFile')}
-                />
-              </$Vertical>
-              <br />
-              <$Vertical>
-                <$InputImageLabel htmlFor="cover-uploader">
-                  <FormattedMessage
-                    id="createLootbox.customizeTicket.inputCover.prompt"
-                    defaultMessage="{icon} Upload Cover"
-                    description="Label for input field for Lootbox cover file (image file)"
-                    values={{
-                      icon: ticketState.coverFile || ticketState.coverUrl ? '✅' : '⚠️',
-                    }}
+                </$Vertical>
+                <br />
+                <$Vertical>
+                  <$InputImageLabel htmlFor="cover-uploader">
+                    <FormattedMessage
+                      id="createLootbox.customizeTicket.inputCover.prompt"
+                      defaultMessage="{icon} Upload Cover"
+                      description="Label for input field for Lootbox cover file (image file)"
+                      values={{
+                        icon: ticketState.coverFile || ticketState.coverUrl ? '✅' : '⚠️',
+                      }}
+                    />
+                  </$InputImageLabel>
+                  <$InputImage
+                    type="file"
+                    id="cover-uploader"
+                    accept="image/*"
+                    onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
                   />
-                </$InputImageLabel>
-                <$InputImage
-                  type="file"
-                  id="cover-uploader"
-                  accept="image/*"
-                  onChange={() => onImageInputChange('cover-uploader', 'coverFile')}
+                </$Vertical>
+                <br />
+                <$InputMedium
+                  value={ticketState.lootboxThemeColor}
+                  onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
+                  style={{
+                    width: '120px',
+                    textAlign: 'center',
+                    border: ticketState.lootboxThemeColor ? `${ticketState.lootboxThemeColor} solid 2px ` : '',
+                  }}
                 />
-              </$Vertical>
-              <br />
-              <$InputMedium
-                value={ticketState.lootboxThemeColor}
-                onChange={(e) => parseInput('lootboxThemeColor', e.target.value)}
-                style={{
-                  width: '120px',
-                  textAlign: 'center',
-                  border: ticketState.lootboxThemeColor ? `${ticketState.lootboxThemeColor} solid 2px ` : '',
-                }}
-              />
-              {/* <$Vertical>
+                {/* <$Vertical>
                   <$InputImageLabel
                     onClick={(e) => {
                       if (ticketState.badgeFile) {
@@ -707,33 +812,34 @@ const QuickCreate = (props: QuickCreateProps) => {
                     onChange={() => onImageInputChange('badge-uploader', 'badgeFile')}
                   />
                 </$Vertical> */}
-            </$Vertical>
-            <$Vertical>
-              <$Vertical flex={1}>
-                <div id="color-picker" />
               </$Vertical>
+              <$Vertical>
+                <$Vertical flex={1}>
+                  <div id="color-picker" />
+                </$Vertical>
+              </$Vertical>
+            </$Horizontal>
+          </$Vertical>
+        </div>
+        <br />
+        <br />
+        <$Vertical>
+          {renderButton()}
+          <$Horizontal justifyContent="center">
+            <$Vertical justifyContent="center">
+              {Object.values(errors)
+                .filter((e) => e)
+                .map((err, index) => {
+                  return (
+                    <p key={index} style={{ color: COLORS.dangerFontColor, fontFamily: 'sans-serif' }}>
+                      {err}
+                    </p>
+                  )
+                })}
             </$Vertical>
           </$Horizontal>
         </$Vertical>
-      </div>
-      <br />
-      <br />
-      <$Vertical>
-        {renderButton()}
-        <$Horizontal justifyContent="center">
-          <$Vertical justifyContent="center">
-            {Object.values(errors)
-              .filter((e) => e)
-              .map((err, index) => {
-                return (
-                  <p key={index} style={{ color: COLORS.dangerFontColor, fontFamily: 'sans-serif' }}>
-                    {err}
-                  </p>
-                )
-              })}
-          </$Vertical>
-        </$Horizontal>
-      </$Vertical>
+      </$InnerLining>
     </$QuickCreate>
   )
 }
@@ -744,6 +850,10 @@ const $QuickCreate = styled.div<{}>`
   max-width: 700px;
   border-radius: 15px;
   box-shadow: 0px 4px 4px rgb(0 0 0 / 10%);
+`
+
+const $InnerLining = styled.div<{}>`
+  font-family: 'Roboto', sans-serif;
   padding: 20px;
 `
 

@@ -601,6 +601,38 @@
     "defaultMessage": "Funding type set to {type}",
     "description": "Checklist item, displaying that the lootbox type has been already set when making a Lootbox"
   },
+  "quickCreateLootbox.singleStep.heading": {
+    "defaultMessage": "Join {tournamentName}",
+    "description": "Join Tournament"
+  },
+  "quickCreateLootbox.singleStep.headingTooltip": {
+    "defaultMessage": "Quickly create a Lootbox by joining a tournament with its predefined settings.",
+    "description": "Tooltip for quickly creating a Lootbox by joining a tournament with its predefined settings."
+  },
+  "quickCreateLootbox.singleStep.subheadingDescription": {
+    "defaultMessage": "Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox.",
+    "description": "Question about what the quick create Lootbox widget does"
+  },
+  "quickCreateLootbox.singleStep.socials": {
+    "defaultMessage": "Socials (optional)",
+    "description": "Label for socials section"
+  },
+  "quickCreateLootbox.singleStep.socials.tooltip": {
+    "defaultMessage": "Provide your teams social media so that tournament organizers and fans can contact or follow you.",
+    "description": "Tooltip for socials section in Quick Create Lootbox"
+  },
+  "quickCreateLootbox.singleStep.button.joinTournament": {
+    "defaultMessage": "Join Tournament",
+    "description": "Submit button to quick create Lootbox and join a tournament"
+  },
+  "quickCreateLootbox.singleStep.________": {
+    "defaultMessage": "Lorem Ipsum",
+    "description": "Lorem Ipsum"
+  },
+  "quickCreateLootbox.singleStep.________": {
+    "defaultMessage": "Lorem Ipsum",
+    "description": "Lorem Ipsum"
+  },
   "fundraisingBar.help.template": {
     "defaultMessage": "This is the target funding goal of the gamer.",
     "description": "Template message for user displayed with the Lootbox fundraising goals"
