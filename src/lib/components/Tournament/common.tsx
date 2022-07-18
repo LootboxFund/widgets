@@ -110,8 +110,9 @@ interface LootboxListProps {
   lootboxes: LootboxTournamentSnapshot[]
   screen: ScreenSize
   templateAction?: () => void
+  magicLink: string
 }
-export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction }: LootboxListProps) => {
+export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction, magicLink }: LootboxListProps) => {
   const intl = useIntl()
   const words = useWords()
   const [searchTerm, setSearchTerm] = useState('')
@@ -167,13 +168,27 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction 
       />
       <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
         {!!templateAction && screen !== 'mobile' && (
-          <$PlaceHolderLootboxListItem screen={screen} onClick={templateAction}>
-            <$Vertical justifyContent="center" height="100%" spacing={3}>
+          <$PlaceHolderLootboxListItem screen={screen}>
+            <$Vertical justifyContent="center" height="100%" spacing={3} onClick={templateAction}>
               <$PlusIcon screen={screen} />
               <$h3 color={`${COLORS.surpressedFontColor}ae`} textAlign="center" style={{ textTransform: 'uppercase' }}>
                 {words.createNew}
               </$h3>
             </$Vertical>
+            <$Horizontal justifyContent="center" style={{ marginTop: '20px' }}>
+              <a
+                href={magicLink}
+                target="_blank"
+                style={{
+                  fontFamily: 'sans-serif',
+                  textAlign: 'center',
+                  margin: 'auto',
+                  color: COLORS.surpressedBackground,
+                }}
+              >
+                {words.advancedCreate}
+              </a>
+            </$Horizontal>
           </$PlaceHolderLootboxListItem>
         )}
         {lootboxes.length === 0 ? (

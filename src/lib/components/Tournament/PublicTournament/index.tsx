@@ -173,14 +173,13 @@ const PublicTournament = (props: PublicTournamentProps) => {
           tournament.magicLink
             ? () => {
                 setCreateModalOpen(true)
-                // window.open(`${tournament.magicLink}`, '_self')
               }
             : undefined
         }
+        magicLink={tournament.magicLink || ''}
       />
       <Modal
         isOpen={createModalOpen}
-        onAfterOpen={() => console.log('onAfterOpen')}
         onRequestClose={() => setCreateModalOpen(false)}
         contentLabel="Create Lootbox Modal"
         style={customStyles}
@@ -193,7 +192,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
         </$Horizontal>
         <QuickCreate
           tournamentName={tournament.title}
-          tournamentId={tournament.id as TournamentID}
+          tournamentId={magicLinkParams.tournamentId as TournamentID}
           receivingWallet={magicLinkParams.receivingWallet as Address}
           network={network}
           fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}

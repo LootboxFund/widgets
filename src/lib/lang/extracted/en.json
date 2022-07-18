@@ -625,14 +625,6 @@
     "defaultMessage": "Join Tournament",
     "description": "Submit button to quick create Lootbox and join a tournament"
   },
-  "quickCreateLootbox.singleStep.________": {
-    "defaultMessage": "Lorem Ipsum",
-    "description": "Lorem Ipsum"
-  },
-  "quickCreateLootbox.singleStep.________": {
-    "defaultMessage": "Lorem Ipsum",
-    "description": "Lorem Ipsum"
-  },
   "fundraisingBar.help.template": {
     "defaultMessage": "This is the target funding goal of the gamer.",
     "description": "Template message for user displayed with the Lootbox fundraising goals"
@@ -728,6 +720,10 @@
   "generic.createNew": {
     "defaultMessage": "Create new",
     "description": "Generic user action to create a new something"
+  },
+  "generic.advancedCreate": {
+    "defaultMessage": "Advanced Create",
+    "description": "Generic user action to create a new something with advanced options"
   },
   "generic.description": {
     "defaultMessage": "Description",

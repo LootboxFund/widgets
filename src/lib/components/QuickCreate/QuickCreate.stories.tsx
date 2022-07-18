@@ -31,7 +31,6 @@ const Demo = (args: QuickCreateProps) => {
       <button onClick={() => setCreateModalOpen(true)}>Open Modal</button>
       <Modal
         isOpen={createModalOpen}
-        onAfterOpen={() => console.log('onAfterOpen')}
         onRequestClose={() => setCreateModalOpen(false)}
         style={customStyles}
         contentLabel="Create Lootbox Modal"
