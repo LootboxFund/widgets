@@ -20,9 +20,10 @@ import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { createEscrowLootbox } from 'lib/api/createLootbox'
 import { SubmitStatus } from '../CreateLootbox/StepTermsConditions'
-import { useProvider } from 'lib/hooks/useWeb3Api'
+import { addCustomEVMChain, useProvider } from 'lib/hooks/useWeb3Api'
 import { TournamentID } from '../../types/index'
 import { manifest } from '../../../manifest'
+import useWords from 'lib/hooks/useWords'
 
 export interface QuickCreateProps {
   tournamentName: string
@@ -69,6 +70,7 @@ const QuickCreate = (props: QuickCreateProps) => {
   const [downloaded, setDownloaded] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('unsubmitted')
   const intl = useIntl()
+  const words = useWords()
   const snapUserState = useSnapshot(userState)
   const reputationWallet = (snapUserState.currentAccount || '') as Address
   const isMobile = screen === 'mobile' || screen === 'tablet'
@@ -427,6 +429,28 @@ const QuickCreate = (props: QuickCreateProps) => {
       ticketState.coverFile &&
       ticketState.logoFile &&
       ticketState.biography
+    if (snapUserState.network.currentNetworkIdHex !== props.network.chainIdHex) {
+      return (
+        <$Button
+          screen={screen}
+          backgroundColor={`${props.network.themeColor}`}
+          backgroundColorHover={props.network.themeColor}
+          color={COLORS.white}
+          style={{
+            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+            fontWeight: TYPOGRAPHY.fontWeight.bold,
+            fontSize: TYPOGRAPHY.fontSize.large,
+            padding: '15px',
+            borderRadius: '5px',
+          }}
+          onClick={async () => {
+            await addCustomEVMChain(props.network.chainIdHex)
+          }}
+        >
+          {words.switchNetwork}
+        </$Button>
+      )
+    }
     if (submitStatus === 'in_progress') {
       return (
         <$Button
