@@ -226,6 +226,7 @@ export const useAuth = () => {
         },
       },
     })
+
     if (!data) {
       throw new Error(words.anErrorOccured)
     } else if (data?.createUserWithPassword?.__typename === 'ResponseError') {

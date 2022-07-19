@@ -310,7 +310,6 @@ export const createEscrowLootbox = async (
   if (!chain) {
     throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
   }
-
   const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts[chainIdHex]?.LootboxEscrowFactory
     ?.address as unknown as ContractAddress
 
@@ -333,11 +332,13 @@ export const createEscrowLootbox = async (
   }
 
   const submissionId = uuidv4()
+
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
     args.logoFile ? uploadLootboxLogo(submissionId, args.logoFile) : (args.logoUrl as string),
     args.coverFile ? uploadLootboxCover(submissionId, args.coverFile) : (args.coverUrl as string),
     args.badgeFile ? uploadLootboxBadge(submissionId, args.badgeFile) : null,
   ])
+
   /**
    * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
    * an event listener.

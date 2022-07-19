@@ -288,6 +288,12 @@ const useWords = () => {
     description: 'Generic user action to create a new something',
   })
 
+  const advancedCreate = intl.formatMessage({
+    id: 'generic.advancedCreate',
+    defaultMessage: 'Advanced Create',
+    description: 'Generic user action to create a new something in full',
+  })
+
   const clickingHere = intl.formatMessage({
     id: 'generic.clickingHere',
     defaultMessage: 'Clicking here',
@@ -552,6 +558,7 @@ const useWords = () => {
     watchTutorial,
     createMagicLink,
     createNew,
+    advancedCreate,
     clickingHere,
     learnMore,
     notFound,

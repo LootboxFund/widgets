@@ -4,6 +4,7 @@ import { GET_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { TournamentID } from 'lib/types'
+import Modal from 'react-modal'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -15,12 +16,15 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
-import { initDApp } from 'lib/hooks/useWeb3Api'
-import { COLORS } from '@wormgraph/helpers'
+import { initDApp, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { Address, COLORS } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { tournamentWords as getTournamentWords } from '../common'
 import { useIntl } from 'react-intl'
+import QuickCreate from 'lib/components/QuickCreate'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
+import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -30,7 +34,10 @@ interface PublicTournamentProps {
 const PublicTournament = (props: PublicTournamentProps) => {
   const intl = useIntl()
   const words = useWords()
+  const web3Utils = useWeb3Utils()
+  const [network, setNetwork] = useState<NetworkOption>()
   const { screen } = useWindowSize()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
     variables: {
@@ -48,6 +55,51 @@ const PublicTournament = (props: PublicTournamentProps) => {
   }
 
   const { tournament } = data.tournament as TournamentResponseSuccess
+
+  const url = new URL(tournament.magicLink || '')
+  const magicLinkParams: InitialUrlParams = {
+    network: url.searchParams.get('network'),
+    type: url.searchParams.get('type'),
+    fundingTarget: url.searchParams.get('fundingTarget'),
+    fundingLimit: url.searchParams.get('fundingLimit'),
+    receivingWallet: url.searchParams.get('receivingWallet'),
+    returnsTarget: url.searchParams.get('returnsTarget'),
+    returnsDate: url.searchParams.get('returnsDate'),
+    logoImage: url.searchParams.get('logoImage'),
+    coverImage: url.searchParams.get('coverImage'),
+    campaignBio: url.searchParams.get('campaignBio'),
+    campaignWebsite: url.searchParams.get('campaignWebsite'),
+    themeColor: url.searchParams.get('themeColor'),
+    tournamentId: url.searchParams.get('tournamentId'),
+  }
+
+  const networkOption = matchNetworkByHex(magicLinkParams.network as string)
+  if (!network && networkOption) {
+    setNetwork(networkOption)
+  }
+
+  if (tournament.magicLink && !network) {
+    return <span>No network detected</span>
+  }
+
+  const customStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+  }
 
   return (
     <$Vertical spacing={4} width="100%" maxWidth="1000px">
@@ -118,11 +170,35 @@ const PublicTournament = (props: PublicTournamentProps) => {
         templateAction={
           tournament.magicLink
             ? () => {
-                window.open(`${tournament.magicLink}`, '_self')
+                setCreateModalOpen(true)
               }
             : undefined
         }
+        magicLink={tournament.magicLink || ''}
       />
+      {network && (
+        <Modal
+          isOpen={createModalOpen}
+          onRequestClose={() => setCreateModalOpen(false)}
+          contentLabel="Create Lootbox Modal"
+          style={customStyles}
+        >
+          <$Horizontal
+            justifyContent="flex-end"
+            style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <span onClick={() => setCreateModalOpen(false)}>X</span>
+          </$Horizontal>
+          <QuickCreate
+            tournamentName={tournament.title}
+            tournamentId={magicLinkParams.tournamentId as TournamentID}
+            receivingWallet={magicLinkParams.receivingWallet as Address}
+            network={network}
+            fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
+            fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
+          />
+        </Modal>
+      )}
     </$Vertical>
   )
 }
