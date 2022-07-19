@@ -244,6 +244,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                 }
               : undefined
           }
+          magicLink={tournament.magicLink || ''}
         />
       )}
 
