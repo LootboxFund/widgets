@@ -75,18 +75,18 @@ const QuickCreate = (props: QuickCreateProps) => {
   const reputationWallet = (snapUserState.currentAccount || '') as Address
   const isMobile = screen === 'mobile' || screen === 'tablet'
   const initialErrors: {
-    name: string | React.ReactElement
-    // symbol: string | React.ReactElement
-    biography: string | React.ReactElement
-    lootboxThemeColor: string | React.ReactElement
-    logoUrl: string | React.ReactElement
-    coverUrl: string | React.ReactElement
-    badgeUrl: string | React.ReactElement
-    logoFile: string | React.ReactElement
-    coverFile: string | React.ReactElement
-    badgeFile: string | React.ReactElement
-    email: string | React.ReactElement
-    submit: string | React.ReactElement
+    name: string
+    // symbol: string
+    biography: string
+    lootboxThemeColor: string
+    logoUrl: string
+    coverUrl: string
+    badgeUrl: string
+    logoFile: string
+    coverFile: string
+    badgeFile: string
+    email: string
+    submit: string
   } = {
     name: '',
     // symbol: '',
@@ -197,13 +197,11 @@ const QuickCreate = (props: QuickCreateProps) => {
         valid = false
         setErrors({
           ...errors,
-          logoFile: (
-            <FormattedMessage
-              id="createLootbox.stepCustomize.logoFile.error"
-              defaultMessage="Please upload a logo image"
-              description="Error message for user if they forgot to upload a logo file (image file)"
-            />
-          ),
+          logoFile: intl.formatMessage({
+            id: 'createLootbox.stepCustomize.logoFile.error',
+            defaultMessage: 'Please upload a logo imag',
+            description: 'Error message for user if they forgot to upload a logo file (image file)',
+          }),
         })
         return
       }
@@ -211,13 +209,11 @@ const QuickCreate = (props: QuickCreateProps) => {
         valid = false
         setErrors({
           ...errors,
-          coverFile: (
-            <FormattedMessage
-              id="createLootbox.stepCustomize.coverFile.error"
-              defaultMessage="Please upload a cover photo"
-              description="Error message for user if they forgot to upload a cover file (image file)"
-            />
-          ),
+          coverFile: intl.formatMessage({
+            id: 'createLootbox.stepCustomize.coverFile.error',
+            defaultMessage: 'Please upload a cover photo',
+            description: 'Error message for user if they forgot to upload a cover file (image file)',
+          }),
         })
         return
       }
@@ -245,15 +241,13 @@ const QuickCreate = (props: QuickCreateProps) => {
     if (slug === 'name') {
       setErrors({
         ...errors,
-        name: validateName(value as string) ? (
-          ''
-        ) : (
-          <FormattedMessage
-            id="createLootbox.stepCustomize.name.error"
-            defaultMessage="Name cannot be empty"
-            description="Error message for user if they forgot to enter a name for their Lootbox"
-          />
-        ),
+        name: validateName(value as string)
+          ? ''
+          : intl.formatMessage({
+              id: 'createLootbox.stepCustomize.name.error',
+              defaultMessage: 'Name cannot be empty',
+              description: 'Error message for user if they forgot to enter a name for their Lootbox',
+            }),
       })
     }
     // if (slug === 'symbol') {
@@ -273,29 +267,26 @@ const QuickCreate = (props: QuickCreateProps) => {
     if (slug === 'biography') {
       setErrors({
         ...errors,
-        biography: validateBiography(value as string) ? (
-          ''
-        ) : (
-          <FormattedMessage
-            id="createLootbox.stepCustomize.biography.error"
-            defaultMessage="Biography must be at least 12 characters"
-            description="Error message for user if they forgot to enter a valid biography for their Lootbox"
-          />
-        ),
+        biography: validateBiography(value as string)
+          ? ''
+          : intl.formatMessage({
+              id: 'createLootbox.stepCustomize.biography.error',
+              defaultMessage: 'Biography must be at least 12 characters',
+              description: 'Error message for user if they forgot to enter a valid biography for their Lootbox',
+            }),
       })
     }
     if (slug === 'lootboxThemeColor') {
       setErrors({
         ...errors,
-        lootboxThemeColor: validateThemeColor(value as string) ? (
-          ''
-        ) : (
-          <FormattedMessage
-            id="createLootbox.stepCustomize.themeColor.error"
-            defaultMessage="Theme color must be a valid hex color"
-            description="Error message for user if they forgot to enter a valid themecolor which should be HEX format (i.e. #fefefe)"
-          />
-        ),
+        lootboxThemeColor: validateThemeColor(value as string)
+          ? ''
+          : intl.formatMessage({
+              id: 'createLootbox.stepCustomize.themeColor.error',
+              defaultMessage: 'Theme color must be a valid hex color',
+              description:
+                'Error message for user if they forgot to enter a valid themecolor which should be HEX format (i.e. #fefefe)',
+            }),
       })
     }
   }
@@ -306,24 +297,20 @@ const QuickCreate = (props: QuickCreateProps) => {
       if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
-          email: (
-            <FormattedMessage
-              id="step.socials.email.invalid"
-              defaultMessage="Invalid email"
-              description="When a user enters an invalid email address, this message is shown."
-            />
-          ),
+          email: intl.formatMessage({
+            id: 'step.socials.email.invalid',
+            defaultMessage: 'Invalid email',
+            description: 'When a user enters an invalid email address, this message is shown.',
+          }),
         })
       } else if (value.length === 0) {
         setErrors({
           ...errors,
-          email: (
-            <FormattedMessage
-              id="step.socials.email.empty"
-              defaultMessage="Email is mandatory"
-              description="When a user does not enter an email address, this message is shown."
-            />
-          ),
+          email: intl.formatMessage({
+            id: 'step.socials.email.empty',
+            defaultMessage: 'Email is mandatory',
+            description: 'When a user does not enter an email address, this message is shown.',
+          }),
         })
       } else {
         setErrors({
@@ -334,13 +321,11 @@ const QuickCreate = (props: QuickCreateProps) => {
     } else if (!socialState.email) {
       setErrors({
         ...errors,
-        email: (
-          <FormattedMessage
-            id="step.socials.email.empty2"
-            defaultMessage="Email is mandatory"
-            description="When a user does not enter an email address, this message is shown."
-          />
-        ),
+        email: intl.formatMessage({
+          id: 'step.socials.email.empty2',
+          defaultMessage: 'Email is mandatory',
+          description: 'When a user does not enter an email address, this message is shown.',
+        }),
       })
     }
   }
@@ -394,7 +379,7 @@ const QuickCreate = (props: QuickCreateProps) => {
       setSubmitStatus,
       {
         name: ticketState.name as string,
-        symbol: (ticketState.name as string).toUpperCase().replace(' ', ''),
+        symbol: (ticketState.name as string).toUpperCase().replace(' ', '').slice(0, 9),
         biography: ticketState.biography as string,
         lootboxThemeColor: ticketState.lootboxThemeColor as string,
         logoFile: ticketState.logoFile as File,
@@ -763,11 +748,6 @@ const QuickCreate = (props: QuickCreateProps) => {
               style={{ flexDirection: screen === 'mobile' ? 'column' : 'row' }}
             >
               <$Vertical>
-                {/* <$ColorPreview
-                
-                    color={ticketState.lootboxThemeColor as string}
-                    onClick={() => window.open('https://htmlcolorcodes.com/color-picker/', '_blank')}
-                  /> */}
                 <br />
                 <$Vertical>
                   <$InputImageLabel htmlFor="logo-uploader">

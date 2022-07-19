@@ -310,14 +310,9 @@ export const createEscrowLootbox = async (
   if (!chain) {
     throw new Error(`Chain not found for chainIdHex: ${chainIdHex}`)
   }
-  console.log(provider)
-  console.log(args)
-  console.log(socials)
-  console.log(manifest.lootbox)
-  console.log(chainIdHex)
   const LOOTBOX_ESCROW_FACTORY_ADDRESS = manifest.lootbox.contracts[chainIdHex]?.LootboxEscrowFactory
     ?.address as unknown as ContractAddress
-  console.log(`LOOTBOX_ESCROW_FACTORY_ADDRESS = ${LOOTBOX_ESCROW_FACTORY_ADDRESS}`)
+
   if (!LOOTBOX_ESCROW_FACTORY_ADDRESS) {
     throw new Error('Could not find lootbox escrow factory address')
   }
@@ -335,15 +330,15 @@ export const createEscrowLootbox = async (
   if (!args.logoFile && !args.logoUrl) {
     throw new Error('Missing logo file')
   }
-  console.log('Hello world 1')
+
   const submissionId = uuidv4()
-  console.log('Hello world 2')
+
   const [imagePublicPath, backgroundPublicPath, badgePublicPath] = await Promise.all([
     args.logoFile ? uploadLootboxLogo(submissionId, args.logoFile) : (args.logoUrl as string),
     args.coverFile ? uploadLootboxCover(submissionId, args.coverFile) : (args.coverUrl as string),
     args.badgeFile ? uploadLootboxBadge(submissionId, args.badgeFile) : null,
   ])
-  console.log('Hello world 3')
+
   /**
    * Send a stringified JSON into the creation method. This will be parsed in the backend when it gets picked up by
    * an event listener.
@@ -405,9 +400,9 @@ export const createEscrowLootbox = async (
       },
     },
   }
-  console.log('Hello world 4')
+
   const blockNum = await provider.getBlockNumber()
-  console.log('Hello world 5')
+
   const targetSharesSold = args.fundraisingTarget
     .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .div(new web3Utils.BN(SHARE_PRICE_WEI))
@@ -417,11 +412,11 @@ export const createEscrowLootbox = async (
     .mul(new web3Utils.BN('10').pow(new web3Utils.BN(SHARE_PRICE_WEI_DECIMALS)))
     .div(new web3Utils.BN(SHARE_PRICE_WEI))
     .toString()
-  console.log('Hello world 6')
+
   const ethers = ethersObj
   const signer = await provider.getSigner()
   const lootboxEscrow = new ethers.Contract(LOOTBOX_ESCROW_FACTORY_ADDRESS, LOOTBOX_ESCROW_FACTORY_ABI, signer)
-  console.log('Hello world 7')
+
   try {
     console.log(`
     

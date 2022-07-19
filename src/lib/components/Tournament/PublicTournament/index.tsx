@@ -23,8 +23,6 @@ import useWords from 'lib/hooks/useWords'
 import { tournamentWords as getTournamentWords } from '../common'
 import { useIntl } from 'react-intl'
 import QuickCreate from 'lib/components/QuickCreate'
-import { userState } from 'lib/state/userState'
-import { useSnapshot } from 'valtio'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
 
@@ -80,7 +78,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
     setNetwork(networkOption)
   }
 
-  if (!network) {
+  if (tournament.magicLink && !network) {
     return <span>No network detected</span>
   }
 
@@ -178,27 +176,29 @@ const PublicTournament = (props: PublicTournamentProps) => {
         }
         magicLink={tournament.magicLink || ''}
       />
-      <Modal
-        isOpen={createModalOpen}
-        onRequestClose={() => setCreateModalOpen(false)}
-        contentLabel="Create Lootbox Modal"
-        style={customStyles}
-      >
-        <$Horizontal
-          justifyContent="flex-end"
-          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+      {network && (
+        <Modal
+          isOpen={createModalOpen}
+          onRequestClose={() => setCreateModalOpen(false)}
+          contentLabel="Create Lootbox Modal"
+          style={customStyles}
         >
-          <span onClick={() => setCreateModalOpen(false)}>X</span>
-        </$Horizontal>
-        <QuickCreate
-          tournamentName={tournament.title}
-          tournamentId={magicLinkParams.tournamentId as TournamentID}
-          receivingWallet={magicLinkParams.receivingWallet as Address}
-          network={network}
-          fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
-          fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
-        />
-      </Modal>
+          <$Horizontal
+            justifyContent="flex-end"
+            style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <span onClick={() => setCreateModalOpen(false)}>X</span>
+          </$Horizontal>
+          <QuickCreate
+            tournamentName={tournament.title}
+            tournamentId={magicLinkParams.tournamentId as TournamentID}
+            receivingWallet={magicLinkParams.receivingWallet as Address}
+            network={network}
+            fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
+            fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
+          />
+        </Modal>
+      )}
     </$Vertical>
   )
 }
