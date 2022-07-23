@@ -19,7 +19,7 @@ import { $ErrorMessage, $InputLabel, $InputMedium, $TextAreaMedium, $TournamentC
 import { $CoverImage, $InputImage, $InputImageLabel } from '../CreateTournament'
 import { uploadTournamentCover } from 'lib/api/firebase/storage'
 import { useIntl } from 'react-intl'
-import { tournamentWords as getTournamentWords } from '../common'
+import { useTournamentWords } from '../common'
 import useWords from 'lib/hooks/useWords'
 
 interface EditTournamentProps {
@@ -40,7 +40,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
   >(EDIT_TOURNAMENT)
   const words = useWords()
   const intl = useIntl()
-  const tournamentWords = getTournamentWords(intl)
+  const tournamentWords = useTournamentWords()
 
   const saveChangesText = intl.formatMessage({
     id: 'tournament.manage.saveChanges',
@@ -170,7 +170,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
   return (
     <AuthGuard>
       <$Vertical
-        spacing={5}
+        spacing={4}
         width="100%"
         style={{
           background: '#FFFFFF',

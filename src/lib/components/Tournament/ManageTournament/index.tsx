@@ -1,7 +1,7 @@
 import AuthGuard from '../../AuthGuard'
-import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3 } from '../../Generics'
+import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3, $p } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { LootboxList, $SearchInput, $TournamentCover } from '../common'
+import { LootboxList, $SearchInput, $TournamentCover, StreamList } from '../common'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
@@ -12,7 +12,7 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { useQuery } from '@apollo/client'
 import { GET_MY_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
-import { TournamentID } from 'lib/types'
+import { StreamID, TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
@@ -22,7 +22,10 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { tournamentWords as getTournamentWords } from '../common'
+import { useTournamentWords } from '../common'
+import AddStream from './AddStream'
+
+const LEARN_MORE_STREAM_LINK = 'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'
 
 interface ManageTournamentProps {
   tournamentId: TournamentID
@@ -42,7 +45,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
     }
   )
 
-  const tournamentWords = getTournamentWords(intl)
+  const tournamentWords = useTournamentWords()
   const noLootboxesText = intl.formatMessage({
     id: 'tournament.manage.noLootboxes.text',
     defaultMessage: 'No Lootboxes',
@@ -198,10 +201,48 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   <FormattedMessage
                     id="tournament.edit.createMagicLink.help.step2"
                     defaultMessage="2) Update your tournament with the Magic Link by 👉 {hyperlink}"
-                    description=""
+                    description="Message to the user to update their tournament with a magic link"
                     values={{
                       hyperlink: (
                         <$Link fontStyle="italic" href={'#input-magic'} style={{ textTransform: 'lowercase' }}>
+                          {words.clickingHere}
+                        </$Link>
+                      ),
+                    }}
+                  />
+                </$span>
+              }
+            />
+          </div>
+        )}
+
+        {(!tournament.streams || tournament.streams.length === 0) && (
+          <div style={{ paddingBottom: '15px' }}>
+            <Oopsies
+              title={words.addLiveStream}
+              icon="🎥"
+              message={
+                <$span>
+                  <FormattedMessage
+                    id="tournament.manage.addLiveStream.message1"
+                    defaultMessage="Live Streams let people watch your tournament in real-time! {learnMoreHyperLink}"
+                    values={{
+                      learnMoreHyperLink: (
+                        <$Link fontStyle="italic" href={LEARN_MORE_STREAM_LINK} target="_blank">
+                          {words.learnMore}.
+                        </$Link>
+                      ),
+                    }}
+                  />
+                  <br />
+                  <br />
+                  <FormattedMessage
+                    id="tournament.manage.addLiveStream.message2"
+                    defaultMessage="Update your tournament with a Live Stream by 👉 {hyperlink}"
+                    description="Message to the user to update their tournament with a live stream"
+                    values={{
+                      hyperlink: (
+                        <$Link fontStyle="italic" href={'#button-add-stream'} style={{ textTransform: 'lowercase' }}>
                           {words.clickingHere}
                         </$Link>
                       ),
@@ -244,6 +285,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                 }
               : undefined
           }
+          magicLink={tournament.magicLink ? tournament.magicLink : undefined}
         />
       )}
 
@@ -256,6 +298,31 @@ const ManageTournament = (props: ManageTournamentProps) => {
         />
       </$h3>
       <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
+      <$Divider />
+      <$h3 style={{ fontStyle: 'italic' }}>
+        <FormattedMessage
+          id="tournament.edit.addStream.title"
+          defaultMessage="Manage Streams"
+          description="Title for the section to add / manage a live stream for tournament. A live stream is a video feed of an esports tournament gameplay."
+        />
+      </$h3>
+      <$p style={{ marginTop: '0px' }}>
+        <FormattedMessage
+          id="tournament.edit.addStream.description"
+          defaultMessage="Tournament streams increase community engagement by allowing users to watch the tournament live, directly on the public tournament page. You can add a stream for your tournament by clicking the button below."
+          description="Description for the section to add / manage a live stream for tournament."
+        />{' '}
+        <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
+      </$p>
+      {!!tournament?.streams && tournament?.streams?.length > 0 && (
+        <StreamList
+          streams={tournament.streams}
+          onDelete={async (streamId: StreamID) => {
+            console.log('streamId', streamId)
+          }}
+        />
+      )}
+      <AddStream tournamentId={tournament.id as TournamentID} />
     </$Vertical>
   )
 }

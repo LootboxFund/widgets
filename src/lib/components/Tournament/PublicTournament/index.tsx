@@ -20,8 +20,7 @@ import { initDApp, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { Address, COLORS } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
-import { tournamentWords as getTournamentWords } from '../common'
-import { useIntl } from 'react-intl'
+import { useTournamentWords } from '../common'
 import QuickCreate from 'lib/components/QuickCreate'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
@@ -32,19 +31,17 @@ interface PublicTournamentProps {
 
 /** Public Tournament Widget */
 const PublicTournament = (props: PublicTournamentProps) => {
-  const intl = useIntl()
   const words = useWords()
   const web3Utils = useWeb3Utils()
   const [network, setNetwork] = useState<NetworkOption>()
   const { screen } = useWindowSize()
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
     variables: {
       id: props.tournamentId,
     },
   })
-  const tournamentWords = getTournamentWords(intl)
+  const tournamentWords = useTournamentWords()
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />

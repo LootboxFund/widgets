@@ -1,5 +1,25 @@
 import { gql } from '@apollo/client'
 
+export const ADD_STREAM = gql`
+  mutation Mutation($payload: AddStreamPayload!) {
+    addStream(payload: $payload) {
+      ... on AddStreamResponseSuccess {
+        stream {
+          id
+          tournamentId
+          name
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const EDIT_TOURNAMENT = gql`
   mutation Mutation($payload: EditTournamentPayload!) {
     editTournament(payload: $payload) {
@@ -38,6 +58,13 @@ export const GET_MY_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
+          streams {
+            id
+            creatorId
+            type
+            url
+            name
+          }
           lootboxSnapshots {
             address
             name

@@ -14,6 +14,7 @@ import ReactTooltip from 'react-tooltip'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import { checkIfValidUrl } from 'lib/api/helpers'
 import { FormattedMessage } from 'react-intl'
+import useWords from 'lib/hooks/useWords'
 
 const INITAL_LOGO =
   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Fdefault-ticket-logo.png?alt=media'
@@ -45,6 +46,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
   const web3Utils = useWeb3Utils()
   const [nativeTokenPrice, setNativeTokenPrice] = useState<BigNumber>()
   const [themeColor, setThemeColor] = useState('')
+  const words = useWords()
 
   useEffect(() => {
     const colorPickerElement = document.getElementById('color-picker')
@@ -161,15 +163,7 @@ const StepCustomize = forwardRef((props: StepCustomizeProps, ref: React.RefObjec
     if (slug === 'name') {
       setErrors({
         ...errors,
-        name: validateName(value as string) ? (
-          ''
-        ) : (
-          <FormattedMessage
-            id="createLootbox.stepCustomize.name.error"
-            defaultMessage="Name cannot be empty"
-            description="Error message for user if they forgot to enter a name for their Lootbox"
-          />
-        ),
+        name: validateName(value as string) ? '' : words.nameCannotBeEmpty,
       })
     }
     if (slug === 'symbol') {

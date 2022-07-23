@@ -512,6 +512,24 @@ const useWords = () => {
     description: 'Text indicating to see more',
   })
 
+  const addLiveStream = intl.formatMessage({
+    id: 'generic.addLiveStream',
+    defaultMessage: 'Add Live Stream',
+    description: 'Text prompting user to add a Live Stream to their tournament',
+  })
+
+  const name = intl.formatMessage({
+    id: 'generic.name',
+    defaultMessage: 'Name',
+    description: 'Generic text indicating the name of something',
+  })
+
+  const nameCannotBeEmpty = intl.formatMessage({
+    id: 'generic.nameCannotBeEmpty',
+    defaultMessage: 'Name cannot be empty',
+    description: 'Error message for user if they forgot to enter a name in a form',
+  })
+
   return {
     cancel,
     back,
@@ -595,6 +613,9 @@ const useWords = () => {
     win,
     inDays,
     seeMore,
+    addLiveStream,
+    name,
+    nameCannotBeEmpty,
   }
 }
 
