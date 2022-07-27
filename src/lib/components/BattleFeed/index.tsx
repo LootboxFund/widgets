@@ -80,7 +80,9 @@ const BattleFeed = () => {
                 <$BattleCardsContainer width="40%">
                   {tourny.lootboxSnapshots?.length ? (
                     tourny.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
-                      return <$BattleCardImage src={snap.stampImage} cardNumber={idx2} />
+                      return (
+                        <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`${tourny.id}-img-${idx2}`} />
+                      )
                     })
                   ) : (
                     <$BattleCardImage

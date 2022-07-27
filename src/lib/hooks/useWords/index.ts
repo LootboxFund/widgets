@@ -77,6 +77,12 @@ const useWords = () => {
       'Shares are considered a portion of the Lootbox`s earnings which allows a user to share the Lootboxes / gamers profits. It is similar to the term "share" in investment, where you can buy "shares" of a company in the stock exchange.',
   })
 
+  const buyLootbox = intl.formatMessage({
+    id: 'generic.buyLootbox',
+    defaultMessage: 'Buy Lootbox',
+    description: 'Text to buy from a Lootbox using cryptocurrency.',
+  })
+
   const readMore = intl.formatMessage({
     id: 'generic.readMore',
     defaultMessage: 'Read more',
@@ -530,6 +536,12 @@ const useWords = () => {
     description: 'Error message for user if they forgot to enter a name in a form',
   })
 
+  const shareLink = intl.formatMessage({
+    id: 'generic.shareLink',
+    defaultMessage: 'Share link',
+    description: 'Text to share a hyperlink',
+  })
+
   return {
     cancel,
     back,
@@ -616,6 +628,8 @@ const useWords = () => {
     addLiveStream,
     name,
     nameCannotBeEmpty,
+    shareLink,
+    buyLootbox,
   }
 }
 
