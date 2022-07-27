@@ -542,6 +542,12 @@ const useWords = () => {
     description: 'Text to share a hyperlink',
   })
 
+  const saveChanges = intl.formatMessage({
+    id: 'generics.saveChanges',
+    defaultMessage: 'Save Changes',
+    description: 'Button text to save changes to a tournament or something',
+  })
+
   return {
     cancel,
     back,
@@ -630,6 +636,7 @@ const useWords = () => {
     nameCannotBeEmpty,
     shareLink,
     buyLootbox,
+    saveChanges,
   }
 }
 

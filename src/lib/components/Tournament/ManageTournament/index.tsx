@@ -316,6 +316,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
       </$p>
       {!!tournament?.streams && tournament?.streams?.length > 0 && (
         <StreamList
+          tournamentId={tournament.id as TournamentID}
           streams={tournament.streams}
           onDelete={async (streamId: StreamID) => {
             console.log('streamId', streamId)

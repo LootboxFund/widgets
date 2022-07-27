@@ -1,31 +1,41 @@
+/**
+ * This component doubles as a stream edit form when `initialParams` are passed in
+ */
+
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import styled from 'styled-components'
 import AuthGuard from '../../AuthGuard'
 import { $h3, $Horizontal, $span, $Vertical } from '../../Generics'
 import {
-  AddStreamPayload,
   AddStreamResponse,
+  EditStreamResponse,
   MutationAddStreamArgs,
+  MutationEditStreamArgs,
   StreamType,
 } from '../../../api/graphql/generated/types'
 import $Button from '../../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation } from '@apollo/client'
-import { ADD_STREAM, GET_MY_TOURNAMENT } from './api.gql'
-import LogRocket from 'logrocket'
+import { ADD_STREAM, GET_MY_TOURNAMENT, EDIT_STREAM } from './api.gql'
 import { LoadingText } from '../../Generics/Spinner'
-import { TournamentID } from 'lib/types'
+import { StreamID, TournamentID } from 'lib/types'
 import { $ErrorMessage, $InputMedium, useTournamentWords } from '../common'
-import { uploadTournamentCover } from 'lib/api/firebase/storage'
-import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
-import { parseType } from 'graphql'
+import { useIntl } from 'react-intl'
 
 const DEFAULT_STREAM_TYPE: StreamType = StreamType.Facebook
 
 interface AddStreamProps {
   tournamentId: TournamentID
+  onCancel?: () => void
+  onSuccess?: () => void
+  initialParams?: {
+    name: string
+    url: string
+    type: StreamType
+    id: StreamID | string
+  }
 }
 
 const isUrl = (s: string) => {
@@ -33,14 +43,30 @@ const isUrl = (s: string) => {
   return regexp.test(s)
 }
 
-const AddStream = ({ tournamentId }: AddStreamProps) => {
+const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStreamProps) => {
   const { screen } = useWindowSize()
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(!!initialParams)
   const [errorMessage, setErrorMessage] = useState('')
-  const [name, setName] = useState('')
-  const [url, setUrl] = useState('')
-  const [type, setType] = useState<StreamType>(DEFAULT_STREAM_TYPE)
-  const [addStream, { loading }] = useMutation<{ addStream: AddStreamResponse }, MutationAddStreamArgs>(ADD_STREAM, {
+  const [name, setName] = useState(initialParams?.name || '')
+  const [url, setUrl] = useState(initialParams?.url || '')
+  const [type, setType] = useState<StreamType>(initialParams?.type || DEFAULT_STREAM_TYPE)
+  const [addStream, { loading: addLoading }] = useMutation<{ addStream: AddStreamResponse }, MutationAddStreamArgs>(
+    ADD_STREAM,
+    {
+      refetchQueries: [
+        {
+          query: GET_MY_TOURNAMENT,
+          variables: {
+            id: tournamentId,
+          },
+        },
+      ],
+    }
+  )
+  const [editStream, { loading: editLoading }] = useMutation<
+    { editStream: EditStreamResponse },
+    MutationEditStreamArgs
+  >(EDIT_STREAM, {
     refetchQueries: [
       {
         query: GET_MY_TOURNAMENT,
@@ -50,6 +76,7 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
       },
     ],
   })
+  const loading = editLoading || addLoading
   const words = useWords()
   const tournamentWords = useTournamentWords()
   const intl = useIntl()
@@ -98,21 +125,41 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
       }
 
       try {
-        const res = await addStream({
-          variables: {
-            payload: {
-              tournamentId,
-              stream: {
+        if (initialParams) {
+          // This is a stream edit
+          const res = await editStream({
+            variables: {
+              payload: {
                 name,
                 url,
                 type,
+                id: initialParams.id,
               },
             },
-          },
-        })
+          })
 
-        if (res.data?.addStream?.__typename === 'ResponseError') {
-          throw new Error(res.data.addStream.error?.message || words.anErrorOccured)
+          if (res.data?.editStream?.__typename === 'ResponseError') {
+            throw new Error(res.data.editStream.error?.message || words.anErrorOccured)
+          }
+        } else {
+          // This is a stream add
+
+          const res = await addStream({
+            variables: {
+              payload: {
+                tournamentId,
+                stream: {
+                  name,
+                  url,
+                  type,
+                },
+              },
+            },
+          })
+
+          if (res.data?.addStream?.__typename === 'ResponseError') {
+            throw new Error(res.data.addStream.error?.message || words.anErrorOccured)
+          }
         }
 
         // Close the thing:
@@ -121,6 +168,7 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
         setUrl('')
         setType(DEFAULT_STREAM_TYPE)
         setErrorMessage('')
+        onSuccess && onSuccess()
       } catch (err) {
         console.error('Error making stream')
         setErrorMessage(err?.message || words.anErrorOccured)
@@ -131,6 +179,9 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
   const closeAddStreamSection = () => {
     setIsExpanded(false)
     setErrorMessage('')
+    if (onCancel) {
+      onCancel()
+    }
   }
 
   const parseName = (name: string) => {
@@ -159,7 +210,7 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
       >
         {isExpanded && (
           <$Vertical spacing={3}>
-            <$h3>{words.addLiveStream}</$h3>
+            {!initialParams && <$h3>{words.addLiveStream}</$h3>}
             <$AddStreamContainer>
               <$Horizontal flexWrap spacing={2}>
                 <$InputMedium
@@ -206,14 +257,15 @@ const AddStream = ({ tournamentId }: AddStreamProps) => {
               }}
               disabled={loading}
             >
-              <LoadingText loading={loading} text={words.addLiveStream} color={COLORS.trustFontColor} />
+              <LoadingText
+                loading={loading}
+                text={initialParams ? words.saveChanges : words.addLiveStream}
+                color={COLORS.trustFontColor}
+              />
             </$Button>
           </div>
           {isExpanded && (
-            <$span
-              onClick={closeAddStreamSection}
-              style={{ lineHeight: '40px', fontWeight: TYPOGRAPHY.fontWeight.light, cursor: 'pointer' }}
-            >
+            <$span onClick={closeAddStreamSection} style={{ lineHeight: '40px', cursor: 'pointer' }}>
               {words.cancel}
             </$span>
           )}

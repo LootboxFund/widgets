@@ -20,6 +20,26 @@ export const ADD_STREAM = gql`
   }
 `
 
+export const EDIT_STREAM = gql`
+  mutation Mutation($payload: EditStreamPayload!) {
+    editStream(payload: $payload) {
+      ... on EditStreamResponseSuccess {
+        stream {
+          id
+          tournamentId
+          name
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const EDIT_TOURNAMENT = gql`
   mutation Mutation($payload: EditTournamentPayload!) {
     editTournament(payload: $payload) {

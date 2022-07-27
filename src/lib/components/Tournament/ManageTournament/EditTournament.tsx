@@ -42,12 +42,6 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
   const intl = useIntl()
   const tournamentWords = useTournamentWords()
 
-  const saveChangesText = intl.formatMessage({
-    id: 'tournament.manage.saveChanges',
-    defaultMessage: 'Save Changes',
-    description: 'Button text to save changes to a tournament',
-  })
-
   const parseTitle = (title: string) => {
     setTournamentPayload({
       ...tournamentPayload,
@@ -265,7 +259,11 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
             }}
             disabled={loadingImageUpload || loading}
           >
-            <LoadingText loading={loadingImageUpload || loading} text={saveChangesText} color={COLORS.trustFontColor} />
+            <LoadingText
+              loading={loadingImageUpload || loading}
+              text={words.saveChanges}
+              color={COLORS.trustFontColor}
+            />
           </$Button>
         </div>
         {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}

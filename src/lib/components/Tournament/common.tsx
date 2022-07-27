@@ -9,9 +9,10 @@ import { $Link, Oopsies } from '../Profile/common'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
-import { StreamID } from 'lib/types'
+import { StreamID, TournamentID } from 'lib/types'
 import PopConfirm from '../Generics/PopConfirm'
 import { twitchIcon, facebookIcon, discordIcon, youtubeIcon } from 'lib/hooks/constants'
+import AddStream from './ManageTournament/AddStream'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -111,7 +112,7 @@ export const useTournamentWords = () => {
 
   const streamURLNotValidUrl = intl.formatMessage({
     id: 'tournament.stream.streamURLNotValidUrl',
-    defaultMessage: 'Stream URL is not a valid URL',
+    defaultMessage: 'Stream URL is not a valid URL. It must start with "https://"',
     description: 'Error message shown to user when they input an invalid stream URL in a form',
   })
 
@@ -449,11 +450,13 @@ export const $TournamentCover = styled.img`
 `
 
 interface StreamListProps {
+  tournamentId: TournamentID
   streams: Stream[]
   onDelete?: (streamId: StreamID) => Promise<void>
 }
 export const StreamList = (props: StreamListProps) => {
   const words = useWords()
+  const [editStream, setEditStream] = useState<Stream | undefined>(undefined)
 
   const getLogo = (streamType: StreamType): string => {
     if (streamType === StreamType.Discord) {
@@ -467,33 +470,57 @@ export const StreamList = (props: StreamListProps) => {
     }
   }
 
+  const closeEdit = () => {
+    setEditStream(undefined)
+  }
+
   return (
     <$Vertical spacing={2}>
       {props.streams.map((stream, index) => {
-        return (
-          <$StreamListItem key={`stream-${index}`}>
-            <$Horizontal spacing={2} justifyContent="space-between">
-              <$Horizontal spacing={2}>
-                <$StreamLogo src={getLogo(stream.type)} />
-                <$h3>{stream.name}</$h3>
-              </$Horizontal>
+        if (stream.id === editStream?.id) {
+          return (
+            <$StreamListItem key={`edit-stream-${index}`}>
+              <AddStream
+                tournamentId={props.tournamentId}
+                initialParams={stream}
+                onCancel={closeEdit}
+                onSuccess={closeEdit}
+              />
+            </$StreamListItem>
+          )
+        } else {
+          return (
+            <$StreamListItem key={`stream-${index}`}>
+              <$Horizontal spacing={2} justifyContent="space-between">
+                <$Horizontal spacing={2}>
+                  <$StreamLogo src={getLogo(stream.type)} />
+                  <$h3>{stream.name}</$h3>
+                </$Horizontal>
 
-              <$Horizontal>
-                {!!props?.onDelete && (
-                  <PopConfirm onOk={() => props.onDelete!(stream.id as StreamID)} style={{ margin: 'auto' }}>
-                    <$span
-                      textAlign="center"
-                      color={COLORS.dangerFontColor}
-                      style={{ cursor: 'pointer', textTransform: 'lowercase' }}
-                    >
-                      {words.remove}
-                    </$span>
-                  </PopConfirm>
-                )}
+                <$Horizontal spacing={3}>
+                  <$span
+                    textAlign="center"
+                    style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
+                    onClick={() => setEditStream(stream)}
+                  >
+                    {words.edit}
+                  </$span>
+                  {!!props?.onDelete && (
+                    <PopConfirm onOk={() => props.onDelete!(stream.id as StreamID)} style={{ margin: 'auto' }}>
+                      <$span
+                        textAlign="center"
+                        color={COLORS.dangerFontColor}
+                        style={{ cursor: 'pointer', textTransform: 'lowercase' }}
+                      >
+                        {words.remove}
+                      </$span>
+                    </PopConfirm>
+                  )}
+                </$Horizontal>
               </$Horizontal>
-            </$Horizontal>
-          </$StreamListItem>
-        )
+            </$StreamListItem>
+          )
+        }
       })}
     </$Vertical>
   )
