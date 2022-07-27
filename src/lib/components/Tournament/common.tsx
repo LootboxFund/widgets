@@ -3,7 +3,14 @@ import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
-import { Lootbox, LootboxTournamentSnapshot, Stream, StreamType } from 'lib/api/graphql/generated/types'
+import {
+  DeleteStreamResponse,
+  Lootbox,
+  LootboxTournamentSnapshot,
+  MutationDeleteStreamArgs,
+  Stream,
+  StreamType,
+} from 'lib/api/graphql/generated/types'
 import { $Horizontal, $p, $h1, $span, $Vertical, $h3, $h2 } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
@@ -13,6 +20,8 @@ import { StreamID, TournamentID } from 'lib/types'
 import PopConfirm from '../Generics/PopConfirm'
 import { twitchIcon, facebookIcon, discordIcon, youtubeIcon } from 'lib/hooks/constants'
 import AddStream from './ManageTournament/AddStream'
+import { DELETE_STREAM, GET_MY_TOURNAMENT } from './ManageTournament/api.gql'
+import { useMutation } from '@apollo/client'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -449,14 +458,26 @@ export const $TournamentCover = styled.img`
   background-position: center;
 `
 
-interface StreamListProps {
+interface StreamListItemProps {
   tournamentId: TournamentID
-  streams: Stream[]
-  onDelete?: (streamId: StreamID) => Promise<void>
+  stream: Stream
 }
-export const StreamList = (props: StreamListProps) => {
+
+export const StreamListItem = (props: StreamListItemProps) => {
   const words = useWords()
-  const [editStream, setEditStream] = useState<Stream | undefined>(undefined)
+  const [isEdit, setIsEdit] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const [deleteStream] = useMutation<{ deleteStream: DeleteStreamResponse }, MutationDeleteStreamArgs>(DELETE_STREAM, {
+    refetchQueries: [
+      {
+        query: GET_MY_TOURNAMENT,
+        variables: {
+          id: props.tournamentId,
+        },
+      },
+    ],
+  })
 
   const getLogo = (streamType: StreamType): string => {
     if (streamType === StreamType.Discord) {
@@ -470,59 +491,64 @@ export const StreamList = (props: StreamListProps) => {
     }
   }
 
-  const closeEdit = () => {
-    setEditStream(undefined)
+  const toggleEdit = () => {
+    setIsEdit(!isEdit)
+  }
+
+  const onDelete = async () => {
+    setErrorMessage('')
+    try {
+      const { data } = await deleteStream({ variables: { id: props.stream.id } })
+
+      if (!data) {
+        throw new Error(words.anErrorOccured)
+      } else if (data?.deleteStream?.__typename === 'ResponseError') {
+        throw new Error(data.deleteStream.error.message)
+      }
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    }
   }
 
   return (
-    <$Vertical spacing={2}>
-      {props.streams.map((stream, index) => {
-        if (stream.id === editStream?.id) {
-          return (
-            <$StreamListItem key={`edit-stream-${index}`}>
-              <AddStream
-                tournamentId={props.tournamentId}
-                initialParams={stream}
-                onCancel={closeEdit}
-                onSuccess={closeEdit}
-              />
-            </$StreamListItem>
-          )
-        } else {
-          return (
-            <$StreamListItem key={`stream-${index}`}>
-              <$Horizontal spacing={2} justifyContent="space-between">
-                <$Horizontal spacing={2}>
-                  <$StreamLogo src={getLogo(stream.type)} />
-                  <$h3>{stream.name}</$h3>
-                </$Horizontal>
+    <$StreamListItem>
+      {isEdit && (
+        <AddStream
+          tournamentId={props.tournamentId}
+          initialParams={props.stream}
+          onCancel={toggleEdit}
+          onSuccess={toggleEdit}
+        />
+      )}
+      {!isEdit && (
+        <$Horizontal spacing={2} justifyContent="space-between">
+          <$Horizontal spacing={2}>
+            <$StreamLogo src={getLogo(props.stream.type)} />
+            <$h3>{props.stream.name}</$h3>
+          </$Horizontal>
 
-                <$Horizontal spacing={3}>
-                  <$span
-                    textAlign="center"
-                    style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
-                    onClick={() => setEditStream(stream)}
-                  >
-                    {words.edit}
-                  </$span>
-                  {!!props?.onDelete && (
-                    <PopConfirm onOk={() => props.onDelete!(stream.id as StreamID)} style={{ margin: 'auto' }}>
-                      <$span
-                        textAlign="center"
-                        color={COLORS.dangerFontColor}
-                        style={{ cursor: 'pointer', textTransform: 'lowercase' }}
-                      >
-                        {words.remove}
-                      </$span>
-                    </PopConfirm>
-                  )}
-                </$Horizontal>
-              </$Horizontal>
-            </$StreamListItem>
-          )
-        }
-      })}
-    </$Vertical>
+          <$Horizontal spacing={3}>
+            <$span
+              textAlign="center"
+              style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
+              onClick={toggleEdit}
+            >
+              {words.edit}
+            </$span>
+            <PopConfirm onOk={onDelete} style={{ margin: 'auto' }}>
+              <$span
+                textAlign="center"
+                color={COLORS.dangerFontColor}
+                style={{ cursor: 'pointer', textTransform: 'lowercase' }}
+              >
+                {words.remove}
+              </$span>
+            </PopConfirm>
+          </$Horizontal>
+        </$Horizontal>
+      )}
+      {errorMessage && <$ErrorMessage>{errorMessage}</$ErrorMessage>}
+    </$StreamListItem>
   )
 }
 

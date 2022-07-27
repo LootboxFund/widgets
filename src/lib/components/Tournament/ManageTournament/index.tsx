@@ -1,16 +1,18 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3, $p } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { LootboxList, $SearchInput, $TournamentCover, StreamList } from '../common'
+import { LootboxList, $SearchInput, $TournamentCover, StreamListItem } from '../common'
 import {
+  DeleteStreamResponse,
   LootboxTournamentSnapshot,
+  MutationDeleteStreamArgs,
   QueryTournamentArgs,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useQuery } from '@apollo/client'
-import { GET_MY_TOURNAMENT } from './api.gql'
+import { useMutation, useQuery } from '@apollo/client'
+import { GET_MY_TOURNAMENT, DELETE_STREAM } from './api.gql'
 import { useEffect, useState } from 'react'
 import { StreamID, TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -44,6 +46,20 @@ const ManageTournament = (props: ManageTournamentProps) => {
       },
     }
   )
+
+  const [deleteStream, { loading: deleteStreamLoading }] = useMutation<
+    { deleteStream: DeleteStreamResponse },
+    MutationDeleteStreamArgs
+  >(DELETE_STREAM, {
+    refetchQueries: [
+      {
+        query: GET_MY_TOURNAMENT,
+        variables: {
+          id: props.tournamentId,
+        },
+      },
+    ],
+  })
 
   const tournamentWords = useTournamentWords()
   const noLootboxesText = intl.formatMessage({
@@ -315,13 +331,11 @@ const ManageTournament = (props: ManageTournamentProps) => {
         <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
       </$p>
       {!!tournament?.streams && tournament?.streams?.length > 0 && (
-        <StreamList
-          tournamentId={tournament.id as TournamentID}
-          streams={tournament.streams}
-          onDelete={async (streamId: StreamID) => {
-            console.log('streamId', streamId)
-          }}
-        />
+        <$Vertical spacing={2}>
+          {tournament.streams.map((stream, index) => (
+            <StreamListItem key={`stream-${index}`} stream={stream} tournamentId={tournament.id as TournamentID} />
+          ))}
+        </$Vertical>
       )}
       <AddStream tournamentId={tournament.id as TournamentID} />
     </$Vertical>

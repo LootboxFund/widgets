@@ -1,5 +1,23 @@
 import { gql } from '@apollo/client'
 
+export const DELETE_STREAM = gql`
+  mutation deleteStream($id: ID!) {
+    deleteStream(id: $id) {
+      ... on DeleteStreamResponseSuccess {
+        stream {
+          id
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const ADD_STREAM = gql`
   mutation Mutation($payload: AddStreamPayload!) {
     addStream(payload: $payload) {

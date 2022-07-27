@@ -193,7 +193,6 @@ const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStre
   }
 
   const parseType = (type: StreamType) => {
-    console.log('parse type', type)
     setType(type)
   }
 

@@ -4,6 +4,7 @@ import LogRocket from 'logrocket'
 import { useState } from 'react'
 import styled from 'styled-components'
 import { $Horizontal } from '..'
+import Spinner from '../Spinner'
 import { $span } from '../Typography'
 
 interface PopConfirmProps {
@@ -40,7 +41,8 @@ export const PopConfirm = ({ children, onOk, ...rest }: PopConfirmProps) => {
         <$Horizontal spacing={2}>
           <$NoButton>{words.no}</$NoButton>
           <$YesButton disabled={loading} onClick={handleOk}>
-            {words.yes}
+            {loading && <Spinner />}
+            {!loading && words.yes}
           </$YesButton>
         </$Horizontal>
       </$ConfirmModalContainer>
