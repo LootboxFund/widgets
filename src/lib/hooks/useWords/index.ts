@@ -1,5 +1,30 @@
 import { useIntl } from 'react-intl'
 
+export const useSignatures = () => {
+  const intl = useIntl()
+
+  const loginMessage = intl.formatMessage({
+    id: 'signatures.loginMessage',
+    defaultMessage:
+      "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message.',
+  })
+
+  const whitelistMessage = intl.formatMessage({
+    id: 'signatures.whitelistMessage',
+    defaultMessage:
+      "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message',
+  })
+
+  return {
+    loginMessage,
+    whitelistMessage,
+  }
+}
+
 const useWords = () => {
   const intl = useIntl()
 
@@ -548,6 +573,24 @@ const useWords = () => {
     description: 'Button text to save changes to a tournament or something',
   })
 
+  const networkNotSet = intl.formatMessage({
+    id: 'generics.networkNotSet',
+    defaultMessage: 'Network not set',
+    description: 'Error message for user if they forgot to set a blockchain network',
+  })
+
+  const confirmOnMetamask = intl.formatMessage({
+    id: 'step.terms.submit.metamask-confirmation',
+    defaultMessage: 'Confirm on MetaMask',
+    description: 'Message shown to user when they need to confirm the transaction on MetaMask',
+  })
+
+  const joinTournament = intl.formatMessage({
+    id: 'quickCreateLootbox.singleStep.button.joinTournament',
+    defaultMessage: 'Join Tournament',
+    description: 'Text to join an esports tournament',
+  })
+
   return {
     cancel,
     back,
@@ -637,31 +680,10 @@ const useWords = () => {
     shareLink,
     buyLootbox,
     saveChanges,
+    networkNotSet,
+    confirmOnMetamask,
+    joinTournament,
   }
 }
 
-export const useSignatures = () => {
-  const intl = useIntl()
-
-  const loginMessage = intl.formatMessage({
-    id: 'signatures.loginMessage',
-    defaultMessage:
-      "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
-    description:
-      'Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message.',
-  })
-
-  const whitelistMessage = intl.formatMessage({
-    id: 'signatures.whitelistMessage',
-    defaultMessage:
-      "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
-    description:
-      'Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message',
-  })
-
-  return {
-    loginMessage,
-    whitelistMessage,
-  }
-}
 export default useWords

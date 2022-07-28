@@ -13,6 +13,8 @@ import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { InitialUrlParams } from '../state'
 import { FormattedMessage } from 'react-intl'
 import React from 'react'
+import { useWords as useWordsCreate } from '../constants'
+import useWords from 'lib/hooks/useWords'
 
 export interface TermsFragment {
   slug: string
@@ -77,6 +79,8 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
     treasuryWallet: '',
   }
   const [errors, setErrors] = useState(initialErrors)
+  const wordsCreate = useWordsCreate()
+  const words = useWords()
   useEffect(() => {
     if (timeLeft === 0) {
       setTimeLeft(null)
@@ -168,13 +172,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
           allConditionsMet={props.allConditionsMet}
           themeColor={COLORS.dangerFontColor}
           onSubmit={() => submitWithCountdown()}
-          text={
-            <FormattedMessage
-              id="step.terms.submit.failed"
-              defaultMessage="Failed, try again?"
-              description="Failure message shown to user when create Lootbox fails"
-            />
-          }
+          text={wordsCreate.failedTryAgain}
         />
       )
     } else if (props.submitStatus === 'success') {
@@ -186,14 +184,7 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
             themeColor={`${COLORS.trustBackground}50`}
             disabled
           >
-            <FormattedMessage
-              id="step.terms.submit.success-preparing"
-              defaultMessage="... Preparing your Lootbox ({timeLeft})"
-              description="Success message shown to user when create Lootbox succeeds"
-              values={{
-                timeLeft: timeLeft,
-              }}
-            />
+            {wordsCreate.preparingElapsedTimeFn(timeLeft)}
           </$CreateLootboxButton>
         )
       } else {
@@ -203,33 +194,20 @@ const StepTermsConditions = forwardRef((props: StepTermsConditionsProps, ref: Re
             onClick={() => window.open(props.goToLootboxAdminPage())}
             themeColor={COLORS.successFontColor}
           >
-            <FormattedMessage
-              id="step.terms.submit.success"
-              defaultMessage="View Your Lootbox"
-              description="Success message shown to user when create Lootbox succeeds"
-            />
+            {wordsCreate.viewYourLootbox}
           </$CreateLootboxButton>
         )
       }
     } else if (props.submitStatus === 'in_progress') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={props.selectedNetwork?.themeColor}>
-          <FormattedMessage
-            id="step.terms.submit.pending-submissino"
-            defaultMessage="... submitting ({timeElapsed})"
-            description="Message shown to user when they are waiting for they Lootbox to be made"
-            values={{ timeElapsed: timeElapsed }}
-          />
+          {wordsCreate.submittingElapsedTimeFn(timeElapsed)}
         </$CreateLootboxButton>
       )
     } else if (props.submitStatus === 'pending_confirmation') {
       return (
         <$CreateLootboxButton allConditionsMet={false} disabled themeColor={COLORS.warningBackground}>
-          <FormattedMessage
-            id="step.terms.submit.metamask-confirmation"
-            defaultMessage="Confirm on MetaMask"
-            description="Message shown to user when they need to confirm the transaction on MetaMask"
-          />
+          {words.confirmOnMetamask}
         </$CreateLootboxButton>
       )
     }
