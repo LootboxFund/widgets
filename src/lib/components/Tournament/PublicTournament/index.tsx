@@ -34,6 +34,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
   const words = useWords()
   const web3Utils = useWeb3Utils()
   const [network, setNetwork] = useState<NetworkOption>()
+  const [magicLinkParams, setMagicLinkParams] = useState<InitialUrlParams>()
   const { screen } = useWindowSize()
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
@@ -42,6 +43,38 @@ const PublicTournament = (props: PublicTournamentProps) => {
     },
   })
   const tournamentWords = useTournamentWords()
+
+  useEffect(() => {
+    if (data?.tournament?.__typename === 'TournamentResponseSuccess' && data?.tournament?.tournament?.magicLink) {
+      try {
+        const url = new URL(data?.tournament?.tournament?.magicLink)
+        const _magicLinkParams: InitialUrlParams = {
+          network: url.searchParams.get('network'),
+          type: url.searchParams.get('type'),
+          fundingTarget: url.searchParams.get('fundingTarget'),
+          fundingLimit: url.searchParams.get('fundingLimit'),
+          receivingWallet: url.searchParams.get('receivingWallet'),
+          returnsTarget: url.searchParams.get('returnsTarget'),
+          returnsDate: url.searchParams.get('returnsDate'),
+          logoImage: url.searchParams.get('logoImage'),
+          coverImage: url.searchParams.get('coverImage'),
+          campaignBio: url.searchParams.get('campaignBio'),
+          campaignWebsite: url.searchParams.get('campaignWebsite'),
+          themeColor: url.searchParams.get('themeColor'),
+          tournamentId: url.searchParams.get('tournamentId'),
+        }
+
+        setMagicLinkParams(_magicLinkParams)
+
+        const networkOption = matchNetworkByHex(_magicLinkParams.network as string)
+        if (networkOption) {
+          setNetwork(networkOption)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }, [data])
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -52,32 +85,6 @@ const PublicTournament = (props: PublicTournamentProps) => {
   }
 
   const { tournament } = data.tournament as TournamentResponseSuccess
-
-  const url = new URL(tournament.magicLink || '')
-  const magicLinkParams: InitialUrlParams = {
-    network: url.searchParams.get('network'),
-    type: url.searchParams.get('type'),
-    fundingTarget: url.searchParams.get('fundingTarget'),
-    fundingLimit: url.searchParams.get('fundingLimit'),
-    receivingWallet: url.searchParams.get('receivingWallet'),
-    returnsTarget: url.searchParams.get('returnsTarget'),
-    returnsDate: url.searchParams.get('returnsDate'),
-    logoImage: url.searchParams.get('logoImage'),
-    coverImage: url.searchParams.get('coverImage'),
-    campaignBio: url.searchParams.get('campaignBio'),
-    campaignWebsite: url.searchParams.get('campaignWebsite'),
-    themeColor: url.searchParams.get('themeColor'),
-    tournamentId: url.searchParams.get('tournamentId'),
-  }
-
-  const networkOption = matchNetworkByHex(magicLinkParams.network as string)
-  if (!network && networkOption) {
-    setNetwork(networkOption)
-  }
-
-  if (tournament.magicLink && !network) {
-    return <span>No network detected</span>
-  }
 
   const customStyles = {
     content: {
@@ -173,7 +180,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
         }
         magicLink={tournament.magicLink || ''}
       />
-      {network && (
+      {magicLinkParams && network && (
         <Modal
           isOpen={createModalOpen}
           onRequestClose={() => setCreateModalOpen(false)}
