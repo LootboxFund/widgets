@@ -403,6 +403,14 @@ const BattlePage = (props: BattlePageParams) => {
         {!tournament?.streams || (tournament.streams.length === 0 && <Oopsies title={noStreamsMessage} icon="🧐" />)}
         {tournament?.streams && tournament.streams.length > 0 && (
           <$Vertical spacing={2}>
+            <$h1 textAlign="center">
+              <FormattedMessage
+                id="battlePage.chooseStream.header"
+                defaultMessage="Choose a Stream"
+                description="Header for live esports stream selection modal"
+              />
+            </$h1>
+            <br />
             {tournament.streams.map((stream) => {
               return (
                 <$StreamListItem style={{ cursor: 'pointer' }}>

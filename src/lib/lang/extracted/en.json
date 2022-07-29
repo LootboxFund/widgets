@@ -93,6 +93,10 @@
     "defaultMessage": "None available",
     "description": "Text indicating that something is not available"
   },
+  "battlePage.chooseStream.header": {
+    "defaultMessage": "Choose a Stream",
+    "description": "Header for live esports stream selection modal"
+  },
   "battlePage.lotteryHeader": {
     "defaultMessage": "Claim a Lottery Ticket",
     "description": "Header indicating to user to receive a free NFT lottery ticket."

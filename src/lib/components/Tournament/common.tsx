@@ -525,6 +525,7 @@ export const StreamListItem = (props: StreamListItemProps) => {
               <$Link
                 href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${props.stream.id}`}
                 target="_blank"
+                style={{ textDecoration: 'none', color: 'inherit', fontStyle: 'inherit' }}
               >
                 {words.view}
               </$Link>
