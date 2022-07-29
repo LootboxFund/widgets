@@ -11,6 +11,7 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 import { ScreenSize } from '../../../hooks/useScreenSize/index'
 import { getSocials } from 'lib/hooks/constants'
 import { FormattedMessage, useIntl } from 'react-intl'
+import { useWords as useWordsCreate } from '../constants'
 
 export interface StepSocialsProps {
   stage: StepStage
@@ -46,6 +47,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
     twitch: '',
     web: '',
   }
+  const wordsCreate = useWordsCreate()
   const SOCIALS = getSocials(intl)
   const [errors, setErrors] = useState(initialErrors)
 
@@ -55,25 +57,13 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
-          email: (
-            <FormattedMessage
-              id="step.socials.email.invalid"
-              defaultMessage="Invalid email"
-              description="When a user enters an invalid email address, this message is shown."
-            />
-          ),
+          email: wordsCreate.invalidEmail,
         })
         props.setValidity(false)
       } else if (value.length === 0) {
         setErrors({
           ...errors,
-          email: (
-            <FormattedMessage
-              id="step.socials.email.empty"
-              defaultMessage="Email is mandatory"
-              description="When a user does not enter an email address, this message is shown."
-            />
-          ),
+          email: wordsCreate.emailIsMandatory,
         })
       } else {
         setErrors({
@@ -85,13 +75,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
     } else if (!props.socialState.email) {
       setErrors({
         ...errors,
-        email: (
-          <FormattedMessage
-            id="step.socials.email.empty2"
-            defaultMessage="Email is mandatory"
-            description="When a user does not enter an email address, this message is shown."
-          />
-        ),
+        email: wordsCreate.emailIsMandatory,
       })
       props.setValidity(false)
     } else {

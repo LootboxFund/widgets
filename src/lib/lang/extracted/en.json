@@ -1,4 +1,7 @@
 {
+  "addStream.streamLink.help": {
+    "defaultMessage": "The \"Stream Link\" is different for each stream type.{newline}{newline}For Facebook, it must be PUBLIC. It is the URL when you click \"share\" or \"copy link\" (e.x. \"https://fb.watch/eyTrWLFDxu\").{newline}{newline}For YouTube, the stream must be PUBLIC and you need to allow \"video embedding\". It is the livestream/video ID (i.e. \"6mnMw_jKbxw\" if the video URL is \"https://www.youtube.com/watch?v=6mnMw_jKbxw\").{newline}{newline}For Twitch, it is your channel name / ID."
+  },
   "auth.emailIsRequired": {
     "defaultMessage": "Email is required",
     "description": "Error message when user tries to sign up without an email"
@@ -77,6 +80,46 @@
   "battleFeed.msg.startsToday": {
     "defaultMessage": "Starts today",
     "description": "Text indicating a tournament or something starts today"
+  },
+  "battlePage.about.aboutTournament": {
+    "defaultMessage": "About tournament",
+    "description": "Text describing the details of an esports tournament"
+  },
+  "battlePage.button.claimLottery": {
+    "defaultMessage": "Claim lottery",
+    "description": "Text prompting user to claim a lottery ticket"
+  },
+  "battlePage.button.noneAvailable": {
+    "defaultMessage": "None available",
+    "description": "Text indicating that something is not available"
+  },
+  "battlePage.chooseStream.header": {
+    "defaultMessage": "Choose a Stream",
+    "description": "Header for live esports stream selection modal"
+  },
+  "battlePage.lotteryHeader": {
+    "defaultMessage": "Claim a Lottery Ticket",
+    "description": "Header indicating to user to receive a free NFT lottery ticket."
+  },
+  "battlePage.noStreamsMessage": {
+    "defaultMessage": "Tournament does not have any streams. Ask the Tournament host to add some.",
+    "description": "Text prompting indicating that there are no streams for this tournament"
+  },
+  "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
+    "defaultMessage": "Seems like this tournament does not have any lottery tickets yet",
+    "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"
+  },
+  "battlePage.socials.followSocials": {
+    "defaultMessage": "Follow socials",
+    "description": "Text prompting user to follow social media"
+  },
+  "battlePage.streamText.switchStreamText": {
+    "defaultMessage": "You are watching \"{streamName}\". To switch to another stream, {clickHereHyperlink}",
+    "description": "Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
+  },
+  "battlePage.streamText.switchStreamText.noStream": {
+    "defaultMessage": "You are not watching a stream. To choose a stream, {clickHereHyperlink}",
+    "description": "Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
   },
   "bounty.myNFTs.title": {
     "defaultMessage": "Your NFTs",
@@ -283,11 +326,11 @@
   },
   "createLootbox.customizeTicket.inputName": {
     "defaultMessage": "Lootbox Name",
-    "description": "Label for name input in 5th step in creating a Lootbox - this is a name for the Lootbox"
+    "description": "Label for name input creating a Lootbox - this is a name for the Lootbox"
   },
   "createLootbox.customizeTicket.inputName.toolTip": {
     "defaultMessage": "The name of your Lootbox. It can be your name, your mission, or just something catchy. Keep in mind that you will likely have multiple Lootboxes in the future, so try to have a uniquely identifyable name to reduce confusion.",
-    "description": "Tooltip for name input in 5th step in creating a Lootbox"
+    "description": "Tooltip for name input in creating a Lootbox"
   },
   "createLootbox.customizeTicket.inputSymbol": {
     "defaultMessage": "Lootbox Symbol",
@@ -320,6 +363,10 @@
   "createLootbox.networkMismatch": {
     "defaultMessage": "MetaMask is on the wrong network",
     "description": "Error text when user is on the wrong blockchain network"
+  },
+  "createLootbox.quickCreate.jointTourny.fn": {
+    "defaultMessage": "Join {name}",
+    "description": "Header for joining a esports tournament"
   },
   "createLootbox.receivingWalletError": {
     "defaultMessage": "Invalid Receiving Wallet, check if the address is compatible with {networkName}.",
@@ -513,10 +560,6 @@
     "defaultMessage": "Please upload a logo image",
     "description": "Error message for user if they forgot to upload a logo file (image file)"
   },
-  "createLootbox.stepCustomize.name.error": {
-    "defaultMessage": "Name cannot be empty",
-    "description": "Error message for user if they forgot to enter a name for their Lootbox"
-  },
   "createLootbox.stepCustomize.symbol.error": {
     "defaultMessage": "Symbol cannot be empty",
     "description": "Error message for user if they forgot to enter a symbol for their Lootbox"
@@ -601,30 +644,6 @@
     "defaultMessage": "Funding type set to {type}",
     "description": "Checklist item, displaying that the lootbox type has been already set when making a Lootbox"
   },
-  "quickCreateLootbox.singleStep.heading": {
-    "defaultMessage": "Join {tournamentName}",
-    "description": "Join Tournament"
-  },
-  "quickCreateLootbox.singleStep.headingTooltip": {
-    "defaultMessage": "Quickly create a Lootbox by joining a tournament with its predefined settings.",
-    "description": "Tooltip for quickly creating a Lootbox by joining a tournament with its predefined settings."
-  },
-  "quickCreateLootbox.singleStep.subheadingDescription": {
-    "defaultMessage": "Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox.",
-    "description": "Question about what the quick create Lootbox widget does"
-  },
-  "quickCreateLootbox.singleStep.socials": {
-    "defaultMessage": "Socials (optional)",
-    "description": "Label for socials section"
-  },
-  "quickCreateLootbox.singleStep.socials.tooltip": {
-    "defaultMessage": "Provide your teams social media so that tournament organizers and fans can contact or follow you.",
-    "description": "Tooltip for socials section in Quick Create Lootbox"
-  },
-  "quickCreateLootbox.singleStep.button.joinTournament": {
-    "defaultMessage": "Join Tournament",
-    "description": "Submit button to quick create Lootbox and join a tournament"
-  },
   "fundraisingBar.help.template": {
     "defaultMessage": "This is the target funding goal of the gamer.",
     "description": "Template message for user displayed with the Lootbox fundraising goals"
@@ -641,6 +660,10 @@
     "defaultMessage": "Add",
     "description": "text indicating to add something to something else"
   },
+  "generic.addLiveStream": {
+    "defaultMessage": "Add Live Stream",
+    "description": "Text prompting user to add a Live Stream to their tournament"
+  },
   "generic.addWallet": {
     "defaultMessage": "Add wallet",
     "description": "Generic user action to add a crypto wallet to our website. This is done by connecting metamask."
@@ -648,6 +671,10 @@
   "generic.address": {
     "defaultMessage": "Address",
     "description": "This is a blockchain address, usually a Metamask wallet address. (i.e. user has 0x1234567890123456789012345678901234567890 address)"
+  },
+  "generic.advancedCreate": {
+    "defaultMessage": "Advanced Create",
+    "description": "Generic user action to create a new something in full"
   },
   "generic.anErrorOccured": {
     "defaultMessage": "An error occured",
@@ -672,6 +699,10 @@
   "generic.bulkMintNFTs": {
     "defaultMessage": "Bulk mint NFTs",
     "description": "Text indicating to bulk mint NFTs"
+  },
+  "generic.buyLootbox": {
+    "defaultMessage": "Buy Lootbox",
+    "description": "Text to buy from a Lootbox using cryptocurrency."
   },
   "generic.cancel": {
     "defaultMessage": "Cancel",
@@ -720,10 +751,6 @@
   "generic.createNew": {
     "defaultMessage": "Create new",
     "description": "Generic user action to create a new something"
-  },
-  "generic.advancedCreate": {
-    "defaultMessage": "Advanced Create",
-    "description": "Generic user action to create a new something with advanced options"
   },
   "generic.description": {
     "defaultMessage": "Description",
@@ -780,6 +807,14 @@
   "generic.minted": {
     "defaultMessage": "Minted",
     "description": "Word indicating that an NFT on the blockchain has been created"
+  },
+  "generic.name": {
+    "defaultMessage": "Name",
+    "description": "Generic text indicating the name of something"
+  },
+  "generic.nameCannotBeEmpty": {
+    "defaultMessage": "Name cannot be empty",
+    "description": "Error message for user if they forgot to enter a name in a form"
   },
   "generic.network": {
     "defaultMessage": "Network",
@@ -881,6 +916,10 @@
     "defaultMessage": "See more",
     "description": "Text indicating to see more"
   },
+  "generic.shareLink": {
+    "defaultMessage": "Share link",
+    "description": "Text to share a hyperlink"
+  },
   "generic.shares": {
     "defaultMessage": "Shares",
     "description": "Shares are considered a portion of the Lootbox`s earnings which allows a user to share the Lootboxes / gamers profits. It is similar to the term \"share\" in investment, where you can buy \"shares\" of a company in the stock exchange."
@@ -949,9 +988,17 @@
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
   },
+  "generics.networkNotSet": {
+    "defaultMessage": "Network not set",
+    "description": "Error message for user if they forgot to set a blockchain network"
+  },
   "generics.partyBasketInformation": {
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
+  },
+  "generics.saveChanges": {
+    "defaultMessage": "Save Changes",
+    "description": "Button text to save changes to a tournament or something"
   },
   "interactWithLootbox.manageLootbox.button": {
     "defaultMessage": "Manage Lootbox",
@@ -1514,6 +1561,30 @@
   "profile.welcomeUserMessage": {
     "defaultMessage": "Welcome, {userName}"
   },
+  "quickCreateLootbox.singleStep.button.joinTournament": {
+    "defaultMessage": "Join Tournament",
+    "description": "Text to join an esports tournament"
+  },
+  "quickCreateLootbox.singleStep.heading": {
+    "defaultMessage": "Join Lootbox Tournament",
+    "description": "Header for quickly creating a Lootbox to join a tournament"
+  },
+  "quickCreateLootbox.singleStep.headingTooltip": {
+    "defaultMessage": "Quickly create a Lootbox by joining a tournament with its predefined settings.",
+    "description": "Info tooltip for quickly creating a Lootbox"
+  },
+  "quickCreateLootbox.singleStep.socials": {
+    "defaultMessage": "Socials",
+    "description": "Label for user socials so that tournament organizers and fans can contact or follow them."
+  },
+  "quickCreateLootbox.singleStep.socials.tooltip": {
+    "defaultMessage": "Provide your teams social media so that tournament organizers and fans can contact or follow you.",
+    "description": "Tooltip for socials section in Quick Create Lootbox"
+  },
+  "quickCreateLootbox.singleStep.subheadingDescription": {
+    "defaultMessage": "Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox.",
+    "description": "Info statement about quickly creating a Lootbox"
+  },
   "signatures.loginMessage": {
     "defaultMessage": "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
     "description": "Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message."
@@ -1636,10 +1707,6 @@
     "defaultMessage": "Email is mandatory",
     "description": "When a user does not enter an email address, this message is shown."
   },
-  "step.socials.email.empty2": {
-    "defaultMessage": "Email is mandatory",
-    "description": "When a user does not enter an email address, this message is shown."
-  },
   "step.socials.email.invalid": {
     "defaultMessage": "Invalid email",
     "description": "When a user enters an invalid email address, this message is shown."
@@ -1728,6 +1795,14 @@
     "defaultMessage": "Create a Tournament",
     "description": "Button text for the create tournament form - these are e-sports tournaments and or 1v1 battles etc"
   },
+  "tournament.edit.addStream.description": {
+    "defaultMessage": "Tournament streams increase community engagement by allowing users to watch the tournament live, directly on the public tournament page. You can add a stream for your tournament by clicking the button below.",
+    "description": "Description for the section to add / manage a live stream for tournament."
+  },
+  "tournament.edit.addStream.title": {
+    "defaultMessage": "Manage Streams",
+    "description": "Title for the section to add / manage a live stream for tournament. A live stream is a video feed of an esports tournament gameplay."
+  },
   "tournament.edit.addTournamentLink": {
     "defaultMessage": "Add tournament link",
     "description": "Prompt to user to add a hyperlink URL to the tournament's official page. I.e. might be a streaming website etc."
@@ -1742,7 +1817,7 @@
   },
   "tournament.edit.createMagicLink.help.step2": {
     "defaultMessage": "2) Update your tournament with the Magic Link by 👉 {hyperlink}",
-    "description": ""
+    "description": "Message to the user to update their tournament with a magic link"
   },
   "tournament.edit.editTournament.title": {
     "defaultMessage": "Edit your Lootbox Tournament",
@@ -1808,13 +1883,40 @@
     "defaultMessage": "Teams in this Tournament",
     "description": "Header for section that displays lootboxes (or teams) in a tournament. A team is actually a Lootbox."
   },
+  "tournament.manage.addLiveStream.message1": {
+    "defaultMessage": "Live Streams let people watch your tournament in real-time! {learnMoreHyperLink}"
+  },
+  "tournament.manage.addLiveStream.message2": {
+    "defaultMessage": "Update your tournament with a Live Stream by 👉 {hyperlink}",
+    "description": "Message to the user to update their tournament with a live stream"
+  },
+  "tournament.manage.addStream.facebookGaming": {
+    "defaultMessage": "Facebook Gaming",
+    "description": "Name of live stream for Facebook"
+  },
+  "tournament.manage.addStream.linkToStream": {
+    "defaultMessage": "Link to Stream",
+    "description": "Button text to link to a stream"
+  },
+  "tournament.manage.addStream.twitch": {
+    "defaultMessage": "Twitch",
+    "description": "Name of live stream for Twitch"
+  },
+  "tournament.manage.addStream.youtubeLive": {
+    "defaultMessage": "YouTube Live",
+    "description": "Name of live stream for YouTube"
+  },
   "tournament.manage.noLootboxes.text": {
     "defaultMessage": "No Lootboxes",
     "description": "Text when no Lootboxes were found"
   },
-  "tournament.manage.saveChanges": {
-    "defaultMessage": "Save Changes",
-    "description": "Button text to save changes to a tournament"
+  "tournament.stream.streamTypeCannotBeEmpty": {
+    "defaultMessage": "Stream type cannot be empty",
+    "description": "Error message shown to user when they dont input a stream type in a form"
+  },
+  "tournament.stream.streamURLCannotBeEmpty": {
+    "defaultMessage": "Stream URL cannot be empty",
+    "description": "Error message shown to user when they dont input a stream URL in a form"
   },
   "tournament.visit.header": {
     "defaultMessage": "Visit Tournament",

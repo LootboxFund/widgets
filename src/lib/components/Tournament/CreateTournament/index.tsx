@@ -21,7 +21,7 @@ import { manifest } from 'manifest'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
 import { uploadTournamentCover } from 'lib/api/firebase/storage'
-import { tournamentWords as getTournamentWords } from '../common'
+import { useTournamentWords } from '../common'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 
@@ -43,8 +43,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     MutationCreateTournamentArgs
   >(CREATE_TOURNAMENT)
   const words = useWords()
-  const intl = useIntl()
-  const tournamentWords = getTournamentWords(intl)
+  const tournamentWords = useTournamentWords()
 
   const parseTitle = (title: string) => {
     setTournamentPayload({

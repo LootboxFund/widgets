@@ -1,4 +1,14 @@
-const HelpIcon = ({ width = 20, fill = '#CFCFCF', tipID }: { width?: number; fill?: string; tipID?: string }) => {
+const HelpIcon = ({
+  width = 20,
+  fill = '#CFCFCF',
+  tipID,
+  marginLeft,
+}: {
+  width?: number
+  fill?: string
+  tipID?: string
+  marginLeft?: string
+}) => {
   return (
     <svg
       width={width}
@@ -6,7 +16,7 @@ const HelpIcon = ({ width = 20, fill = '#CFCFCF', tipID }: { width?: number; fil
       viewBox={`0 0 ${width} ${width}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ marginLeft: '5px', cursor: 'help' }}
+      style={{ marginLeft: marginLeft || '5px', cursor: 'help' }}
       data-tip
       data-for={tipID}
     >

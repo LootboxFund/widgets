@@ -3,6 +3,7 @@ import { manifest } from '../../manifest'
 import { SocialFragment } from 'lib/types'
 import { ScreenSize } from './useScreenSize'
 import { IntlShape, useIntl } from 'react-intl'
+import { StreamType } from 'lib/api/graphql/generated/types'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
@@ -16,6 +17,16 @@ export const DEFAULT_TICKET_BACKGROUND = `${manifest.storage.downloadUrl}/o/${ma
 export const TEMPLATE_LOOTBOX_STAMP = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FTemplateLootboxCard.png?alt=media`
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 export const NATIVE_ADDRESS = '0x0native' as Address
+export const twitterIcon =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media'
+export const youtubeIcon =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media'
+export const facebookIcon =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media'
+export const discordIcon =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media'
+export const twitchIcon =
+  'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media'
 
 export const BSC_MAINNET_FULL_TOKEN_LIST: TokenDataFE[] = [
   {
@@ -176,7 +187,7 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
       slug: 'twitter',
       name: twitter,
       placeholder: twitter,
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media',
+      icon: twitterIcon,
     },
     {
       slug: 'youtube',
@@ -190,7 +201,7 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
         defaultMessage: 'YouTube 1 min Intro Video',
         description: 'Placeholder for youtube input field. Users should make a 1 minute intro video.',
       }),
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fyoutube.png?alt=media',
+      icon: youtubeIcon,
     },
     {
       slug: 'instagram',
@@ -232,7 +243,7 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
         defaultMessage: 'Facebook',
         description: 'Placeholder for Facebook input field.',
       }),
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ffacebook.png?alt=media',
+      icon: facebookIcon,
     },
     {
       slug: 'discord',
@@ -246,7 +257,7 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
         defaultMessage: 'Discord Server',
         description: 'Placeholder for Discord input field.',
       }),
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Fdiscord.png?alt=media',
+      icon: discordIcon,
     },
     {
       slug: 'snapchat',
@@ -274,7 +285,7 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
         defaultMessage: 'Twitch',
         description: 'Input field placeholder for Twitch.',
       }),
-      icon: 'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitch.png?alt=media',
+      icon: twitchIcon,
     },
     {
       slug: 'web',
@@ -294,3 +305,15 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
 }
 
 export const smallScreens: ScreenSize[] = ['mobile', 'tablet']
+
+export const getStreamLogo = (streamType: StreamType): string => {
+  if (streamType === StreamType.Discord) {
+    return discordIcon
+  } else if (streamType === StreamType.Youtube) {
+    return youtubeIcon
+  } else if (streamType === StreamType.Twitch) {
+    return twitchIcon
+  } else {
+    return facebookIcon
+  }
+}

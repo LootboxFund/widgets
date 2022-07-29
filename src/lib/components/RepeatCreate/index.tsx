@@ -17,6 +17,7 @@ import { TournamentID } from 'lib/types'
 import { createEscrowLootbox } from 'lib/api/createLootbox'
 import { useProvider, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import BigNumber from 'bignumber.js'
+import useWords from 'lib/hooks/useWords'
 
 export interface RepeatCreateProps {
   tournamentName: string
@@ -49,6 +50,7 @@ const RepeatCreate = (props: RepeatCreateProps) => {
   const [receivingWallet, setReceivingWallet] = useState<Address | undefined>(
     (snapUserState.currentAccount || undefined) as Address
   )
+  const words = useWords()
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const reputationWallet = (snapUserState.currentAccount || '') as Address
 
@@ -119,7 +121,7 @@ const RepeatCreate = (props: RepeatCreateProps) => {
     setSubmitStatus('in_progress')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (!snapUserState?.network?.currentNetworkIdHex) {
-      throw new Error('Network not set')
+      throw new Error(words.networkNotSet)
     }
     console.log(`Generating Escrow/Tournament Lootbox...`)
     await createEscrowLootbox(
@@ -248,10 +250,11 @@ const RepeatCreate = (props: RepeatCreateProps) => {
           fontSize: TYPOGRAPHY.fontSize.large,
           padding: '15px',
           borderRadius: '5px',
+          textTransform: 'uppercase',
         }}
         disabled={!chosenLootbox}
       >
-        JOIN TOURNAMENT
+        {words.joinTournament}
       </$Button>
     )
   }

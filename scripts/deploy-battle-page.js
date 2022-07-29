@@ -10,7 +10,7 @@ const { uploadFile } = require('./upload-file')
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
 
 console.log(`
 
@@ -19,9 +19,9 @@ console.log(`
   env: ${process.env.NODE_ENV}
 `)
 
-const BattleFeed = process.env.NODE_ENV === 'production' ? 'BattleFeed.production.js' : 'BattleFeed.js'
+const BattlePage = process.env.NODE_ENV === 'production' ? 'BattlePage.production.js' : 'BattlePage.js'
 
-const fileNames = [BattleFeed]
+const fileNames = [BattlePage]
 
 fileNames.map((filename) => {
   uploadFile({
