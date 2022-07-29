@@ -24,6 +24,7 @@
   "battlePage.button.claimLottery": "Claim lottery",
   "battlePage.button.noneAvailable": "None available",
   "battlePage.lotteryHeader": "Claim a Lottery Ticket",
+  "battlePage.noStreamsMessage": "Tournament does not have any streams. Ask the Tournament host to add some.",
   "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": "Seems like this tournament does not have any lottery tickets yet",
   "battlePage.socials.followSocials": "Follow socials",
   "battlePage.streamText.switchStreamText": "You are watching \"{streamName}\". To switch to another stream, {clickHereHyperlink}",

@@ -1,15 +1,8 @@
 import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3, $p } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
-import { LootboxList, $SearchInput, $TournamentCover, StreamListItem } from '../common'
-import {
-  DeleteStreamResponse,
-  LootboxTournamentSnapshot,
-  MutationDeleteStreamArgs,
-  QueryTournamentArgs,
-  TournamentResponse,
-  TournamentResponseSuccess,
-} from 'lib/api/graphql/generated/types'
+import { LootboxList, $TournamentCover, StreamListItem } from '../common'
+import { QueryTournamentArgs, TournamentResponse, TournamentResponseSuccess } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_MY_TOURNAMENT, DELETE_STREAM } from './api.gql'
@@ -46,20 +39,6 @@ const ManageTournament = (props: ManageTournamentProps) => {
       },
     }
   )
-
-  const [deleteStream, { loading: deleteStreamLoading }] = useMutation<
-    { deleteStream: DeleteStreamResponse },
-    MutationDeleteStreamArgs
-  >(DELETE_STREAM, {
-    refetchQueries: [
-      {
-        query: GET_MY_TOURNAMENT,
-        variables: {
-          id: props.tournamentId,
-        },
-      },
-    ],
-  })
 
   const tournamentWords = useTournamentWords()
   const noLootboxesText = intl.formatMessage({

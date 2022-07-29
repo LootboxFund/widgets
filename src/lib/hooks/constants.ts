@@ -3,6 +3,7 @@ import { manifest } from '../../manifest'
 import { SocialFragment } from 'lib/types'
 import { ScreenSize } from './useScreenSize'
 import { IntlShape, useIntl } from 'react-intl'
+import { StreamType } from 'lib/api/graphql/generated/types'
 
 // update this to match backend types `TokenDataFE`
 export interface TokenDataFE extends TokenData {
@@ -304,3 +305,15 @@ export const getSocials = (intl: IntlShape): SocialFragment[] => {
 }
 
 export const smallScreens: ScreenSize[] = ['mobile', 'tablet']
+
+export const getStreamLogo = (streamType: StreamType): string => {
+  if (streamType === StreamType.Discord) {
+    return discordIcon
+  } else if (streamType === StreamType.Youtube) {
+    return youtubeIcon
+  } else if (streamType === StreamType.Twitch) {
+    return twitchIcon
+  } else {
+    return facebookIcon
+  }
+}

@@ -18,7 +18,7 @@ import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import { StreamID, TournamentID } from 'lib/types'
 import PopConfirm from '../Generics/PopConfirm'
-import { twitchIcon, facebookIcon, discordIcon, youtubeIcon } from 'lib/hooks/constants'
+import { getStreamLogo } from 'lib/hooks/constants'
 import AddStream from './ManageTournament/AddStream'
 import { DELETE_STREAM, GET_MY_TOURNAMENT } from './ManageTournament/api.gql'
 import { useMutation } from '@apollo/client'
@@ -480,18 +480,6 @@ export const StreamListItem = (props: StreamListItemProps) => {
     ],
   })
 
-  const getLogo = (streamType: StreamType): string => {
-    if (streamType === StreamType.Discord) {
-      return discordIcon
-    } else if (streamType === StreamType.Youtube) {
-      return youtubeIcon
-    } else if (streamType === StreamType.Twitch) {
-      return twitchIcon
-    } else {
-      return facebookIcon
-    }
-  }
-
   const toggleEdit = () => {
     setIsEdit(!isEdit)
   }
@@ -524,7 +512,7 @@ export const StreamListItem = (props: StreamListItemProps) => {
       {!isEdit && (
         <$Horizontal spacing={2} justifyContent="space-between">
           <$Horizontal spacing={2}>
-            <$StreamLogo src={getLogo(props.stream.type)} />
+            <$StreamLogo src={getStreamLogo(props.stream.type)} />
             <$h3>{props.stream.name}</$h3>
           </$Horizontal>
 
@@ -565,7 +553,7 @@ export const StreamListItem = (props: StreamListItemProps) => {
   )
 }
 
-const $StreamListItem = styled.div`
+export const $StreamListItem = styled.div`
   border-radius: 10px;
   background-color: ${COLORS.white};
   filter: drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.14));

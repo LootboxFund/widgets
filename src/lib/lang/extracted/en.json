@@ -97,6 +97,10 @@
     "defaultMessage": "Claim a Lottery Ticket",
     "description": "Header indicating to user to receive a free NFT lottery ticket."
   },
+  "battlePage.noStreamsMessage": {
+    "defaultMessage": "Tournament does not have any streams. Ask the Tournament host to add some.",
+    "description": "Text prompting indicating that there are no streams for this tournament"
+  },
   "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
     "defaultMessage": "Seems like this tournament does not have any lottery tickets yet",
     "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"

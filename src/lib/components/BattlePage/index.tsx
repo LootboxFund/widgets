@@ -17,7 +17,6 @@ import styled from 'styled-components'
 import { $h1, $h2, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
 import Spinner from '../Generics/Spinner'
 import { $Link, Oopsies } from '../Profile/common'
-import { useTournamentWords } from '../Tournament/common'
 import { GET_TOURNAMENT_BATTLE_PAGE } from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
@@ -25,6 +24,9 @@ import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
+import Modal from 'react-modal'
+import { $StreamListItem, $StreamLogo } from '../Tournament/common'
+import { getStreamLogo } from 'lib/hooks/constants'
 
 interface LootboxPartyBasket {
   lootbox: LootboxTournamentSnapshot
@@ -44,6 +46,7 @@ const BattlePage = (props: BattlePageParams) => {
       },
     }
   )
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
@@ -54,6 +57,33 @@ const BattlePage = (props: BattlePageParams) => {
     defaultMessage: 'Seems like this tournament does not have any lottery tickets yet',
     description: 'Text prompting indicating that there are no lottery tickets yet for this tournament',
   })
+  const noStreamsMessage = intl.formatMessage({
+    id: 'battlePage.noStreamsMessage',
+    defaultMessage: 'Tournament does not have any streams. Ask the Tournament host to add some.',
+    description: 'Text prompting indicating that there are no streams for this tournament',
+  })
+
+  const customStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+      maxWidth: '500px',
+      margin: 'auto',
+      maxHeight: '500px',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+  }
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -157,7 +187,7 @@ const BattlePage = (props: BattlePageParams) => {
                   values={{
                     streamName: stream.name,
                     clickHereHyperlink: (
-                      <$Link href="#" style={{ textTransform: 'lowercase' }}>
+                      <$Link style={{ textTransform: 'lowercase' }} onClick={() => setIsModalOpen(true)}>
                         {words.clickHere}.
                       </$Link>
                     ),
@@ -358,6 +388,39 @@ const BattlePage = (props: BattlePageParams) => {
           </$Vertical>
         </$BattlePageBody>
       </$Vertical>
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Stream Selection Modal"
+        style={customStyles}
+      >
+        <$Horizontal
+          justifyContent="flex-end"
+          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          <span onClick={() => setIsModalOpen(false)}>X</span>
+        </$Horizontal>
+        {!tournament?.streams || (tournament.streams.length === 0 && <Oopsies title={noStreamsMessage} icon="🧐" />)}
+        {tournament?.streams && tournament.streams.length > 0 && (
+          <$Vertical spacing={2}>
+            {tournament.streams.map((stream) => {
+              return (
+                <$StreamListItem style={{ cursor: 'pointer' }}>
+                  <a
+                    href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <$Horizontal spacing={2}>
+                      <$StreamLogo src={getStreamLogo(stream.type)} />
+                      <$h3 style={{ textDecoration: 'none' }}>{stream.name}</$h3>
+                    </$Horizontal>
+                  </a>
+                </$StreamListItem>
+              )
+            })}
+          </$Vertical>
+        )}
+      </Modal>
     </$BattlePageContainer>
   )
 }
