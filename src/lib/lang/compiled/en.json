@@ -77,7 +77,7 @@
   "create.lootbox.step.type.subheading": "Use the default option “Escrow” if you don’t know which to pick.",
   "createLootbox.connectWallet": "Wallet not connected",
   "createLootbox.customizeTicket.inputBiography": "Biography",
-  "createLootbox.customizeTicket.inputBiography.tooltip": "Write a 3-5 sentence introduction of yourself",
+  "createLootbox.customizeTicket.inputBiography.tooltip": "Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for.",
   "createLootbox.customizeTicket.inputCover.prompt": "{icon} Upload Cover",
   "createLootbox.customizeTicket.inputLogo.prompt": "{icon} Upload Logo",
   "createLootbox.customizeTicket.inputName": "Lootbox Name",

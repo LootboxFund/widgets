@@ -265,7 +265,7 @@ export const useWords = () => {
 
   const biographyHelp = intl.formatMessage({
     id: 'createLootbox.customizeTicket.inputBiography.tooltip',
-    defaultMessage: 'Write a 3-5 sentence introduction of yourself',
+    defaultMessage: 'Write a 3-5 sentence introduction of yourself and what you plan to use the investment money for.',
     description: 'tooltip for people who might be confused about what the Lootbox biography field is',
   })
 
