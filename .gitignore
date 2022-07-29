@@ -7,3 +7,4 @@ umd
 /iife
 generated
 .npmrc
+.DS_Store
