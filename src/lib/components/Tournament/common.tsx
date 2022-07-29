@@ -22,6 +22,7 @@ import { twitchIcon, facebookIcon, discordIcon, youtubeIcon } from 'lib/hooks/co
 import AddStream from './ManageTournament/AddStream'
 import { DELETE_STREAM, GET_MY_TOURNAMENT } from './ManageTournament/api.gql'
 import { useMutation } from '@apollo/client'
+import { manifest } from 'manifest'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -119,11 +120,11 @@ export const useTournamentWords = () => {
     description: 'Error message shown to user when they dont input a stream URL in a form',
   })
 
-  const streamURLNotValidUrl = intl.formatMessage({
-    id: 'tournament.stream.streamURLNotValidUrl',
-    defaultMessage: 'Stream URL is not a valid URL. It must start with "https://"',
-    description: 'Error message shown to user when they input an invalid stream URL in a form',
-  })
+  // const streamURLNotValidUrl = intl.formatMessage({
+  //   id: 'tournament.stream.streamURLNotValidUrl',
+  //   defaultMessage: 'Stream URL is not a valid URL. It must start with "https://"',
+  //   description: 'Error message shown to user when they input an invalid stream URL in a form',
+  // })
 
   const streamTypeCannotBeEmpty = intl.formatMessage({
     id: 'tournament.stream.streamTypeCannotBeEmpty',
@@ -144,7 +145,7 @@ export const useTournamentWords = () => {
     prizePlaceholder,
     visitTournament,
     streamURLCannotBeEmpty,
-    streamURLNotValidUrl,
+    // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
   }
 }
@@ -528,6 +529,18 @@ export const StreamListItem = (props: StreamListItemProps) => {
           </$Horizontal>
 
           <$Horizontal spacing={3}>
+            <$span
+              textAlign="center"
+              style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
+              onClick={toggleEdit}
+            >
+              <$Link
+                href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${props.stream.id}`}
+                target="_blank"
+              >
+                {words.view}
+              </$Link>
+            </$span>
             <$span
               textAlign="center"
               style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}

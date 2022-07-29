@@ -49,6 +49,12 @@ const BattlePage = (props: BattlePageParams) => {
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
 
+  const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
+    id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
+    defaultMessage: 'Seems like this tournament does not have any lottery tickets yet',
+    description: 'Text prompting indicating that there are no lottery tickets yet for this tournament',
+  })
+
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
@@ -138,7 +144,8 @@ const BattlePage = (props: BattlePageParams) => {
     <$BattlePageContainer>
       <$Vertical spacing={4}>
         {!!stream && <LiveStreamVideo stream={stream} />}
-        {!stream && <>No stream selected</>}
+        {!stream && !!tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
+        {!stream && !tournament.coverPhoto && <$TournamentCoverPlaceholder />}
         <$BattlePageBody screen={screen}>
           <$Vertical spacing={4} height="100%">
             {!!stream && (
@@ -149,6 +156,22 @@ const BattlePage = (props: BattlePageParams) => {
                   description="Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
                   values={{
                     streamName: stream.name,
+                    clickHereHyperlink: (
+                      <$Link href="#" style={{ textTransform: 'lowercase' }}>
+                        {words.clickHere}.
+                      </$Link>
+                    ),
+                  }}
+                />
+              </$span>
+            )}
+            {!stream && (
+              <$span>
+                <FormattedMessage
+                  id="battlePage.streamText.switchStreamText.noStream"
+                  defaultMessage="You are not watching a stream. To choose a stream, {clickHereHyperlink}"
+                  description="Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
+                  values={{
                     clickHereHyperlink: (
                       <$Link href="#" style={{ textTransform: 'lowercase' }}>
                         {words.clickHere}.
@@ -173,7 +196,7 @@ const BattlePage = (props: BattlePageParams) => {
                     )}
                   </$BattleCardsContainer>
                 </$Vertical>
-                <$Vertical height="100%" spacing={2}>
+                <$Vertical height="100%" width="100%" spacing={2}>
                   <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>{tournament.title}</$h1>
                   {tournament.prize && (
                     <$span
@@ -225,6 +248,9 @@ const BattlePage = (props: BattlePageParams) => {
                 description="Header indicating to user to receive a free NFT lottery ticket."
               />
             </$h1>
+            {(!lootboxPartyBaskets || lootboxPartyBaskets?.length === 0) && (
+              <Oopsies title={seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet} icon="🧐" />
+            )}
             {lootboxPartyBaskets.map((data) => {
               return (
                 <$BattlePageSection screen={screen}>
@@ -253,9 +279,9 @@ const BattlePage = (props: BattlePageParams) => {
                         </$Link>
                       </span>
                     </$Vertical>
-                    <$Vertical height="100%" spacing={2}>
+                    <$Vertical height="100%" width="100%" spacing={2}>
                       <$Horizontal justifyContent="space-between" flexWrap={screen !== 'desktop'} spacing={2}>
-                        <$Vertical>
+                        <$Vertical width={screen === 'mobile' ? '100%' : 'auto'}>
                           <$h1 style={{ marginBottom: '0', textAlign: screen === 'mobile' ? 'center' : 'left' }}>
                             {data?.partyBasket?.name || data?.lootbox?.name}
                           </$h1>
@@ -390,6 +416,15 @@ const $BattleCardsContainer = styled.div<{ width: string; screen: ScreenSize }>`
 const $BattleCardImage = styled.img<{ cardNumber: number }>`
   position: absolute;
   width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+  width: 100%;
   max-width: 90%;
   max-height: 400px;
   background-size: cover;
@@ -402,6 +437,32 @@ const $BattleCardImage = styled.img<{ cardNumber: number }>`
 export const $SocialLogo = styled.img`
   width: 30px;
   height: 30px;
+`
+
+export const $TournamentCover = styled.img`
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+`
+
+const $TournamentCoverPlaceholder = styled.div`
+  width: 100%;
+  height: 40vh;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: #16222a; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to bottom, #3a6073, #16222a); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to bottom,
+    #3a6073,
+    #16222a
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 `
 
 export default BattlePageWrapper

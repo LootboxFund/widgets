@@ -22,7 +22,9 @@ import { LoadingText } from '../../Generics/Spinner'
 import { StreamID, TournamentID } from 'lib/types'
 import { $ErrorMessage, $InputMedium, useTournamentWords } from '../common'
 import useWords from 'lib/hooks/useWords'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
+import ReactTooltip from 'react-tooltip'
+import HelpIcon from 'lib/theme/icons/Help.icon'
 
 const DEFAULT_STREAM_TYPE: StreamType = StreamType.Facebook
 
@@ -36,11 +38,6 @@ interface AddStreamProps {
     type: StreamType
     id: StreamID | string
   }
-}
-
-const isUrl = (s: string) => {
-  var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-  return regexp.test(s)
 }
 
 const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStreamProps) => {
@@ -116,10 +113,12 @@ const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStre
       } else if (url.length === 0) {
         setErrorMessage(tournamentWords.streamURLCannotBeEmpty)
         return
-      } else if (!isUrl(url)) {
-        setErrorMessage(tournamentWords.streamURLNotValidUrl)
-        return
-      } else if (!type) {
+      }
+      // else if (!isUrl(url)) {
+      //   setErrorMessage(tournamentWords.streamURLNotValidUrl)
+      //   return
+      // }
+      else if (!type) {
         setErrorMessage(tournamentWords.streamTypeCannotBeEmpty)
         return
       }
@@ -143,7 +142,6 @@ const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStre
           }
         } else {
           // This is a stream add
-
           const res = await addStream({
             variables: {
               payload: {
@@ -211,7 +209,7 @@ const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStre
           <$Vertical spacing={3}>
             {!initialParams && <$h3>{words.addLiveStream}</$h3>}
             <$AddStreamContainer>
-              <$Horizontal flexWrap spacing={2}>
+              <$Horizontal flexWrap={screen === 'mobile'} spacing={2}>
                 <$InputMedium
                   placeholder={words.name}
                   value={name}
@@ -224,8 +222,18 @@ const AddStream = ({ tournamentId, initialParams, onCancel, onSuccess }: AddStre
                   value={url}
                   onChange={(e) => parseUrl(e.target.value)}
                   style={{ borderRadius: '5px', background: COLORS.white, marginTop: '10px', marginBottom: '10px' }}
-                  width={screen === 'mobile' ? '100%' : '45%'}
+                  width={screen === 'mobile' ? '80%' : '40%'}
                 />
+                <div style={{ margin: 'auto 0' }}>
+                  <HelpIcon tipID="linkToStream" marginLeft="0px" />
+                </div>
+                <ReactTooltip id="linkToStream" place="top" effect="solid">
+                  <FormattedMessage
+                    id="addStream.streamLink.help"
+                    defaultMessage='The "Stream Link" is different for each stream type.{newline}{newline}For Facebook, it must be PUBLIC. It is the URL when you click "share" or "copy link" (e.x. "https://fb.watch/eyTrWLFDxu").{newline}{newline}For YouTube, the stream must be PUBLIC and you need to allow "video embedding". It is the livestream/video ID (i.e. "6mnMw_jKbxw" if the video URL is "https://www.youtube.com/watch?v=6mnMw_jKbxw").{newline}{newline}For Twitch, it is your channel name / ID.'
+                    values={{ newline: <br /> }}
+                  />
+                </ReactTooltip>
 
                 <$TournamentSelect
                   value={type}

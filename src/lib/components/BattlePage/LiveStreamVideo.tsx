@@ -9,30 +9,33 @@ interface Props {
   stream: Stream
 }
 const LiveStreamVideo = (props: Props) => {
+  let embededSrc: string
+  const encodedVideoUrl = encodeURIComponent(props.stream.url)
   if (props.stream.type === StreamType.Facebook) {
-    const encodedVideoUrl = encodeURIComponent(props.stream.url)
-    const embededSrc = `https://www.facebook.com/plugins/video.php?href=${encodedVideoUrl}&show_text=false&appId`
-    return (
-      <FrameWrapper>
-        <$Frame
-          src={embededSrc}
-          width="100%"
-          height="100%"
-          style={{
-            border: 'none',
-            overflow: 'hidden',
-          }}
-          scrolling="no"
-          frameBorder={0}
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowFullScreen={true}
-        ></$Frame>
-      </FrameWrapper>
-    )
+    embededSrc = `https://www.facebook.com/plugins/video.php?href=${encodedVideoUrl}&show_text=false&appId`
+  } else if (props.stream.type === StreamType.Youtube) {
+    embededSrc = `https://www.youtube.com/embed/${encodedVideoUrl}`
   } else {
-    console.error('live stream not implemented ', props.stream.type)
-    return <>NOT IMPLEMENTED</>
+    // twitch
+    embededSrc = `https://player.twitch.tv/?channel=${encodedVideoUrl}&parent=lootbox.fund`
   }
+  return (
+    <FrameWrapper>
+      <$Frame
+        src={embededSrc}
+        width="100%"
+        height="100%"
+        style={{
+          border: 'none',
+          overflow: 'hidden',
+        }}
+        scrolling="no"
+        frameBorder={0}
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+        allowFullScreen={true}
+      ></$Frame>
+    </FrameWrapper>
+  )
 }
 
 const FrameWrapper = ({ children }: { children: React.ReactElement }) => {

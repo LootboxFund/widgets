@@ -1,4 +1,7 @@
 {
+  "addStream.streamLink.help": {
+    "defaultMessage": "The \"Stream Link\" is different for each stream type.{newline}{newline}For Facebook, it must be PUBLIC. It is the URL when you click \"share\" or \"copy link\" (e.x. \"https://fb.watch/eyTrWLFDxu\").{newline}{newline}For YouTube, the stream must be PUBLIC and you need to allow \"video embedding\". It is the livestream/video ID (i.e. \"6mnMw_jKbxw\" if the video URL is \"https://www.youtube.com/watch?v=6mnMw_jKbxw\").{newline}{newline}For Twitch, it is your channel name / ID."
+  },
   "auth.emailIsRequired": {
     "defaultMessage": "Email is required",
     "description": "Error message when user tries to sign up without an email"
@@ -94,12 +97,20 @@
     "defaultMessage": "Claim a Lottery Ticket",
     "description": "Header indicating to user to receive a free NFT lottery ticket."
   },
+  "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
+    "defaultMessage": "Seems like this tournament does not have any lottery tickets yet",
+    "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"
+  },
   "battlePage.socials.followSocials": {
     "defaultMessage": "Follow socials",
     "description": "Text prompting user to follow social media"
   },
   "battlePage.streamText.switchStreamText": {
     "defaultMessage": "You are watching \"{streamName}\". To switch to another stream, {clickHereHyperlink}",
+    "description": "Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
+  },
+  "battlePage.streamText.switchStreamText.noStream": {
+    "defaultMessage": "You are not watching a stream. To choose a stream, {clickHereHyperlink}",
     "description": "Text shown to user to allow them to switch streams. Stream is a live video feed of an esports tournament."
   },
   "bounty.myNFTs.title": {
@@ -1894,10 +1905,6 @@
   "tournament.stream.streamURLCannotBeEmpty": {
     "defaultMessage": "Stream URL cannot be empty",
     "description": "Error message shown to user when they dont input a stream URL in a form"
-  },
-  "tournament.stream.streamURLNotValidUrl": {
-    "defaultMessage": "Stream URL is not a valid URL. It must start with \"https://\"",
-    "description": "Error message shown to user when they input an invalid stream URL in a form"
   },
   "tournament.visit.header": {
     "defaultMessage": "Visit Tournament",
