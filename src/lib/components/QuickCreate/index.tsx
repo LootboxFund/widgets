@@ -25,6 +25,7 @@ import { TournamentID } from '../../types/index'
 import { manifest } from '../../../manifest'
 import useWords from 'lib/hooks/useWords'
 import { useWords as useWordsCreate } from 'lib/components/CreateLootbox/constants'
+import WalletButton from '../WalletButton'
 
 export interface QuickCreateProps {
   tournamentName: string
@@ -377,6 +378,10 @@ const QuickCreate = (props: QuickCreateProps) => {
       ticketState.coverFile &&
       ticketState.logoFile &&
       ticketState.biography
+    if (!reputationWallet) {
+      // Connect wallet
+      return <WalletButton />
+    }
     if (snapUserState.network.currentNetworkIdHex !== props.network.chainIdHex) {
       return (
         <$Button
@@ -459,7 +464,7 @@ const QuickCreate = (props: QuickCreateProps) => {
               window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootboxAddress}`, '_blank')
             }
           >
-            {wordsCreate.viewYourLootbox}
+            🎉 {wordsCreate.viewYourLootbox} 🎉
           </$Button>
         )
       }
@@ -540,7 +545,7 @@ const QuickCreate = (props: QuickCreateProps) => {
           borderRadius: '15px 15px 0px 0px',
         }}
       >
-        {wordsCreate.joinLootboxTournament}
+        {wordsCreate.joinTournamentNameFn(props.tournamentName)}
       </$Horizontal>
       <$InnerLining>
         <div

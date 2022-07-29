@@ -356,6 +356,10 @@
     "defaultMessage": "MetaMask is on the wrong network",
     "description": "Error text when user is on the wrong blockchain network"
   },
+  "createLootbox.quickCreate.jointTourny.fn": {
+    "defaultMessage": "Join {name}",
+    "description": "Header for joining a esports tournament"
+  },
   "createLootbox.receivingWalletError": {
     "defaultMessage": "Invalid Receiving Wallet, check if the address is compatible with {networkName}.",
     "description": "Error message when the user enters an invalid receiving wallet address"

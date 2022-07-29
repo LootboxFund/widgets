@@ -291,6 +291,17 @@ export const useWords = () => {
       { icon }
     )
 
+  const joinTournamentNameFn = (name: string) =>
+    intl.formatMessage(
+      {
+        id: 'createLootbox.quickCreate.jointTourny.fn',
+        defaultMessage: 'Join {name}',
+        description: 'Header for joining a esports tournament',
+      },
+      {
+        name,
+      }
+    )
   return {
     pleaseUploadALogoImage,
     pleaseUploadACoverPhoto,
@@ -309,5 +320,6 @@ export const useWords = () => {
     biographyHelp,
     uploadLogoFn,
     uploadCoverFn,
+    joinTournamentNameFn,
   }
 }
