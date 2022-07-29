@@ -2,16 +2,25 @@ import React, { useState, useEffect } from 'react'
 import { IntlProvider } from 'react-intl'
 
 // TODO put in @helpers
-type Locale = 'en' | 'vi'
+/**
+ * en = English
+ * vi = Vietnamese
+ * tl = Tagalog
+ */
+type Locale = 'en' | 'vi' | 'tl'
 
 let initLocale: Locale = 'en'
 
 if (navigator.language === 'vi') {
   initLocale = 'vi'
+} else if (navigator.language === 'tl') {
+  initLocale = 'tl'
 }
 
 const loadMessages = async (locale: Locale) => {
   switch (locale) {
+    case 'tl':
+      return import('lib/lang/compiled/tl.json')
     case 'vi':
       return import('lib/lang/compiled/vi.json')
     case 'en':
