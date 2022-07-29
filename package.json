@@ -36,7 +36,8 @@
     "deploy:galileo": "NODE_ENV=production node scripts/deploy-party-basket-manage.js",
     "deploy:armstrong": "NODE_ENV=production node scripts/deploy-party-basket-redeem.js",
     "deploy:degrasse": "NODE_ENV=production node scripts/deploy-lootbox-feed.js",
-    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse",
+    "deploy:lagrange": "NODE_ENV=production node scripts/deploy-battle-page.js",
+    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
