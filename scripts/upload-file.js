@@ -5,7 +5,7 @@ const storage = new Storage()
 // const { latest: Manifest } = require('@wormgraph/manifest')
 // const manifest = Manifest.default
 
-export const uploadFile = async ({ filename, semver, absPath }) => {
+const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
   // Uploads a local file to the bucket
   const filepath = `widgets/${semver}/build/${filename}`
   const localFilePath = `${absPath}${filename}`
@@ -28,3 +28,5 @@ export const uploadFile = async ({ filename, semver, absPath }) => {
   console.log(`${filename} made public`)
   process.exit()
 }
+
+module.exports = { uploadFile }

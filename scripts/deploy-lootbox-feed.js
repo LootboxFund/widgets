@@ -28,6 +28,7 @@ fileNames.map((filename) => {
     filename,
     semver,
     absPath,
+    bucketName,
   })
 })
 
