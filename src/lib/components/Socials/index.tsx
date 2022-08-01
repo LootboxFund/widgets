@@ -75,7 +75,7 @@ const Socials = ({ lootbox }: SocialsProps) => {
   return (
     <$Container screen={screen}>
       <$Vertical spacing={2}>
-        <$Vertical spacing={1}>
+        {/* <$Vertical spacing={1}>
           <$TargetReturnHeader>
             <FormattedMessage
               id="socials.targetReturn"
@@ -87,16 +87,16 @@ const Socials = ({ lootbox }: SocialsProps) => {
             />
           </$TargetReturnHeader>
           <$PaybackDateSubHeader>{words.inDays(diffDays < 0 ? 0 : diffDays)}</$PaybackDateSubHeader>
-        </$Vertical>
+        </$Vertical> */}
         {lootboxDescription ? (
-          <$Vertical spacing={1}>
-            <$AboutLootboxHeader>
+          <$Vertical spacing={2}>
+            <$TargetReturnHeader>
               <FormattedMessage
                 id="socials.aboutLootbox"
                 defaultMessage="About this Lootbox"
                 description="Header for the Lootbox description section"
               />
-            </$AboutLootboxHeader>
+            </$TargetReturnHeader>
             <$LootboxDescription>{lootboxDescription}</$LootboxDescription>
           </$Vertical>
         ) : undefined}

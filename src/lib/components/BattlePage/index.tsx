@@ -62,6 +62,11 @@ const BattlePage = (props: BattlePageParams) => {
     defaultMessage: 'Tournament does not have any streams. Ask the Tournament host to add some.',
     description: 'Text prompting indicating that there are no streams for this tournament',
   })
+  const viewTournament = intl.formatMessage({
+    id: 'battlePage.viewTournament.link',
+    defaultMessage: 'Visit tournament',
+    description: 'Text prompting user to visit tournament page',
+  })
 
   const customStyles = {
     content: {
@@ -225,6 +230,28 @@ const BattlePage = (props: BattlePageParams) => {
                       <$BattleCardImage src={TEMPLATE_LOOTBOX_STAMP} cardNumber={0} />
                     )}
                   </$BattleCardsContainer>
+                  {tournament.tournamentLink && (
+                    <span
+                      style={{
+                        textAlign: 'center',
+                        width: '90%',
+                        paddingBottom: screen === 'mobile' ? '12px' : 'auto',
+                      }}
+                    >
+                      🔗{' '}
+                      <$Link
+                        href={tournament.tournamentLink}
+                        style={{
+                          color: `${COLORS.surpressedFontColor}ce`,
+                          textDecoration: 'none',
+                          textTransform: 'capitalize',
+                        }}
+                        target="_blank"
+                      >
+                        {viewTournament}
+                      </$Link>
+                    </span>
+                  )}
                 </$Vertical>
                 <$Vertical height="100%" width="100%" spacing={2}>
                   <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>{tournament.title}</$h1>
@@ -420,7 +447,7 @@ const BattlePage = (props: BattlePageParams) => {
                   >
                     <$Horizontal spacing={2}>
                       <$StreamLogo src={getStreamLogo(stream.type)} />
-                      <$h3 style={{ textDecoration: 'none' }}>{stream.name}</$h3>
+                      <$h3 style={{ textDecoration: 'none', margin: 'auto 0' }}>{stream.name}</$h3>
                     </$Horizontal>
                   </a>
                 </$StreamListItem>

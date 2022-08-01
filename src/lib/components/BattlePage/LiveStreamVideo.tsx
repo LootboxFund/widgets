@@ -17,7 +17,7 @@ const LiveStreamVideo = (props: Props) => {
     embededSrc = `https://www.youtube.com/embed/${encodedVideoUrl}`
   } else {
     // twitch
-    embededSrc = `https://player.twitch.tv/?channel=${encodedVideoUrl}&parent=lootbox.fund`
+    embededSrc = `https://player.twitch.tv/?channel=${encodedVideoUrl}&parent=www.lootbox.fund`
   }
   return (
     <FrameWrapper>
