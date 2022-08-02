@@ -25,7 +25,7 @@ import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
 import Modal from 'react-modal'
-import { $StreamListItem, $StreamLogo } from '../Tournament/common'
+import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 
 interface LootboxPartyBasket {
@@ -49,6 +49,7 @@ const BattlePage = (props: BattlePageParams) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
+  const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
 
@@ -61,11 +62,6 @@ const BattlePage = (props: BattlePageParams) => {
     id: 'battlePage.noStreamsMessage',
     defaultMessage: 'Tournament does not have any streams. Ask the Tournament host to add some.',
     description: 'Text prompting indicating that there are no streams for this tournament',
-  })
-  const viewTournament = intl.formatMessage({
-    id: 'battlePage.viewTournament.link',
-    defaultMessage: 'Visit tournament',
-    description: 'Text prompting user to visit tournament page',
   })
 
   const customStyles = {
@@ -248,7 +244,7 @@ const BattlePage = (props: BattlePageParams) => {
                         }}
                         target="_blank"
                       >
-                        {viewTournament}
+                        {tournamentWords.visitTournament}
                       </$Link>
                     </span>
                   )}
