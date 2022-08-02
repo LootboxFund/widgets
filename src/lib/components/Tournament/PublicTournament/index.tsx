@@ -1,4 +1,4 @@
-import { $Divider, $Horizontal, $Vertical, $h1, $span, $h3 } from '../../Generics'
+import { $Divider, $Horizontal, $Vertical, $h1, $span, $h3, $h2 } from '../../Generics'
 import { useQuery } from '@apollo/client'
 import { GET_TOURNAMENT } from './api.gql'
 import { useEffect, useState } from 'react'
@@ -24,6 +24,9 @@ import { useTournamentWords } from '../common'
 import QuickCreate from 'lib/components/QuickCreate'
 import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
+import { $StreamListItem, $StreamLogo } from 'lib/components/Tournament/common'
+import { getStreamLogo } from 'lib/hooks/constants'
+import { FormattedMessage } from 'react-intl'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -180,6 +183,34 @@ const PublicTournament = (props: PublicTournamentProps) => {
         }
         magicLink={tournament.magicLink || ''}
       />
+      {tournament?.streams && tournament.streams.length > 0 && (
+        <$Vertical spacing={2}>
+          <$h2>
+            <FormattedMessage
+              id="tournament.manage.chooseStream.header"
+              defaultMessage="Watch this Tournament Live"
+              description="Header for stream selection in the public tournament page"
+            />
+          </$h2>
+          <br />
+          {tournament.streams.map((stream) => {
+            return (
+              <$StreamListItem style={{ cursor: 'pointer' }}>
+                <a
+                  href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <$Horizontal spacing={2}>
+                    <$StreamLogo src={getStreamLogo(stream.type)} />
+                    <$h3 style={{ textDecoration: 'none', margin: 'auto 0' }}>{stream.name}</$h3>
+                  </$Horizontal>
+                </a>
+              </$StreamListItem>
+            )
+          })}
+        </$Vertical>
+      )}
+
       {magicLinkParams && network && (
         <Modal
           isOpen={createModalOpen}

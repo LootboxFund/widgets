@@ -1418,10 +1418,6 @@
     "defaultMessage": "Row",
     "description": "Text for a row number of a CSV file"
   },
-  "partyBasket.manage.shareLinkToRedeemText": {
-    "defaultMessage": "Share link to redeem",
-    "description": "Text for a link to share that allows one to redeem a Lootbox NFT"
-  },
   "partyBasket.manage.successfullyWhitelisted": {
     "defaultMessage": "Successfully whitelisted",
     "description": "Text for a successful whitelist"
@@ -1429,6 +1425,10 @@
   "partyBasket.manage.viewExampleCSV.button": {
     "defaultMessage": "View Sample CSV",
     "description": "Button to view an example CSV file"
+  },
+  "partyBasket.manage.viewPublicPartyBasket": {
+    "defaultMessage": "View Public Party Basket",
+    "description": "Text for a hyperlink that opens the Party Basket page to redeem a Lootbox NFT"
   },
   "partyBasket.manage.viewWhitelistedWallets.button": {
     "defaultMessage": "Download CSV",
@@ -1635,10 +1635,6 @@
   "socials.snapchat.placeholder": {
     "defaultMessage": "Snapchat",
     "description": "Placeholder for Snapchat input field."
-  },
-  "socials.targetReturn": {
-    "defaultMessage": "{returnPercentage}% Target Return",
-    "description": "Percentage return on investment that investors can expect to receive from a lootbox"
   },
   "socials.tiktok.name": {
     "defaultMessage": "Tiktok",
@@ -1905,6 +1901,10 @@
   "tournament.manage.addStream.youtubeLive": {
     "defaultMessage": "YouTube Live",
     "description": "Name of live stream for YouTube"
+  },
+  "tournament.manage.chooseStream.header": {
+    "defaultMessage": "Watch this Tournament Live",
+    "description": "Header for stream selection in the public tournament page"
   },
   "tournament.manage.noLootboxes.text": {
     "defaultMessage": "No Lootboxes",

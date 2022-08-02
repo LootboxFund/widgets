@@ -10,6 +10,7 @@ export const GET_PARTY_BASKET = gql`
           lootboxSnapshot {
             name
             address
+            stampImage
           }
           chainIdHex
           creatorId

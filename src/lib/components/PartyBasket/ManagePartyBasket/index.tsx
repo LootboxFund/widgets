@@ -127,10 +127,15 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     description: 'Error message when the user has not selected a file to upload',
   })
 
-  const shareLinkToRedeemText = intl.formatMessage({
-    id: 'partyBasket.manage.shareLinkToRedeemText',
-    defaultMessage: 'Share link to redeem',
-    description: 'Text for a link to share that allows one to redeem a Lootbox NFT',
+  // const shareLinkToRedeemText = intl.formatMessage({
+  //   id: 'partyBasket.manage.shareLinkToRedeemText',
+  //   defaultMessage: 'Share link to redeem',
+  //   description: 'Text for a link to share that allows one to redeem a Lootbox NFT',
+  // })
+  const viewPublicPartyBasket = intl.formatMessage({
+    id: 'partyBasket.manage.viewPublicPartyBasket',
+    defaultMessage: 'View Public Party Basket',
+    description: 'Text for a hyperlink that opens the Party Basket page to redeem a Lootbox NFT',
   })
 
   const successfullyWhitelisted = intl.formatMessage({
@@ -321,18 +326,18 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     }
   }
 
-  const copyRedeemUrl = () => {
-    navigator.clipboard.writeText(
-      `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.partyBasketAddress}`
-    )
-    const el = document.getElementById('share-redeem-link')
-    if (el) {
-      el.innerText = `✅ ${words.copiedToClipBoard}!`
-      setTimeout(() => {
-        el.innerText = shareLinkToRedeemText
-      }, 2000)
-    }
-  }
+  // const copyRedeemUrl = () => {
+  //   navigator.clipboard.writeText(
+  //     `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.partyBasketAddress}`
+  //   )
+  //   const el = document.getElementById('share-redeem-link')
+  //   if (el) {
+  //     el.innerText = `✅ ${words.copiedToClipBoard}!`
+  //     setTimeout(() => {
+  //       el.innerText = shareLinkToRedeemText
+  //     }, 2000)
+  //   }
+  // }
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -350,7 +355,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
 
   const chain = NETWORK_OPTIONS.find((c) => c.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
-  const { name: lootboxName, address: lootboxAddress } = lootboxSnapshot || {}
+  const { name: lootboxName, address: lootboxAddress, stampImage: lootboxImage } = lootboxSnapshot || {}
 
   const network = NETWORK_OPTIONS.find((network) => network.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
 
@@ -382,34 +387,38 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
             )}
           </$Vertical>
 
-          <$StepSubheading>
-            <FormattedMessage
-              id="partyBasket.manage.partyBasketDescription"
-              defaultMessage='This is your Party Basket for "{lootboxName}". Party Baskets hold onto Lootbox NFTs and allow you to "whitelist" specific wallets, giving them special permission to redeem an NFT from the Party Basket for free.'
-              description="Information message about the Party Basket"
-              values={{
-                lootboxName: lootboxName,
-              }}
-            />
-            <br />
-            <br />
-            <FormattedMessage
-              id="partyBasket.manage.bulkWhitelistingDescription"
-              defaultMessage="Bulk whitelisting will grant a large number of wallets a free NFT to redeem. You can use a CSV file (like {hyperlink}), and then you can upload it by clicking the button below. Your Party Basket will need to have Lootbox NFTs in it (by bulk minting) in order for your followers to be able to redeem one."
-              description="Information message about bulk whitelisting. Bulk whitelisting allows you to give a large number of users permission to get a free Lootbox NFT from a Party Basket"
-              values={{
-                hyperlink: (
-                  <a href={exampleCSV} target="_blank" style={{ display: 'contents', textTransform: 'lowercase' }}>
-                    <FormattedMessage
-                      id="partyBasket.manage.helpHyperlink"
-                      defaultMessage="This one"
-                      description="This is a hyperlink to an example google drive file they can use"
-                    />
-                  </a>
-                ),
-              }}
-            />
-          </$StepSubheading>
+          <$Horizontal spacing={2} justifyContent="space-between" flexWrap={screen === 'mobile'}>
+            <$StepSubheading>
+              <FormattedMessage
+                id="partyBasket.manage.partyBasketDescription"
+                defaultMessage='This is your Party Basket for "{lootboxName}". Party Baskets hold onto Lootbox NFTs and allow you to "whitelist" specific wallets, giving them special permission to redeem an NFT from the Party Basket for free.'
+                description="Information message about the Party Basket"
+                values={{
+                  lootboxName: lootboxName,
+                }}
+              />
+              <br />
+              <br />
+              <FormattedMessage
+                id="partyBasket.manage.bulkWhitelistingDescription"
+                defaultMessage="Bulk whitelisting will grant a large number of wallets a free NFT to redeem. You can use a CSV file (like {hyperlink}), and then you can upload it by clicking the button below. Your Party Basket will need to have Lootbox NFTs in it (by bulk minting) in order for your followers to be able to redeem one."
+                description="Information message about bulk whitelisting. Bulk whitelisting allows you to give a large number of users permission to get a free Lootbox NFT from a Party Basket"
+                values={{
+                  hyperlink: (
+                    <a href={exampleCSV} target="_blank" style={{ display: 'contents', textTransform: 'lowercase' }}>
+                      <FormattedMessage
+                        id="partyBasket.manage.helpHyperlink"
+                        defaultMessage="This one"
+                        description="This is a hyperlink to an example google drive file they can use"
+                      />
+                    </a>
+                  ),
+                }}
+              />
+            </$StepSubheading>
+            {!!lootboxImage && <$LootboxPreviewImage screen={screen} src={lootboxImage || ''} />}
+          </$Horizontal>
+
           <$Vertical spacing={3}>
             <$Vertical>
               <span>
@@ -429,6 +438,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   </ReactTooltip>
                 </$StepSubheading>
               </span>
+
               <$Horizontal spacing={2} flexWrap={screen === 'mobile'}>
                 <$InputWrapper
                   screen={screen}
@@ -559,8 +569,16 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
 
             <br />
 
-            <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
+            {/* <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen} onClick={copyRedeemUrl}>
               🔗 {shareLinkToRedeemText}
+            </$BasketButton> */}
+            <$BasketButton id="share-redeem-link" themeColor={chain.themeColor} screen={screen}>
+              <a
+                style={{ textDecoration: 'none', color: 'inherit' }}
+                href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.partyBasketAddress}`}
+              >
+                🔗 {viewPublicPartyBasket}
+              </a>
             </$BasketButton>
             <$BasketLink
               themeColor={chain.themeColor}
@@ -791,7 +809,9 @@ const $BasketButton = styled.div<{
   display: inline;
 `
 
-const $ManagePartyBasket = styled.div``
+const $ManagePartyBasket = styled.div`
+  width: 100%;
+`
 
 const $AddWhitelistButton = styled.button<{
   themeColor: string
@@ -816,6 +836,12 @@ const $CopyableInput = styled.div`
   justify-content: flex-start;
   flex: 1;
   width: 100%;
+`
+
+const $LootboxPreviewImage = styled.img<{ screen: ScreenSize }>`
+  width: 30%;
+  min-width: 220px;
+  ${(props) => props.screen === 'mobile' && 'padding-top: 20px;'}
 `
 
 export default ManagePartyBasketPage

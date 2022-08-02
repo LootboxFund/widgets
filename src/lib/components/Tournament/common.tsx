@@ -513,14 +513,13 @@ export const StreamListItem = (props: StreamListItemProps) => {
         <$Horizontal spacing={2} justifyContent="space-between">
           <$Horizontal spacing={2}>
             <$StreamLogo src={getStreamLogo(props.stream.type)} />
-            <$h3>{props.stream.name}</$h3>
+            <$h3 style={{ margin: 'auto 0' }}>{props.stream.name}</$h3>
           </$Horizontal>
 
           <$Horizontal spacing={3}>
             <$span
               textAlign="center"
               style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
-              onClick={toggleEdit}
             >
               <$Link
                 href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${props.stream.id}`}

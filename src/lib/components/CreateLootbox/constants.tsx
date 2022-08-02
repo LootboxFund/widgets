@@ -214,7 +214,7 @@ export const useWords = () => {
       { timeElapsed: timeElapsed }
     )
 
-  const preparingElapsedTimeFn = (timeElapsed: number) =>
+  const preparingElapsedTimeFn = (timeLeft: number) =>
     intl.formatMessage(
       {
         id: 'step.terms.submit.success-preparing',
@@ -222,7 +222,7 @@ export const useWords = () => {
         description: 'Success message shown to user when create Lootbox succeeds',
       },
       {
-        timeElapsed: timeElapsed,
+        timeLeft: timeLeft,
       }
     )
 

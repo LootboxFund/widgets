@@ -15,6 +15,13 @@ export const GET_TOURNAMENT = gql`
             name
             stampImage
           }
+          streams {
+            id
+            creatorId
+            type
+            url
+            name
+          }
         }
       }
       ... on ResponseError {
