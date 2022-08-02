@@ -1,5 +1,30 @@
 import { useIntl } from 'react-intl'
 
+export const useSignatures = () => {
+  const intl = useIntl()
+
+  const loginMessage = intl.formatMessage({
+    id: 'signatures.loginMessage',
+    defaultMessage:
+      "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message.',
+  })
+
+  const whitelistMessage = intl.formatMessage({
+    id: 'signatures.whitelistMessage',
+    defaultMessage:
+      "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
+    description:
+      'Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message',
+  })
+
+  return {
+    loginMessage,
+    whitelistMessage,
+  }
+}
+
 const useWords = () => {
   const intl = useIntl()
 
@@ -75,6 +100,12 @@ const useWords = () => {
     defaultMessage: 'Shares',
     description:
       'Shares are considered a portion of the Lootbox`s earnings which allows a user to share the Lootboxes / gamers profits. It is similar to the term "share" in investment, where you can buy "shares" of a company in the stock exchange.',
+  })
+
+  const buyLootbox = intl.formatMessage({
+    id: 'generic.buyLootbox',
+    defaultMessage: 'Buy Lootbox',
+    description: 'Text to buy from a Lootbox using cryptocurrency.',
   })
 
   const readMore = intl.formatMessage({
@@ -286,6 +317,12 @@ const useWords = () => {
     id: 'generic.createNew',
     defaultMessage: 'Create new',
     description: 'Generic user action to create a new something',
+  })
+
+  const advancedCreate = intl.formatMessage({
+    id: 'generic.advancedCreate',
+    defaultMessage: 'Advanced Create',
+    description: 'Generic user action to create a new something in full',
   })
 
   const clickingHere = intl.formatMessage({
@@ -506,6 +543,54 @@ const useWords = () => {
     description: 'Text indicating to see more',
   })
 
+  const addLiveStream = intl.formatMessage({
+    id: 'generic.addLiveStream',
+    defaultMessage: 'Add Live Stream',
+    description: 'Text prompting user to add a Live Stream to their tournament',
+  })
+
+  const name = intl.formatMessage({
+    id: 'generic.name',
+    defaultMessage: 'Name',
+    description: 'Generic text indicating the name of something',
+  })
+
+  const nameCannotBeEmpty = intl.formatMessage({
+    id: 'generic.nameCannotBeEmpty',
+    defaultMessage: 'Name cannot be empty',
+    description: 'Error message for user if they forgot to enter a name in a form',
+  })
+
+  const shareLink = intl.formatMessage({
+    id: 'generic.shareLink',
+    defaultMessage: 'Share link',
+    description: 'Text to share a hyperlink',
+  })
+
+  const saveChanges = intl.formatMessage({
+    id: 'generics.saveChanges',
+    defaultMessage: 'Save Changes',
+    description: 'Button text to save changes to a tournament or something',
+  })
+
+  const networkNotSet = intl.formatMessage({
+    id: 'generics.networkNotSet',
+    defaultMessage: 'Network not set',
+    description: 'Error message for user if they forgot to set a blockchain network',
+  })
+
+  const confirmOnMetamask = intl.formatMessage({
+    id: 'step.terms.submit.metamask-confirmation',
+    defaultMessage: 'Confirm on MetaMask',
+    description: 'Message shown to user when they need to confirm the transaction on MetaMask',
+  })
+
+  const joinTournament = intl.formatMessage({
+    id: 'quickCreateLootbox.singleStep.button.joinTournament',
+    defaultMessage: 'Join Tournament',
+    description: 'Text to join an esports tournament',
+  })
+
   return {
     cancel,
     back,
@@ -552,6 +637,7 @@ const useWords = () => {
     watchTutorial,
     createMagicLink,
     createNew,
+    advancedCreate,
     clickingHere,
     learnMore,
     notFound,
@@ -588,31 +674,15 @@ const useWords = () => {
     win,
     inDays,
     seeMore,
-  }
-}
-
-export const useSignatures = () => {
-  const intl = useIntl()
-
-  const loginMessage = intl.formatMessage({
-    id: 'signatures.loginMessage',
-    defaultMessage:
-      "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
-    description:
-      'Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message.',
-  })
-
-  const whitelistMessage = intl.formatMessage({
-    id: 'signatures.whitelistMessage',
-    defaultMessage:
-      "Sign this message to see if you can redeem a FREE NFT from Lootbox! This doesn't cost you anything and is free of any gas fees.",
-    description:
-      'Message to sign to see if you can redeem a FREE NFT from Lootbox. A signature is a cryptographic hash of a message',
-  })
-
-  return {
-    loginMessage,
-    whitelistMessage,
+    addLiveStream,
+    name,
+    nameCannotBeEmpty,
+    shareLink,
+    buyLootbox,
+    saveChanges,
+    networkNotSet,
+    confirmOnMetamask,
+    joinTournament,
   }
 }
 

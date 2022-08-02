@@ -54,6 +54,7 @@ import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib
 import { TournamentID } from 'lib/types'
 import { InitialUrlParams } from './state'
 import { useMagicWords } from './constants'
+import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
 
 // Multiplies the fundraisingTarget by this value
@@ -94,6 +95,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
   const isWalletConnected = snapUserState.accounts.length > 0
   const [tournamentId, setTournamentId] = useState<string>('')
   const intl = useIntl()
+  const words = useWords()
 
   const [lootboxAddress, setLootboxAddress] = useState<ContractAddress>()
   const [preconfigParams, setPreconfigParams] = useState<string[]>([])
@@ -423,7 +425,7 @@ const CreateLootbox = (props: CreateLootboxProps) => {
     setSubmitStatus('pending_confirmation')
     const current = snapUserState.currentAccount ? (snapUserState.currentAccount as String).toLowerCase() : ''
     if (!snapUserState?.network?.currentNetworkIdHex) {
-      throw new Error('Network not set')
+      throw new Error(words.networkNotSet)
     }
     if (fundingType === 'instant') {
       console.log(`Generating Instant Lootbox...`)

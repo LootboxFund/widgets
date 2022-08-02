@@ -1,5 +1,63 @@
 import { gql } from '@apollo/client'
 
+export const DELETE_STREAM = gql`
+  mutation deleteStream($id: ID!) {
+    deleteStream(id: $id) {
+      ... on DeleteStreamResponseSuccess {
+        stream {
+          id
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export const ADD_STREAM = gql`
+  mutation Mutation($payload: AddStreamPayload!) {
+    addStream(payload: $payload) {
+      ... on AddStreamResponseSuccess {
+        stream {
+          id
+          tournamentId
+          name
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export const EDIT_STREAM = gql`
+  mutation Mutation($payload: EditStreamPayload!) {
+    editStream(payload: $payload) {
+      ... on EditStreamResponseSuccess {
+        stream {
+          id
+          tournamentId
+          name
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const EDIT_TOURNAMENT = gql`
   mutation Mutation($payload: EditTournamentPayload!) {
     editTournament(payload: $payload) {
@@ -38,6 +96,13 @@ export const GET_MY_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
+          streams {
+            id
+            creatorId
+            type
+            url
+            name
+          }
           lootboxSnapshots {
             address
             name

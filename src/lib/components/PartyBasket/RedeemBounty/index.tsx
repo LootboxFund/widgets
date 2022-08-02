@@ -145,7 +145,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
   }, [_lootboxAddress])
 
   if (loading) {
-    return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
+    return <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} size="50px" />
   } else if (error) {
     return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.getPartyBasket?.__typename === 'ResponseError') {
@@ -501,7 +501,7 @@ const RedeemBounty = (props: RedeemBountyProps) => {
       {userTicketStatus === 'success' ? (
         <UserTicketsSimple lootboxAddress={lootboxAddress as Address | undefined} />
       ) : (
-        <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} />
+        <Spinner color={COLORS.surpressedBackground} style={{ textAlign: 'center', margin: '0 auto' }} size="50px" />
       )}
     </$Vertical>
   )

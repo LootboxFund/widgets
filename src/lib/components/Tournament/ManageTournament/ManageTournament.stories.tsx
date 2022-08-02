@@ -28,6 +28,14 @@ const Template = () => {
       <LocalizationWrapper>
         <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
           <ManageTournament />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
         </$CardViewport>
       </LocalizationWrapper>
     </ApolloProvider>

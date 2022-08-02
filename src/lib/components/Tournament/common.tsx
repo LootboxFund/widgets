@@ -3,12 +3,26 @@ import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
-import { Lootbox, LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
+import {
+  DeleteStreamResponse,
+  Lootbox,
+  LootboxTournamentSnapshot,
+  MutationDeleteStreamArgs,
+  Stream,
+  StreamType,
+} from 'lib/api/graphql/generated/types'
 import { $Horizontal, $p, $h1, $span, $Vertical, $h3, $h2 } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
+import { StreamID, TournamentID } from 'lib/types'
+import PopConfirm from '../Generics/PopConfirm'
+import { getStreamLogo } from 'lib/hooks/constants'
+import AddStream from './ManageTournament/AddStream'
+import { DELETE_STREAM, GET_MY_TOURNAMENT } from './ManageTournament/api.gql'
+import { useMutation } from '@apollo/client'
+import { manifest } from 'manifest'
 
 export const $HideTings = styled.div<{ isHidden: boolean }>`
   position: absolute;
@@ -25,12 +39,116 @@ export const $HideTings = styled.div<{ isHidden: boolean }>`
   );`
       : 'none'};
   display: ${(props) => (props.isHidden ? 'auto' : 'none')};
-  };
-  `
+`
 
 const $DescriptionContainer = styled.div`
   position: relative;
 `
+
+export const useTournamentWords = () => {
+  const intl = useIntl()
+  const titleRequired = intl.formatMessage({
+    id: 'tournament.form.titleRequired',
+    defaultMessage: 'Title is required',
+    description: 'Error message shown to user when they dont have a tournament title',
+  })
+
+  const descriptionRequired = intl.formatMessage({
+    id: 'tournament.form.descriptionRequired',
+    defaultMessage: 'Description is required',
+    description: 'Error message shown to user when they dont have a tournament description whem creating / editing one',
+  })
+
+  const startDateRequired = intl.formatMessage({
+    id: 'tournament.form.startDateRequired',
+    defaultMessage: 'Battle date is required',
+    description: 'Error message shown to user when they dont have a tournament battle date',
+  })
+
+  const landscapeRecommended = intl.formatMessage({
+    id: 'tournament.form.landscapeRecommended',
+    defaultMessage: 'Landscape image is recommended',
+    description: 'Picture orientation recommened to look the best on website',
+  })
+
+  const editCoverPhoto = intl.formatMessage({
+    id: 'tournament.form.editCoverPhoto',
+    defaultMessage: 'Edit cover photo',
+    description: 'Button to edit the cover photo of a tournament',
+  })
+
+  const addCoverPhoto = intl.formatMessage({
+    id: 'tournament.form.addCoverPhoto',
+    defaultMessage: 'Add a cover photo',
+    description: 'Button to add a cover photo to a tournament',
+  })
+
+  const linkToOfficalTournament = intl.formatMessage({
+    id: 'tournament.form.linkToOfficalTournament',
+    defaultMessage: 'Link to official tournament',
+    description:
+      'This is a url to another website that is actually streaming the esport tournament, or where someone can go to get more info',
+  })
+
+  const titlePlaceholder = intl.formatMessage({
+    id: 'tournament.edit.title.placeholder',
+    defaultMessage: 'e.x. My Awesome Tournament',
+    description: 'Placeholder for the tournament title form. Its an example tournament title.',
+  })
+
+  const prizePlaceholder = intl.formatMessage({
+    id: 'tournament.edit.prize.placeholder',
+    defaultMessage: 'e.x. $50 USD',
+    description: 'Placeholder for the tournament prize form. Its an example tournament prize.',
+  })
+
+  const createTournament = intl.formatMessage({
+    id: 'tournament.create.header',
+    defaultMessage: 'Create a Tournament',
+    description: 'Button text for the create tournament form - these are e-sports tournaments and or 1v1 battles etc',
+  })
+
+  const visitTournament = intl.formatMessage({
+    id: 'tournament.visit.header',
+    defaultMessage: 'Visit Tournament',
+    description: 'Button text for the user to navigate to the public page of a given tournament',
+  })
+
+  const streamURLCannotBeEmpty = intl.formatMessage({
+    id: 'tournament.stream.streamURLCannotBeEmpty',
+    defaultMessage: 'Stream URL cannot be empty',
+    description: 'Error message shown to user when they dont input a stream URL in a form',
+  })
+
+  // const streamURLNotValidUrl = intl.formatMessage({
+  //   id: 'tournament.stream.streamURLNotValidUrl',
+  //   defaultMessage: 'Stream URL is not a valid URL. It must start with "https://"',
+  //   description: 'Error message shown to user when they input an invalid stream URL in a form',
+  // })
+
+  const streamTypeCannotBeEmpty = intl.formatMessage({
+    id: 'tournament.stream.streamTypeCannotBeEmpty',
+    defaultMessage: 'Stream type cannot be empty',
+    description: 'Error message shown to user when they dont input a stream type in a form',
+  })
+
+  return {
+    titleRequired,
+    descriptionRequired,
+    startDateRequired,
+    landscapeRecommended,
+    editCoverPhoto,
+    addCoverPhoto,
+    linkToOfficalTournament,
+    titlePlaceholder,
+    createTournament,
+    prizePlaceholder,
+    visitTournament,
+    streamURLCannotBeEmpty,
+    // streamURLNotValidUrl,
+    streamTypeCannotBeEmpty,
+  }
+}
 
 export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
   const words = useWords()
@@ -111,8 +229,9 @@ interface LootboxListProps {
   lootboxes: LootboxTournamentSnapshot[]
   screen: ScreenSize
   templateAction?: () => void
+  magicLink?: string
 }
-export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction }: LootboxListProps) => {
+export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction, magicLink }: LootboxListProps) => {
   const intl = useIntl()
   const words = useWords()
   const [searchTerm, setSearchTerm] = useState('')
@@ -168,13 +287,29 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction 
       />
       <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
         {!!templateAction && screen !== 'mobile' && (
-          <$PlaceHolderLootboxListItem screen={screen} onClick={templateAction}>
-            <$Vertical justifyContent="center" height="100%" spacing={3}>
+          <$PlaceHolderLootboxListItem screen={screen}>
+            <$Vertical justifyContent="center" height="100%" spacing={3} onClick={templateAction}>
               <$PlusIcon screen={screen} />
               <$h3 color={`${COLORS.surpressedFontColor}ae`} textAlign="center" style={{ textTransform: 'uppercase' }}>
                 {words.createNew}
               </$h3>
             </$Vertical>
+            {magicLink && (
+              <$Horizontal justifyContent="center" style={{ marginTop: '20px' }}>
+                <a
+                  href={magicLink}
+                  target="_blank"
+                  style={{
+                    fontFamily: 'sans-serif',
+                    textAlign: 'center',
+                    margin: 'auto',
+                    color: COLORS.surpressedBackground,
+                  }}
+                >
+                  {words.advancedCreate}
+                </a>
+              </$Horizontal>
+            )}
           </$PlaceHolderLootboxListItem>
         )}
         {lootboxes.length === 0 ? (
@@ -206,89 +341,6 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction 
       </$Horizontal>
     </$Vertical>
   )
-}
-
-export const tournamentWords = (intl: IntlShape) => {
-  const titleRequired = intl.formatMessage({
-    id: 'tournament.form.titleRequired',
-    defaultMessage: 'Title is required',
-    description: 'Error message shown to user when they dont have a tournament title',
-  })
-
-  const descriptionRequired = intl.formatMessage({
-    id: 'tournament.form.descriptionRequired',
-    defaultMessage: 'Description is required',
-    description: 'Error message shown to user when they dont have a tournament description whem creating / editing one',
-  })
-
-  const startDateRequired = intl.formatMessage({
-    id: 'tournament.form.startDateRequired',
-    defaultMessage: 'Battle date is required',
-    description: 'Error message shown to user when they dont have a tournament battle date',
-  })
-
-  const landscapeRecommended = intl.formatMessage({
-    id: 'tournament.form.landscapeRecommended',
-    defaultMessage: 'Landscape image is recommended',
-    description: 'Picture orientation recommened to look the best on website',
-  })
-
-  const editCoverPhoto = intl.formatMessage({
-    id: 'tournament.form.editCoverPhoto',
-    defaultMessage: 'Edit cover photo',
-    description: 'Button to edit the cover photo of a tournament',
-  })
-
-  const addCoverPhoto = intl.formatMessage({
-    id: 'tournament.form.addCoverPhoto',
-    defaultMessage: 'Add a cover photo',
-    description: 'Button to add a cover photo to a tournament',
-  })
-
-  const linkToOfficalTournament = intl.formatMessage({
-    id: 'tournament.form.linkToOfficalTournament',
-    defaultMessage: 'Link to official tournament',
-    description:
-      'This is a url to another website that is actually streaming the esport tournament, or where someone can go to get more info',
-  })
-
-  const titlePlaceholder = intl.formatMessage({
-    id: 'tournament.edit.title.placeholder',
-    defaultMessage: 'e.x. My Awesome Tournament',
-    description: 'Placeholder for the tournament title form. Its an example tournament title.',
-  })
-
-  const prizePlaceholder = intl.formatMessage({
-    id: 'tournament.edit.prize.placeholder',
-    defaultMessage: 'e.x. $50 USD',
-    description: 'Placeholder for the tournament prize form. Its an example tournament prize.',
-  })
-
-  const createTournament = intl.formatMessage({
-    id: 'tournament.create.header',
-    defaultMessage: 'Create a Tournament',
-    description: 'Button text for the create tournament form - these are e-sports tournaments and or 1v1 battles etc',
-  })
-
-  const visitTournament = intl.formatMessage({
-    id: 'tournament.visit.header',
-    defaultMessage: 'Visit Tournament',
-    description: 'Button text for the user to navigate to the public page of a given tournament',
-  })
-
-  return {
-    titleRequired,
-    descriptionRequired,
-    startDateRequired,
-    landscapeRecommended,
-    editCoverPhoto,
-    addCoverPhoto,
-    linkToOfficalTournament,
-    titlePlaceholder,
-    createTournament,
-    prizePlaceholder,
-    visitTournament,
-  }
 }
 
 const $PlusIcon = styled.div<{ screen: ScreenSize }>`
@@ -356,7 +408,7 @@ export const $Header = styled.span`
   color: ${COLORS.surpressedFontColor};
 `
 
-export const $InputMedium = styled.input`
+export const $InputMedium = styled.input<{ width?: string }>`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;
@@ -366,6 +418,8 @@ export const $InputMedium = styled.input`
   height: 40px;
 
   color: ${COLORS.surpressedFontColor}ae;
+
+  ${(props) => props.width && `width: ${props.width}`};
 
   &:focus {
     color: ${COLORS.black}ca;
@@ -403,4 +457,109 @@ export const $TournamentCover = styled.img`
   background: rgba(0, 0, 0, 0.05);
   background-size: cover;
   background-position: center;
+`
+
+interface StreamListItemProps {
+  tournamentId: TournamentID
+  stream: Stream
+}
+
+export const StreamListItem = (props: StreamListItemProps) => {
+  const words = useWords()
+  const [isEdit, setIsEdit] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const [deleteStream] = useMutation<{ deleteStream: DeleteStreamResponse }, MutationDeleteStreamArgs>(DELETE_STREAM, {
+    refetchQueries: [
+      {
+        query: GET_MY_TOURNAMENT,
+        variables: {
+          id: props.tournamentId,
+        },
+      },
+    ],
+  })
+
+  const toggleEdit = () => {
+    setIsEdit(!isEdit)
+  }
+
+  const onDelete = async () => {
+    setErrorMessage('')
+    try {
+      const { data } = await deleteStream({ variables: { id: props.stream.id } })
+
+      if (!data) {
+        throw new Error(words.anErrorOccured)
+      } else if (data?.deleteStream?.__typename === 'ResponseError') {
+        throw new Error(data.deleteStream.error.message)
+      }
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    }
+  }
+
+  return (
+    <$StreamListItem>
+      {isEdit && (
+        <AddStream
+          tournamentId={props.tournamentId}
+          initialParams={props.stream}
+          onCancel={toggleEdit}
+          onSuccess={toggleEdit}
+        />
+      )}
+      {!isEdit && (
+        <$Horizontal spacing={2} justifyContent="space-between">
+          <$Horizontal spacing={2}>
+            <$StreamLogo src={getStreamLogo(props.stream.type)} />
+            <$h3 style={{ margin: 'auto 0' }}>{props.stream.name}</$h3>
+          </$Horizontal>
+
+          <$Horizontal spacing={3}>
+            <$span
+              textAlign="center"
+              style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
+            >
+              <$Link
+                href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${props.stream.id}`}
+                target="_blank"
+                style={{ textDecoration: 'none', color: 'inherit', fontStyle: 'inherit' }}
+              >
+                {words.view}
+              </$Link>
+            </$span>
+            <$span
+              textAlign="center"
+              style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
+              onClick={toggleEdit}
+            >
+              {words.edit}
+            </$span>
+            <PopConfirm onOk={onDelete} style={{ margin: 'auto' }}>
+              <$span
+                textAlign="center"
+                color={COLORS.dangerFontColor}
+                style={{ cursor: 'pointer', textTransform: 'lowercase' }}
+              >
+                {words.remove}
+              </$span>
+            </PopConfirm>
+          </$Horizontal>
+        </$Horizontal>
+      )}
+      {errorMessage && <$ErrorMessage>{errorMessage}</$ErrorMessage>}
+    </$StreamListItem>
+  )
+}
+
+export const $StreamListItem = styled.div`
+  border-radius: 10px;
+  background-color: ${COLORS.white};
+  filter: drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.14));
+  padding: 10px 15px;
+`
+export const $StreamLogo = styled.img`
+  width: 40px;
+  height: 40px;
 `
