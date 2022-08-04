@@ -58,6 +58,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const [reputationAddress, setReputationAddress] = useState<Address>()
   const [nativeRewardAmount, setNativeRewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   const [nativeRewardUSD, setNativeRewardUSD] = useState(0)
+  const [rawErc20RewardAmount, setRawErc20RewardAmount] = useState<string>('1')
   const [erc20RewardAmount, setErc20RewardAmount] = useState(web3Utils.toBN(web3Utils.toWei('1', 'ether')))
   // const [transactionNote, setTransactionNote] = useState('')
   const [rewardSubmissionStatus, setRewardSubmissionStatus] = useState<ManagementButtonState>('enabled')
@@ -67,6 +68,7 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
   const [transactionHash, setTransactionHash] = useState('')
   const [approvalReceived, setApprovalReceived] = useState(false)
   const [erc20Name, setErc20TokenName] = useState('ERC20')
+  const [erc20Decimals, setErc20Decimals] = useState(18)
   const { screen } = useWindowSize()
   const intl = useIntl()
   const words = useWords()
@@ -100,13 +102,26 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
     generateValidationErrorMessages()
   }, [erc20Address, nativeRewardAmount, erc20RewardAmount])
 
+  useEffect(() => {
+    try {
+      const weiAmount = web3Utils.toWei(rawErc20RewardAmount || '0', 'ether')
+      const amount = web3Utils.toBN(weiAmount).div(web3Utils.toBN(10).pow(web3Utils.toBN(18 - erc20Decimals)))
+      setErc20RewardAmount(amount)
+    } catch (err) {
+      console.error(err)
+    }
+    
+  }, [rawErc20RewardAmount, erc20Decimals, erc20Address])
+
   const updateErc20TokenIdentified = async (erc20Addr: ContractAddress) => {
     const ethers = window.ethers ? window.ethers : ethersObj
     const { provider } = await getProvider()
     const signer = await provider.getSigner()
     const erc20 = new ethers.Contract(erc20Addr, ERC20ABI, signer)
     const name = await erc20.symbol()
+    const decimals = await erc20.decimals()
     setErc20TokenName(name)
+    setErc20Decimals(Number(decimals))
   }
 
   useEffect(() => {
@@ -279,7 +294,9 @@ const RewardSponsors = (props: RewardSponsorsProps) => {
             >
               {props.network && <b style={{ fontSize: '1.2rem', marginRight: '20px' }}>💎</b>}
               <InputDecimal
-                onChange={(e: string) => setErc20RewardAmount(web3Utils.toBN(web3Utils.toWei(e || '0')))}
+                onChange={(e: string) => {
+                  setRawErc20RewardAmount(e)
+                }}
                 width={calculateInputWidth(erc20RewardAmount)}
               />
               <$InputTranslationLight>{erc20Name}</$InputTranslationLight>
