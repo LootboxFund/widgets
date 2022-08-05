@@ -1,5 +1,23 @@
 import { gql } from '@apollo/client'
 
+export const CREATE_USER = gql`
+  mutation Mutation {
+    createUserRecord {
+      ... on CreateUserResponseSuccess {
+        user {
+          id
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const SIGN_UP_WITH_PASSWORD = gql`
   mutation Mutation($payload: CreateUserWithPasswordPayload!) {
     createUserWithPassword(payload: $payload) {

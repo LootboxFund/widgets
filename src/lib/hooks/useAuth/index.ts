@@ -7,6 +7,7 @@ import {
   MutationCreateUserWithPasswordArgs,
   ConnectWalletResponse,
   MutationConnectWalletArgs,
+  ResponseError,
 } from '../../api/graphql/generated/types'
 import { useSnapshot } from 'valtio'
 import { useEffect, useState } from 'react'
@@ -16,7 +17,13 @@ import { ethers } from 'ethers'
 import { userState } from 'lib/state/userState'
 import { generateAuthSignatureMessage } from 'lib/utils/signatureMessage'
 import { v4 as uuidv4 } from 'uuid'
-import { SIGN_UP_WITH_WALLET, GET_WALLET_LOGIN_TOKEN, SIGN_UP_WITH_PASSWORD, CONNECT_WALLET } from './api.gql'
+import {
+  SIGN_UP_WITH_WALLET,
+  GET_WALLET_LOGIN_TOKEN,
+  SIGN_UP_WITH_PASSWORD,
+  CONNECT_WALLET,
+  CREATE_USER,
+} from './api.gql'
 import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
@@ -26,6 +33,9 @@ import {
   Persistence,
   setPersistence as setPersistenceFirebase,
   setPersistence,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  ConfirmationResult,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -40,6 +50,7 @@ import useWords, { useSignatures } from 'lib/hooks/useWords'
 interface FrontendUser {
   id: UserID
   email: string | null
+  phone: string | null
   isEmailVerified: boolean
 }
 
@@ -55,6 +66,26 @@ export const useAuth = () => {
   const userStateSnapshot = useSnapshot(userState)
   const intl = useIntl()
   const signatureWords = useSignatures()
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
+  const [phoneConfirmationResult, setPhoneConfirmationResult] = useState<ConfirmationResult | null>(null)
+
+  useEffect(() => {
+    const el = document.getElementById('recaptcha-container')
+    if (!!el) {
+      const recaptchaVerifier = new RecaptchaVerifier(
+        'recaptcha-container',
+        {
+          // size: 'normal',
+          size: 'invisible',
+          // callback: (response: any) => {
+          //   return signInWithPhone(response)
+          // },
+        },
+        auth
+      )
+      setRecaptchaVerifier(recaptchaVerifier)
+    }
+  }, [])
 
   const [signUpWithWalletMutation] = useMutation<
     { createUserWithWallet: CreateUserResponse },
@@ -70,6 +101,8 @@ export const useAuth = () => {
     { authenticateWallet: AuthenticateWalletResponse },
     MutationAuthenticateWalletArgs
   >(GET_WALLET_LOGIN_TOKEN)
+
+  const [createUserMutation] = useMutation<{ createUserRecord: CreateUserResponse }>(CREATE_USER)
 
   const [connectWalletMutation] = useMutation<{ connectWallet: ConnectWalletResponse }, MutationConnectWalletArgs>(
     CONNECT_WALLET,
@@ -103,10 +136,11 @@ export const useAuth = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const { uid, email } = user
+        const { uid, email, phoneNumber } = user
         const userData: FrontendUser = {
           id: uid as UserID,
           email: email,
+          phone: phoneNumber,
           isEmailVerified: user.emailVerified,
         }
         setUser(userData)
@@ -120,6 +154,42 @@ export const useAuth = () => {
       unsubscribe()
     }
   }, [])
+
+  const sendPhoneVerification = async (phoneNumber: string) => {
+    if (!phoneNumber) {
+      throw new Error(words.pleaseEnterYourPhoneNumber)
+    }
+
+    if (!recaptchaVerifier) {
+      console.error('no captcha verifier')
+      throw new Error(words.anErrorOccured)
+    }
+
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+
+    setPhoneConfirmationResult(confirmationResult)
+  }
+
+  const signInPhoneWithCode = async (code: string) => {
+    if (!phoneConfirmationResult) {
+      console.error('No phone confirmation result')
+      throw new Error(words.anErrorOccured)
+    }
+
+    const result = await phoneConfirmationResult.confirm(code)
+
+    const { user } = result
+    // Now create a user record
+    const { data } = await createUserMutation()
+
+    if (!data || data.createUserRecord?.__typename === 'ResponseError') {
+      console.error('Error creating user record', (data?.createUserRecord as ResponseError)?.error?.message)
+      LogRocket.captureException(new Error('Error creating user record'))
+      throw new Error(words.anErrorOccured)
+    }
+
+    return data.createUserRecord as CreateUserResponse
+  }
 
   const signUpWithWallet = async (email: string): Promise<void> => {
     if (!email) {
@@ -286,6 +356,8 @@ export const useAuth = () => {
     signUpWithWallet,
     signInWithEmailAndPassword,
     signUpWithEmailAndPassword,
+    sendPhoneVerification,
+    signInPhoneWithCode,
     connectWallet,
     logout,
   }
