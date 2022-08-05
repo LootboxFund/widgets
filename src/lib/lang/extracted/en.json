@@ -17,6 +17,18 @@
     "defaultMessage": "Forgot password?",
     "description": "Allows the user to reset their password"
   },
+  "auth.method.loginWithMetaMaskWallet": {
+    "defaultMessage": "MetaMask Wallet",
+    "description": "Button text for user to login using their MetaMask wallet instead of their email and password"
+  },
+  "auth.method.loginWithPassword": {
+    "defaultMessage": "Email & Password",
+    "description": "Button to login with email & password"
+  },
+  "auth.method.loginWithPhone": {
+    "defaultMessage": "Phone Number",
+    "description": "Button to login with phone"
+  },
   "auth.method.loginWithWallet": {
     "defaultMessage": "Login with Wallet",
     "description": "Button text for user to login using their MetaMask wallet instead of their email and password"
@@ -53,6 +65,9 @@
     "defaultMessage": "Password is required",
     "description": "Error message when user tries to sign up without a password"
   },
+  "auth.phone.enterYourPhoneNumber": {
+    "defaultMessage": "Enter your phone number"
+  },
   "auth.provider.accountAlreadyExists": {
     "defaultMessage": "This account already exists!",
     "description": "Error message when user tries to sign up with an email that already exists"
@@ -72,6 +87,10 @@
   "auth.signup.wallet.text": {
     "defaultMessage": "Wallet Sign Up",
     "description": "Button text where a user clicks to sign up using their Metamask wallet"
+  },
+  "auth.signupPhone.button.sendText": {
+    "defaultMessage": "Send code",
+    "description": "button text to send code to phone number for verification"
   },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
@@ -984,6 +1003,10 @@
     "defaultMessage": "Yes",
     "description": "Indicating \"yes\" or \"ok\" (positive)"
   },
+  "generics.confirm": {
+    "defaultMessage": "Confirm",
+    "description": "Text to confirm something"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -996,9 +1019,17 @@
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
   },
+  "generics.pleaseEnterYourPhoneNumber": {
+    "defaultMessage": "Please enter your phone number",
+    "description": "Text prompting user to enter their phone number"
+  },
   "generics.saveChanges": {
     "defaultMessage": "Save Changes",
     "description": "Button text to save changes to a tournament or something"
+  },
+  "generics.verificationCode": {
+    "defaultMessage": "Verification code",
+    "description": "Text to enter a verification code for signup"
   },
   "interactWithLootbox.manageLootbox.button": {
     "defaultMessage": "Manage Lootbox",
@@ -1489,6 +1520,10 @@
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
     "description": "Title for the page that allows a user to add a password"
+  },
+  "profile.settings.emailNotSet": {
+    "defaultMessage": "Email not set!",
+    "description": "Message displayed when the user does not have an email."
   },
   "profile.settings.newPassword": {
     "defaultMessage": "New password",
