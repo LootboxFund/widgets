@@ -194,11 +194,15 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
       {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
       {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
       {(route === 'signup-phone' || route === 'login-phone') && (
-        <LoginPhone
-          onChangeMode={setRoute}
-          onSignupSuccess={onSignupSuccess}
-          title={route === 'signup-phone' ? words.register : words.login}
-        />
+        <div>
+          <LoginPhone
+            onChangeMode={setRoute}
+            onSignupSuccess={onSignupSuccess}
+            title={route === 'signup-phone' ? words.register : words.login}
+          />
+
+          <br />
+        </div>
       )}
 
       {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}

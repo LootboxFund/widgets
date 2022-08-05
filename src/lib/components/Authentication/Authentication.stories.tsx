@@ -29,7 +29,10 @@ const Template = () => {
     <ApolloProvider client={client}>
       <LocalizationWrapper>
         <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-          <Authentication onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')} />
+          <Authentication
+            initialMode="signup-phone"
+            onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')}
+          />
         </$CardViewport>
       </LocalizationWrapper>
     </ApolloProvider>

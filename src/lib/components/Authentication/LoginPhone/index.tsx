@@ -1,17 +1,19 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { useAuth } from 'lib/hooks/useAuth'
 import { $Button } from '../../Generics/Button'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import LogRocket from 'logrocket'
-import { $Vertical } from 'lib/components/Generics'
-import { $InputMedium, $ChangeMode, ModeOptions } from '../Shared'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import { $InputMedium, $ChangeMode, ModeOptions, $Checkbox } from '../Shared'
 import { $Header, $ErrorMessage, $span } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
+import { browserLocalPersistence, browserSessionPersistence, setPersistence } from 'firebase/auth'
+import { auth } from 'lib/api/firebase/app'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -25,6 +27,10 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [confirmationCode, setConfirmationCode] = useState('')
+  const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
+    | 'session'
+    | 'local'
+  const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
   const intl = useIntl()
   const words = useWords()
 
@@ -68,6 +74,20 @@ const LoginPhone = (props: SignUpEmailProps) => {
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
+    }
+  }
+
+  const clickRememberMe = (e: ChangeEvent<HTMLInputElement>) => {
+    const newPersistenceChecked = e.target.checked
+    setPersistenceChecked(newPersistenceChecked)
+    if (newPersistenceChecked) {
+      setPersistence(auth, browserLocalPersistence)
+      localStorage.setItem('auth.persistence', 'local')
+      return
+    } else {
+      setPersistence(auth, browserSessionPersistence)
+      localStorage.setItem('auth.persistence', 'session')
+      return
     }
   }
 
@@ -139,6 +159,12 @@ const LoginPhone = (props: SignUpEmailProps) => {
           </$Button>
         </$Vertical>
       )}
+      <$Horizontal spacing={2} flexWrap justifyContent="space-between">
+        <$span textAlign="start" style={{ display: 'flex', alignItems: 'center' }}>
+          <$Checkbox type="checkbox" checked={persistenceChecked} onChange={clickRememberMe} />
+          <$span style={{ verticalAlign: 'middle', display: 'inline-block' }}> {words.rememberMe}</$span>
+        </$span>
+      </$Horizontal>
 
       {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
