@@ -35,6 +35,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
               web
             }
             partyBaskets {
+              id
               name
               nftBountyValue
               address
