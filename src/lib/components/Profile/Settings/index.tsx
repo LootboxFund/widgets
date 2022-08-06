@@ -70,6 +70,12 @@ const SettingsComponent = () => {
     description: 'Message displayed when the user does not have a password.',
   })
 
+  const emailNotSetText = intl.formatMessage({
+    id: 'profile.settings.emailNotSet',
+    defaultMessage: 'Email not set!',
+    description: 'Message displayed when the user does not have an email.',
+  })
+
   const newPasswordText = intl.formatMessage({
     id: 'profile.settings.newPassword',
     defaultMessage: 'New password',
@@ -101,49 +107,52 @@ const SettingsComponent = () => {
               <$span>{user?.email}</$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
-                {`${passwordNotSetText}!`}
+                {emailNotSetText}
               </$span>
             )}
           </$span>
         </$Horizontal>
       </$SettingContainer>
-      <$SettingContainer>
-        <$Horizontal
-          justifyContent="flex-start"
-          flexWrap
-          style={{
-            paddingLeft: screen === 'mobile' ? '0px' : '8%',
-          }}
-        >
-          <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
-            {words.password}
-          </$span>
-          <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
-            {isPasswordEnabled ? (
-              <$span textAlign="start">******************</$span>
-            ) : (
-              <$span textAlign="start" color={COLORS.dangerFontColor}>
-                {`${passwordNotSetText} ⛔️`}
-              </$span>
-            )}
-          </$span>
-          <$span
-            textAlign={screen === 'mobile' ? 'start' : 'center'}
-            width={screen === 'mobile' ? '100%' : '30%'}
-            lineHeight="40px"
+      {user?.email && (
+        <$SettingContainer>
+          <$Horizontal
+            justifyContent="flex-start"
+            flexWrap
+            style={{
+              paddingLeft: screen === 'mobile' ? '0px' : '8%',
+            }}
           >
-            {isPasswordEnabled ? (
-              <$Link style={{ fontStyle: 'normal' }} onClick={sendPasswordReset}>
-                {`${words.resetPassword.toLowerCase()}?`}
-              </$Link>
-            ) : (
-              <$Link style={{ fontStyle: 'normal', textTransform: 'lowercase' }} onClick={handleNewPassword}>
-                {passwordResetFormVisible ? `👇 ${words.hide}` : newPasswordText}
-              </$Link>
-            )}
-          </$span>
-        </$Horizontal>
-      </$SettingContainer>
+            <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
+              {words.password}
+            </$span>
+            <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
+              {isPasswordEnabled ? (
+                <$span textAlign="start">******************</$span>
+              ) : (
+                <$span textAlign="start" color={COLORS.dangerFontColor}>
+                  {`${passwordNotSetText} ⛔️`}
+                </$span>
+              )}
+            </$span>
+            <$span
+              textAlign={screen === 'mobile' ? 'start' : 'center'}
+              width={screen === 'mobile' ? '100%' : '30%'}
+              lineHeight="40px"
+            >
+              {isPasswordEnabled ? (
+                <$Link style={{ fontStyle: 'normal' }} onClick={sendPasswordReset}>
+                  {`${words.resetPassword.toLowerCase()}?`}
+                </$Link>
+              ) : (
+                <$Link style={{ fontStyle: 'normal', textTransform: 'lowercase' }} onClick={handleNewPassword}>
+                  {passwordResetFormVisible ? `👇 ${words.hide}` : newPasswordText}
+                </$Link>
+              )}
+            </$span>
+          </$Horizontal>
+        </$SettingContainer>
+      )}
+
       {passwordResetStatus === 'email-sent' && (
         <$span textAlign="end">
           ✅{' '}

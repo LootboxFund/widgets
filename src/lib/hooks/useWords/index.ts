@@ -591,6 +591,24 @@ const useWords = () => {
     description: 'Text to join an esports tournament',
   })
 
+  const pleaseEnterYourPhoneNumber = intl.formatMessage({
+    id: 'generics.pleaseEnterYourPhoneNumber',
+    defaultMessage: 'Please enter your phone number',
+    description: 'Text prompting user to enter their phone number',
+  })
+
+  const confirm = intl.formatMessage({
+    id: 'generics.confirm',
+    defaultMessage: 'Confirm',
+    description: 'Text to confirm something',
+  })
+
+  const verificationCode = intl.formatMessage({
+    id: 'generics.verificationCode',
+    defaultMessage: 'Verification code',
+    description: 'Text to enter a verification code for signup',
+  })
+
   return {
     cancel,
     back,
@@ -683,6 +701,9 @@ const useWords = () => {
     networkNotSet,
     confirmOnMetamask,
     joinTournament,
+    pleaseEnterYourPhoneNumber,
+    confirm,
+    verificationCode,
   }
 }
 

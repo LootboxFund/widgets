@@ -9,3 +9,4 @@ const firebaseConfig = manifest.firebase
 export const app = initializeApp(firebaseConfig)
 export const storage = getStorage(app)
 export const auth = getAuth(app)
+auth.useDeviceLanguage();
