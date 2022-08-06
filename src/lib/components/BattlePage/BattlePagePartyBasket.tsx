@@ -11,15 +11,21 @@ import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
+import { useState } from 'react'
+import { PartyBasketID, TournamentID } from 'lib/types'
+import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasketReferral'
+import AuthGuard from '../AuthGuard'
 
 interface Props {
   lootboxPartyBasket: LootboxPartyBasket
+  tournamentId: TournamentID
 }
 const BattlePagePartyBasket = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
+  const [isCreateReferralLinkOpen, setIsCreateReferralLinkOpen] = useState(false)
 
   const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: LootboxTournamentSnapshot }) => {
     const flatSocials = Object.entries(lootboxSnapshot.socials)
@@ -77,10 +83,43 @@ const BattlePagePartyBasket = (props: Props) => {
     )
   }
 
+  const ReferralLinkGeneration = ({ partyBasketId }: { partyBasketId: PartyBasketID }) => {
+    return (
+      <$Vertical spacing={4}>
+        <span
+          style={{
+            width: '90%',
+            paddingBottom: screen === 'mobile' ? '12px' : 'auto',
+          }}
+        >
+          ⭐️{' '}
+          <$Link
+            onClick={() => setIsCreateReferralLinkOpen(!isCreateReferralLinkOpen)}
+            style={{
+              color: `${COLORS.surpressedFontColor}ce`,
+              textDecoration: 'none',
+              fontWeight: TYPOGRAPHY.fontWeight.bold,
+            }}
+          >
+            <FormattedMessage
+              id="battlePagePartyBasket.referralLinkToggle.text"
+              defaultMessage="Promote this Lootbox"
+            />
+          </$Link>
+        </span>
+        {isCreateReferralLinkOpen && (
+          <AuthGuard>
+            <CreatePartyBasketReferral partyBasketId={partyBasketId} tournamentId={props.tournamentId} />
+          </AuthGuard>
+        )}
+      </$Vertical>
+    )
+  }
+
   return (
     <$BattlePageSection screen={screen}>
       <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
-        <$Vertical height="100%" spacing={2} style={{ margin: '0 auto' }}>
+        <$Vertical spacing={2} style={{ margin: '0 auto' }}>
           <$BattleCardsContainer screen={screen} width="220px">
             <$BattleCardImage src={props.lootboxPartyBasket.lootbox?.stampImage} cardNumber={0} />
           </$BattleCardsContainer>
@@ -176,7 +215,10 @@ const BattlePagePartyBasket = (props: Props) => {
             </$Vertical>
           </$Horizontal>
           <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />
-          {/* {!!props.lootboxPartyBasket?.partyBasket?.id && <ReferralLinkGeneration partyBasketId={data.partyBasket.id as PartyBasketID} />} */}
+
+          {!!props.lootboxPartyBasket?.partyBasket?.id && (
+            <ReferralLinkGeneration partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID} />
+          )}
         </$Vertical>
       </$Horizontal>
     </$BattlePageSection>

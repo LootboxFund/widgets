@@ -262,6 +262,7 @@ const BattlePage = (props: BattlePageParams) => {
               return (
                 <BattlePagePartyBasket
                   lootboxPartyBasket={data}
+                  tournamentId={tournament.id as TournamentID}
                   key={`${data.lootbox.address}_${data.partyBasket?.address || ''}`}
                 />
               )
@@ -353,7 +354,8 @@ export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
   width: 100%;
   background: ${COLORS.surpressedBackground}25;
   border-radius: 20px;
-  height: ${(props) => (props.screen === 'mobile' ? 'auto' : '400px')};
+  height: auto;
+  min-height: 400px;
   padding: 2rem;
   box-sizing: border-box;
   overflow: hidden;
