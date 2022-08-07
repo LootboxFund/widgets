@@ -20,6 +20,9 @@ import { GET_USER_CLAIMS } from './api.gql'
 import { extractURLState_PublicProfilePage } from './utils'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import HelpIcon from 'lib/theme/icons/Help.icon'
+import ReactTooltip from 'react-tooltip'
+import { FormattedMessage } from 'react-intl'
 
 interface PublicProfileProps {
   userId: UserID
@@ -67,16 +70,24 @@ const PublicProfile = (props: PublicProfileProps) => {
     // fetchs another batch of claims
     setLastCreatedAt(pageInfo.endCursor || null)
   }
-  console.log(profileData)
-  console.log(edges)
   return (
     <$PublicProfilePageContainer screen={screen}>
       <$Horizontal justifyContent="space-between">
         <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton>INVITE</$InviteButton>
+          <$InviteButton>
+            <FormattedMessage
+              id="profile.public.inviteFriends"
+              defaultMessage="Invite Friend"
+              description="Button to invite friend"
+            />
+          </$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
-            Both get a bonus FREE Lottery Ticket
+            <FormattedMessage
+              id="profile.public.bothGetBonusTickets"
+              defaultMessage="Both get a bonus FREE Lottery Ticket"
+              description="Reward caption for inviting friend"
+            />
           </span>
         </$Vertical>
       </$Horizontal>
@@ -96,11 +107,19 @@ const PublicProfile = (props: PublicProfileProps) => {
             }}
           >
             <a href="" style={{ textDecoration: 'none' }}>
-              View Socials
+              <FormattedMessage
+                id="profile.public.viewSocials"
+                defaultMessage="View Socials"
+                description="Public Profile Page link to view socials"
+              />
             </a>
             <span>{` | `}</span>
             <a href="" style={{ textDecoration: 'none' }}>
-              Edit Profile
+              <FormattedMessage
+                id="profile.public.editProfile"
+                defaultMessage="Edit Profile"
+                description="Public Profile Page link to edit profile"
+              />
             </a>
           </span>
         </div>
@@ -118,18 +137,33 @@ const PublicProfile = (props: PublicProfileProps) => {
       </$Vertical>
 
       <$Vertical>
-        <span
-          style={{
-            color: screen === 'desktop' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.7)',
-            fontWeight: screen === 'desktop' ? 'bold' : 'normal',
-          }}
-        >
-          My Claimed Lottery Tickets
-        </span>
+        <$Horizontal>
+          <span
+            style={{
+              color: screen === 'desktop' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.7)',
+              fontWeight: screen === 'desktop' ? 'bold' : 'normal',
+            }}
+          >
+            <FormattedMessage
+              id="profile.public.myLotteryTicketsLabel"
+              defaultMessage="My Lottery Tickets"
+              description="Label for list of lottery tickets"
+            />
+          </span>
+          <HelpIcon tipID="myLotteryTicketTip" />
+          <ReactTooltip id="myLotteryTicketTip" place="right" effect="solid">
+            <FormattedMessage
+              id="profile.public.myLotteryTicketsTip"
+              defaultMessage="Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets."
+              description="Tooltip for my lottery tickets list on Public Profile Page"
+            />
+          </ReactTooltip>
+        </$Horizontal>
+
         <input
           value={searchString}
           onChange={(e) => setSearchString(e.target.value)}
-          placeholder="Search Tickets"
+          placeholder={words.search}
           style={{
             width: '100%',
             height: '20px',
@@ -161,7 +195,11 @@ const PublicProfile = (props: PublicProfileProps) => {
                 color: 'rgba(0,0,0,0.7)',
               }}
             >
-              Invite Friend
+              <FormattedMessage
+                id="profile.public.inviteFriends"
+                defaultMessage="Invite Friend"
+                description="Button to invite friend"
+              />
             </span>
             <span
               style={{
@@ -172,7 +210,11 @@ const PublicProfile = (props: PublicProfileProps) => {
                 marginTop: '5px',
               }}
             >
-              Both get a bonus FREE Lottery Ticket
+              <FormattedMessage
+                id="profile.public.bothGetBonusTickets"
+                defaultMessage="Both get a bonus FREE Lottery Ticket"
+                description="Reward caption for inviting friend"
+              />
             </span>
           </$InviteFriend>
         </$ClaimCard>
@@ -284,6 +326,7 @@ const $InviteButton = styled.button`
   background-color: ${COLORS.trustBackground};
   color: ${COLORS.white};
   border: 0px solid white;
+  text-transform: uppercase;
 `
 
 export default PublicProfilePage

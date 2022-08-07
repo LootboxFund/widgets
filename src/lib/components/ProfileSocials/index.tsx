@@ -4,27 +4,41 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $ProfileImage } from '../PublicProfile'
 import { COLORS } from '@wormgraph/helpers'
 import { getSocials } from 'lib/hooks/constants'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { $SocialGridInputs, $SocialLogo } from '../CreateLootbox/StepSocials'
+import useWords from 'lib/hooks/useWords'
 
 export interface ProfileSocialsProps {}
 const ProfileSocials = (props: ProfileSocialsProps) => {
   const intl = useIntl()
+  const words = useWords()
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
   return (
     <div style={{ height: '100vh', overflowY: 'scroll' }}>
       <$ProfileSocials screen={screen}>
         <$Horizontal verticalCenter style={{ height: '50px' }}>
-          <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Social Profiles</span>
+          <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+            <FormattedMessage
+              id="profile.socials.pageHeader"
+              defaultMessage="Social Profiles"
+              description="Page Header of Social Profiles Page"
+            />
+          </span>
           <a href="" style={{ marginLeft: '10px', fontStyle: 'italic' }}>
-            {`[Back]`}
+            {`[${words.back}]`}
           </a>
         </$Horizontal>
         <$Horizontal alignItems="center" style={{ display: 'flex', flexDirection: 'row' }}>
           <$Vertical style={{ alignItems: 'center', marginRight: '20px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 'lighter', marginBottom: '10px' }}>Change Photo</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 'lighter', marginBottom: '10px' }}>
+              <FormattedMessage
+                id="profile.socials.changePhoto"
+                defaultMessage="Change Photo"
+                description="Change Photo of User"
+              />
+            </span>
             <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
           </$Vertical>
           <$Vertical style={{ flex: 1 }}>
@@ -34,12 +48,24 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
         </$Horizontal>
         <br />
         <$Vertical>
-          <span style={{ margin: '5px 0px' }}>Biography</span>
+          <span style={{ margin: '5px 0px' }}>
+            <FormattedMessage
+              id="profile.socials.biography"
+              defaultMessage="Biography"
+              description="Biography of User"
+            />
+          </span>
           <$ProfilePageTextArea rows={3} />
         </$Vertical>
         <br />
         <$Vertical>
-          <$LabelInput>My Socials</$LabelInput>
+          <$LabelInput>
+            <FormattedMessage
+              id="profile.socials.mySocials"
+              defaultMessage="My Socials"
+              description="List of user socials for public view"
+            />
+          </$LabelInput>
           <$SocialGridInputs screen={screen}>
             {SOCIALS.map((social) => {
               return (
@@ -68,10 +94,10 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
             color: COLORS.white,
             textDecoration: 'none',
             marginRight: '20px',
-            fontSize: '1.2rem',
+            fontSize: '1rem',
           }}
         >
-          cancel
+          {words.cancel}
         </a>
         <button
           style={{
@@ -87,7 +113,7 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
             marginRight: '30px',
           }}
         >
-          SAVE
+          {words.saveChanges}
         </button>
       </$StickySaveBar>
     </div>
