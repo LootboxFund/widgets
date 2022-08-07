@@ -30,6 +30,7 @@ interface PublicProfileProps {
 const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
+  const [searchString, setSearchString] = useState('')
   const [lastCreatedAt, setLastCreatedAt] = useState<null | number>(null)
   const [userClaims, setUserClaims] = useState<Claim[]>([])
   const {
@@ -69,7 +70,7 @@ const PublicProfile = (props: PublicProfileProps) => {
   console.log(profileData)
   console.log(edges)
   return (
-    <$PublicProfilePageContainer>
+    <$PublicProfilePageContainer screen={screen}>
       <$Horizontal justifyContent="space-between">
         <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
@@ -80,12 +81,29 @@ const PublicProfile = (props: PublicProfileProps) => {
         </$Vertical>
       </$Horizontal>
       <$Vertical style={{ marginTop: '10px' }}>
-        <$Horizontal alignItems="center">
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: screen === 'mobile' ? 'column' : 'row',
+          }}
+        >
           <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>User34535</b>
-          <a href="" style={{ marginLeft: '10px', fontStyle: 'italic' }}>
-            {`[Edit]`}
-          </a>
-        </$Horizontal>
+          <span
+            style={{
+              margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
+              fontStyle: 'italic',
+              fontSize: screen === 'mobile' ? '0.7rem' : '0.8rem',
+            }}
+          >
+            <a href="" style={{ textDecoration: 'none' }}>
+              View Socials
+            </a>
+            <span>{` | `}</span>
+            <a href="" style={{ textDecoration: 'none' }}>
+              Edit Profile
+            </a>
+          </span>
+        </div>
         <span
           style={{
             fontWeight: 'lighter',
@@ -99,27 +117,31 @@ const PublicProfile = (props: PublicProfileProps) => {
         </span>
       </$Vertical>
 
-      <span
-        style={{
-          color: screen === 'desktop' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.7)',
-          fontWeight: screen === 'desktop' ? 'bold' : 'normal',
-        }}
-      >
-        Claimed Lottery Tickets
-      </span>
+      <$Vertical>
+        <span
+          style={{
+            color: screen === 'desktop' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.7)',
+            fontWeight: screen === 'desktop' ? 'bold' : 'normal',
+          }}
+        >
+          My Claimed Lottery Tickets
+        </span>
+        <input
+          value={searchString}
+          onChange={(e) => setSearchString(e.target.value)}
+          placeholder="Search Tickets"
+          style={{
+            width: '100%',
+            height: '20px',
+            maxWidth: '400px',
+            padding: '5px',
+            borderRadius: '5px',
+            border: '1px solid rgba(0,0,0,0.5)',
+            margin: '5px 0px 5px 0px',
+          }}
+        ></input>
+      </$Vertical>
       <$ClaimsGrid screen={screen}>
-        {edges.map((edge) => {
-          return (
-            <a href="" target="_blank">
-              <$ClaimCard key={edge.node.id}>
-                <img
-                  src={edge.node?.chosenPartyBasket?.lootboxSnapshot?.image}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </$ClaimCard>
-            </a>
-          )
-        })}
         <$ClaimCard onClick={() => console.log('Invite Friend')}>
           <$InviteFriend>
             <span
@@ -154,6 +176,26 @@ const PublicProfile = (props: PublicProfileProps) => {
             </span>
           </$InviteFriend>
         </$ClaimCard>
+        {edges
+          .filter(
+            (edge) =>
+              (edge.node.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
+              (edge.node.chosenPartyBasket?.lootboxSnapshot?.name
+                .toLowerCase()
+                .indexOf(searchString.toLowerCase()) as number) > -1
+          )
+          .map((edge) => {
+            return (
+              <a href="" target="_blank">
+                <$ClaimCard key={edge.node.id}>
+                  <img
+                    src={edge.node?.chosenPartyBasket?.lootboxSnapshot?.image}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </$ClaimCard>
+              </a>
+            )
+          })}
       </$ClaimsGrid>
       {/* <button onClick={handleMore}>load more (intl me)</button> */}
     </$PublicProfilePageContainer>
@@ -180,9 +222,9 @@ const PublicProfilePage = () => {
   return <PublicProfile userId={userId as UserID} />
 }
 
-const $PublicProfilePageContainer = styled.div`
+const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   font-family: sans-serif;
-  padding: 10px;
+  padding: ${(props) => (props.screen === 'mobile' ? '5px' : '10px')};
 `
 
 const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
@@ -198,7 +240,7 @@ const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
   margin-top: 10px;
 `
 
-const $ProfileImage = styled.img`
+export const $ProfileImage = styled.img`
   width: 70px;
   height: 70px;
   max-width: 70px;
@@ -218,7 +260,7 @@ const $ClaimCard = styled.div`
 
 const $InviteFriend = styled.div`
   width: auto;
-  height: 100%;
+  height: 80%;
   display: flex;
   border-radius: 10px;
   flex-direction: column;
