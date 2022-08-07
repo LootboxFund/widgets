@@ -1538,7 +1538,7 @@
     "description": "Button to invite friend"
   },
   "profile.public.bothGetBonusTickets": {
-    "defaultMessage": "Both get a bonus FREE Lottery Ticket",
+    "defaultMessage": "Both get bonus FREE Lottery Tickets",
     "description": "Reward caption for inviting friend"
   },
   "profile.socials.pageHeader": {
