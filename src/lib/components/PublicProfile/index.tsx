@@ -42,7 +42,7 @@ const PublicProfile = (props: PublicProfileProps) => {
     loading: loadingData,
     error: errorData,
   } = useQuery<{ userClaims: UserClaimsResponse }, QueryUserClaimsArgs>(GET_USER_CLAIMS, {
-    variables: { userId: props.userId, first: 1, after: lastCreatedAt },
+    variables: { userId: props.userId, first: 2, after: lastCreatedAt },
     onCompleted: (claimsData) => {
       if (claimsData?.userClaims?.__typename === 'UserClaimsResponseSuccess') {
         const nodes = claimsData.userClaims.edges
@@ -75,7 +75,7 @@ const PublicProfile = (props: PublicProfileProps) => {
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
           <$InviteButton>INVITE</$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
-            Extra tickets for each friend invited
+            Both get a bonus FREE Lottery Ticket
           </span>
         </$Vertical>
       </$Horizontal>
@@ -86,7 +86,15 @@ const PublicProfile = (props: PublicProfileProps) => {
             {`[Edit]`}
           </a>
         </$Horizontal>
-        <span style={{ fontWeight: 'lighter', color: 'rgba(0,0,0,0.7)', margin: '10px 0px 30px 0px' }}>
+        <span
+          style={{
+            fontWeight: 'lighter',
+            color: 'rgba(0,0,0,0.7)',
+            margin: '10px 0px 30px 0px',
+            width: '100%',
+            maxWidth: '600px',
+          }}
+        >
           Lorem ipsum dolar discarate simpar fiat nolan compare. Innocent lamar descartes.
         </span>
       </$Vertical>
@@ -99,7 +107,7 @@ const PublicProfile = (props: PublicProfileProps) => {
       >
         Claimed Lottery Tickets
       </span>
-      <$ClaimsGrid>
+      <$ClaimsGrid screen={screen}>
         {edges.map((edge) => {
           return (
             <a href="" target="_blank">
@@ -177,9 +185,13 @@ const $PublicProfilePageContainer = styled.div`
   padding: 10px;
 `
 
-const $ClaimsGrid = styled.div`
+const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: ${(props) => {
+    if (props.screen === 'desktop') return '1fr 1fr 1fr 1fr'
+    else if (props.screen === 'tablet') return '1fr 1fr 1fr'
+    else return '1fr 1fr'
+  }};
   width: 100%;
   column-gap: 10px;
   row-gap: 10px;
