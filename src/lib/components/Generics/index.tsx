@@ -114,3 +114,22 @@ export const $Divider = styled.div<{ margin?: string; width?: string }>`
   width: ${(props) => (props.width ? props.width : '100%')};
   border-top: 1px solid rgba(0, 0, 0, 0.23);
 `
+
+export const $ViralOnboardingCard = styled.div<{ background?: string }>`
+  max-width: 500px;
+  width: 100%;
+  height: 100vh;
+  ${(props) => props.background && `background-image: url(${props.background});`}
+  ${(props) =>
+    props.background &&
+    `background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${props.background});`}
+  background-size: cover;
+  background-position: center;
+`
+export const $ViralOnboardingSafeArea = styled.div`
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  padding: 3.5rem 2.2rem;
+  box-sizing: border-box;
+`

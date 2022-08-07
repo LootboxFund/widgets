@@ -609,6 +609,12 @@ const useWords = () => {
     description: 'Text to enter a verification code for signup',
   })
 
+  const tournament = intl.formatMessage({
+    id: 'generics.tournament',
+    defaultMessage: 'Tournament',
+    description: 'Text to describe an esports tournament',
+  })
+
   return {
     cancel,
     back,
@@ -704,6 +710,7 @@ const useWords = () => {
     pleaseEnterYourPhoneNumber,
     confirm,
     verificationCode,
+    tournament,
   }
 }
 
