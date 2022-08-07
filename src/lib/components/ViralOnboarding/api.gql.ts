@@ -1,5 +1,34 @@
 import { gql } from '@apollo/client'
 
+export const COMPLETE_CLAIM = gql`
+  mutation Mutation($payload: CompleteClaimPayload!) {
+    completeClaim(payload: $payload) {
+      ... on CompleteClaimResponseSuccess {
+        claim {
+          id
+          referralId
+          referralSlug
+          tournamentId
+          referrerId
+          chosenPartyBasketId
+          chosenPartyBasketAddress
+          lootboxAddress
+          rewardFromClaim
+          claimerUserId
+          status
+          type
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export const GET_REFERRAL = gql`
   query Query($slug: ID!) {
     referral(slug: $slug) {
@@ -11,6 +40,8 @@ export const GET_REFERRAL = gql`
           campaignName
           tournamentId
           tournament {
+            title
+            description
             tournamentDate
             lootboxSnapshots {
               address
@@ -48,6 +79,7 @@ export const GET_LOTTERY_LISTINGS = gql`
               name
               nftBountyValue
               address
+              lootboxAddress
             }
           }
         }
@@ -77,7 +109,6 @@ export const CREATE_CLAIM = gql`
           lootboxAddress
           rewardFromClaim
           claimerUserId
-          claimerIsNewUser
           status
           type
         }

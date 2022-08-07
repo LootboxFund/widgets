@@ -19,11 +19,17 @@ const SelectLottery = (props: Props) => {
     ? new Date(referral.tournament.tournamentDate).toDateString()
     : words.tournament
 
+  const image =
+    !!chosenPartyBasket?.lootboxAddress && !!referral?.tournament?.lootboxSnapshots
+      ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+          ?.stampImage || TEMPLATE_LOOTBOX_STAMP
+      : TEMPLATE_LOOTBOX_STAMP
+
   return (
     <$ViralOnboardingCard background={background2}>
       <$ViralOnboardingSafeArea>
         <$Vertical>
-          <$PartyBasketImage src={chosenPartyBasket?.lootboxSnapshot?.stampImage || TEMPLATE_LOOTBOX_STAMP} />
+          <$PartyBasketImage src={image} />
           <$Heading>
             <FormattedMessage
               id="viralOnboarding.selectLottery.header"
@@ -31,7 +37,7 @@ const SelectLottery = (props: Props) => {
               description="Header for lottery claim"
             />
           </$Heading>
-          <$SubHeading>
+          <$SubHeading style={{ marginTop: '0px' }}>
             <FormattedMessage
               id="viralOnboarding.selectLottery.description"
               defaultMessage="Join {nPeople} other people who each earn {lotteryPrize} if this team wins the tournament."

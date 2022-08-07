@@ -638,6 +638,33 @@ const useWords = () => {
     description: 'Text to send a code',
   })
 
+  const event = intl.formatMessage({
+    id: 'generics.event',
+    defaultMessage: 'Event',
+    description: 'Event, like an esports tournament',
+  })
+
+  const date = intl.formatMessage({
+    id: 'generics.date',
+    defaultMessage: 'Date',
+    description: 'Calendar date',
+  })
+
+  const about = intl.formatMessage({
+    id: 'generics.about',
+    defaultMessage: 'About',
+  })
+
+  const finish = intl.formatMessage({
+    id: 'generics.finish',
+    defaultMessage: 'Finish',
+  })
+
+  const tryAgain = intl.formatMessage({
+    id: 'generics.tryAgain',
+    defaultMessage: 'Try again',
+  })
+
   return {
     retry,
     sendCode,
@@ -738,6 +765,11 @@ const useWords = () => {
     tournament,
     freeNFT,
     verifyYourPhoneNumber,
+    event,
+    date,
+    about,
+    finish,
+    tryAgain,
   }
 }
 

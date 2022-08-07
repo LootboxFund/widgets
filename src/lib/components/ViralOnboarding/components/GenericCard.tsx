@@ -2,7 +2,7 @@ import { COLORS } from '@wormgraph/helpers'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
-import { ReactChildren, PropsWithChildren } from 'react'
+import { PropsWithChildren } from 'react'
 import styled from 'styled-components'
 import { background1, $Heading, $SubHeading } from '../contants'
 
@@ -36,7 +36,7 @@ export const ErrorCard = ({ title, icon = '🤕', children, message }: PropsWith
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
-        <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
+        <$Vertical justifyContent="center" style={{ marginTop: '8vh' }}>
           <$Icon>{icon}</$Icon>
           <$Heading>{title || words.anErrorOccured}</$Heading>
           {message ? <$SubHeading style={{ marginTop: '0px' }}>{message}</$SubHeading> : null}
