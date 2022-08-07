@@ -5,7 +5,16 @@ import styled from 'styled-components'
 
 export const background1 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG1-compressed.png?alt=media`
 
+export const background2 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG2.png?alt=media`
+
 export const $Heading = styled.h1`
+  color: ${COLORS.white};
+  text-align: center;
+  text-transform: capitalize;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+`
+
+export const $Heading2 = styled.h2`
   color: ${COLORS.white};
   text-align: center;
   text-transform: capitalize;
@@ -29,7 +38,7 @@ export const $SupressedParagraph = styled.p`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-size: ${TYPOGRAPHY.fontSize.large};
   line-height: ${TYPOGRAPHY.fontSize.xxlarge};
-  line-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
 `
 
 export const $SubHeading = styled.p`
@@ -39,7 +48,18 @@ export const $SubHeading = styled.p`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-size: ${TYPOGRAPHY.fontSize.large};
   line-height: ${TYPOGRAPHY.fontSize.xxlarge};
-  line-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+`
+
+export const $SmallText = styled.p`
+  color: ${COLORS.white};
+  text-align: center;
+  text-transform: none;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  margin: 8px 0px;
 `
 
 export const $NextButton = styled.button<{

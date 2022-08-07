@@ -90,6 +90,7 @@ const AcceptGift = (props: Props) => {
           </$SubHeading>
           <$Heading>
             <$NextButton
+              onClick={props.onNext}
               color={COLORS.trustFontColor}
               backgroundColor={COLORS.trustBackground}
               style={{ width: '100%' }}
