@@ -107,7 +107,7 @@ const AcceptGift = (props: Props) => {
 
   if (errorMessage) {
     return (
-      <ErrorCard title={errorMessage} icon="🤕">
+      <ErrorCard title={words.anErrorOccured} message={errorMessage} icon="🤕">
         <$SubHeading
           onClick={() => setErrorMessage(undefined)}
           style={{ fontStyle: 'italic', textTransform: 'lowercase' }}

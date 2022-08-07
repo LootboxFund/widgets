@@ -3,8 +3,8 @@ import { ScreenSize } from 'lib/hooks/useScreenSize'
 import { manifest } from 'manifest'
 import styled from 'styled-components'
 
+export const handIconImg = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FhandIcon.png?alt=media`
 export const background1 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG1-compressed.png?alt=media`
-
 export const background2 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG2.png?alt=media`
 
 export const $Heading = styled.h1`

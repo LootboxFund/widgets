@@ -14,8 +14,8 @@ import ChooseLottery from './components/ChooseLottery'
 import SelectLottery from './components/SelectLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
-import { $ViralOnboardingCard } from 'lib/components/Generics'
 import GenericCard, { LoadingCard, ErrorCard } from './components/GenericCard'
+import { initLogging } from 'lib/api/logrocket'
 
 interface ViralOnboardingProps {
   referralSlug: ReferralSlug
@@ -72,6 +72,13 @@ const ViralOnboardingPage = () => {
   useEffect(() => {
     const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
     setReferralSlug(INITIAL_URL_PARAMS.referralSlug)
+  }, [])
+
+  useEffect(() => {
+    const load = async () => {
+      initLogging()
+    }
+    load()
   }, [])
 
   if (!referralSlug) {

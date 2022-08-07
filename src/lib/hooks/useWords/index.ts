@@ -627,8 +627,20 @@ const useWords = () => {
     description: 'Text to retry something',
   })
 
+  const verifyYourPhoneNumber = intl.formatMessage({
+    id: 'generics.verifyYourPhoneNumber',
+    defaultMessage: 'Verify your phone number',
+  })
+
+  const sendCode = intl.formatMessage({
+    id: 'generics.sendCode',
+    defaultMessage: 'Send code',
+    description: 'Text to send a code',
+  })
+
   return {
     retry,
+    sendCode,
     cancel,
     back,
     network,
@@ -725,6 +737,7 @@ const useWords = () => {
     verificationCode,
     tournament,
     freeNFT,
+    verifyYourPhoneNumber,
   }
 }
 

@@ -4,7 +4,7 @@ import Spinner from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { ReactChildren, PropsWithChildren } from 'react'
 import styled from 'styled-components'
-import { background1, $Heading } from '../contants'
+import { background1, $Heading, $SubHeading } from '../contants'
 
 const GenericCard = ({ children }: PropsWithChildren<{}>) => {
   return (
@@ -31,7 +31,7 @@ interface ErrorCardProps {
   message?: string
   icon?: string
 }
-export const ErrorCard = ({ title, icon = '🤕', children }: PropsWithChildren<ErrorCardProps>) => {
+export const ErrorCard = ({ title, icon = '🤕', children, message }: PropsWithChildren<ErrorCardProps>) => {
   const words = useWords()
   return (
     <$ViralOnboardingCard background={background1}>
@@ -39,6 +39,7 @@ export const ErrorCard = ({ title, icon = '🤕', children }: PropsWithChildren<
         <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
           <$Icon>{icon}</$Icon>
           <$Heading>{title || words.anErrorOccured}</$Heading>
+          {message ? <$SubHeading style={{ marginTop: '0px' }}>{message}</$SubHeading> : null}
           {children}
         </$Vertical>
       </$ViralOnboardingSafeArea>
