@@ -16,7 +16,7 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
+        <$CardViewport width="100%" maxWidth="720px" margin="0 auto" style={{ border: '1px solid black' }}>
           <PublicProfilePage />
         </$CardViewport>
       </LocalizationWrapper>
