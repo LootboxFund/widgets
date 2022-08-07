@@ -1,4 +1,4 @@
-import { Claim, Referral } from 'lib/api/graphql/generated/types'
+import { Claim, PartyBasket, Referral } from 'lib/api/graphql/generated/types'
 import { PartyBasketID } from 'lib/types'
 import { useState, createContext, useContext, PropsWithChildren } from 'react'
 
@@ -6,8 +6,8 @@ interface ViralOnboardingContextType {
   referral?: Referral
   claim?: Claim
   setClaim: (claim: Claim | undefined) => void
-  chosenPartyBasketId?: PartyBasketID
-  setChosenPartyBasketId: (partyBasketId: PartyBasketID | undefined) => void
+  chosenPartyBasket?: PartyBasket
+  setChosenPartyBasket: (partyBasket: PartyBasket | undefined) => void
 }
 
 const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(null)
@@ -27,15 +27,15 @@ interface ViralOnboardingProviderProps {
 
 const ViralOnboardingProvider = ({ referral, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
   const [claim, setClaim] = useState<Claim>()
-  const [chosenPartyBasketId, setChosenPartyBasketId] = useState<PartyBasketID>()
+  const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasket>()
   return (
     <ViralOnboardingContext.Provider
       value={{
         referral,
         claim,
         setClaim,
-        chosenPartyBasketId,
-        setChosenPartyBasketId,
+        chosenPartyBasket,
+        setChosenPartyBasket,
       }}
     >
       {children}

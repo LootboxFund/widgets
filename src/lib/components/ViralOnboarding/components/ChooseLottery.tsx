@@ -15,8 +15,6 @@ import { ErrorCard, LoadingCard } from './GenericCard'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
-import { ScreenSize } from 'lib/hooks/useScreenSize'
-import { PartyBasketID } from 'lib/types'
 
 interface LootboxPartyBasket {
   lootbox: LootboxTournamentSnapshot
@@ -28,7 +26,7 @@ interface Props {
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
-  const { referral, setChosenPartyBasketId, chosenPartyBasketId } = useViralOnboarding()
+  const { referral, setChosenPartyBasket, chosenPartyBasket } = useViralOnboarding()
   const words = useWords()
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(
     GET_LOTTERY_LISTINGS,
@@ -55,9 +53,9 @@ const ChooseLottery = (props: Props) => {
   tournament.lootboxSnapshots?.forEach((snapshot) => {
     if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
       snapshot.partyBaskets.forEach((partyBasket) => {
-        const doc = {
+        const doc: LootboxPartyBasket = {
           lootbox: snapshot,
-          partyBasket: partyBasket,
+          partyBasket,
         }
         if (partyBasket.id === referral?.seedPartyBasketId) {
           //   lootboxPartyBaskets.unshift(doc)
@@ -105,7 +103,7 @@ const ChooseLottery = (props: Props) => {
               return (
                 <$LotteryContainer
                   onClick={() => {
-                    setChosenPartyBasketId(data.partyBasket.id as PartyBasketID)
+                    setChosenPartyBasket(data.partyBasket)
                     props.onNext()
                   }}
                   key={`selection-${idx}`}

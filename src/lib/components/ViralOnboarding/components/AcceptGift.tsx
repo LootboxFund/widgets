@@ -1,7 +1,7 @@
 import useWords from 'lib/hooks/useWords'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   background1,
@@ -16,6 +16,14 @@ import {
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { COLORS } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { useMutation } from '@apollo/client'
+import { CREATE_CLAIM } from '../api.gql'
+import {
+  CreateClaimResponse,
+  CreateClaimResponseSuccess,
+  MutationCreateClaimArgs,
+} from 'lib/api/graphql/generated/types'
+import { ErrorCard } from './GenericCard'
 
 interface Props {
   onNext: () => void
@@ -24,8 +32,12 @@ interface Props {
 const AcceptGift = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
-  const { referral } = useViralOnboarding()
-  const { screen } = useWindowSize()
+  const { referral, setClaim } = useViralOnboarding()
+  const [errorMessage, setErrorMessage] = useState<string>()
+  const [createClaim, { loading }] = useMutation<{ createClaim: CreateClaimResponse }, MutationCreateClaimArgs>(
+    CREATE_CLAIM
+  )
+
   const LootboxSnapshots = () => {
     const seedLootboxAddress = referral?.seedPartyBasket?.lootboxAddress
     let showCasedLootboxImages: string[]
@@ -61,6 +73,51 @@ const AcceptGift = (props: Props) => {
     ? new Date(referral.tournament.tournamentDate).toDateString()
     : words.tournament
 
+  const startFlight = async () => {
+    try {
+      if (!referral?.slug) {
+        console.error('No referral slug')
+        throw new Error(words.anErrorOccured)
+      }
+      const { data } = await createClaim({
+        variables: {
+          payload: {
+            referralSlug: referral?.slug,
+          },
+        },
+      })
+
+      if (
+        !data?.createClaim ||
+        data?.createClaim?.__typename === 'ResponseError' ||
+        data?.createClaim?.__typename !== 'CreateClaimResponseSuccess'
+      ) {
+        throw new Error(words.anErrorOccured)
+      }
+
+      const claim = (data.createClaim as CreateClaimResponseSuccess).claim
+
+      setClaim(claim)
+      props.onNext()
+    } catch (err) {
+      console.error(err)
+      setErrorMessage(err?.message || words.anErrorOccured)
+    }
+  }
+
+  if (errorMessage) {
+    return (
+      <ErrorCard title={errorMessage} icon="🤕">
+        <$SubHeading
+          onClick={() => setErrorMessage(undefined)}
+          style={{ fontStyle: 'italic', textTransform: 'lowercase' }}
+        >
+          {words.retry + '?'}
+        </$SubHeading>
+      </ErrorCard>
+    )
+  }
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -90,10 +147,11 @@ const AcceptGift = (props: Props) => {
           </$SubHeading>
           <$Heading>
             <$NextButton
-              onClick={props.onNext}
+              onClick={startFlight}
               color={COLORS.trustFontColor}
               backgroundColor={COLORS.trustBackground}
               style={{ width: '100%' }}
+              disabled={loading}
             >
               <FormattedMessage
                 id="viralOnboarding.acceptGift.next"

@@ -615,7 +615,20 @@ const useWords = () => {
     description: 'Text to describe an esports tournament',
   })
 
+  const freeNFT = intl.formatMessage({
+    id: 'generics.freeNFT',
+    defaultMessage: 'Free NFT',
+    description: 'Text to describe a free NFT',
+  })
+
+  const retry = intl.formatMessage({
+    id: 'generics.retry',
+    defaultMessage: 'Retry',
+    description: 'Text to retry something',
+  })
+
   return {
+    retry,
     cancel,
     back,
     network,
@@ -711,6 +724,7 @@ const useWords = () => {
     confirm,
     verificationCode,
     tournament,
+    freeNFT,
   }
 }
 

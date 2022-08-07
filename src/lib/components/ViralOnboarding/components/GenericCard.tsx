@@ -26,7 +26,12 @@ export const LoadingCard = () => {
   )
 }
 
-export const ErrorCard = ({ title, icon = '🤕' }: { title?: string; message?: string; icon?: string }) => {
+interface ErrorCardProps {
+  title?: string
+  message?: string
+  icon?: string
+}
+export const ErrorCard = ({ title, icon = '🤕', children }: PropsWithChildren<ErrorCardProps>) => {
   const words = useWords()
   return (
     <$ViralOnboardingCard background={background1}>
@@ -34,6 +39,7 @@ export const ErrorCard = ({ title, icon = '🤕' }: { title?: string; message?: 
         <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
           <$Icon>{icon}</$Icon>
           <$Heading>{title || words.anErrorOccured}</$Heading>
+          {children}
         </$Vertical>
       </$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>

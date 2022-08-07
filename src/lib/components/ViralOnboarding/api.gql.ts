@@ -5,6 +5,7 @@ export const GET_REFERRAL = gql`
     referral(slug: $slug) {
       ... on ReferralResponseSuccess {
         referral {
+          slug
           seedPartyBasketId
           nConversions
           campaignName
@@ -49,6 +50,36 @@ export const GET_LOTTERY_LISTINGS = gql`
               address
             }
           }
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export const CREATE_CLAIM = gql`
+  mutation Mutation($payload: CreateClaimPayload!) {
+    createClaim(payload: $payload) {
+      ... on CreateClaimResponseSuccess {
+        claim {
+          id
+          referralId
+          referralSlug
+          tournamentId
+          referrerId
+          chosenPartyBasketId
+          chosenPartyBasketAddress
+          lootboxAddress
+          rewardFromClaim
+          claimerUserId
+          claimerIsNewUser
+          status
+          type
         }
       }
       ... on ResponseError {
