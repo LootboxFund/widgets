@@ -85,7 +85,7 @@ const PublicProfile = (props: PublicProfileProps) => {
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
             <FormattedMessage
               id="profile.public.bothGetBonusTickets"
-              defaultMessage="Both get a bonus FREE Lottery Ticket"
+              defaultMessage="Both get bonus FREE Lottery Tickets"
               description="Reward caption for inviting friend"
             />
           </span>
@@ -212,7 +212,7 @@ const PublicProfile = (props: PublicProfileProps) => {
             >
               <FormattedMessage
                 id="profile.public.bothGetBonusTickets"
-                defaultMessage="Both get a bonus FREE Lottery Ticket"
+                defaultMessage="Both get bonus FREE Lottery Tickets"
                 description="Reward caption for inviting friend"
               />
             </span>
