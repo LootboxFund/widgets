@@ -231,7 +231,7 @@ const PublicProfile = (props: PublicProfileProps) => {
               <a href="" target="_blank">
                 <$ClaimCard key={edge.node.id}>
                   <img
-                    src={edge.node?.chosenPartyBasket?.lootboxSnapshot?.image}
+                    src={edge.node?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </$ClaimCard>
@@ -302,7 +302,7 @@ const $ClaimCard = styled.div`
 
 const $InviteFriend = styled.div`
   width: auto;
-  height: 80%;
+  height: 90%;
   display: flex;
   border-radius: 10px;
   flex-direction: column;
