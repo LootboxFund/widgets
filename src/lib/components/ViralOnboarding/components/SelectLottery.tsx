@@ -64,7 +64,7 @@ const SelectLottery = (props: Props) => {
           </$Heading>
           <$SupressedParagraph style={{ width: '80%', margin: '0 auto' }}>
             <FormattedMessage
-              id="viralOnboarding.acceptGift.nConversions"
+              id="viralOnboarding.selectLottery.dateWinnerAnnounce"
               defaultMessage="Winners Announced {dateWin}"
               description="date when we announce the winners of the lottery"
               values={{

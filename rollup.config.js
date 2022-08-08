@@ -159,6 +159,10 @@ const LootboxFeed = widgetConfig('LootboxFeed')
 
 const BattlePage = widgetConfig('BattlePage')
 
+const PublicProfile = widgetConfig('PublicProfile')
+
+const ViralOnboarding = widgetConfig('ViralOnboarding')
+
 export default [
   CreateLootbox,
   InteractWithLootbox,
@@ -174,4 +178,6 @@ export default [
   PartyBasketRedeem,
   LootboxFeed,
   BattlePage,
+  PublicProfile,
+  ViralOnboarding,
 ]
