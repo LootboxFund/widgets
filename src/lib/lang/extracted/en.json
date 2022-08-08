@@ -1541,6 +1541,46 @@
     "defaultMessage": "You should have received an email from us. {checkSpamFolderText}{newlineCharacter}Can't find it? {resendVerificationEmail}",
     "description": "This is the message that tells the user to verify their email address."
   },
+  "profile.public.viewSocials": {
+    "defaultMessage": "View Socials",
+    "description": "Public Profile Page link to view socials"
+  },
+  "profile.public.editProfile": {
+    "defaultMessage": "Edit Profile",
+    "description": "Public Profile Page link to edit profile"
+  },
+  "profile.public.myLotteryTicketsLabel": {
+    "defaultMessage": "My Lottery Tickets",
+    "description": "Label for list of lottery tickets"
+  },
+  "profile.public.myLotteryTicketsTip": {
+    "defaultMessage": "Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
+    "description": "Tooltip for my lottery tickets list on Public Profile Page"
+  },
+  "profile.public.inviteFriend": {
+    "defaultMessage": "Invite Friend",
+    "description": "Button to invite friend"
+  },
+  "profile.public.bothGetBonusTickets": {
+    "defaultMessage": "Both get bonus FREE Lottery Tickets",
+    "description": "Reward caption for inviting friend"
+  },
+  "profile.socials.pageHeader": {
+    "defaultMessage": "Social Profiles",
+    "description": "Page Header of Social Profiles Page"
+  },
+  "profile.socials.changePhoto": {
+    "defaultMessage": "Change Photo",
+    "description": "Change Photo of User"
+  },
+  "profile.socials.biography": {
+    "defaultMessage": "Biography",
+    "description": "Biography of User"
+  },
+  "profile.socials.mySocials": {
+    "defaultMessage": "My Socials",
+    "description": "Public list of user socials"
+  },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
     "description": "Title for the page that allows a user to add a password"

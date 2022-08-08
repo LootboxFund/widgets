@@ -1,0 +1,52 @@
+[
+  {
+    "__typename": "ClaimEdge",
+    "cursor": 1659852166494,
+    "node": {
+      "__typename": "Claim",
+      "id": "CKoVgW9SQWk9e9xHoWqw",
+      "referralId": "pua2QiIihNUOfMGmfnqQ",
+      "referralSlug": "IMf-SI-XOooW",
+      "tournamentId": "LuKi5CuxihGAEVXGq6Ei",
+      "referrerId": "jMMkyWKM2RgAP43iFhz6M2i6jYl1",
+      "chosenPartyBasketId": "KX6GynmMd9puybAClOFB",
+      "chosenPartyBasketAddress": null,
+      "lootboxAddress": null,
+      "rewardFromClaim": null,
+      "claimerUserId": "kbbROY4XHqSdeICfLCbKnHSaoBD3",
+      "claimerIsNewUser": null,
+      "status": "complete",
+      "type": "referral",
+      "timestamps": {
+        "__typename": "ClaimTimestamps",
+        "createdAt": 1659852166494,
+        "updatedAt": 1659852166495,
+        "deletedAt": null
+      },
+      "chosenPartyBasket": {
+        "__typename": "PartyBasket",
+        "id": "KX6GynmMd9puybAClOFB",
+        "address": "0xDb75de46774F8F82aD4396520FE874A3B9c1A8b9",
+        "factory": "0xEBE589EBDD28Ec3D7C6Ca70DaD80B1Ff6B462c6A",
+        "creatorId": "jMMkyWKM2RgAP43iFhz6M2i6jYl1",
+        "creatorAddress": "0x2C83b49EdB3f00A38331028e2D8bFA3Cd93B8288",
+        "lootboxAddress": "0xb1f8FC88d54Ba05A73d7eAABDcdbeF8AB0C43967",
+        "name": "Dragon Sweat #2",
+        "chainIdHex": "0x13881",
+        "lootboxSnapshot": {
+          "__typename": "LootboxSnapshot",
+          "address": "0xb1f8FC88d54Ba05A73d7eAABDcdbeF8AB0C43967",
+          "issuer": "0x2C83b49EdB3f00A38331028e2D8bFA3Cd93B8288",
+          "description": "Your Lootbox fundraises money by selling NFT tickets to investors, who enjoy profit sharing when you deposit earnings back into the Lootbox.",
+          "name": "Dragon Swarts",
+          "stampImage": "https://storage.googleapis.com/lootbox-stamp-staging/0xb1f8FC88d54Ba05A73d7eAABDcdbeF8AB0C43967%2Flootbox.png?alt=media",
+          "image": "https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/assets%2Flootbox%2F14cfb2b0-e890-4ab4-94c3-f0b4085663d3%2Flogo.webp?alt=media&token=2ced2cb4-bfbd-4f95-b261-2bb1a8c1ac76",
+          "backgroundColor": "#005DFF",
+          "backgroundImage": "https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/assets%2Flootbox%2F14cfb2b0-e890-4ab4-94c3-f0b4085663d3%2Fcover.jpeg?alt=media&token=d78154f2-0fee-40c3-b8ae-0b1c4cfaf31d",
+          "metadataDownloadUrl": "https://storage.googleapis.com/lootbox-data-staging/0xb1f8fc88d54ba05a73d7eaabdcdbef8ab0c43967%2Flootbox.json?alt=media"
+        },
+        "nftBountyValue": "20 Matic"
+      }
+    }
+  }
+]

@@ -28,7 +28,6 @@ interface ViralOnboardingProviderProps {
 const ViralOnboardingProvider = ({ referral, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
   const [claim, setClaim] = useState<Claim>()
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasket>()
-  console.log('chosenPartyBasket', chosenPartyBasket)
   return (
     <ViralOnboardingContext.Provider
       value={{
