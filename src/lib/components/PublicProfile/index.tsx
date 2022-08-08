@@ -34,7 +34,7 @@ const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [searchString, setSearchString] = useState('')
-  const [lastCreatedAt, setLastCreatedAt] = useState<null | number>(null)
+  const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<null | string>(null)
   const [userClaims, setUserClaims] = useState<Claim[]>([])
   const {
     data: profileData,
@@ -46,18 +46,18 @@ const PublicProfile = (props: PublicProfileProps) => {
     loading: loadingData,
     error: errorData,
   } = useQuery<{ userClaims: UserClaimsResponse }, QueryUserClaimsArgs>(GET_USER_CLAIMS, {
-    variables: { userId: props.userId, first: 2, after: lastCreatedAt },
+    variables: { userId: props.userId, first: 6, after: lastClaimCreatedAt },
     onCompleted: (claimsData) => {
       if (claimsData?.userClaims?.__typename === 'UserClaimsResponseSuccess') {
         const nodes = claimsData.userClaims.edges
-        setUserClaims([...userClaims, ...nodes.map((node) => node.node)])
+        const newClaims = [...userClaims, ...nodes.map((node) => node.node)]
+        console.log('new', newClaims)
+        setUserClaims(newClaims)
       }
     },
   })
 
-  if (loadingData) {
-    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
-  } else if (errorData) {
+  if (errorData) {
     return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
   } else if (claimsData?.userClaims?.__typename === 'ResponseError') {
     return <Oopsies title={words.anErrorOccured} message={claimsData?.userClaims?.error?.message || ''} icon="🤕" />
@@ -65,10 +65,11 @@ const PublicProfile = (props: PublicProfileProps) => {
 
   // Here we kinda coalesce the response into a predictable type
   const { edges, pageInfo } = (claimsData?.userClaims as UserClaimsResponseSuccess) || {}
+  console.log(edges)
 
   const handleMore = () => {
     // fetchs another batch of claims
-    setLastCreatedAt(pageInfo.endCursor || null)
+    setLastClaimCreatedAt(pageInfo.endCursor || null)
   }
   return (
     <$PublicProfilePageContainer screen={screen}>
@@ -218,28 +219,32 @@ const PublicProfile = (props: PublicProfileProps) => {
             </span>
           </$InviteFriend>
         </$ClaimCard>
-        {edges
-          .filter(
-            (edge) =>
-              (edge.node.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
-              (edge.node.chosenPartyBasket?.lootboxSnapshot?.name
-                .toLowerCase()
-                .indexOf(searchString.toLowerCase()) as number) > -1
-          )
-          .map((edge) => {
-            return (
-              <a href="" target="_blank">
-                <$ClaimCard key={edge.node.id}>
-                  <img
-                    src={edge.node?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </$ClaimCard>
-              </a>
+        {userClaims &&
+          userClaims
+            .filter(
+              (claim) =>
+                (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
+                (claim.chosenPartyBasket?.lootboxSnapshot?.name
+                  .toLowerCase()
+                  .indexOf(searchString.toLowerCase()) as number) > -1
             )
-          })}
+            .map((claim) => {
+              return (
+                <a href="" target="_blank">
+                  <$ClaimCard key={claim.id}>
+                    <img
+                      src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </$ClaimCard>
+                </a>
+              )
+            })}
+
+        {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
       </$ClaimsGrid>
       {/* <button onClick={handleMore}>load more (intl me)</button> */}
+      {pageInfo?.hasNextPage && <$MoreButton onClick={handleMore}>{words.seeMore}</$MoreButton>}
     </$PublicProfilePageContainer>
   )
 }
@@ -315,6 +320,21 @@ const $InviteFriend = styled.div`
 `
 
 const $InviteButton = styled.button`
+  width: 100%;
+  height: 40px;
+  max-width: 200px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 10px;
+  background-color: ${COLORS.trustBackground};
+  color: ${COLORS.white};
+  border: 0px solid white;
+  text-transform: uppercase;
+`
+
+const $MoreButton = styled.button`
   width: 100%;
   height: 40px;
   max-width: 200px;
