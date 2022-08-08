@@ -39,7 +39,7 @@
     "deploy:lagrange": "NODE_ENV=production node scripts/deploy-battle-page.js",
     "deploy:publicprofile": "NODE_ENV=production node scripts/public-profile.js",
     "deploy:viralonboarding": "NODE_ENV=production node scripts/deploy-viral-onboarding.js",
-    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange",
+    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:viralonboarding",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
