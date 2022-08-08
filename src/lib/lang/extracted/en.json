@@ -2071,8 +2071,8 @@
     "description": "Message to show when a user is gifted a free lottery ticket"
   },
   "viralOnboarding.acceptGift.nConversions": {
-    "defaultMessage": "Winners Announced {dateWin}",
-    "description": "date when we announce the winners of the lottery"
+    "defaultMessage": "{nPeople} people already accepted this gift",
+    "description": "Counts how many users accepted the gift"
   },
   "viralOnboarding.acceptGift.next": {
     "defaultMessage": "Accept Gift",
@@ -2103,6 +2103,10 @@
   },
   "viralOnboarding.completeOnboarding.winnersAnnouned4": {
     "defaultMessage": "Winners Already Announced"
+  },
+  "viralOnboarding.selectLottery.dateWinnerAnnounce": {
+    "defaultMessage": "Winners Announced {dateWin}",
+    "description": "date when we announce the winners of the lottery"
   },
   "viralOnboarding.selectLottery.description": {
     "defaultMessage": "Join {nPeople} other people who each earn {lotteryPrize} if this team wins the tournament.",
