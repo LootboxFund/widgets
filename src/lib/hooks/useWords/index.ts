@@ -609,7 +609,65 @@ const useWords = () => {
     description: 'Text to enter a verification code for signup',
   })
 
+  const tournament = intl.formatMessage({
+    id: 'generics.tournament',
+    defaultMessage: 'Tournament',
+    description: 'Text to describe an esports tournament',
+  })
+
+  const freeNFT = intl.formatMessage({
+    id: 'generics.freeNFT',
+    defaultMessage: 'Free NFT',
+    description: 'Text to describe a free NFT',
+  })
+
+  const retry = intl.formatMessage({
+    id: 'generics.retry',
+    defaultMessage: 'Retry',
+    description: 'Text to retry something',
+  })
+
+  const verifyYourPhoneNumber = intl.formatMessage({
+    id: 'generics.verifyYourPhoneNumber',
+    defaultMessage: 'Verify your phone number',
+  })
+
+  const sendCode = intl.formatMessage({
+    id: 'generics.sendCode',
+    defaultMessage: 'Send code',
+    description: 'Text to send a code',
+  })
+
+  const event = intl.formatMessage({
+    id: 'generics.event',
+    defaultMessage: 'Event',
+    description: 'Event, like an esports tournament',
+  })
+
+  const date = intl.formatMessage({
+    id: 'generics.date',
+    defaultMessage: 'Date',
+    description: 'Calendar date',
+  })
+
+  const about = intl.formatMessage({
+    id: 'generics.about',
+    defaultMessage: 'About',
+  })
+
+  const finish = intl.formatMessage({
+    id: 'generics.finish',
+    defaultMessage: 'Finish',
+  })
+
+  const tryAgain = intl.formatMessage({
+    id: 'generics.tryAgain',
+    defaultMessage: 'Try again',
+  })
+
   return {
+    retry,
+    sendCode,
     cancel,
     back,
     network,
@@ -704,6 +762,14 @@ const useWords = () => {
     pleaseEnterYourPhoneNumber,
     confirm,
     verificationCode,
+    tournament,
+    freeNFT,
+    verifyYourPhoneNumber,
+    event,
+    date,
+    about,
+    finish,
+    tryAgain,
   }
 }
 

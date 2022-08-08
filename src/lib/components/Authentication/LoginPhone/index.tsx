@@ -34,11 +34,6 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const intl = useIntl()
   const words = useWords()
 
-  const enterYourPhoneNumber = intl.formatMessage({
-    id: 'auth.phone.enterYourPhoneNumber',
-    defaultMessage: 'Enter your phone number',
-  })
-
   useEffect(() => {
     if (status === 'verification_sent') {
       const el = document.getElementById('verification-input')
@@ -98,7 +93,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
       {status === 'pending' && (
         <$Vertical spacing={4}>
           <$Vertical spacing={2}>
-            <$span>{enterYourPhoneNumber}</$span>
+            <$span>{words.verifyYourPhoneNumber}</$span>
             <$InputMedium
               id="sms-verf"
               type="tel"
@@ -125,11 +120,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
                 // textTransform: 'uppercase',
               }}
             >
-              <FormattedMessage
-                id="auth.signupPhone.button.sendText"
-                defaultMessage="Send code"
-                description="button text to send code to phone number for verification"
-              />
+              {words.sendCode}
             </$Button>
           </$Vertical>
         </$Vertical>
