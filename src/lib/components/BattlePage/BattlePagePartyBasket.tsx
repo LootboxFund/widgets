@@ -19,6 +19,7 @@ import AuthGuard from '../AuthGuard'
 interface Props {
   lootboxPartyBasket: LootboxPartyBasket
   tournamentId: TournamentID
+  setIsInviteModalOpen: (isOpen: boolean) => void
 }
 const BattlePagePartyBasket = (props: Props) => {
   const intl = useIntl()
@@ -120,10 +121,68 @@ const BattlePagePartyBasket = (props: Props) => {
     <$BattlePageSection screen={screen}>
       <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
         <$Vertical spacing={2} style={{ margin: '0 auto' }}>
-          <$BattleCardsContainer screen={screen} width="220px">
-            <$BattleCardImage src={props.lootboxPartyBasket.lootbox?.stampImage} cardNumber={0} />
+          <$BattleCardsContainer
+            screen={screen}
+            width="220px"
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          >
+            <$BattleCardImage
+              src={props.lootboxPartyBasket.lootbox?.stampImage}
+              cardNumber={0}
+              style={{ position: 'relative', maxWidth: '100%' }}
+            />
+            <$Button
+              screen={screen}
+              onClick={() =>
+                props.lootboxPartyBasket?.partyBasket &&
+                window.open(
+                  `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket.partyBasket.address}`,
+                  '_blank'
+                )
+              }
+              style={{
+                textTransform: 'capitalize',
+                color: `${COLORS.trustBackground}B0`,
+                border: `1px solid ${COLORS.trustBackground}B0`,
+                background: props.lootboxPartyBasket.partyBasket
+                  ? `rgba(0,0,0,0.05)`
+                  : `${COLORS.surpressedBackground}ae`,
+                whiteSpace: 'nowrap',
+                marginTop: '0.67em',
+                fontWeight: 'ligher',
+                width: '100%',
+                cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {props.lootboxPartyBasket.partyBasket ? (
+                <FormattedMessage
+                  id="battlePage.button.claimLottery"
+                  defaultMessage="Claim lottery"
+                  description="Text prompting user to claim a lottery ticket"
+                />
+              ) : (
+                <FormattedMessage
+                  id="battlePage.button.noneAvailable"
+                  defaultMessage="None available"
+                  description="Text indicating that something is not available"
+                />
+              )}
+            </$Button>
+            {props.lootboxPartyBasket.partyBasket?.nftBountyValue && (
+              <$span
+                style={{
+                  textTransform: 'capitalize',
+                  color: COLORS.surpressedFontColor,
+                  textAlign: 'center',
+                  paddingTop: '10px',
+                }}
+              >
+                {words.win} {props.lootboxPartyBasket.partyBasket.nftBountyValue}
+              </$span>
+            )}
           </$BattleCardsContainer>
-          <span
+
+          {/* <span
             style={{
               textAlign: 'center',
               width: '90%',
@@ -141,11 +200,11 @@ const BattlePagePartyBasket = (props: Props) => {
             >
               {words.buyLootbox}
             </$Link>
-          </span>
+          </span> */}
         </$Vertical>
-        <$Vertical height="100%" width="100%" spacing={2}>
+        <$Vertical height="100%" width="100%" spacing={2} style={{ marginLeft: '20px' }}>
           <$Horizontal justifyContent="space-between" flexWrap={screen !== 'desktop'} spacing={2}>
-            <$Vertical width={screen === 'mobile' ? '100%' : 'auto'}>
+            <$Vertical width={screen === 'mobile' ? '100%' : 'auto'} style={{ flex: 3 }}>
               <$h1 style={{ marginBottom: '0', textAlign: screen === 'mobile' ? 'center' : 'left' }}>
                 {props.lootboxPartyBasket?.partyBasket?.name || props.lootboxPartyBasket?.lootbox?.name}
               </$h1>
@@ -161,18 +220,13 @@ const BattlePagePartyBasket = (props: Props) => {
             <$Vertical
               style={{
                 margin: screen === 'mobile' ? '0 auto' : 'unset',
+                flex: 2,
               }}
             >
               <div>
                 <$Button
                   screen={screen}
-                  onClick={() =>
-                    props.lootboxPartyBasket?.partyBasket &&
-                    window.open(
-                      `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket.partyBasket.address}`,
-                      '_blank'
-                    )
-                  }
+                  onClick={() => props.lootboxPartyBasket?.partyBasket && props.setIsInviteModalOpen(true)}
                   style={{
                     textTransform: 'capitalize',
                     color: COLORS.trustFontColor,
@@ -181,37 +235,25 @@ const BattlePagePartyBasket = (props: Props) => {
                       : `${COLORS.surpressedBackground}ae`,
                     whiteSpace: 'nowrap',
                     marginTop: '0.67em',
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
                     cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
                   }}
                 >
-                  {props.lootboxPartyBasket.partyBasket ? (
-                    <FormattedMessage
-                      id="battlePage.button.claimLottery"
-                      defaultMessage="Claim lottery"
-                      description="Text prompting user to claim a lottery ticket"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="battlePage.button.noneAvailable"
-                      defaultMessage="None available"
-                      description="Text indicating that something is not available"
-                    />
-                  )}
+                  <FormattedMessage
+                    id="battlePage.button.inviteFriend"
+                    defaultMessage="Invite Friend"
+                    description="Invite button on Party Basket on the Battle page"
+                  />
                 </$Button>
+                <p style={{ color: COLORS.surpressedBackground, textAlign: 'center', marginTop: '10px' }}>
+                  <FormattedMessage
+                    id="battlePage.button.inviteFriendRewardPrompt"
+                    defaultMessage="Both get a FREE lottery ticket"
+                    description="Text prompting user on why they should invite a friend"
+                  />
+                </p>
               </div>
-
-              {props.lootboxPartyBasket.partyBasket?.nftBountyValue && (
-                <$span
-                  style={{
-                    textTransform: 'capitalize',
-                    color: COLORS.black,
-                    textAlign: 'center',
-                    paddingTop: '10px',
-                  }}
-                >
-                  {words.win} {props.lootboxPartyBasket.partyBasket.nftBountyValue}
-                </$span>
-              )}
             </$Vertical>
           </$Horizontal>
           <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />

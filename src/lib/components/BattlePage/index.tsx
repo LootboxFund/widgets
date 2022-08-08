@@ -10,7 +10,7 @@ import {
 } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
-import { TournamentID, StreamID, PartyBasketID } from 'lib/types'
+import { TournamentID, StreamID } from 'lib/types'
 import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -47,6 +47,7 @@ const BattlePage = (props: BattlePageParams) => {
     }
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
   const tournamentWords = useTournamentWords()
@@ -75,6 +76,7 @@ const BattlePage = (props: BattlePageParams) => {
       maxWidth: '500px',
       margin: 'auto',
       maxHeight: '500px',
+      fontFamily: 'sans-serif',
     },
     overlay: {
       position: 'fixed' as 'fixed',
@@ -264,6 +266,7 @@ const BattlePage = (props: BattlePageParams) => {
                   lootboxPartyBasket={data}
                   tournamentId={tournament.id as TournamentID}
                   key={`${data.lootbox.address}_${data.partyBasket?.address || ''}`}
+                  setIsInviteModalOpen={setIsInviteModalOpen}
                 />
               )
             })}
@@ -310,6 +313,96 @@ const BattlePage = (props: BattlePageParams) => {
             })}
           </$Vertical>
         )}
+      </Modal>
+      <Modal
+        isOpen={isInviteModalOpen}
+        onRequestClose={() => setIsInviteModalOpen(false)}
+        contentLabel="Invite Link Modal"
+        style={customStyles}
+      >
+        <$Horizontal width="100%" justifyContent="space-between">
+          <span style={{ fontWeight: 'bold' }}></span>
+          <span onClick={() => setIsInviteModalOpen(false)} style={{ cursor: 'pointer' }}>
+            X
+          </span>
+        </$Horizontal>
+        <br />
+        <br />
+        <br />
+        <$Vertical width="100%" justifyContent="center" style={{ padding: '30px' }}>
+          <b style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
+            <FormattedMessage
+              id="inviteLink.modal.header"
+              description="Title of this modal for inviting friends"
+              defaultMessage="Invite Friends"
+            />
+          </b>
+          <span style={{ fontWeight: 'lighter', margin: '10px 0px 15px 0px', color: COLORS.black }}>
+            <FormattedMessage
+              id="inviteLink.modal.description"
+              description="Description of the invite link modal contents"
+              defaultMessage="You’ll BOTH get extra free lottery tickets for each person invited"
+            />
+          </span>
+          <$Horizontal width="100%" justifyContent="center">
+            <input
+              style={{
+                flex: 5,
+                height: '20px',
+                backgroundColor: `rgba(0,0,0,0.05)`,
+                padding: '15px',
+                fontSize: '1rem',
+                border: '0px solid white',
+              }}
+            ></input>
+            <button
+              style={{
+                flex: 1,
+                color: COLORS.trustFontColor,
+                backgroundColor: `${COLORS.trustBackground}20`,
+                border: '0px solid white',
+                padding: '10px',
+                borderRadius: '5px',
+                marginLeft: '5px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+              }}
+            >
+              {words.copy}
+            </button>
+          </$Horizontal>
+          <input
+            placeholder="Campaign Name (Optional)"
+            style={{
+              margin: '5px 0px',
+              height: '20px',
+              backgroundColor: `rgba(0,0,0,0.05)`,
+              padding: '15px',
+              fontSize: '1rem',
+              border: '0px solid white',
+            }}
+          ></input>
+          <button
+            style={{
+              flex: 1,
+              color: COLORS.trustFontColor,
+              backgroundColor: COLORS.trustBackground,
+              border: '0px solid white',
+              padding: '15px',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <FormattedMessage
+              id="inviteLink.modal.generateInviteLink"
+              description="Main action button for invite link modal"
+              defaultMessage="Generate Invite Link"
+            />
+          </button>
+        </$Vertical>
       </Modal>
     </$BattlePageContainer>
   )

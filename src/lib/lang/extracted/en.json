@@ -92,6 +92,22 @@
     "defaultMessage": "Send code",
     "description": "button text to send code to phone number for verification"
   },
+  "inviteLink.modal.header": {
+    "defaultMessage": "Invite Friends",
+    "description": "Title of this modal for inviting friends"
+  },
+  "inviteLink.modal.description": {
+    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
+    "description": "Description of the invite link modal contents"
+  },
+  "inviteLink.modal.campaignNamePlaceholder": {
+    "defaultMessage": "Campaign Name (Optional)",
+    "description": "Input text placeholder for campaign name in invite link"
+  },
+  "inviteLink.modal.generateInviteLink": {
+    "defaultMessage": "Generate Invite Link",
+    "description": "Main action button for invite link modal"
+  },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
     "description": "Text indicating a tournament is finished"
@@ -103,6 +119,14 @@
   "battlePage.about.aboutTournament": {
     "defaultMessage": "About tournament",
     "description": "Text describing the details of an esports tournament"
+  },
+  "battlePage.button.inviteFriend": {
+    "defaultMessage": "Invite Friend",
+    "description": "Invite button on Party Basket on the Battle page"
+  },
+  "battlePage.button.inviteFriendRewardPrompt": {
+    "defaultMessage": "Both get a FREE lottery ticket",
+    "description": "Text prompting user on why they should invite a friend"
   },
   "battlePage.button.claimLottery": {
     "defaultMessage": "Claim lottery",
