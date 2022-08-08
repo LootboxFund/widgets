@@ -133,34 +133,59 @@ const BattlePagePartyBasket = (props: Props) => {
     )
   }
 
-  const ReferralLinkGeneration = ({ partyBasketId }: { partyBasketId: PartyBasketID }) => {
+  const ClaimLotteryButton = () => {
     return (
-      <$Vertical spacing={4}>
-        <span
+      <$Vertical>
+        <$Button
+          screen={screen}
+          onClick={() =>
+            props.lootboxPartyBasket?.partyBasket &&
+            window.open(
+              `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket.partyBasket.address}`,
+              '_blank'
+            )
+          }
           style={{
-            width: '90%',
-            paddingBottom: screen === 'mobile' ? '12px' : 'auto',
+            textTransform: 'capitalize',
+            color: props.lootboxPartyBasket.partyBasket ? `${COLORS.trustBackground}B0` : COLORS.white,
+            border: `1px solid ${
+              props.lootboxPartyBasket.partyBasket ? `${COLORS.trustBackground}B0` : 'rgba(0,0,0,0.05)'
+            }`,
+            background: props.lootboxPartyBasket.partyBasket ? `rgba(0,0,0,0.05)` : `${COLORS.surpressedBackground}ae`,
+            whiteSpace: 'nowrap',
+            marginTop: '0.67em',
+            fontWeight: 'ligher',
+            width: '100%',
+            cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
+            maxHeight: '50px',
+            fontSize: '1.2rem',
           }}
         >
-          ⭐️{' '}
-          <$Link
-            onClick={() => setIsCreateReferralLinkOpen(!isCreateReferralLinkOpen)}
+          {props.lootboxPartyBasket.partyBasket ? (
+            <FormattedMessage
+              id="battlePage.button.claimLottery"
+              defaultMessage="Claim lottery"
+              description="Text prompting user to claim a lottery ticket"
+            />
+          ) : (
+            <FormattedMessage
+              id="battlePage.button.noneAvailable"
+              defaultMessage="None available"
+              description="Text indicating that something is not available"
+            />
+          )}
+        </$Button>
+        {props.lootboxPartyBasket.partyBasket?.nftBountyValue && (
+          <$span
             style={{
-              color: `${COLORS.surpressedFontColor}ce`,
-              textDecoration: 'none',
-              fontWeight: TYPOGRAPHY.fontWeight.bold,
+              textTransform: 'capitalize',
+              color: COLORS.surpressedFontColor,
+              textAlign: 'center',
+              paddingTop: '10px',
             }}
           >
-            <FormattedMessage
-              id="battlePagePartyBasket.referralLinkToggle.text"
-              defaultMessage="Promote this Lootbox"
-            />
-          </$Link>
-        </span>
-        {isCreateReferralLinkOpen && (
-          <AuthGuard>
-            <CreatePartyBasketReferral partyBasketId={partyBasketId} tournamentId={props.tournamentId} />
-          </AuthGuard>
+            {words.win} {props.lootboxPartyBasket.partyBasket.nftBountyValue}
+          </$span>
         )}
       </$Vertical>
     )
@@ -168,8 +193,8 @@ const BattlePagePartyBasket = (props: Props) => {
 
   return (
     <$BattlePageSection screen={screen}>
-      <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
-        <$Vertical spacing={2} style={{ margin: '0 auto' }}>
+      <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={4}>
+        <$Vertical spacing={2} style={screen === 'mobile' ? { margin: '0 auto' } : {}}>
           <$BattleCardsContainer
             screen={screen}
             width="220px"
@@ -180,55 +205,7 @@ const BattlePagePartyBasket = (props: Props) => {
               cardNumber={0}
               style={{ position: 'relative', maxWidth: '100%' }}
             />
-            <$Button
-              screen={screen}
-              onClick={() =>
-                props.lootboxPartyBasket?.partyBasket &&
-                window.open(
-                  `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket.partyBasket.address}`,
-                  '_blank'
-                )
-              }
-              style={{
-                textTransform: 'capitalize',
-                color: `${COLORS.trustBackground}B0`,
-                border: `1px solid ${COLORS.trustBackground}B0`,
-                background: props.lootboxPartyBasket.partyBasket
-                  ? `rgba(0,0,0,0.05)`
-                  : `${COLORS.surpressedBackground}ae`,
-                whiteSpace: 'nowrap',
-                marginTop: '0.67em',
-                fontWeight: 'ligher',
-                width: '100%',
-                cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
-              }}
-            >
-              {props.lootboxPartyBasket.partyBasket ? (
-                <FormattedMessage
-                  id="battlePage.button.claimLottery"
-                  defaultMessage="Claim lottery"
-                  description="Text prompting user to claim a lottery ticket"
-                />
-              ) : (
-                <FormattedMessage
-                  id="battlePage.button.noneAvailable"
-                  defaultMessage="None available"
-                  description="Text indicating that something is not available"
-                />
-              )}
-            </$Button>
-            {props.lootboxPartyBasket.partyBasket?.nftBountyValue && (
-              <$span
-                style={{
-                  textTransform: 'capitalize',
-                  color: COLORS.surpressedFontColor,
-                  textAlign: 'center',
-                  paddingTop: '10px',
-                }}
-              >
-                {words.win} {props.lootboxPartyBasket.partyBasket.nftBountyValue}
-              </$span>
-            )}
+            {screen !== 'mobile' && <ClaimLotteryButton />}
           </$BattleCardsContainer>
 
           {/* <span
@@ -251,10 +228,16 @@ const BattlePagePartyBasket = (props: Props) => {
             </$Link>
           </span> */}
         </$Vertical>
-        <$Vertical height="100%" width="100%" spacing={2} style={{ marginLeft: '20px' }}>
+        <$Vertical height="100%" width="100%" spacing={2}>
           <$Horizontal justifyContent="space-between" flexWrap={screen !== 'desktop'} spacing={2}>
-            <$Vertical width={screen === 'mobile' ? '100%' : 'auto'} style={{ flex: 3 }}>
-              <$h1 style={{ marginBottom: '0', textAlign: screen === 'mobile' ? 'center' : 'left' }}>
+            <$Vertical width={screen === 'mobile' ? '100%' : '65%'} style={{ flex: 2 }}>
+              <$h1
+                style={{
+                  marginBottom: '0',
+                  textAlign: screen === 'mobile' ? 'center' : 'left',
+                  marginTop: screen === 'mobile' ? '20px' : undefined,
+                }}
+              >
                 {props.lootboxPartyBasket?.partyBasket?.name || props.lootboxPartyBasket?.lootbox?.name}
               </$h1>
               <$p style={{ color: COLORS.black, textAlign: screen === 'mobile' ? 'center' : 'left' }}>
@@ -269,8 +252,9 @@ const BattlePagePartyBasket = (props: Props) => {
             <$Vertical
               style={{
                 margin: screen === 'mobile' ? '0 auto' : 'unset',
-                flex: 2,
               }}
+              width={screen === 'mobile' ? '100%' : '35%'}
+              minWidth={screen !== 'desktop' ? '175px' : 'unset'}
             >
               <div>
                 <$Button
@@ -302,14 +286,11 @@ const BattlePagePartyBasket = (props: Props) => {
                     description="Text prompting user on why they should invite a friend"
                   />
                 </p>
+                {screen === 'mobile' && <ClaimLotteryButton />}
               </div>
             </$Vertical>
           </$Horizontal>
           <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />
-
-          {!!props.lootboxPartyBasket?.partyBasket?.id && (
-            <ReferralLinkGeneration partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID} />
-          )}
         </$Vertical>
       </$Horizontal>
     </$BattlePageSection>

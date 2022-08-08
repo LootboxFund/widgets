@@ -21,14 +21,11 @@ import { GET_TOURNAMENT_BATTLE_PAGE } from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
 import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
-import AuthGuard from '../AuthGuard'
-import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 
 export interface LootboxPartyBasket {
   lootbox: LootboxTournamentSnapshot
