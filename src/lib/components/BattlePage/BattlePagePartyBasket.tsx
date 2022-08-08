@@ -15,11 +15,11 @@ import { useState } from 'react'
 import { PartyBasketID, TournamentID } from 'lib/types'
 import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasketReferral'
 import AuthGuard from '../AuthGuard'
+import Modal from 'react-modal'
 
 interface Props {
   lootboxPartyBasket: LootboxPartyBasket
   tournamentId: TournamentID
-  setIsInviteModalOpen: (isOpen: boolean) => void
 }
 const BattlePagePartyBasket = (props: Props) => {
   const intl = useIntl()
@@ -27,6 +27,30 @@ const BattlePagePartyBasket = (props: Props) => {
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
   const [isCreateReferralLinkOpen, setIsCreateReferralLinkOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+
+  const customStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+      maxWidth: '500px',
+      margin: 'auto',
+      maxHeight: '500px',
+      fontFamily: 'sans-serif',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+  }
 
   const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: LootboxTournamentSnapshot }) => {
     const flatSocials = Object.entries(lootboxSnapshot.socials)
@@ -80,6 +104,31 @@ const BattlePagePartyBasket = (props: Props) => {
             }
           })}
         </$Horizontal>
+        <Modal
+          isOpen={isInviteModalOpen}
+          onRequestClose={() => setIsInviteModalOpen(false)}
+          contentLabel="Invite Link Modal"
+          style={customStyles}
+        >
+          <$Horizontal width="100%" justifyContent="space-between">
+            <span style={{ fontWeight: 'bold' }}></span>
+            <span onClick={() => setIsInviteModalOpen(false)} style={{ cursor: 'pointer' }}>
+              X
+            </span>
+          </$Horizontal>
+          <br />
+          <br />
+          <br />
+          {!props.lootboxPartyBasket.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
+          {props.lootboxPartyBasket.partyBasket?.id && (
+            <AuthGuard>
+              <CreatePartyBasketReferral
+                partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
+                tournamentId={props.tournamentId}
+              />
+            </AuthGuard>
+          )}
+        </Modal>
       </$Vertical>
     )
   }
@@ -226,7 +275,7 @@ const BattlePagePartyBasket = (props: Props) => {
               <div>
                 <$Button
                   screen={screen}
-                  onClick={() => props.lootboxPartyBasket?.partyBasket && props.setIsInviteModalOpen(true)}
+                  onClick={() => props.lootboxPartyBasket?.partyBasket && setIsInviteModalOpen(true)}
                   style={{
                     textTransform: 'capitalize',
                     color: COLORS.trustFontColor,
