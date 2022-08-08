@@ -13,12 +13,15 @@ import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
 import GenericCard, { LoadingCard, ErrorCard } from './components/GenericCard'
 import { initLogging } from 'lib/api/logrocket'
+import { manifest } from 'manifest'
+import { useAuth } from 'lib/hooks/useAuth'
 
 interface ViralOnboardingProps {
   referralSlug: ReferralSlug
 }
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'select-lottery' | 'sign-up' | 'success'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
+  const { user } = useAuth()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   const { data, loading, error } = useQuery<{ referral: ReferralResponse }, QueryReferralArgs>(GET_REFERRAL, {
     variables: {
@@ -49,7 +52,10 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <CompleteOnboarding
             onNext={() => {
-              console.log('Done onboarding!')
+              // Send to public profile
+              const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+              // navigate to url
+              window.location.href = url
             }}
             onBack={() => console.log('back')}
           />

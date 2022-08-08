@@ -26,7 +26,6 @@ const BattlePagePartyBasket = (props: Props) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
-  const [isCreateReferralLinkOpen, setIsCreateReferralLinkOpen] = useState(false)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
 
   const customStyles = {

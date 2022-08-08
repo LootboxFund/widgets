@@ -8,11 +8,7 @@ import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, background2 } from '../contants'
 import { COMPLETE_CLAIM } from '../api.gql'
 import { useMutation } from '@apollo/client'
-import {
-  CompleteClaimResponse,
-  MutationCompleteClaimArgs,
-  MutationCreateClaimArgs,
-} from 'lib/api/graphql/generated/types'
+import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
 import { useState } from 'react'
 import { ErrorCard } from './GenericCard'
 
