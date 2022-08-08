@@ -75,11 +75,7 @@ export const useAuth = () => {
       const recaptchaVerifier = new RecaptchaVerifier(
         'recaptcha-container',
         {
-          // size: 'normal',
           size: 'invisible',
-          // callback: (response: any) => {
-          //   return signInWithPhone(response)
-          // },
         },
         auth
       )
