@@ -18,7 +18,6 @@ export const GET_USER_CLAIMS = gql`
             lootboxAddress
             rewardFromClaim
             claimerUserId
-            claimerIsNewUser
             status
             type
             timestamps {
