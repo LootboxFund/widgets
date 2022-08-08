@@ -21,14 +21,13 @@ import { GET_TOURNAMENT_BATTLE_PAGE } from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
 import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
-import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
 import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
+import BattlePagePartyBasket from './BattlePagePartyBasket'
 
-interface LootboxPartyBasket {
+export interface LootboxPartyBasket {
   lootbox: LootboxTournamentSnapshot
   partyBasket?: PartyBasket
 }
@@ -75,6 +74,7 @@ const BattlePage = (props: BattlePageParams) => {
       maxWidth: '500px',
       margin: 'auto',
       maxHeight: '500px',
+      fontFamily: 'sans-serif',
     },
     overlay: {
       position: 'fixed' as 'fixed',
@@ -118,58 +118,6 @@ const BattlePage = (props: BattlePageParams) => {
       })
     }
   })
-
-  const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: LootboxTournamentSnapshot }) => {
-    const flatSocials = Object.entries(lootboxSnapshot.socials)
-      .filter((fack) => fack[0] !== '__typename')
-      .filter((fack) => !!fack[1]) // Filter graphql ting
-    return (
-      <$Vertical spacing={4} style={{ paddingTop: screen === 'mobile' ? '10px' : 'auto' }}>
-        <$h3
-          style={{
-            textTransform: 'capitalize',
-            color: COLORS.black,
-            textAlign: screen === 'mobile' ? 'center' : 'left',
-          }}
-        >
-          <FormattedMessage
-            id="battlePage.socials.followSocials"
-            defaultMessage="Follow socials"
-            description="Text prompting user to follow social media"
-          />
-        </$h3>
-        <$Horizontal flexWrap justifyContent="space-between">
-          {flatSocials.map(([platform, value]) => {
-            const socialData = SOCIALS.find((soc) => soc.slug === platform.toLowerCase())
-            if (socialData) {
-              const url = getSocialUrlLink(socialData.slug as SocialType, value as string)
-              return (
-                <$Horizontal spacing={2} style={{ paddingBottom: '10px' }}>
-                  <$SocialLogo src={socialData.icon} />
-                  <a
-                    href={url}
-                    style={{
-                      width: '100px',
-                      margin: 'auto 0',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      cursor: url ? 'pointer' : 'unset',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <$span>{value}</$span>
-                  </a>
-                </$Horizontal>
-              )
-            } else {
-              return null
-            }
-          })}
-        </$Horizontal>
-      </$Vertical>
-    )
-  }
 
   return (
     <$BattlePageContainer>
@@ -306,106 +254,11 @@ const BattlePage = (props: BattlePageParams) => {
             )}
             {lootboxPartyBaskets.map((data) => {
               return (
-                <$BattlePageSection screen={screen}>
-                  <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
-                    <$Vertical height="100%" spacing={2} style={{ margin: '0 auto' }}>
-                      <$BattleCardsContainer screen={screen} width="220px">
-                        <$BattleCardImage src={data.lootbox?.stampImage} cardNumber={0} />
-                      </$BattleCardsContainer>
-                      <span
-                        style={{
-                          textAlign: 'center',
-                          width: '90%',
-                          paddingBottom: screen === 'mobile' ? '12px' : 'auto',
-                        }}
-                      >
-                        🎁{' '}
-                        <$Link
-                          href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${data.lootbox.address}`}
-                          style={{
-                            color: `${COLORS.surpressedFontColor}ce`,
-                            textDecoration: 'none',
-                          }}
-                          target="_blank"
-                        >
-                          {words.buyLootbox}
-                        </$Link>
-                      </span>
-                    </$Vertical>
-                    <$Vertical height="100%" width="100%" spacing={2}>
-                      <$Horizontal justifyContent="space-between" flexWrap={screen !== 'desktop'} spacing={2}>
-                        <$Vertical width={screen === 'mobile' ? '100%' : 'auto'}>
-                          <$h1 style={{ marginBottom: '0', textAlign: screen === 'mobile' ? 'center' : 'left' }}>
-                            {data?.partyBasket?.name || data?.lootbox?.name}
-                          </$h1>
-                          <$p style={{ color: COLORS.black, textAlign: screen === 'mobile' ? 'center' : 'left' }}>
-                            {data?.lootbox?.description && data?.lootbox?.description?.length > 250
-                              ? data?.lootbox?.description.slice(0, 250) + '...'
-                              : data?.lootbox?.description
-                              ? data?.lootbox?.description
-                              : ''}
-                          </$p>
-                        </$Vertical>
-                        <$Vertical
-                          style={{
-                            margin: screen === 'mobile' ? '0 auto' : 'unset',
-                          }}
-                        >
-                          <div>
-                            <$Button
-                              screen={screen}
-                              onClick={() =>
-                                data?.partyBasket &&
-                                window.open(
-                                  `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${data.partyBasket.address}`,
-                                  '_blank'
-                                )
-                              }
-                              style={{
-                                textTransform: 'capitalize',
-                                color: COLORS.trustFontColor,
-                                background: data.partyBasket
-                                  ? COLORS.trustBackground
-                                  : `${COLORS.surpressedBackground}ae`,
-                                whiteSpace: 'nowrap',
-                                marginTop: '0.67em',
-                                cursor: data.partyBasket ? 'pointer' : 'not-allowed',
-                              }}
-                            >
-                              {data.partyBasket ? (
-                                <FormattedMessage
-                                  id="battlePage.button.claimLottery"
-                                  defaultMessage="Claim lottery"
-                                  description="Text prompting user to claim a lottery ticket"
-                                />
-                              ) : (
-                                <FormattedMessage
-                                  id="battlePage.button.noneAvailable"
-                                  defaultMessage="None available"
-                                  description="Text indicating that something is not available"
-                                />
-                              )}
-                            </$Button>
-                          </div>
-
-                          {data.partyBasket?.nftBountyValue && (
-                            <$span
-                              style={{
-                                textTransform: 'capitalize',
-                                color: COLORS.black,
-                                textAlign: 'center',
-                                paddingTop: '10px',
-                              }}
-                            >
-                              {words.win} {data.partyBasket.nftBountyValue}
-                            </$span>
-                          )}
-                        </$Vertical>
-                      </$Horizontal>
-                      <Socials lootboxSnapshot={data.lootbox} />
-                    </$Vertical>
-                  </$Horizontal>
-                </$BattlePageSection>
+                <BattlePagePartyBasket
+                  lootboxPartyBasket={data}
+                  tournamentId={tournament.id as TournamentID}
+                  key={`${data.lootbox.address}_${data.partyBasket?.address || ''}`}
+                />
               )
             })}
           </$Vertical>
@@ -436,7 +289,7 @@ const BattlePage = (props: BattlePageParams) => {
             <br />
             {tournament.streams.map((stream) => {
               return (
-                <$StreamListItem style={{ cursor: 'pointer' }}>
+                <$StreamListItem style={{ cursor: 'pointer' }} key={stream.id}>
                   <a
                     href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
                     style={{ textDecoration: 'none' }}
@@ -491,23 +344,24 @@ const $BattlePageBody = styled.div<{ screen: ScreenSize }>`
   box-sizing: border-box;
 `
 
-const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
+export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
   width: 100%;
   background: ${COLORS.surpressedBackground}25;
   border-radius: 20px;
-  height: ${(props) => (props.screen === 'mobile' ? 'auto' : '400px')};
+  height: auto;
+  min-height: 400px;
   padding: 2rem;
   box-sizing: border-box;
   overflow: hidden;
 `
 
-const $BattleCardsContainer = styled.div<{ width: string; screen: ScreenSize }>`
+export const $BattleCardsContainer = styled.div<{ width: string; screen: ScreenSize }>`
   height: ${(props) => (props.screen === 'mobile' ? '300px' : '100%')};
   position: relative;
   ${(props) => props.width && `width: ${props.width};`}
 `
 
-const $BattleCardImage = styled.img<{ cardNumber: number }>`
+export const $BattleCardImage = styled.img<{ cardNumber: number }>`
   position: absolute;
   width: 100%;
   height: auto;
