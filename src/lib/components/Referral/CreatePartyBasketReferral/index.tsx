@@ -17,6 +17,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
+import { manifest } from 'manifest'
 
 interface Props {
   partyBasketId: PartyBasketID
@@ -34,6 +35,7 @@ const CreatePartyBasketReferral = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState('')
   const intl = useIntl()
   const words = useWords()
+  const [wasCopied, setWasCopied] = useState(false)
 
   const partyBasketRequiredText = intl.formatMessage({
     id: `referral.create.form.partyBasketRequired`,
@@ -63,8 +65,6 @@ const CreatePartyBasketReferral = (props: Props) => {
         },
       })
 
-      console.log('res', data)
-
       if (!data) {
         throw new Error(`${words.anErrorOccured}!`)
       } else if (data?.createReferral?.__typename === 'ResponseError') {
@@ -84,6 +84,11 @@ const CreatePartyBasketReferral = (props: Props) => {
     }
   }
 
+  const lastReferral = createdReferrals.length > 0 ? createdReferrals[createdReferrals.length - 1] : undefined
+  const lastReferralLink = lastReferral
+    ? `${manifest.microfrontends.webflow.referral}?r=${lastReferral.slug}`
+    : undefined
+
   return (
     <$Vertical width="100%" justifyContent="center" style={{ padding: '30px' }}>
       <b style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
@@ -100,36 +105,10 @@ const CreatePartyBasketReferral = (props: Props) => {
           defaultMessage="You’ll BOTH get extra free lottery tickets for each person invited"
         />
       </span>
-      <$Horizontal width="100%" justifyContent="center">
-        <input
-          style={{
-            flex: 5,
-            height: '20px',
-            backgroundColor: `rgba(0,0,0,0.05)`,
-            padding: '15px',
-            fontSize: '1rem',
-            border: '0px solid white',
-          }}
-        ></input>
-        <button
-          style={{
-            flex: 1,
-            color: COLORS.trustFontColor,
-            backgroundColor: `${COLORS.trustBackground}20`,
-            border: '0px solid white',
-            padding: '10px',
-            borderRadius: '5px',
-            marginLeft: '5px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '1rem',
-          }}
-        >
-          {words.copy}
-        </button>
-      </$Horizontal>
       <input
         placeholder="Campaign Name (Optional)"
+        value={campaignName}
+        onChange={(e) => setCampaignName(e.target.value)}
         style={{
           margin: '5px 0px',
           height: '20px',
@@ -144,7 +123,7 @@ const CreatePartyBasketReferral = (props: Props) => {
         style={{
           flex: 1,
           color: COLORS.trustFontColor,
-          backgroundColor: COLORS.trustBackground,
+          backgroundColor: lastReferralLink ? `${COLORS.trustBackground}70` : COLORS.trustBackground,
           border: '0px solid white',
           padding: '15px',
           fontWeight: 'bold',
@@ -161,6 +140,63 @@ const CreatePartyBasketReferral = (props: Props) => {
         />
       </button>
       {errorMessage ? <$ErrorMessage style={{ paddingTop: '15px' }}>{errorMessage}</$ErrorMessage> : null}
+      {lastReferralLink && (
+        <$Vertical>
+          <b style={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign: 'center', padding: '15px' }}>
+            👇 <FormattedMessage id="inviteLink.modal.success.header" defaultMessage="Your Referral Link" /> 👇
+          </b>
+          <span style={{ fontWeight: 'lighter', margin: '0px 15px', color: COLORS.black, textAlign: 'center' }}>
+            <FormattedMessage
+              id="inviteLink.modal.success.description"
+              defaultMessage="Copy the link and share it with your friends."
+            />
+          </span>
+
+          <$Horizontal width="100%" justifyContent="center" style={{ paddingTop: '15px' }}>
+            <input
+              value={lastReferralLink}
+              style={{
+                flex: 5,
+                height: '20px',
+                backgroundColor: `rgba(0,0,0,0.05)`,
+                padding: '15px',
+                fontSize: '1rem',
+                border: '0px solid white',
+                cursor: 'not-allowed',
+              }}
+              disabled={true}
+            ></input>
+            <button
+              style={{
+                flex: 1,
+                color: COLORS.trustFontColor,
+                backgroundColor: lastReferralLink ? `${COLORS.trustBackground}` : `${COLORS.trustBackground}20`,
+                border: '0px solid white',
+                padding: '10px',
+                borderRadius: '5px',
+                marginLeft: '5px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+              }}
+              onClick={() => {
+                if (lastReferralLink) {
+                  navigator.clipboard.writeText(lastReferralLink)
+                  setWasCopied(true)
+                  setTimeout(() => {
+                    setWasCopied(false)
+                  }, 2000)
+                } else {
+                  setErrorMessage(words.anErrorOccured)
+                }
+              }}
+            >
+              {wasCopied ? '✅ ' : ''}
+              {words.copy}
+            </button>
+          </$Horizontal>
+        </$Vertical>
+      )}
     </$Vertical>
     // <$AddReferralContainer>
     //   {createdReferrals?.length > 0 && (
