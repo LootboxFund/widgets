@@ -111,7 +111,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
     const getColor = (option: Option): { background: string; color: string; icon: string } => {
       if (option === 'password') {
         return {
-          background: `${COLORS.black}ea`,
+          background: `${COLORS.black}ce`,
           color: COLORS.white,
           icon: '📧',
         }
