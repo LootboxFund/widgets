@@ -5709,10 +5709,10 @@
     axios "0.25.0"
     lodash "4.17.21"
 
-"@wormgraph/manifest@0.3.121":
-  version "0.3.121"
-  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.3.121.tgz#63f8fde22d82f2084a5d35102b7e3db43893d0c6"
-  integrity sha512-Vi0Mp8uRFP5OsEWrNaGweTvtIdIpkKf1WjSQnJ2pGpjWEwo2FzbBr/FbEeqI2C1nevojxB919AGjxhE0Cjyq3A==
+"@wormgraph/manifest@0.3.122":
+  version "0.3.122"
+  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.3.122.tgz#36021052e1d0879fdb0eced3e2c8eb5e88d8d898"
+  integrity sha512-X0RtrGVhcaODdtNJ3+zm5/uXIYRv0bK4Zr0htc2fA4flJ4eC6+4w8i+d5NtI9tihcsUbmiaMNgTybfeBaTe7BQ==
   dependencies:
     "@wormgraph/helpers" "0.1.10"
 
