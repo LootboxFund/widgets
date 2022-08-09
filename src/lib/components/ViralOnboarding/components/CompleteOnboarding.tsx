@@ -1,6 +1,7 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { LocalClaim } from '../contants'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage } from 'react-intl'
@@ -47,6 +48,29 @@ const CompleteOnboarding = (props: Props) => {
       if (!data || data?.completeClaim?.__typename === 'ResponseError') {
         // @ts-ignore
         throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
+      }
+
+      // Add it to localStorage
+      try {
+        const pastClaimsRaw = localStorage.getItem('recentClaims')
+        const pastClaims: LocalClaim[] = pastClaimsRaw ? JSON.parse(pastClaimsRaw) : []
+        pastClaims.unshift({
+          campaignName: referral?.campaignName,
+          tournamentId: claim.tournamentId,
+          partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
+        })
+        localStorage.setItem('recentClaims', JSON.stringify(pastClaims))
+      } catch (err) {
+        localStorage.setItem(
+          'recentClaims',
+          JSON.stringify([
+            {
+              campaignName: referral?.campaignName,
+              tournamentId: claim.tournamentId,
+              partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
+            },
+          ])
+        )
       }
 
       props.onNext()

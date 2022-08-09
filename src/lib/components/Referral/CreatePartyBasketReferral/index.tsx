@@ -90,7 +90,7 @@ const CreatePartyBasketReferral = (props: Props) => {
     : undefined
 
   return (
-    <$Vertical width="100%" justifyContent="center" style={{ padding: '30px' }}>
+    <$Vertical width="100%" justifyContent="center" style={{ padding: '30px', boxSizing: 'border-box' }}>
       <b style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
         <FormattedMessage
           id="inviteLink.modal.header"
