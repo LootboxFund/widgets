@@ -270,6 +270,7 @@ const BattlePagePartyBasket = (props: Props) => {
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
                     cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
+                    width: '100%',
                   }}
                 >
                   <FormattedMessage
@@ -278,7 +279,16 @@ const BattlePagePartyBasket = (props: Props) => {
                     description="Invite button on Party Basket on the Battle page"
                   />
                 </$Button>
-                <p style={{ color: COLORS.surpressedBackground, textAlign: 'center', marginTop: '10px' }}>
+                <p
+                  style={{
+                    color: COLORS.surpressedBackground,
+                    textAlign: 'center',
+                    marginTop: '10px',
+                    fontSize: TYPOGRAPHY.fontSize.medium,
+                    lineHeight: TYPOGRAPHY.fontSize.large,
+                    fontFamily: TYPOGRAPHY.fontFamily.regular,
+                  }}
+                >
                   <FormattedMessage
                     id="battlePage.button.inviteFriendRewardPrompt"
                     defaultMessage="Both get a FREE lottery ticket"

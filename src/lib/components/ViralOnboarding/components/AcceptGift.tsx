@@ -56,7 +56,7 @@ const AcceptGift = (props: Props) => {
     }
 
     return (
-      <$TournamentStampPreviewContainer style={{ marginLeft: '30%', padding: '2rem 0px' }}>
+      <$TournamentStampPreviewContainer style={{ marginLeft: '30%', padding: '2rem 0px', boxSizing: 'content-box' }}>
         {showCasedLootboxImages.slice(0, 2).map((img, idx) => (
           <$TournamentStampPreviewImage key={`tournament-${idx}`} src={img} cardNumber={idx as 0 | 1} />
         ))}

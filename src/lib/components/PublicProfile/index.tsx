@@ -22,7 +22,7 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 interface PublicProfileProps {
   userId: UserID
@@ -36,6 +36,7 @@ const PublicProfile = (props: PublicProfileProps) => {
   const [searchString, setSearchString] = useState('')
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<null | string>(null)
   const [userClaims, setUserClaims] = useState<Claim[]>([])
+  const intl = useIntl()
   const {
     data: profileData,
     loading: profileLoading,
@@ -55,6 +56,16 @@ const PublicProfile = (props: PublicProfileProps) => {
         setUserClaims(newClaims)
       }
     },
+  })
+  const inviteFriendText = intl.formatMessage({
+    id: 'profile.public.inviteFriends',
+    defaultMessage: 'Invite Friend',
+    description: 'Button to invite friend',
+  })
+  const bonusTicketText = intl.formatMessage({
+    id: 'profile.public.bothGetBonusTickets',
+    defaultMessage: 'Both get bonus FREE Lottery Tickets',
+    description: 'Reward caption for inviting friend',
   })
 
   if (errorData) {
@@ -76,19 +87,9 @@ const PublicProfile = (props: PublicProfileProps) => {
       <$Horizontal justifyContent="space-between">
         <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton>
-            <FormattedMessage
-              id="profile.public.inviteFriends"
-              defaultMessage="Invite Friend"
-              description="Button to invite friend"
-            />
-          </$InviteButton>
+          <$InviteButton>{inviteFriendText}</$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
-            <FormattedMessage
-              id="profile.public.bothGetBonusTickets"
-              defaultMessage="Both get bonus FREE Lottery Tickets"
-              description="Reward caption for inviting friend"
-            />
+            {bonusTicketText}
           </span>
         </$Vertical>
       </$Horizontal>
@@ -196,11 +197,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 color: 'rgba(0,0,0,0.7)',
               }}
             >
-              <FormattedMessage
-                id="profile.public.inviteFriends"
-                defaultMessage="Invite Friend"
-                description="Button to invite friend"
-              />
+              {inviteFriendText}
             </span>
             <span
               style={{
@@ -211,11 +208,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 marginTop: '5px',
               }}
             >
-              <FormattedMessage
-                id="profile.public.bothGetBonusTickets"
-                defaultMessage="Both get bonus FREE Lottery Tickets"
-                description="Reward caption for inviting friend"
-              />
+              {bonusTicketText}
             </span>
           </$InviteFriend>
         </$ClaimCard>

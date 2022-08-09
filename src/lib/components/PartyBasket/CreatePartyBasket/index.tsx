@@ -80,7 +80,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
         },
         async (data: CreatePartyBasketPayload) => {
           try {
-            await createPartyBasketMutation({
+            const res = await createPartyBasketMutation({
               variables: {
                 payload: {
                   name: data.name,
@@ -93,6 +93,9 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
                 },
               },
             })
+            if (!res?.data || res?.data?.createPartyBasket?.__typename === 'ResponseError') {
+              throw new Error(res?.data?.createPartyBasket?.error?.message || words.anErrorOccured)
+            }
             setPartyBasketSubmissionStatus({ status: 'success' })
             if (props.successCallback) {
               props.successCallback(data.address as Address)
