@@ -24,6 +24,7 @@ import {
   MutationCreateClaimArgs,
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard } from './GenericCard'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
 interface Props {
   onNext: () => void
@@ -37,6 +38,11 @@ const AcceptGift = (props: Props) => {
   const [createClaim, { loading }] = useMutation<{ createClaim: CreateClaimResponse }, MutationCreateClaimArgs>(
     CREATE_CLAIM
   )
+  const acceptGiftText = intl.formatMessage({
+    id: 'viralOnboarding.acceptGift.next',
+    defaultMessage: 'Accept Gift',
+    description: 'Button to accept a gift',
+  })
 
   const LootboxSnapshots = () => {
     const seedLootboxAddress = referral?.seedPartyBasket?.lootboxAddress
@@ -153,11 +159,7 @@ const AcceptGift = (props: Props) => {
               style={{ width: '100%' }}
               disabled={loading}
             >
-              <FormattedMessage
-                id="viralOnboarding.acceptGift.next"
-                defaultMessage="Accept Gift"
-                description="Button to accept a gift"
-              />
+              <LoadingText loading={loading} color={COLORS.white} text={acceptGiftText} />
             </$NextButton>
           </$Heading>
           <$SupressedParagraph style={{ width: '60%', margin: '0 auto' }}>
