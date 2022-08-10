@@ -7,7 +7,7 @@ const storage = new Storage()
 
 const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
   // Uploads a local file to the bucket
-  const filepath = `widgets/${semver}/build/${filename}`
+  const filepath = `widgets/${semver}/build-viral-onboarding/${filename}`
   const localFilePath = `${absPath}${filename}`
   await storage.bucket(bucketName).upload(localFilePath, {
     destination: filepath,

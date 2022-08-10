@@ -18,10 +18,12 @@ import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
+import QRCode from 'lib/components/ViralOnboarding/components/QRCode'
 
 interface Props {
   partyBasketId: PartyBasketID
   tournamentId: TournamentID
+  qrcodeMargin?: string
 }
 
 const CreatePartyBasketReferral = (props: Props) => {
@@ -90,7 +92,7 @@ const CreatePartyBasketReferral = (props: Props) => {
     : undefined
 
   return (
-    <$Vertical width="100%" justifyContent="center" style={{ padding: '30px' }}>
+    <$Vertical width="100%" justifyContent="center" style={{ padding: '30px', boxSizing: 'border-box' }}>
       <b style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
         <FormattedMessage
           id="inviteLink.modal.header"
@@ -142,16 +144,24 @@ const CreatePartyBasketReferral = (props: Props) => {
       {errorMessage ? <$ErrorMessage style={{ paddingTop: '15px' }}>{errorMessage}</$ErrorMessage> : null}
       {lastReferralLink && (
         <$Vertical>
-          <b style={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign: 'center', padding: '15px' }}>
+          <br />
+          <b
+            style={{
+              fontWeight: 'bold',
+              fontSize: screen === 'mobile' ? '1.2rem' : '1.5rem',
+              textAlign: 'center',
+              padding: '15px',
+            }}
+          >
             👇 <FormattedMessage id="inviteLink.modal.success.header" defaultMessage="Your Referral Link" /> 👇
           </b>
+          <br />
           <span style={{ fontWeight: 'lighter', margin: '0px 15px', color: COLORS.black, textAlign: 'center' }}>
             <FormattedMessage
               id="inviteLink.modal.success.description"
               defaultMessage="Copy the link and share it with your friends."
             />
           </span>
-
           <$Horizontal width="100%" justifyContent="center" style={{ paddingTop: '15px' }}>
             <input
               value={lastReferralLink}
@@ -195,6 +205,28 @@ const CreatePartyBasketReferral = (props: Props) => {
               {words.copy}
             </button>
           </$Horizontal>
+          <br />
+          <br />
+          <b
+            style={{
+              fontWeight: 'bold',
+              fontSize: screen === 'mobile' ? '1.2rem' : '1.5rem',
+              textAlign: 'center',
+              padding: '15px',
+            }}
+          >
+            👇{' '}
+            <FormattedMessage
+              id="inviteLink.modal.success.screenshotHeader"
+              defaultMessage="Screenshot the QRCode and Share with Friends"
+            />{' '}
+            👇
+          </b>
+          <br />
+          <br />
+          <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
+            <QRCode referral={createdReferrals[0]} />
+          </div>
         </$Vertical>
       )}
     </$Vertical>

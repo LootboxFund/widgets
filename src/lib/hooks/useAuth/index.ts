@@ -156,6 +156,10 @@ export const useAuth = () => {
       throw new Error(words.pleaseEnterYourPhoneNumber)
     }
 
+    if (phoneNumber[0] !== '+') {
+      throw new Error(words.includeCountryCode)
+    }
+
     if (!recaptchaVerifier) {
       console.error('no captcha verifier')
       throw new Error(words.anErrorOccured)

@@ -629,7 +629,8 @@ const useWords = () => {
 
   const verifyYourPhoneNumber = intl.formatMessage({
     id: 'generics.verifyYourPhoneNumber',
-    defaultMessage: 'Verify your phone number',
+    defaultMessage: 'Verify your phone number with country code (eg.+63)',
+    description: 'Text to verify your phone number',
   })
 
   const sendCode = intl.formatMessage({
@@ -663,6 +664,11 @@ const useWords = () => {
   const tryAgain = intl.formatMessage({
     id: 'generics.tryAgain',
     defaultMessage: 'Try again',
+  })
+
+  const includeCountryCode = intl.formatMessage({
+    id: 'generics.includeCountryCode',
+    defaultMessage: 'Phone number needs a country code (eg. +63 or +1)',
   })
 
   return {
@@ -770,6 +776,7 @@ const useWords = () => {
     about,
     finish,
     tryAgain,
+    includeCountryCode,
   }
 }
 

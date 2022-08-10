@@ -10,7 +10,7 @@ import {
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { userState } from 'lib/state/userState'
-import { UserID } from 'lib/types'
+import { PartyBasketID, TournamentID, UserID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Spinner from '../Generics/Spinner'
@@ -22,7 +22,12 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
+import Modal from 'react-modal'
+import AuthGuard from '../AuthGuard'
+import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
+import { LocalClaim } from '../ViralOnboarding/contants'
+import { manifest } from 'manifest'
 
 interface PublicProfileProps {
   userId: UserID
@@ -36,6 +41,8 @@ const PublicProfile = (props: PublicProfileProps) => {
   const [searchString, setSearchString] = useState('')
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<null | string>(null)
   const [userClaims, setUserClaims] = useState<Claim[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const intl = useIntl()
   const {
     data: profileData,
     loading: profileLoading,
@@ -56,6 +63,40 @@ const PublicProfile = (props: PublicProfileProps) => {
       }
     },
   })
+  const inviteFriendText = intl.formatMessage({
+    id: 'profile.public.inviteFriends',
+    defaultMessage: 'Invite Friend',
+    description: 'Button to invite friend',
+  })
+  const bonusTicketText = intl.formatMessage({
+    id: 'profile.public.bothGetBonusTickets',
+    defaultMessage: 'Both get bonus FREE Lottery Tickets',
+    description: 'Reward caption for inviting friend',
+  })
+
+  const customStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+      maxWidth: '500px',
+      margin: 'auto',
+      maxHeight: '800px',
+      fontFamily: 'sans-serif',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      zIndex: 10000,
+    },
+  }
 
   if (errorData) {
     return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
@@ -63,9 +104,17 @@ const PublicProfile = (props: PublicProfileProps) => {
     return <Oopsies title={words.anErrorOccured} message={claimsData?.userClaims?.error?.message || ''} icon="🤕" />
   }
 
+  let recentClaims: LocalClaim[]
+  try {
+    const raw = localStorage.getItem('recentClaims')
+    recentClaims = raw ? JSON.parse(raw) : []
+  } catch (err) {
+    recentClaims = []
+  }
+
   // Here we kinda coalesce the response into a predictable type
   const { edges, pageInfo } = (claimsData?.userClaims as UserClaimsResponseSuccess) || {}
-  console.log(edges)
+  const [latest, ...rest] = edges || []
 
   const handleMore = () => {
     // fetchs another batch of claims
@@ -76,19 +125,9 @@ const PublicProfile = (props: PublicProfileProps) => {
       <$Horizontal justifyContent="space-between">
         <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton>
-            <FormattedMessage
-              id="profile.public.inviteFriends"
-              defaultMessage="Invite Friend"
-              description="Button to invite friend"
-            />
-          </$InviteButton>
+          <$InviteButton onClick={() => setIsModalOpen(true)}>{inviteFriendText}</$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
-            <FormattedMessage
-              id="profile.public.bothGetBonusTickets"
-              defaultMessage="Both get bonus FREE Lottery Tickets"
-              description="Reward caption for inviting friend"
-            />
+            {bonusTicketText}
           </span>
         </$Vertical>
       </$Horizontal>
@@ -100,7 +139,10 @@ const PublicProfile = (props: PublicProfileProps) => {
           }}
         >
           <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>User34535</b>
-          <span
+          <br />
+          <br />
+          <br />
+          {/* <span
             style={{
               margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
               fontStyle: 'italic',
@@ -122,7 +164,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 description="Public Profile Page link to edit profile"
               />
             </a>
-          </span>
+          </span> */}
         </div>
         <span
           style={{
@@ -133,7 +175,10 @@ const PublicProfile = (props: PublicProfileProps) => {
             maxWidth: '600px',
           }}
         >
-          Lorem ipsum dolar discarate simpar fiat nolan compare. Innocent lamar descartes.
+          <FormattedMessage
+            id="profile.public.aboutMe"
+            defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+          />
         </span>
       </$Vertical>
 
@@ -178,11 +223,12 @@ const PublicProfile = (props: PublicProfileProps) => {
       </$Vertical>
       <$ClaimsGrid screen={screen}>
         <$ClaimCard onClick={() => console.log('Invite Friend')}>
-          <$InviteFriend>
+          <$InviteFriend screen={screen} onClick={() => setIsModalOpen(true)}>
             <span
               style={{
                 fontWeight: 'bold',
                 fontSize: screen === 'desktop' ? '5rem' : '2.5rem',
+                lineHeight: screen === 'desktop' ? '5rem' : '2.5rem',
                 color: 'rgba(0,0,0,0.5)',
               }}
             >
@@ -196,11 +242,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 color: 'rgba(0,0,0,0.7)',
               }}
             >
-              <FormattedMessage
-                id="profile.public.inviteFriends"
-                defaultMessage="Invite Friend"
-                description="Button to invite friend"
-              />
+              {inviteFriendText}
             </span>
             <span
               style={{
@@ -211,11 +253,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 marginTop: '5px',
               }}
             >
-              <FormattedMessage
-                id="profile.public.bothGetBonusTickets"
-                defaultMessage="Both get bonus FREE Lottery Tickets"
-                description="Reward caption for inviting friend"
-              />
+              {bonusTicketText}
             </span>
           </$InviteFriend>
         </$ClaimCard>
@@ -230,7 +268,10 @@ const PublicProfile = (props: PublicProfileProps) => {
             )
             .map((claim) => {
               return (
-                <a href="" target="_blank">
+                <a
+                  href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasketAddress}`}
+                  target="_blank"
+                >
                   <$ClaimCard key={claim.id}>
                     <img
                       src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
@@ -243,8 +284,29 @@ const PublicProfile = (props: PublicProfileProps) => {
 
         {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
       </$ClaimsGrid>
-      {/* <button onClick={handleMore}>load more (intl me)</button> */}
       {pageInfo?.hasNextPage && <$MoreButton onClick={handleMore}>{words.seeMore}</$MoreButton>}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Stream Selection Modal"
+        style={customStyles}
+      >
+        <$Horizontal
+          justifyContent="flex-end"
+          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          <span onClick={() => setIsModalOpen(false)}>X</span>
+        </$Horizontal>
+        {latest && (
+          <AuthGuard>
+            <CreatePartyBasketReferral
+              partyBasketId={latest.node.chosenPartyBasketId as PartyBasketID}
+              tournamentId={latest.node.tournamentId as TournamentID}
+              qrcodeMargin={'0px -40px'}
+            />
+          </AuthGuard>
+        )}
+      </Modal>
     </$PublicProfilePageContainer>
   )
 }
@@ -263,7 +325,7 @@ const PublicProfilePage = () => {
   }, [])
 
   if (!userId) {
-    return <>No uid url param (intl me)</>
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="20vh auto" />
   }
 
   return <PublicProfile userId={userId as UserID} />
@@ -272,6 +334,8 @@ const PublicProfilePage = () => {
 const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   font-family: sans-serif;
   padding: ${(props) => (props.screen === 'mobile' ? '5px' : '10px')};
+  max-width: 600px;
+  margin: 0 auto;
 `
 
 const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
@@ -305,9 +369,10 @@ const $ClaimCard = styled.div`
   cursor: pointer;
 `
 
-const $InviteFriend = styled.div`
+const $InviteFriend = styled.div<{ screen: ScreenSize }>`
   width: auto;
   height: 90%;
+  min-height: ${(props) => (props.screen === 'mobile' ? '180px' : '220px')};
   display: flex;
   border-radius: 10px;
   flex-direction: column;

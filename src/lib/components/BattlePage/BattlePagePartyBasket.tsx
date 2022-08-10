@@ -38,7 +38,7 @@ const BattlePagePartyBasket = (props: Props) => {
       inset: screen === 'mobile' ? '10px' : '60px',
       maxWidth: '500px',
       margin: 'auto',
-      maxHeight: '500px',
+      maxHeight: '800px',
       fontFamily: 'sans-serif',
     },
     overlay: {
@@ -116,14 +116,13 @@ const BattlePagePartyBasket = (props: Props) => {
             </span>
           </$Horizontal>
           <br />
-          <br />
-          <br />
           {!props.lootboxPartyBasket.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
           {props.lootboxPartyBasket.partyBasket?.id && (
             <AuthGuard>
               <CreatePartyBasketReferral
                 partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
                 tournamentId={props.tournamentId}
+                qrcodeMargin={'0px -40px'}
               />
             </AuthGuard>
           )}
@@ -270,6 +269,7 @@ const BattlePagePartyBasket = (props: Props) => {
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
                     cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
+                    width: '100%',
                   }}
                 >
                   <FormattedMessage
@@ -278,7 +278,16 @@ const BattlePagePartyBasket = (props: Props) => {
                     description="Invite button on Party Basket on the Battle page"
                   />
                 </$Button>
-                <p style={{ color: COLORS.surpressedBackground, textAlign: 'center', marginTop: '10px' }}>
+                <p
+                  style={{
+                    color: COLORS.surpressedBackground,
+                    textAlign: 'center',
+                    marginTop: '10px',
+                    fontSize: TYPOGRAPHY.fontSize.medium,
+                    lineHeight: TYPOGRAPHY.fontSize.large,
+                    fontFamily: TYPOGRAPHY.fontFamily.regular,
+                  }}
+                >
                   <FormattedMessage
                     id="battlePage.button.inviteFriendRewardPrompt"
                     defaultMessage="Both get a FREE lottery ticket"

@@ -3,12 +3,9 @@ import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/c
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
-import { FormattedMessage } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, background2 } from '../contants'
-import { COMPLETE_CLAIM } from '../api.gql'
-import { useMutation } from '@apollo/client'
-import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
 import { useState } from 'react'
 import { ErrorCard } from './GenericCard'
 
@@ -21,39 +18,8 @@ const CompleteOnboarding = (props: Props) => {
   const words = useWords()
   const [err, setErr] = useState<string>()
 
-  const [completeClaim, { loading }] = useMutation<{ completeClaim: CompleteClaimResponse }, MutationCompleteClaimArgs>(
-    COMPLETE_CLAIM
-  )
-
-  const completeClaimRequest = async () => {
-    setErr('')
-    try {
-      if (!claim?.id) {
-        console.error('no claim')
-        throw new Error(words.anErrorOccured)
-      } else if (!chosenPartyBasket?.id) {
-        console.error('no party basket')
-        throw new Error(words.anErrorOccured)
-      }
-      const { data } = await completeClaim({
-        variables: {
-          payload: {
-            claimId: claim.id,
-            chosenPartyBasketId: chosenPartyBasket.id,
-          },
-        },
-      })
-
-      if (!data || data?.completeClaim?.__typename === 'ResponseError') {
-        // @ts-ignore
-        throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
-      }
-
-      props.onNext()
-    } catch (e) {
-      console.error(e)
-      setErr(e.message)
-    }
+  const completeOnboarding = () => {
+    props.onNext()
   }
 
   const formattedDate: string = referral?.tournament?.tournamentDate
@@ -201,11 +167,11 @@ const CompleteOnboarding = (props: Props) => {
           <$PaddingWrapper style={{ padding: '0px 1.6rem' }}>
             <$Heading style={{ marginTop: '0px' }}>
               <$NextButton
-                onClick={completeClaimRequest}
+                onClick={completeOnboarding}
                 color={COLORS.trustFontColor}
                 backgroundColor={COLORS.trustBackground}
                 style={{ width: '100%' }}
-                disabled={loading}
+                // disabled={loading}
               >
                 {words.finish}
               </$NextButton>

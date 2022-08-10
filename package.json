@@ -37,7 +37,9 @@
     "deploy:armstrong": "NODE_ENV=production node scripts/deploy-party-basket-redeem.js",
     "deploy:degrasse": "NODE_ENV=production node scripts/deploy-lootbox-feed.js",
     "deploy:lagrange": "NODE_ENV=production node scripts/deploy-battle-page.js",
-    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange",
+    "deploy:publicprofile": "NODE_ENV=production node scripts/deploy-public-profile.js",
+    "deploy:viralonboarding": "NODE_ENV=production node scripts/deploy-viral-onboarding.js",
+    "deploy:nerds": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:viralonboarding",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
@@ -107,6 +109,7 @@
     "@wormgraph/manifest": "0.3.122",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
+    "easyqrcodejs": "^4.4.12",
     "ethers": "5.5.4",
     "firebase": "^9.6.7",
     "graphql": "^16.5.0",

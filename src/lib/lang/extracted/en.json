@@ -65,9 +65,6 @@
     "defaultMessage": "Password is required",
     "description": "Error message when user tries to sign up without a password"
   },
-  "auth.phone.enterYourPhoneNumber": {
-    "defaultMessage": "Enter your phone number"
-  },
   "auth.provider.accountAlreadyExists": {
     "defaultMessage": "This account already exists!",
     "description": "Error message when user tries to sign up with an email that already exists"
@@ -88,26 +85,6 @@
     "defaultMessage": "Wallet Sign Up",
     "description": "Button text where a user clicks to sign up using their Metamask wallet"
   },
-  "auth.signupPhone.button.sendText": {
-    "defaultMessage": "Send code",
-    "description": "button text to send code to phone number for verification"
-  },
-  "inviteLink.modal.header": {
-    "defaultMessage": "Invite Friends",
-    "description": "Title of this modal for inviting friends"
-  },
-  "inviteLink.modal.description": {
-    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
-    "description": "Description of the invite link modal contents"
-  },
-  "inviteLink.modal.campaignNamePlaceholder": {
-    "defaultMessage": "Campaign Name (Optional)",
-    "description": "Input text placeholder for campaign name in invite link"
-  },
-  "inviteLink.modal.generateInviteLink": {
-    "defaultMessage": "Generate Invite Link",
-    "description": "Main action button for invite link modal"
-  },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
     "description": "Text indicating a tournament is finished"
@@ -120,6 +97,10 @@
     "defaultMessage": "About tournament",
     "description": "Text describing the details of an esports tournament"
   },
+  "battlePage.button.claimLottery": {
+    "defaultMessage": "Claim lottery",
+    "description": "Text prompting user to claim a lottery ticket"
+  },
   "battlePage.button.inviteFriend": {
     "defaultMessage": "Invite Friend",
     "description": "Invite button on Party Basket on the Battle page"
@@ -127,10 +108,6 @@
   "battlePage.button.inviteFriendRewardPrompt": {
     "defaultMessage": "Both get a FREE lottery ticket",
     "description": "Text prompting user on why they should invite a friend"
-  },
-  "battlePage.button.claimLottery": {
-    "defaultMessage": "Claim lottery",
-    "description": "Text prompting user to claim a lottery ticket"
   },
   "battlePage.button.noneAvailable": {
     "defaultMessage": "None available",
@@ -1027,9 +1004,30 @@
     "defaultMessage": "Yes",
     "description": "Indicating \"yes\" or \"ok\" (positive)"
   },
+  "generics.about": {
+    "defaultMessage": "About"
+  },
   "generics.confirm": {
     "defaultMessage": "Confirm",
     "description": "Text to confirm something"
+  },
+  "generics.date": {
+    "defaultMessage": "Date",
+    "description": "Calendar date"
+  },
+  "generics.event": {
+    "defaultMessage": "Event",
+    "description": "Event, like an esports tournament"
+  },
+  "generics.finish": {
+    "defaultMessage": "Finish"
+  },
+  "generics.freeNFT": {
+    "defaultMessage": "Free NFT",
+    "description": "Text to describe a free NFT"
+  },
+  "generics.includeCountryCode": {
+    "defaultMessage": "Phone number needs a country code (eg. +63 or +1)"
   },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
@@ -1047,17 +1045,57 @@
     "defaultMessage": "Please enter your phone number",
     "description": "Text prompting user to enter their phone number"
   },
+  "generics.retry": {
+    "defaultMessage": "Retry",
+    "description": "Text to retry something"
+  },
   "generics.saveChanges": {
     "defaultMessage": "Save Changes",
     "description": "Button text to save changes to a tournament or something"
+  },
+  "generics.sendCode": {
+    "defaultMessage": "Send code",
+    "description": "Text to send a code"
+  },
+  "generics.tournament": {
+    "defaultMessage": "Tournament",
+    "description": "Text to describe an esports tournament"
+  },
+  "generics.tryAgain": {
+    "defaultMessage": "Try again"
   },
   "generics.verificationCode": {
     "defaultMessage": "Verification code",
     "description": "Text to enter a verification code for signup"
   },
+  "generics.verifyYourPhoneNumber": {
+    "defaultMessage": "Verify your phone number with country code (eg.+63)",
+    "description": "Text to verify your phone number"
+  },
   "interactWithLootbox.manageLootbox.button": {
     "defaultMessage": "Manage Lootbox",
     "description": "Button prompt leading to the \"Manage\" Lootbox page (AKA: \"Edit\" lootbox page)"
+  },
+  "inviteLink.modal.description": {
+    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
+    "description": "Description of the invite link modal contents"
+  },
+  "inviteLink.modal.generateInviteLink": {
+    "defaultMessage": "Generate Invite Link",
+    "description": "Main action button for invite link modal"
+  },
+  "inviteLink.modal.header": {
+    "defaultMessage": "Invite Friends",
+    "description": "Title of this modal for inviting friends"
+  },
+  "inviteLink.modal.success.description": {
+    "defaultMessage": "Copy the link and share it with your friends."
+  },
+  "inviteLink.modal.success.header": {
+    "defaultMessage": "Your Referral Link"
+  },
+  "inviteLink.modal.success.screenshotHeader": {
+    "defaultMessage": "Screenshot the QRCode and Share with Friends"
   },
   "lootbox.manage.advanced.button": {
     "defaultMessage": "Launch OZ Defender",
@@ -1541,13 +1579,16 @@
     "defaultMessage": "You should have received an email from us. {checkSpamFolderText}{newlineCharacter}Can't find it? {resendVerificationEmail}",
     "description": "This is the message that tells the user to verify their email address."
   },
-  "profile.public.viewSocials": {
-    "defaultMessage": "View Socials",
-    "description": "Public Profile Page link to view socials"
+  "profile.public.aboutMe": {
+    "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
   },
-  "profile.public.editProfile": {
-    "defaultMessage": "Edit Profile",
-    "description": "Public Profile Page link to edit profile"
+  "profile.public.bothGetBonusTickets": {
+    "defaultMessage": "Both get bonus FREE Lottery Tickets",
+    "description": "Reward caption for inviting friend"
+  },
+  "profile.public.inviteFriends": {
+    "defaultMessage": "Invite Friend",
+    "description": "Button to invite friend"
   },
   "profile.public.myLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
@@ -1556,30 +1597,6 @@
   "profile.public.myLotteryTicketsTip": {
     "defaultMessage": "Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
     "description": "Tooltip for my lottery tickets list on Public Profile Page"
-  },
-  "profile.public.inviteFriend": {
-    "defaultMessage": "Invite Friend",
-    "description": "Button to invite friend"
-  },
-  "profile.public.bothGetBonusTickets": {
-    "defaultMessage": "Both get bonus FREE Lottery Tickets",
-    "description": "Reward caption for inviting friend"
-  },
-  "profile.socials.pageHeader": {
-    "defaultMessage": "Social Profiles",
-    "description": "Page Header of Social Profiles Page"
-  },
-  "profile.socials.changePhoto": {
-    "defaultMessage": "Change Photo",
-    "description": "Change Photo of User"
-  },
-  "profile.socials.biography": {
-    "defaultMessage": "Biography",
-    "description": "Biography of User"
-  },
-  "profile.socials.mySocials": {
-    "defaultMessage": "My Socials",
-    "description": "Public list of user socials"
   },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
@@ -1620,6 +1637,22 @@
   "profile.settings.title": {
     "defaultMessage": "Account Settings",
     "description": "Title for the account settings page. Here users can change their password, email, etc."
+  },
+  "profile.socials.biography": {
+    "defaultMessage": "Biography",
+    "description": "Biography of User"
+  },
+  "profile.socials.changePhoto": {
+    "defaultMessage": "Change Photo",
+    "description": "Change Photo of User"
+  },
+  "profile.socials.mySocials": {
+    "defaultMessage": "My Socials",
+    "description": "List of user socials for public view"
+  },
+  "profile.socials.pageHeader": {
+    "defaultMessage": "Social Profiles",
+    "description": "Page Header of Social Profiles Page"
   },
   "profile.tournaments.myTournaments": {
     "defaultMessage": "My Tournaments",
@@ -1683,6 +1716,12 @@
   "quickCreateLootbox.singleStep.subheadingDescription": {
     "defaultMessage": "Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox.",
     "description": "Info statement about quickly creating a Lootbox"
+  },
+  "referral.create.form.partyBasketRequired": {
+    "defaultMessage": "Party Basket is required"
+  },
+  "referral.create.form.tournamentRequired": {
+    "defaultMessage": "Tournament is required"
   },
   "signatures.loginMessage": {
     "defaultMessage": "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
@@ -2024,6 +2063,84 @@
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",
     "description": "Prompt for user to redeem their Lootbox NFTs in exchange for money"
+  },
+  "viralOnboarding.acceptGift.description": {
+    "defaultMessage": "Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}",
+    "description": "Description of the prize"
+  },
+  "viralOnboarding.acceptGift.invitationMessage": {
+    "defaultMessage": "{name}{newline}Gifted you a Lottery Ticket",
+    "description": "Message to show when a user is gifted a free lottery ticket"
+  },
+  "viralOnboarding.acceptGift.nConversions": {
+    "defaultMessage": "{nPeople} people already accepted this gift",
+    "description": "Counts how many users accepted the gift"
+  },
+  "viralOnboarding.acceptGift.next": {
+    "defaultMessage": "Accept Gift",
+    "description": "Button to accept a gift"
+  },
+  "viralOnboarding.acceptGift.winAFreeNFT": {
+    "defaultMessage": "Win a Free NFT",
+    "description": "Prize message to win a free Lootbox NFT"
+  },
+  "viralOnboarding.chooseLottery.description": {
+    "defaultMessage": "Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
+  },
+  "viralOnboarding.chooseLottery.heading": {
+    "defaultMessage": "Choose Your FREE Lottery",
+    "description": "Heading for lottery gift"
+  },
+  "viralOnboarding.completeOnboarding.error.subheading": {
+    "defaultMessage": "Or, go to your profile"
+  },
+  "viralOnboarding.completeOnboarding.winnersAnnouned1": {
+    "defaultMessage": "Winners Announced Shortly"
+  },
+  "viralOnboarding.completeOnboarding.winnersAnnouned2": {
+    "defaultMessage": "Winners Announced in {days} days"
+  },
+  "viralOnboarding.completeOnboarding.winnersAnnouned3": {
+    "defaultMessage": "Winners Announced Today"
+  },
+  "viralOnboarding.completeOnboarding.winnersAnnouned4": {
+    "defaultMessage": "Winners Already Announced"
+  },
+  "viralOnboarding.qrcode.description": {
+    "defaultMessage": "Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+  },
+  "viralOnboarding.qrcode.screenshotAndShare": {
+    "defaultMessage": "Screenshot & Share",
+    "description": "Message to show user to screen shot a picture & share w friends"
+  },
+  "viralOnboarding.selectLottery.dateWinnerAnnounce": {
+    "defaultMessage": "Winners Announced {dateWin}",
+    "description": "date when we announce the winners of the lottery"
+  },
+  "viralOnboarding.selectLottery.description": {
+    "defaultMessage": "Join {nPeople} other people who each earn {lotteryPrize} if this team wins the tournament.",
+    "description": "Description of the prize"
+  },
+  "viralOnboarding.selectLottery.header": {
+    "defaultMessage": "Claim Lottery Ticket",
+    "description": "Header for lottery claim"
+  },
+  "viralOnboarding.selectLottery.next": {
+    "defaultMessage": "Claim Ticket",
+    "description": "Button to accept a gift"
+  },
+  "viralOnboarding.signup.header": {
+    "defaultMessage": "Almost Finished..."
+  },
+  "viralOnboarding.verification.sentTo": {
+    "defaultMessage": "Sent to {userPhoneNumber}",
+    "description": "Indicating a confirmation code was sent to a number"
+  },
+  "viralOnboarding.youHaveAlreadyAccepted": {
+    "defaultMessage": "You have already accepted this referral."
+  },
+  "viralOnboarding.youHaveAlreadyAcceptedInfo": {
+    "defaultMessage": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link."
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",
