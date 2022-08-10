@@ -109,6 +109,7 @@
     "@wormgraph/manifest": "0.3.122",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
+    "easyqrcodejs": "^4.4.12",
     "ethers": "5.5.4",
     "firebase": "^9.6.7",
     "graphql": "^16.5.0",

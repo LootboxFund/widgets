@@ -18,6 +18,7 @@ import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
+import QRCode from 'lib/components/ViralOnboarding/components/QRCode'
 
 interface Props {
   partyBasketId: PartyBasketID
@@ -195,6 +196,16 @@ const CreatePartyBasketReferral = (props: Props) => {
               {words.copy}
             </button>
           </$Horizontal>
+          <br />
+          <b style={{ fontWeight: 'bold', fontSize: '1.5rem', textAlign: 'center', padding: '15px' }}>
+            👇{' '}
+            <FormattedMessage
+              id="inviteLink.modal.success.screenshotHeader"
+              defaultMessage="Screenshot the QRCode and Share with Friends"
+            />{' '}
+            👇
+          </b>
+          <QRCode referral={createdReferrals[0]} />
         </$Vertical>
       )}
     </$Vertical>

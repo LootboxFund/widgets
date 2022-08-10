@@ -6,13 +6,24 @@ export const CREATE_REFERRAL = gql`
       ... on CreateReferralResponseSuccess {
         referral {
           id
-          referrerId
-          creatorId
           slug
-          tournamentId
           seedPartyBasketId
-          campaignName
           nConversions
+          campaignName
+          tournamentId
+          tournament {
+            title
+            description
+            tournamentDate
+            lootboxSnapshots {
+              address
+              stampImage
+            }
+          }
+          seedPartyBasket {
+            nftBountyValue
+            lootboxAddress
+          }
         }
       }
       ... on ResponseError {

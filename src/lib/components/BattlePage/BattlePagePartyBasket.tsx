@@ -38,7 +38,7 @@ const BattlePagePartyBasket = (props: Props) => {
       inset: screen === 'mobile' ? '10px' : '60px',
       maxWidth: '500px',
       margin: 'auto',
-      maxHeight: '500px',
+      maxHeight: '800px',
       fontFamily: 'sans-serif',
     },
     overlay: {
