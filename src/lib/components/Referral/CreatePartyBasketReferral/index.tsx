@@ -174,7 +174,6 @@ const CreatePartyBasketReferral = (props: Props) => {
                 border: '0px solid white',
                 cursor: 'not-allowed',
               }}
-              disabled={true}
             ></input>
             <button
               style={{

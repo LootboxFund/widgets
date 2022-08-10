@@ -1,6 +1,6 @@
 const express = require('express')
 const app = new express()
-const { Manifest_v0_6_3_demo: Manifest } = require('@wormgraph/manifest')
+const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 
@@ -19,8 +19,7 @@ console.log(`
   env: ${process.env.NODE_ENV}
 `)
 
-const PublicProfile =
-  process.env.NODE_ENV === 'production' ? 'PublicProfile.production.js' : 'PublicProfile.js'
+const PublicProfile = process.env.NODE_ENV === 'production' ? 'PublicProfile.production.js' : 'PublicProfile.js'
 
 const fileNames = [PublicProfile]
 
