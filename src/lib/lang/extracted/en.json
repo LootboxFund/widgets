@@ -1026,6 +1026,9 @@
     "defaultMessage": "Free NFT",
     "description": "Text to describe a free NFT"
   },
+  "generics.includeCountryCode": {
+    "defaultMessage": "Phone number needs a country code (eg. +63 or +1)"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -1066,7 +1069,8 @@
     "description": "Text to enter a verification code for signup"
   },
   "generics.verifyYourPhoneNumber": {
-    "defaultMessage": "Verify your phone number"
+    "defaultMessage": "Verify your phone number with country code (eg.+63)",
+    "description": "Text to verify your phone number"
   },
   "interactWithLootbox.manageLootbox.button": {
     "defaultMessage": "Manage Lootbox",
@@ -1089,6 +1093,9 @@
   },
   "inviteLink.modal.success.header": {
     "defaultMessage": "Your Referral Link"
+  },
+  "inviteLink.modal.success.screenshotHeader": {
+    "defaultMessage": "Screenshot the QRCode and Share with Friends"
   },
   "lootbox.manage.advanced.button": {
     "defaultMessage": "Launch OZ Defender",
@@ -1572,13 +1579,12 @@
     "defaultMessage": "You should have received an email from us. {checkSpamFolderText}{newlineCharacter}Can't find it? {resendVerificationEmail}",
     "description": "This is the message that tells the user to verify their email address."
   },
+  "profile.public.aboutMe": {
+    "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+  },
   "profile.public.bothGetBonusTickets": {
     "defaultMessage": "Both get bonus FREE Lottery Tickets",
     "description": "Reward caption for inviting friend"
-  },
-  "profile.public.editProfile": {
-    "defaultMessage": "Edit Profile",
-    "description": "Public Profile Page link to edit profile"
   },
   "profile.public.inviteFriends": {
     "defaultMessage": "Invite Friend",
@@ -1591,10 +1597,6 @@
   "profile.public.myLotteryTicketsTip": {
     "defaultMessage": "Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
     "description": "Tooltip for my lottery tickets list on Public Profile Page"
-  },
-  "profile.public.viewSocials": {
-    "defaultMessage": "View Socials",
-    "description": "Public Profile Page link to view socials"
   },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
@@ -2104,6 +2106,13 @@
   "viralOnboarding.completeOnboarding.winnersAnnouned4": {
     "defaultMessage": "Winners Already Announced"
   },
+  "viralOnboarding.qrcode.description": {
+    "defaultMessage": "Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+  },
+  "viralOnboarding.qrcode.screenshotAndShare": {
+    "defaultMessage": "Screenshot & Share",
+    "description": "Message to show user to screen shot a picture & share w friends"
+  },
   "viralOnboarding.selectLottery.dateWinnerAnnounce": {
     "defaultMessage": "Winners Announced {dateWin}",
     "description": "date when we announce the winners of the lottery"
@@ -2126,6 +2135,12 @@
   "viralOnboarding.verification.sentTo": {
     "defaultMessage": "Sent to {userPhoneNumber}",
     "description": "Indicating a confirmation code was sent to a number"
+  },
+  "viralOnboarding.youHaveAlreadyAccepted": {
+    "defaultMessage": "You have already accepted this referral."
+  },
+  "viralOnboarding.youHaveAlreadyAcceptedInfo": {
+    "defaultMessage": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link."
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",
