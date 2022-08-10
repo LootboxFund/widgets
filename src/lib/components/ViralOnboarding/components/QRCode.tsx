@@ -36,6 +36,7 @@ const QRCode = (props: Props) => {
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCodeComponent.CorrectLevel.H, // L, M, Q, <H></H>
+      quietZone: 12,
       /*
         title: 'QR Title', // content 
         
@@ -90,6 +91,8 @@ const QRCode = (props: Props) => {
     return <div id="qrcode" style={{ margin: 'auto' }} />
   }
 
+  const shortlink = `${manifest.microfrontends.webflow.referral}?r=${props.referral.slug}`.replace('https://www.', '')
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -106,9 +109,10 @@ const QRCode = (props: Props) => {
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.qrcode.description"
-              defaultMessage="Scan QR Code to accept a FREE ESports Lottery Ticket for an ESports Tournament."
+              defaultMessage="Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
             />
           </$SubHeading>
+          <$SubHeading>🔒 {shortlink}</$SubHeading>
           <br />
           {renderQRCode()}
           <br />

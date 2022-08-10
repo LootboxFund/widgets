@@ -119,12 +119,11 @@ const BattlePagePartyBasket = (props: Props) => {
           {!props.lootboxPartyBasket.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
           {props.lootboxPartyBasket.partyBasket?.id && (
             <AuthGuard>
-              <div>
-                <CreatePartyBasketReferral
-                  partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
-                  tournamentId={props.tournamentId}
-                />
-              </div>
+              <CreatePartyBasketReferral
+                partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
+                tournamentId={props.tournamentId}
+                qrcodeMargin={'0px -40px'}
+              />
             </AuthGuard>
           )}
         </Modal>

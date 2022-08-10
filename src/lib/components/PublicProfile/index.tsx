@@ -94,6 +94,7 @@ const PublicProfile = (props: PublicProfileProps) => {
       right: 0,
       bottom: 0,
       backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      zIndex: 10000,
     },
   }
 
@@ -165,7 +166,7 @@ const PublicProfile = (props: PublicProfileProps) => {
             </a>
           </span> */}
         </div>
-        {/* <span
+        <span
           style={{
             fontWeight: 'lighter',
             color: 'rgba(0,0,0,0.7)',
@@ -174,8 +175,11 @@ const PublicProfile = (props: PublicProfileProps) => {
             maxWidth: '600px',
           }}
         >
-          Lorem ipsum dolar discarate simpar fiat nolan compare. Innocent lamar descartes.
-        </span> */}
+          <FormattedMessage
+            id="profile.public.aboutMe"
+            defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+          />
+        </span>
       </$Vertical>
 
       <$Vertical>
@@ -295,12 +299,11 @@ const PublicProfile = (props: PublicProfileProps) => {
         </$Horizontal>
         {latest && (
           <AuthGuard>
-            <div>
-              <CreatePartyBasketReferral
-                partyBasketId={latest.node.chosenPartyBasketId as PartyBasketID}
-                tournamentId={latest.node.tournamentId as TournamentID}
-              />
-            </div>
+            <CreatePartyBasketReferral
+              partyBasketId={latest.node.chosenPartyBasketId as PartyBasketID}
+              tournamentId={latest.node.tournamentId as TournamentID}
+              qrcodeMargin={'0px -40px'}
+            />
           </AuthGuard>
         )}
       </Modal>
@@ -332,6 +335,7 @@ const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   font-family: sans-serif;
   padding: ${(props) => (props.screen === 'mobile' ? '5px' : '10px')};
   max-width: 600px;
+  margin: 0 auto;
 `
 
 const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
