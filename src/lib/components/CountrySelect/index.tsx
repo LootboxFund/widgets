@@ -102,7 +102,7 @@ const $CountrySelect = styled.select<{ background?: string }>`
 
 const $InputWrapper = styled.span<{ background?: string }>`
   background-color: ${(props) => props.background || `${COLORS.surpressedBackground}1A`};
-  border: ${(props) => `${props.background}2f` || `${COLORS.surpressedBackground}3A`} 1px solid;
+  border: none;
   border-radius: 10px 0px 0px 10px;
   padding: 5px 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
