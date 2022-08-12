@@ -629,7 +629,7 @@ const useWords = () => {
 
   const verifyYourPhoneNumber = intl.formatMessage({
     id: 'generics.verifyYourPhoneNumber',
-    defaultMessage: 'Verify your phone number with country code (eg.+63)',
+    defaultMessage: 'Verify your phone number',
     description: 'Text to verify your phone number',
   })
 
