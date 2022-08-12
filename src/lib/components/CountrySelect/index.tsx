@@ -53,6 +53,16 @@ const CountrySelect = (props: Props) => {
     return `${country.name} +${country.phone}`
   }
 
+  const sortCountryCode = (countryA: Country, countryB: Country) => {
+    if (countryA.name < countryB.name) {
+      return -1
+    }
+    if (countryA.name > countryB.name) {
+      return 1
+    }
+    return 0
+  }
+
   return (
     <$InputWrapper>
       {getCountryIcon()}
@@ -61,17 +71,21 @@ const CountrySelect = (props: Props) => {
         defaultValue={defaultCountry}
         onChange={(e) => onSelectCountry(e.target.value as keyof typeof countries)}
       >
-        {Object.entries(perferredCountries).map(([code, country]) => (
-          <option key={code} value={code}>
-            {parseCountryOption(country)}
-          </option>
-        ))}
+        {Object.entries(perferredCountries)
+          .sort(([_, countryA], [__, countryB]) => sortCountryCode(countryA, countryB))
+          .map(([code, country]) => (
+            <option key={code} value={code}>
+              {parseCountryOption(country)}
+            </option>
+          ))}
         <option disabled>──────────</option>
-        {Object.entries(otherCountries).map(([code, country]) => (
-          <option key={code} value={code}>
-            {parseCountryOption(country)}
-          </option>
-        ))}
+        {Object.entries(otherCountries)
+          .sort(([_, countryA], [__, countryB]) => sortCountryCode(countryA, countryB))
+          .map(([code, country]) => (
+            <option key={code} value={code}>
+              {parseCountryOption(country)}
+            </option>
+          ))}
       </$CountrySelect>
     </$InputWrapper>
   )
