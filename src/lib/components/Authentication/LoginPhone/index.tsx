@@ -14,6 +14,10 @@ import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { browserLocalPersistence, browserSessionPersistence, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
+import intlTelInput from 'intl-tel-input'
+import 'intl-tel-input/build/css/intlTelInput.css'
+
+export interface PhoneCountryCode {}
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -27,12 +31,23 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [confirmationCode, setConfirmationCode] = useState('')
+  const [iti, setIti] = useState<intlTelInput.Plugin>()
   const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
     | 'session'
     | 'local'
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
   const intl = useIntl()
   const words = useWords()
+
+  useEffect(() => {
+    const el = document.getElementById('phone-input')
+    if (el) {
+      const iti = intlTelInput(el, { separateDialCode: true, initialCountry: 'PH' })
+      el.focus()
+      setIti(iti)
+    }
+    return
+  }, [])
 
   useEffect(() => {
     if (status === 'verification_sent') {
@@ -43,17 +58,13 @@ const LoginPhone = (props: SignUpEmailProps) => {
     }
   }, [status])
 
-  useEffect(() => {
-    const focusEl = document.getElementById('sms-verf')
-    if (focusEl) {
-      focusEl.focus()
-    }
-  }, [])
-
   const handleVerificationRequest = async () => {
+    const dialCode = iti?.getSelectedCountryData()?.dialCode
     setErrorMessage('')
     try {
-      await sendPhoneVerification(phoneNumber)
+      const fmtPhone = dialCode ? `+${dialCode}` + phoneNumber : phoneNumber
+      console.log('submitting phone', fmtPhone)
+      await sendPhoneVerification(fmtPhone)
       setStatus('verification_sent')
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
@@ -70,6 +81,10 @@ const LoginPhone = (props: SignUpEmailProps) => {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     }
+  }
+
+  const handlePhoneChange = async (phoneNumber: string) => {
+    setPhoneNumber(phoneNumber)
   }
 
   const clickRememberMe = (e: ChangeEvent<HTMLInputElement>) => {
@@ -94,14 +109,13 @@ const LoginPhone = (props: SignUpEmailProps) => {
         <$Vertical spacing={4}>
           <$Vertical spacing={2}>
             <$span>{words.verifyYourPhoneNumber}</$span>
+            {/* <input id="phone-input" /> */}
             <$InputMedium
-              id="sms-verf"
+              id="phone-input"
               type="tel"
-              name="phone"
-              placeholder="+1 123-456-7890"
-              // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-              // required
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="123-456-7890"
+              onChange={(e) => handlePhoneChange(e.target.value)}
+              style={{ width: '100%' }}
             />
           </$Vertical>
 

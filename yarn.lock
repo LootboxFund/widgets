@@ -4923,6 +4923,13 @@
   resolved "https://registry.yarnpkg.com/@types/insert-css/-/insert-css-2.0.1.tgz#742574b45c0e90615e56bc83ac7976ee21a6b3fc"
   integrity sha512-slUriXg8Y0JvpQoZlQ96bzzi86AU0DvtstKmGtBWpzJilFnpMUDbREi28Gpa+ZaIrTTCQUfvpDS7z7F1uwlYjQ==
 
+"@types/intl-tel-input@^17.0.5":
+  version "17.0.5"
+  resolved "https://registry.yarnpkg.com/@types/intl-tel-input/-/intl-tel-input-17.0.5.tgz#eaf9d0ce32c20e3ba590317b68509cb6c193edbb"
+  integrity sha512-Fy78eswLvfx82vZ/N5/gsC9Cping2PNSU28VIcs4frmVwH2rnoyiRhwEMrMrUeZ1NiuvDxHrsTMwz6CDpngbBg==
+  dependencies:
+    "@types/jquery" "*"
+
 "@types/is-function@^1.0.0":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/is-function/-/is-function-1.0.1.tgz#2d024eace950c836d9e3335a66b97960ae41d022"
@@ -4962,6 +4969,13 @@
   dependencies:
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
+
+"@types/jquery@*":
+  version "3.5.14"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.14.tgz#ac8e11ee591e94d4d58da602cb3a5a8320dee577"
+  integrity sha512-X1gtMRMbziVQkErhTQmSe2jFwwENA/Zr+PprCkF63vFq+Yt5PZ4AlKqgmeNlwgn7dhsXEK888eIW2520EpC+xg==
+  dependencies:
+    "@types/sizzle" "*"
 
 "@types/js-yaml@^4.0.0":
   version "4.0.5"
@@ -5200,6 +5214,11 @@
   integrity sha512-Da66lEIFeIz9ltsdMZcpQvmrmmoqrfju8pm1BH8WbYjZSwUgCwXLb9C+9XYogwBITnbsSaMdVPb2ekf7TV+03w==
   dependencies:
     "@types/node" "*"
+
+"@types/sizzle@*":
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.3.tgz#ff5e2f1902969d305225a047c8a0fd5c915cebef"
+  integrity sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==
 
 "@types/source-list-map@*":
   version "0.1.2"
@@ -10549,6 +10568,11 @@ intl-messageformat@10.1.1:
     "@formatjs/fast-memoize" "1.2.4"
     "@formatjs/icu-messageformat-parser" "2.1.4"
     tslib "2.4.0"
+
+intl-tel-input@^17.0.18:
+  version "17.0.18"
+  resolved "https://registry.yarnpkg.com/intl-tel-input/-/intl-tel-input-17.0.18.tgz#dd6eeefc5b33bfbea32cbba770270ac138c5cda3"
+  integrity sha512-U+ugXhOrYO/6ggIWKccsXcfAEWzjnTBLXK8c/71zvatjSPNz3TgVnXH8KhotaPh+4mBxXy4SlNOgsbXiecfPSA==
 
 invariant@^2.2.4:
   version "2.2.4"

@@ -65,6 +65,7 @@ export const $InputMedium = styled.input`
   border-radius: 10px;
   padding: 5px 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
   height: 40px;
 `
 export const $ChangeMode = styled.div`
