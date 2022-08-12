@@ -35,6 +35,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
   const intl = useIntl()
   const words = useWords()
+  const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
   useEffect(() => {
     if (status === 'verification_sent') {
@@ -88,6 +89,10 @@ const LoginPhone = (props: SignUpEmailProps) => {
     }
   }
 
+  const reset = () => {
+    setStatus('pending')
+  }
+
   return (
     <$Vertical spacing={4}>
       {props.title && <$Header>{props.title}</$Header>}
@@ -105,7 +110,11 @@ const LoginPhone = (props: SignUpEmailProps) => {
                 // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
                 // required
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                style={{ width: '100%', borderRadius: '0px 10px 10px 0px' }}
+                style={{
+                  width: '100%',
+                  borderRadius: '0px 10px 10px 0px',
+                  borderLeft: `${COLORS.surpressedBackground}ae 1px solid`,
+                }}
               />
             </$Horizontal>
           </$Vertical>
@@ -132,12 +141,24 @@ const LoginPhone = (props: SignUpEmailProps) => {
       )}
       {status === 'verification_sent' && (
         <$Vertical spacing={4}>
-          <$InputMedium
-            id="verification-input"
-            placeholder={words.verificationCode}
-            onChange={(e) => setConfirmationCode(e.target.value)}
-            type="number"
-          />
+          <$Vertical spacing={2}>
+            <$span>
+              {words.codeSentToFn(parsedPhone)}{' '}
+              <$span
+                onClick={reset}
+                style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}
+              >
+                [{words.edit}]
+              </$span>
+            </$span>
+
+            <$InputMedium
+              id="verification-input"
+              placeholder={words.verificationCode}
+              onChange={(e) => setConfirmationCode(e.target.value)}
+              type="number"
+            />
+          </$Vertical>
           <$Button
             screen={screen}
             onClick={handleCodeSubmit}

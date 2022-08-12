@@ -57,6 +57,8 @@ const OnboardingSignUp = (props: Props) => {
       'You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link.',
   })
 
+  const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
+
   useEffect(() => {
     if (status === 'verification_sent') {
       const el = document.getElementById('verification-input')
@@ -108,7 +110,7 @@ const OnboardingSignUp = (props: Props) => {
     setErrorMessage('')
     setLoading(true)
     try {
-      await sendPhoneVerification(`${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`)
+      await sendPhoneVerification(parsedPhone)
       setStatus('verification_sent')
     } catch (err) {
       setStatus('error')
@@ -242,16 +244,20 @@ const OnboardingSignUp = (props: Props) => {
             <br />
             <br />
             <$SubHeading style={{ textAlign: 'start' }}>
-              <FormattedMessage
+              {/* <FormattedMessage
                 id="viralOnboarding.verification.sentTo"
                 defaultMessage="Sent to {userPhoneNumber}"
                 description="Indicating a confirmation code was sent to a number"
                 values={{
                   userPhoneNumber: (
-                    <$SupressedParagraph style={{ display: 'inline' }}>{phoneNumber}</$SupressedParagraph>
+                    <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
                   ),
                 }}
-              />{' '}
+              />{' '} */}
+              {words.codeSentToFn(
+                parsedPhone
+                // <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
+              )}{' '}
               <$SubHeading
                 onClick={reset}
                 style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}
