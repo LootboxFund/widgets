@@ -96,12 +96,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
           <$Vertical spacing={2}>
             <$span>{words.verifyYourPhoneNumber}</$span>
             <$Horizontal>
-              <CountrySelect
-                onChange={(e) => {
-                  console.log('change', e)
-                  setPhoneCode(e)
-                }}
-              />
+              <CountrySelect onChange={setPhoneCode} />
               <$InputMedium
                 id="sms-verf"
                 type="tel"

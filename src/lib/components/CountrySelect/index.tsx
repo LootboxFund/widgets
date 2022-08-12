@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 interface Props {
   initialCountry?: keyof typeof countries
+  backgroundColor?: string
   onChange: (phoneCode: string) => void
 }
 const perferredCountryCodes = ['ID', 'IN', 'PH', 'US', 'VN']
@@ -64,12 +65,13 @@ const CountrySelect = (props: Props) => {
   }
 
   return (
-    <$InputWrapper>
+    <$InputWrapper background={props.backgroundColor}>
       {getCountryIcon()}
       <$CountrySelect
         id="countries-select"
         defaultValue={defaultCountry}
         onChange={(e) => onSelectCountry(e.target.value as keyof typeof countries)}
+        background={props.backgroundColor}
       >
         {Object.entries(perferredCountries)
           .sort(([_, countryA], [__, countryB]) => sortCountryCode(countryA, countryB))
@@ -91,16 +93,16 @@ const CountrySelect = (props: Props) => {
   )
 }
 
-const $CountrySelect = styled.select`
+const $CountrySelect = styled.select<{ background?: string }>`
   border: none;
-  background: none;
+  background: ${(props) => props.background || 'none'};
   height: 100%;
   max-width: 60px;
 `
 
-const $InputWrapper = styled.span`
-  background-color: ${`${COLORS.surpressedBackground}1A`};
-  border: ${`${COLORS.surpressedBackground}3A`} 1px solid;
+const $InputWrapper = styled.span<{ background?: string }>`
+  background-color: ${(props) => props.background || `${COLORS.surpressedBackground}1A`};
+  border: ${(props) => `${props.background}2f` || `${COLORS.surpressedBackground}3A`} 1px solid;
   border-radius: 10px 0px 0px 10px;
   padding: 5px 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
