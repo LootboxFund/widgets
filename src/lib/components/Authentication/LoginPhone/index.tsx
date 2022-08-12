@@ -14,6 +14,7 @@ import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { browserLocalPersistence, browserSessionPersistence, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
+import CountrySelect from 'lib/components/CountrySelect'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -26,6 +27,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
   const [phoneNumber, setPhoneNumber] = useState<string>('')
+  const [phoneCode, setPhoneCode] = useState<string>('')
   const [confirmationCode, setConfirmationCode] = useState('')
   const persistence: 'session' | 'local' = (localStorage.getItem('auth.persistence') || 'session') as
     | 'session'
@@ -53,7 +55,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const handleVerificationRequest = async () => {
     setErrorMessage('')
     try {
-      await sendPhoneVerification(phoneNumber)
+      await sendPhoneVerification(`${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`)
       setStatus('verification_sent')
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
@@ -89,20 +91,28 @@ const LoginPhone = (props: SignUpEmailProps) => {
   return (
     <$Vertical spacing={4}>
       {props.title && <$Header>{props.title}</$Header>}
-
       {status === 'pending' && (
         <$Vertical spacing={4}>
           <$Vertical spacing={2}>
             <$span>{words.verifyYourPhoneNumber}</$span>
-            <$InputMedium
-              id="sms-verf"
-              type="tel"
-              name="phone"
-              placeholder="+1 123-456-7890"
-              // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-              // required
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
+            <$Horizontal>
+              <CountrySelect
+                onChange={(e) => {
+                  console.log('change', e)
+                  setPhoneCode(e)
+                }}
+              />
+              <$InputMedium
+                id="sms-verf"
+                type="tel"
+                name="phone"
+                placeholder="123-456-7890"
+                // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                // required
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                style={{ width: '100%', borderRadius: '0px 10px 10px 0px' }}
+              />
+            </$Horizontal>
           </$Vertical>
 
           <$Vertical spacing={2}>
@@ -156,7 +166,6 @@ const LoginPhone = (props: SignUpEmailProps) => {
           <$span style={{ verticalAlign: 'middle', display: 'inline-block' }}> {words.rememberMe}</$span>
         </$span>
       </$Horizontal>
-
       {errorMessage ? <$ErrorMessage>{parseAuthError(intl, errorMessage)}</$ErrorMessage> : null}
     </$Vertical>
   )

@@ -1,0 +1,97 @@
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { countries, Country } from 'countries-list'
+import { useEffect, useState } from 'react'
+import styled from 'styled-components'
+
+interface Props {
+  initialCountry?: keyof typeof countries
+  onChange: (phoneCode: string) => void
+}
+const perferredCountryCodes = ['ID', 'IN', 'PH', 'US', 'VN']
+const CountrySelect = (props: Props) => {
+  const defaultCountry: keyof typeof countries = props.initialCountry || 'PH'
+  const [selectedIndex, setSelectedIndex] = useState<number>()
+  const [selectedCountry, setSelectedCountry] = useState<Country>(countries[defaultCountry])
+
+  useEffect(() => {
+    onSelectCountry(defaultCountry)
+  }, [])
+
+  const getCountryIcon = () => {
+    return `${selectedCountry.emoji}`
+  }
+
+  const onSelectCountry = (code: keyof typeof countries) => {
+    const newCountry = countries[code]
+    const oldCountry = { ...selectedCountry }
+    if (newCountry) {
+      setSelectedCountry(countries[code])
+      const el = document.getElementById('countries-select') as HTMLSelectElement
+      if (el) {
+        el.selectedOptions[0].innerHTML = `+${newCountry.phone}`
+        if (selectedIndex) {
+          el.options[selectedIndex].innerHTML = parseCountryOption(oldCountry)
+        }
+        setSelectedIndex(el.selectedIndex)
+      }
+      props.onChange(newCountry.phone)
+    }
+  }
+
+  const perferredCountries: Partial<typeof countries> = {}
+  const otherCountries: Partial<typeof countries> = {}
+
+  Object.entries(countries).forEach(([code, country]: [keyof typeof countries, Country]) => {
+    if (perferredCountryCodes.indexOf(code) > -1) {
+      perferredCountries[code] = country
+    } else {
+      otherCountries[code] = country
+    }
+  })
+
+  const parseCountryOption = (country: Country) => {
+    return `${country.name} +${country.phone}`
+  }
+
+  return (
+    <$InputWrapper>
+      {getCountryIcon()}
+      <$CountrySelect
+        id="countries-select"
+        defaultValue={defaultCountry}
+        onChange={(e) => onSelectCountry(e.target.value as keyof typeof countries)}
+      >
+        {Object.entries(perferredCountries).map(([code, country]) => (
+          <option key={code} value={code}>
+            {parseCountryOption(country)}
+          </option>
+        ))}
+        <option disabled>──────────</option>
+        {Object.entries(otherCountries).map(([code, country]) => (
+          <option key={code} value={code}>
+            {parseCountryOption(country)}
+          </option>
+        ))}
+      </$CountrySelect>
+    </$InputWrapper>
+  )
+}
+
+const $CountrySelect = styled.select`
+  border: none;
+  background: none;
+  height: 100%;
+  max-width: 60px;
+`
+
+const $InputWrapper = styled.span`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: ${`${COLORS.surpressedBackground}3A`} 1px solid;
+  border-radius: 10px 0px 0px 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  box-sizing: border-box;
+  white-space: nowrap;
+`
+
+export default CountrySelect
