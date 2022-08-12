@@ -22,8 +22,7 @@ interface ViralOnboardingProps {
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'select-lottery' | 'sign-up' | 'success'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
-  // const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
-  const [route, setRoute] = useState<ViralOnboardingRoute>('sign-up')
+  const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   const { data, loading, error } = useQuery<{ referral: ReferralResponse }, QueryReferralArgs>(GET_REFERRAL, {
     variables: {
       slug: props.referralSlug,
