@@ -2,7 +2,7 @@ const { Storage } = require('@google-cloud/storage')
 // const express = require('express')
 // const app = new express()
 const storage = new Storage()
-// const { latest: Manifest } = require('@wormgraph/manifest')
+// const { Manifest_v0_6_3_prod: Manifest } = require('@wormgraph/manifest')
 // const manifest = Manifest.default
 
 const uploadFile = async ({ filename, semver, absPath, bucketName }) => {

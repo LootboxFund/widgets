@@ -1,6 +1,6 @@
 const express = require('express')
 const app = new express()
-const { latest: Manifest } = require('@wormgraph/manifest')
+const { Manifest_v0_6_3_prod: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 
@@ -19,8 +19,7 @@ console.log(`
   env: ${process.env.NODE_ENV}
 `)
 
-const ViralOnboarding =
-  process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.js' : 'ViralOnboarding.js'
+const ViralOnboarding = process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.js' : 'ViralOnboarding.js'
 
 const fileNames = [ViralOnboarding]
 
