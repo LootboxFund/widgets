@@ -1,5 +1,5 @@
 import useWords from 'lib/hooks/useWords'
-import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   $Heading,
@@ -24,6 +24,7 @@ import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useMutation } from '@apollo/client'
 import { COMPLETE_CLAIM } from '../api.gql'
 import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
+import CountrySelect from 'lib/components/CountrySelect'
 
 interface Props {
   onNext: () => void
@@ -34,6 +35,7 @@ const OnboardingSignUp = (props: Props) => {
   const words = useWords()
   const [status, setStatus] = useState<Status>('initializing')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneCode, setPhoneCode] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
@@ -55,6 +57,8 @@ const OnboardingSignUp = (props: Props) => {
       'You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link.',
   })
 
+  const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
+
   useEffect(() => {
     if (status === 'verification_sent') {
       const el = document.getElementById('verification-input')
@@ -70,6 +74,23 @@ const OnboardingSignUp = (props: Props) => {
       focusEl.focus()
     }
   }, [])
+
+  useEffect(() => {
+    if (user) {
+      completeClaimRequest()
+        .then(() => {
+          console.log('completed')
+          props.onNext()
+        })
+        .catch((err) => {
+          console.error(err)
+          setErrorMessage(err.message)
+          setStatus('error')
+        })
+    } else if (user === null) {
+      setStatus('pending')
+    }
+  }, [user])
 
   const handleCodeSubmit = async () => {
     setLoading(true)
@@ -89,7 +110,7 @@ const OnboardingSignUp = (props: Props) => {
     setErrorMessage('')
     setLoading(true)
     try {
-      await sendPhoneVerification(phoneNumber)
+      await sendPhoneVerification(parsedPhone)
       setStatus('verification_sent')
     } catch (err) {
       setStatus('error')
@@ -149,23 +170,6 @@ const OnboardingSignUp = (props: Props) => {
     props.onNext()
   }
 
-  useEffect(() => {
-    if (user) {
-      completeClaimRequest()
-        .then(() => {
-          console.log('completed')
-          props.onNext()
-        })
-        .catch((err) => {
-          console.error(err)
-          setErrorMessage(err.message)
-          setStatus('error')
-        })
-    } else if (user === null) {
-      setStatus('pending')
-    }
-  }, [user])
-
   const reset = () => {
     setStatus('pending')
   }
@@ -198,21 +202,29 @@ const OnboardingSignUp = (props: Props) => {
             </$Heading2>
             <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}</$SubHeading>
             <$Vertical spacing={3}>
-              <$InputMedium
-                id="sms-verf"
-                type="tel"
-                name="phone"
-                placeholder="+1 123-456-7890"
-                value={phoneNumber}
-                // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-                // required
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                onKeyUp={(event) => {
-                  if (event.key == 'Enter') {
-                    handleVerificationRequest()
-                  }
-                }}
-              />
+              <$Horizontal>
+                <CountrySelect onChange={setPhoneCode} backgroundColor="#ffffff" />
+                <$InputMedium
+                  id="sms-verf"
+                  type="tel"
+                  name="phone"
+                  placeholder="123-456-7890"
+                  value={phoneNumber}
+                  // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                  // required
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  style={{
+                    borderRadius: '0px 10px 10px 0px',
+                    borderLeft: `${COLORS.surpressedBackground}ae 1px solid`,
+                    width: '100%',
+                  }}
+                  onKeyUp={(event) => {
+                    if (event.key == 'Enter') {
+                      handleVerificationRequest()
+                    }
+                  }}
+                />
+              </$Horizontal>
               <$NextButton
                 onClick={handleVerificationRequest}
                 color={COLORS.trustFontColor}
@@ -232,16 +244,20 @@ const OnboardingSignUp = (props: Props) => {
             <br />
             <br />
             <$SubHeading style={{ textAlign: 'start' }}>
-              <FormattedMessage
+              {/* <FormattedMessage
                 id="viralOnboarding.verification.sentTo"
                 defaultMessage="Sent to {userPhoneNumber}"
                 description="Indicating a confirmation code was sent to a number"
                 values={{
                   userPhoneNumber: (
-                    <$SupressedParagraph style={{ display: 'inline' }}>{phoneNumber}</$SupressedParagraph>
+                    <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
                   ),
                 }}
-              />{' '}
+              />{' '} */}
+              {words.codeSentToFn(
+                parsedPhone
+                // <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
+              )}{' '}
               <$SubHeading
                 onClick={reset}
                 style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}

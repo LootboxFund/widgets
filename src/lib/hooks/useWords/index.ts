@@ -1,3 +1,4 @@
+import { ReactElement } from 'react'
 import { useIntl } from 'react-intl'
 
 export const useSignatures = () => {
@@ -629,7 +630,7 @@ const useWords = () => {
 
   const verifyYourPhoneNumber = intl.formatMessage({
     id: 'generics.verifyYourPhoneNumber',
-    defaultMessage: 'Verify your phone number with country code (eg.+63)',
+    defaultMessage: 'Verify your phone number',
     description: 'Text to verify your phone number',
   })
 
@@ -670,6 +671,18 @@ const useWords = () => {
     id: 'generics.includeCountryCode',
     defaultMessage: 'Phone number needs a country code (eg. +63 or +1)',
   })
+
+  const codeSentToFn = (phoneNumber: string) =>
+    intl.formatMessage(
+      {
+        id: 'viralOnboarding.verification.sentTo',
+        defaultMessage: 'Sent to {userPhoneNumber}',
+        description: 'Indicating a confirmation code was sent to a number',
+      },
+      {
+        userPhoneNumber: phoneNumber,
+      }
+    )
 
   return {
     retry,
@@ -777,6 +790,7 @@ const useWords = () => {
     finish,
     tryAgain,
     includeCountryCode,
+    codeSentToFn,
   }
 }
 
