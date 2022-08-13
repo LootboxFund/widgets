@@ -3,7 +3,9 @@ import { COLORS } from '@wormgraph/helpers'
 import {
   Claim,
   GetMyProfileResponse,
+  QueryPublicUserArgs,
   QueryUserClaimsArgs,
+  ResponseError,
   UserClaimsResponse,
   UserClaimsResponseSuccess,
 } from 'lib/api/graphql/generated/types'
@@ -14,9 +16,8 @@ import { PartyBasketID, TournamentID, UserID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Spinner from '../Generics/Spinner'
-import { GET_MY_PROFILE } from '../Profile/api.gql'
 import { Oopsies } from '../Profile/common'
-import { GET_USER_CLAIMS } from './api.gql'
+import { PublicUserFE, PublicUserGQLArgs, PUBLIC_USER, PublicUserFEClaims } from './api.gql'
 import { extractURLState_PublicProfilePage } from './utils'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
@@ -39,26 +40,20 @@ const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [searchString, setSearchString] = useState('')
-  const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<null | string>(null)
-  const [userClaims, setUserClaims] = useState<Claim[]>([])
+  const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
+  const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const {
-    data: profileData,
-    loading: profileLoading,
-    error: errorLoading,
-  } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_PROFILE)
-  const {
-    data: claimsData,
+    data: userData,
     loading: loadingData,
     error: errorData,
-  } = useQuery<{ userClaims: UserClaimsResponse }, QueryUserClaimsArgs>(GET_USER_CLAIMS, {
-    variables: { userId: props.userId, first: 6, after: lastClaimCreatedAt },
-    onCompleted: (claimsData) => {
-      if (claimsData?.userClaims?.__typename === 'UserClaimsResponseSuccess') {
-        const nodes = claimsData.userClaims.edges
-        const newClaims = [...userClaims, ...nodes.map((node) => node.node)]
-        console.log('new', newClaims)
+  } = useQuery<{ publicUser: ResponseError | PublicUserFE }, PublicUserGQLArgs>(PUBLIC_USER, {
+    variables: { publicUserId: props.userId, first: 6, after: lastClaimCreatedAt },
+    onCompleted: (userData) => {
+      if (userData?.publicUser?.__typename === 'PublicUserResponseSuccess') {
+        const nodes = userData?.publicUser?.user?.claims?.edges
+        const newClaims = [...userClaims, ...(nodes ? nodes.map((node) => node.node) : [])]
         setUserClaims(newClaims)
       }
     },
@@ -100,10 +95,13 @@ const PublicProfile = (props: PublicProfileProps) => {
 
   if (errorData) {
     return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
-  } else if (claimsData?.userClaims?.__typename === 'ResponseError') {
-    return <Oopsies title={words.anErrorOccured} message={claimsData?.userClaims?.error?.message || ''} icon="🤕" />
+  } else if (userData?.publicUser?.__typename === 'ResponseError') {
+    return <Oopsies title={words.anErrorOccured} message={userData?.publicUser?.error?.message || ''} icon="🤕" />
   }
 
+  /**
+   * TODO: remove localstorage bs
+   */
   let recentClaims: LocalClaim[]
   try {
     const raw = localStorage.getItem('recentClaims')
@@ -113,12 +111,12 @@ const PublicProfile = (props: PublicProfileProps) => {
   }
 
   // Here we kinda coalesce the response into a predictable type
-  const { edges, pageInfo } = (claimsData?.userClaims as UserClaimsResponseSuccess) || {}
-  const [latest, ...rest] = edges || []
+
+  const { pageInfo } = (userData?.publicUser as PublicUserFE)?.user?.claims || {}
 
   const handleMore = () => {
     // fetchs another batch of claims
-    setLastClaimCreatedAt(pageInfo.endCursor || null)
+    setLastClaimCreatedAt(pageInfo.endCursor || undefined)
   }
   return (
     <$PublicProfilePageContainer screen={screen}>
@@ -262,14 +260,14 @@ const PublicProfile = (props: PublicProfileProps) => {
             .filter(
               (claim) =>
                 (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
-                (claim.chosenPartyBasket?.lootboxSnapshot?.name
+                ((claim.chosenPartyBasket?.lootboxSnapshot.name || '')
                   .toLowerCase()
                   .indexOf(searchString.toLowerCase()) as number) > -1
             )
             .map((claim) => {
               return (
                 <a
-                  href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasketAddress}`}
+                  href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
                   target="_blank"
                 >
                   <$ClaimCard key={claim.id}>
@@ -297,11 +295,11 @@ const PublicProfile = (props: PublicProfileProps) => {
         >
           <span onClick={() => setIsModalOpen(false)}>X</span>
         </$Horizontal>
-        {latest && (
+        {!!userClaims && !!userClaims[0] && (
           <AuthGuard>
             <CreatePartyBasketReferral
-              partyBasketId={latest.node.chosenPartyBasketId as PartyBasketID}
-              tournamentId={latest.node.tournamentId as TournamentID}
+              partyBasketId={userClaims[0].chosenPartyBasket.id}
+              tournamentId={userClaims[0].tournamentId}
               qrcodeMargin={'0px -40px'}
             />
           </AuthGuard>
