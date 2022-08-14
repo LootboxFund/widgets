@@ -36,6 +36,7 @@ import {
   signInWithPhoneNumber,
   RecaptchaVerifier,
   ConfirmationResult,
+  User,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -52,9 +53,24 @@ interface FrontendUser {
   email: string | null
   phone: string | null
   isEmailVerified: boolean
+  username: string | null
+  avatar: string | null
 }
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
+
+const convertUserToUserFE = (user: User): FrontendUser => {
+  const { uid, email, phoneNumber, displayName, photoURL } = user
+  const userData: FrontendUser = {
+    id: uid as UserID,
+    email: email,
+    phone: phoneNumber,
+    isEmailVerified: user.emailVerified,
+    username: displayName,
+    avatar: photoURL,
+  }
+  return userData
+}
 
 export const useAuth = () => {
   /**
@@ -132,13 +148,7 @@ export const useAuth = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const { uid, email, phoneNumber } = user
-        const userData: FrontendUser = {
-          id: uid as UserID,
-          email: email,
-          phone: phoneNumber,
-          isEmailVerified: user.emailVerified,
-        }
+        const userData = convertUserToUserFE(user)
         setUser(userData)
       } else {
         setUser(null)

@@ -114,3 +114,30 @@ export const $ProfileSectionContainer = styled.div<{ screen: ScreenSize }>`
   border-radius: 10px;
   padding: ${(props) => (props.screen === 'mobile' ? '1.5rem 1rem 2.2rem' : '1.2rem 1.6rem 3.4rem')};
 `
+
+export const $ProfilePageInput = styled.input`
+  border: 0px solid ${COLORS.white};
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  padding: 5px 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  height: 50px;
+  color: ${COLORS.surpressedFontColor};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+`
+
+export const $ProfilePageTextArea = styled.textarea`
+  border: 0px solid ${COLORS.white};
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  padding: 14px 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  color: ${COLORS.surpressedFontColor};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.large};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+`

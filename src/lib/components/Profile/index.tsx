@@ -68,27 +68,6 @@ const Profile = () => {
           </div>
         </$Horizontal>
         {user && (
-          // <$Vertical>
-          //   <$Divider width={dividerWidth} margin="20px auto 20px" />
-          //   <$Horizontal justifyContent="center" flexWrap>
-          //     <$p style={{ margin: '0px 15px 0px 0px' }}>{user?.email} </$p>
-          //     <$p style={{ margin: '0px' }}>
-          //       <$Link
-          //         onClick={logout}
-          //         style={{
-          //           textAlign: 'center',
-          //           textDecoration: 'none',
-          //           fontStyle: 'normal',
-          //           fontFamily: TYPOGRAPHY.fontFamily.regular,
-          //           textTransform: 'lowercase',
-          //         }}
-          //       >
-          //         {words.logout}
-          //       </$Link>
-          //     </$p>
-          //   </$Horizontal>
-          //   <$Divider width={dividerWidth} margin="20px auto 0px" />
-          // </$Vertical>
           <$p style={{ margin: '0px' }} textAlign="center">
             <$Link
               onClick={logout}

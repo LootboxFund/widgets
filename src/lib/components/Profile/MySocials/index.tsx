@@ -15,6 +15,7 @@ import { UpdateSocialsResponseFE, UPDATE_USER_SOCIALS } from './api.gql'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { GET_MY_PROFILE } from '../api.gql'
+import { $ProfilePageInput } from '../common'
 
 export interface ProfileSocialsProps {
   userSocials: UserSocials
@@ -149,13 +150,5 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
     </$Vertical>
   )
 }
-
-const $ProfilePageInput = styled.input`
-  border: 0px solid ${COLORS.white};
-  background-color: rgba(0, 0, 0, 0.08);
-  padding: 5px 10px;
-  border-radius: 5px;
-  overflow: hidden;
-`
 
 export default ProfileSocials
