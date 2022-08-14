@@ -56,7 +56,7 @@ const Onboarding = () => {
 
   return (
     <$Vertical spacing={4}>
-      <$h1>
+      <$h1 style={{ fontStyle: 'italic' }}>
         <FormattedMessage
           id="profile.onboarding.title"
           defaultMessage="You're almost set up..."

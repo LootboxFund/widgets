@@ -38,7 +38,7 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
         placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
         onChange={(e) => setSearchTerm(e.target.value || '')}
       />
-      <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+      <$Horizontal justifyContent="space-between" flexWrap>
         {filteredLootboxes.map((lootbox, index) => (
           <$LootboxThumbailContainer
             key={index}
@@ -139,10 +139,10 @@ const MyLootboxes = () => {
 }
 
 const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
-  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '30%')};
+  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '32%')};
   width: 100%;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.5));
   overflow: hidden;
 `

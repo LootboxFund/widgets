@@ -99,7 +99,7 @@ const SettingsComponent = () => {
             paddingLeft: screen === 'mobile' ? '0px' : '8%',
           }}
         >
-          <$span width="20%" lineHeight="40px">
+          <$span width="20%" lineHeight="40px" color={`${COLORS.surpressedFontColor}be`}>
             {words.email}
           </$span>
           <$span width="80%" lineHeight="40px">
@@ -122,7 +122,11 @@ const SettingsComponent = () => {
               paddingLeft: screen === 'mobile' ? '0px' : '8%',
             }}
           >
-            <$span width={screen === 'mobile' ? '35%' : '20%'} lineHeight="40px">
+            <$span
+              width={screen === 'mobile' ? '35%' : '20%'}
+              lineHeight="40px"
+              color={`${COLORS.surpressedFontColor}be`}
+            >
               {words.password}
             </$span>
             <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">

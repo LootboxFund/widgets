@@ -155,16 +155,14 @@ const MyTournaments = () => {
 
   return (
     <$Vertical spacing={4}>
-      <$Vertical>
-        <$h1>
-          <FormattedMessage
-            id="profile.tournaments.myTournaments"
-            defaultMessage="My Tournaments"
-            description="Section heading displaying users esport tournaments they made"
-          />
-        </$h1>
-        <TournamentList tournaments={tournaments} />
-      </$Vertical>
+      <$h1>
+        <FormattedMessage
+          id="profile.tournaments.myTournaments"
+          defaultMessage="My Tournaments"
+          description="Section heading displaying users esport tournaments they made"
+        />
+      </$h1>
+      <TournamentList tournaments={tournaments} />
       <div>
         <$Button
           screen={screen}
