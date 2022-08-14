@@ -5,6 +5,10 @@ import { ClaimID, PartyBasketID, TournamentID, UserID } from 'lib/types'
 
 export type PublicUserGQLArgs = {
   publicUserId: UserID
+}
+
+export type PublicUserClaimsGQLArgs = {
+  publicUserId: UserID
   first: number
   after?: string
 }
@@ -23,13 +27,9 @@ export type PublicUserFEClaims = {
   }
 }
 
-export interface PublicUserFE {
+export type PublicUserLotteriesFE = {
   __typename: 'PublicUserResponseSuccess'
   user: {
-    id: UserID
-    username?: string
-    avatar?: string
-    socials?: Partial<UserSocials>
     claims: {
       pageInfo: {
         hasNextPage?: boolean
@@ -42,24 +42,30 @@ export interface PublicUserFE {
   }
 }
 
-export const PUBLIC_USER = gql`
+export interface PublicUserFE {
+  __typename: 'PublicUserResponseSuccess'
+  user: {
+    id: UserID
+    username?: string
+    avatar?: string
+    socials?: Partial<UserSocials>
+    // claims: {
+    //   pageInfo: {
+    //     hasNextPage?: boolean
+    //     endCursor?: string | null
+    //   }
+    //   edges: {
+    //     node: PublicUserFEClaims
+    //   }[]
+    // }
+  }
+}
+
+export const PUBLIC_USER_CLAIMS = gql`
   query PublicUser($publicUserId: ID!, $first: Int!, $after: Timestamp) {
     publicUser(id: $publicUserId) {
       ... on PublicUserResponseSuccess {
         user {
-          id
-          username
-          avatar
-          socials {
-            twitter
-            instagram
-            tiktok
-            facebook
-            discord
-            snapchat
-            twitch
-            web
-          }
           claims(first: $first, after: $after) {
             pageInfo {
               hasNextPage
@@ -81,6 +87,36 @@ export const PUBLIC_USER = gql`
               }
               cursor
             }
+          }
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export const PUBLIC_USER = gql`
+  query PublicUser($publicUserId: ID!) {
+    publicUser(id: $publicUserId) {
+      ... on PublicUserResponseSuccess {
+        user {
+          id
+          username
+          avatar
+          socials {
+            twitter
+            instagram
+            tiktok
+            facebook
+            discord
+            snapchat
+            twitch
+            web
           }
         }
       }

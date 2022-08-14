@@ -1,18 +1,9 @@
 import { useQuery } from '@apollo/client'
 import { COLORS } from '@wormgraph/helpers'
-import {
-  Claim,
-  GetMyProfileResponse,
-  QueryPublicUserArgs,
-  QueryUserClaimsArgs,
-  ResponseError,
-  UserClaimsResponse,
-  UserClaimsResponseSuccess,
-} from 'lib/api/graphql/generated/types'
+import { ResponseError } from 'lib/api/graphql/generated/types'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
-import { userState } from 'lib/state/userState'
-import { PartyBasketID, TournamentID, UserID } from 'lib/types'
+import { UserID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Spinner from '../Generics/Spinner'
@@ -21,25 +12,21 @@ import { PublicUserFE, PublicUserGQLArgs, PUBLIC_USER, PublicUserFEClaims } from
 import { extractURLState_PublicProfilePage } from './utils'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
-import HelpIcon from 'lib/theme/icons/Help.icon'
-import ReactTooltip from 'react-tooltip'
 import { FormattedMessage, useIntl } from 'react-intl'
 import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
 import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import { LocalClaim } from '../ViralOnboarding/contants'
-import { manifest } from 'manifest'
+import ProfileSocials from 'lib/components/ProfileSocials'
+import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
 
 interface PublicProfileProps {
   userId: UserID
 }
-/**
- * @terran edit this component
- */
 const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
-  const [searchString, setSearchString] = useState('')
+  const [isSocialsOpen, setIsSocialsOpen] = useState(false)
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
   const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -49,14 +36,7 @@ const PublicProfile = (props: PublicProfileProps) => {
     loading: loadingData,
     error: errorData,
   } = useQuery<{ publicUser: ResponseError | PublicUserFE }, PublicUserGQLArgs>(PUBLIC_USER, {
-    variables: { publicUserId: props.userId, first: 6, after: lastClaimCreatedAt },
-    onCompleted: (userData) => {
-      if (userData?.publicUser?.__typename === 'PublicUserResponseSuccess') {
-        const nodes = userData?.publicUser?.user?.claims?.edges
-        const newClaims = [...userClaims, ...(nodes ? nodes.map((node) => node.node) : [])]
-        setUserClaims(newClaims)
-      }
-    },
+    variables: { publicUserId: props.userId },
   })
   const inviteFriendText = intl.formatMessage({
     id: 'profile.public.inviteFriends',
@@ -93,7 +73,9 @@ const PublicProfile = (props: PublicProfileProps) => {
     },
   }
 
-  if (errorData) {
+  if (loadingData) {
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
+  } else if (errorData || !userData) {
     return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
   } else if (userData?.publicUser?.__typename === 'ResponseError') {
     return <Oopsies title={words.anErrorOccured} message={userData?.publicUser?.error?.message || ''} icon="🤕" />
@@ -111,12 +93,14 @@ const PublicProfile = (props: PublicProfileProps) => {
   }
 
   // Here we kinda coalesce the response into a predictable type
+  const { username } = (userData?.publicUser as PublicUserFE)?.user || {}
 
-  const { pageInfo } = (userData?.publicUser as PublicUserFE)?.user?.claims || {}
-
-  const handleMore = () => {
-    // fetchs another batch of claims
-    setLastClaimCreatedAt(pageInfo.endCursor || undefined)
+  if (isSocialsOpen) {
+    return (
+      <$PublicProfilePageContainer screen={screen}>
+        <ProfileSocials />
+      </$PublicProfilePageContainer>
+    )
   }
   return (
     <$PublicProfilePageContainer screen={screen}>
@@ -136,18 +120,18 @@ const PublicProfile = (props: PublicProfileProps) => {
             flexDirection: screen === 'mobile' ? 'column' : 'row',
           }}
         >
-          <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>User34535</b>
+          <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{username || 'Human'}</b>
           <br />
           <br />
           <br />
-          {/* <span
+          <span
             style={{
               margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
               fontStyle: 'italic',
               fontSize: screen === 'mobile' ? '0.7rem' : '0.8rem',
             }}
           >
-            <a href="" style={{ textDecoration: 'none' }}>
+            <a onClick={() => setIsSocialsOpen(true)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
               <FormattedMessage
                 id="profile.public.viewSocials"
                 defaultMessage="View Socials"
@@ -162,7 +146,7 @@ const PublicProfile = (props: PublicProfileProps) => {
                 description="Public Profile Page link to edit profile"
               />
             </a>
-          </span> */}
+          </span>
         </div>
         <span
           style={{
@@ -180,109 +164,8 @@ const PublicProfile = (props: PublicProfileProps) => {
         </span>
       </$Vertical>
 
-      <$Vertical>
-        <$Horizontal>
-          <span
-            style={{
-              color: screen === 'desktop' ? 'rgba(0,0,0,1)' : 'rgba(0,0,0,0.7)',
-              fontWeight: screen === 'desktop' ? 'bold' : 'normal',
-            }}
-          >
-            <FormattedMessage
-              id="profile.public.myLotteryTicketsLabel"
-              defaultMessage="My Lottery Tickets"
-              description="Label for list of lottery tickets"
-            />
-          </span>
-          <HelpIcon tipID="myLotteryTicketTip" />
-          <ReactTooltip id="myLotteryTicketTip" place="right" effect="solid">
-            <FormattedMessage
-              id="profile.public.myLotteryTicketsTip"
-              defaultMessage="Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets."
-              description="Tooltip for my lottery tickets list on Public Profile Page"
-            />
-          </ReactTooltip>
-        </$Horizontal>
+      {isSocialsOpen ? <ProfileSocials /> : <UserLotteryTickets userId={props.userId} />}
 
-        <input
-          value={searchString}
-          onChange={(e) => setSearchString(e.target.value)}
-          placeholder={words.search}
-          style={{
-            width: '100%',
-            height: '20px',
-            maxWidth: '400px',
-            padding: '5px',
-            borderRadius: '5px',
-            border: '1px solid rgba(0,0,0,0.5)',
-            margin: '5px 0px 5px 0px',
-          }}
-        ></input>
-      </$Vertical>
-      <$ClaimsGrid screen={screen}>
-        <$ClaimCard onClick={() => console.log('Invite Friend')}>
-          <$InviteFriend screen={screen} onClick={() => setIsModalOpen(true)}>
-            <span
-              style={{
-                fontWeight: 'bold',
-                fontSize: screen === 'desktop' ? '5rem' : '2.5rem',
-                lineHeight: screen === 'desktop' ? '5rem' : '2.5rem',
-                color: 'rgba(0,0,0,0.5)',
-              }}
-            >
-              +
-            </span>
-            <span
-              style={{
-                fontWeight: 'normal',
-                fontSize: screen === 'desktop' ? '1.3rem' : '1rem',
-                textAlign: 'center',
-                color: 'rgba(0,0,0,0.7)',
-              }}
-            >
-              {inviteFriendText}
-            </span>
-            <span
-              style={{
-                fontWeight: 'lighter',
-                fontSize: screen === 'desktop' ? '0.8rem' : '0.6rem',
-                textAlign: 'center',
-                color: 'rgba(0,0,0,0.7)',
-                marginTop: '5px',
-              }}
-            >
-              {bonusTicketText}
-            </span>
-          </$InviteFriend>
-        </$ClaimCard>
-        {userClaims &&
-          userClaims
-            .filter(
-              (claim) =>
-                (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
-                ((claim.chosenPartyBasket?.lootboxSnapshot.name || '')
-                  .toLowerCase()
-                  .indexOf(searchString.toLowerCase()) as number) > -1
-            )
-            .map((claim) => {
-              return (
-                <a
-                  href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
-                  target="_blank"
-                >
-                  <$ClaimCard key={claim.id}>
-                    <img
-                      src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                  </$ClaimCard>
-                </a>
-              )
-            })}
-
-        {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
-      </$ClaimsGrid>
-      {pageInfo?.hasNextPage && <$MoreButton onClick={handleMore}>{words.seeMore}</$MoreButton>}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
