@@ -672,6 +672,11 @@ const useWords = () => {
     defaultMessage: 'Phone number needs a country code (eg. +63 or +1)',
   })
 
+  const noChangesMade = intl.formatMessage({
+    id: 'generics.noChangesMade',
+    defaultMessage: 'No changes made',
+  })
+
   const codeSentToFn = (phoneNumber: string) =>
     intl.formatMessage(
       {
@@ -683,6 +688,32 @@ const useWords = () => {
         userPhoneNumber: phoneNumber,
       }
     )
+
+  const publicProfile = intl.formatMessage({
+    id: 'generics.publicProfile',
+    defaultMessage: 'Public Profile',
+    description: 'Refering a public profile webpage',
+  })
+
+  const userId = intl.formatMessage({
+    id: 'generics.userId',
+    defaultMessage: 'User ID',
+  })
+
+  const username = intl.formatMessage({
+    id: 'generics.username',
+    defaultMessage: 'Username',
+  })
+
+  const biography = intl.formatMessage({
+    id: 'generics.biography',
+    defaultMessage: 'Biography',
+  })
+
+  const youAreNotLoggedIn = intl.formatMessage({
+    id: 'generics.youAreNotLoggedIn',
+    defaultMessage: 'You are not logged in',
+  })
 
   return {
     retry,
@@ -791,6 +822,12 @@ const useWords = () => {
     tryAgain,
     includeCountryCode,
     codeSentToFn,
+    noChangesMade,
+    publicProfile,
+    userId,
+    username,
+    biography,
+    youAreNotLoggedIn,
   }
 }
 

@@ -12,9 +12,9 @@ export const $Button = styled.button<{
   screen: ScreenSize
   justifyContent?: string
 }>`
-  padding: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  padding: 10px 16px;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
+  border-radius: 6px;
   flex: 1;
   ${(props) => props.justifyContent && `justify-content: ${props.justifyContent}`};
   font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xlarge : TYPOGRAPHY.fontSize.large)};

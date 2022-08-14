@@ -18,10 +18,12 @@ import { useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { $Link, $SearchInput, $SettingContainer, Oopsies } from '../common'
 import { DELETE_TOURNAMENT, GET_MY_TOURNAMENTS } from './api.gql'
+import { useTournamentWords } from 'lib/components/Tournament/common'
 
 const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
   const words = useWords()
   const intl = useIntl()
+  const tournamentWords = useTournamentWords()
   const [searchTerm, setSearchTerm] = useState('')
   const { screen } = useWindowSize()
   const [deleteTournament] = useMutation<{ deleteTournament: DeleteTournamentResponse }, MutationDeleteTournamentArgs>(
@@ -65,6 +67,21 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
         [tournament.id]: { loading: false, errorMessage: error.message || `${words.anErrorOccured}!` },
       })
     }
+  }
+
+  if (tournaments.length === 0) {
+    return (
+      <Oopsies
+        icon="🎁"
+        title={tournamentWords.createTournament}
+        message={
+          <FormattedMessage
+            id="profile.tournament.noTournaments"
+            defaultMessage="You can create a Tournament for a professional esports tournaments, a live stream battle chest or if you just want to dual your friends."
+          />
+        }
+      />
+    )
   }
 
   return (
@@ -155,16 +172,14 @@ const MyTournaments = () => {
 
   return (
     <$Vertical spacing={4}>
-      <$Vertical>
-        <$h1>
-          <FormattedMessage
-            id="profile.tournaments.myTournaments"
-            defaultMessage="My Tournaments"
-            description="Section heading displaying users esport tournaments they made"
-          />
-        </$h1>
-        <TournamentList tournaments={tournaments} />
-      </$Vertical>
+      <$h1>
+        <FormattedMessage
+          id="profile.tournaments.myTournaments"
+          defaultMessage="My Tournaments"
+          description="Section heading displaying users esport tournaments they made"
+        />
+      </$h1>
+      <TournamentList tournaments={tournaments} />
       <div>
         <$Button
           screen={screen}
