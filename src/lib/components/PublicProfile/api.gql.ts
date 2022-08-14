@@ -22,6 +22,7 @@ export type PublicUserFEClaims = {
     }
   }
 }
+
 export interface PublicUserFE {
   __typename: 'PublicUserResponseSuccess'
   user: {

@@ -1,8 +1,8 @@
 import { useAuth } from 'lib/hooks/useAuth'
 import AuthGuard from '../AuthGuard'
 import { useQuery } from '@apollo/client'
-import { GET_MY_PROFILE } from './api.gql'
-import { GetMyProfileResponse } from 'lib/api/graphql/generated/types'
+import { GET_MY_PROFILE, MyProfileFE } from './api.gql'
+import { GetMyProfileResponse, ResponseError } from 'lib/api/graphql/generated/types'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import styled from 'styled-components'
 import { $Divider, $Horizontal, $Vertical } from '../Generics'
@@ -22,24 +22,26 @@ import { initLogging } from 'lib/api/logrocket'
 import { FormattedMessage } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
+import MySocials from './MySocials'
+import ManagePublicProfile from './ManagePublicProfile'
 
 const Profile = () => {
   const { user, logout } = useAuth()
-  const { data, loading, error } = useQuery<{ getMyProfile: GetMyProfileResponse }>(GET_MY_PROFILE)
+  const { data, loading, error } = useQuery<{ getMyProfile: ResponseError | MyProfileFE }>(GET_MY_PROFILE)
   const { screen } = useWindowSize()
   const words = useWords()
 
   const pseudoUserName = user?.username || user?.email?.split('@')[0] || 'Human'
 
-  if (loading) {
+  if (loading || user === undefined) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
-  } else if (error || !data) {
+  } else if (!user || error || !data) {
     return <Oopsies title={words.anErrorOccured} message={error?.message || ''} icon="🤕" />
   } else if (data?.getMyProfile?.__typename === 'ResponseError') {
     return <Oopsies title={words.anErrorOccured} message={data?.getMyProfile?.error?.message || ''} icon="🤕" />
   }
 
-  const dividerWidth = screen === 'mobile' ? '100%' : '320px'
+  const { user: userDB } = (data?.getMyProfile as MyProfileFE) || {}
 
   return (
     <$Vertical spacing={5}>
@@ -105,6 +107,12 @@ const Profile = () => {
       </$Vertical>
       <$ProfileSectionContainer screen={screen}>
         <Onboarding />
+      </$ProfileSectionContainer>
+      <$ProfileSectionContainer screen={screen}>
+        <ManagePublicProfile />
+      </$ProfileSectionContainer>
+      <$ProfileSectionContainer screen={screen}>
+        <MySocials userSocials={userDB.socials} />
       </$ProfileSectionContainer>
       <$ProfileSectionContainer screen={screen}>
         <Settings />

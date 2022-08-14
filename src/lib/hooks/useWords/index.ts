@@ -672,6 +672,11 @@ const useWords = () => {
     defaultMessage: 'Phone number needs a country code (eg. +63 or +1)',
   })
 
+  const noChangesMade = intl.formatMessage({
+    id: 'generics.noChangesMade',
+    defaultMessage: 'No changes made',
+  })
+
   const codeSentToFn = (phoneNumber: string) =>
     intl.formatMessage(
       {
@@ -791,6 +796,7 @@ const useWords = () => {
     tryAgain,
     includeCountryCode,
     codeSentToFn,
+    noChangesMade,
   }
 }
 
