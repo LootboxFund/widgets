@@ -26,6 +26,7 @@ import { manifest } from 'manifest'
 
 interface MyLotteryTicketsProps {
   userId: UserID
+  onLookupComplete?: (claims: PublicUserFEClaims[]) => void
 }
 const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const words = useWords()
@@ -46,6 +47,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         const nodes = userData?.publicUser?.user?.claims?.edges
         const newClaims = [...userClaims, ...(nodes ? nodes.map((node) => node.node) : [])]
         setUserClaims(newClaims)
+        props.onLookupComplete && props.onLookupComplete(newClaims)
       }
     },
   })
@@ -96,6 +98,10 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const handleMore = () => {
     // fetchs another batch of claims
     setLastClaimCreatedAt(pageInfo.endCursor || undefined)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
   }
 
   return (
@@ -211,7 +217,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       )}
       <Modal
         isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
+        onRequestClose={closeModal}
         contentLabel="Stream Selection Modal"
         style={customStyles}
       >
@@ -219,7 +225,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           justifyContent="flex-end"
           style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
         >
-          <span onClick={() => setIsModalOpen(false)}>X</span>
+          <span onClick={closeModal}>X</span>
         </$Horizontal>
         {!!userClaims && !!userClaims[0] && (
           <AuthGuard>

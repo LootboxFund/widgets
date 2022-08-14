@@ -19,6 +19,7 @@ import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import { LocalClaim } from '../ViralOnboarding/contants'
 import ProfileSocials from 'lib/components/ProfileSocials'
 import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
+import { manifest } from 'manifest'
 
 interface PublicProfileProps {
   userId: UserID
@@ -27,8 +28,7 @@ const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [isSocialsOpen, setIsSocialsOpen] = useState(false)
-  const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
-  const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
+  const [latestClaim, setLatestClaim] = useState<PublicUserFEClaims>()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const {
@@ -93,15 +93,8 @@ const PublicProfile = (props: PublicProfileProps) => {
   }
 
   // Here we kinda coalesce the response into a predictable type
-  const { username } = (userData?.publicUser as PublicUserFE)?.user || {}
+  const { username, socials } = (userData?.publicUser as PublicUserFE)?.user || {}
 
-  if (isSocialsOpen) {
-    return (
-      <$PublicProfilePageContainer screen={screen}>
-        <ProfileSocials />
-      </$PublicProfilePageContainer>
-    )
-  }
   return (
     <$PublicProfilePageContainer screen={screen}>
       <$Horizontal justifyContent="space-between">
@@ -122,8 +115,6 @@ const PublicProfile = (props: PublicProfileProps) => {
         >
           <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{username || 'Human'}</b>
           <br />
-          <br />
-          <br />
           <span
             style={{
               margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
@@ -139,7 +130,7 @@ const PublicProfile = (props: PublicProfileProps) => {
               />
             </a>
             <span>{` | `}</span>
-            <a href="" style={{ textDecoration: 'none' }}>
+            <a href={`${manifest.microfrontends.webflow.myProfilePage}`} style={{ textDecoration: 'none' }}>
               <FormattedMessage
                 id="profile.public.editProfile"
                 defaultMessage="Edit Profile"
@@ -164,7 +155,18 @@ const PublicProfile = (props: PublicProfileProps) => {
         </span>
       </$Vertical>
 
-      {isSocialsOpen ? <ProfileSocials /> : <UserLotteryTickets userId={props.userId} />}
+      {isSocialsOpen && socials ? (
+        <ProfileSocials userSocials={socials} onClose={() => setIsSocialsOpen(false)} />
+      ) : (
+        <UserLotteryTickets
+          userId={props.userId}
+          onLookupComplete={(claims: PublicUserFEClaims[]) => {
+            if (claims.length > 0) {
+              setLatestClaim(claims[0])
+            }
+          }}
+        />
+      )}
 
       <Modal
         isOpen={isModalOpen}
@@ -178,11 +180,11 @@ const PublicProfile = (props: PublicProfileProps) => {
         >
           <span onClick={() => setIsModalOpen(false)}>X</span>
         </$Horizontal>
-        {!!userClaims && !!userClaims[0] && (
+        {!!latestClaim && (
           <AuthGuard>
             <CreatePartyBasketReferral
-              partyBasketId={userClaims[0].chosenPartyBasket.id}
-              tournamentId={userClaims[0].tournamentId}
+              partyBasketId={latestClaim.chosenPartyBasket.id}
+              tournamentId={latestClaim.tournamentId}
               qrcodeMargin={'0px -40px'}
             />
           </AuthGuard>
@@ -219,19 +221,6 @@ const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   margin: 0 auto;
 `
 
-const $ClaimsGrid = styled.div<{ screen: ScreenSize }>`
-  display: grid;
-  grid-template-columns: ${(props) => {
-    if (props.screen === 'desktop') return '1fr 1fr 1fr 1fr'
-    else if (props.screen === 'tablet') return '1fr 1fr 1fr'
-    else return '1fr 1fr'
-  }};
-  width: 100%;
-  column-gap: 10px;
-  row-gap: 10px;
-  margin-top: 10px;
-`
-
 export const $ProfileImage = styled.img`
   width: 70px;
   height: 70px;
@@ -242,27 +231,6 @@ export const $ProfileImage = styled.img`
   border-radius: 50%;
   margin-bottom: 10px;
   object-fit: cover;
-`
-
-const $ClaimCard = styled.div`
-  flex: 1;
-  width: 100%;
-  cursor: pointer;
-`
-
-const $InviteFriend = styled.div<{ screen: ScreenSize }>`
-  width: auto;
-  height: 90%;
-  min-height: ${(props) => (props.screen === 'mobile' ? '180px' : '220px')};
-  display: flex;
-  border-radius: 10px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  background-color: rgba(225, 225, 225, 0.2);
-  border-style: dashed;
-  padding: 10px 0px 10px 0px;
 `
 
 const $InviteButton = styled.button`

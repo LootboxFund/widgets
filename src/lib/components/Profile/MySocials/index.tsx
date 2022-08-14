@@ -1,6 +1,6 @@
 import react, { useState } from 'react'
 import styled from 'styled-components'
-import { $ErrorMessage, $h1, $Horizontal, $Vertical } from 'lib/components/Generics'
+import { $ErrorMessage, $h1, $Horizontal, $p, $Vertical } from 'lib/components/Generics'
 import { $ProfileImage } from 'lib/components/PublicProfile'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { getSocials } from 'lib/hooks/constants'
@@ -107,6 +107,18 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
           description="List of user socials for public view"
         />
       </$h1>
+      <$p
+        style={{
+          color: `${COLORS.surpressedFontColor}ae`,
+          marginTop: '0px',
+          width: screen === 'mobile' ? '100%' : '60%',
+        }}
+      >
+        <FormattedMessage
+          id="profile.socials.mySocialsDescription"
+          defaultMessage="It is important you add these details so that tournament organizers can notify you if you’ve won prize money."
+        />
+      </$p>
 
       <$SocialGridInputs screen={screen}>
         {SOCIALS.filter((social) => social.slug in localSocials).map((social) => {
