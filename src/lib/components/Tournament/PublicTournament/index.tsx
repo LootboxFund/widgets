@@ -11,13 +11,20 @@ import {
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import { $HideTings, HiddenDescription, $SearchInput, LootboxList, $TournamentCover } from '../common'
+import {
+  $HideTings,
+  HiddenDescription,
+  $SearchInput,
+  LootboxList,
+  $TournamentCover,
+  $TournamentSectionContainer,
+} from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
 import { initDApp, useWeb3Utils } from 'lib/hooks/useWeb3Api'
-import { Address, COLORS } from '@wormgraph/helpers'
+import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { useTournamentWords } from '../common'
@@ -27,6 +34,7 @@ import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
 import { $StreamListItem, $StreamLogo } from 'lib/components/Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 import { FormattedMessage } from 'react-intl'
+import $Button from 'lib/components/Generics/Button'
 
 interface PublicTournamentProps {
   tournamentId: TournamentID
@@ -108,90 +116,101 @@ const PublicTournament = (props: PublicTournamentProps) => {
     },
   }
 
+  const JoinButton = () => (
+    <$Button
+      screen={screen}
+      onClick={
+        tournament.magicLink
+          ? () => {
+              setCreateModalOpen(true)
+            }
+          : undefined
+      }
+      color={COLORS.trustFontColor}
+      backgroundColor={`${COLORS.trustBackground}`}
+      style={{
+        fontWeight: TYPOGRAPHY.fontWeight.light,
+        fontSize: TYPOGRAPHY.fontSize.large,
+      }}
+    >
+      {words.joinTournament}
+    </$Button>
+  )
+
   return (
-    <$Vertical spacing={4} width="100%" maxWidth="1000px">
-      <$Vertical spacing={4}>
-        <$Vertical spacing={4}>
-          {tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
+    <$Vertical spacing={5} width="100%" maxWidth="720px" style={{ margin: '0 auto' }}>
+      <$TournamentSectionContainer screen={screen} style={{ boxShadow: 'none', marginBottom: '0px' }}>
+        <$Vertical>
+          <$Vertical spacing={4}>
+            {tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
 
-          <$Vertical>
-            <$h1>{tournament.title}</$h1>
-            <$Divider margin="0px 0px 20px 0px" />
+            <$Vertical>
+              <$Horizontal width="100%" justifyContent="space-between" flexWrap spacing={2}>
+                <$h1>{tournament.title}</$h1>
+                <div style={{ marginBottom: '20px' }}>
+                  <JoinButton />
+                </div>
+              </$Horizontal>
+              <$Divider margin="0px 0px 20px 0px" />
+              <$Horizontal flexWrap>
+                {tournament.magicLink && (
+                  <$span style={{ paddingBottom: '15px' }}>
+                    👉{' '}
+                    <$Link
+                      color={'inherit'}
+                      fontStyle="italic"
+                      href={tournament.magicLink}
+                      style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                      target="_self"
+                    >
+                      {words.createLootbox}
+                    </$Link>
+                  </$span>
+                )}
 
-            <$Horizontal flexWrap>
-              {tournament.magicLink && (
-                <$span>
+                {tournament.tournamentLink ? (
+                  <$span style={{ paddingBottom: '15px' }}>
+                    👉{' '}
+                    <$Link
+                      color={'inherit'}
+                      fontStyle="italic"
+                      href={tournament.tournamentLink}
+                      style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                      target="_blank"
+                    >
+                      {tournamentWords.visitTournament}
+                    </$Link>
+                  </$span>
+                ) : null}
+
+                <$span style={{ paddingBottom: '15px' }}>
                   👉{' '}
                   <$Link
                     color={'inherit'}
                     fontStyle="italic"
-                    href={tournament.magicLink}
-                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                    target="_self"
-                  >
-                    {words.createLootbox}
-                  </$Link>
-                </$span>
-              )}
-
-              {tournament.tournamentLink ? (
-                <$span>
-                  👉{' '}
-                  <$Link
-                    color={'inherit'}
-                    fontStyle="italic"
-                    href={tournament.tournamentLink}
+                    href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
                     style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                     target="_blank"
                   >
-                    {tournamentWords.visitTournament}
+                    {words.watchTutorial}
                   </$Link>
                 </$span>
-              ) : null}
-
-              <$span>
-                👉{' '}
-                <$Link
-                  color={'inherit'}
-                  fontStyle="italic"
-                  href={'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'}
-                  style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                  target="_blank"
-                >
-                  {words.watchTutorial}
-                </$Link>
-              </$span>
-            </$Horizontal>
+              </$Horizontal>
+            </$Vertical>
           </$Vertical>
+          <HiddenDescription description={tournament.description} screen={screen} />
         </$Vertical>
-        <HiddenDescription description={tournament.description} screen={screen} />
-      </$Vertical>
-      <LootboxList
-        lootboxes={tournament?.lootboxSnapshots || []}
-        screen={screen}
-        onClickLootbox={(lootbox) => {
-          lootbox &&
-            lootbox.address &&
-            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
-        }}
-        templateAction={
-          tournament.magicLink
-            ? () => {
-                setCreateModalOpen(true)
-              }
-            : undefined
-        }
-        magicLink={tournament.magicLink || ''}
-      />
+      </$TournamentSectionContainer>
+
       {tournament?.streams && tournament.streams.length > 0 && (
         <$Vertical spacing={2}>
-          <$h2>
+          <$h1>
             <FormattedMessage
               id="tournament.manage.chooseStream.header"
               defaultMessage="Watch this Tournament Live"
               description="Header for stream selection in the public tournament page"
             />
-          </$h2>
+          </$h1>
           <br />
           {tournament.streams.map((stream) => {
             return (
@@ -211,19 +230,37 @@ const PublicTournament = (props: PublicTournamentProps) => {
         </$Vertical>
       )}
 
-      {magicLinkParams && network && (
-        <Modal
-          isOpen={createModalOpen}
-          onRequestClose={() => setCreateModalOpen(false)}
-          contentLabel="Create Lootbox Modal"
-          style={customStyles}
+      <LootboxList
+        lootboxes={tournament?.lootboxSnapshots || []}
+        screen={screen}
+        onClickLootbox={(lootbox) => {
+          lootbox &&
+            lootbox.address &&
+            window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
+        }}
+        templateAction={
+          tournament.magicLink
+            ? () => {
+                setCreateModalOpen(true)
+              }
+            : undefined
+        }
+        magicLink={tournament.magicLink || ''}
+      />
+
+      <Modal
+        isOpen={createModalOpen}
+        onRequestClose={() => setCreateModalOpen(false)}
+        contentLabel="Create Lootbox Modal"
+        style={customStyles}
+      >
+        <$Horizontal
+          justifyContent="flex-end"
+          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
         >
-          <$Horizontal
-            justifyContent="flex-end"
-            style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
-          >
-            <span onClick={() => setCreateModalOpen(false)}>X</span>
-          </$Horizontal>
+          <span onClick={() => setCreateModalOpen(false)}>X</span>
+        </$Horizontal>
+        {magicLinkParams && network && (
           <QuickCreate
             tournamentName={tournament.title}
             tournamentId={magicLinkParams.tournamentId as TournamentID}
@@ -232,8 +269,8 @@ const PublicTournament = (props: PublicTournamentProps) => {
             fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
             fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
           />
-        </Modal>
-      )}
+        )}
+      </Modal>
     </$Vertical>
   )
 }
