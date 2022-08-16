@@ -221,7 +221,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
 
         <$Vertical>
           <$InputImageLabel htmlFor="tournament-cover-uploader">
-            {tournamentWords.editCoverPhoto} ({tournamentWords.landscapeRecommended})
+            📸 {tournamentWords.editCoverPhoto} ({tournamentWords.landscapeRecommended})
           </$InputImageLabel>
           <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
           <$CoverImage id="tournament-cover-photo" display={localCoverPhoto ? 'block' : 'none'} />

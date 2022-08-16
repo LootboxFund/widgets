@@ -185,7 +185,14 @@ const ManageTournament = (props: ManageTournamentProps) => {
               </$Horizontal>
             </$Vertical>
           </$Vertical>
+        </$Vertical>
+      </$TournamentSectionContainer>
 
+      {!tournament.magicLink || !tournament.streams || tournament.streams.length === 0 ? (
+        <$TournamentSectionContainer screen={screen}>
+          <$h1>
+            <FormattedMessage id="profile.onboarding.title" />
+          </$h1>
           {!tournament.magicLink && (
             <div style={{ paddingBottom: '15px' }}>
               <Oopsies
@@ -286,9 +293,8 @@ const ManageTournament = (props: ManageTournamentProps) => {
               />
             </div>
           )}
-        </$Vertical>
-      </$TournamentSectionContainer>
-
+        </$TournamentSectionContainer>
+      ) : null}
       <$TournamentSectionContainer screen={screen}>
         <$Vertical spacing={4}>
           <$h1>
