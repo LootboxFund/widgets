@@ -562,7 +562,7 @@ export const StreamListItem = (props: StreamListItemProps) => {
 }
 
 export const $StreamListItem = styled.div`
-  border-radius: 10px;
+  border-radius: 6px;
   // background-color: ${COLORS.white};
   background-color: ${COLORS.surpressedBackground}10;
   // filter: drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.14));

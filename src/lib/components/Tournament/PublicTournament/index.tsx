@@ -214,7 +214,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
           <br />
           {tournament.streams.map((stream) => {
             return (
-              <$StreamListItem style={{ cursor: 'pointer' }}>
+              <$StreamListItem style={{ cursor: 'pointer', width: screen === 'mobile' ? '100%' : '80%' }}>
                 <a
                   href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
                   style={{ textDecoration: 'none' }}
