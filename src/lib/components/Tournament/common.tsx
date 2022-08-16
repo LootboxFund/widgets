@@ -150,11 +150,19 @@ export const useTournamentWords = () => {
   }
 }
 
-export const HiddenDescription = ({ description, screen }: { description: string; screen: ScreenSize }) => {
+export const HiddenDescription = ({
+  description,
+  screen,
+  len,
+}: {
+  description: string
+  screen: ScreenSize
+  len?: number
+}) => {
   const words = useWords()
   const [isHidden, setIsHidden] = useState(true)
 
-  const truncate = screen === 'mobile' ? 250 : 550
+  const truncate = screen === 'mobile' ? 200 : 450
 
   if (description.length < 250) {
     return (
@@ -254,7 +262,7 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
 
   return (
     <$Vertical spacing={4}>
-      {!!templateAction && screen === 'mobile' && (
+      {/* {!!templateAction && screen === 'mobile' && (
         <$Button
           screen={screen}
           onClick={templateAction}
@@ -272,14 +280,14 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
             description="message to prompt a user to join an esports tournament"
           />
         </$Button>
-      )}
-      <$h2>
+      )} */}
+      <$h1>
         <FormattedMessage
           id="tournament.lootboxList.title"
           defaultMessage="Teams in this Tournament"
           description="Header for section that displays lootboxes (or teams) in a tournament. A team is actually a Lootbox."
         />
-      </$h2>
+      </$h1>
       <$SearchInput
         type="search"
         placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
@@ -451,7 +459,7 @@ export const $TournamentCover = styled.img`
   width: 100%;
   height: auto;
   max-height: 40vh;
-  object-fit: contain;
+  object-fit: cover;
   border: 0px solid transparent;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.05);
@@ -554,12 +562,21 @@ export const StreamListItem = (props: StreamListItemProps) => {
 }
 
 export const $StreamListItem = styled.div`
-  border-radius: 10px;
-  background-color: ${COLORS.white};
-  filter: drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.14));
+  border-radius: 6px;
+  // background-color: ${COLORS.white};
+  background-color: ${COLORS.surpressedBackground}10;
+  // filter: drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.14));
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
   padding: 10px 15px;
 `
 export const $StreamLogo = styled.img`
   width: 40px;
   height: 40px;
+`
+
+export const $TournamentSectionContainer = styled.div<{ screen: ScreenSize }>`
+  background: #ffffff;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
+  border-radius: 10px;
+  padding: ${(props) => (props.screen === 'mobile' ? '1.5rem 1rem 2.2rem' : '1.2rem 1.6rem 3.4rem')};
 `

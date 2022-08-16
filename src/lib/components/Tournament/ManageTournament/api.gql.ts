@@ -120,3 +120,23 @@ export const GET_MY_TOURNAMENT = gql`
     }
   }
 `
+
+export interface GenerateClaimsCsvFE {
+  csv: string
+  __typename: 'GenerateClaimsCsvResponseSuccess'
+}
+export const GET_CLAIMS_CSV = gql`
+  mutation Mutation($payload: GenerateClaimsCsvPayload!) {
+    generateClaimsCsv(payload: $payload) {
+      ... on GenerateClaimsCsvResponseSuccess {
+        csv
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

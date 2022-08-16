@@ -99,6 +99,7 @@ const Wallets = () => {
         <$WalletContainerSkeleton>
           <$Horizontal justifyContent="space-between">
             <$span
+              color={`${COLORS.surpressedBackground}be`}
               lineHeight={WALLET_CONTAINER_HEIGHT}
               width="30%"
               textAlign="center"
@@ -108,6 +109,7 @@ const Wallets = () => {
             </$span>
             {screen !== 'mobile' ? (
               <$span
+                color={`${COLORS.surpressedBackground}be`}
                 lineHeight={WALLET_CONTAINER_HEIGHT}
                 width="30%"
                 textAlign="center"

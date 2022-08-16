@@ -11,6 +11,8 @@ import { useState } from 'react'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
+import $Button from 'lib/components/Generics/Button'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -38,7 +40,7 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
         placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
         onChange={(e) => setSearchTerm(e.target.value || '')}
       />
-      <$Horizontal justifyContent="flex-start" flexWrap spacing={4}>
+      <$Horizontal justifyContent="space-between" flexWrap>
         {filteredLootboxes.map((lootbox, index) => (
           <$LootboxThumbailContainer
             key={index}
@@ -115,34 +117,51 @@ const MyLootboxes = () => {
       {lootboxSnapshots.length > 0 ? (
         <LootboxList lootboxes={lootboxSnapshots} screen={screen} onClickLootbox={navigateToLootbox} />
       ) : (
-        <Oopsies
-          title={couldNotFindLootboxText}
-          message={
-            <FormattedMessage
-              id="profile.lootboxes.noLootboxes"
-              defaultMessage="Already made one? Then you need to add your wallet ☝️ Otherwise, you can {createLootboxHyperLink}."
-              description="Message when the user has no Lootboxes listed on their page. There is a button shown above to add their wallet, which will help them find their lootboxes."
-              values={{
-                createLootboxHyperLink: (
-                  <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
-                    {words.createLootbox}
-                  </$Link>
-                ),
+        <$Vertical spacing={4}>
+          <Oopsies
+            icon="🎁"
+            title={words.createLootbox}
+            message={
+              <FormattedMessage
+                id="profile.lootboxes.noLootboxes"
+                defaultMessage="Already made one? Then you need to add your wallet ☝️ Otherwise, you can {createLootboxHyperLink}."
+                description="Message when the user has no Lootboxes listed on their page. There is a button shown above to add their wallet, which will help them find their lootboxes."
+                values={{
+                  createLootboxHyperLink: (
+                    <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
+                      {words.createLootbox}
+                    </$Link>
+                  ),
+                }}
+              />
+            }
+          />
+          <$Link target="_self" href={manifest.microfrontends.webflow.createPage}>
+            <$Button
+              screen={screen}
+              backgroundColor={`${COLORS.trustBackground}C0`}
+              backgroundColorHover={`${COLORS.trustBackground}`}
+              color={COLORS.trustFontColor}
+              style={{
+                fontWeight: TYPOGRAPHY.fontWeight.regular,
+                fontSize: TYPOGRAPHY.fontSize.large,
+                boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
               }}
-            />
-          }
-          icon="🧐"
-        />
+            >
+              {words.createLootbox}
+            </$Button>
+          </$Link>
+        </$Vertical>
       )}
     </$Vertical>
   )
 }
 
 const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
-  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '30%')};
+  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '32%')};
   width: 100%;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.5));
   overflow: hidden;
 `
