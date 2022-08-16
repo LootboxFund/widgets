@@ -105,6 +105,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
 
   const closeModal = () => {
     setIsModalOpen(false)
+    setChosenClaim(undefined)
   }
 
   const handleButtonToggle = (elId: string) => {
