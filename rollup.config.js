@@ -163,6 +163,8 @@ const PublicProfile = widgetConfig('PublicProfile')
 
 const ViralOnboarding = widgetConfig('ViralOnboarding')
 
+const SignOut = widgetConfig('SignOut')
+
 export default [
   CreateLootbox,
   InteractWithLootbox,
@@ -180,4 +182,5 @@ export default [
   BattlePage,
   PublicProfile,
   ViralOnboarding,
+  SignOut,
 ]
