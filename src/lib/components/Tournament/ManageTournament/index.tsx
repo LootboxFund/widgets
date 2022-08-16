@@ -71,13 +71,13 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const JoinButton = () => (
     <$Button
       screen={screen}
-      onClick={
-        tournament.magicLink
-          ? () => {
-              window.open(`${tournament.magicLink}`, '_self')
-            }
-          : undefined
-      }
+      onClick={() => {
+        if (tournament.magicLink) {
+          window.open(`${tournament.magicLink}`, '_self')
+        } else {
+          window.open(createLootboxUrl, '_self')
+        }
+      }}
       color={COLORS.trustFontColor}
       backgroundColor={`${COLORS.trustBackground}`}
       style={{
