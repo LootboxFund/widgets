@@ -249,11 +249,10 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
           <$Button
             screen={screen}
             onClick={handleButtonClick}
-            backgroundColor={`${COLORS.trustBackground}C0`}
+            backgroundColor={`${COLORS.trustBackground}`}
             backgroundColorHover={`${COLORS.trustBackground}`}
             color={COLORS.trustFontColor}
             style={{
-              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
               fontWeight: TYPOGRAPHY.fontWeight.regular,
               fontSize: TYPOGRAPHY.fontSize.large,
             }}

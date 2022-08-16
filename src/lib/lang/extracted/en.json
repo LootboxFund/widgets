@@ -1007,6 +1007,9 @@
   "generics.about": {
     "defaultMessage": "About"
   },
+  "generics.biography": {
+    "defaultMessage": "Biography"
+  },
   "generics.confirm": {
     "defaultMessage": "Confirm",
     "description": "Text to confirm something"
@@ -1037,6 +1040,9 @@
     "defaultMessage": "Network not set",
     "description": "Error message for user if they forgot to set a blockchain network"
   },
+  "generics.noChangesMade": {
+    "defaultMessage": "No changes made"
+  },
   "generics.partyBasketInformation": {
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
@@ -1044,6 +1050,10 @@
   "generics.pleaseEnterYourPhoneNumber": {
     "defaultMessage": "Please enter your phone number",
     "description": "Text prompting user to enter their phone number"
+  },
+  "generics.publicProfile": {
+    "defaultMessage": "Public Profile",
+    "description": "Refering a public profile webpage"
   },
   "generics.retry": {
     "defaultMessage": "Retry",
@@ -1064,6 +1074,12 @@
   "generics.tryAgain": {
     "defaultMessage": "Try again"
   },
+  "generics.userId": {
+    "defaultMessage": "User ID"
+  },
+  "generics.username": {
+    "defaultMessage": "Username"
+  },
   "generics.verificationCode": {
     "defaultMessage": "Verification code",
     "description": "Text to enter a verification code for signup"
@@ -1072,6 +1088,9 @@
     "defaultMessage": "Verify your phone number",
     "description": "Text to verify your phone number"
   },
+  "generics.youAreNotLoggedIn": {
+    "defaultMessage": "You are not logged in"
+  },
   "interactWithLootbox.manageLootbox.button": {
     "defaultMessage": "Manage Lootbox",
     "description": "Button prompt leading to the \"Manage\" Lootbox page (AKA: \"Edit\" lootbox page)"
@@ -1079,6 +1098,10 @@
   "inviteLink.modal.description": {
     "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
     "description": "Description of the invite link modal contents"
+  },
+  "inviteLink.modal.enableBonusClaim": {
+    "defaultMessage": "Get Bonus Rewards for Referrals",
+    "description": "Checkbox label, when clicked, the user will get a reward if a referral signs up from them"
   },
   "inviteLink.modal.generateInviteLink": {
     "defaultMessage": "Generate Invite Link",
@@ -1535,6 +1558,19 @@
     "defaultMessage": "View All Whitelisted Wallets",
     "description": "Title for whitelisted wallets section."
   },
+  "profile.addUsername": {
+    "defaultMessage": "Add username"
+  },
+  "profile.avatar.editHeadshot": {
+    "defaultMessage": "Edit headshot",
+    "description": "Referring to a picture of our user's head / upper torso"
+  },
+  "profile.avatar.editProfilePic": {
+    "defaultMessage": "Edit profile pic"
+  },
+  "profile.button.viewLotteryTickets": {
+    "defaultMessage": "View Lottery Tickets"
+  },
   "profile.lootboxes.couldNotFindLootbox": {
     "defaultMessage": "We couldn't find your Lootbox",
     "description": "Message displayed when the user does not have any lootboxes."
@@ -1586,17 +1622,25 @@
     "defaultMessage": "Both get bonus FREE Lottery Tickets",
     "description": "Reward caption for inviting friend"
   },
+  "profile.public.editProfile": {
+    "defaultMessage": "Edit Profile",
+    "description": "Public Profile Page link to edit profile"
+  },
   "profile.public.inviteFriends": {
     "defaultMessage": "Invite Friend",
     "description": "Button to invite friend"
   },
-  "profile.public.myLotteryTicketsLabel": {
+  "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
     "description": "Label for list of lottery tickets"
   },
-  "profile.public.myLotteryTicketsTip": {
+  "profile.public.userLotteryTicketsTip": {
     "defaultMessage": "Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
     "description": "Tooltip for my lottery tickets list on Public Profile Page"
+  },
+  "profile.public.viewSocials": {
+    "defaultMessage": "View Socials",
+    "description": "Public Profile Page link to view socials"
   },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
@@ -1638,21 +1682,15 @@
     "defaultMessage": "Account Settings",
     "description": "Title for the account settings page. Here users can change their password, email, etc."
   },
-  "profile.socials.biography": {
-    "defaultMessage": "Biography",
-    "description": "Biography of User"
-  },
-  "profile.socials.changePhoto": {
-    "defaultMessage": "Change Photo",
-    "description": "Change Photo of User"
-  },
   "profile.socials.mySocials": {
     "defaultMessage": "My Socials",
     "description": "List of user socials for public view"
   },
-  "profile.socials.pageHeader": {
-    "defaultMessage": "Social Profiles",
-    "description": "Page Header of Social Profiles Page"
+  "profile.socials.mySocialsDescription": {
+    "defaultMessage": "It is important you add these details so that tournament organizers can notify you if you’ve won prize money."
+  },
+  "profile.tournament.noTournaments": {
+    "defaultMessage": "You can create a Tournament for a professional esports tournaments, a live stream battle chest or if you just want to dual your friends."
   },
   "profile.tournaments.myTournaments": {
     "defaultMessage": "My Tournaments",
@@ -1665,6 +1703,9 @@
   "profile.tournaments.searchTournamentsByName": {
     "defaultMessage": "Search Tournaments by Name",
     "description": "User can search their esports tournaments by name"
+  },
+  "profile.usernameRequired": {
+    "defaultMessage": "Username is required"
   },
   "profile.wallets.dateCreated": {
     "defaultMessage": "Date created",
@@ -1925,6 +1966,9 @@
     "defaultMessage": "The gamer has not deposited any earnings yet. Come back later to claim your rewards.",
     "description": "Text displayed when the Lootbox owner has not deposited any earnings yet and so, the investor cannot redeem anything from their profit share NFTs."
   },
+  "tournament.analytics.download": {
+    "defaultMessage": "Click to download CSV file"
+  },
   "tournament.create.header": {
     "defaultMessage": "Create a Tournament",
     "description": "Button text for the create tournament form - these are e-sports tournaments and or 1v1 battles etc"
@@ -1940,6 +1984,12 @@
   "tournament.edit.addTournamentLink": {
     "defaultMessage": "Add tournament link",
     "description": "Prompt to user to add a hyperlink URL to the tournament's official page. I.e. might be a streaming website etc."
+  },
+  "tournament.edit.analytics.description": {
+    "defaultMessage": "Track how many referral bounties have been claimed by your community."
+  },
+  "tournament.edit.analytics.title": {
+    "defaultMessage": "Tournament Analytics"
   },
   "tournament.edit.createMagicLink.help": {
     "defaultMessage": "Magic Links help people sign up for your tournament by creating a special Lootbox with the settings you choose! {learnMoreHyperLink}",
@@ -2009,10 +2059,6 @@
     "defaultMessage": "Join by creating a Lootbox!",
     "description": "Text prompting user to join an esports tournament by making a new Lootbox"
   },
-  "tournament.lootboxList.templateActionButton": {
-    "defaultMessage": "Join the Tournament",
-    "description": "message to prompt a user to join an esports tournament"
-  },
   "tournament.lootboxList.title": {
     "defaultMessage": "Teams in this Tournament",
     "description": "Header for section that displays lootboxes (or teams) in a tournament. A team is actually a Lootbox."
@@ -2044,6 +2090,10 @@
     "defaultMessage": "Watch this Tournament Live",
     "description": "Header for stream selection in the public tournament page"
   },
+  "tournament.manage.joinButton.text": {
+    "defaultMessage": "Add Team",
+    "description": "button text to add team to tournament"
+  },
   "tournament.manage.noLootboxes.text": {
     "defaultMessage": "No Lootboxes",
     "description": "Text when no Lootboxes were found"
@@ -2059,6 +2109,9 @@
   "tournament.visit.header": {
     "defaultMessage": "Visit Tournament",
     "description": "Button text for the user to navigate to the public page of a given tournament"
+  },
+  "tournamentAnalytics.button.downloadCSV": {
+    "defaultMessage": "Download CSV"
   },
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",
