@@ -238,7 +238,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                   >
                     <img
                       src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', paddingBottom: '5px' }}
                     />
                   </a>
                   <$Vertical
