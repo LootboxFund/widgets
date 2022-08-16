@@ -715,7 +715,19 @@ const useWords = () => {
     defaultMessage: 'You are not logged in',
   })
 
+  const generateInviteLinkText = intl.formatMessage({
+    id: 'inviteLink.modal.generateInviteLink',
+    description: 'Main action button for invite link modal',
+    defaultMessage: 'Generate Invite Link',
+  })
+
+  const inviteFriend = intl.formatMessage({
+    id: 'generics.inviteFriend',
+    defaultMessage: 'Invite Friend',
+  })
+
   return {
+    inviteFriend,
     retry,
     sendCode,
     cancel,
@@ -828,6 +840,7 @@ const useWords = () => {
     username,
     biography,
     youAreNotLoggedIn,
+    generateInviteLinkText,
   }
 }
 

@@ -38,11 +38,6 @@ const PublicProfile = (props: PublicProfileProps) => {
   } = useQuery<{ publicUser: ResponseError | PublicUserFE }, PublicUserGQLArgs>(PUBLIC_USER, {
     variables: { publicUserId: props.userId },
   })
-  const inviteFriendText = intl.formatMessage({
-    id: 'profile.public.inviteFriends',
-    defaultMessage: 'Invite Friend',
-    description: 'Button to invite friend',
-  })
   const bonusTicketText = intl.formatMessage({
     id: 'profile.public.bothGetBonusTickets',
     defaultMessage: 'Both get bonus FREE Lottery Tickets',
@@ -100,7 +95,7 @@ const PublicProfile = (props: PublicProfileProps) => {
       <$Horizontal justifyContent="space-between">
         <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton onClick={() => setIsModalOpen(true)}>{inviteFriendText}</$InviteButton>
+          <$InviteButton onClick={() => setIsModalOpen(true)}>{words.inviteFriend}</$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
             {bonusTicketText}
           </span>
@@ -217,8 +212,12 @@ const PublicProfilePage = () => {
 const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   font-family: sans-serif;
   padding: ${(props) => (props.screen === 'mobile' ? '5px' : '10px')};
-  max-width: 600px;
+  max-width: 920px;
   margin: 0 auto;
+  background: #ffffff;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
+  border-radius: 10px;
+  padding: ${(props) => (props.screen === 'mobile' ? '1.5rem 1rem 2.2rem' : '1.2rem 1.6rem 3.4rem')};
 `
 
 export const $ProfileImage = styled.img`
@@ -261,6 +260,13 @@ const $MoreButton = styled.button`
   color: ${COLORS.white};
   border: 0px solid white;
   text-transform: uppercase;
+`
+
+export const $ProfileSectionContainer = styled.div<{ screen: ScreenSize }>`
+  background: #ffffff;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
+  border-radius: 10px;
+  padding: ${(props) => (props.screen === 'mobile' ? '1.5rem 1rem 2.2rem' : '1.2rem 1.6rem 3.4rem')};
 `
 
 export default PublicProfilePage

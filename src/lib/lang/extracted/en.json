@@ -41,6 +41,9 @@
     "defaultMessage": "Or use a password",
     "description": "Hyperlink message to user allowing them to signin / signup with a password"
   },
+  "auth.method.signupWithPhoneTerms": {
+    "defaultMessage": "By verifying your phone number, you are agreeing to our {termsOfService}."
+  },
   "auth.password.passwordLength": {
     "defaultMessage": "Password must be at least {minLength} characters",
     "description": "Error message when user tries to sign up/in with a password that is too short"
@@ -85,6 +88,10 @@
     "defaultMessage": "Wallet Sign Up",
     "description": "Button text where a user clicks to sign up using their Metamask wallet"
   },
+  "auth.termsOfService": {
+    "defaultMessage": "Terms of Service",
+    "description": "Link to terms of service"
+  },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
     "description": "Text indicating a tournament is finished"
@@ -100,10 +107,6 @@
   "battlePage.button.claimLottery": {
     "defaultMessage": "Claim lottery",
     "description": "Text prompting user to claim a lottery ticket"
-  },
-  "battlePage.button.inviteFriend": {
-    "defaultMessage": "Invite Friend",
-    "description": "Invite button on Party Basket on the Battle page"
   },
   "battlePage.button.inviteFriendRewardPrompt": {
     "defaultMessage": "Both get a FREE lottery ticket",
@@ -1032,6 +1035,9 @@
   "generics.includeCountryCode": {
     "defaultMessage": "Phone number needs a country code (eg. +63 or +1)"
   },
+  "generics.inviteFriend": {
+    "defaultMessage": "Invite Friend"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -1626,10 +1632,6 @@
     "defaultMessage": "Edit Profile",
     "description": "Public Profile Page link to edit profile"
   },
-  "profile.public.inviteFriends": {
-    "defaultMessage": "Invite Friend",
-    "description": "Button to invite friend"
-  },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
     "description": "Label for list of lottery tickets"
@@ -2166,6 +2168,9 @@
     "defaultMessage": "Screenshot & Share",
     "description": "Message to show user to screen shot a picture & share w friends"
   },
+  "viralOnboarding.screenshotAndShare": {
+    "defaultMessage": "If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇"
+  },
   "viralOnboarding.selectLottery.dateWinnerAnnounce": {
     "defaultMessage": "Winners Announced {dateWin}",
     "description": "date when we announce the winners of the lottery"
@@ -2193,7 +2198,7 @@
     "defaultMessage": "You have already accepted this referral."
   },
   "viralOnboarding.youHaveAlreadyAcceptedInfo": {
-    "defaultMessage": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link."
+    "defaultMessage": "You can only accept an initial invite once. {boldText}"
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",

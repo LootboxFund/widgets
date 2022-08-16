@@ -272,11 +272,7 @@ const BattlePagePartyBasket = (props: Props) => {
                     width: '100%',
                   }}
                 >
-                  <FormattedMessage
-                    id="battlePage.button.inviteFriend"
-                    defaultMessage="Invite Friend"
-                    description="Invite button on Party Basket on the Battle page"
-                  />
+                  {words.inviteFriend}
                 </$Button>
                 <p
                   style={{

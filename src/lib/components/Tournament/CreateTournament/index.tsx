@@ -220,7 +220,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
 
           <$Vertical>
             <$InputImageLabel htmlFor="tournament-cover-uploader">
-              {localCoverPhoto ? tournamentWords.editCoverPhoto : tournamentWords.addCoverPhoto} (
+              📸 {localCoverPhoto ? tournamentWords.editCoverPhoto : tournamentWords.addCoverPhoto} (
               {tournamentWords.landscapeRecommended})
             </$InputImageLabel>
             <$InputImage type="file" id="tournament-cover-uploader" accept="image/*" onChange={parseCover} />
@@ -312,12 +312,13 @@ export const $InputImage = styled.input`
 `
 
 export const $InputImageLabel = styled.label`
+  height: 100px;
+  line-height: 100px;
   background-color: ${`${COLORS.surpressedBackground}1A`};
   color: ${COLORS.surpressedFontColor}ae;
   border: none;
   border-radius: 10px;
   padding: 5px 10px;
-  line-height: 40px;
   text-align: center;
   cursor: pointer;
   white-space: nowrap;
