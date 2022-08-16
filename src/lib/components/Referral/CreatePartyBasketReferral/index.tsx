@@ -15,7 +15,7 @@ import { $InputMedium } from 'lib/components/Tournament/common'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
-import { LoadingText } from 'lib/components/Generics/Spinner'
+import Spinner, { LoadingText } from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
 import QRCode from 'lib/components/ViralOnboarding/components/QRCode'
@@ -28,6 +28,7 @@ interface Props {
 
 const CreatePartyBasketReferral = (props: Props) => {
   const { screen } = useWindowSize()
+  const [bonucClaimEnabled, setBonusClaimEnabled] = useState(true)
   const [createReferral, { loading }] = useMutation<
     { createReferral: CreateReferralResponse },
     MutationCreateReferralArgs
@@ -47,6 +48,11 @@ const CreatePartyBasketReferral = (props: Props) => {
     id: `referral.create.form.tournamentRequired`,
     defaultMessage: 'Tournament is required',
   })
+  const generateInviteLinkText = intl.formatMessage({
+    id: 'inviteLink.modal.generateInviteLink',
+    description: 'Main action button for invite link modal',
+    defaultMessage: 'Generate Invite Link',
+  })
 
   const handleButtonClick = async () => {
     setErrorMessage('')
@@ -63,6 +69,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             campaignName,
             partyBasketId: props.partyBasketId,
             tournamentId: props.tournamentId,
+            isRewardDisabled: !bonucClaimEnabled,
           },
         },
       })
@@ -120,6 +127,20 @@ const CreatePartyBasketReferral = (props: Props) => {
           border: '0px solid white',
         }}
       ></input>
+      <br />
+      <$span>
+        <$Checkbox
+          type="checkbox"
+          checked={bonucClaimEnabled}
+          onChange={() => setBonusClaimEnabled(!bonucClaimEnabled)}
+        />
+        <FormattedMessage
+          id="inviteLink.modal.enableBonusClaim"
+          defaultMessage="Get Bonus Rewards for Referrals"
+          description="Checkbox label, when clicked, the user will get a reward if a referral signs up from them"
+        />
+      </$span>
+      <br />
       <button
         onClick={handleButtonClick}
         style={{
@@ -135,11 +156,7 @@ const CreatePartyBasketReferral = (props: Props) => {
         }}
         disabled={loading}
       >
-        <FormattedMessage
-          id="inviteLink.modal.generateInviteLink"
-          description="Main action button for invite link modal"
-          defaultMessage="Generate Invite Link"
-        />
+        <LoadingText loading={loading} text={generateInviteLinkText} color={COLORS.white} />
       </button>
       {errorMessage ? <$ErrorMessage style={{ paddingTop: '15px' }}>{errorMessage}</$ErrorMessage> : null}
       {lastReferralLink && (
@@ -223,9 +240,13 @@ const CreatePartyBasketReferral = (props: Props) => {
           </b>
           <br />
           <br />
-          <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
-            <QRCode referral={createdReferrals[0]} />
-          </div>
+          {loading ? (
+            <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
+          ) : (
+            <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
+              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} />
+            </div>
+          )}
         </$Vertical>
       )}
     </$Vertical>
@@ -299,6 +320,15 @@ const $AddReferralContainer = styled.div`
   border-radius: 20px;
   width: 100%;
   box-sizing: border-box;
+`
+
+const $Checkbox = styled.input`
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  margin-right: 10px;
+  cursor: pointer;
 `
 
 export default CreatePartyBasketReferral

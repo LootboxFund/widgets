@@ -48,6 +48,9 @@ const QRCode = (props: Props) => {
     }
     const el = document.getElementById('qrcode')
     if (el) {
+      if (el.firstChild) {
+        el.removeChild(el.firstChild)
+      }
       new QRCodeComponent(el, options_object)
     }
   }, [props.referral])
