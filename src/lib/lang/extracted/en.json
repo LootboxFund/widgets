@@ -1610,8 +1610,7 @@
     "description": "This is the link that will send the user a verification email."
   },
   "profile.onboarding.title": {
-    "defaultMessage": "You're almost set up...",
-    "description": "This is the header of the user onboarding section. They will have to complete a few steps before this message disappears."
+    "defaultMessage": "You're almost set up..."
   },
   "profile.onboarding.verifyEmailHeader": {
     "defaultMessage": "Verify your email",
@@ -1632,6 +1631,9 @@
     "defaultMessage": "Edit Profile",
     "description": "Public Profile Page link to edit profile"
   },
+  "profile.public.eventDetails": {
+    "defaultMessage": "Event Details"
+  },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
     "description": "Label for list of lottery tickets"
@@ -1643,6 +1645,9 @@
   "profile.public.viewSocials": {
     "defaultMessage": "View Socials",
     "description": "Public Profile Page link to view socials"
+  },
+  "profile.public.watchStream": {
+    "defaultMessage": "Watch Stream"
   },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",

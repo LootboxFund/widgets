@@ -726,7 +726,13 @@ const useWords = () => {
     defaultMessage: 'Invite Friend',
   })
 
+  const yourAlmostSetup = intl.formatMessage({
+    id:"profile.onboarding.title",
+    defaultMessage:"You're almost set up..."
+  })
+
   return {
+    yourAlmostSetup,
     inviteFriend,
     retry,
     sendCode,

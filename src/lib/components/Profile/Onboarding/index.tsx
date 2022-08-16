@@ -60,11 +60,7 @@ const Onboarding = () => {
     <$ProfileSectionContainer screen={screen}>
       <$Vertical spacing={4}>
         <$h1 style={{ fontStyle: 'italic' }}>
-          <FormattedMessage
-            id="profile.onboarding.title"
-            defaultMessage="You're almost set up..."
-            description="This is the header of the user onboarding section. They will have to complete a few steps before this message disappears."
-          />
+          {words.yourAlmostSetup}
         </$h1>
         {showEmailVerification ? (
           <Oopsies

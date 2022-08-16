@@ -191,7 +191,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
       {!tournament.magicLink || !tournament.streams || tournament.streams.length === 0 ? (
         <$TournamentSectionContainer screen={screen}>
           <$h1>
-            <FormattedMessage id="profile.onboarding.title" />
+            {words.yourAlmostSetup}
           </$h1>
           {!tournament.magicLink && (
             <div style={{ paddingBottom: '15px' }}>
