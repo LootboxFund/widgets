@@ -103,7 +103,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
               <$h3 style={{ marginBottom: '-10px', textTransform: 'uppercase' }}>{words.manage}</$h3>
               <$Horizontal width="100%" justifyContent="space-between" flexWrap spacing={2}>
                 <$h1>{tournament.title}</$h1>
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{ margin: 'auto 0 10px' }}>
                   <JoinButton />
                 </div>
               </$Horizontal>
