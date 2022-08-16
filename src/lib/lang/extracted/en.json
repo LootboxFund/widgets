@@ -108,10 +108,6 @@
     "defaultMessage": "Claim lottery",
     "description": "Text prompting user to claim a lottery ticket"
   },
-  "battlePage.button.inviteFriend": {
-    "defaultMessage": "Invite Friend",
-    "description": "Invite button on Party Basket on the Battle page"
-  },
   "battlePage.button.inviteFriendRewardPrompt": {
     "defaultMessage": "Both get a FREE lottery ticket",
     "description": "Text prompting user on why they should invite a friend"
@@ -1039,6 +1035,9 @@
   "generics.includeCountryCode": {
     "defaultMessage": "Phone number needs a country code (eg. +63 or +1)"
   },
+  "generics.inviteFriend": {
+    "defaultMessage": "Invite Friend"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -1632,10 +1631,6 @@
   "profile.public.editProfile": {
     "defaultMessage": "Edit Profile",
     "description": "Public Profile Page link to edit profile"
-  },
-  "profile.public.inviteFriends": {
-    "defaultMessage": "Invite Friend",
-    "description": "Button to invite friend"
   },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
