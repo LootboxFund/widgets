@@ -535,7 +535,7 @@
   "tournament.stream.streamTypeCannotBeEmpty": "Stream type cannot be empty",
   "tournament.stream.streamURLCannotBeEmpty": "Stream URL cannot be empty",
   "tournament.visit.header": "Visit Tournament",
-  "tournamentAnalytics.button.downloadCSV": "Download CSV",
+  "tournamentAnalytics.button.downloadCSV": "Generate CSV",
   "userTickets.title": "Redeem Profit Sharing NFTs",
   "viralOnboarding.acceptGift.description": "Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}",
   "viralOnboarding.acceptGift.invitationMessage": "{name}{newline}Gifted you a Lottery Ticket",

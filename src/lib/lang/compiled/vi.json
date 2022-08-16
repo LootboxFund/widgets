@@ -546,7 +546,7 @@
   "tournament.stream.streamTypeCannotBeEmpty": "Loại luồng không được để trống",
   "tournament.stream.streamURLCannotBeEmpty": "URL luồng không được để trống",
   "tournament.visit.header": "Ghé thăm giải đấu",
-  "tournamentAnalytics.button.downloadCSV": "Tải xuống CSV",
+  "tournamentAnalytics.button.downloadCSV": "Tạo CSV",
   "userTickets.title": "Đổi NFT chia sẻ lợi nhuận",
   "viralOnboarding.acceptGift.description": "Yêu cầu Vé xổ số ESports MIỄN PHÍ này để giành tiền mặt {tournamentDate}",
   "viralOnboarding.acceptGift.invitationMessage": "{name}{newline}Tặng bạn một vé xổ số",

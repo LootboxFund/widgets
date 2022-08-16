@@ -545,7 +545,7 @@
   "tournament.stream.streamTypeCannotBeEmpty": "Hindi maaaring walang laman ang uri ng stream",
   "tournament.stream.streamURLCannotBeEmpty": "Hindi maaaring walang laman ang URL ng stream",
   "tournament.visit.header": "Bisitahin ang Paligsahan",
-  "tournamentAnalytics.button.downloadCSV": "I-download ang CSV",
+  "tournamentAnalytics.button.downloadCSV": "Bumuo ng CSV",
   "userTickets.title": "Kuhanin ang mga NFT sa Pagbabahagi ng Kita",
   "viralOnboarding.acceptGift.description": "I-claim itong LIBRENG ESports Lottery Ticket para manalo ng cash {tournamentDate}",
   "viralOnboarding.acceptGift.invitationMessage": "{name}{newline}Niregaluhan ka ng Lottery Ticket",

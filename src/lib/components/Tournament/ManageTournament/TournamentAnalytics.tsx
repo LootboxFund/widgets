@@ -33,7 +33,7 @@ const TournamentAnalytics = (props: TournamentAnalyticsProps) => {
   })
   const downloadCsvText = intl.formatMessage({
     id: 'tournamentAnalytics.button.downloadCSV',
-    defaultMessage: 'Download CSV',
+    defaultMessage: 'Generate CSV',
   })
 
   return (

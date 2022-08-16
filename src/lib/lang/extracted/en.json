@@ -2111,7 +2111,7 @@
     "description": "Button text for the user to navigate to the public page of a given tournament"
   },
   "tournamentAnalytics.button.downloadCSV": {
-    "defaultMessage": "Download CSV"
+    "defaultMessage": "Generate CSV"
   },
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",
