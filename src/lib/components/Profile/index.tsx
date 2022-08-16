@@ -84,9 +84,8 @@ const Profile = () => {
           </$p>
         )}
       </$Vertical>
-      <$ProfileSectionContainer screen={screen}>
-        <Onboarding />
-      </$ProfileSectionContainer>
+
+      <Onboarding />
       <$ProfileSectionContainer screen={screen}>
         <ManagePublicProfile />
       </$ProfileSectionContainer>
