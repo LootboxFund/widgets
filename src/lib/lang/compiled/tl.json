@@ -563,6 +563,7 @@
   "viralOnboarding.completeOnboarding.winnersAnnouned4": "Inanunsyo na ang mga Nanalo",
   "viralOnboarding.qrcode.description": "I-scan ang QR Code para tumanggap ng LIBRENG Fan Lottery Ticket para sa isang ESports Tournament.",
   "viralOnboarding.qrcode.screenshotAndShare": "Screenshot at Ibahagi",
+  "viralOnboarding.screenshotAndShare": "Kung gusto mo ng higit pang mga tiket, bumuo ng QR code sa ibaba, i-screenshot ito, at ibahagi ito sa iyong mga kaibigan 👇",
   "viralOnboarding.selectLottery.dateWinnerAnnounce": "Inanunsyo ang mga Nanalo {dateWin}",
   "viralOnboarding.selectLottery.description": "Sumali sa {nPeople} iba pang mga tao na bawat isa ay makakakuha ng {lotteryPrize} kung ang koponang ito ang mananalo sa paligsahan.",
   "viralOnboarding.selectLottery.header": "Mag-claim ng Lottery Ticket",
@@ -570,7 +571,7 @@
   "viralOnboarding.signup.header": "Halos Tapos na...",
   "viralOnboarding.verification.sentTo": "Ipinadala sa {userPhoneNumber}",
   "viralOnboarding.youHaveAlreadyAccepted": "Tinanggap mo na ang referral na ito.",
-  "viralOnboarding.youHaveAlreadyAcceptedInfo": "Isang beses ka lang makakatanggap ng paunang imbitasyon. Kung gusto mo ng higit pang mga tiket, tanungin ang iyong host ng tournament para sa isang bagong link ng referral.",
+  "viralOnboarding.youHaveAlreadyAcceptedInfo": "Isang beses ka lang makakatanggap ng paunang imbitasyon. {boldText}",
   "wallet-button.connect-wallet": "Ikonekta ang Wallet",
   "walletButton.connected": "Nakakonekta na"
 }

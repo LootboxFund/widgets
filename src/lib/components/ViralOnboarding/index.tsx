@@ -15,11 +15,18 @@ import GenericCard, { LoadingCard, ErrorCard } from './components/GenericCard'
 import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
+import CreateReferral from './components/CreateReferral'
 
 interface ViralOnboardingProps {
   referralSlug: ReferralSlug
 }
-type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'select-lottery' | 'sign-up' | 'success'
+type ViralOnboardingRoute =
+  | 'accept-gift'
+  | 'browse-lottery'
+  | 'select-lottery'
+  | 'sign-up'
+  | 'success'
+  | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
@@ -47,7 +54,15 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       case 'select-lottery':
         return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
       case 'sign-up':
-        return <OnboardingSignUp onNext={() => setRoute('success')} onBack={() => console.log('back')} />
+        return (
+          <OnboardingSignUp
+            onNext={() => setRoute('success')}
+            onBack={() => setRoute('accept-gift')}
+            goToReferralCreation={() => setRoute('create-referral')}
+          />
+        )
+      case 'create-referral':
+        return <CreateReferral goBack={() => setRoute('accept-gift')} />
       case 'success':
         return (
           <CompleteOnboarding

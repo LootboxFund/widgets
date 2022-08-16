@@ -18,7 +18,7 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { browserLocalPersistence, setPersistence } from 'firebase/auth'
+import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useMutation } from '@apollo/client'
@@ -34,6 +34,7 @@ import { parseAuthError } from 'lib/utils/firebase'
 interface Props {
   onNext: () => void
   onBack: () => void
+  goToReferralCreation: () => void
 }
 type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
 const OnboardingSignUp = (props: Props) => {
@@ -58,11 +59,19 @@ const OnboardingSignUp = (props: Props) => {
     id: 'viralOnboarding.youHaveAlreadyAccepted',
     defaultMessage: 'You have already accepted this referral.',
   })
-  const youHaveAlreadyAcceptedInfo = intl.formatMessage({
-    id: 'viralOnboarding.youHaveAlreadyAcceptedInfo',
+  const screenshotAndShare = intl.formatMessage({
+    id: 'viralOnboarding.screenshotAndShare',
     defaultMessage:
-      'You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link.',
+      'If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇',
   })
+
+  const youHaveAlreadyAcceptedInfo = intl.formatMessage(
+    {
+      id: 'viralOnboarding.youHaveAlreadyAcceptedInfo',
+      defaultMessage: 'You can only accept an initial invite once. {boldText}',
+    },
+    { boldText: <b>{screenshotAndShare}</b> }
+  )
 
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
@@ -207,20 +216,48 @@ const OnboardingSignUp = (props: Props) => {
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
         {status === 'initializing' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
-        {status === 'error' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
-            <$Icon>{isAlreadyAccepted ? '😅' : '🤕'}</$Icon>
+        {status === 'error' && !isAlreadyAccepted && (
+          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+            <$Icon>{'🤕'}</$Icon>
             <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
-              {isAlreadyAccepted ? youHaveAlreadyAccepted : parseAuthError(intl, errorMessage) || words.anErrorOccured}
+              {words.anErrorOccured}
             </$Heading>
-            {isAlreadyAccepted ? (
-              <$SubHeading style={{ marginTop: '0px' }}>{youHaveAlreadyAcceptedInfo}</$SubHeading>
+            {errorMessage ? (
+              <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(intl, errorMessage)}</$SubHeading>
             ) : null}
-            <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
+
+            <$SubHeading
+              onClick={() => props.onBack()}
+              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+            >
               {words.retry + '?'}
             </$SubHeading>
           </$Vertical>
         )}
+        {status === 'error' && isAlreadyAccepted && (
+          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+            <$Icon>{'😅'}</$Icon>
+            <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
+              {errorMessage ? parseAuthError(intl, errorMessage) : words.anErrorOccured}
+            </$Heading>
+            <$SubHeading style={{ marginTop: '0px' }}>{youHaveAlreadyAcceptedInfo}</$SubHeading>
+            <$NextButton
+              onClick={() => props.goToReferralCreation()}
+              color={COLORS.trustFontColor}
+              backgroundColor={COLORS.trustBackground}
+              style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.regular }}
+            >
+              {words.generateInviteLinkText}
+            </$NextButton>
+            <$SubHeading
+              onClick={() => props.onBack()}
+              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+            >
+              {words.back}
+            </$SubHeading>
+          </$Vertical>
+        )}
+
         {status === 'pending' && (
           <$Vertical height="100%">
             <Spinner size="30px" />

@@ -2173,6 +2173,9 @@
     "defaultMessage": "Screenshot & Share",
     "description": "Message to show user to screen shot a picture & share w friends"
   },
+  "viralOnboarding.screenshotAndShare": {
+    "defaultMessage": "If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇"
+  },
   "viralOnboarding.selectLottery.dateWinnerAnnounce": {
     "defaultMessage": "Winners Announced {dateWin}",
     "description": "date when we announce the winners of the lottery"
@@ -2200,7 +2203,7 @@
     "defaultMessage": "You have already accepted this referral."
   },
   "viralOnboarding.youHaveAlreadyAcceptedInfo": {
-    "defaultMessage": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link."
+    "defaultMessage": "You can only accept an initial invite once. {boldText}"
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",

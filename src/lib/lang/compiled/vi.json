@@ -564,6 +564,7 @@
   "viralOnboarding.completeOnboarding.winnersAnnouned4": "Người chiến thắng đã được công bố",
   "viralOnboarding.qrcode.description": "Quét mã QR để nhận Vé xổ số của người hâm mộ MIỄN PHÍ cho Giải đấu thể thao điện tử.",
   "viralOnboarding.qrcode.screenshotAndShare": "Ảnh chụp màn hình & Chia sẻ",
+  "viralOnboarding.screenshotAndShare": "Nếu bạn muốn có thêm vé, hãy tạo mã QR bên dưới, chụp ảnh màn hình và chia sẻ nó với bạn bè của bạn 👇",
   "viralOnboarding.selectLottery.dateWinnerAnnounce": "Người chiến thắng được công bố {dateWin}",
   "viralOnboarding.selectLottery.description": "Tham gia với {nPeople} những người khác, mỗi người kiếm được {lotteryPrize} nếu đội này thắng giải đấu.",
   "viralOnboarding.selectLottery.header": "Yêu cầu vé xổ số",
@@ -571,7 +572,7 @@
   "viralOnboarding.signup.header": "Gần như đã hoàn thành...",
   "viralOnboarding.verification.sentTo": "Gửi đến {userPhoneNumber}",
   "viralOnboarding.youHaveAlreadyAccepted": "Bạn đã chấp nhận lời giới thiệu này.",
-  "viralOnboarding.youHaveAlreadyAcceptedInfo": "Bạn chỉ có thể chấp nhận lời mời ban đầu một lần. Nếu bạn muốn có thêm vé, hãy yêu cầu tổ chức giải đấu của bạn cung cấp liên kết giới thiệu mới.",
+  "viralOnboarding.youHaveAlreadyAcceptedInfo": "Bạn chỉ có thể chấp nhận lời mời ban đầu một lần. {boldText}",
   "wallet-button.connect-wallet": "Kết nối ví",
   "walletButton.connected": "Đã kết nối"
 }

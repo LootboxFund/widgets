@@ -553,6 +553,7 @@
   "viralOnboarding.completeOnboarding.winnersAnnouned4": "Winners Already Announced",
   "viralOnboarding.qrcode.description": "Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament.",
   "viralOnboarding.qrcode.screenshotAndShare": "Screenshot & Share",
+  "viralOnboarding.screenshotAndShare": "If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇",
   "viralOnboarding.selectLottery.dateWinnerAnnounce": "Winners Announced {dateWin}",
   "viralOnboarding.selectLottery.description": "Join {nPeople} other people who each earn {lotteryPrize} if this team wins the tournament.",
   "viralOnboarding.selectLottery.header": "Claim Lottery Ticket",
@@ -560,7 +561,7 @@
   "viralOnboarding.signup.header": "Almost Finished...",
   "viralOnboarding.verification.sentTo": "Sent to {userPhoneNumber}",
   "viralOnboarding.youHaveAlreadyAccepted": "You have already accepted this referral.",
-  "viralOnboarding.youHaveAlreadyAcceptedInfo": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link.",
+  "viralOnboarding.youHaveAlreadyAcceptedInfo": "You can only accept an initial invite once. {boldText}",
   "wallet-button.connect-wallet": "Connect Wallet",
   "walletButton.connected": "Connected"
 }
