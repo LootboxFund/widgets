@@ -41,6 +41,9 @@
     "defaultMessage": "Or use a password",
     "description": "Hyperlink message to user allowing them to signin / signup with a password"
   },
+  "auth.method.signupWithPhoneTerms": {
+    "defaultMessage": "By verifying your phone number, you are agreeing to our {termsOfService}."
+  },
   "auth.password.passwordLength": {
     "defaultMessage": "Password must be at least {minLength} characters",
     "description": "Error message when user tries to sign up/in with a password that is too short"
@@ -84,6 +87,10 @@
   "auth.signup.wallet.text": {
     "defaultMessage": "Wallet Sign Up",
     "description": "Button text where a user clicks to sign up using their Metamask wallet"
+  },
+  "auth.termsOfService": {
+    "defaultMessage": "Terms of Service",
+    "description": "Link to terms of service"
   },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",

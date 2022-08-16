@@ -25,6 +25,11 @@ import { useMutation } from '@apollo/client'
 import { COMPLETE_CLAIM } from '../api.gql'
 import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
 import CountrySelect from 'lib/components/CountrySelect'
+import { useAuthWords } from 'lib/components/Authentication/Shared/index'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { $Link } from 'lib/components/Profile/common'
+import { TOS_URL } from 'lib/hooks/constants'
+import { parseAuthError } from 'lib/utils/firebase'
 
 interface Props {
   onNext: () => void
@@ -33,6 +38,7 @@ interface Props {
 type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
 const OnboardingSignUp = (props: Props) => {
   const words = useWords()
+  const { screen } = useWindowSize()
   const [status, setStatus] = useState<Status>('initializing')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneCode, setPhoneCode] = useState<string>('')
@@ -47,6 +53,7 @@ const OnboardingSignUp = (props: Props) => {
     MutationCompleteClaimArgs
   >(COMPLETE_CLAIM)
   const intl = useIntl()
+  const authWords = useAuthWords()
   const youHaveAlreadyAccepted = intl.formatMessage({
     id: 'viralOnboarding.youHaveAlreadyAccepted',
     defaultMessage: 'You have already accepted this referral.',
@@ -170,6 +177,26 @@ const OnboardingSignUp = (props: Props) => {
     props.onNext()
   }
 
+  const renderTOS = () => {
+    return (
+      <$SupressedParagraph
+        style={{
+          fontSize: TYPOGRAPHY.fontSize.small,
+          marginTop: '40px',
+          width: screen === 'mobile' ? '100%' : '80%',
+          textAlign: 'start',
+        }}
+      >
+        *
+        {authWords.signupWithPhoneTerms(
+          <$Link href={TOS_URL} target="_blank">
+            {authWords.termsOfService}
+          </$Link>
+        )}
+      </$SupressedParagraph>
+    )
+  }
+
   const reset = () => {
     setStatus('pending')
   }
@@ -184,7 +211,7 @@ const OnboardingSignUp = (props: Props) => {
           <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
             <$Icon>{isAlreadyAccepted ? '😅' : '🤕'}</$Icon>
             <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
-              {isAlreadyAccepted ? youHaveAlreadyAccepted : errorMessage || words.anErrorOccured}
+              {isAlreadyAccepted ? youHaveAlreadyAccepted : parseAuthError(intl, errorMessage) || words.anErrorOccured}
             </$Heading>
             {isAlreadyAccepted ? (
               <$SubHeading style={{ marginTop: '0px' }}>{youHaveAlreadyAcceptedInfo}</$SubHeading>
@@ -200,7 +227,7 @@ const OnboardingSignUp = (props: Props) => {
             <$Heading2 style={{ textAlign: 'start' }}>
               <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
             </$Heading2>
-            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}</$SubHeading>
+            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}*</$SubHeading>
             <$Vertical spacing={3}>
               <$Horizontal>
                 <CountrySelect onChange={setPhoneCode} backgroundColor="#ffffff" />
@@ -234,6 +261,7 @@ const OnboardingSignUp = (props: Props) => {
                 <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
               </$NextButton>
             </$Vertical>
+            {renderTOS()}
 
             <$HandImage src={handIconImg} />
           </$Vertical>
@@ -287,6 +315,7 @@ const OnboardingSignUp = (props: Props) => {
                 <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
               </$NextButton>
             </$Vertical>
+            {renderTOS()}
           </$Vertical>
         )}
         <div id="recaptcha-container" ref={captchaRef} />
