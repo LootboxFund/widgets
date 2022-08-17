@@ -256,10 +256,19 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     </$Horizontal>
                     <$DropDownContainer id={elId} className="dd-container">
                       <$Vertical>
+                        {claim?.chosenPartyBasket?.socialLink ? (
+                          <$DropDownOption
+                            href={claim.chosenPartyBasket.socialLink}
+                            target="_blank"
+                            style={{ borderRadius: '10px 10px 0px 0px' }}
+                          >
+                            <FormattedMessage id="profile.public.joinCommunity" defaultMessage="Join Community" />
+                          </$DropDownOption>
+                        ) : null}
+
                         <$DropDownOption
                           href={`${manifest.microfrontends.webflow.battlePage}?tournament=${claim.tournamentId}`}
                           target="_blank"
-                          style={{ borderRadius: '10px 10px 0px 0px' }}
                         >
                           <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />
                         </$DropDownOption>
