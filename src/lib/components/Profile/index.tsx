@@ -67,22 +67,6 @@ const Profile = () => {
             </a>
           </div>
         </$Horizontal>
-        {user && (
-          <$p style={{ margin: '0px' }} textAlign="center">
-            <$Link
-              onClick={logout}
-              style={{
-                textAlign: 'center',
-                textDecoration: 'none',
-                fontStyle: 'normal',
-                fontFamily: TYPOGRAPHY.fontFamily.regular,
-                textTransform: 'lowercase',
-              }}
-            >
-              {words.logout}
-            </$Link>
-          </$p>
-        )}
       </$Vertical>
 
       <Onboarding />
@@ -109,6 +93,20 @@ const Profile = () => {
       <$ProfileSectionContainer screen={screen}>
         <MyLootboxes />
       </$ProfileSectionContainer>
+      {user && (
+        <$Link
+          onClick={logout}
+          style={{
+            textAlign: 'center',
+            textDecoration: 'none',
+            fontStyle: 'normal',
+            fontFamily: TYPOGRAPHY.fontFamily.regular,
+            textTransform: 'lowercase',
+          }}
+        >
+          {words.logout}
+        </$Link>
+      )}
     </$Vertical>
   )
 }
