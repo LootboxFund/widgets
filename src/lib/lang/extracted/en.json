@@ -1464,6 +1464,13 @@
     "defaultMessage": "You determine how much each NFT bounty will be worth. You can specify crypto currencies like \"10 Matic\" or fiat like \"$10 USD\"",
     "description": "Tooltip for NFT Prize Value field"
   },
+  "partyBasket.create.form.socialLink.title": {
+    "defaultMessage": "Add a link to your community"
+  },
+  "partyBasket.create.form.socialLink.tooltip": {
+    "defaultMessage": "Direct users to your community by adding a link to your community page.",
+    "description": "Tooltip for NFT Prize Value field"
+  },
   "partyBasket.manage.bulkWhitelisting.address.header": {
     "defaultMessage": "Whitelist Address",
     "description": "Title for whitelisting section. \"Whitelist\" means to give someone permission to get a free Lootbox NFT from your Party Basket"
@@ -1633,6 +1640,9 @@
   },
   "profile.public.eventDetails": {
     "defaultMessage": "Event Details"
+  },
+  "profile.public.joinCommunity": {
+    "defaultMessage": "Join Community"
   },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
