@@ -311,6 +311,7 @@ export const $ProfileImage = styled.img`
   margin: 0 auto;
   object-fit: cover;
   cursor: pointer;
+  box-shadow: 3px 6px 6px ${COLORS.surpressedBackground}aa;
 `
 
 export default ManagePublicProfile
