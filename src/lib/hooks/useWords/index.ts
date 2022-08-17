@@ -727,11 +727,18 @@ const useWords = () => {
   })
 
   const yourAlmostSetup = intl.formatMessage({
-    id:"profile.onboarding.title",
-    defaultMessage:"You're almost set up..."
+    id: 'profile.onboarding.title',
+    defaultMessage: "You're almost set up...",
+  })
+
+  const redeemNFTText = intl.formatMessage({
+    id: 'bounty.redeem.redeemNFT.text',
+    defaultMessage: 'Redeem NFT',
+    description: 'Text displayed when the user can redeem an NFT',
   })
 
   return {
+    redeemNFTText,
     yourAlmostSetup,
     inviteFriend,
     retry,

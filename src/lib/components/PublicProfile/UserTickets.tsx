@@ -23,6 +23,7 @@ import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
 import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import { manifest } from 'manifest'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface MyLotteryTicketsProps {
   userId: UserID
@@ -35,8 +36,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
   const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
   const [chosenClaim, setChosenClaim] = useState<PublicUserFEClaims>()
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claims', [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const intl = useIntl()
+
   const {
     data: userData,
     loading: loadingData,
@@ -59,11 +61,16 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     }
   }, [chosenClaim])
 
-  const bonusTicketText = intl.formatMessage({
-    id: 'profile.public.bothGetBonusTickets',
-    defaultMessage: 'Both get bonus FREE Lottery Tickets',
-    description: 'Reward caption for inviting friend',
-  })
+  const removeClaimNotification = (claimId: string) => {
+    const filteredClaims = notificationClaims.filter((claim) => claim !== claimId)
+    setNotificationClaims(filteredClaims)
+  }
+
+  // const bonusTicketText = intl.formatMessage({
+  //   id: 'profile.public.bothGetBonusTickets',
+  //   defaultMessage: 'Both get bonus FREE Lottery Tickets',
+  //   description: 'Reward caption for inviting friend',
+  // })
 
   const customStyles = {
     content: {
@@ -229,6 +236,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
             )
             .map((claim) => {
               const elId = `dropdown${claim.id}`
+              const isNotifReq = notificationClaims.indexOf(claim.id) > -1
+              const joinNotif = isNotifReq && !!claim?.chosenPartyBasket?.joinCommunityUrl
+              const isNotif = !!joinNotif
               return (
                 <$ClaimCard key={claim.id}>
                   <a
@@ -251,24 +261,45 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     <$Horizontal width="100%">
                       <$ActionsButton onClick={() => setChosenClaim(claim)}>{words.inviteFriend}</$ActionsButton>
                       <$ActionsMenuButton onClick={(e) => handleButtonToggle(elId)}>
+                        {isNotif && <$ButtonBadge />}
                         <div id={`btn${elId}`}>︙</div>
                       </$ActionsMenuButton>
                     </$Horizontal>
                     <$DropDownContainer id={elId} className="dd-container">
                       <$Vertical>
+                        {claim?.chosenPartyBasket?.joinCommunityUrl ? (
+                          <$DropDownOption
+                            href={claim.chosenPartyBasket.joinCommunityUrl}
+                            target="_blank"
+                            style={{ borderRadius: '10px 10px 0px 0px' }}
+                            onClick={() => {
+                              removeClaimNotification(claim.id)
+                            }}
+                          >
+                            <FormattedMessage id="profile.public.joinCommunity" defaultMessage="Join Community" />
+                            {joinNotif && <$ButtonBadge inline />}
+                          </$DropDownOption>
+                        ) : null}
+
                         <$DropDownOption
                           href={`${manifest.microfrontends.webflow.battlePage}?tournament=${claim.tournamentId}`}
                           target="_blank"
-                          style={{ borderRadius: '10px 10px 0px 0px' }}
                         >
-                          <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />
+                          <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
                         </$DropDownOption>
                         <$DropDownOption
                           href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`}
                           target="_blank"
-                          style={{ borderRadius: '0px 0px 10px 10px' }}
                         >
                           <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
+                        </$DropDownOption>
+
+                        <$DropDownOption
+                          href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
+                          target="_blank"
+                          style={{ borderRadius: '0px 0px 10px 10px' }}
+                        >
+                          {words.redeemNFTText}
                         </$DropDownOption>
                         {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>
                           <FormattedMessage id="profile.public.viewLootbox" defaultMessage="View Lootbox" />
@@ -341,6 +372,23 @@ const $ActionsMenuButton = styled.button`
   background-color: ${COLORS.trustBackground}ba;
   color: ${COLORS.white};
   border: 0px solid white;
+  position: relative;
+`
+
+/* Make the badge float in the top right corner of the button */
+const $ButtonBadge = styled.div<{ inline?: boolean }>`
+  background-color: #fa3e3e;
+  color: white;
+  border-radius: 100px;
+  width: 12px;
+  height: 12px;
+  position: absolute; /* Position the badge within the relatively positioned button */
+  top: -3px;
+  right: -5px;
+  ${(props) =>
+    props.inline &&
+    `position: relative;
+  display: inline-block;`}
 `
 
 const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`

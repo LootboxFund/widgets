@@ -98,11 +98,11 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     description: 'Text displayed when there are no NFTs (non-fungible tokens) to redeem',
   })
 
-  const redeemNFTText = intl.formatMessage({
-    id: 'bounty.redeem.redeemNFT.text',
-    defaultMessage: 'Redeem NFT',
-    description: 'Text displayed when the user can redeem an NFT',
-  })
+  // const redeemNFTText = intl.formatMessage({
+  //   id: 'bounty.redeem.redeemNFT.text',
+  //   defaultMessage: 'Redeem NFT',
+  //   description: 'Text displayed when the user can redeem an NFT',
+  // })
 
   const checkForRedeemableNFTsText = intl.formatMessage({
     id: 'bounty.redeem.checkForRedeemableNFTs.text',
@@ -361,10 +361,10 @@ const RedeemBounty = (props: RedeemBountyProps) => {
               : noBountiesToRedeem
               ? noNFTsRetry
               : hasBountyToRedeem
-              ? redeemNFTText
+              ? words.redeemNFTText
               : redeemState.status === 'success'
               ? `✅ ${bountyRedeemedMessage}`
-              : redeemNFTText}
+              : words.redeemNFTText}
           </$RedeemNFTButton>
         )}
       </$Vertical>
