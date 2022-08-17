@@ -1025,6 +1025,10 @@
     "defaultMessage": "Event",
     "description": "Event, like an esports tournament"
   },
+  "generics.fileTooLarge": {
+    "defaultMessage": "File too large",
+    "description": "Error message for user if they upload a file that is too large"
+  },
   "generics.finish": {
     "defaultMessage": "Finish"
   },
@@ -1583,6 +1587,9 @@
   },
   "profile.button.viewLotteryTickets": {
     "defaultMessage": "View Lottery Tickets"
+  },
+  "profile.enterBiography": {
+    "defaultMessage": "Enter your biography"
   },
   "profile.lootboxes.couldNotFindLootbox": {
     "defaultMessage": "We couldn't find your Lootbox",

@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { uploadUserAvatar, uploadUserHeadshot } from 'lib/api/firebase/storage'
 import { MutationUpdateUserArgs, ResponseError, UpdateUserPayload } from 'lib/api/graphql/generated/types'
 import { $ErrorMessage, $h1, $Horizontal, $span, $Vertical } from 'lib/components/Generics'
 import $Button from 'lib/components/Generics/Button'
@@ -85,7 +86,7 @@ const ManagePublicProfile = (props: Props) => {
 
     const newUser: UpdateUserPayload = {}
 
-    if (localUsername !== userIDP.username) {
+    if (localUsername !== props.username) {
       newUser.username = localUsername
     }
 
@@ -93,18 +94,20 @@ const ManagePublicProfile = (props: Props) => {
       newUser.biography = localUserBiography
     }
 
-    if (localAvatar !== props.avatar) {
-      newUser.avatar = localAvatar
-    }
+    // Avatar / headshot updated in uploadImage
+    // if (localAvatar !== props.avatar) {
+    //   newUser.avatar = localAvatar
+    // }
 
-    if (localAvatar !== props.headshot) {
-      newUser.headshot = localHeadshot
-    }
+    // if (localHeadshot !== props.headshot) {
+    //   newUser.headshot = localHeadshot
+    // }
 
     try {
       if (Object.keys(newUser).length === 0) {
         throw new Error(words.noChangesMade)
       }
+
       const { data } = await updateUser({
         variables: {
           payload: {
@@ -122,29 +125,90 @@ const ManagePublicProfile = (props: Props) => {
     }
   }
 
+  const uploadImage = async (type: 'avatar' | 'headshot', file: File) => {
+    setErrorMessage('')
+
+    if (!userIDP) {
+      setErrorMessage(words.youAreNotLoggedIn)
+      return
+    }
+
+    if (type === 'avatar' && file.size > 1000000) {
+      // 1 MB
+      setErrorMessage(words.fileTooLarge)
+      return
+    }
+
+    if (type === 'headshot' && file.size > 5000000) {
+      // 5 MB
+      setErrorMessage(words.fileTooLarge)
+      return
+    }
+
+    try {
+      let url
+      if (type === 'avatar') {
+        url = await uploadUserAvatar(userIDP.id, file)
+      } else if (type === 'headshot') {
+        url = await uploadUserHeadshot(userIDP.id, file)
+      }
+
+      const { data } = await updateUser({
+        variables: {
+          payload: type === 'avatar' ? { avatar: url } : { headshot: url },
+        },
+      })
+
+      if (!data || data?.updateUser?.__typename === 'ResponseError') {
+        console.error((data?.updateUser as ResponseError | undefined)?.error?.message || words.anErrorOccured)
+        throw new Error((data?.updateUser as ResponseError | undefined)?.error?.message || words.anErrorOccured)
+      }
+    } catch (err) {
+      setErrorMessage(err.message || words.anErrorOccured)
+    }
+  }
+
   const renderAvatarSection = () => {
     return (
       <$Horizontal flexWrap={screen !== 'mobile'} justifyContent="flex-start" spacing={4}>
         <$Horizontal width={screen !== 'mobile' ? '100%' : 'auto'}>
-          <$Vertical spacing={2}>
-            <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
-              <FormattedMessage id="profile.avatar.editProfilePic" defaultMessage="Edit profile pic" />
-            </$span>
-            <$ProfileImage src={localAvatar || DEFAULT_PROFILE_PICTURE} />
-          </$Vertical>
+          <label htmlFor="avatar-uploader" style={{ cursor: 'pointer' }}>
+            <$Vertical spacing={2}>
+              <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
+                <FormattedMessage id="profile.avatar.editProfilePic" defaultMessage="Edit profile pic" />
+              </$span>
+              <$ProfileImage src={localAvatar || DEFAULT_PROFILE_PICTURE} />
+            </$Vertical>
+          </label>
+          <input
+            type="file"
+            id="avatar-uploader"
+            accept="image/*"
+            onChange={(e) => e?.target?.files && uploadImage('avatar', e.target.files[0])}
+            style={{ display: 'none' }}
+          />
         </$Horizontal>
 
         <$Horizontal width={screen !== 'mobile' ? '100%' : 'auto'}>
-          <$Vertical spacing={2}>
-            <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
-              <FormattedMessage
-                id="profile.avatar.editHeadshot"
-                defaultMessage="Edit headshot"
-                description="Referring to a picture of our user's head / upper torso"
-              />
-            </$span>
-            <$ProfileImage src={localHeadshot || DEFAULT_PROFILE_PICTURE} />
-          </$Vertical>
+          <label htmlFor="headshot-uploader" style={{ cursor: 'pointer' }}>
+            <$Vertical spacing={2}>
+              <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
+                <FormattedMessage
+                  id="profile.avatar.editHeadshot"
+                  defaultMessage="Edit headshot"
+                  description="Referring to a picture of our user's head / upper torso"
+                />
+              </$span>
+              <$ProfileImage src={localHeadshot || DEFAULT_PROFILE_PICTURE} />
+            </$Vertical>
+          </label>
+          <input
+            type="file"
+            id="headshot-uploader"
+            accept="image/*"
+            onChange={(e) => e?.target?.files && uploadImage('headshot', e.target.files[0])}
+            style={{ display: 'none' }}
+          />
         </$Horizontal>
       </$Horizontal>
     )
@@ -246,7 +310,7 @@ export const $ProfileImage = styled.img`
   border-radius: 50%;
   margin: 0 auto;
   object-fit: cover;
-  cursor: not-allowed;
+  cursor: pointer;
 `
 
 export default ManagePublicProfile
