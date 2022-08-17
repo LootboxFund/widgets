@@ -50,6 +50,7 @@ export interface PublicUserFE {
     username?: string
     avatar?: string
     socials?: Partial<UserSocials>
+    biography?: string
     // claims: {
     //   pageInfo: {
     //     hasNextPage?: boolean
@@ -110,6 +111,7 @@ export const PUBLIC_USER = gql`
           id
           username
           avatar
+          biography
           socials {
             twitter
             instagram

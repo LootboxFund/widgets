@@ -22,6 +22,9 @@ import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
+const DEFAULT_PROFILE_PICTURE =
+  'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
+
 interface PublicProfileProps {
   userId: UserID
 }
@@ -78,12 +81,12 @@ const PublicProfile = (props: PublicProfileProps) => {
   }
 
   // Here we kinda coalesce the response into a predictable type
-  const { username, socials } = (userData?.publicUser as PublicUserFE)?.user || {}
+  const { username, socials, biography, avatar } = (userData?.publicUser as PublicUserFE)?.user || {}
 
   return (
     <$PublicProfilePageContainer screen={screen}>
       <$Horizontal justifyContent="space-between">
-        <$ProfileImage src="https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg" />
+        <$ProfileImage src={avatar ? avatar : DEFAULT_PROFILE_PICTURE} />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
           <$InviteButton onClick={() => setIsModalOpen(true)}>{words.inviteFriend}</$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
@@ -133,10 +136,14 @@ const PublicProfile = (props: PublicProfileProps) => {
             maxWidth: '600px',
           }}
         >
-          <FormattedMessage
-            id="profile.public.aboutMe"
-            defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
-          />
+          {biography ? (
+            biography
+          ) : (
+            <FormattedMessage
+              id="profile.public.aboutMe"
+              defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+            />
+          )}
         </span>
       </$Vertical>
 
