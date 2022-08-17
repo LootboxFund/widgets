@@ -256,9 +256,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     </$Horizontal>
                     <$DropDownContainer id={elId} className="dd-container">
                       <$Vertical>
-                        {claim?.chosenPartyBasket?.socialLink ? (
+                        {claim?.chosenPartyBasket?.joinCommunityUrl ? (
                           <$DropDownOption
-                            href={claim.chosenPartyBasket.socialLink}
+                            href={claim.chosenPartyBasket.joinCommunityUrl}
                             target="_blank"
                             style={{ borderRadius: '10px 10px 0px 0px' }}
                           >

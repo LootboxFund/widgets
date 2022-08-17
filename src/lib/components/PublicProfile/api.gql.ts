@@ -20,7 +20,7 @@ export type PublicUserFEClaims = {
     id: PartyBasketID
     address: Address
     name: string
-    socialLink?: string
+    joinCommunityUrl?: string
     lootboxSnapshot: {
       stampImage?: string
       name?: string
@@ -80,7 +80,7 @@ export const PUBLIC_USER_CLAIMS = gql`
                   id
                   address
                   name
-                  socialLink
+                  joinCommunityUrl
                   lootboxSnapshot {
                     stampImage
                     name

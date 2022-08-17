@@ -37,7 +37,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [partyBasketName, setPartyBasketName] = useState('')
-  const [socialsLink, setSocialsLink] = useState('')
+  const [joinCommunityUrl, setJoinCommunityUrl] = useState('')
   const [partyBasketSubmissionStatus, setPartyBasketSubmissionStatus] = useState<PartyBasketSubmission>({
     status: 'ready',
   })
@@ -45,7 +45,10 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
 
   const [provider, loading] = useProvider()
   const snapUserState = useSnapshot(userState)
-  const [createPartyBasketMutation] = useMutation<{createPartyBasket: ResponseError | CreatePartyBasketFE}, MutationCreatePartyBasketArgs>(CREATE_PARTY_BASKET, {
+  const [createPartyBasketMutation] = useMutation<
+    { createPartyBasket: ResponseError | CreatePartyBasketFE },
+    MutationCreatePartyBasketArgs
+  >(CREATE_PARTY_BASKET, {
     refetchQueries: [{ query: GET_MY_PARTY_BASKETS, variables: { address: props.lootboxAddress } }],
   })
 
@@ -91,7 +94,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
                   lootboxAddress: data.lootboxAddress,
                   creatorAddress: data.creatorAddress,
                   nftBountyValue: bountyPrize,
-                  socialLink: socialsLink,
+                  joinCommunityUrl: joinCommunityUrl,
                 },
               },
             })
@@ -181,11 +184,11 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
               defaultMessage="Add a link to your community"
             />
           </$StepSubheading>
-          <HelpIcon tipID="socialLink" />
-          <ReactTooltip id="socialLink" place="right" effect="solid">
+          <HelpIcon tipID="joinCommunityUrl" />
+          <ReactTooltip id="joinCommunityUrl" place="right" effect="solid">
             <FormattedMessage
               id="partyBasket.create.form.socialLink.tooltip"
-              defaultMessage='Direct users to your community by adding a link to your community page.'
+              defaultMessage="Direct users to your community by adding a link to your community page."
               description="Tooltip for NFT Prize Value field"
             />
           </ReactTooltip>
@@ -195,8 +198,8 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
           <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
             <$Input
               type="text"
-              value={socialsLink}
-              onChange={(e) => setSocialsLink(e.target.value)}
+              value={joinCommunityUrl}
+              onChange={(e) => setJoinCommunityUrl(e.target.value)}
               placeholder="link to join your community"
               screen={screen}
               style={{ fontWeight: 'lighter' }}
