@@ -20,6 +20,7 @@ import { LocalClaim } from '../ViralOnboarding/contants'
 import ProfileSocials from 'lib/components/ProfileSocials'
 import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
 import { manifest } from 'manifest'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface PublicProfileProps {
   userId: UserID
@@ -74,17 +75,6 @@ const PublicProfile = (props: PublicProfileProps) => {
     return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
   } else if (userData?.publicUser?.__typename === 'ResponseError') {
     return <Oopsies title={words.anErrorOccured} message={userData?.publicUser?.error?.message || ''} icon="🤕" />
-  }
-
-  /**
-   * TODO: remove localstorage bs
-   */
-  let recentClaims: LocalClaim[]
-  try {
-    const raw = localStorage.getItem('recentClaims')
-    recentClaims = raw ? JSON.parse(raw) : []
-  } catch (err) {
-    recentClaims = []
   }
 
   // Here we kinda coalesce the response into a predictable type

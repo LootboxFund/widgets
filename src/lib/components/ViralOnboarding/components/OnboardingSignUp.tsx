@@ -23,13 +23,18 @@ import { auth } from 'lib/api/firebase/app'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useMutation } from '@apollo/client'
 import { COMPLETE_CLAIM } from '../api.gql'
-import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
+import {
+  CompleteClaimResponse,
+  CompleteClaimResponseSuccess,
+  MutationCompleteClaimArgs,
+} from 'lib/api/graphql/generated/types'
 import CountrySelect from 'lib/components/CountrySelect'
 import { useAuthWords } from 'lib/components/Authentication/Shared/index'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
 import { parseAuthError } from 'lib/utils/firebase'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface Props {
   onNext: () => void
@@ -48,6 +53,7 @@ const OnboardingSignUp = (props: Props) => {
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
   const { claim, referral, chosenPartyBasket } = useViralOnboarding()
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
   const [completeClaim, { loading: loadingMutation }] = useMutation<
     { completeClaim: CompleteClaimResponse },
@@ -160,27 +166,15 @@ const OnboardingSignUp = (props: Props) => {
       throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
     }
 
-    // Add it to localStorage
+    // Add notification to local storage
+    // this notification shows a notif on the user profile page
+
     try {
-      const pastClaimsRaw = localStorage.getItem('recentClaims')
-      const pastClaims: LocalClaim[] = pastClaimsRaw ? JSON.parse(pastClaimsRaw) : []
-      pastClaims.unshift({
-        campaignName: referral?.campaignName,
-        tournamentId: claim.tournamentId,
-        partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
-      })
-      localStorage.setItem('recentClaims', JSON.stringify(pastClaims))
+      if ((data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id) {
+        setNotificationClaims([...notificationClaims, (data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id])
+      }
     } catch (err) {
-      localStorage.setItem(
-        'recentClaims',
-        JSON.stringify([
-          {
-            campaignName: referral?.campaignName,
-            tournamentId: claim.tournamentId,
-            partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
-          },
-        ])
-      )
+      console.error(err)
     }
 
     props.onNext()
