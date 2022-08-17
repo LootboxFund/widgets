@@ -11,36 +11,50 @@ import { manifest } from 'manifest'
 import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { GET_MY_PROFILE } from '../api.gql'
+import { GET_MY_PROFILE, MyProfileFE } from '../api.gql'
 import { $ProfilePageInput, $ProfilePageTextArea } from '../common'
 import { UpdateUserResponseFE, UPDATE_USER } from './api.gql'
 
-const ManagePublicProfile = () => {
+const DEFAULT_PROFILE_PICTURE =
+  'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
+
+interface Props {
+  username?: string
+  avatar?: string
+  biography?: string
+  headshot?: string
+}
+const ManagePublicProfile = (props: Props) => {
   const words = useWords()
   const intl = useIntl()
   const { screen } = useWindowSize()
-  const { user } = useAuth()
+  const { user: userIDP } = useAuth()
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [localUsername, setLocalUsername] = useState<string>(user?.username || '')
-  const [localUserBiography, setLocalUserBiography] = useState<string>(
-    'Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win.'
-  )
-  const [localAvatar, setLocalAvatar] = useState<string>(
-    user?.avatar ||
-      'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
-  )
+  const [localUsername, setLocalUsername] = useState<string>('')
+  const [localUserBiography, setLocalUserBiography] = useState<string>('')
+  const [localAvatar, setLocalAvatar] = useState<string>('')
+  const [localHeadshot, setLocalHeadshot] = useState<string>('')
   const [updateUser, { loading }] = useMutation<
     { updateUser: ResponseError | UpdateUserResponseFE },
     MutationUpdateUserArgs
   >(UPDATE_USER, {
-    // onCompleted: refetchUser,
+    refetchQueries: [{ query: GET_MY_PROFILE }],
   })
 
   useEffect(() => {
-    if (user?.username) {
-      setLocalUsername(user.username)
+    if (props?.username) {
+      setLocalUsername(props.username)
     }
-  }, [user?.username])
+    if (props?.biography) {
+      setLocalUserBiography(props.biography)
+    }
+    if (props.avatar) {
+      setLocalAvatar(props.avatar)
+    }
+    if (props.headshot) {
+      setLocalHeadshot(props.headshot)
+    }
+  }, [props.username, props.avatar, props.biography, props.headshot])
 
   const usernameRequired = intl.formatMessage({
     id: 'profile.usernameRequired',
@@ -52,9 +66,14 @@ const ManagePublicProfile = () => {
     defaultMessage: 'Add username',
   })
 
+  const enterBiography = intl.formatMessage({
+    id: 'profile.enterBiography',
+    defaultMessage: 'Enter your biography',
+  })
+
   const formSubmit = async () => {
     setErrorMessage(undefined)
-    if (!user) {
+    if (!userIDP) {
       setErrorMessage(words.youAreNotLoggedIn)
       return
     }
@@ -66,8 +85,20 @@ const ManagePublicProfile = () => {
 
     const newUser: UpdateUserPayload = {}
 
-    if (localUsername !== user.username) {
+    if (localUsername !== userIDP.username) {
       newUser.username = localUsername
+    }
+
+    if (localUserBiography !== props.biography) {
+      newUser.biography = localUserBiography
+    }
+
+    if (localAvatar !== props.avatar) {
+      newUser.avatar = localAvatar
+    }
+
+    if (localAvatar !== props.headshot) {
+      newUser.headshot = localHeadshot
     }
 
     try {
@@ -99,7 +130,7 @@ const ManagePublicProfile = () => {
             <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
               <FormattedMessage id="profile.avatar.editProfilePic" defaultMessage="Edit profile pic" />
             </$span>
-            <$ProfileImage src={localAvatar} />
+            <$ProfileImage src={localAvatar || DEFAULT_PROFILE_PICTURE} />
           </$Vertical>
         </$Horizontal>
 
@@ -112,14 +143,14 @@ const ManagePublicProfile = () => {
                 description="Referring to a picture of our user's head / upper torso"
               />
             </$span>
-            <$ProfileImage src={localAvatar} />
+            <$ProfileImage src={localHeadshot || DEFAULT_PROFILE_PICTURE} />
           </$Vertical>
         </$Horizontal>
       </$Horizontal>
     )
   }
 
-  if (!user) {
+  if (!userIDP) {
     return null
   }
   return (
@@ -128,7 +159,7 @@ const ManagePublicProfile = () => {
         {words.publicProfile}
         {'   '}
         <a
-          href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user.id}`}
+          href={`${manifest.microfrontends.webflow.publicProfile}?uid=${userIDP.id}`}
           target="_blank"
           style={{ textDecoration: 'none' }}
         >
@@ -157,7 +188,7 @@ const ManagePublicProfile = () => {
         >
           {words.userId}
         </$span>{' '}
-        {user.id}
+        {userIDP.id}
       </$span>
       <br />
       {screen === 'mobile' && renderAvatarSection()}
@@ -175,11 +206,10 @@ const ManagePublicProfile = () => {
           <$Vertical spacing={2}>
             <$span style={{ fontWeight: TYPOGRAPHY.fontWeight.light }}>{words.biography}</$span>
             <$ProfilePageTextArea
+              placeholder={enterBiography}
               value={localUserBiography}
-              disabled
-              style={{ cursor: 'not-allowed' }}
               rows={4}
-              // onChange={(e) => setLocalUserName(e.target.value)}
+              onChange={(e) => setLocalUserBiography(e.target.value)}
             />
           </$Vertical>
         </$Vertical>

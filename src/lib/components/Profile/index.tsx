@@ -31,8 +31,6 @@ const Profile = () => {
   const { screen } = useWindowSize()
   const words = useWords()
 
-  const pseudoUserName = user?.username || user?.email?.split('@')[0] || 'Human'
-
   if (loading || user === undefined) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (!user || error || !data) {
@@ -42,6 +40,8 @@ const Profile = () => {
   }
 
   const { user: userDB } = (data?.getMyProfile as MyProfileFE) || {}
+
+  const pseudoUserName = userDB?.username || user?.username || user?.email?.split('@')[0] || 'Human'
 
   return (
     <$Vertical spacing={5}>
@@ -87,7 +87,12 @@ const Profile = () => {
 
       <Onboarding />
       <$ProfileSectionContainer screen={screen}>
-        <ManagePublicProfile />
+        <ManagePublicProfile
+          username={userDB.username}
+          avatar={userDB.avatar}
+          biography={userDB.biography}
+          headshot={userDB?.headshot ? userDB?.headshot[0] : undefined}
+        />
       </$ProfileSectionContainer>
       <$ProfileSectionContainer screen={screen}>
         <MySocials userSocials={userDB.socials} />
