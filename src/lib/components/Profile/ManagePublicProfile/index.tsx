@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { uploadUserAvatar, uploadUserHeadshot } from 'lib/api/firebase/storage'
 import { MutationUpdateUserArgs, ResponseError, UpdateUserPayload } from 'lib/api/graphql/generated/types'
 import { $ErrorMessage, $h1, $Horizontal, $span, $Vertical } from 'lib/components/Generics'
 import $Button from 'lib/components/Generics/Button'
@@ -11,36 +12,50 @@ import { manifest } from 'manifest'
 import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { GET_MY_PROFILE } from '../api.gql'
+import { GET_MY_PROFILE, MyProfileFE } from '../api.gql'
 import { $ProfilePageInput, $ProfilePageTextArea } from '../common'
 import { UpdateUserResponseFE, UPDATE_USER } from './api.gql'
 
-const ManagePublicProfile = () => {
+const DEFAULT_PROFILE_PICTURE =
+  'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
+
+interface Props {
+  username?: string
+  avatar?: string
+  biography?: string
+  headshot?: string
+}
+const ManagePublicProfile = (props: Props) => {
   const words = useWords()
   const intl = useIntl()
   const { screen } = useWindowSize()
-  const { user } = useAuth()
+  const { user: userIDP } = useAuth()
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [localUsername, setLocalUsername] = useState<string>(user?.username || '')
-  const [localUserBiography, setLocalUserBiography] = useState<string>(
-    'Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win.'
-  )
-  const [localAvatar, setLocalAvatar] = useState<string>(
-    user?.avatar ||
-      'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
-  )
+  const [localUsername, setLocalUsername] = useState<string>('')
+  const [localUserBiography, setLocalUserBiography] = useState<string>('')
+  const [localAvatar, setLocalAvatar] = useState<string>('')
+  const [localHeadshot, setLocalHeadshot] = useState<string>('')
   const [updateUser, { loading }] = useMutation<
     { updateUser: ResponseError | UpdateUserResponseFE },
     MutationUpdateUserArgs
   >(UPDATE_USER, {
-    // onCompleted: refetchUser,
+    refetchQueries: [{ query: GET_MY_PROFILE }],
   })
 
   useEffect(() => {
-    if (user?.username) {
-      setLocalUsername(user.username)
+    if (props?.username) {
+      setLocalUsername(props.username)
     }
-  }, [user?.username])
+    if (props?.biography) {
+      setLocalUserBiography(props.biography)
+    }
+    if (props.avatar) {
+      setLocalAvatar(props.avatar)
+    }
+    if (props.headshot) {
+      setLocalHeadshot(props.headshot)
+    }
+  }, [props.username, props.avatar, props.biography, props.headshot])
 
   const usernameRequired = intl.formatMessage({
     id: 'profile.usernameRequired',
@@ -52,9 +67,14 @@ const ManagePublicProfile = () => {
     defaultMessage: 'Add username',
   })
 
+  const enterBiography = intl.formatMessage({
+    id: 'profile.enterBiography',
+    defaultMessage: 'Enter your biography',
+  })
+
   const formSubmit = async () => {
     setErrorMessage(undefined)
-    if (!user) {
+    if (!userIDP) {
       setErrorMessage(words.youAreNotLoggedIn)
       return
     }
@@ -66,14 +86,28 @@ const ManagePublicProfile = () => {
 
     const newUser: UpdateUserPayload = {}
 
-    if (localUsername !== user.username) {
+    if (localUsername !== props.username) {
       newUser.username = localUsername
     }
+
+    if (localUserBiography !== props.biography) {
+      newUser.biography = localUserBiography
+    }
+
+    // Avatar / headshot updated in uploadImage
+    // if (localAvatar !== props.avatar) {
+    //   newUser.avatar = localAvatar
+    // }
+
+    // if (localHeadshot !== props.headshot) {
+    //   newUser.headshot = localHeadshot
+    // }
 
     try {
       if (Object.keys(newUser).length === 0) {
         throw new Error(words.noChangesMade)
       }
+
       const { data } = await updateUser({
         variables: {
           payload: {
@@ -91,35 +125,96 @@ const ManagePublicProfile = () => {
     }
   }
 
+  const uploadImage = async (type: 'avatar' | 'headshot', file: File) => {
+    setErrorMessage('')
+
+    if (!userIDP) {
+      setErrorMessage(words.youAreNotLoggedIn)
+      return
+    }
+
+    if (type === 'avatar' && file.size > 1000000) {
+      // 1 MB
+      setErrorMessage(words.fileTooLarge)
+      return
+    }
+
+    if (type === 'headshot' && file.size > 5000000) {
+      // 5 MB
+      setErrorMessage(words.fileTooLarge)
+      return
+    }
+
+    try {
+      let url
+      if (type === 'avatar') {
+        url = await uploadUserAvatar(userIDP.id, file)
+      } else if (type === 'headshot') {
+        url = await uploadUserHeadshot(userIDP.id, file)
+      }
+
+      const { data } = await updateUser({
+        variables: {
+          payload: type === 'avatar' ? { avatar: url } : { headshot: url },
+        },
+      })
+
+      if (!data || data?.updateUser?.__typename === 'ResponseError') {
+        console.error((data?.updateUser as ResponseError | undefined)?.error?.message || words.anErrorOccured)
+        throw new Error((data?.updateUser as ResponseError | undefined)?.error?.message || words.anErrorOccured)
+      }
+    } catch (err) {
+      setErrorMessage(err.message || words.anErrorOccured)
+    }
+  }
+
   const renderAvatarSection = () => {
     return (
       <$Horizontal flexWrap={screen !== 'mobile'} justifyContent="flex-start" spacing={4}>
         <$Horizontal width={screen !== 'mobile' ? '100%' : 'auto'}>
-          <$Vertical spacing={2}>
-            <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
-              <FormattedMessage id="profile.avatar.editProfilePic" defaultMessage="Edit profile pic" />
-            </$span>
-            <$ProfileImage src={localAvatar} />
-          </$Vertical>
+          <label htmlFor="avatar-uploader" style={{ cursor: 'pointer' }}>
+            <$Vertical spacing={2}>
+              <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
+                <FormattedMessage id="profile.avatar.editProfilePic" defaultMessage="Edit profile pic" />
+              </$span>
+              <$ProfileImage src={localAvatar || DEFAULT_PROFILE_PICTURE} />
+            </$Vertical>
+          </label>
+          <input
+            type="file"
+            id="avatar-uploader"
+            accept="image/*"
+            onChange={(e) => e?.target?.files && uploadImage('avatar', e.target.files[0])}
+            style={{ display: 'none' }}
+          />
         </$Horizontal>
 
         <$Horizontal width={screen !== 'mobile' ? '100%' : 'auto'}>
-          <$Vertical spacing={2}>
-            <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
-              <FormattedMessage
-                id="profile.avatar.editHeadshot"
-                defaultMessage="Edit headshot"
-                description="Referring to a picture of our user's head / upper torso"
-              />
-            </$span>
-            <$ProfileImage src={localAvatar} />
-          </$Vertical>
+          <label htmlFor="headshot-uploader" style={{ cursor: 'pointer' }}>
+            <$Vertical spacing={2}>
+              <$span style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.light }}>
+                <FormattedMessage
+                  id="profile.avatar.editHeadshot"
+                  defaultMessage="Edit headshot"
+                  description="Referring to a picture of our user's head / upper torso"
+                />
+              </$span>
+              <$ProfileImage src={localHeadshot || DEFAULT_PROFILE_PICTURE} />
+            </$Vertical>
+          </label>
+          <input
+            type="file"
+            id="headshot-uploader"
+            accept="image/*"
+            onChange={(e) => e?.target?.files && uploadImage('headshot', e.target.files[0])}
+            style={{ display: 'none' }}
+          />
         </$Horizontal>
       </$Horizontal>
     )
   }
 
-  if (!user) {
+  if (!userIDP) {
     return null
   }
   return (
@@ -128,7 +223,7 @@ const ManagePublicProfile = () => {
         {words.publicProfile}
         {'   '}
         <a
-          href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user.id}`}
+          href={`${manifest.microfrontends.webflow.publicProfile}?uid=${userIDP.id}`}
           target="_blank"
           style={{ textDecoration: 'none' }}
         >
@@ -157,7 +252,7 @@ const ManagePublicProfile = () => {
         >
           {words.userId}
         </$span>{' '}
-        {user.id}
+        {userIDP.id}
       </$span>
       <br />
       {screen === 'mobile' && renderAvatarSection()}
@@ -175,11 +270,10 @@ const ManagePublicProfile = () => {
           <$Vertical spacing={2}>
             <$span style={{ fontWeight: TYPOGRAPHY.fontWeight.light }}>{words.biography}</$span>
             <$ProfilePageTextArea
+              placeholder={enterBiography}
               value={localUserBiography}
-              disabled
-              style={{ cursor: 'not-allowed' }}
               rows={4}
-              // onChange={(e) => setLocalUserName(e.target.value)}
+              onChange={(e) => setLocalUserBiography(e.target.value)}
             />
           </$Vertical>
         </$Vertical>
@@ -216,7 +310,8 @@ export const $ProfileImage = styled.img`
   border-radius: 50%;
   margin: 0 auto;
   object-fit: cover;
-  cursor: not-allowed;
+  cursor: pointer;
+  box-shadow: 3px 6px 6px ${COLORS.surpressedBackground}aa;
 `
 
 export default ManagePublicProfile

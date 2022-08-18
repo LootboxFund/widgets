@@ -1,4 +1,7 @@
 import { gql } from '@apollo/client'
+import { Address } from '@wormgraph/helpers'
+import { StreamType } from 'lib/api/graphql/generated/types'
+import { StreamID, TournamentID, UserID } from 'lib/types'
 
 export const DELETE_STREAM = gql`
   mutation deleteStream($id: ID!) {
@@ -58,6 +61,21 @@ export const EDIT_STREAM = gql`
   }
 `
 
+export interface EditTournamentResponseFE {
+  __typename: 'EditTournamentResponseSuccess'
+  tournament: {
+    id: TournamentID
+    title: string
+    description: string
+    tournamentLink?: string
+    magicLink?: string
+    tournamentDate?: string
+    prize?: string
+    coverPhoto?: string
+    campaignCompleteURL?: string
+  }
+}
+
 export const EDIT_TOURNAMENT = gql`
   mutation Mutation($payload: EditTournamentPayload!) {
     editTournament(payload: $payload) {
@@ -71,6 +89,7 @@ export const EDIT_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
+          campaignCompleteURL
         }
       }
       ... on ResponseError {
@@ -82,6 +101,37 @@ export const EDIT_TOURNAMENT = gql`
     }
   }
 `
+
+export interface MyTournamentLootboxSnapshot {
+  address: Address
+  name: string
+  stampImage?: string
+}
+
+export interface MyTournamentStreamsFE {
+  id: StreamID
+  creatorId: UserID
+  type: StreamType
+  url: string
+  name: string
+}
+
+export interface MyTournamentFE {
+  __typename: 'MyTournamentResponseSuccess'
+  tournament: {
+    id?: TournamentID
+    title?: string
+    description?: string
+    tournamentLink?: string
+    magicLink?: string
+    tournamentDate?: number
+    prize?: string
+    coverPhoto?: string
+    campaignCompleteURL?: string
+    streams: MyTournamentStreamsFE[]
+    lootboxSnapshots: MyTournamentLootboxSnapshot[]
+  }
+}
 
 export const GET_MY_TOURNAMENT = gql`
   query Query($id: ID!) {
@@ -96,6 +146,7 @@ export const GET_MY_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
+          campaignCompleteURL
           streams {
             id
             creatorId

@@ -70,6 +70,12 @@ const SettingsComponent = () => {
     description: 'Message displayed when the user does not have a password.',
   })
 
+  const phoneNotSetText = intl.formatMessage({
+    id: 'profile.settings.phoneNotSet',
+    defaultMessage: 'Phone not set!',
+    description: 'Message displayed when the user does not have a phone.',
+  })
+
   const emailNotSetText = intl.formatMessage({
     id: 'profile.settings.emailNotSet',
     defaultMessage: 'Email not set!',
@@ -91,6 +97,39 @@ const SettingsComponent = () => {
           description="Title for the account settings page. Here users can change their password, email, etc."
         />
       </$h1>
+      <$SettingContainer disabled>
+        <$Horizontal
+          justifyContent="flex-start"
+          flexWrap
+          style={{
+            paddingLeft: screen === 'mobile' ? '0px' : '8%',
+          }}
+        >
+          <$span
+            width={screen === 'mobile' ? '35%' : '20%'}
+            lineHeight="40px"
+            color={`${COLORS.surpressedFontColor}be`}
+          >
+            {words.phone}
+          </$span>
+          <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
+            {user?.phone ? (
+              <$span textAlign="start">{user?.phone}</$span>
+            ) : (
+              <$span textAlign="start" color={COLORS.dangerFontColor}>
+                {`${phoneNotSetText} ⛔️`}
+              </$span>
+            )}
+          </$span>
+          {/* <$span
+            textAlign={screen === 'mobile' ? 'start' : 'center'}
+            width={screen === 'mobile' ? '100%' : '30%'}
+            lineHeight="40px"
+          >
+            {!user?.phone && <$Link style={{ fontStyle: 'normal' }}>Add phone</$Link>}
+          </$span> */}
+        </$Horizontal>
+      </$SettingContainer>
       <$SettingContainer disabled>
         <$Horizontal
           justifyContent="flex-start"

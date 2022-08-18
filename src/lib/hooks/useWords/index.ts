@@ -737,7 +737,20 @@ const useWords = () => {
     description: 'Text displayed when the user can redeem an NFT',
   })
 
+  const fileTooLarge = intl.formatMessage({
+    id: 'generics.fileTooLarge',
+    defaultMessage: 'File too large',
+    description: 'Error message for user if they upload a file that is too large',
+  })
+
+  const phone = intl.formatMessage({
+    id: 'generics.phone',
+    defaultMessage: 'Phone',
+  })
+
   return {
+    phone,
+    fileTooLarge,
     redeemNFTText,
     yourAlmostSetup,
     inviteFriend,

@@ -1025,6 +1025,10 @@
     "defaultMessage": "Event",
     "description": "Event, like an esports tournament"
   },
+  "generics.fileTooLarge": {
+    "defaultMessage": "File too large",
+    "description": "Error message for user if they upload a file that is too large"
+  },
   "generics.finish": {
     "defaultMessage": "Finish"
   },
@@ -1052,6 +1056,9 @@
   "generics.partyBasketInformation": {
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
+  },
+  "generics.phone": {
+    "defaultMessage": "Phone"
   },
   "generics.pleaseEnterYourPhoneNumber": {
     "defaultMessage": "Please enter your phone number",
@@ -1584,6 +1591,9 @@
   "profile.button.viewLotteryTickets": {
     "defaultMessage": "View Lottery Tickets"
   },
+  "profile.enterBiography": {
+    "defaultMessage": "Enter your biography"
+  },
   "profile.lootboxes.couldNotFindLootbox": {
     "defaultMessage": "We couldn't find your Lootbox",
     "description": "Message displayed when the user does not have any lootboxes."
@@ -1690,6 +1700,10 @@
   "profile.settings.passwordResetEmailSent": {
     "defaultMessage": "A password reset email was sent to your email.",
     "description": "Message displayed when the user clicks to make a new password."
+  },
+  "profile.settings.phoneNotSet": {
+    "defaultMessage": "Phone not set!",
+    "description": "Message displayed when the user does not have a phone."
   },
   "profile.settings.savePassword": {
     "defaultMessage": "Save password",
@@ -2114,6 +2128,9 @@
   "tournament.manage.noLootboxes.text": {
     "defaultMessage": "No Lootboxes",
     "description": "Text when no Lootboxes were found"
+  },
+  "tournament.stream.addCampaignCompleteUrl": {
+    "defaultMessage": "Add URL for AFTER the tournament"
   },
   "tournament.stream.streamTypeCannotBeEmpty": {
     "defaultMessage": "Stream type cannot be empty",

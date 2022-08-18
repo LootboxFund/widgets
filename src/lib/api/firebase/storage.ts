@@ -2,6 +2,7 @@ import { storage } from './app'
 import { ref, uploadBytes, getDownloadURL } from '@firebase/storage'
 import { v4 as uuidV4 } from 'uuid'
 
+export const USER_ASSET_SUB_FOLDER = 'users'
 export const LOOTBOX_ASSET_FOLDER = `assets`
 export const LOOTBOX_ASSET_SUB_FOLDER = 'lootbox'
 
@@ -51,6 +52,24 @@ export const uploadTournamentCover = async (file: File): Promise<string> => {
   const extension = file?.name?.split('.').pop()
   const folder = uuidV4()
   const fileDestination = `${LOOTBOX_ASSET_FOLDER}/tournament/${folder}/cover${extension ? '.' + extension : ''}`
+  const res = await uploadImageToBucket(fileDestination, file)
+  return res
+}
+
+export const uploadUserAvatar = async (folder: string, file: File): Promise<string> => {
+  const extension = file?.name?.split('.').pop()
+  const fileDestination = `${LOOTBOX_ASSET_FOLDER}/${USER_ASSET_SUB_FOLDER}/${folder}/avatar-${uuidV4()}${
+    extension ? '.' + extension : ''
+  }`
+  const res = await uploadImageToBucket(fileDestination, file)
+  return res
+}
+
+export const uploadUserHeadshot = async (folder: string, file: File): Promise<string> => {
+  const extension = file?.name?.split('.').pop()
+  const fileDestination = `${LOOTBOX_ASSET_FOLDER}/${USER_ASSET_SUB_FOLDER}/${folder}/headshot-${uuidV4()}${
+    extension ? '.' + extension : ''
+  }`
   const res = await uploadImageToBucket(fileDestination, file)
   return res
 }
