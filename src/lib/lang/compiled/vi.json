@@ -552,6 +552,7 @@
   "tournament.manage.chooseStream.header": "Xem trực tiếp giải đấu này",
   "tournament.manage.joinButton.text": "Thêm nhóm",
   "tournament.manage.noLootboxes.text": "Không có Lootboxes",
+  "tournament.stream.addCampaignCompleteUrl": "Thêm URL cho SAU giải đấu",
   "tournament.stream.streamTypeCannotBeEmpty": "Loại luồng không được để trống",
   "tournament.stream.streamURLCannotBeEmpty": "URL luồng không được để trống",
   "tournament.visit.header": "Ghé thăm giải đấu",

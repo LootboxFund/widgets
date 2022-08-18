@@ -4,13 +4,14 @@ import Spinner from 'lib/components/Generics/Spinner'
 import { LootboxList, $TournamentCover, StreamListItem, $TournamentSectionContainer } from '../common'
 import {
   QueryTournamentArgs,
+  ResponseError,
   Tournament,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation, useQuery } from '@apollo/client'
-import { GET_MY_TOURNAMENT, DELETE_STREAM } from './api.gql'
+import { GET_MY_TOURNAMENT, DELETE_STREAM, MyTournamentFE } from './api.gql'
 import { useEffect, useState } from 'react'
 import { StreamID, TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -38,7 +39,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
-  const { data, loading, error } = useQuery<{ myTournament: TournamentResponse }, QueryTournamentArgs>(
+  const { data, loading, error } = useQuery<{ myTournament: MyTournamentFE | ResponseError }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
     {
       variables: {
@@ -62,7 +63,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
     return <Oopsies title={words.anErrorOccured} icon="🤕" message={data?.myTournament?.error?.message || ''} />
   }
 
-  const { tournament } = data.myTournament as TournamentResponseSuccess
+  const { tournament } = data.myTournament as MyTournamentFE
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
   const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
@@ -190,9 +191,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
       {!tournament.magicLink || !tournament.streams || tournament.streams.length === 0 ? (
         <$TournamentSectionContainer screen={screen}>
-          <$h1>
-            {words.yourAlmostSetup}
-          </$h1>
+          <$h1>{words.yourAlmostSetup}</$h1>
           {!tournament.magicLink && (
             <div style={{ paddingBottom: '15px' }}>
               <Oopsies

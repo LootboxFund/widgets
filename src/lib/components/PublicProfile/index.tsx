@@ -86,9 +86,14 @@ const PublicProfile = (props: PublicProfileProps) => {
   return (
     <$PublicProfilePageContainer screen={screen}>
       <$Horizontal justifyContent="space-between">
-        <$ProfileImage src={avatar ? avatar : DEFAULT_PROFILE_PICTURE} />
+        <$ProfileImage src={avatar ? avatar : DEFAULT_PROFILE_PICTURE} alt={`Avatar ${username}`} />
         <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton onClick={() => setIsModalOpen(true)}>{words.inviteFriend}</$InviteButton>
+          <$InviteButton
+            onClick={() => setIsModalOpen(true)}
+            style={{ boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa` }}
+          >
+            {words.inviteFriend}
+          </$InviteButton>
           <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
             {bonusTicketText}
           </span>
@@ -227,6 +232,7 @@ export const $ProfileImage = styled.img`
   border-radius: 50%;
   margin-bottom: 10px;
   object-fit: cover;
+  box-shadow: 3px 3px 6px ${COLORS.surpressedBackground}aa;
 `
 
 const $InviteButton = styled.button`

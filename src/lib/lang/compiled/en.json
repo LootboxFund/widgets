@@ -542,6 +542,7 @@
   "tournament.manage.chooseStream.header": "Watch this Tournament Live",
   "tournament.manage.joinButton.text": "Add Team",
   "tournament.manage.noLootboxes.text": "No Lootboxes",
+  "tournament.stream.addCampaignCompleteUrl": "Add URL for AFTER the tournament",
   "tournament.stream.streamTypeCannotBeEmpty": "Stream type cannot be empty",
   "tournament.stream.streamURLCannotBeEmpty": "Stream URL cannot be empty",
   "tournament.visit.header": "Visit Tournament",

@@ -2129,6 +2129,9 @@
     "defaultMessage": "No Lootboxes",
     "description": "Text when no Lootboxes were found"
   },
+  "tournament.stream.addCampaignCompleteUrl": {
+    "defaultMessage": "Add URL for AFTER the tournament"
+  },
   "tournament.stream.streamTypeCannotBeEmpty": {
     "defaultMessage": "Stream type cannot be empty",
     "description": "Error message shown to user when they dont input a stream type in a form"

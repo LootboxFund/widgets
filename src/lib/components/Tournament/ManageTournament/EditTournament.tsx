@@ -7,11 +7,12 @@ import {
   EditTournamentPayload,
   EditTournamentResponse,
   MutationEditTournamentArgs,
+  ResponseError,
 } from '../../../api/graphql/generated/types'
 import $Button from '../../Generics/Button'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation } from '@apollo/client'
-import { EDIT_TOURNAMENT } from './api.gql'
+import { EditTournamentResponseFE, EDIT_TOURNAMENT } from './api.gql'
 import LogRocket from 'logrocket'
 import { LoadingText } from '../../Generics/Spinner'
 import { TournamentID } from 'lib/types'
@@ -35,7 +36,7 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
   const [localCoverPhoto, setLocalCoverPhoto] = useState<File | undefined>()
   const [tournamentPayload, setTournamentPayload] = useState<Omit<EditTournamentPayload, 'id'>>(initialState || {})
   const [editTournament, { loading }] = useMutation<
-    { editTournament: EditTournamentResponse },
+    { editTournament: EditTournamentResponseFE | ResponseError },
     MutationEditTournamentArgs
   >(EDIT_TOURNAMENT)
   const words = useWords()
@@ -82,6 +83,13 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     setTournamentPayload({
       ...tournamentPayload,
       tournamentDate,
+    })
+  }
+
+  const parseCampaignComplete = (campaignCompleteURL: string) => {
+    setTournamentPayload({
+      ...tournamentPayload,
+      campaignCompleteURL,
     })
   }
 
@@ -135,7 +143,14 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         magicLink: tournamentPayload.magicLink,
         tournamentDate: tournamentPayload.tournamentDate,
         prize: tournamentPayload.prize,
-        ...(coverUrl && { coverPhoto: coverUrl }),
+      }
+
+      if (!!coverUrl) {
+        payload.coverPhoto = coverUrl
+      }
+
+      if (!!tournamentPayload.campaignCompleteURL) {
+        payload.campaignCompleteURL = tournamentPayload.campaignCompleteURL
       }
 
       const { data } = await editTournament({
@@ -233,6 +248,15 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
             id="input-link"
             onChange={(e) => parseTournamentLink(e.target.value)}
             value={tournamentPayload?.tournamentLink || ''}
+          ></$InputMedium>
+        </$Vertical>
+
+        <$Vertical spacing={2}>
+          <$InputLabel htmlFor="input-campaign-complete-url">{tournamentWords.addCampaignCompleteUrl}</$InputLabel>
+          <$InputMedium
+            id="input-campaign-complete-url"
+            onChange={(e) => parseCampaignComplete(e.target.value)}
+            value={tournamentPayload?.campaignCompleteURL || ''}
           ></$InputMedium>
         </$Vertical>
 

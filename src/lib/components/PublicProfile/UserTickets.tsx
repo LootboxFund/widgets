@@ -248,7 +248,14 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                   >
                     <img
                       src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', paddingBottom: '5px' }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        paddingBottom: '5px',
+                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+                      }}
                     />
                   </a>
                   <$Vertical
@@ -258,7 +265,15 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                       display: 'inline-block',
                     }}
                   >
-                    <$Horizontal width="100%">
+                    <$Horizontal
+                      width="100%"
+                      style={{
+                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+                        boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa`,
+                        borderRadius: '6px',
+                      }}
+                    >
                       <$ActionsButton onClick={() => setChosenClaim(claim)}>{words.inviteFriend}</$ActionsButton>
                       <$ActionsMenuButton onClick={(e) => handleButtonToggle(elId)}>
                         {isNotif && <$ButtonBadge />}
@@ -465,6 +480,7 @@ const $DropDownContainer = styled.div`
   min-width: 160px;
   width: 100%;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
   z-index: 1;
   // background-color: ${COLORS.trustBackground};
 `

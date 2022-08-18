@@ -132,6 +132,11 @@ export const useTournamentWords = () => {
     description: 'Error message shown to user when they dont input a stream type in a form',
   })
 
+  const addCampaignCompleteUrl = intl.formatMessage({
+    id: 'tournament.stream.addCampaignCompleteUrl',
+    defaultMessage: 'Add URL for AFTER the tournament',
+  })
+
   return {
     titleRequired,
     descriptionRequired,
@@ -147,6 +152,7 @@ export const useTournamentWords = () => {
     streamURLCannotBeEmpty,
     // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
+    addCampaignCompleteUrl,
   }
 }
 
@@ -232,9 +238,14 @@ export const HiddenDescription = ({
   )
 }
 
+interface LootboxListSnapshot {
+  name: string
+  address: Address
+  stampImage?: string
+}
 interface LootboxListProps {
-  onClickLootbox?: (lootbox: LootboxTournamentSnapshot) => void
-  lootboxes: LootboxTournamentSnapshot[]
+  onClickLootbox?: (lootbox: LootboxListSnapshot) => void
+  lootboxes: LootboxListSnapshot[]
   screen: ScreenSize
   templateAction?: () => void
   magicLink?: string
@@ -250,7 +261,7 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
     description: 'Text prompting user to join an esports tournament by making a new Lootbox',
   })
 
-  const filteredLootboxSnapshots: LootboxTournamentSnapshot[] = !!searchTerm
+  const filteredLootboxSnapshots: LootboxListSnapshot[] = !!searchTerm
     ? [
         ...(lootboxes?.filter(
           (snapshot) =>
@@ -444,9 +455,10 @@ export const $TextAreaMedium = styled.textarea`
   background-color: ${`${COLORS.surpressedBackground}1A`};
   border: none;
   border-radius: 10px;
-  padding: 5px 10px;
+  padding: 20px 10px;
   max-width: 100%;
   font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${COLORS.surpressedFontColor}ae;
 
@@ -467,9 +479,16 @@ export const $TournamentCover = styled.img`
   background-position: center;
 `
 
+interface StreamItemFE {
+  type: StreamType
+  name: string
+  id: StreamID
+  url: string
+}
+
 interface StreamListItemProps {
   tournamentId: TournamentID
-  stream: Stream
+  stream: StreamItemFE
 }
 
 export const StreamListItem = (props: StreamListItemProps) => {
