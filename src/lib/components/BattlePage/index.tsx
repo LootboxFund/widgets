@@ -51,6 +51,7 @@ const BattlePage = (props: BattlePageParams) => {
   const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
   const SOCIALS = getSocials(intl)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
@@ -118,6 +119,19 @@ const BattlePage = (props: BattlePageParams) => {
         lootbox: snapshot,
       })
     }
+  })
+
+  const filteredLootboxPartyBaskets = lootboxPartyBaskets.filter((partyBasket) => {
+    if (!searchTerm) {
+      return true
+    }
+
+    return (
+      partyBasket.lootbox.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.partyBasket?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.lootbox.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.partyBasket?.address.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   })
 
   return (
@@ -253,7 +267,13 @@ const BattlePage = (props: BattlePageParams) => {
             {(!lootboxPartyBaskets || lootboxPartyBaskets?.length === 0) && (
               <Oopsies title={seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet} icon="🧐" />
             )}
-            {lootboxPartyBaskets.map((data) => {
+
+            <$SearchInput
+              type="search"
+              placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
+              onChange={(e) => setSearchTerm(e.target.value || '')}
+            />
+            {filteredLootboxPartyBaskets.map((data) => {
               return (
                 <BattlePagePartyBasket
                   lootboxPartyBasket={data}
@@ -412,6 +432,30 @@ const $TournamentCoverPlaceholder = styled.div`
     #3a6073,
     #16222a
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+`
+export const $SearchInput = styled.input`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  height: 40px;
+  ::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: ${COLORS.surpressedFontColor}7a;
+    opacity: 1; /* Firefox */
+  }
+
+  :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: ${COLORS.surpressedFontColor}7a;
+  }
+
+  ::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: ${COLORS.surpressedFontColor}7a;
+  }
 `
 
 export default BattlePageWrapper
