@@ -282,11 +282,22 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     </$Horizontal>
                     <$DropDownContainer id={elId} className="dd-container">
                       <$Vertical>
+                        <$DropDownOption
+                          style={{ borderRadius: '10px 10px 0px 0px' }}
+                          href={
+                            claim.tournament?.tournamentLink
+                              ? claim.tournament?.tournamentLink
+                              : `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`
+                          }
+                          target="_blank"
+                        >
+                          <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
+                        </$DropDownOption>
+
                         {claim?.chosenPartyBasket?.joinCommunityUrl ? (
                           <$DropDownOption
                             href={claim.chosenPartyBasket.joinCommunityUrl}
                             target="_blank"
-                            style={{ borderRadius: '10px 10px 0px 0px' }}
                             onClick={() => {
                               removeClaimNotification(claim.id)
                             }}
@@ -301,12 +312,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                           target="_blank"
                         >
                           <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
-                        </$DropDownOption>
-                        <$DropDownOption
-                          href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`}
-                          target="_blank"
-                        >
-                          <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
                         </$DropDownOption>
 
                         <$DropDownOption

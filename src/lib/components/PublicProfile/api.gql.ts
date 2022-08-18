@@ -16,6 +16,9 @@ export type PublicUserClaimsGQLArgs = {
 export type PublicUserFEClaims = {
   id: ClaimID
   tournamentId: TournamentID
+  tournament: {
+    tournamentLink?: string
+  }
   chosenPartyBasket: {
     id: PartyBasketID
     address: Address
@@ -77,6 +80,9 @@ export const PUBLIC_USER_CLAIMS = gql`
               node {
                 id
                 tournamentId
+                tournament {
+                  tournamentLink
+                }
                 chosenPartyBasket {
                   id
                   address

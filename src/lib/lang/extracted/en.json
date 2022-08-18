@@ -216,6 +216,10 @@
     "defaultMessage": "Mystery ROI",
     "description": "Text displayed when we do not know the potential ROI (Return on Investment) of the NFT"
   },
+  "bounty.redeem.upTo": {
+    "defaultMessage": "Win up to...",
+    "description": "Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
+  },
   "buyShares.buyButton.buttonPrompt": {
     "defaultMessage": "Enter an amount",
     "description": "Input text for a user to enter an amount of crypto currency to buy from Lootbox"
@@ -1050,6 +1054,9 @@
     "defaultMessage": "Network not set",
     "description": "Error message for user if they forgot to set a blockchain network"
   },
+  "generics.nextSteps": {
+    "defaultMessage": "Next Steps"
+  },
   "generics.noChangesMade": {
     "defaultMessage": "No changes made"
   },
@@ -1639,10 +1646,6 @@
   },
   "profile.public.aboutMe": {
     "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
-  },
-  "profile.public.bothGetBonusTickets": {
-    "defaultMessage": "Both get bonus FREE Lottery Tickets",
-    "description": "Reward caption for inviting friend"
   },
   "profile.public.editProfile": {
     "defaultMessage": "Edit Profile",

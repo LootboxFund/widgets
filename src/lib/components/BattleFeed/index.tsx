@@ -56,14 +56,10 @@ const BattleFeed = () => {
     return <Oopsies title={words.anErrorOccured} message={data?.battleFeed?.error?.message || ''} icon="🤕" />
   }
 
-  const { edges, pageInfo } = (data?.battleFeed as BattleFeedResponseSuccess) || {}
+  const { pageInfo } = (data?.battleFeed as BattleFeedResponseSuccess) || {}
 
   const handleMore = () => {
     setLastTournament(pageInfo?.endCursor || null)
-  }
-
-  const goToTournamentPage = (tourny: Tournament) => {
-    window.open(`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tourny.id}`, '_self')
   }
 
   return (
@@ -73,87 +69,89 @@ const BattleFeed = () => {
           const daysDiff = tourny.tournamentDate
             ? Math.round((new Date(tourny.tournamentDate).valueOf() - new Date().valueOf()) / (1000 * 60 * 60 * 24))
             : undefined
-
+          const tournamentPage = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tourny.id}`
           return (
-            <$BattleContainer key={`battle_${idx}`} screen={screen} onClick={() => goToTournamentPage(tourny)}>
-              <$Horizontal height="100%" spacing={2}>
-                <$BattleCardsContainer width="40%">
-                  {tourny.lootboxSnapshots?.length ? (
-                    tourny.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
-                      return (
-                        <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`${tourny.id}-img-${idx2}`} />
-                      )
-                    })
-                  ) : (
-                    <$BattleCardImage
-                      src={TEMPLATE_LOOTBOX_STAMP}
-                      cardNumber={0}
+            <$BattleContainer key={`battle_${idx}`} screen={screen}>
+              <a href={tournamentPage} style={{ textDecoration: 'none', display: 'block' }}>
+                <$Horizontal height="100%" spacing={2}>
+                  <$BattleCardsContainer width="40%">
+                    {tourny.lootboxSnapshots?.length ? (
+                      tourny.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
+                        return (
+                          <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`${tourny.id}-img-${idx2}`} />
+                        )
+                      })
+                    ) : (
+                      <$BattleCardImage
+                        src={TEMPLATE_LOOTBOX_STAMP}
+                        cardNumber={0}
+                        style={{
+                          maxWidth: '100%',
+                        }}
+                      />
+                    )}
+                  </$BattleCardsContainer>
+                  <$Vertical width="60%">
+                    {tourny.prize && (
+                      <$Vertical>
+                        <$span
+                          style={{
+                            color: `${COLORS.surpressedFontColor}5f`,
+                            fontSize: TYPOGRAPHY.fontSize.small,
+                            fontStyle: 'italic',
+                          }}
+                        >
+                          {words.prize}
+                        </$span>
+                        <$span
+                          style={{
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
+                            overflow: 'hidden',
+                            fontSize: TYPOGRAPHY.fontSize.xlarge,
+                            lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+                            fontWeight: TYPOGRAPHY.fontWeight.light,
+                          }}
+                        >
+                          {tourny.prize}
+                        </$span>
+                      </$Vertical>
+                    )}
+
+                    <$h2
                       style={{
-                        maxWidth: '100%',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
                       }}
-                    />
-                  )}
-                </$BattleCardsContainer>
-                <$Vertical width="60%">
-                  {tourny.prize && (
-                    <$Vertical>
+                    >
+                      {tourny.title}
+                    </$h2>
+                    <$p
+                      style={{
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        marginTop: '0px',
+                        height: 'calc(1.4rem * 3)',
+                      }}
+                    >
+                      {tourny.description}
+                    </$p>
+                    {daysDiff != undefined && (
                       <$span
                         style={{
                           color: `${COLORS.surpressedFontColor}5f`,
                           fontSize: TYPOGRAPHY.fontSize.small,
                           fontStyle: 'italic',
+                          textTransform: 'lowercase',
                         }}
                       >
-                        {words.prize}
+                        {daysDiff > 0 ? words.inDays(daysDiff) : daysDiff === 0 ? startsToday : battleFinished}
                       </$span>
-                      <$span
-                        style={{
-                          whiteSpace: 'nowrap',
-                          textOverflow: 'ellipsis',
-                          overflow: 'hidden',
-                          fontSize: TYPOGRAPHY.fontSize.xlarge,
-                          lineHeight: TYPOGRAPHY.fontSize.xxlarge,
-                          fontWeight: TYPOGRAPHY.fontWeight.light,
-                        }}
-                      >
-                        {tourny.prize}
-                      </$span>
-                    </$Vertical>
-                  )}
-
-                  <$h2
-                    style={{
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {tourny.title}
-                  </$h2>
-                  <$p
-                    style={{
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                      marginTop: '0px',
-                      height: 'calc(1.4rem * 3)',
-                    }}
-                  >
-                    {tourny.description}
-                  </$p>
-                  {daysDiff != undefined && (
-                    <$span
-                      style={{
-                        color: `${COLORS.surpressedFontColor}5f`,
-                        fontSize: TYPOGRAPHY.fontSize.small,
-                        fontStyle: 'italic',
-                        textTransform: 'lowercase',
-                      }}
-                    >
-                      {daysDiff > 0 ? words.inDays(daysDiff) : daysDiff === 0 ? startsToday : battleFinished}
-                    </$span>
-                  )}
-                </$Vertical>
-              </$Horizontal>
+                    )}
+                  </$Vertical>
+                </$Horizontal>
+              </a>
             </$BattleContainer>
           )
         })}

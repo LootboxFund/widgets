@@ -445,6 +445,13 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                   </$StepSubheading>
                 </$Horizontal>
                 <$EarningsContainer>
+                  <$Light style={{ marginBottom: '0px' }}>
+                    <FormattedMessage
+                      id="bounty.redeem.upTo"
+                      defaultMessage="Win up to..."
+                      description="Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
+                    />
+                  </$Light>
                   <$EarningsText>{!!nftBountyValue ? nftBountyValue : unknownEarningText}</$EarningsText>
                 </$EarningsContainer>
               </$Vertical>
@@ -626,11 +633,22 @@ const $EarningsContainer = styled.div<{}>`
 `
 
 const $EarningsText = styled.p<{}>`
+  margin-top: 5px;
   text-align: center;
   font-size: ${TYPOGRAPHY.fontSize.xxlarge};
   line-height: ${TYPOGRAPHY.fontSize.xxlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   color: ${COLORS.surpressedFontColor};
+`
+
+const $Light = styled.p<{}>`
+  text-align: center;
+  font-style: italic;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  color: ${COLORS.surpressedFontColor};
+  text-transform: lowercase;
 `
 
 const $RedeemNFTButton = styled.button<{ themeColor?: string; disabled?: boolean }>`
