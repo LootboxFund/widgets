@@ -41,6 +41,9 @@
     "defaultMessage": "Or use a password",
     "description": "Hyperlink message to user allowing them to signin / signup with a password"
   },
+  "auth.method.signupWithPhoneTerms": {
+    "defaultMessage": "By verifying your phone number, you are agreeing to our {termsOfService}."
+  },
   "auth.password.passwordLength": {
     "defaultMessage": "Password must be at least {minLength} characters",
     "description": "Error message when user tries to sign up/in with a password that is too short"
@@ -85,6 +88,10 @@
     "defaultMessage": "Wallet Sign Up",
     "description": "Button text where a user clicks to sign up using their Metamask wallet"
   },
+  "auth.termsOfService": {
+    "defaultMessage": "Terms of Service",
+    "description": "Link to terms of service"
+  },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
     "description": "Text indicating a tournament is finished"
@@ -100,10 +107,6 @@
   "battlePage.button.claimLottery": {
     "defaultMessage": "Claim lottery",
     "description": "Text prompting user to claim a lottery ticket"
-  },
-  "battlePage.button.inviteFriend": {
-    "defaultMessage": "Invite Friend",
-    "description": "Invite button on Party Basket on the Battle page"
   },
   "battlePage.button.inviteFriendRewardPrompt": {
     "defaultMessage": "Both get a FREE lottery ticket",
@@ -212,6 +215,10 @@
   "bounty.redeem.unknownEarning.text": {
     "defaultMessage": "Mystery ROI",
     "description": "Text displayed when we do not know the potential ROI (Return on Investment) of the NFT"
+  },
+  "bounty.redeem.upTo": {
+    "defaultMessage": "Win up to...",
+    "description": "Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
   },
   "buyShares.buyButton.buttonPrompt": {
     "defaultMessage": "Enter an amount",
@@ -1022,6 +1029,10 @@
     "defaultMessage": "Event",
     "description": "Event, like an esports tournament"
   },
+  "generics.fileTooLarge": {
+    "defaultMessage": "File too large",
+    "description": "Error message for user if they upload a file that is too large"
+  },
   "generics.finish": {
     "defaultMessage": "Finish"
   },
@@ -1032,6 +1043,9 @@
   "generics.includeCountryCode": {
     "defaultMessage": "Phone number needs a country code (eg. +63 or +1)"
   },
+  "generics.inviteFriend": {
+    "defaultMessage": "Invite Friend"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -1040,12 +1054,18 @@
     "defaultMessage": "Network not set",
     "description": "Error message for user if they forgot to set a blockchain network"
   },
+  "generics.nextSteps": {
+    "defaultMessage": "Next Steps"
+  },
   "generics.noChangesMade": {
     "defaultMessage": "No changes made"
   },
   "generics.partyBasketInformation": {
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
+  },
+  "generics.phone": {
+    "defaultMessage": "Phone"
   },
   "generics.pleaseEnterYourPhoneNumber": {
     "defaultMessage": "Please enter your phone number",
@@ -1458,6 +1478,13 @@
     "defaultMessage": "You determine how much each NFT bounty will be worth. You can specify crypto currencies like \"10 Matic\" or fiat like \"$10 USD\"",
     "description": "Tooltip for NFT Prize Value field"
   },
+  "partyBasket.create.form.socialLink.title": {
+    "defaultMessage": "Add a link to your community"
+  },
+  "partyBasket.create.form.socialLink.tooltip": {
+    "defaultMessage": "Direct users to your community by adding a link to your community page.",
+    "description": "Tooltip for NFT Prize Value field"
+  },
   "partyBasket.manage.bulkWhitelisting.address.header": {
     "defaultMessage": "Whitelist Address",
     "description": "Title for whitelisting section. \"Whitelist\" means to give someone permission to get a free Lootbox NFT from your Party Basket"
@@ -1571,6 +1598,9 @@
   "profile.button.viewLotteryTickets": {
     "defaultMessage": "View Lottery Tickets"
   },
+  "profile.enterBiography": {
+    "defaultMessage": "Enter your biography"
+  },
   "profile.lootboxes.couldNotFindLootbox": {
     "defaultMessage": "We couldn't find your Lootbox",
     "description": "Message displayed when the user does not have any lootboxes."
@@ -1604,8 +1634,7 @@
     "description": "This is the link that will send the user a verification email."
   },
   "profile.onboarding.title": {
-    "defaultMessage": "You're almost set up...",
-    "description": "This is the header of the user onboarding section. They will have to complete a few steps before this message disappears."
+    "defaultMessage": "You're almost set up..."
   },
   "profile.onboarding.verifyEmailHeader": {
     "defaultMessage": "Verify your email",
@@ -1618,17 +1647,15 @@
   "profile.public.aboutMe": {
     "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
   },
-  "profile.public.bothGetBonusTickets": {
-    "defaultMessage": "Both get bonus FREE Lottery Tickets",
-    "description": "Reward caption for inviting friend"
-  },
   "profile.public.editProfile": {
     "defaultMessage": "Edit Profile",
     "description": "Public Profile Page link to edit profile"
   },
-  "profile.public.inviteFriends": {
-    "defaultMessage": "Invite Friend",
-    "description": "Button to invite friend"
+  "profile.public.eventDetails": {
+    "defaultMessage": "Event Details"
+  },
+  "profile.public.joinCommunity": {
+    "defaultMessage": "Join Community"
   },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lottery Tickets",
@@ -1641,6 +1668,9 @@
   "profile.public.viewSocials": {
     "defaultMessage": "View Socials",
     "description": "Public Profile Page link to view socials"
+  },
+  "profile.public.watchStream": {
+    "defaultMessage": "Watch Stream"
   },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
@@ -1673,6 +1703,10 @@
   "profile.settings.passwordResetEmailSent": {
     "defaultMessage": "A password reset email was sent to your email.",
     "description": "Message displayed when the user clicks to make a new password."
+  },
+  "profile.settings.phoneNotSet": {
+    "defaultMessage": "Phone not set!",
+    "description": "Message displayed when the user does not have a phone."
   },
   "profile.settings.savePassword": {
     "defaultMessage": "Save password",
@@ -2098,6 +2132,9 @@
     "defaultMessage": "No Lootboxes",
     "description": "Text when no Lootboxes were found"
   },
+  "tournament.stream.addCampaignCompleteUrl": {
+    "defaultMessage": "Add URL for AFTER the tournament"
+  },
   "tournament.stream.streamTypeCannotBeEmpty": {
     "defaultMessage": "Stream type cannot be empty",
     "description": "Error message shown to user when they dont input a stream type in a form"
@@ -2111,7 +2148,7 @@
     "description": "Button text for the user to navigate to the public page of a given tournament"
   },
   "tournamentAnalytics.button.downloadCSV": {
-    "defaultMessage": "Download CSV"
+    "defaultMessage": "Generate CSV"
   },
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",
@@ -2166,6 +2203,9 @@
     "defaultMessage": "Screenshot & Share",
     "description": "Message to show user to screen shot a picture & share w friends"
   },
+  "viralOnboarding.screenshotAndShare": {
+    "defaultMessage": "If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇"
+  },
   "viralOnboarding.selectLottery.dateWinnerAnnounce": {
     "defaultMessage": "Winners Announced {dateWin}",
     "description": "date when we announce the winners of the lottery"
@@ -2193,7 +2233,7 @@
     "defaultMessage": "You have already accepted this referral."
   },
   "viralOnboarding.youHaveAlreadyAcceptedInfo": {
-    "defaultMessage": "You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link."
+    "defaultMessage": "You can only accept an initial invite once. {boldText}"
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",

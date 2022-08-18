@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { COLORS } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { ResponseError } from 'lib/api/graphql/generated/types'
 import useWords from 'lib/hooks/useWords'
 import { UserID } from 'lib/types'
@@ -23,6 +23,7 @@ import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
 import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import { manifest } from 'manifest'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface MyLotteryTicketsProps {
   userId: UserID
@@ -34,14 +35,16 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const [searchString, setSearchString] = useState('')
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
   const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
+  const [chosenClaim, setChosenClaim] = useState<PublicUserFEClaims>()
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claims', [])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const intl = useIntl()
+
   const {
     data: userData,
     loading: loadingData,
     error: errorData,
   } = useQuery<{ publicUser: ResponseError | PublicUserLotteriesFE }, PublicUserClaimsGQLArgs>(PUBLIC_USER_CLAIMS, {
-    variables: { publicUserId: props.userId, first: 7, after: lastClaimCreatedAt },
+    variables: { publicUserId: props.userId, first: 8, after: lastClaimCreatedAt },
     onCompleted: (userData) => {
       if (userData?.publicUser?.__typename === 'PublicUserResponseSuccess') {
         const nodes = userData?.publicUser?.user?.claims?.edges
@@ -51,16 +54,23 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       }
     },
   })
-  const inviteFriendText = intl.formatMessage({
-    id: 'profile.public.inviteFriends',
-    defaultMessage: 'Invite Friend',
-    description: 'Button to invite friend',
-  })
-  const bonusTicketText = intl.formatMessage({
-    id: 'profile.public.bothGetBonusTickets',
-    defaultMessage: 'Both get bonus FREE Lottery Tickets',
-    description: 'Reward caption for inviting friend',
-  })
+
+  useEffect(() => {
+    if (chosenClaim) {
+      setIsModalOpen(true)
+    }
+  }, [chosenClaim])
+
+  const removeClaimNotification = (claimId: string) => {
+    const filteredClaims = notificationClaims.filter((claim) => claim !== claimId)
+    setNotificationClaims(filteredClaims)
+  }
+
+  // const bonusTicketText = intl.formatMessage({
+  //   id: 'profile.public.bothGetBonusTickets',
+  //   defaultMessage: 'Both get bonus FREE Lottery Tickets',
+  //   description: 'Reward caption for inviting friend',
+  // })
 
   const customStyles = {
     content: {
@@ -102,6 +112,40 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
 
   const closeModal = () => {
     setIsModalOpen(false)
+    setChosenClaim(undefined)
+  }
+
+  const handleButtonToggle = (elId: string) => {
+    const el = document.getElementById(elId)
+    const el2 = document.getElementById(`btn${elId}`)
+    try {
+      const els = document.getElementsByClassName('dd-container') as HTMLCollectionOf<HTMLElement>
+      for (let i = 0; i < els.length; i++) {
+        if (els[i] !== el) {
+          els[i].style.display = 'none'
+        }
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    try {
+      if (el) {
+        if (el.style.display === 'block') {
+          el.style.display = 'none'
+          if (el2) {
+            el2.innerText = '︙'
+          }
+        } else {
+          el.style.display = 'block'
+          if (el2) {
+            el2.innerText = '−'
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
@@ -146,7 +190,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         ></input>
       </$Vertical>
       <$ClaimsGrid screen={screen}>
-        <$ClaimCard onClick={() => console.log('Invite Friend')}>
+        {/* <$ClaimCard onClick={() => console.log('Invite Friend')}>
           <$InviteFriend screen={screen} onClick={() => setIsModalOpen(true)}>
             <span
               style={{
@@ -166,7 +210,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                 color: 'rgba(0,0,0,0.7)',
               }}
             >
-              {inviteFriendText}
+              {words.inviteFriend}
             </span>
             <span
               style={{
@@ -180,7 +224,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
               {bonusTicketText}
             </span>
           </$InviteFriend>
-        </$ClaimCard>
+        </$ClaimCard> */}
         {userClaims &&
           userClaims
             .filter(
@@ -191,18 +235,99 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                   .indexOf(searchString.toLowerCase()) as number) > -1
             )
             .map((claim) => {
+              const elId = `dropdown${claim.id}`
+              const isNotifReq = notificationClaims.indexOf(claim.id) > -1
+              const joinNotif = isNotifReq && !!claim?.chosenPartyBasket?.joinCommunityUrl
+              const isNotif = !!joinNotif
               return (
-                <a
-                  href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
-                  target="_blank"
-                >
-                  <$ClaimCard key={claim.id}>
+                <$ClaimCard key={claim.id}>
+                  <a
+                    href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
+                    target="_blank"
+                    style={{ display: 'block', cursor: 'pointer' }}
+                  >
                     <img
                       src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        paddingBottom: '5px',
+                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+                      }}
                     />
-                  </$ClaimCard>
-                </a>
+                  </a>
+                  <$Vertical
+                    width="100%"
+                    style={{
+                      position: 'relative',
+                      display: 'inline-block',
+                    }}
+                  >
+                    <$Horizontal
+                      width="100%"
+                      style={{
+                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+                        boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa`,
+                        borderRadius: '6px',
+                      }}
+                    >
+                      <$ActionsButton onClick={() => setChosenClaim(claim)}>{words.inviteFriend}</$ActionsButton>
+                      <$ActionsMenuButton onClick={(e) => handleButtonToggle(elId)}>
+                        {isNotif && <$ButtonBadge />}
+                        <div id={`btn${elId}`}>︙</div>
+                      </$ActionsMenuButton>
+                    </$Horizontal>
+                    <$DropDownContainer id={elId} className="dd-container">
+                      <$Vertical>
+                        <$DropDownOption
+                          style={{ borderRadius: '10px 10px 0px 0px' }}
+                          href={
+                            claim.tournament?.tournamentLink
+                              ? claim.tournament?.tournamentLink
+                              : `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`
+                          }
+                          target="_blank"
+                        >
+                          <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
+                        </$DropDownOption>
+
+                        {claim?.chosenPartyBasket?.joinCommunityUrl ? (
+                          <$DropDownOption
+                            href={claim.chosenPartyBasket.joinCommunityUrl}
+                            target="_blank"
+                            onClick={() => {
+                              removeClaimNotification(claim.id)
+                            }}
+                          >
+                            <FormattedMessage id="profile.public.joinCommunity" defaultMessage="Join Community" />
+                            {joinNotif && <$ButtonBadge inline />}
+                          </$DropDownOption>
+                        ) : null}
+
+                        <$DropDownOption
+                          href={`${manifest.microfrontends.webflow.battlePage}?tournament=${claim.tournamentId}`}
+                          target="_blank"
+                        >
+                          <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
+                        </$DropDownOption>
+
+                        <$DropDownOption
+                          href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
+                          target="_blank"
+                          style={{ borderRadius: '0px 0px 10px 10px' }}
+                        >
+                          {words.redeemNFTText}
+                        </$DropDownOption>
+                        {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>
+                          <FormattedMessage id="profile.public.viewLootbox" defaultMessage="View Lootbox" />
+                        </$DropDownOption> */}
+                      </$Vertical>
+                    </$DropDownContainer>
+                  </$Vertical>
+                </$ClaimCard>
               )
             })}
 
@@ -230,8 +355,10 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         {!!userClaims && !!userClaims[0] && (
           <AuthGuard>
             <CreatePartyBasketReferral
-              partyBasketId={userClaims[0].chosenPartyBasket.id}
-              tournamentId={userClaims[0].tournamentId}
+              partyBasketId={
+                chosenClaim != undefined ? chosenClaim.chosenPartyBasket.id : userClaims[0].chosenPartyBasket.id
+              }
+              tournamentId={chosenClaim != undefined ? chosenClaim.tournamentId : userClaims[0].tournamentId}
               qrcodeMargin={'0px -40px'}
             />
           </AuthGuard>
@@ -240,6 +367,49 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     </$Vertical>
   )
 }
+
+const $ActionsButton = styled.button`
+  width: 100%;
+  height: 40px;
+  max-width: 200px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px 0px 0px 6px;
+  background-color: ${COLORS.trustBackground};
+  color: ${COLORS.white};
+  border: 0px solid white;
+  text-transform: capitalize;
+`
+
+const $ActionsMenuButton = styled.button`
+  width: 30px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 0px 6px 6px 0px;
+  background-color: ${COLORS.trustBackground}ba;
+  color: ${COLORS.white};
+  border: 0px solid white;
+  position: relative;
+`
+
+/* Make the badge float in the top right corner of the button */
+const $ButtonBadge = styled.div<{ inline?: boolean }>`
+  background-color: #fa3e3e;
+  color: white;
+  border-radius: 100px;
+  width: 12px;
+  height: 12px;
+  position: absolute; /* Position the badge within the relatively positioned button */
+  top: -3px;
+  right: -5px;
+  ${(props) =>
+    props.inline &&
+    `position: relative;
+  display: inline-block;`}
+`
 
 const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
   font-family: sans-serif;
@@ -276,7 +446,6 @@ export const $ProfileImage = styled.img`
 const $ClaimCard = styled.div`
   flex: 1;
   width: 100%;
-  cursor: pointer;
 `
 
 const $InviteFriend = styled.div<{ screen: ScreenSize }>`
@@ -307,6 +476,29 @@ const $MoreButton = styled.button`
   color: ${COLORS.white};
   border: 0px solid white;
   text-transform: uppercase;
+`
+
+const $DropDownContainer = styled.div`
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  width: 100%;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  z-index: 1;
+  // background-color: ${COLORS.trustBackground};
+`
+
+const $DropDownOption = styled.a`
+  height: 40px;
+  padding: 2px 10px;
+  border-bottom: 1px lightblue solid;
+  line-height: 40px;
+  background-color: ${COLORS.trustBackground}ba;
+  color: ${COLORS.white};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  text-decoration: none;
 `
 
 export default UserLotteryTickets

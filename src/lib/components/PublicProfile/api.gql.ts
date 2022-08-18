@@ -16,10 +16,14 @@ export type PublicUserClaimsGQLArgs = {
 export type PublicUserFEClaims = {
   id: ClaimID
   tournamentId: TournamentID
+  tournament: {
+    tournamentLink?: string
+  }
   chosenPartyBasket: {
     id: PartyBasketID
     address: Address
     name: string
+    joinCommunityUrl?: string
     lootboxSnapshot: {
       stampImage?: string
       name?: string
@@ -49,6 +53,7 @@ export interface PublicUserFE {
     username?: string
     avatar?: string
     socials?: Partial<UserSocials>
+    biography?: string
     // claims: {
     //   pageInfo: {
     //     hasNextPage?: boolean
@@ -75,10 +80,14 @@ export const PUBLIC_USER_CLAIMS = gql`
               node {
                 id
                 tournamentId
+                tournament {
+                  tournamentLink
+                }
                 chosenPartyBasket {
                   id
                   address
                   name
+                  joinCommunityUrl
                   lootboxSnapshot {
                     stampImage
                     name
@@ -108,6 +117,7 @@ export const PUBLIC_USER = gql`
           id
           username
           avatar
+          biography
           socials {
             twitter
             instagram

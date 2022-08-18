@@ -1,7 +1,7 @@
 import { useMutation } from '@apollo/client'
 import { Address, COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { createPartyBasket } from 'lib/api/createPartyBasket'
-import { CreatePartyBasketPayload } from 'lib/api/graphql/generated/types'
+import { CreatePartyBasketPayload, MutationCreatePartyBasketArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import { NetworkOption } from 'lib/api/network'
 import { $ErrorText } from 'lib/components/BuyShares/PurchaseComplete'
 import { $StepSubheading } from 'lib/components/CreateLootbox/StepCard'
@@ -16,7 +16,7 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { useSnapshot } from 'valtio'
 import { GET_MY_PARTY_BASKETS } from '../ViewPartyBaskets/api.gql'
-import { CREATE_PARTY_BASKET } from './api.gql'
+import { CREATE_PARTY_BASKET, CreatePartyBasketFE } from './api.gql'
 import ReactTooltip from 'react-tooltip'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -37,6 +37,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [partyBasketName, setPartyBasketName] = useState('')
+  const [joinCommunityUrl, setJoinCommunityUrl] = useState('')
   const [partyBasketSubmissionStatus, setPartyBasketSubmissionStatus] = useState<PartyBasketSubmission>({
     status: 'ready',
   })
@@ -44,7 +45,10 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
 
   const [provider, loading] = useProvider()
   const snapUserState = useSnapshot(userState)
-  const [createPartyBasketMutation] = useMutation(CREATE_PARTY_BASKET, {
+  const [createPartyBasketMutation] = useMutation<
+    { createPartyBasket: ResponseError | CreatePartyBasketFE },
+    MutationCreatePartyBasketArgs
+  >(CREATE_PARTY_BASKET, {
     refetchQueries: [{ query: GET_MY_PARTY_BASKETS, variables: { address: props.lootboxAddress } }],
   })
 
@@ -90,10 +94,12 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
                   lootboxAddress: data.lootboxAddress,
                   creatorAddress: data.creatorAddress,
                   nftBountyValue: bountyPrize,
+                  joinCommunityUrl: joinCommunityUrl,
                 },
               },
             })
             if (!res?.data || res?.data?.createPartyBasket?.__typename === 'ResponseError') {
+              // @ts-ignore
               throw new Error(res?.data?.createPartyBasket?.error?.message || words.anErrorOccured)
             }
             setPartyBasketSubmissionStatus({ status: 'success' })
@@ -163,6 +169,38 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
               value={bountyPrize}
               onChange={(e) => setBountyPrize(e.target.value)}
               placeholder="e.g. 150 SLP"
+              screen={screen}
+              style={{ fontWeight: 'lighter' }}
+            />
+          </div>
+        </$InputWrapper>
+      </$Vertical>
+
+      <$Vertical>
+        <$Horizontal verticalCenter>
+          <$StepSubheading style={{ width: 'auto', textTransform: 'capitalize' }}>
+            <FormattedMessage
+              id="partyBasket.create.form.socialLink.title"
+              defaultMessage="Add a link to your community"
+            />
+          </$StepSubheading>
+          <HelpIcon tipID="joinCommunityUrl" />
+          <ReactTooltip id="joinCommunityUrl" place="right" effect="solid">
+            <FormattedMessage
+              id="partyBasket.create.form.socialLink.tooltip"
+              defaultMessage="Direct users to your community by adding a link to your community page."
+              description="Tooltip for NFT Prize Value field"
+            />
+          </ReactTooltip>
+        </$Horizontal>
+
+        <$InputWrapper screen={screen}>
+          <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+            <$Input
+              type="text"
+              value={joinCommunityUrl}
+              onChange={(e) => setJoinCommunityUrl(e.target.value)}
+              placeholder="link to join your community"
               screen={screen}
               style={{ fontWeight: 'lighter' }}
             />

@@ -60,12 +60,12 @@ interface FrontendUser {
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 const convertUserToUserFE = (user: User): FrontendUser => {
-  const { uid, email, phoneNumber, displayName, photoURL } = user
+  const { uid, email, phoneNumber, displayName, photoURL, emailVerified } = user
   const userData: FrontendUser = {
     id: uid as UserID,
     email: email,
     phone: phoneNumber,
-    isEmailVerified: user.emailVerified,
+    isEmailVerified: emailVerified,
     username: displayName,
     avatar: photoURL,
   }

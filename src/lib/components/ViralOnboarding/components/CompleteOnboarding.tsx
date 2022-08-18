@@ -113,6 +113,7 @@ const CompleteOnboarding = (props: Props) => {
                 <FormattedMessage
                   id="viralOnboarding.completeOnboarding.winnersAnnouned2"
                   defaultMessage="Winners Announced in {days} days"
+                  values={{ days: daysDiff }}
                 />
               ) : daysDiff === 0 ? (
                 <FormattedMessage

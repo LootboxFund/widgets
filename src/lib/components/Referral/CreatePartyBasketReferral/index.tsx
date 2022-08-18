@@ -48,11 +48,6 @@ const CreatePartyBasketReferral = (props: Props) => {
     id: `referral.create.form.tournamentRequired`,
     defaultMessage: 'Tournament is required',
   })
-  const generateInviteLinkText = intl.formatMessage({
-    id: 'inviteLink.modal.generateInviteLink',
-    description: 'Main action button for invite link modal',
-    defaultMessage: 'Generate Invite Link',
-  })
 
   const handleButtonClick = async () => {
     setErrorMessage('')
@@ -156,7 +151,7 @@ const CreatePartyBasketReferral = (props: Props) => {
         }}
         disabled={loading}
       >
-        <LoadingText loading={loading} text={generateInviteLinkText} color={COLORS.white} />
+        <LoadingText loading={loading} text={words.generateInviteLinkText} color={COLORS.white} />
       </button>
       {errorMessage ? <$ErrorMessage style={{ paddingTop: '15px' }}>{errorMessage}</$ErrorMessage> : null}
       {lastReferralLink && (

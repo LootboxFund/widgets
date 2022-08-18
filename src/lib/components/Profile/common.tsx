@@ -122,6 +122,7 @@ export const $ProfilePageInput = styled.input`
   border-radius: 5px;
   overflow: hidden;
   height: 50px;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
   color: ${COLORS.surpressedFontColor};
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.large};
@@ -135,6 +136,7 @@ export const $ProfilePageTextArea = styled.textarea`
   padding: 14px 10px;
   border-radius: 5px;
   overflow: hidden;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
   color: ${COLORS.surpressedFontColor};
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.large};

@@ -98,11 +98,11 @@ const RedeemBounty = (props: RedeemBountyProps) => {
     description: 'Text displayed when there are no NFTs (non-fungible tokens) to redeem',
   })
 
-  const redeemNFTText = intl.formatMessage({
-    id: 'bounty.redeem.redeemNFT.text',
-    defaultMessage: 'Redeem NFT',
-    description: 'Text displayed when the user can redeem an NFT',
-  })
+  // const redeemNFTText = intl.formatMessage({
+  //   id: 'bounty.redeem.redeemNFT.text',
+  //   defaultMessage: 'Redeem NFT',
+  //   description: 'Text displayed when the user can redeem an NFT',
+  // })
 
   const checkForRedeemableNFTsText = intl.formatMessage({
     id: 'bounty.redeem.checkForRedeemableNFTs.text',
@@ -361,10 +361,10 @@ const RedeemBounty = (props: RedeemBountyProps) => {
               : noBountiesToRedeem
               ? noNFTsRetry
               : hasBountyToRedeem
-              ? redeemNFTText
+              ? words.redeemNFTText
               : redeemState.status === 'success'
               ? `✅ ${bountyRedeemedMessage}`
-              : redeemNFTText}
+              : words.redeemNFTText}
           </$RedeemNFTButton>
         )}
       </$Vertical>
@@ -425,6 +425,9 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                           id="bounty.redeem.bountyValueTooltip"
                           defaultMessage='The NFT you redeem has the chance of earning "{bountyValue}" according to the Party Basket issuer. There is no guarantee of a profit and please contact the Party Basket issuer if you have questions.'
                           description="Indicates how much money the user can get from a Lootbox NFT"
+                          values={{
+                            bountyValue: nftBountyValue,
+                          }}
                         />
                       ) : (
                         <FormattedMessage
@@ -445,6 +448,13 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                   </$StepSubheading>
                 </$Horizontal>
                 <$EarningsContainer>
+                  <$Light style={{ marginBottom: '0px' }}>
+                    <FormattedMessage
+                      id="bounty.redeem.upTo"
+                      defaultMessage="Win up to..."
+                      description="Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
+                    />
+                  </$Light>
                   <$EarningsText>{!!nftBountyValue ? nftBountyValue : unknownEarningText}</$EarningsText>
                 </$EarningsContainer>
               </$Vertical>
@@ -626,11 +636,22 @@ const $EarningsContainer = styled.div<{}>`
 `
 
 const $EarningsText = styled.p<{}>`
+  margin-top: 5px;
   text-align: center;
   font-size: ${TYPOGRAPHY.fontSize.xxlarge};
   line-height: ${TYPOGRAPHY.fontSize.xxlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   color: ${COLORS.surpressedFontColor};
+`
+
+const $Light = styled.p<{}>`
+  text-align: center;
+  font-style: italic;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  color: ${COLORS.surpressedFontColor};
+  text-transform: lowercase;
 `
 
 const $RedeemNFTButton = styled.button<{ themeColor?: string; disabled?: boolean }>`

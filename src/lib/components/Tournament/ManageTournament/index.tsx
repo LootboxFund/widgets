@@ -4,13 +4,14 @@ import Spinner from 'lib/components/Generics/Spinner'
 import { LootboxList, $TournamentCover, StreamListItem, $TournamentSectionContainer } from '../common'
 import {
   QueryTournamentArgs,
+  ResponseError,
   Tournament,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation, useQuery } from '@apollo/client'
-import { GET_MY_TOURNAMENT, DELETE_STREAM } from './api.gql'
+import { GET_MY_TOURNAMENT, DELETE_STREAM, MyTournamentFE } from './api.gql'
 import { useEffect, useState } from 'react'
 import { StreamID, TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -38,7 +39,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
-  const { data, loading, error } = useQuery<{ myTournament: TournamentResponse }, QueryTournamentArgs>(
+  const { data, loading, error } = useQuery<{ myTournament: MyTournamentFE | ResponseError }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
     {
       variables: {
@@ -62,7 +63,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
     return <Oopsies title={words.anErrorOccured} icon="🤕" message={data?.myTournament?.error?.message || ''} />
   }
 
-  const { tournament } = data.myTournament as TournamentResponseSuccess
+  const { tournament } = data.myTournament as MyTournamentFE
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
   const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
@@ -71,13 +72,13 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const JoinButton = () => (
     <$Button
       screen={screen}
-      onClick={
-        tournament.magicLink
-          ? () => {
-              window.open(`${tournament.magicLink}`, '_self')
-            }
-          : undefined
-      }
+      onClick={() => {
+        if (tournament.magicLink) {
+          window.open(`${tournament.magicLink}`, '_self')
+        } else {
+          window.open(createLootboxUrl, '_self')
+        }
+      }}
       color={COLORS.trustFontColor}
       backgroundColor={`${COLORS.trustBackground}`}
       style={{
@@ -103,7 +104,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
               <$h3 style={{ marginBottom: '-10px', textTransform: 'uppercase' }}>{words.manage}</$h3>
               <$Horizontal width="100%" justifyContent="space-between" flexWrap spacing={2}>
                 <$h1>{tournament.title}</$h1>
-                <div style={{ marginBottom: '20px' }}>
+                <div style={{ margin: 'auto 0 10px' }}>
                   <JoinButton />
                 </div>
               </$Horizontal>
@@ -185,7 +186,12 @@ const ManageTournament = (props: ManageTournamentProps) => {
               </$Horizontal>
             </$Vertical>
           </$Vertical>
+        </$Vertical>
+      </$TournamentSectionContainer>
 
+      {!tournament.magicLink || !tournament.streams || tournament.streams.length === 0 ? (
+        <$TournamentSectionContainer screen={screen}>
+          <$h1>{words.yourAlmostSetup}</$h1>
           {!tournament.magicLink && (
             <div style={{ paddingBottom: '15px' }}>
               <Oopsies
@@ -286,9 +292,8 @@ const ManageTournament = (props: ManageTournamentProps) => {
               />
             </div>
           )}
-        </$Vertical>
-      </$TournamentSectionContainer>
-
+        </$TournamentSectionContainer>
+      ) : null}
       <$TournamentSectionContainer screen={screen}>
         <$Vertical spacing={4}>
           <$h1>

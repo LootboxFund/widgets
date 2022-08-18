@@ -715,7 +715,50 @@ const useWords = () => {
     defaultMessage: 'You are not logged in',
   })
 
+  const generateInviteLinkText = intl.formatMessage({
+    id: 'inviteLink.modal.generateInviteLink',
+    description: 'Main action button for invite link modal',
+    defaultMessage: 'Generate Invite Link',
+  })
+
+  const inviteFriend = intl.formatMessage({
+    id: 'generics.inviteFriend',
+    defaultMessage: 'Invite Friend',
+  })
+
+  const yourAlmostSetup = intl.formatMessage({
+    id: 'profile.onboarding.title',
+    defaultMessage: "You're almost set up...",
+  })
+
+  const redeemNFTText = intl.formatMessage({
+    id: 'bounty.redeem.redeemNFT.text',
+    defaultMessage: 'Redeem NFT',
+    description: 'Text displayed when the user can redeem an NFT',
+  })
+
+  const fileTooLarge = intl.formatMessage({
+    id: 'generics.fileTooLarge',
+    defaultMessage: 'File too large',
+    description: 'Error message for user if they upload a file that is too large',
+  })
+
+  const phone = intl.formatMessage({
+    id: 'generics.phone',
+    defaultMessage: 'Phone',
+  })
+
+  const nextSteps = intl.formatMessage({
+    id: 'generics.nextSteps',
+    defaultMessage: 'Next Steps',
+  })
+
   return {
+    phone,
+    fileTooLarge,
+    redeemNFTText,
+    yourAlmostSetup,
+    inviteFriend,
     retry,
     sendCode,
     cancel,
@@ -828,6 +871,8 @@ const useWords = () => {
     username,
     biography,
     youAreNotLoggedIn,
+    generateInviteLinkText,
+    nextSteps,
   }
 }
 

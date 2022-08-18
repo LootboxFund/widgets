@@ -18,21 +18,33 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { browserLocalPersistence, setPersistence } from 'firebase/auth'
+import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useMutation } from '@apollo/client'
 import { COMPLETE_CLAIM } from '../api.gql'
-import { CompleteClaimResponse, MutationCompleteClaimArgs } from 'lib/api/graphql/generated/types'
+import {
+  CompleteClaimResponse,
+  CompleteClaimResponseSuccess,
+  MutationCompleteClaimArgs,
+} from 'lib/api/graphql/generated/types'
 import CountrySelect from 'lib/components/CountrySelect'
+import { useAuthWords } from 'lib/components/Authentication/Shared/index'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import { $Link } from 'lib/components/Profile/common'
+import { TOS_URL } from 'lib/hooks/constants'
+import { parseAuthError } from 'lib/utils/firebase'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface Props {
   onNext: () => void
   onBack: () => void
+  goToReferralCreation: () => void
 }
 type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
 const OnboardingSignUp = (props: Props) => {
   const words = useWords()
+  const { screen } = useWindowSize()
   const [status, setStatus] = useState<Status>('initializing')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneCode, setPhoneCode] = useState<string>('')
@@ -41,21 +53,31 @@ const OnboardingSignUp = (props: Props) => {
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
   const { claim, referral, chosenPartyBasket } = useViralOnboarding()
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
   const [completeClaim, { loading: loadingMutation }] = useMutation<
     { completeClaim: CompleteClaimResponse },
     MutationCompleteClaimArgs
   >(COMPLETE_CLAIM)
   const intl = useIntl()
+  const authWords = useAuthWords()
   const youHaveAlreadyAccepted = intl.formatMessage({
     id: 'viralOnboarding.youHaveAlreadyAccepted',
     defaultMessage: 'You have already accepted this referral.',
   })
-  const youHaveAlreadyAcceptedInfo = intl.formatMessage({
-    id: 'viralOnboarding.youHaveAlreadyAcceptedInfo',
+  const screenshotAndShare = intl.formatMessage({
+    id: 'viralOnboarding.screenshotAndShare',
     defaultMessage:
-      'You can only accept an initial invite once. If you want more tickets, ask your tournament host for a new referral link.',
+      'If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇',
   })
+
+  const youHaveAlreadyAcceptedInfo = intl.formatMessage(
+    {
+      id: 'viralOnboarding.youHaveAlreadyAcceptedInfo',
+      defaultMessage: 'You can only accept an initial invite once. {boldText}',
+    },
+    { boldText: <b>{screenshotAndShare}</b> }
+  )
 
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
@@ -144,30 +166,38 @@ const OnboardingSignUp = (props: Props) => {
       throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
     }
 
-    // Add it to localStorage
+    // Add notification to local storage
+    // this notification shows a notif on the user profile page
+
     try {
-      const pastClaimsRaw = localStorage.getItem('recentClaims')
-      const pastClaims: LocalClaim[] = pastClaimsRaw ? JSON.parse(pastClaimsRaw) : []
-      pastClaims.unshift({
-        campaignName: referral?.campaignName,
-        tournamentId: claim.tournamentId,
-        partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
-      })
-      localStorage.setItem('recentClaims', JSON.stringify(pastClaims))
+      if ((data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id) {
+        setNotificationClaims([...notificationClaims, (data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id])
+      }
     } catch (err) {
-      localStorage.setItem(
-        'recentClaims',
-        JSON.stringify([
-          {
-            campaignName: referral?.campaignName,
-            tournamentId: claim.tournamentId,
-            partyBasketId: claim.chosenPartyBasketId ? claim.chosenPartyBasketId : undefined,
-          },
-        ])
-      )
+      console.error(err)
     }
 
     props.onNext()
+  }
+
+  const renderTOS = () => {
+    return (
+      <$SupressedParagraph
+        style={{
+          fontSize: TYPOGRAPHY.fontSize.small,
+          marginTop: '40px',
+          width: screen === 'mobile' ? '100%' : '80%',
+          textAlign: 'start',
+        }}
+      >
+        *
+        {authWords.signupWithPhoneTerms(
+          <$Link href={TOS_URL} target="_blank">
+            {authWords.termsOfService}
+          </$Link>
+        )}
+      </$SupressedParagraph>
+    )
   }
 
   const reset = () => {
@@ -180,27 +210,55 @@ const OnboardingSignUp = (props: Props) => {
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
         {status === 'initializing' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
-        {status === 'error' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '15vh' }}>
-            <$Icon>{isAlreadyAccepted ? '😅' : '🤕'}</$Icon>
+        {status === 'error' && !isAlreadyAccepted && (
+          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+            <$Icon>{'🤕'}</$Icon>
             <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
-              {isAlreadyAccepted ? youHaveAlreadyAccepted : errorMessage || words.anErrorOccured}
+              {words.anErrorOccured}
             </$Heading>
-            {isAlreadyAccepted ? (
-              <$SubHeading style={{ marginTop: '0px' }}>{youHaveAlreadyAcceptedInfo}</$SubHeading>
+            {errorMessage ? (
+              <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(intl, errorMessage)}</$SubHeading>
             ) : null}
-            <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
+
+            <$SubHeading
+              onClick={() => props.onBack()}
+              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+            >
               {words.retry + '?'}
             </$SubHeading>
           </$Vertical>
         )}
+        {status === 'error' && isAlreadyAccepted && (
+          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+            <$Icon>{'😅'}</$Icon>
+            <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
+              {errorMessage ? parseAuthError(intl, errorMessage) : words.anErrorOccured}
+            </$Heading>
+            <$SubHeading style={{ marginTop: '0px' }}>{youHaveAlreadyAcceptedInfo}</$SubHeading>
+            <$NextButton
+              onClick={() => props.goToReferralCreation()}
+              color={COLORS.trustFontColor}
+              backgroundColor={COLORS.trustBackground}
+              style={{ textTransform: 'capitalize', fontWeight: TYPOGRAPHY.fontWeight.regular }}
+            >
+              {words.generateInviteLinkText}
+            </$NextButton>
+            <$SubHeading
+              onClick={() => props.onBack()}
+              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+            >
+              {words.back}
+            </$SubHeading>
+          </$Vertical>
+        )}
+
         {status === 'pending' && (
           <$Vertical height="100%">
             <Spinner size="30px" />
             <$Heading2 style={{ textAlign: 'start' }}>
               <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
             </$Heading2>
-            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}</$SubHeading>
+            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}*</$SubHeading>
             <$Vertical spacing={3}>
               <$Horizontal>
                 <CountrySelect onChange={setPhoneCode} backgroundColor="#ffffff" />
@@ -234,6 +292,7 @@ const OnboardingSignUp = (props: Props) => {
                 <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
               </$NextButton>
             </$Vertical>
+            {renderTOS()}
 
             <$HandImage src={handIconImg} />
           </$Vertical>
@@ -287,6 +346,7 @@ const OnboardingSignUp = (props: Props) => {
                 <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
               </$NextButton>
             </$Vertical>
+            {renderTOS()}
           </$Vertical>
         )}
         <div id="recaptcha-container" ref={captchaRef} />

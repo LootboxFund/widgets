@@ -88,10 +88,11 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
 
 const $ProfilePageInput = styled.input`
   border: 0px solid ${COLORS.white};
-  background-color: rgba(0, 0, 0, 0.08);
   padding: 5px 10px;
   border-radius: 5px;
   overflow: hidden;
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
 `
 
 const $StickySaveBar = styled.div`
