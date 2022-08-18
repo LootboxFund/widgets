@@ -32,6 +32,7 @@ interface MyLotteryTicketsProps {
 const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
+  const intl = useIntl()
   const [searchString, setSearchString] = useState('')
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
   const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
@@ -54,6 +55,33 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       }
     },
   })
+
+  const participationReward = intl.formatMessage({
+    id: 'userClaims.participationReward',
+    defaultMessage: 'Participation Reward',
+  })
+
+  const referredUser = (username: string) =>
+    intl.formatMessage(
+      {
+        id: 'userClaims.referredUser',
+        defaultMessage: 'Referred {username}',
+      },
+      {
+        username,
+      }
+    )
+
+  const invitedByUser = (username: string) =>
+    intl.formatMessage(
+      {
+        id: 'userClaims.invitedByUser',
+        defaultMessage: 'Invited by {username}',
+      },
+      {
+        username,
+      }
+    )
 
   useEffect(() => {
     if (chosenClaim) {
@@ -146,6 +174,20 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     } catch (err) {
       console.error(err)
     }
+  }
+
+  const TicketBadge = ({ claim }: { claim: PublicUserFEClaims }) => {
+    let text = ''
+
+    if (claim.type === 'reward') {
+      text = referredUser(claim?.userLink?.username || 'User')
+    } else if (claim.type === 'referral') {
+      text = invitedByUser(claim?.userLink?.username || 'User')
+    } else if (claim.type === 'one-time') {
+      text = participationReward
+    }
+
+    return <$TicketBadge>{text}</$TicketBadge>
   }
 
   return (
@@ -246,17 +288,20 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     target="_blank"
                     style={{ display: 'block', cursor: 'pointer' }}
                   >
-                    <img
-                      src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        paddingBottom: '5px',
-                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
-                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-                      }}
-                    />
+                    <$ImageContainer>
+                      <img
+                        src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          paddingBottom: '5px',
+                          // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+                          // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+                        }}
+                      />
+                      <TicketBadge claim={claim} />
+                    </$ImageContainer>
                   </a>
                   <$Vertical
                     width="100%"
@@ -499,6 +544,33 @@ const $DropDownOption = styled.a`
   color: ${COLORS.white};
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
   text-decoration: none;
+`
+
+const $ImageContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: inline-flex;
+`
+
+const $TicketBadge = styled.div`
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  background-color: #535353;
+  text-align: center;
+  color: ${COLORS.white};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  font-size: ${TYPOGRAPHY.fontSize.small};
+  height: 25px;
+  line-height: 25px;
+  border-radius: 0px 0px 10px 10px;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  padding: 0px 5px;
+  box-sizing: border-box;
 `
 
 export default UserLotteryTickets
