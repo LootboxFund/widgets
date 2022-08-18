@@ -425,6 +425,9 @@ const RedeemBounty = (props: RedeemBountyProps) => {
                           id="bounty.redeem.bountyValueTooltip"
                           defaultMessage='The NFT you redeem has the chance of earning "{bountyValue}" according to the Party Basket issuer. There is no guarantee of a profit and please contact the Party Basket issuer if you have questions.'
                           description="Indicates how much money the user can get from a Lootbox NFT"
+                          values={{
+                            bountyValue: nftBountyValue,
+                          }}
                         />
                       ) : (
                         <FormattedMessage
