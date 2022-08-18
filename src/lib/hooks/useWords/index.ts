@@ -748,6 +748,11 @@ const useWords = () => {
     defaultMessage: 'Phone',
   })
 
+  const nextSteps = intl.formatMessage({
+    id: 'generics.nextSteps',
+    defaultMessage: 'Next Steps',
+  })
+
   return {
     phone,
     fileTooLarge,
@@ -867,6 +872,7 @@ const useWords = () => {
     biography,
     youAreNotLoggedIn,
     generateInviteLinkText,
+    nextSteps,
   }
 }
 
