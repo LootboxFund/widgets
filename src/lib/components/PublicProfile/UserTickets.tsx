@@ -36,7 +36,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const [lastClaimCreatedAt, setLastClaimCreatedAt] = useState<undefined | string>(undefined)
   const [userClaims, setUserClaims] = useState<PublicUserFEClaims[]>([])
   const [chosenClaim, setChosenClaim] = useState<PublicUserFEClaims>()
-  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claims', [])
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const {
