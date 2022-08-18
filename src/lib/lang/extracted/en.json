@@ -216,6 +216,10 @@
     "defaultMessage": "Mystery ROI",
     "description": "Text displayed when we do not know the potential ROI (Return on Investment) of the NFT"
   },
+  "bounty.redeem.upTo": {
+    "defaultMessage": "Win up to...",
+    "description": "Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
+  },
   "buyShares.buyButton.buttonPrompt": {
     "defaultMessage": "Enter an amount",
     "description": "Input text for a user to enter an amount of crypto currency to buy from Lootbox"
