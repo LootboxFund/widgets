@@ -1057,6 +1057,9 @@
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
     "description": "Tooltip for creating a Party Basket"
   },
+  "generics.phone": {
+    "defaultMessage": "Phone"
+  },
   "generics.pleaseEnterYourPhoneNumber": {
     "defaultMessage": "Please enter your phone number",
     "description": "Text prompting user to enter their phone number"
@@ -1697,6 +1700,10 @@
   "profile.settings.passwordResetEmailSent": {
     "defaultMessage": "A password reset email was sent to your email.",
     "description": "Message displayed when the user clicks to make a new password."
+  },
+  "profile.settings.phoneNotSet": {
+    "defaultMessage": "Phone not set!",
+    "description": "Message displayed when the user does not have a phone."
   },
   "profile.settings.savePassword": {
     "defaultMessage": "Save password",

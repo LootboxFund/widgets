@@ -743,7 +743,13 @@ const useWords = () => {
     description: 'Error message for user if they upload a file that is too large',
   })
 
+  const phone = intl.formatMessage({
+    id: 'generics.phone',
+    defaultMessage: 'Phone',
+  })
+
   return {
+    phone,
     fileTooLarge,
     redeemNFTText,
     yourAlmostSetup,
