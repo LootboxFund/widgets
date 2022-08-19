@@ -1,6 +1,6 @@
 import { $Divider, $Horizontal, $Vertical, $h1, $span, $h3, $h2 } from '../../Generics'
 import { useQuery } from '@apollo/client'
-import { GET_TOURNAMENT } from './api.gql'
+import { GET_TOURNAMENT, TournamentFE } from './api.gql'
 import { useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { TournamentID } from 'lib/types'
@@ -8,6 +8,7 @@ import Modal from 'react-modal'
 import {
   LootboxTournamentSnapshot,
   QueryTournamentArgs,
+  ResponseError,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
@@ -48,11 +49,14 @@ const PublicTournament = (props: PublicTournamentProps) => {
   const [magicLinkParams, setMagicLinkParams] = useState<InitialUrlParams>()
   const { screen } = useWindowSize()
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(GET_TOURNAMENT, {
-    variables: {
-      id: props.tournamentId,
-    },
-  })
+  const { data, loading, error } = useQuery<{ tournament: TournamentFE | ResponseError }, QueryTournamentArgs>(
+    GET_TOURNAMENT,
+    {
+      variables: {
+        id: props.tournamentId,
+      },
+    }
+  )
   const tournamentWords = useTournamentWords()
 
   useEffect(() => {
@@ -95,7 +99,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
     return <Oopsies message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
-  const { tournament } = data.tournament as TournamentResponseSuccess
+  const { tournament } = data.tournament as TournamentFE
 
   const customStyles = {
     content: {
@@ -198,7 +202,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
               </$Horizontal>
             </$Vertical>
           </$Vertical>
-          <HiddenDescription description={tournament.description} screen={screen} />
+          {tournament.description && <HiddenDescription description={tournament.description} screen={screen} />}
         </$Vertical>
       </$TournamentSectionContainer>
 
@@ -231,6 +235,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
       )}
 
       <LootboxList
+        pageSize={5}
         lootboxes={tournament?.lootboxSnapshots || []}
         screen={screen}
         onClickLootbox={(lootbox) => {
@@ -262,7 +267,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
         </$Horizontal>
         {magicLinkParams && network && (
           <QuickCreate
-            tournamentName={tournament.title}
+            tournamentName={tournament.title || ''}
             tournamentId={magicLinkParams.tournamentId as TournamentID}
             receivingWallet={magicLinkParams.receivingWallet as Address}
             network={network}

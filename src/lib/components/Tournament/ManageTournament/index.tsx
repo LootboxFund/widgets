@@ -366,6 +366,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
       {lootboxSnapshots.length > 0 && (
         <LootboxList
+          pageSize={5}
           lootboxes={lootboxSnapshots}
           screen={screen}
           onClickLootbox={(lootbox) => {
