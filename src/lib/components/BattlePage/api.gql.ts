@@ -12,6 +12,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
           magicLink
           coverPhoto
           prize
+          joinCommunityUrl
           streams {
             id
             creatorId

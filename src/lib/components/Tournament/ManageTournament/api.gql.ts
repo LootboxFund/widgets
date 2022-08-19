@@ -72,7 +72,7 @@ export interface EditTournamentResponseFE {
     tournamentDate?: string
     prize?: string
     coverPhoto?: string
-    campaignCompleteURL?: string
+    communityURL?: string
   }
 }
 
@@ -89,7 +89,7 @@ export const EDIT_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
-          campaignCompleteURL
+          communityURL
         }
       }
       ... on ResponseError {
@@ -127,7 +127,7 @@ export interface MyTournamentFE {
     tournamentDate?: number
     prize?: string
     coverPhoto?: string
-    campaignCompleteURL?: string
+    communityURL?: string
     streams: MyTournamentStreamsFE[]
     lootboxSnapshots: MyTournamentLootboxSnapshot[]
   }
@@ -146,7 +146,7 @@ export const GET_MY_TOURNAMENT = gql`
           tournamentDate
           prize
           coverPhoto
-          campaignCompleteURL
+          communityURL
           streams {
             id
             creatorId

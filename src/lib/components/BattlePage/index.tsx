@@ -225,6 +225,35 @@ const BattlePage = (props: BattlePageParams) => {
                       {tournament.prize} {words.prize}
                     </$span>
                   )}
+                  <$Horizontal flexWrap>
+                    {tournament.tournamentLink ? (
+                      <$span style={{ paddingBottom: '15px' }}>
+                        👉{' '}
+                        <$Link
+                          color={'inherit'}
+                          fontStyle="italic"
+                          href={tournament.tournamentLink}
+                          style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                          target="_blank"
+                        >
+                          {tournamentWords.visitTournament}
+                        </$Link>
+                      </$span>
+                    ) : null}
+
+                    <$span style={{ paddingBottom: '15px' }}>
+                      👉{' '}
+                      <$Link
+                        color={'inherit'}
+                        fontStyle="italic"
+                        href={watchUrl}
+                        style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                        target="_self"
+                      >
+                        {words.joinCommunity}
+                      </$Link>
+                    </$span>
+                  </$Horizontal>
                   <$span
                     style={{
                       textTransform: 'capitalize',

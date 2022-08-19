@@ -132,9 +132,9 @@ export const useTournamentWords = () => {
     description: 'Error message shown to user when they dont input a stream type in a form',
   })
 
-  const addCampaignCompleteUrl = intl.formatMessage({
+  const communityURL = intl.formatMessage({
     id: 'tournament.stream.addCampaignCompleteUrl',
-    defaultMessage: 'Add URL for AFTER the tournament',
+    defaultMessage: 'Link to your Community',
   })
 
   return {
@@ -152,7 +152,7 @@ export const useTournamentWords = () => {
     streamURLCannotBeEmpty,
     // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
-    addCampaignCompleteUrl,
+    communityURL,
   }
 }
 
