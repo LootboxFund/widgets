@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 import { Address } from '@wormgraph/helpers'
 import { StreamType } from 'lib/api/graphql/generated/types'
-import { StreamID, UserID } from 'lib/types'
+import { StreamID, TournamentID, UserID } from 'lib/types'
 
 export interface TournamentLootboxSnapshot {
   address: Address
@@ -20,6 +20,7 @@ export interface TournamentStreamsFE {
 export interface TournamentFE {
   __typename: 'TournamentResponseSuccess'
   tournament: {
+    id: TournamentID
     title?: string
     description?: string
     tournamentLink?: string
@@ -37,6 +38,7 @@ export const GET_TOURNAMENT = gql`
     tournament(id: $id) {
       ... on TournamentResponseSuccess {
         tournament {
+          id
           title
           description
           tournamentLink

@@ -50,7 +50,7 @@ const BattlePage = (props: BattlePageParams) => {
   const words = useWords()
   const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
-  const SOCIALS = getSocials(intl)
+  // const SOCIALS = getSocials(intl)
   const [searchTerm, setSearchTerm] = useState('')
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({

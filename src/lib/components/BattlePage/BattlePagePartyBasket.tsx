@@ -12,7 +12,7 @@ import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
 import { useState } from 'react'
-import { PartyBasketID, TournamentID } from 'lib/types'
+import { PartyBasketID, SocialFragment, TournamentID } from 'lib/types'
 import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasketReferral'
 import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
@@ -55,6 +55,17 @@ const BattlePagePartyBasket = (props: Props) => {
     const flatSocials = Object.entries(lootboxSnapshot.socials)
       .filter((fack) => fack[0] !== '__typename')
       .filter((fack) => !!fack[1]) // Filter graphql ting
+
+    const data: SocialFragment[] = flatSocials
+      .map(([platform, value]) => {
+        const socialData = SOCIALS.find((soc) => soc.slug === platform.toLowerCase())
+        return socialData
+      })
+      .filter((d) => d != undefined) as SocialFragment[]
+
+    if (data.length === 0) {
+      return null
+    }
     return (
       <$Vertical spacing={4} style={{ paddingTop: screen === 'mobile' ? '10px' : 'auto' }}>
         <$h3
@@ -71,36 +82,31 @@ const BattlePagePartyBasket = (props: Props) => {
           />
         </$h3>
         <$Horizontal flexWrap justifyContent="space-between">
-          {flatSocials.map(([platform, value]) => {
-            const socialData = SOCIALS.find((soc) => soc.slug === platform.toLowerCase())
-            if (socialData) {
-              const url = getSocialUrlLink(socialData.slug as SocialType, value as string)
-              return (
-                <$Horizontal
-                  key={`${props.lootboxPartyBasket.lootbox.address}-${platform}`}
-                  spacing={2}
-                  style={{ paddingBottom: '10px' }}
+          {data.map((social) => {
+            const url = getSocialUrlLink(social.slug as SocialType, social.slug as string)
+            return (
+              <$Horizontal
+                key={`${props.lootboxPartyBasket.lootbox.address}-${social.slug}`}
+                spacing={2}
+                style={{ paddingBottom: '10px' }}
+              >
+                <$SocialLogo src={social.icon} />
+                <a
+                  href={url}
+                  style={{
+                    width: '100px',
+                    margin: 'auto 0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    cursor: url ? 'pointer' : 'unset',
+                    textDecoration: 'none',
+                  }}
                 >
-                  <$SocialLogo src={socialData.icon} />
-                  <a
-                    href={url}
-                    style={{
-                      width: '100px',
-                      margin: 'auto 0',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      cursor: url ? 'pointer' : 'unset',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <$span>{value}</$span>
-                  </a>
-                </$Horizontal>
-              )
-            } else {
-              return null
-            }
+                  <$span>{social.slug}</$span>
+                </a>
+              </$Horizontal>
+            )
           })}
         </$Horizontal>
         <Modal
@@ -246,6 +252,24 @@ const BattlePagePartyBasket = (props: Props) => {
                   ? props.lootboxPartyBasket?.lootbox?.description
                   : ''}
               </$p>
+              <$Horizontal flexWrap>
+                {props.lootboxPartyBasket?.partyBasket?.address && (
+                  <$Link
+                    href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket?.partyBasket?.address}`}
+                    style={{ margin: '10px 10px 10px 0px', textTransform: 'lowercase', textDecoration: 'none' }}
+                  >
+                    👉 Redeem
+                  </$Link>
+                )}
+                {props.lootboxPartyBasket?.lootbox?.address && (
+                  <$Link
+                    href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxPartyBasket?.lootbox?.address}`}
+                    style={{ margin: '10px 10px 10px 0px', textTransform: 'lowercase', textDecoration: 'none' }}
+                  >
+                    👉 View Lootbox
+                  </$Link>
+                )}
+              </$Horizontal>
             </$Vertical>
             <$Vertical
               style={{

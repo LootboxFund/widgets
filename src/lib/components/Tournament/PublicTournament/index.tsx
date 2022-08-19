@@ -141,6 +141,8 @@ const PublicTournament = (props: PublicTournamentProps) => {
     </$Button>
   )
 
+  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tournament=${tournament.id}`
+
   return (
     <$Vertical spacing={5} width="100%" maxWidth="720px" style={{ margin: '0 auto' }}>
       <$TournamentSectionContainer screen={screen} style={{ boxShadow: 'none', marginBottom: '0px' }}>
@@ -157,21 +159,6 @@ const PublicTournament = (props: PublicTournamentProps) => {
               </$Horizontal>
               <$Divider margin="0px 0px 20px 0px" />
               <$Horizontal flexWrap>
-                {tournament.magicLink && (
-                  <$span style={{ paddingBottom: '15px' }}>
-                    👉{' '}
-                    <$Link
-                      color={'inherit'}
-                      fontStyle="italic"
-                      href={tournament.magicLink}
-                      style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                      target="_self"
-                    >
-                      {words.createLootbox}
-                    </$Link>
-                  </$span>
-                )}
-
                 {tournament.tournamentLink ? (
                   <$span style={{ paddingBottom: '15px' }}>
                     👉{' '}
@@ -186,6 +173,38 @@ const PublicTournament = (props: PublicTournamentProps) => {
                     </$Link>
                   </$span>
                 ) : null}
+
+                <$span style={{ paddingBottom: '15px' }}>
+                  👉{' '}
+                  <$Link
+                    color={'inherit'}
+                    fontStyle="italic"
+                    href={watchUrl}
+                    style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                    target="_self"
+                  >
+                    <FormattedMessage
+                      id="tournament.edit.publicWatchPage"
+                      defaultMessage="Public Watch Page"
+                      description="Hyperlink to navigate to the public watch page of an esports tournament"
+                    />
+                  </$Link>
+                </$span>
+                {/* 
+                {tournament.magicLink && (
+                  <$span style={{ paddingBottom: '15px' }}>
+                    👉{' '}
+                    <$Link
+                      color={'inherit'}
+                      fontStyle="italic"
+                      href={tournament.magicLink}
+                      style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                      target="_self"
+                    >
+                      {words.joinTournament}
+                    </$Link>
+                  </$span>
+                )} */}
 
                 <$span style={{ paddingBottom: '15px' }}>
                   👉{' '}
@@ -215,6 +234,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
               description="Header for stream selection in the public tournament page"
             />
           </$h1>
+
           <br />
           {tournament.streams.map((stream) => {
             return (
