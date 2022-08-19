@@ -2150,6 +2150,15 @@
   "tournamentAnalytics.button.downloadCSV": {
     "defaultMessage": "Generate CSV"
   },
+  "userClaims.invitedByUser": {
+    "defaultMessage": "Invited by {username}"
+  },
+  "userClaims.participationReward": {
+    "defaultMessage": "Participation Reward"
+  },
+  "userClaims.referredUser": {
+    "defaultMessage": "Referred {username}"
+  },
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",
     "description": "Prompt for user to redeem their Lootbox NFTs in exchange for money"
