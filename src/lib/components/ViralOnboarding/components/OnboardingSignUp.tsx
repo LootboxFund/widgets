@@ -115,7 +115,11 @@ const OnboardingSignUp = (props: Props) => {
   }, [user])
 
   const handleCodeSubmit = async () => {
+    if (loading) {
+      return
+    }
     setLoading(true)
+    setErrorMessage('')
     try {
       setPersistence(auth, browserLocalPersistence)
       await signInPhoneWithCode(confirmationCode)
@@ -129,6 +133,9 @@ const OnboardingSignUp = (props: Props) => {
   }
 
   const handleVerificationRequest = async () => {
+    if (loading) {
+      return
+    }
     setErrorMessage('')
     setLoading(true)
     try {
@@ -213,7 +220,7 @@ const OnboardingSignUp = (props: Props) => {
         {status === 'error' && !isAlreadyAccepted && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Icon>{'🤕'}</$Icon>
-            <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge }}>
+            <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge, lineHeight:  TYPOGRAPHY.fontSize.xxlarge}}>
               {words.anErrorOccured}
             </$Heading>
             {errorMessage ? (
@@ -221,7 +228,7 @@ const OnboardingSignUp = (props: Props) => {
             ) : null}
 
             <$SubHeading
-              onClick={() => props.onBack()}
+              onClick={reset}
               style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
             >
               {words.retry + '?'}
@@ -245,7 +252,7 @@ const OnboardingSignUp = (props: Props) => {
             </$NextButton>
             <$SubHeading
               onClick={() => props.onBack()}
-              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer', margin: '30px 0px' }}
             >
               {words.back}
             </$SubHeading>
@@ -254,7 +261,7 @@ const OnboardingSignUp = (props: Props) => {
 
         {status === 'pending' && (
           <$Vertical height="100%">
-            <Spinner size="30px" />
+            <Spinner size="30px" color={`${COLORS.white}66`}/>
             <$Heading2 style={{ textAlign: 'start' }}>
               <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
             </$Heading2>

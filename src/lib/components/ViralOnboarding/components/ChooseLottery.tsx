@@ -130,6 +130,7 @@ const ChooseLottery = (props: Props) => {
                           textAlign: 'start',
                           margin: '0px',
                           fontSize: TYPOGRAPHY.fontSize.large,
+                          lineHeight: TYPOGRAPHY.fontSize.xxlarge,
                         }}
                       >
                         {data?.partyBasket?.name}
