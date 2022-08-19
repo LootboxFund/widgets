@@ -1,6 +1,6 @@
 import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage } from 'react-intl'
-import { $Heading, $SubHeading, background1, $Heading2, $SmallText } from '../contants'
+import { $Heading, $SubHeading, background1, $Heading2, $SmallText, $NextButton } from '../contants'
 import { GET_LOTTERY_LISTINGS } from '../api.gql'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useQuery } from '@apollo/client'
@@ -15,6 +15,9 @@ import { ErrorCard, LoadingCard } from './GenericCard'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
+import { useEffect, useMemo, useState } from 'react'
+
+const PAGE_SIZE = 6
 
 interface LootboxPartyBasket {
   lootbox: LootboxTournamentSnapshot
@@ -26,7 +29,8 @@ interface Props {
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
-  const { referral, setChosenPartyBasket, chosenPartyBasket } = useViralOnboarding()
+  const [page, setPage] = useState(0)
+  const { referral, setChosenPartyBasket } = useViralOnboarding()
   const words = useWords()
   const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(
     GET_LOTTERY_LISTINGS,
@@ -36,6 +40,39 @@ const ChooseLottery = (props: Props) => {
       },
     }
   )
+  const [tickets, hasNextPage] = useMemo<[LootboxPartyBasket[], boolean]>(() => {
+    if (!data || data?.tournament?.__typename === 'ResponseError') {
+      return [[], false]
+    }
+
+    const { tournament } = data.tournament as TournamentResponseSuccess
+
+    let lootboxPartyBaskets: LootboxPartyBasket[] = []
+
+    tournament.lootboxSnapshots?.forEach((snapshot) => {
+      if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
+        snapshot.partyBaskets.forEach((partyBasket) => {
+          const doc: LootboxPartyBasket = {
+            lootbox: snapshot,
+            partyBasket,
+          }
+          if (partyBasket.id === referral?.seedPartyBasketId) {
+            lootboxPartyBaskets.unshift(doc)
+          } else {
+            if (lootboxPartyBaskets.some((snap) => snap.partyBasket.id === doc.lootbox.address)) {
+              lootboxPartyBaskets.push(doc)
+            } else {
+              lootboxPartyBaskets.splice(1, 0, doc)
+            }
+          }
+        })
+      }
+    })
+
+    const paginated = lootboxPartyBaskets.slice(0, PAGE_SIZE * (page + 1))
+
+    return [paginated, paginated.length < lootboxPartyBaskets.length]
+  }, [page, data, referral?.seedPartyBasketId])
 
   if (loading) {
     return <LoadingCard />
@@ -44,37 +81,6 @@ const ChooseLottery = (props: Props) => {
   } else if (data?.tournament?.__typename === 'ResponseError') {
     return <ErrorCard message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
-
-  const { tournament } = data.tournament as TournamentResponseSuccess
-
-  let lootboxPartyBaskets: LootboxPartyBasket[] = []
-  const seenLootboxId: string[] = []
-  let highligted: LootboxPartyBasket | undefined = undefined
-  tournament.lootboxSnapshots?.forEach((snapshot) => {
-    if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
-      snapshot.partyBaskets.forEach((partyBasket) => {
-        const doc: LootboxPartyBasket = {
-          lootbox: snapshot,
-          partyBasket,
-        }
-        if (partyBasket.id === referral?.seedPartyBasketId) {
-          //   lootboxPartyBaskets.unshift(doc)
-          highligted = doc
-        } else {
-          if (
-            seenLootboxId.includes(doc.lootbox.address) ||
-            (highligted && highligted.lootbox.address === doc.lootbox.address)
-          ) {
-            lootboxPartyBaskets.push(doc)
-          } else {
-            lootboxPartyBaskets.unshift(doc)
-          }
-        }
-      })
-    }
-  })
-  // Hacky shit to get the highlighted and slightly depuped tickets
-  lootboxPartyBaskets = !!highligted ? [highligted, ...lootboxPartyBaskets] : [...lootboxPartyBaskets]
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -94,7 +100,7 @@ const ChooseLottery = (props: Props) => {
             />
           </$SubHeading>
           <$Vertical spacing={4} style={{ margin: '0px -10px' }}>
-            {lootboxPartyBaskets.map((data, idx) => {
+            {tickets.map((data, idx) => {
               const description = !data?.lootbox?.description
                 ? ''
                 : data.lootbox.description.length > 80
@@ -134,6 +140,14 @@ const ChooseLottery = (props: Props) => {
                 </$LotteryContainer>
               )
             })}
+            {hasNextPage && (
+              <$NextButton
+                onClick={() => setPage(page + 1)}
+                style={{ color: COLORS.white, background: COLORS.trustBackground }}
+              >
+                {words.seeMore}
+              </$NextButton>
+            )}
           </$Vertical>
         </$Vertical>
       </$ViralOnboardingSafeArea>
@@ -150,7 +164,7 @@ const $LotteryContainer = styled.div<{ type?: 'default' | 'highlight' | 'locked'
   box-sizing: border-box;
   overflow: hidden;
   cursor: ${(props) => (props.type === 'locked' ? 'not-allowed' : 'pointer')};
-  filter: ${(props) => (props.type === 'highlight' ? 'drop-shadow(0px 0px 50px #00a3ff)' : 'none')};
+  box-shadow: ${(props) => (props.type === 'highlight' ? `0px 3px 50px #00a3ff` : 'none')};
 `
 
 const $PartyBasketImage = styled.img`
