@@ -758,7 +758,18 @@ const useWords = () => {
     defaultMessage: 'Next Steps',
   })
 
+  const soldOut = intl.formatMessage({
+    id: 'generics.soldOut',
+    defaultMessage: 'Sold Out',
+  })
+
+  const outOfStock = intl.formatMessage({
+    id: 'generics.outOfStock',
+    defaultMessage: 'Out of Stock',
+  })
+
   return {
+    outOfStock,
     phone,
     fileTooLarge,
     redeemNFTText,
@@ -879,6 +890,7 @@ const useWords = () => {
     generateInviteLinkText,
     nextSteps,
     joinCommunity,
+    soldOut,
   }
 }
 

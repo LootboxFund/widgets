@@ -140,10 +140,11 @@ const BattlePage = (props: BattlePageParams) => {
         {!!stream && <LiveStreamVideo stream={stream} />}
         {!stream && !!tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
         {!stream && !tournament.coverPhoto && <$TournamentCoverPlaceholder />}
+        <br />
         <$BattlePageBody screen={screen}>
           <$Vertical spacing={4} height="100%">
             {!!stream && (
-              <$span>
+              <$span style={{ textAlign: 'center' }}>
                 <FormattedMessage
                   id="battlePage.streamText.switchStreamText"
                   defaultMessage='You are watching "{streamName}". To switch to another stream, {clickHereHyperlink}'
@@ -157,6 +158,8 @@ const BattlePage = (props: BattlePageParams) => {
                     ),
                   }}
                 />
+                <br />
+                <br />
               </$span>
             )}
             {!stream && (
@@ -180,11 +183,14 @@ const BattlePage = (props: BattlePageParams) => {
                 <$Vertical height="100%" spacing={2} style={{ margin: '0 auto' }}>
                   <$BattleCardsContainer screen={screen} width="220px">
                     {tournament.lootboxSnapshots?.length ? (
-                      tournament.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
-                        return (
-                          <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`tournament-img-${idx2}`} />
-                        )
-                      })
+                      tournament.lootboxSnapshots
+                        ?.slice(0, 2)
+                        ?.reverse() // reversed to show the "second" one first
+                        ?.map((snap, idx2) => {
+                          return (
+                            <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`tournament-img-${idx2}`} />
+                          )
+                        })
                     ) : (
                       <$BattleCardImage src={TEMPLATE_LOOTBOX_STAMP} cardNumber={0} />
                     )}
@@ -391,6 +397,8 @@ const $BattlePageBody = styled.div<{ screen: ScreenSize }>`
   width: 100%;
   padding: 0px ${(props) => (props.screen === 'mobile' ? '0px' : '3rem')};
   box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
 `
 
 export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`

@@ -151,17 +151,19 @@ const BattlePagePartyBasket = (props: Props) => {
             }
             style={{
               textTransform: 'capitalize',
-              color: props.lootboxPartyBasket.partyBasket ? `${COLORS.trustBackground}B0` : COLORS.white,
+              color: props.lootboxPartyBasket.partyBasket
+                ? `${COLORS.trustBackground}B0`
+                : `rgba(154, 154, 154, 0.682)`,
               border: `1px solid ${
                 props.lootboxPartyBasket.partyBasket ? `${COLORS.trustBackground}B0` : 'rgba(0,0,0,0.05)'
               }`,
               background: props.lootboxPartyBasket.partyBasket
-                ? `rgba(0,0,0,0.05)`
-                : `${COLORS.surpressedBackground}ae`,
+                ? `rgba(0,0,0,0.02)`
+                : `${COLORS.surpressedBackground}2e`,
               whiteSpace: 'nowrap',
               marginTop: '0.67em',
               fontWeight: 'ligher',
-              // width: '100%',
+              width: '100%',
               cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
               maxHeight: '50px',
               fontSize: '1.2rem',
@@ -187,7 +189,7 @@ const BattlePagePartyBasket = (props: Props) => {
             style={{
               textTransform: 'capitalize',
               textAlign: 'center',
-              paddingTop: '10px',
+              paddingTop: '30px',
               color: COLORS.surpressedFontColor,
               fontSize: TYPOGRAPHY.fontSize.medium,
               lineHeight: TYPOGRAPHY.fontSize.large,
@@ -215,7 +217,7 @@ const BattlePagePartyBasket = (props: Props) => {
               cardNumber={0}
               style={{ position: 'relative', maxWidth: '100%' }}
             />
-            {screen !== 'mobile' && <ClaimLotteryButton />}
+            {/* {screen !== 'mobile' && <ClaimLotteryButton />} */}
           </$BattleCardsContainer>
 
           {/* <span
@@ -310,7 +312,7 @@ const BattlePagePartyBasket = (props: Props) => {
                 >
                   {words.inviteFriend}
                 </$Button>
-                <p
+                {/* <p
                   style={{
                     color: COLORS.surpressedFontColor,
                     textAlign: 'center',
@@ -325,8 +327,8 @@ const BattlePagePartyBasket = (props: Props) => {
                     defaultMessage="Both get a FREE lottery ticket"
                     description="Text prompting user on why they should invite a friend"
                   />
-                </p>
-                {screen === 'mobile' && <ClaimLotteryButton />}
+                </p> */}
+                <ClaimLotteryButton />
               </div>
             </$Vertical>
           </$Horizontal>

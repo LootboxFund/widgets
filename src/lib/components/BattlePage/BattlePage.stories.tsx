@@ -13,7 +13,7 @@ const Demo = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
+        <$CardViewport width="100%" maxWidth="1200px" height="auto" margin="0 auto">
           <BattlePage />
           <br />
           <br />

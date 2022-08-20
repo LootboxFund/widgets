@@ -209,6 +209,9 @@ const OnboardingSignUp = (props: Props) => {
 
   const reset = () => {
     setStatus('pending')
+    if (errorMessage?.toLowerCase()?.indexOf('sold out')) {
+      props.onBack()
+    }
   }
 
   const isAlreadyAccepted = errorMessage && errorMessage?.toLowerCase().includes('already accepted')
@@ -220,17 +223,20 @@ const OnboardingSignUp = (props: Props) => {
         {status === 'error' && !isAlreadyAccepted && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Icon>{'🤕'}</$Icon>
-            <$Heading style={{ textTransform: 'none', fontSize: TYPOGRAPHY.fontSize.xlarge, lineHeight:  TYPOGRAPHY.fontSize.xxlarge}}>
+            <$Heading
+              style={{
+                textTransform: 'none',
+                fontSize: TYPOGRAPHY.fontSize.xlarge,
+                lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+              }}
+            >
               {words.anErrorOccured}
             </$Heading>
             {errorMessage ? (
               <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(intl, errorMessage)}</$SubHeading>
             ) : null}
 
-            <$SubHeading
-              onClick={reset}
-              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
-            >
+            <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
               {words.retry + '?'}
             </$SubHeading>
           </$Vertical>
@@ -261,7 +267,7 @@ const OnboardingSignUp = (props: Props) => {
 
         {status === 'pending' && (
           <$Vertical height="100%">
-            <Spinner size="30px" color={`${COLORS.white}66`}/>
+            <Spinner size="30px" color={`${COLORS.white}66`} />
             <$Heading2 style={{ textAlign: 'start' }}>
               <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
             </$Heading2>

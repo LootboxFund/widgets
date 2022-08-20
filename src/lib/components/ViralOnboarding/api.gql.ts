@@ -1,4 +1,7 @@
 import { gql } from '@apollo/client'
+import { Address } from '@wormgraph/helpers'
+import { ClaimStatus, ClaimType, PartyBasketStatus } from 'lib/api/graphql/generated/types'
+import { ClaimID, ReferralID, PartyBasketID, ReferralSlug, TournamentID, UserID } from 'lib/types'
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {
@@ -28,6 +31,34 @@ export const COMPLETE_CLAIM = gql`
     }
   }
 `
+
+export interface OnboardingTournamentFE {
+  title?: string
+  description?: string
+  tournamentDate?: number
+  lootboxSnapshots: {
+    address: Address
+    stampImage?: string
+  }[]
+}
+
+export interface ReferralFE {
+  slug: ReferralSlug
+  seedPartyBasketId?: PartyBasketID
+  nConversions?: number
+  campaignName?: string
+  tournamentId: TournamentID
+  tournament: OnboardingTournamentFE
+  seedPartyBasket: {
+    nftBountyValue?: string
+    lootboxAddress: Address
+  }
+}
+
+export interface ReferralResponseFE {
+  __typename: 'ReferralResponseSuccess'
+  referral: ReferralFE
+}
 
 export const GET_REFERRAL = gql`
   query Query($slug: ID!) {
@@ -64,6 +95,29 @@ export const GET_REFERRAL = gql`
   }
 `
 
+export interface PartyBasketFE {
+  id: PartyBasketID
+  name?: string
+  nftBountyValue?: string
+  address: Address
+  lootboxAddress?: Address
+  status?: PartyBasketStatus
+}
+
+export interface LootboxSnapshotFE {
+  address: Address
+  name?: string
+  stampImage?: string
+  description?: string
+  partyBaskets: PartyBasketFE[]
+}
+export interface LotteryListingFE {
+  __typename: 'LotteryListingResponseSuccess'
+  tournament: {
+    lootboxSnapshots: LootboxSnapshotFE[]
+  }
+}
+
 export const GET_LOTTERY_LISTINGS = gql`
   query Query($id: ID!) {
     tournament(id: $id) {
@@ -80,6 +134,7 @@ export const GET_LOTTERY_LISTINGS = gql`
               nftBountyValue
               address
               lootboxAddress
+              status
             }
           }
         }
@@ -93,6 +148,26 @@ export const GET_LOTTERY_LISTINGS = gql`
     }
   }
 `
+
+export interface ClaimFE {
+  id: ClaimID
+  referralId: ReferralID
+  referralSlug: ReferralSlug
+  tournamentId: TournamentID
+  referrerId?: UserID
+  chosenPartyBasketId?: PartyBasketID
+  chosenPartyBasketAddress?: Address
+  lootboxAddress?: Address
+  rewardFromClaim?: string
+  claimerUserId?: UserID
+  status?: ClaimStatus
+  type?: ClaimType
+}
+
+export interface CreateClaimResponseFE {
+  __typename: 'CreateClaimResponseSuccess'
+  claim: ClaimFE
+}
 
 export const CREATE_CLAIM = gql`
   mutation Mutation($payload: CreateClaimPayload!) {
