@@ -213,13 +213,12 @@ const BattlePage = (props: BattlePageParams) => {
                   )}
                 </$Vertical>
                 <$Vertical height="100%" width="100%" spacing={2}>
-                  <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>{tournament.title}</$h1>
+                  <$h1> {tournament.title}</$h1>
                   {tournament.prize && (
                     <$span
                       style={{
                         textTransform: 'capitalize',
                         color: COLORS.black,
-                        textAlign: screen === 'mobile' ? 'center' : 'left',
                       }}
                     >
                       {tournament.prize} {words.prize}
@@ -227,10 +226,10 @@ const BattlePage = (props: BattlePageParams) => {
                   )}
                   <$Horizontal flexWrap>
                     {tournament.tournamentLink ? (
-                      <$span style={{ paddingBottom: '15px' }}>
+                      <$span style={{ padding: '15px 0px' }}>
                         👉{' '}
                         <$Link
-                          color={'inherit'}
+                          // color={'inherit'}
                           fontStyle="italic"
                           href={tournament.tournamentLink}
                           style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
@@ -241,26 +240,27 @@ const BattlePage = (props: BattlePageParams) => {
                       </$span>
                     ) : null}
 
-                    <$span style={{ paddingBottom: '15px' }}>
-                      👉{' '}
-                      <$Link
-                        color={'inherit'}
-                        fontStyle="italic"
-                        href={watchUrl}
-                        style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                        target="_self"
-                      >
-                        {words.joinCommunity}
-                      </$Link>
-                    </$span>
+                    {tournament.communityURL && (
+                      <$span style={{ padding: '15px 0px' }}>
+                        👉{' '}
+                        <$Link
+                          // color={'inherit'}
+                          fontStyle="italic"
+                          href={tournament.communityURL}
+                          style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                          target="_self"
+                        >
+                          {words.joinCommunity}
+                        </$Link>
+                      </$span>
+                    )}
                   </$Horizontal>
                   <$span
                     style={{
                       textTransform: 'capitalize',
                       color: COLORS.black,
-                      marginTop: '20px',
+                      marginTop: '10px',
                       fontWeight: TYPOGRAPHY.fontWeight.bold,
-                      textAlign: screen === 'mobile' ? 'center' : 'left',
                     }}
                   >
                     <FormattedMessage
@@ -274,7 +274,6 @@ const BattlePage = (props: BattlePageParams) => {
                       color: COLORS.black,
                       overflow: 'hidden',
                       whiteSpace: 'pre-line',
-                      textAlign: screen === 'mobile' ? 'center' : 'left',
                     }}
                   >
                     {tournament.description && tournament.description?.length > 250
@@ -286,7 +285,7 @@ const BattlePage = (props: BattlePageParams) => {
                 </$Vertical>
               </$Horizontal>
             </$BattlePageSection>
-            <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>
+            <$h1>
               <FormattedMessage
                 id="battlePage.lotteryHeader"
                 defaultMessage="Claim a Lottery Ticket"
@@ -403,6 +402,7 @@ export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
   padding: 2rem;
   box-sizing: border-box;
   overflow: hidden;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
 `
 
 export const $BattleCardsContainer = styled.div<{ width: string; screen: ScreenSize }>`
@@ -428,8 +428,8 @@ export const $BattleCardImage = styled.img<{ cardNumber: number }>`
   background-size: cover;
   margin-left: -${(props) => props.cardNumber * 10}px;
   margin-top: ${(props) => props.cardNumber * 12}px;
-  filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.25));
   object-fit: contain;
+  box-shadow: 2px 4px 5px #a2a2a2;
 `
 
 export const $SocialLogo = styled.img`
