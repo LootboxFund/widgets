@@ -592,6 +592,11 @@ const useWords = () => {
     description: 'Text to join an esports tournament',
   })
 
+  const joinCommunity = intl.formatMessage({
+    id: 'generics.joinCommunity',
+    defaultMessage: 'Join Community',
+  })
+
   const pleaseEnterYourPhoneNumber = intl.formatMessage({
     id: 'generics.pleaseEnterYourPhoneNumber',
     defaultMessage: 'Please enter your phone number',
@@ -753,7 +758,18 @@ const useWords = () => {
     defaultMessage: 'Next Steps',
   })
 
+  const soldOut = intl.formatMessage({
+    id: 'generics.soldOut',
+    defaultMessage: 'Sold Out',
+  })
+
+  const outOfStock = intl.formatMessage({
+    id: 'generics.outOfStock',
+    defaultMessage: 'Out of Stock',
+  })
+
   return {
+    outOfStock,
     phone,
     fileTooLarge,
     redeemNFTText,
@@ -873,6 +889,8 @@ const useWords = () => {
     youAreNotLoggedIn,
     generateInviteLinkText,
     nextSteps,
+    joinCommunity,
+    soldOut,
   }
 }
 

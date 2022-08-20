@@ -3,7 +3,9 @@ import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import {
   LootboxTournamentSnapshot,
   PartyBasket,
+  PartyBasketStatus,
   QueryTournamentArgs,
+  ResponseError,
   Stream,
   TournamentResponse,
   TournamentResponseSuccess,
@@ -11,13 +13,19 @@ import {
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { TournamentID, StreamID } from 'lib/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { $h1, $h2, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
 import Spinner from '../Generics/Spinner'
 import { $Link, Oopsies } from '../Profile/common'
-import { GET_TOURNAMENT_BATTLE_PAGE } from './api.gql'
+import {
+  GET_TOURNAMENT_BATTLE_PAGE,
+  BattlePageResponseSuccessFE,
+  PartyBasketFE,
+  BattlePageLootboxSnapshotFE,
+  TournamentStreamsFE,
+} from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
 import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
@@ -26,10 +34,11 @@ import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
+import $Button from '../Generics/Button'
 
 export interface LootboxPartyBasket {
-  lootbox: LootboxTournamentSnapshot
-  partyBasket?: PartyBasket
+  lootbox: BattlePageLootboxSnapshotFE
+  partyBasket?: PartyBasketFE
 }
 
 interface BattlePageParams {
@@ -37,21 +46,56 @@ interface BattlePageParams {
   streamId?: StreamID
 }
 const BattlePage = (props: BattlePageParams) => {
-  const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(
-    GET_TOURNAMENT_BATTLE_PAGE,
-    {
-      variables: {
-        id: props.tournamentId,
-      },
-    }
-  )
+  const { data, loading, error } = useQuery<
+    { tournament: BattlePageResponseSuccessFE | ResponseError },
+    QueryTournamentArgs
+  >(GET_TOURNAMENT_BATTLE_PAGE, {
+    variables: {
+      id: props.tournamentId,
+    },
+  })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
   const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
-  const SOCIALS = getSocials(intl)
+  // const SOCIALS = getSocials(intl)
   const [searchTerm, setSearchTerm] = useState('')
+
+  const [lootboxPartyBaskets] = useMemo<[LootboxPartyBasket[]]>(() => {
+    if (!data || data?.tournament?.__typename === 'ResponseError') {
+      return [[]]
+    }
+
+    const _lootboxPartyBaskets: LootboxPartyBasket[] = []
+    const _soldout: LootboxPartyBasket[] = []
+    const _noPartyBaskets: LootboxPartyBasket[] = []
+
+    ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
+      if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
+        snapshot.partyBaskets.forEach((partyBasket) => {
+          if (partyBasket.status === PartyBasketStatus.SoldOut) {
+            _soldout.push({
+              lootbox: snapshot,
+              partyBasket: partyBasket,
+            })
+          } else {
+            _lootboxPartyBaskets.push({
+              lootbox: snapshot,
+              partyBasket: partyBasket,
+            })
+          }
+        })
+      } else {
+        console.log('no party baskets', snapshot.name)
+        _noPartyBaskets.push({
+          lootbox: snapshot,
+        })
+      }
+    })
+
+    return [[..._lootboxPartyBaskets, ..._soldout, ..._noPartyBaskets]]
+  }, [data])
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
@@ -96,30 +140,14 @@ const BattlePage = (props: BattlePageParams) => {
     return <Oopsies message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
-  const { tournament } = data.tournament as TournamentResponseSuccess
+  const { tournament } = data.tournament as BattlePageResponseSuccessFE
 
   // Find the stream from  the URL params
-  const stream: Stream | undefined = props.streamId
+  const stream: TournamentStreamsFE | undefined = props.streamId
     ? tournament.streams?.find((stream) => stream.id === props.streamId)
     : !!tournament.streams
     ? tournament.streams[0]
     : undefined
-
-  const lootboxPartyBaskets: LootboxPartyBasket[] = []
-  tournament.lootboxSnapshots?.forEach((snapshot) => {
-    if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
-      snapshot.partyBaskets.forEach((partyBasket) => {
-        lootboxPartyBaskets.push({
-          lootbox: snapshot,
-          partyBasket: partyBasket,
-        })
-      })
-    } else {
-      lootboxPartyBaskets.push({
-        lootbox: snapshot,
-      })
-    }
-  })
 
   const filteredLootboxPartyBaskets = lootboxPartyBaskets.filter((partyBasket) => {
     if (!searchTerm) {
@@ -127,12 +155,14 @@ const BattlePage = (props: BattlePageParams) => {
     }
 
     return (
-      partyBasket.lootbox.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partyBasket.partyBasket?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.partyBasket?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partyBasket.lootbox.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partyBasket.partyBasket?.address.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })
+
+  const publicTournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
   return (
     <$BattlePageContainer>
@@ -140,10 +170,11 @@ const BattlePage = (props: BattlePageParams) => {
         {!!stream && <LiveStreamVideo stream={stream} />}
         {!stream && !!tournament.coverPhoto && <$TournamentCover src={tournament.coverPhoto} />}
         {!stream && !tournament.coverPhoto && <$TournamentCoverPlaceholder />}
+        <br />
         <$BattlePageBody screen={screen}>
           <$Vertical spacing={4} height="100%">
             {!!stream && (
-              <$span>
+              <$span style={{ textAlign: 'center' }}>
                 <FormattedMessage
                   id="battlePage.streamText.switchStreamText"
                   defaultMessage='You are watching "{streamName}". To switch to another stream, {clickHereHyperlink}'
@@ -157,6 +188,8 @@ const BattlePage = (props: BattlePageParams) => {
                     ),
                   }}
                 />
+                <br />
+                <br />
               </$span>
             )}
             {!stream && (
@@ -175,21 +208,42 @@ const BattlePage = (props: BattlePageParams) => {
                 />
               </$span>
             )}
-            <$BattlePageSection screen={screen}>
+            <$BattlePageSection screen={screen} style={{ overflow: 'visible' }}>
               <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
                 <$Vertical height="100%" spacing={2} style={{ margin: '0 auto' }}>
-                  <$BattleCardsContainer screen={screen} width="220px">
+                  <$BattleCardsContainer
+                    screen={screen}
+                    width="220px"
+                    style={{
+                      marginBottom:
+                        tournament.lootboxSnapshots?.length > 0
+                          ? `${tournament.lootboxSnapshots?.length * 20}px`
+                          : 'auto',
+                      marginLeft:
+                        tournament.lootboxSnapshots?.length > 0
+                          ? `${tournament.lootboxSnapshots?.length * 10}px`
+                          : 'auto',
+                    }}
+                  >
                     {tournament.lootboxSnapshots?.length ? (
-                      tournament.lootboxSnapshots?.slice(0, 2)?.map((snap, idx2) => {
-                        return (
-                          <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`tournament-img-${idx2}`} />
-                        )
-                      })
+                      tournament.lootboxSnapshots
+                        ?.slice(0, 4)
+                        ?.reverse() // reversed to show the "second" one first
+                        ?.map((snap, idx2) => {
+                          return (
+                            <$BattleCardBlessed
+                              screen={screen}
+                              src={snap.stampImage}
+                              cardNumber={idx2}
+                              key={`tournament-img-${idx2}`}
+                            />
+                          )
+                        })
                     ) : (
                       <$BattleCardImage src={TEMPLATE_LOOTBOX_STAMP} cardNumber={0} />
                     )}
                   </$BattleCardsContainer>
-                  {tournament.tournamentLink && (
+                  {/* {tournament.tournamentLink && (
                     <span
                       style={{
                         textAlign: 'center',
@@ -210,54 +264,111 @@ const BattlePage = (props: BattlePageParams) => {
                         {tournamentWords.visitTournament}
                       </$Link>
                     </span>
-                  )}
+                  )} */}
                 </$Vertical>
-                <$Vertical height="100%" width="100%" spacing={2}>
-                  <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>{tournament.title}</$h1>
-                  {tournament.prize && (
-                    <$span
+                <$Horizontal flexWrap spacing={2}>
+                  <$Vertical width="100%" spacing={2}>
+                    <$h1> {tournament.title}</$h1>
+                    {tournament.prize && (
+                      <$span
+                        style={{
+                          textTransform: 'capitalize',
+                          // color: COLORS.black,
+                          color: `${COLORS.surpressedFontColor}`,
+                        }}
+                      >
+                        {tournament.prize} {words.prize}
+                      </$span>
+                    )}
+                    <$Horizontal flexWrap>
+                      {tournament.tournamentLink ? (
+                        <$span style={{ padding: '15px 0px 0px' }}>
+                          👉{' '}
+                          <$Link
+                            color={'inherit'}
+                            fontStyle="italic"
+                            href={tournament.tournamentLink}
+                            style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                            target="_blank"
+                          >
+                            {tournamentWords.visitTournament}
+                          </$Link>
+                        </$span>
+                      ) : null}
+
+                      {tournament.communityURL && (
+                        <$span style={{ padding: '15px 0px 0px' }}>
+                          👉{' '}
+                          <$Link
+                            color={'inherit'}
+                            fontStyle="italic"
+                            href={tournament.communityURL}
+                            style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                            target="_self"
+                          >
+                            {words.joinCommunity}
+                          </$Link>
+                        </$span>
+                      )}
+                    </$Horizontal>
+                    {/* <$span
                       style={{
                         textTransform: 'capitalize',
                         color: COLORS.black,
-                        textAlign: screen === 'mobile' ? 'center' : 'left',
+                        marginTop: '10px',
+                        fontWeight: TYPOGRAPHY.fontWeight.bold,
                       }}
                     >
-                      {tournament.prize} {words.prize}
-                    </$span>
-                  )}
-                  <$span
-                    style={{
-                      textTransform: 'capitalize',
-                      color: COLORS.black,
-                      marginTop: '20px',
-                      fontWeight: TYPOGRAPHY.fontWeight.bold,
-                      textAlign: screen === 'mobile' ? 'center' : 'left',
-                    }}
-                  >
-                    <FormattedMessage
-                      id="battlePage.about.aboutTournament"
-                      description="Text describing the details of an esports tournament"
-                      defaultMessage="About tournament"
-                    />
-                  </$span>
-                  <$p
-                    style={{
-                      color: COLORS.black,
-                      overflow: 'hidden',
-                      whiteSpace: 'pre-line',
-                      textAlign: screen === 'mobile' ? 'center' : 'left',
-                    }}
-                  >
-                    {tournament.description && tournament.description?.length > 250
-                      ? tournament.description.slice(0, 250) + '...'
-                      : tournament.description
-                      ? tournament.description
-                      : ''}
-                  </$p>
-                </$Vertical>
+                      <FormattedMessage
+                        id="battlePage.about.aboutTournament"
+                        description="Text describing the details of an esports tournament"
+                        defaultMessage="About tournament"
+                      />
+                    </$span> */}
+                    <$p
+                      style={{
+                        color: COLORS.black,
+                        overflow: 'hidden',
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {tournament.description && tournament.description?.length > 250
+                        ? tournament.description.slice(0, 250) + '...'
+                        : tournament.description
+                        ? tournament.description
+                        : ''}
+                    </$p>
+                  </$Vertical>
+
+                  <div>
+                    <a
+                      href={tournament?.communityURL || tournament.tournamentLink || publicTournamentUrl}
+                      target="_blank"
+                    >
+                      <$Button
+                        screen={screen}
+                        // onClick={() => isInviteEnabled && setIsInviteModalOpen(true)}
+                        style={{
+                          textTransform: 'capitalize',
+                          color: COLORS.trustFontColor,
+                          background: COLORS.trustBackground,
+                          whiteSpace: 'nowrap',
+                          marginTop: '0.67em',
+                          fontWeight: 'bold',
+                          fontSize: '1.2rem',
+                          cursor: 'pointer',
+                          width: '100%',
+                          filter: 'drop-shadow(0px 4px 20px rgba(38, 166, 239, 0.64))',
+                        }}
+                      >
+                        {words.joinCommunity}
+                      </$Button>
+                    </a>
+                  </div>
+                </$Horizontal>
               </$Horizontal>
             </$BattlePageSection>
-            <$h1 style={{ textAlign: screen === 'mobile' ? 'center' : 'left' }}>
+            <$h1>
               <FormattedMessage
                 id="battlePage.lotteryHeader"
                 defaultMessage="Claim a Lottery Ticket"
@@ -363,6 +474,8 @@ const $BattlePageBody = styled.div<{ screen: ScreenSize }>`
   width: 100%;
   padding: 0px ${(props) => (props.screen === 'mobile' ? '0px' : '3rem')};
   box-sizing: border-box;
+  max-width: 900px;
+  margin: 0 auto;
 `
 
 export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
@@ -374,6 +487,7 @@ export const $BattlePageSection = styled.div<{ screen: ScreenSize }>`
   padding: 2rem;
   box-sizing: border-box;
   overflow: hidden;
+  box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
 `
 
 export const $BattleCardsContainer = styled.div<{ width: string; screen: ScreenSize }>`
@@ -399,8 +513,30 @@ export const $BattleCardImage = styled.img<{ cardNumber: number }>`
   background-size: cover;
   margin-left: -${(props) => props.cardNumber * 10}px;
   margin-top: ${(props) => props.cardNumber * 12}px;
-  filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.25));
   object-fit: contain;
+  box-shadow: 2px 4px 5px #a2a2a2;
+`
+
+export const $BattleCardBlessed = styled.img<{ screen: ScreenSize; cardNumber: number }>`
+  position: absolute;
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  max-width: 90%;
+  max-height: 400px;
+  background-size: cover;
+  rotate: -${(props) => (props.screen === 'mobile' ? 0 : props.cardNumber * 12)}deg;
+  margin-left: -${(props) => props.cardNumber * 20}px;
+  margin-top: ${(props) => props.cardNumber * 22}px;
+  object-fit: contain;
+  box-shadow: 2px 4px 5px #a2a2a2;
 `
 
 export const $SocialLogo = styled.img`

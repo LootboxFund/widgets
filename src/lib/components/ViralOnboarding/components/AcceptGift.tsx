@@ -17,11 +17,12 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { COLORS } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useMutation } from '@apollo/client'
-import { CREATE_CLAIM } from '../api.gql'
+import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
 import {
   CreateClaimResponse,
   CreateClaimResponseSuccess,
   MutationCreateClaimArgs,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard } from './GenericCard'
 import { LoadingText } from 'lib/components/Generics/Spinner'
@@ -35,9 +36,10 @@ const AcceptGift = (props: Props) => {
   const words = useWords()
   const { referral, setClaim } = useViralOnboarding()
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [createClaim, { loading }] = useMutation<{ createClaim: CreateClaimResponse }, MutationCreateClaimArgs>(
-    CREATE_CLAIM
-  )
+  const [createClaim, { loading }] = useMutation<
+    { createClaim: CreateClaimResponseFE | ResponseError },
+    MutationCreateClaimArgs
+  >(CREATE_CLAIM)
   const acceptGiftText = intl.formatMessage({
     id: 'viralOnboarding.acceptGift.next',
     defaultMessage: 'Accept Gift',
@@ -54,9 +56,9 @@ const AcceptGift = (props: Props) => {
       const secondary = seedLootboxAddress
         ? referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
         : undefined
-      showCasedLootboxImages = showcased
+      showCasedLootboxImages = !!showcased?.stampImage
         ? [showcased.stampImage, secondary?.stampImage || TEMPLATE_LOOTBOX_STAMP]
-        : [...referral.tournament.lootboxSnapshots.map((snap) => snap.stampImage)]
+        : [...referral.tournament.lootboxSnapshots.map((snap) => snap.stampImage || TEMPLATE_LOOTBOX_STAMP)]
     } else {
       showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
     }
@@ -101,7 +103,7 @@ const AcceptGift = (props: Props) => {
         throw new Error(words.anErrorOccured)
       }
 
-      const claim = (data.createClaim as CreateClaimResponseSuccess).claim
+      const claim = (data.createClaim as CreateClaimResponseFE).claim
 
       setClaim(claim)
       props.onNext()

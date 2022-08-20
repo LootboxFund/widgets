@@ -132,9 +132,9 @@ export const useTournamentWords = () => {
     description: 'Error message shown to user when they dont input a stream type in a form',
   })
 
-  const addCampaignCompleteUrl = intl.formatMessage({
+  const communityURL = intl.formatMessage({
     id: 'tournament.stream.addCampaignCompleteUrl',
-    defaultMessage: 'Add URL for AFTER the tournament',
+    defaultMessage: 'Link to your Community',
   })
 
   return {
@@ -152,7 +152,7 @@ export const useTournamentWords = () => {
     streamURLCannotBeEmpty,
     // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
-    addCampaignCompleteUrl,
+    communityURL,
   }
 }
 
@@ -249,10 +249,19 @@ interface LootboxListProps {
   screen: ScreenSize
   templateAction?: () => void
   magicLink?: string
+  pageSize?: number
 }
-export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction, magicLink }: LootboxListProps) => {
+export const LootboxList = ({
+  lootboxes,
+  screen,
+  onClickLootbox,
+  templateAction,
+  magicLink,
+  pageSize,
+}: LootboxListProps) => {
   const intl = useIntl()
   const words = useWords()
+  const [pageNumber, setPageNumber] = useState(0)
   const [searchTerm, setSearchTerm] = useState('')
 
   const joinTournamentText = intl.formatMessage({
@@ -270,6 +279,10 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
         ) || []),
       ]
     : [...(lootboxes || [])]
+
+  const paginatedLootboxSnapshots = pageSize
+    ? filteredLootboxSnapshots.slice(0, (pageNumber + 1) * pageSize)
+    : filteredLootboxSnapshots
 
   return (
     <$Vertical spacing={4}>
@@ -344,7 +357,7 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
             icon={'🎉'}
           />
         ) : null}
-        {filteredLootboxSnapshots.map((lootbox, index) => {
+        {paginatedLootboxSnapshots.map((lootbox, index) => {
           return (
             <$LootboxThumbailContainer
               key={index}
@@ -358,6 +371,25 @@ export const LootboxList = ({ lootboxes, screen, onClickLootbox, templateAction,
           )
         })}
       </$Horizontal>
+      {pageSize && paginatedLootboxSnapshots.length < filteredLootboxSnapshots.length && (
+        <div style={{ textAlign: 'center' }}>
+          <$Button
+            screen={screen}
+            onClick={() => setPageNumber(pageNumber + 1)}
+            style={{
+              height: '40px',
+              backgroundColor: `${COLORS.trustBackground}`,
+              color: `${COLORS.trustFontColor}`,
+              fontWeight: TYPOGRAPHY.fontWeight.light,
+              textTransform: 'capitalize',
+              // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
+              // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+            }}
+          >
+            {words.seeMore}
+          </$Button>
+        </div>
+      )}
     </$Vertical>
   )
 }

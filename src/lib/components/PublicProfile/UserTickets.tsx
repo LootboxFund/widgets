@@ -183,7 +183,8 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       text = referredUser(claim?.userLink?.username || 'User')
     } else if (claim.type === 'referral') {
       text = invitedByUser(claim?.userLink?.username || 'User')
-    } else if (claim.type === 'one-time') {
+    } else {
+      // else if (claim.type === 'one-time') {
       text = participationReward
     }
 

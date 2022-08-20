@@ -6,18 +6,27 @@ import { SyntheticEvent, useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import Spinner from 'lib/components/Generics/Spinner'
 import { useMutation, useQuery } from '@apollo/client'
-import { BULK_WHITELIST_MUTATION, GET_PARTY_BASKET } from './api.gql'
+import {
+  BULK_WHITELIST_MUTATION,
+  EDIT_PARTY_BASKET,
+  GET_PARTY_BASKET,
+  PartyBasketFE,
+  EditPartyBasketResponseFE,
+} from './api.gql'
 import {
   BulkWhitelistPayload,
   BulkWhitelistResponse,
   BulkWhitelistResponseSuccess,
+  EditPartyBasketPayload,
   GetPartyBasketResponse,
   GetPartyBasketResponseSuccess,
+  PartyBasketStatus,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import styled from 'styled-components'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
-import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import { $ErrorMessage, $Horizontal, $Vertical } from 'lib/components/Generics'
 import { $ManageLootboxHeading } from 'lib/components/ManageLootbox'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
@@ -31,6 +40,8 @@ import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { manifest } from 'manifest'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
+import { useAuth } from 'lib/hooks/useAuth'
+import { PartyBasketID } from 'lib/types'
 
 interface ManagePartyBasketProps {
   partyBasketAddress: Address
@@ -56,10 +67,16 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const words = useWords()
   const [whitelistAddress, setWhitelistAddress] = useState<Address | undefined>()
   const [singleWhitelistState, setSingleWhitelistState] = useState<SingleWhitelistState>()
+  const [localName, setLocalName] = useState<string>()
+  const [localNFTBounty, setLocalNFTBounty] = useState<string>()
+  const [localJoinCommunityUrl, setLocalJoinCommunityUrl] = useState<string>()
+  const [localStatus, setLocalStatus] = useState<PartyBasketStatus>(PartyBasketStatus.Active)
+  const [advancedError, setAdvancedError] = useState<string>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
+  const { user } = useAuth()
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
-    getPartyBasket: GetPartyBasketResponse
+    getPartyBasket: PartyBasketFE | ResponseError
   }>(GET_PARTY_BASKET, {
     variables: {
       partyBasketAddress: props.partyBasketAddress,
@@ -71,6 +88,22 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     },
     { payload: BulkWhitelistPayload }
   >(BULK_WHITELIST_MUTATION)
+  const [editPartyBasket, { loading: editPartyBasketLoading }] = useMutation<
+    { editPartyBasket: ResponseError | EditPartyBasketResponseFE },
+    { payload: EditPartyBasketPayload }
+  >(EDIT_PARTY_BASKET, {
+    refetchQueries: [GET_PARTY_BASKET],
+  })
+
+  useEffect(() => {
+    if (!!data && !!(data?.getPartyBasket as PartyBasketFE | undefined)?.partyBasket) {
+      const { partyBasket: _partyBasket } = data.getPartyBasket as PartyBasketFE
+      setLocalName(_partyBasket.name)
+      setLocalJoinCommunityUrl(_partyBasket.joinCommunityUrl)
+      setLocalNFTBounty(_partyBasket.nftBountyValue)
+      setLocalStatus(_partyBasket.status)
+    }
+  }, [data])
 
   const pleaseEnterValidAddressText = intl.formatMessage({
     id: 'partyBasket.manage.pleaseEnterAddress',
@@ -150,6 +183,51 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     description:
       'Error message when partial errors happened with bulk whitelisting submission. We display a list of errors after this message.',
   })
+
+  const advancedSubmit = async () => {
+    setAdvancedError('')
+    const partyBasketId: PartyBasketID | undefined = (data?.getPartyBasket as PartyBasketFE)?.partyBasket?.id
+    if (!partyBasketId) {
+      console.error('No party basket id')
+      setAdvancedError(words.anErrorOccured)
+      return
+    }
+
+    const payload: EditPartyBasketPayload = { id: partyBasketId }
+
+    if (localName !== partyBasket.name) {
+      payload.name = localName
+    }
+
+    if (localJoinCommunityUrl !== partyBasket.joinCommunityUrl) {
+      payload.joinCommunityUrl = localJoinCommunityUrl
+    }
+
+    if (localNFTBounty !== partyBasket.nftBountyValue) {
+      payload.nftBountyValue = localNFTBounty
+    }
+
+    if (localStatus !== partyBasket.status) {
+      payload.status = localStatus
+    }
+
+    if (Object.keys(payload).length === 1) {
+      setAdvancedError(words.noChangesMade)
+      return
+    }
+
+    const { data: responseData } = await editPartyBasket({
+      variables: {
+        payload,
+      },
+    })
+
+    if (!responseData?.editPartyBasket || responseData?.editPartyBasket?.__typename === 'ResponseError') {
+      console.error(responseData)
+      setAdvancedError(words.anErrorOccured)
+      return
+    }
+  }
 
   const validateAddress = (address?: Address): Address => {
     if (!address) {
@@ -347,17 +425,13 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     return <Oopsies title="Error loading Party Basket" message={data?.getPartyBasket?.error?.message || ''} icon="🤕" />
   }
 
-  const {
-    name: partyBasketName,
-    chainIdHex,
-    lootboxSnapshot,
-  } = (data?.getPartyBasket as GetPartyBasketResponseSuccess)?.partyBasket
+  const partyBasket = (data?.getPartyBasket as PartyBasketFE)?.partyBasket
 
-  const chain = NETWORK_OPTIONS.find((c) => c.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
+  const chain = NETWORK_OPTIONS.find((c) => c.chainIdHex === partyBasket.chainIdHex) || NETWORK_OPTIONS[0]
 
-  const { name: lootboxName, address: lootboxAddress, stampImage: lootboxImage } = lootboxSnapshot || {}
+  const { name: lootboxName, address: lootboxAddress, stampImage: lootboxImage } = partyBasket.lootboxSnapshot || {}
 
-  const network = NETWORK_OPTIONS.find((network) => network.chainIdHex === chainIdHex) || NETWORK_OPTIONS[0]
+  const network = NETWORK_OPTIONS.find((network) => network.chainIdHex === partyBasket.chainIdHex) || NETWORK_OPTIONS[0]
 
   return (
     <$ManagePartyBasket>
@@ -380,9 +454,9 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 </ReactTooltip>
               </$Horizontal>
             )}
-            {partyBasketName && (
+            {partyBasket.name && (
               <$Horizontal verticalCenter>
-                <$ManageLootboxHeading screen={screen}>{partyBasketName || 'Party Basket'}</$ManageLootboxHeading>
+                <$ManageLootboxHeading screen={screen}>{partyBasket.name || 'Party Basket'}</$ManageLootboxHeading>
               </$Horizontal>
             )}
           </$Vertical>
@@ -663,6 +737,180 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
           </$Vertical>
         </$Vertical>
       </$StepCard>
+      {!!user?.id && user?.id === partyBasket.creatorId ? (
+        <$StepCard screen={screen} themeColor={network.themeColor} style={{ marginTop: '40px' }}>
+          <$Vertical spacing={4}>
+            <$ManageLootboxHeading screen={screen}>Advanced Settings</$ManageLootboxHeading>
+            <$Vertical spacing={2}>
+              <span>
+                <$StepSubheading>
+                  <FormattedMessage
+                    id="partyBasket.manage.input.name"
+                    defaultMessage="Party Basket Name"
+                    description="Input field for the party basket name form"
+                  />
+                </$StepSubheading>
+              </span>
+
+              <$InputWrapper
+                screen={screen}
+                marginRight="0px"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+                  <$Input
+                    type="text"
+                    value={localName}
+                    onChange={(e) => setLocalName(e?.target?.value)}
+                    min="0"
+                    screen={screen}
+                    style={{ fontWeight: 'lighter' }}
+                  />
+                </div>
+              </$InputWrapper>
+            </$Vertical>
+
+            <$Vertical spacing={2}>
+              <span>
+                <$StepSubheading>
+                  <FormattedMessage id="partyBasket.manage.input.nftBountyValue" defaultMessage="Bounty Value" />
+                </$StepSubheading>
+              </span>
+
+              <$InputWrapper
+                screen={screen}
+                marginRight="0px"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+                  <$Input
+                    type="text"
+                    value={localNFTBounty}
+                    onChange={(e) => setLocalNFTBounty(e?.target?.value)}
+                    placeholder="e.g. $2 USD"
+                    screen={screen}
+                    style={{ fontWeight: 'lighter' }}
+                  />
+                </div>
+              </$InputWrapper>
+            </$Vertical>
+
+            <$Vertical spacing={2}>
+              <span>
+                <$StepSubheading>
+                  <FormattedMessage id="partyBasket.manage.input.joinCommunity" defaultMessage="Community URL" />
+                  <HelpIcon tipID="pbcommunity" />
+                  <ReactTooltip id="pbcommunity" place="right" effect="solid">
+                    <FormattedMessage
+                      id="partyBasket.manage.input.communityUrl.descriptionTooltip"
+                      defaultMessage={`URL of the community to join. Users will be directed to this link after accepting the lottery ticket.`}
+                    />
+                  </ReactTooltip>
+                </$StepSubheading>
+              </span>
+
+              <$InputWrapper
+                screen={screen}
+                marginRight="0px"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+                  <$Input
+                    type="text"
+                    value={localJoinCommunityUrl}
+                    onChange={(e) => setLocalJoinCommunityUrl(e?.target?.value)}
+                    screen={screen}
+                    style={{ fontWeight: 'lighter' }}
+                  />
+                </div>
+              </$InputWrapper>
+            </$Vertical>
+
+            <$Vertical spacing={2}>
+              <span>
+                <$StepSubheading>
+                  <FormattedMessage id="partyBasket.manage.input.status" defaultMessage="Current Status" />
+                  <HelpIcon tipID="pbstatus" />
+                  <ReactTooltip id="pbstatus" place="right" effect="solid">
+                    <FormattedMessage
+                      id="partyBasket.manage.input.status.descriptionTooltip"
+                      defaultMessage={`
+                      Active:{newline}{newline}
+                        - party basket is browseable in the tournament pages{newline}
+                        - party basket is in the viral referral program{newline}{newline}
+
+                      Disabled:{newline}{newline}
+                        - removes party basket from tournament pages{newline}
+                        - removes from viral referral flow{newline}{newline}
+                    
+                      Sold out:{newline}{newline}
+                        - removes from viral referral flow
+                        - party basket still visible on tournament pages
+
+                    `}
+                      values={{ newline: <br /> }}
+                    />
+                  </ReactTooltip>
+                </$StepSubheading>
+              </span>
+
+              <$InputWrapper
+                screen={screen}
+                marginRight="0px"
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  maxWidth: '300px',
+                  fontWeight: TYPOGRAPHY.fontWeight.medium,
+                }}
+              >
+                <$Select
+                  screen={screen}
+                  style={{ fontWeight: TYPOGRAPHY.fontWeight.light, textTransform: 'capitalize' }}
+                  onChange={(e) => setLocalStatus(e.target.value as PartyBasketStatus)}
+                  value={localStatus}
+                >
+                  {Object.values(PartyBasketStatus).map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </$Select>
+              </$InputWrapper>
+            </$Vertical>
+
+            <$AddWhitelistButton
+              themeColor={network.themeColor}
+              // onClick={singleWhitelistAction}
+              disabled={editPartyBasketLoading}
+              onClick={advancedSubmit}
+              screen={screen}
+            >
+              <$ManageLootboxHeading
+                screen={screen}
+                style={{
+                  color: '#ffffff',
+                  margin: 'auto 0px',
+                  fontSize: '1.5rem',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {editPartyBasketLoading ? words.loading : words.saveChanges}
+              </$ManageLootboxHeading>
+            </$AddWhitelistButton>
+            {advancedError && <$ErrorMessage>{advancedError}</$ErrorMessage>}
+          </$Vertical>
+        </$StepCard>
+      ) : null}
     </$ManagePartyBasket>
   )
 }
@@ -842,6 +1090,31 @@ const $LootboxPreviewImage = styled.img<{ screen: ScreenSize }>`
   width: 30%;
   min-width: 220px;
   ${(props) => props.screen === 'mobile' && 'padding-top: 20px;'}
+`
+
+export const $Select = styled.select<{ screen: ScreenSize; width?: string; fontWeight?: string; disabled?: boolean }>`
+  flex: 1;
+  height: ${(props) => (props.screen === 'desktop' ? '50px' : '40px')};
+  padding: ${(props) => (props.screen === 'desktop' ? '10px' : '5px 10px')};
+  font-size: ${(props) => (props.screen === 'desktop' ? TYPOGRAPHY.fontSize.xxlarge : TYPOGRAPHY.fontSize.xlarge)};
+  font-weight: ${(props) => (props.fontWeight ? props.fontWeight : TYPOGRAPHY.fontWeight.bold)};
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0);
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  width: ${(props) => (props.width ? props.width : '100%')};
+  min-width: 70px;
+  max-width: ${(props) => (props.width ? props.width : '100%')};
+  -moz-appearance: textfield;
+  ::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  ${(props) => props.disabled && 'cursor: not-allowed;'}
 `
 
 export default ManagePartyBasketPage

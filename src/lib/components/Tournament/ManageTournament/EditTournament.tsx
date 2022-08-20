@@ -86,10 +86,10 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
     })
   }
 
-  const parseCampaignComplete = (campaignCompleteURL: string) => {
+  const parseCommunityURL = (communityURL: string) => {
     setTournamentPayload({
       ...tournamentPayload,
-      campaignCompleteURL,
+      communityURL,
     })
   }
 
@@ -149,8 +149,8 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         payload.coverPhoto = coverUrl
       }
 
-      if (!!tournamentPayload.campaignCompleteURL) {
-        payload.campaignCompleteURL = tournamentPayload.campaignCompleteURL
+      if (!!tournamentPayload.communityURL) {
+        payload.communityURL = tournamentPayload.communityURL
       }
 
       const { data } = await editTournament({
@@ -252,11 +252,11 @@ const EditTournament = ({ tournamentId, onSuccessCallback, initialState }: EditT
         </$Vertical>
 
         <$Vertical spacing={2}>
-          <$InputLabel htmlFor="input-campaign-complete-url">{tournamentWords.addCampaignCompleteUrl}</$InputLabel>
+          <$InputLabel htmlFor="input-campaign-complete-url">{tournamentWords.communityURL}</$InputLabel>
           <$InputMedium
             id="input-campaign-complete-url"
-            onChange={(e) => parseCampaignComplete(e.target.value)}
-            value={tournamentPayload?.campaignCompleteURL || ''}
+            onChange={(e) => parseCommunityURL(e.target.value)}
+            value={tournamentPayload?.communityURL || ''}
           ></$InputMedium>
         </$Vertical>
 

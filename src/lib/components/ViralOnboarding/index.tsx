@@ -1,10 +1,16 @@
-import { QueryReferralArgs, Referral, ReferralResponse, ReferralResponseSuccess } from 'lib/api/graphql/generated/types'
+import {
+  QueryReferralArgs,
+  Referral,
+  ReferralResponse,
+  ReferralResponseSuccess,
+  ResponseError,
+} from 'lib/api/graphql/generated/types'
 import ViralOnboardingProvider from 'lib/hooks/useViralOnboarding'
 import { useQuery, useMutation } from '@apollo/client'
 import { ReactElement, useEffect, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ReferralSlug } from 'lib/types'
-import { GET_REFERRAL } from './api.gql'
+import { GET_REFERRAL, ReferralFE, ReferralResponseFE } from './api.gql'
 import useWords from 'lib/hooks/useWords'
 import AcceptGift from './components/AcceptGift'
 import ChooseLottery from './components/ChooseLottery'
@@ -30,11 +36,14 @@ type ViralOnboardingRoute =
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
-  const { data, loading, error } = useQuery<{ referral: ReferralResponse }, QueryReferralArgs>(GET_REFERRAL, {
-    variables: {
-      slug: props.referralSlug,
-    },
-  })
+  const { data, loading, error } = useQuery<{ referral: ReferralResponseFE | ResponseError }, QueryReferralArgs>(
+    GET_REFERRAL,
+    {
+      variables: {
+        slug: props.referralSlug,
+      },
+    }
+  )
   const words = useWords()
 
   if (loading) {
@@ -45,7 +54,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     return <ErrorCard message={data?.referral?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
-  const referral: Referral = (data.referral as ReferralResponseSuccess).referral
+  const referral: ReferralFE = (data.referral as ReferralResponseFE).referral
 
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {

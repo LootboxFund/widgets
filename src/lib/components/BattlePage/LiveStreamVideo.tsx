@@ -2,11 +2,12 @@ import { COLORS } from '@wormgraph/helpers'
 import { Stream, StreamType } from 'lib/api/graphql/generated/types'
 import React from 'react'
 import styled from 'styled-components'
+import { TournamentStreamsFE } from './api.gql'
 // import { $p, $Vertical } from '../Generics'
 // import Spinner from '../Generics/Spinner'
 
 interface Props {
-  stream: Stream
+  stream: TournamentStreamsFE
 }
 const LiveStreamVideo = (props: Props) => {
   let embededSrc: string
