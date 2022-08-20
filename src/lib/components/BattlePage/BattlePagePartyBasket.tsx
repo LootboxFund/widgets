@@ -1,7 +1,7 @@
 import { $SocialLogo, LootboxPartyBasket, $BattlePageSection, $BattleCardsContainer, $BattleCardImage } from './index'
 import { useQuery } from '@apollo/client'
 import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
-import { LootboxTournamentSnapshot } from 'lib/api/graphql/generated/types'
+import { LootboxTournamentSnapshot, PartyBasketStatus } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -16,6 +16,7 @@ import { PartyBasketID, SocialFragment, TournamentID } from 'lib/types'
 import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasketReferral'
 import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
+import { BattlePageLootboxSnapshotFE } from './api.gql'
 
 interface Props {
   lootboxPartyBasket: LootboxPartyBasket
@@ -51,7 +52,7 @@ const BattlePagePartyBasket = (props: Props) => {
     },
   }
 
-  const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: LootboxTournamentSnapshot }) => {
+  const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: BattlePageLootboxSnapshotFE }) => {
     const flatSocials = Object.entries(lootboxSnapshot.socials)
       .filter((fack) => fack[0] !== '__typename')
       .filter((fack) => !!fack[1]) // Filter graphql ting
@@ -203,6 +204,13 @@ const BattlePagePartyBasket = (props: Props) => {
     )
   }
 
+  const isInviteEnabled =
+    !!props?.lootboxPartyBasket?.partyBasket &&
+    props.lootboxPartyBasket.partyBasket?.status !== PartyBasketStatus.SoldOut &&
+    props.lootboxPartyBasket.partyBasket?.status !== PartyBasketStatus.Disabled
+
+  props.lootboxPartyBasket.partyBasket?.id && props.lootboxPartyBasket.partyBasket.id !== '0'
+
   return (
     <$BattlePageSection screen={screen}>
       <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={4}>
@@ -295,18 +303,16 @@ const BattlePagePartyBasket = (props: Props) => {
               <div>
                 <$Button
                   screen={screen}
-                  onClick={() => props.lootboxPartyBasket?.partyBasket && setIsInviteModalOpen(true)}
+                  onClick={() => isInviteEnabled && setIsInviteModalOpen(true)}
                   style={{
                     textTransform: 'capitalize',
                     color: COLORS.trustFontColor,
-                    background: props.lootboxPartyBasket.partyBasket
-                      ? COLORS.trustBackground
-                      : `${COLORS.surpressedBackground}ae`,
+                    background: isInviteEnabled ? COLORS.trustBackground : `${COLORS.surpressedBackground}ae`,
                     whiteSpace: 'nowrap',
                     marginTop: '0.67em',
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
-                    cursor: props.lootboxPartyBasket.partyBasket ? 'pointer' : 'not-allowed',
+                    cursor: isInviteEnabled ? 'pointer' : 'not-allowed',
                     width: '100%',
                   }}
                 >

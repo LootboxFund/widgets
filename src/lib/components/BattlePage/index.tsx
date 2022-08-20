@@ -3,7 +3,9 @@ import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import {
   LootboxTournamentSnapshot,
   PartyBasket,
+  PartyBasketStatus,
   QueryTournamentArgs,
+  ResponseError,
   Stream,
   TournamentResponse,
   TournamentResponseSuccess,
@@ -11,13 +13,19 @@ import {
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { TournamentID, StreamID } from 'lib/types'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { $h1, $h2, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
 import Spinner from '../Generics/Spinner'
 import { $Link, Oopsies } from '../Profile/common'
-import { GET_TOURNAMENT_BATTLE_PAGE } from './api.gql'
+import {
+  GET_TOURNAMENT_BATTLE_PAGE,
+  BattlePageResponseSuccessFE,
+  PartyBasketFE,
+  BattlePageLootboxSnapshotFE,
+  TournamentStreamsFE,
+} from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
 import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
@@ -28,8 +36,8 @@ import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
 
 export interface LootboxPartyBasket {
-  lootbox: LootboxTournamentSnapshot
-  partyBasket?: PartyBasket
+  lootbox: BattlePageLootboxSnapshotFE
+  partyBasket?: PartyBasketFE
 }
 
 interface BattlePageParams {
@@ -37,14 +45,14 @@ interface BattlePageParams {
   streamId?: StreamID
 }
 const BattlePage = (props: BattlePageParams) => {
-  const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(
-    GET_TOURNAMENT_BATTLE_PAGE,
-    {
-      variables: {
-        id: props.tournamentId,
-      },
-    }
-  )
+  const { data, loading, error } = useQuery<
+    { tournament: BattlePageResponseSuccessFE | ResponseError },
+    QueryTournamentArgs
+  >(GET_TOURNAMENT_BATTLE_PAGE, {
+    variables: {
+      id: props.tournamentId,
+    },
+  })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
@@ -52,6 +60,41 @@ const BattlePage = (props: BattlePageParams) => {
   const { screen } = useWindowSize()
   // const SOCIALS = getSocials(intl)
   const [searchTerm, setSearchTerm] = useState('')
+
+  const [lootboxPartyBaskets] = useMemo<[LootboxPartyBasket[]]>(() => {
+    if (!data || data?.tournament?.__typename === 'ResponseError') {
+      return [[]]
+    }
+
+    const _lootboxPartyBaskets: LootboxPartyBasket[] = []
+    const _soldout: LootboxPartyBasket[] = []
+    const _noPartyBaskets: LootboxPartyBasket[] = []
+
+    ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
+      if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
+        snapshot.partyBaskets.forEach((partyBasket) => {
+          if (partyBasket.status === PartyBasketStatus.SoldOut) {
+            _soldout.push({
+              lootbox: snapshot,
+              partyBasket: partyBasket,
+            })
+          } else {
+            _lootboxPartyBaskets.push({
+              lootbox: snapshot,
+              partyBasket: partyBasket,
+            })
+          }
+        })
+      } else {
+        console.log('no party baskets', snapshot.name)
+        _noPartyBaskets.push({
+          lootbox: snapshot,
+        })
+      }
+    })
+
+    return [[..._lootboxPartyBaskets, ..._soldout, ..._noPartyBaskets]]
+  }, [data])
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
@@ -96,30 +139,14 @@ const BattlePage = (props: BattlePageParams) => {
     return <Oopsies message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
-  const { tournament } = data.tournament as TournamentResponseSuccess
+  const { tournament } = data.tournament as BattlePageResponseSuccessFE
 
   // Find the stream from  the URL params
-  const stream: Stream | undefined = props.streamId
+  const stream: TournamentStreamsFE | undefined = props.streamId
     ? tournament.streams?.find((stream) => stream.id === props.streamId)
     : !!tournament.streams
     ? tournament.streams[0]
     : undefined
-
-  const lootboxPartyBaskets: LootboxPartyBasket[] = []
-  tournament.lootboxSnapshots?.forEach((snapshot) => {
-    if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
-      snapshot.partyBaskets.forEach((partyBasket) => {
-        lootboxPartyBaskets.push({
-          lootbox: snapshot,
-          partyBasket: partyBasket,
-        })
-      })
-    } else {
-      lootboxPartyBaskets.push({
-        lootbox: snapshot,
-      })
-    }
-  })
 
   const filteredLootboxPartyBaskets = lootboxPartyBaskets.filter((partyBasket) => {
     if (!searchTerm) {
@@ -127,8 +154,8 @@ const BattlePage = (props: BattlePageParams) => {
     }
 
     return (
-      partyBasket.lootbox.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partyBasket.partyBasket?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      partyBasket.partyBasket?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partyBasket.lootbox.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
       partyBasket.partyBasket?.address.toLowerCase().includes(searchTerm.toLowerCase())
     )
