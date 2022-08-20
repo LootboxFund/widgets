@@ -109,30 +109,6 @@ const BattlePagePartyBasket = (props: Props) => {
             )
           })}
         </$Horizontal>
-        <Modal
-          isOpen={isInviteModalOpen}
-          onRequestClose={() => setIsInviteModalOpen(false)}
-          contentLabel="Invite Link Modal"
-          style={customStyles}
-        >
-          <$Horizontal width="100%" justifyContent="space-between">
-            <span style={{ fontWeight: 'bold' }}></span>
-            <span onClick={() => setIsInviteModalOpen(false)} style={{ cursor: 'pointer' }}>
-              X
-            </span>
-          </$Horizontal>
-          <br />
-          {!props.lootboxPartyBasket.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
-          {props.lootboxPartyBasket.partyBasket?.id && (
-            <AuthGuard>
-              <CreatePartyBasketReferral
-                partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
-                tournamentId={props.tournamentId}
-                qrcodeMargin={'0px -40px'}
-              />
-            </AuthGuard>
-          )}
-        </Modal>
       </$Vertical>
     )
   }
@@ -341,6 +317,30 @@ const BattlePagePartyBasket = (props: Props) => {
           {screen !== 'mobile' && <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />}
         </$Vertical>
       </$Horizontal>
+      <Modal
+        isOpen={isInviteModalOpen}
+        onRequestClose={() => setIsInviteModalOpen(false)}
+        contentLabel="Invite Link Modal"
+        style={customStyles}
+      >
+        <$Horizontal width="100%" justifyContent="space-between">
+          <span style={{ fontWeight: 'bold' }}></span>
+          <span onClick={() => setIsInviteModalOpen(false)} style={{ cursor: 'pointer' }}>
+            X
+          </span>
+        </$Horizontal>
+        <br />
+        {!props.lootboxPartyBasket.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
+        {props.lootboxPartyBasket.partyBasket?.id && (
+          <AuthGuard>
+            <CreatePartyBasketReferral
+              partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
+              tournamentId={props.tournamentId}
+              qrcodeMargin={'0px -40px'}
+            />
+          </AuthGuard>
+        )}
+      </Modal>
     </$BattlePageSection>
   )
 }
