@@ -282,7 +282,7 @@ const BattlePage = (props: BattlePageParams) => {
                     )}
                     <$Horizontal flexWrap>
                       {tournament.tournamentLink ? (
-                        <$span style={{ padding: '15px 0px 0px' }}>
+                        <$span style={{ padding: '15px 0px 8px' }}>
                           👉{' '}
                           <$Link
                             color={'inherit'}
@@ -297,7 +297,7 @@ const BattlePage = (props: BattlePageParams) => {
                       ) : null}
 
                       {tournament.communityURL && (
-                        <$span style={{ padding: '15px 0px 0px' }}>
+                        <$span style={{ padding: '15px 0px 8px' }}>
                           👉{' '}
                           <$Link
                             color={'inherit'}
