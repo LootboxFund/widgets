@@ -182,6 +182,8 @@ const BattlePage = (props: BattlePageParams) => {
 
   const publicTournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
+  const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
+
   return (
     <$BattlePageContainer>
       <$Vertical spacing={4}>
@@ -234,18 +236,17 @@ const BattlePage = (props: BattlePageParams) => {
                     width="220px"
                     style={{
                       marginBottom:
-                        lootboxPartyBaskets?.length > 0
-                          ? `${lootboxPartyBaskets?.length * 20}px`
+                      previewLootboxPartyBaskets?.length > 0
+                          ? `${previewLootboxPartyBaskets?.length * 12}px`
                           : 'auto',
                       marginLeft:
-                      lootboxPartyBaskets?.length > 0
-                          ? `${lootboxPartyBaskets?.length * 10}px`
+                      previewLootboxPartyBaskets?.length > 0
+                          ? `${previewLootboxPartyBaskets?.length * 10}px`
                           : 'auto',
                     }}
                   >
-                    {lootboxPartyBaskets?.length ? (
-                      lootboxPartyBaskets
-                        ?.slice(0, 4)
+                    {previewLootboxPartyBaskets?.length ? (
+                      previewLootboxPartyBaskets
                         .reverse()  // reversed because it renders in reverse order
                         ?.map((snap, idx2) => {
                           return (
