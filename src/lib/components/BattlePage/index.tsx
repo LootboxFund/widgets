@@ -74,6 +74,9 @@ const BattlePage = (props: BattlePageParams) => {
     ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
       if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
         snapshot.partyBaskets.forEach((partyBasket) => {
+          if (partyBasket.status === PartyBasketStatus.Disabled) {
+            return
+          }
           if (partyBasket.status === PartyBasketStatus.SoldOut) {
             _soldout.push({
               lootbox: snapshot,
