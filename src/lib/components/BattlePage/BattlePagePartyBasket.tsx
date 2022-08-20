@@ -81,7 +81,7 @@ const BattlePagePartyBasket = (props: Props) => {
             description="Text prompting user to follow social media"
           />
         </$h3>
-        <$Horizontal flexWrap justifyContent="space-between">
+        <$Horizontal flexWrap justifyContent="flex-start">
           {data.map((social) => {
             const url = getSocialUrlLink(social.slug as SocialType, social.slug as string)
             return (
@@ -267,7 +267,7 @@ const BattlePagePartyBasket = (props: Props) => {
                   ? props.lootboxPartyBasket?.lootbox?.description
                   : ''}
               </$p>
-              <$Horizontal flexWrap justifyContent={screen === 'mobile' ? 'space-between' : 'flex-start'}>
+              <$Horizontal flexWrap justifyContent={'flex-start'}>
                 {props.lootboxPartyBasket?.partyBasket?.address && (
                   <$span style={{ margin: '10px 10px 10px 0px' }}>
                     <$Link

@@ -34,6 +34,7 @@ import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
+import $Button from '../Generics/Button'
 
 export interface LootboxPartyBasket {
   lootbox: BattlePageLootboxSnapshotFE
@@ -161,6 +162,8 @@ const BattlePage = (props: BattlePageParams) => {
     )
   })
 
+  const publicTournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
+
   return (
     <$BattlePageContainer>
       <$Vertical spacing={4}>
@@ -205,24 +208,42 @@ const BattlePage = (props: BattlePageParams) => {
                 />
               </$span>
             )}
-            <$BattlePageSection screen={screen}>
+            <$BattlePageSection screen={screen} style={{ overflow: 'visible' }}>
               <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={2}>
                 <$Vertical height="100%" spacing={2} style={{ margin: '0 auto' }}>
-                  <$BattleCardsContainer screen={screen} width="220px">
+                  <$BattleCardsContainer
+                    screen={screen}
+                    width="220px"
+                    style={{
+                      marginBottom:
+                        tournament.lootboxSnapshots?.length > 0
+                          ? `${tournament.lootboxSnapshots?.length * 20}px`
+                          : 'auto',
+                      marginLeft:
+                        tournament.lootboxSnapshots?.length > 0
+                          ? `${tournament.lootboxSnapshots?.length * 10}px`
+                          : 'auto',
+                    }}
+                  >
                     {tournament.lootboxSnapshots?.length ? (
                       tournament.lootboxSnapshots
-                        ?.slice(0, 2)
+                        ?.slice(0, 4)
                         ?.reverse() // reversed to show the "second" one first
                         ?.map((snap, idx2) => {
                           return (
-                            <$BattleCardImage src={snap.stampImage} cardNumber={idx2} key={`tournament-img-${idx2}`} />
+                            <$BattleCardBlessed
+                              screen={screen}
+                              src={snap.stampImage}
+                              cardNumber={idx2}
+                              key={`tournament-img-${idx2}`}
+                            />
                           )
                         })
                     ) : (
                       <$BattleCardImage src={TEMPLATE_LOOTBOX_STAMP} cardNumber={0} />
                     )}
                   </$BattleCardsContainer>
-                  {tournament.tournamentLink && (
+                  {/* {tournament.tournamentLink && (
                     <span
                       style={{
                         textAlign: 'center',
@@ -243,79 +264,108 @@ const BattlePage = (props: BattlePageParams) => {
                         {tournamentWords.visitTournament}
                       </$Link>
                     </span>
-                  )}
+                  )} */}
                 </$Vertical>
-                <$Vertical height="100%" width="100%" spacing={2}>
-                  <$h1> {tournament.title}</$h1>
-                  {tournament.prize && (
-                    <$span
+                <$Horizontal flexWrap spacing={2}>
+                  <$Vertical width="100%" spacing={2}>
+                    <$h1> {tournament.title}</$h1>
+                    {tournament.prize && (
+                      <$span
+                        style={{
+                          textTransform: 'capitalize',
+                          // color: COLORS.black,
+                          color: `${COLORS.surpressedFontColor}`,
+                        }}
+                      >
+                        {tournament.prize} {words.prize}
+                      </$span>
+                    )}
+                    <$Horizontal flexWrap>
+                      {tournament.tournamentLink ? (
+                        <$span style={{ padding: '15px 0px 0px' }}>
+                          👉{' '}
+                          <$Link
+                            color={'inherit'}
+                            fontStyle="italic"
+                            href={tournament.tournamentLink}
+                            style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                            target="_blank"
+                          >
+                            {tournamentWords.visitTournament}
+                          </$Link>
+                        </$span>
+                      ) : null}
+
+                      {tournament.communityURL && (
+                        <$span style={{ padding: '15px 0px 0px' }}>
+                          👉{' '}
+                          <$Link
+                            color={'inherit'}
+                            fontStyle="italic"
+                            href={tournament.communityURL}
+                            style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+                            target="_self"
+                          >
+                            {words.joinCommunity}
+                          </$Link>
+                        </$span>
+                      )}
+                    </$Horizontal>
+                    {/* <$span
                       style={{
                         textTransform: 'capitalize',
                         color: COLORS.black,
+                        marginTop: '10px',
+                        fontWeight: TYPOGRAPHY.fontWeight.bold,
                       }}
                     >
-                      {tournament.prize} {words.prize}
-                    </$span>
-                  )}
-                  <$Horizontal flexWrap>
-                    {tournament.tournamentLink ? (
-                      <$span style={{ padding: '15px 0px' }}>
-                        👉{' '}
-                        <$Link
-                          // color={'inherit'}
-                          fontStyle="italic"
-                          href={tournament.tournamentLink}
-                          style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                          target="_blank"
-                        >
-                          {tournamentWords.visitTournament}
-                        </$Link>
-                      </$span>
-                    ) : null}
+                      <FormattedMessage
+                        id="battlePage.about.aboutTournament"
+                        description="Text describing the details of an esports tournament"
+                        defaultMessage="About tournament"
+                      />
+                    </$span> */}
+                    <$p
+                      style={{
+                        color: COLORS.black,
+                        overflow: 'hidden',
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {tournament.description && tournament.description?.length > 250
+                        ? tournament.description.slice(0, 250) + '...'
+                        : tournament.description
+                        ? tournament.description
+                        : ''}
+                    </$p>
+                  </$Vertical>
 
-                    {tournament.communityURL && (
-                      <$span style={{ padding: '15px 0px' }}>
-                        👉{' '}
-                        <$Link
-                          // color={'inherit'}
-                          fontStyle="italic"
-                          href={tournament.communityURL}
-                          style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
-                          target="_self"
-                        >
-                          {words.joinCommunity}
-                        </$Link>
-                      </$span>
-                    )}
-                  </$Horizontal>
-                  <$span
-                    style={{
-                      textTransform: 'capitalize',
-                      color: COLORS.black,
-                      marginTop: '10px',
-                      fontWeight: TYPOGRAPHY.fontWeight.bold,
-                    }}
-                  >
-                    <FormattedMessage
-                      id="battlePage.about.aboutTournament"
-                      description="Text describing the details of an esports tournament"
-                      defaultMessage="About tournament"
-                    />
-                  </$span>
-                  <$p
-                    style={{
-                      color: COLORS.black,
-                      overflow: 'hidden',
-                      whiteSpace: 'pre-line',
-                    }}
-                  >
-                    {tournament.description && tournament.description?.length > 250
-                      ? tournament.description.slice(0, 250) + '...'
-                      : tournament.description
-                      ? tournament.description
-                      : ''}
-                  </$p>
-                </$Vertical>
+                  <div>
+                    <a
+                      href={tournament?.communityURL || tournament.tournamentLink || publicTournamentUrl}
+                      target="_blank"
+                    >
+                      <$Button
+                        screen={screen}
+                        // onClick={() => isInviteEnabled && setIsInviteModalOpen(true)}
+                        style={{
+                          textTransform: 'capitalize',
+                          color: COLORS.trustFontColor,
+                          background: COLORS.trustBackground,
+                          whiteSpace: 'nowrap',
+                          marginTop: '0.67em',
+                          fontWeight: 'bold',
+                          fontSize: '1.2rem',
+                          cursor: 'pointer',
+                          width: '100%',
+                          filter: 'drop-shadow(0px 4px 20px rgba(38, 166, 239, 0.64))',
+                        }}
+                      >
+                        {words.joinCommunity}
+                      </$Button>
+                    </a>
+                  </div>
+                </$Horizontal>
               </$Horizontal>
             </$BattlePageSection>
             <$h1>
@@ -463,6 +513,28 @@ export const $BattleCardImage = styled.img<{ cardNumber: number }>`
   background-size: cover;
   margin-left: -${(props) => props.cardNumber * 10}px;
   margin-top: ${(props) => props.cardNumber * 12}px;
+  object-fit: contain;
+  box-shadow: 2px 4px 5px #a2a2a2;
+`
+
+export const $BattleCardBlessed = styled.img<{ screen: ScreenSize; cardNumber: number }>`
+  position: absolute;
+  width: 100%;
+  height: auto;
+  max-height: 40vh;
+  object-fit: contain;
+  border: 0px solid transparent;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.05);
+  background-size: cover;
+  background-position: center;
+  width: 100%;
+  max-width: 90%;
+  max-height: 400px;
+  background-size: cover;
+  rotate: -${(props) => (props.screen === 'mobile' ? 0 : props.cardNumber * 12)}deg;
+  margin-left: -${(props) => props.cardNumber * 20}px;
+  margin-top: ${(props) => props.cardNumber * 22}px;
   object-fit: contain;
   box-shadow: 2px 4px 5px #a2a2a2;
 `
