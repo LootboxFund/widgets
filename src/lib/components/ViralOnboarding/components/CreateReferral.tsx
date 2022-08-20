@@ -19,7 +19,7 @@ interface CreateReferralProps {
 }
 const CreateReferral = (props: CreateReferralProps) => {
   const words = useWords()
-  const { referral } = useViralOnboarding()
+  const { referral, claim } = useViralOnboarding()
   const [createReferral, { data, error, loading: loadingCreateReferral }] = useMutation<
     { createReferral: CreateReferralResponse },
     MutationCreateReferralArgs
@@ -27,7 +27,7 @@ const CreateReferral = (props: CreateReferralProps) => {
     variables: {
       payload: {
         tournamentId: referral?.tournamentId || '',
-        partyBasketId: referral?.seedPartyBasketId,
+        partyBasketId: claim?.chosenPartyBasketId || referral?.seedPartyBasketId
       },
     },
   })
