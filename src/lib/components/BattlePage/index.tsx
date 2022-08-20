@@ -70,13 +70,23 @@ const BattlePage = (props: BattlePageParams) => {
     const _lootboxPartyBaskets: LootboxPartyBasket[] = []
     const _soldout: LootboxPartyBasket[] = []
     const _noPartyBaskets: LootboxPartyBasket[] = []
-
+    let _first: LootboxPartyBasket | undefined
+    
     ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
       if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
         snapshot.partyBaskets.forEach((partyBasket) => {
           if (partyBasket.status === PartyBasketStatus.Disabled) {
             return
           }
+
+          if (!_first) {
+            _first = {
+              lootbox: snapshot,
+              partyBasket,
+            }
+            return 
+          }
+
           if (partyBasket.status === PartyBasketStatus.SoldOut) {
             _soldout.push({
               lootbox: snapshot,
@@ -91,11 +101,16 @@ const BattlePage = (props: BattlePageParams) => {
         })
       } else {
         console.log('no party baskets', snapshot.name)
-        _noPartyBaskets.push({
-          lootbox: snapshot,
-        })
+        return
+        // _noPartyBaskets.push({
+        //   lootbox: snapshot,
+        // })
       }
     })
+
+    if (_first) {
+      _lootboxPartyBaskets.unshift(_first)
+    }
 
     return [[..._lootboxPartyBaskets, ..._soldout, ..._noPartyBaskets]]
   }, [data])
@@ -219,24 +234,24 @@ const BattlePage = (props: BattlePageParams) => {
                     width="220px"
                     style={{
                       marginBottom:
-                        tournament.lootboxSnapshots?.length > 0
-                          ? `${tournament.lootboxSnapshots?.length * 20}px`
+                        lootboxPartyBaskets?.length > 0
+                          ? `${lootboxPartyBaskets?.length * 20}px`
                           : 'auto',
                       marginLeft:
-                        tournament.lootboxSnapshots?.length > 0
-                          ? `${tournament.lootboxSnapshots?.length * 10}px`
+                      lootboxPartyBaskets?.length > 0
+                          ? `${lootboxPartyBaskets?.length * 10}px`
                           : 'auto',
                     }}
                   >
-                    {tournament.lootboxSnapshots?.length ? (
-                      tournament.lootboxSnapshots
+                    {lootboxPartyBaskets?.length ? (
+                      lootboxPartyBaskets
                         ?.slice(0, 4)
-                        ?.reverse() // reversed to show the "second" one first
+                        .reverse()  // reversed because it renders in reverse order
                         ?.map((snap, idx2) => {
                           return (
                             <$BattleCardBlessed
                               screen={screen}
-                              src={snap.stampImage}
+                              src={snap.lootbox.stampImage}
                               cardNumber={idx2}
                               key={`tournament-img-${idx2}`}
                             />
