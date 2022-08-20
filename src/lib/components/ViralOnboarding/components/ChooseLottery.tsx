@@ -1,13 +1,15 @@
 import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage } from 'react-intl'
-import { $Heading, $SubHeading, background1, $Heading2, $SmallText } from '../contants'
-import { GET_LOTTERY_LISTINGS } from '../api.gql'
+import { $Heading, $SubHeading, background1, $Heading2, $SmallText, $NextButton } from '../contants'
+import { GET_LOTTERY_LISTINGS, LotteryListingFE, LootboxSnapshotFE, PartyBasketFE } from '../api.gql'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useQuery } from '@apollo/client'
 import {
   LootboxTournamentSnapshot,
   PartyBasket,
+  PartyBasketStatus,
   QueryTournamentArgs,
+  ResponseError,
   TournamentResponse,
   TournamentResponseSuccess,
 } from 'lib/api/graphql/generated/types'
@@ -15,10 +17,14 @@ import { ErrorCard, LoadingCard } from './GenericCard'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
+import { useEffect, useMemo, useState } from 'react'
+
+const PAGE_SIZE = 6
 
 interface LootboxPartyBasket {
-  lootbox: LootboxTournamentSnapshot
-  partyBasket: PartyBasket
+  // lootbox: LootboxTournamentSnapshot
+  lootbox: LootboxSnapshotFE
+  partyBasket: PartyBasketFE
 }
 
 interface Props {
@@ -26,9 +32,10 @@ interface Props {
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
-  const { referral, setChosenPartyBasket, chosenPartyBasket } = useViralOnboarding()
+  const [page, setPage] = useState(0)
+  const { referral, setChosenPartyBasket } = useViralOnboarding()
   const words = useWords()
-  const { data, loading, error } = useQuery<{ tournament: TournamentResponse }, QueryTournamentArgs>(
+  const { data, loading, error } = useQuery<{ tournament: LotteryListingFE | ResponseError }, QueryTournamentArgs>(
     GET_LOTTERY_LISTINGS,
     {
       variables: {
@@ -36,6 +43,49 @@ const ChooseLottery = (props: Props) => {
       },
     }
   )
+  const [tickets, hasNextPage] = useMemo<[LootboxPartyBasket[], boolean]>(() => {
+    if (!data || data?.tournament?.__typename === 'ResponseError') {
+      return [[], false]
+    }
+
+    const { tournament } = data.tournament as LotteryListingFE
+
+    let lootboxPartyBaskets: LootboxPartyBasket[] = []
+    const soldOutPartyBaskets: LootboxPartyBasket[] = []
+
+    tournament.lootboxSnapshots?.forEach((snapshot) => {
+      if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
+        snapshot.partyBaskets.forEach((partyBasket) => {
+          const doc: LootboxPartyBasket = {
+            lootbox: snapshot,
+            partyBasket,
+          }
+          if (partyBasket.status === PartyBasketStatus.Disabled) {
+            return
+          }
+          if (partyBasket.status === PartyBasketStatus.SoldOut) {
+            soldOutPartyBaskets.push(doc)
+            return
+          }
+          if (partyBasket.id === referral?.seedPartyBasketId) {
+            lootboxPartyBaskets.unshift(doc)
+          } else {
+            if (lootboxPartyBaskets.some((snap) => snap.partyBasket.lootboxAddress === doc.lootbox.address)) {
+              lootboxPartyBaskets.push(doc)
+            } else {
+              lootboxPartyBaskets.splice(1, 0, doc)
+            }
+          }
+        })
+      }
+    })
+
+    lootboxPartyBaskets = lootboxPartyBaskets.concat(...soldOutPartyBaskets)
+
+    const paginated = lootboxPartyBaskets.slice(0, PAGE_SIZE * (page + 1))
+
+    return [paginated, paginated.length < lootboxPartyBaskets.length]
+  }, [page, data, referral?.seedPartyBasketId])
 
   if (loading) {
     return <LoadingCard />
@@ -44,37 +94,6 @@ const ChooseLottery = (props: Props) => {
   } else if (data?.tournament?.__typename === 'ResponseError') {
     return <ErrorCard message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
-
-  const { tournament } = data.tournament as TournamentResponseSuccess
-
-  let lootboxPartyBaskets: LootboxPartyBasket[] = []
-  const seenLootboxId: string[] = []
-  let highligted: LootboxPartyBasket | undefined = undefined
-  tournament.lootboxSnapshots?.forEach((snapshot) => {
-    if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
-      snapshot.partyBaskets.forEach((partyBasket) => {
-        const doc: LootboxPartyBasket = {
-          lootbox: snapshot,
-          partyBasket,
-        }
-        if (partyBasket.id === referral?.seedPartyBasketId) {
-          //   lootboxPartyBaskets.unshift(doc)
-          highligted = doc
-        } else {
-          if (
-            seenLootboxId.includes(doc.lootbox.address) ||
-            (highligted && highligted.lootbox.address === doc.lootbox.address)
-          ) {
-            lootboxPartyBaskets.push(doc)
-          } else {
-            lootboxPartyBaskets.unshift(doc)
-          }
-        }
-      })
-    }
-  })
-  // Hacky shit to get the highlighted and slightly depuped tickets
-  lootboxPartyBaskets = !!highligted ? [highligted, ...lootboxPartyBaskets] : [...lootboxPartyBaskets]
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -94,21 +113,35 @@ const ChooseLottery = (props: Props) => {
             />
           </$SubHeading>
           <$Vertical spacing={4} style={{ margin: '0px -10px' }}>
-            {lootboxPartyBaskets.map((data, idx) => {
+            {tickets.map((data, idx) => {
               const description = !data?.lootbox?.description
                 ? ''
                 : data.lootbox.description.length > 80
                 ? data.lootbox.description.slice(0, 80) + '...'
                 : data?.lootbox?.description
+              const isDisabled =
+                data?.partyBasket?.status &&
+                [PartyBasketStatus.SoldOut, PartyBasketStatus.Disabled].indexOf(data.partyBasket.status) > -1
               return (
                 <$LotteryContainer
                   onClick={() => {
+                    if (isDisabled) {
+                      return
+                    }
+
                     setChosenPartyBasket(data.partyBasket)
                     props.onNext()
                   }}
                   key={`selection-${idx}`}
                   type={data.partyBasket?.id === referral?.seedPartyBasketId ? 'highlight' : 'default'}
+                  style={{
+                    cursor: !isDisabled ? 'pointer' : 'not-allowed',
+                    position: 'relative',
+                  }}
                 >
+                  {data.partyBasket.status === PartyBasketStatus.SoldOut && (
+                    <$SoldOut>{`📦 ${words.outOfStock} 📦`}</$SoldOut>
+                  )}
                   <$Horizontal spacing={2}>
                     <$PartyBasketImage
                       src={data?.lootbox?.stampImage || ''}
@@ -124,6 +157,7 @@ const ChooseLottery = (props: Props) => {
                           textAlign: 'start',
                           margin: '0px',
                           fontSize: TYPOGRAPHY.fontSize.large,
+                          lineHeight: TYPOGRAPHY.fontSize.xxlarge,
                         }}
                       >
                         {data?.partyBasket?.name}
@@ -134,6 +168,14 @@ const ChooseLottery = (props: Props) => {
                 </$LotteryContainer>
               )
             })}
+            {hasNextPage && (
+              <$NextButton
+                onClick={() => setPage(page + 1)}
+                style={{ color: COLORS.white, background: COLORS.trustBackground }}
+              >
+                {words.seeMore}
+              </$NextButton>
+            )}
           </$Vertical>
         </$Vertical>
       </$ViralOnboardingSafeArea>
@@ -150,7 +192,7 @@ const $LotteryContainer = styled.div<{ type?: 'default' | 'highlight' | 'locked'
   box-sizing: border-box;
   overflow: hidden;
   cursor: ${(props) => (props.type === 'locked' ? 'not-allowed' : 'pointer')};
-  filter: ${(props) => (props.type === 'highlight' ? 'drop-shadow(0px 0px 50px #00a3ff)' : 'none')};
+  box-shadow: ${(props) => (props.type === 'highlight' ? `0px 3px 50px #00a3ff` : 'none')};
 `
 
 const $PartyBasketImage = styled.img`
@@ -158,6 +200,24 @@ const $PartyBasketImage = styled.img`
   max-height: 180px;
   height: 100%;
   max-width: 35%;
+`
+
+const $SoldOut = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${COLORS.white};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  text-transform: uppercase;
 `
 
 export default ChooseLottery

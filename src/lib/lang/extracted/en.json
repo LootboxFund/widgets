@@ -100,17 +100,9 @@
     "defaultMessage": "Starts today",
     "description": "Text indicating a tournament or something starts today"
   },
-  "battlePage.about.aboutTournament": {
-    "defaultMessage": "About tournament",
-    "description": "Text describing the details of an esports tournament"
-  },
   "battlePage.button.claimLottery": {
     "defaultMessage": "Claim lottery",
     "description": "Text prompting user to claim a lottery ticket"
-  },
-  "battlePage.button.inviteFriendRewardPrompt": {
-    "defaultMessage": "Both get a FREE lottery ticket",
-    "description": "Text prompting user on why they should invite a friend"
   },
   "battlePage.button.noneAvailable": {
     "defaultMessage": "None available",
@@ -1046,6 +1038,9 @@
   "generics.inviteFriend": {
     "defaultMessage": "Invite Friend"
   },
+  "generics.joinCommunity": {
+    "defaultMessage": "Join Community"
+  },
   "generics.loginToMakePartyBasket": {
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
@@ -1059,6 +1054,9 @@
   },
   "generics.noChangesMade": {
     "defaultMessage": "No changes made"
+  },
+  "generics.outOfStock": {
+    "defaultMessage": "Out of Stock"
   },
   "generics.partyBasketInformation": {
     "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
@@ -1086,6 +1084,9 @@
   "generics.sendCode": {
     "defaultMessage": "Send code",
     "description": "Text to send a code"
+  },
+  "generics.soldOut": {
+    "defaultMessage": "Sold Out"
   },
   "generics.tournament": {
     "defaultMessage": "Tournament",
@@ -1532,6 +1533,25 @@
   "partyBasket.manage.helpTooltip": {
     "defaultMessage": "This is your Party Basket for \"{lootboxName}\". You can bulk mint NFTs to this contract address, and then bulk whitelist people (with a CSV upload) to pick them up for FREE (AKA: Redeem a bounty)!",
     "description": "Information message about the Party Basket"
+  },
+  "partyBasket.manage.input.communityUrl.descriptionTooltip": {
+    "defaultMessage": "URL of the community to join. Users will be directed to this link after accepting the lottery ticket."
+  },
+  "partyBasket.manage.input.joinCommunity": {
+    "defaultMessage": "Community URL"
+  },
+  "partyBasket.manage.input.name": {
+    "defaultMessage": "Party Basket Name",
+    "description": "Input field for the party basket name form"
+  },
+  "partyBasket.manage.input.nftBountyValue": {
+    "defaultMessage": "Bounty Value"
+  },
+  "partyBasket.manage.input.status": {
+    "defaultMessage": "Current Status"
+  },
+  "partyBasket.manage.input.status.descriptionTooltip": {
+    "defaultMessage": "Active:{newline}{newline} - party basket is browseable in the tournament pages{newline} - party basket is in the viral referral program{newline}{newline} Disabled:{newline}{newline} - removes party basket from tournament pages{newline} - removes from viral referral flow{newline}{newline} Sold out:{newline}{newline} - removes from viral referral flow - party basket still visible on tournament pages"
   },
   "partyBasket.manage.missingAddressColumnErrorMessage": {
     "defaultMessage": "No \"{csvKey}\" column found in uploaded CSV. Please fix your csv file by adding a column named \"{csvKey}\" with the desired addresses you want to whitelist & re-upload.",
@@ -2053,6 +2073,10 @@
     "defaultMessage": "Public View",
     "description": "Hyperlink to navigate to the public page of an esports tournament"
   },
+  "tournament.edit.publicWatchPage": {
+    "defaultMessage": "Public Watch Page",
+    "description": "Hyperlink to navigate to the public watch page of an esports tournament"
+  },
   "tournament.edit.title.placeholder": {
     "defaultMessage": "e.x. My Awesome Tournament",
     "description": "Placeholder for the tournament title form. Its an example tournament title."
@@ -2133,7 +2157,7 @@
     "description": "Text when no Lootboxes were found"
   },
   "tournament.stream.addCampaignCompleteUrl": {
-    "defaultMessage": "Add URL for AFTER the tournament"
+    "defaultMessage": "Link to your Community"
   },
   "tournament.stream.streamTypeCannotBeEmpty": {
     "defaultMessage": "Stream type cannot be empty",
@@ -2149,6 +2173,15 @@
   },
   "tournamentAnalytics.button.downloadCSV": {
     "defaultMessage": "Generate CSV"
+  },
+  "userClaims.invitedByUser": {
+    "defaultMessage": "Invited by {username}"
+  },
+  "userClaims.participationReward": {
+    "defaultMessage": "Participation Reward"
+  },
+  "userClaims.referredUser": {
+    "defaultMessage": "Referred {username}"
   },
   "userTickets.title": {
     "defaultMessage": "Redeem Profit Sharing NFTs",

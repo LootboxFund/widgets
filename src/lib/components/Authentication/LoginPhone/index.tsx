@@ -25,6 +25,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
   const [status, setStatus] = useState<'pending' | 'verification_sent' | 'complete'>('pending')
   const { sendPhoneVerification, signInPhoneWithCode } = useAuth()
   const { screen } = useWindowSize()
+  const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [phoneCode, setPhoneCode] = useState<string>('')
@@ -54,6 +55,10 @@ const LoginPhone = (props: SignUpEmailProps) => {
   }, [])
 
   const handleVerificationRequest = async () => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
     setErrorMessage('')
     try {
       await sendPhoneVerification(`${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`)
@@ -61,10 +66,17 @@ const LoginPhone = (props: SignUpEmailProps) => {
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleCodeSubmit = async () => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    setErrorMessage('')
     try {
       await signInPhoneWithCode(confirmationCode)
       setStatus('complete')
@@ -72,6 +84,8 @@ const LoginPhone = (props: SignUpEmailProps) => {
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -134,7 +148,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
                 // textTransform: 'uppercase',
               }}
             >
-              {words.sendCode}
+              <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
             </$Button>
           </$Vertical>
         </$Vertical>

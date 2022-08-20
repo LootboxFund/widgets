@@ -37,7 +37,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     title: '',
     description: '',
     tournamentDate: undefined,
-    campaignCompleteURL: undefined,
+    communityURL: undefined,
   })
   const [createTournament, { loading }] = useMutation<
     { createTournament: CreateTournamentResponse },
@@ -67,10 +67,10 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
     })
   }
 
-  const parseCampaignCompleteURL = (campaignCompleteURL: string) => {
+  const parseCommunityURL = (communityURL: string) => {
     setTournamentPayload({
       ...tournamentPayload,
-      campaignCompleteURL,
+      communityURL,
     })
   }
 
@@ -246,10 +246,10 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
             ></$InputMedium>
           </$Vertical>
           <$Vertical spacing={2}>
-            <$span>{tournamentWords.addCampaignCompleteUrl}</$span>
+            <$span>{tournamentWords.communityURL}</$span>
             <$InputMedium
-              onChange={(e) => parseCampaignCompleteURL(e.target.value)}
-              value={tournamentPayload?.campaignCompleteURL || ''}
+              onChange={(e) => parseCommunityURL(e.target.value)}
+              value={tournamentPayload?.communityURL || ''}
               style={{
                 color: `${COLORS.black}ca`,
               }}

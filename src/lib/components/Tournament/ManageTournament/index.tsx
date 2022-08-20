@@ -66,6 +66,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
   const { tournament } = data.myTournament as MyTournamentFE
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
   const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
+  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tournament=${tournament.id}`
 
   const lootboxSnapshots = [...(tournament?.lootboxSnapshots || [])]
 
@@ -311,13 +312,31 @@ const ManageTournament = (props: ManageTournamentProps) => {
       </$TournamentSectionContainer>
 
       <$TournamentSectionContainer screen={screen}>
-        <$h1>
-          <FormattedMessage
-            id="tournament.edit.addStream.title"
-            defaultMessage="Manage Streams"
-            description="Title for the section to add / manage a live stream for tournament. A live stream is a video feed of an esports tournament gameplay."
-          />
-        </$h1>
+        <$Horizontal justifyContent="space-between" flexWrap>
+          <$h1>
+            <FormattedMessage
+              id="tournament.edit.addStream.title"
+              defaultMessage="Manage Streams"
+              description="Title for the section to add / manage a live stream for tournament. A live stream is a video feed of an esports tournament gameplay."
+            />
+          </$h1>
+          <$span style={{ paddingBottom: '15px', margin: 'auto 0' }}>
+            👉{' '}
+            <$Link
+              color={'inherit'}
+              fontStyle="italic"
+              href={watchUrl}
+              style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
+              target="_self"
+            >
+              <FormattedMessage
+                id="tournament.edit.publicWatchPage"
+                defaultMessage="Public Watch Page"
+                description="Hyperlink to navigate to the public watch page of an esports tournament"
+              />
+            </$Link>
+          </$span>
+        </$Horizontal>
         <$p style={{ marginTop: '0px' }}>
           <FormattedMessage
             id="tournament.edit.addStream.description"
@@ -366,6 +385,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
       {lootboxSnapshots.length > 0 && (
         <LootboxList
+          pageSize={5}
           lootboxes={lootboxSnapshots}
           screen={screen}
           onClickLootbox={(lootbox) => {
