@@ -3,6 +3,7 @@ import {
   CreateReferralResponseSuccess,
   MutationCreateReferralArgs,
   Referral,
+  ReferralType,
 } from 'lib/api/graphql/generated/types'
 import { PartyBasketID, TournamentID } from 'lib/types'
 import { CREATE_REFERRAL } from './api.gql'
@@ -64,7 +65,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             campaignName,
             partyBasketId: props.partyBasketId,
             tournamentId: props.tournamentId,
-            isRewardDisabled: !bonucClaimEnabled,
+            type: !!bonucClaimEnabled ? ReferralType.Viral : ReferralType.Genesis,
           },
         },
       })
