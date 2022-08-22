@@ -3,6 +3,7 @@ import {
   CreateReferralResponse,
   CreateReferralResponseSuccess,
   MutationCreateReferralArgs,
+  ReferralType,
 } from 'lib/api/graphql/generated/types'
 import AuthGuard from 'lib/components/AuthGuard'
 import { CREATE_REFERRAL } from 'lib/components/Referral/CreatePartyBasketReferral/api.gql'
@@ -27,7 +28,8 @@ const CreateReferral = (props: CreateReferralProps) => {
     variables: {
       payload: {
         tournamentId: referral?.tournamentId || '',
-        partyBasketId: chosenPartyBasket?.id || referral?.seedPartyBasketId
+        partyBasketId: chosenPartyBasket?.id || referral?.seedPartyBasketId,
+        type: ReferralType.Viral,
       },
     },
   })
