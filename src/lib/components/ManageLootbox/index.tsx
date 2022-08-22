@@ -787,11 +787,7 @@ const ManageLootbox = (props: ManageLootboxProps) => {
         </$Vertical>
         <$Vertical>
           <$StepSubheading style={{ marginBottom: '10px' }}>
-            <FormattedMessage
-              id="lootbox.manage.advanced.title"
-              defaultMessage="Advanced"
-              description="Title for the advanced section in Lootbox control panel section"
-            />
+            {words.advanced}
             <HelpIcon tipID="advancedSettings" />
             <ReactTooltip id="advancedSettings" place="right" effect="solid">
               <FormattedMessage
