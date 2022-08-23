@@ -52,6 +52,13 @@ export const getERC20Symbol = async (tokenAddress: Address): Promise<string> => 
   return await token.symbol()
 }
 
+export const getERC20Decimal = async (tokenAddress: Address): Promise<string> => {
+  const ethers = window.ethers ? window.ethers : ethersObj
+  const { provider } = await getProvider()
+  const token = new ethers.Contract(tokenAddress, ERC20ABI, provider)
+  return await token.decimals()
+}
+
 export const approveERC20Token = async (delegator: Address | undefined, tokenData: TokenData, quantity: string) => {
   if (!delegator) return
   const ethers = window.ethers ? window.ethers : ethersObj

@@ -1,7 +1,7 @@
 import { ITicket, IDividend } from 'lib/types'
 import { proxy } from 'valtio'
 import { loadLootboxMetadata } from 'lib/state/lootbox.state'
-import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol } from 'lib/hooks/useContract'
+import { getTicketDividends, withdrawEarningsFromLootbox, getERC20Symbol, getERC20Decimal } from 'lib/hooks/useContract'
 import { getTokenFromList } from 'lib/hooks/useTokenList'
 import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { ContractAddress } from '@wormgraph/helpers'
@@ -74,13 +74,20 @@ export const loadDividends = async (ticketID: string) => {
   const dividends: IDividend[] = await promiseChainDelay(
     dividendFragments.map(async (fragment) => {
       let symbol: string
+      let decimal: string
       if (fragment.tokenAddress === NATIVE_ADDRESS) {
         symbol = nativeToken?.symbol || NATIVE_ADDRESS
+        decimal = '18'
       } else {
         try {
           symbol = await getERC20Symbol(fragment.tokenAddress)
         } catch (err) {
           symbol = fragment.tokenAddress?.slice(0, 4) + '...' || ''
+        }
+        try {
+          decimal = await getERC20Decimal(fragment.tokenAddress)
+        } catch (err) {
+          decimal = '18'
         }
       }
       return {
@@ -88,6 +95,7 @@ export const loadDividends = async (ticketID: string) => {
         tokenAmount: fragment.tokenAmount,
         tokenAddress: fragment.tokenAddress,
         isRedeemed: fragment.isRedeemed,
+        decimal,
       }
     })
   )

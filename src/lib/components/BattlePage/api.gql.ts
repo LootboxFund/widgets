@@ -9,6 +9,7 @@ export interface PartyBasketFE {
   nftBountyValue?: string
   address: Address
   status?: PartyBasketStatus
+  joinCommunityUrl?: string
 }
 
 export interface BattlePageLootboxSnapshotFE {
@@ -99,6 +100,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
               nftBountyValue
               address
               status
+              joinCommunityUrl
             }
           }
         }
