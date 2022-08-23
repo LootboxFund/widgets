@@ -84,7 +84,7 @@ const ViewPayout = (props: ViewPayoutProps) => {
         [...dividends].sort(sortDividends).map((dividend, idx) => {
           return (
             <$DividendRow key={`${snap.lootboxAddress}-${props.ticketID}-${idx}`} isActive={!dividend.isRedeemed}>
-              <$DividendOwed>{parseEth(dividend.tokenAmount)}</$DividendOwed>
+              <$DividendOwed>{parseEth(dividend.tokenAmount, Number(dividend.decimal))}</$DividendOwed>
               <$DividendTokenSymbol>{dividend.tokenSymbol}</$DividendTokenSymbol>
             </$DividendRow>
           )
