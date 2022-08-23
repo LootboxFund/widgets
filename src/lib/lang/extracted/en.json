@@ -1006,6 +1006,9 @@
   "generics.about": {
     "defaultMessage": "About"
   },
+  "generics.advanced": {
+    "defaultMessage": "Advanced"
+  },
   "generics.biography": {
     "defaultMessage": "Biography"
   },
@@ -1132,6 +1135,10 @@
     "defaultMessage": "Invite Friends",
     "description": "Title of this modal for inviting friends"
   },
+  "inviteLink.modal.onetime.text": {
+    "defaultMessage": "One time referral",
+    "description": "Checkbox label, referral can be claimed only once."
+  },
   "inviteLink.modal.success.description": {
     "defaultMessage": "Copy the link and share it with your friends."
   },
@@ -1144,10 +1151,6 @@
   "lootbox.manage.advanced.button": {
     "defaultMessage": "Launch OZ Defender",
     "description": "Button to launch the OZ Defender tutorial. OZ Defender refers to advanced software you can use to manage your Loorbox (defender.openzeppelin.com)"
-  },
-  "lootbox.manage.advanced.title": {
-    "defaultMessage": "Advanced",
-    "description": "Title for the advanced section in Lootbox control panel section"
   },
   "lootbox.manage.advanced.tooltip": {
     "defaultMessage": "This Lootbox management page handles 90% of use cases. If you need access to the full Lootbox controls, you will need to import this contract into OpenZeppelin Defender and interact with the blockchain directly. The most likely reason why you would need to use Advanced Controls is if you accidentally trap tokens in your Lootbox and need to rescue them (tokens get trapped if you just send them to the Lootbox address directly. always use the UI to reward sponsors instead of sending tokens directly. trapped tokens can be rescued easily but its a hassle). A full tutorial on Advanced Controls can be found on the LootboxFund YouTube Channel.",
