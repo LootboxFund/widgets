@@ -1136,7 +1136,7 @@
     "description": "Title of this modal for inviting friends"
   },
   "inviteLink.modal.onetime.text": {
-    "defaultMessage": "One time referral",
+    "defaultMessage": "Participation Reward",
     "description": "Checkbox label, referral can be claimed only once."
   },
   "inviteLink.modal.success.description": {

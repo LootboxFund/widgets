@@ -288,7 +288,7 @@
   "inviteLink.modal.enableBonusClaim": "Get Bonus Rewards for Referrals",
   "inviteLink.modal.generateInviteLink": "Generate Invite Link",
   "inviteLink.modal.header": "Invite Friends",
-  "inviteLink.modal.onetime.text": "One time referral",
+  "inviteLink.modal.onetime.text": "Participation Reward",
   "inviteLink.modal.success.description": "Copy the link and share it with your friends.",
   "inviteLink.modal.success.header": "Your Referral Link",
   "inviteLink.modal.success.screenshotHeader": "Screenshot the QRCode and Share with Friends",
