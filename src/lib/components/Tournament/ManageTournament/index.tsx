@@ -295,21 +295,6 @@ const ManageTournament = (props: ManageTournamentProps) => {
           )}
         </$TournamentSectionContainer>
       ) : null}
-      <$TournamentSectionContainer screen={screen}>
-        <$Vertical spacing={4}>
-          <$h1>
-            <FormattedMessage id="tournament.edit.analytics.title" defaultMessage="Tournament Analytics" />
-          </$h1>
-          <$p style={{ marginTop: '0px' }}>
-            <FormattedMessage
-              id="tournament.edit.analytics.description"
-              defaultMessage="Track how many referral bounties have been claimed by your community."
-            />{' '}
-            <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
-          </$p>
-          <TournamentAnalytics tournamentId={tournament.id as TournamentID} />
-        </$Vertical>
-      </$TournamentSectionContainer>
 
       <$TournamentSectionContainer screen={screen}>
         <$Horizontal justifyContent="space-between" flexWrap>
@@ -365,6 +350,22 @@ const ManageTournament = (props: ManageTournamentProps) => {
           />
         </$h1>
         <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
+      </$TournamentSectionContainer>
+
+      <$TournamentSectionContainer screen={screen}>
+        <$Vertical spacing={4}>
+          <$h1>
+            <FormattedMessage id="tournament.edit.analytics.title" defaultMessage="Tournament Analytics" />
+          </$h1>
+          <$p style={{ marginTop: '0px' }}>
+            <FormattedMessage
+              id="tournament.edit.analytics.description"
+              defaultMessage="Track how many referral bounties have been claimed by your community."
+            />{' '}
+            <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
+          </$p>
+          <TournamentAnalytics tournamentId={tournament.id as TournamentID} />
+        </$Vertical>
       </$TournamentSectionContainer>
 
       {lootboxSnapshots.length === 0 && (
