@@ -133,11 +133,11 @@ export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: 
   background-position: center;
   overflow: hidden;
 `
-export const $ViralOnboardingSafeArea = styled.div`
+export const $ViralOnboardingSafeArea = styled.div<{ inline?: boolean }>`
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: ${(props) => (props.inline ? 'visible' : 'scroll')};
   padding: 3.5rem 2.2rem;
   box-sizing: border-box;
 `

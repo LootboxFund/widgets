@@ -277,7 +277,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
           ) : (
             <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
-              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} />
+              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} inline={true} />
             </div>
           )}
         </$Vertical>
