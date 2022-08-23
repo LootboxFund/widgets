@@ -26,4 +26,5 @@ export interface IDividend {
   tokenAmount: string
   tokenSymbol: string
   isRedeemed: boolean
+  decimal: string
 }

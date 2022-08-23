@@ -768,7 +768,13 @@ const useWords = () => {
     defaultMessage: 'Out of Stock',
   })
 
+  const advanced = intl.formatMessage({
+    id: 'generics.advanced',
+    defaultMessage: 'Advanced',
+  })
+
   return {
+    advanced,
     outOfStock,
     phone,
     fileTooLarge,

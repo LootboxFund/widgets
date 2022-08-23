@@ -3,6 +3,7 @@ import {
   CreateReferralResponseSuccess,
   MutationCreateReferralArgs,
   Referral,
+  ReferralType,
 } from 'lib/api/graphql/generated/types'
 import { PartyBasketID, TournamentID } from 'lib/types'
 import { CREATE_REFERRAL } from './api.gql'
@@ -28,13 +29,14 @@ interface Props {
 
 const CreatePartyBasketReferral = (props: Props) => {
   const { screen } = useWindowSize()
-  const [bonucClaimEnabled, setBonusClaimEnabled] = useState(true)
   const [createReferral, { loading }] = useMutation<
     { createReferral: CreateReferralResponse },
     MutationCreateReferralArgs
   >(CREATE_REFERRAL)
   const [createdReferrals, setCreatedReferrals] = useState<Referral[]>([])
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [campaignName, setCampaignName] = useState('')
+  const [referralType, setReferralType] = useState<ReferralType>(ReferralType.Viral)
   const [errorMessage, setErrorMessage] = useState('')
   const intl = useIntl()
   const words = useWords()
@@ -64,7 +66,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             campaignName,
             partyBasketId: props.partyBasketId,
             tournamentId: props.tournamentId,
-            isRewardDisabled: !bonucClaimEnabled,
+            type: referralType,
           },
         },
       })
@@ -126,8 +128,10 @@ const CreatePartyBasketReferral = (props: Props) => {
       <$span>
         <$Checkbox
           type="checkbox"
-          checked={bonucClaimEnabled}
-          onChange={() => setBonusClaimEnabled(!bonucClaimEnabled)}
+          checked={referralType === ReferralType.Viral}
+          onChange={() =>
+            setReferralType(referralType === ReferralType.Viral ? ReferralType.Genesis : ReferralType.Viral)
+          }
         />
         <FormattedMessage
           id="inviteLink.modal.enableBonusClaim"
@@ -153,6 +157,40 @@ const CreatePartyBasketReferral = (props: Props) => {
       >
         <LoadingText loading={loading} text={words.generateInviteLinkText} color={COLORS.white} />
       </button>
+      <br />
+      <br />
+      <$span
+        onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
+        style={{
+          textTransform: 'lowercase',
+          color: `${COLORS.surpressedFontColor}66`,
+          fontStyle: 'italic',
+          textAlign: 'end',
+          cursor: 'pointer',
+        }}
+      >
+        {words.advanced}
+      </$span>
+      {isAdvancedOpen && (
+        <$Vertical>
+          <br />
+          <$span style={{ textTransform: 'capitalize' }}>
+            <$Checkbox
+              type="checkbox"
+              checked={referralType === ReferralType.OneTime}
+              onChange={() =>
+                setReferralType(referralType === ReferralType.OneTime ? ReferralType.Viral : ReferralType.OneTime)
+              }
+            />
+            <FormattedMessage
+              id="inviteLink.modal.onetime.text"
+              defaultMessage="One time referral"
+              description="Checkbox label, referral can be claimed only once."
+            />
+          </$span>
+        </$Vertical>
+      )}
+
       {errorMessage ? <$ErrorMessage style={{ paddingTop: '15px' }}>{errorMessage}</$ErrorMessage> : null}
       {lastReferralLink && (
         <$Vertical>
@@ -245,60 +283,6 @@ const CreatePartyBasketReferral = (props: Props) => {
         </$Vertical>
       )}
     </$Vertical>
-    // <$AddReferralContainer>
-    //   {createdReferrals?.length > 0 && (
-    //     <$Vertical spacing={2}>
-    //       {createdReferrals.map((ref: Referral) => {
-    //         return (
-    //           <$ReferralItemContainer key={ref.id}>
-    //             <$Horizontal justifyContent="space-between">
-    //               <$span>{ref.campaignName}</$span>
-    //               <$span>{ref.slug}</$span>
-    //             </$Horizontal>
-    //           </$ReferralItemContainer>
-    //         )
-    //       })}
-    //     </$Vertical>
-    //   )}
-    //   <$Vertical spacing={2}>
-    //     <$Horizontal flexWrap={screen === 'mobile'} spacing={2}>
-    //       <$InputMedium
-    //         placeholder={nameYourReferralCampaign}
-    //         value={campaignName}
-    //         onChange={(e) => setCampaignName(e.target.value)}
-    //         style={{
-    //           borderRadius: '5px',
-    //           background: COLORS.white,
-    //           marginTop: '10px',
-    //           marginBottom: '10px',
-    //           boxSizing: 'border-box',
-    //         }}
-    //         width={screen === 'mobile' ? '100%' : '65%'}
-    //       />
-
-    //       <div style={{ margin: 'auto 0' }}>
-    //         <$Button
-    //           id="button-add-stream"
-    //           screen={screen}
-    //           onClick={handleButtonClick}
-    //           backgroundColor={`${COLORS.trustBackground}`}
-    //           backgroundColorHover={`${COLORS.trustBackground}`}
-    //           color={COLORS.trustFontColor}
-    //           style={{
-    //             boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-    //             fontWeight: TYPOGRAPHY.fontWeight.regular,
-    //             fontSize: TYPOGRAPHY.fontSize.large,
-    //             whiteSpace: 'nowrap',
-    //           }}
-    //           disabled={loading}
-    //         >
-    //           <LoadingText loading={loading} text={createReferralText} color={COLORS.trustFontColor} />
-    //         </$Button>
-    //       </div>
-    //     </$Horizontal>
-    //     {errorMessage ? <$ErrorMessage>{errorMessage}</$ErrorMessage> : null}
-    //   </$Vertical>
-    // </$AddReferralContainer>
   )
 }
 

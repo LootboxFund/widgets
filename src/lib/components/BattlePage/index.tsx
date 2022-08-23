@@ -1,22 +1,13 @@
 import { useQuery } from '@apollo/client'
-import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
-import {
-  LootboxTournamentSnapshot,
-  PartyBasket,
-  PartyBasketStatus,
-  QueryTournamentArgs,
-  ResponseError,
-  Stream,
-  TournamentResponse,
-  TournamentResponseSuccess,
-} from 'lib/api/graphql/generated/types'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { PartyBasketStatus, QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { TournamentID, StreamID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { $h1, $h2, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
+import { $h1, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
 import Spinner from '../Generics/Spinner'
 import { $Link, Oopsies } from '../Profile/common'
 import {
@@ -28,7 +19,7 @@ import {
 } from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
-import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
 import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
@@ -59,7 +50,6 @@ const BattlePage = (props: BattlePageParams) => {
   const words = useWords()
   const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
-  // const SOCIALS = getSocials(intl)
   const [searchTerm, setSearchTerm] = useState('')
 
   const [lootboxPartyBaskets] = useMemo<[LootboxPartyBasket[]]>(() => {
@@ -71,7 +61,6 @@ const BattlePage = (props: BattlePageParams) => {
     const _soldout: LootboxPartyBasket[] = []
     const _noPartyBaskets: LootboxPartyBasket[] = []
     let _first: LootboxPartyBasket | undefined
-    
     ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
       if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
         snapshot.partyBaskets.forEach((partyBasket) => {
@@ -84,7 +73,7 @@ const BattlePage = (props: BattlePageParams) => {
               lootbox: snapshot,
               partyBasket,
             }
-            return 
+            return
           }
 
           if (partyBasket.status === PartyBasketStatus.SoldOut) {
@@ -182,6 +171,8 @@ const BattlePage = (props: BattlePageParams) => {
 
   const publicTournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
 
+  const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
+
   return (
     <$BattlePageContainer>
       <$Vertical spacing={4}>
@@ -234,19 +225,18 @@ const BattlePage = (props: BattlePageParams) => {
                     width="220px"
                     style={{
                       marginBottom:
-                        lootboxPartyBaskets?.length > 0
-                          ? `${lootboxPartyBaskets?.length * 20}px`
+                        previewLootboxPartyBaskets?.length > 0
+                          ? `${previewLootboxPartyBaskets?.length * 12}px`
                           : 'auto',
                       marginLeft:
-                      lootboxPartyBaskets?.length > 0
-                          ? `${lootboxPartyBaskets?.length * 10}px`
+                        previewLootboxPartyBaskets?.length > 0
+                          ? `${previewLootboxPartyBaskets?.length * 10}px`
                           : 'auto',
                     }}
                   >
-                    {lootboxPartyBaskets?.length ? (
-                      lootboxPartyBaskets
-                        ?.slice(0, 4)
-                        .reverse()  // reversed because it renders in reverse order
+                    {previewLootboxPartyBaskets?.length ? (
+                      previewLootboxPartyBaskets
+                        .reverse() // reversed because it renders in reverse order
                         ?.map((snap, idx2) => {
                           return (
                             <$BattleCardBlessed

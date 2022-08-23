@@ -282,13 +282,14 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
               const isNotifReq = notificationClaims.indexOf(claim.id) > -1
               const joinNotif = isNotifReq && !!claim?.chosenPartyBasket?.joinCommunityUrl
               const isNotif = !!joinNotif
+              const mainActionLink =
+                claim.chosenPartyBasket.joinCommunityUrl ||
+                claim.tournament?.tournamentLink ||
+                `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`
+
               return (
                 <$ClaimCard key={claim.id}>
-                  <a
-                    href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
-                    target="_blank"
-                    style={{ display: 'block', cursor: 'pointer' }}
-                  >
+                  <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
                     <$ImageContainer>
                       <img
                         src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
@@ -297,8 +298,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                           height: '100%',
                           objectFit: 'cover',
                           paddingBottom: '5px',
-                          // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
-                          // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
                         }}
                       />
                       <TicketBadge claim={claim} />
@@ -314,8 +313,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                     <$Horizontal
                       width="100%"
                       style={{
-                        // filter: 'drop-shadow(rgba(0, 178, 255, 0.5) 0px 4px 30px)',
-                        // boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
                         boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa`,
                         borderRadius: '6px',
                       }}
@@ -380,11 +377,15 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
       </$ClaimsGrid>
       {pageInfo?.hasNextPage && (
-        <$Horizontal justifyContent="center">
-          <$MoreButton onClick={handleMore} style={{ marginTop: '20px' }}>
-            {words.seeMore}
-          </$MoreButton>
-        </$Horizontal>
+        <$Vertical>
+          <br />
+          <br />
+          <$Horizontal justifyContent="center">
+            <$MoreButton onClick={handleMore} style={{ marginTop: '20px' }}>
+              {words.seeMore}
+            </$MoreButton>
+          </$Horizontal>
+        </$Vertical>
       )}
       <Modal
         isOpen={isModalOpen}
@@ -512,15 +513,15 @@ const $InviteFriend = styled.div<{ screen: ScreenSize }>`
 const $MoreButton = styled.button`
   width: 100%;
   height: 40px;
-  max-width: 200px;
+  max-width: 160px;
   padding: 5px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  border-radius: 10px;
-  background-color: ${COLORS.trustBackground};
-  color: ${COLORS.white};
-  border: 0px solid white;
+  border-radius: 6px;
+  background-color: ${COLORS.white};
+  color: ${COLORS.trustBackground};
+  border: 2px solid ${COLORS.trustBackground};
   text-transform: uppercase;
 `
 
