@@ -116,6 +116,7 @@ export const $Divider = styled.div<{ margin?: string; width?: string }>`
 `
 
 export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: string }>`
+  margin: 0 auto;
   max-width: 500px;
   width: 100%;
   height: 100vh;
