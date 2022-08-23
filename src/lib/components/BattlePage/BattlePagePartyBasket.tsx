@@ -244,14 +244,14 @@ const BattlePagePartyBasket = (props: Props) => {
                   : ''}
               </$p>
               <$Horizontal flexWrap justifyContent={'flex-start'}>
-                {props.lootboxPartyBasket?.partyBasket?.address && (
+                {props.lootboxPartyBasket?.partyBasket?.joinCommunityUrl && (
                   <$span style={{ margin: '10px 10px 10px 0px' }}>
                     <$Link
                       color={'inherit'}
-                      href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket?.partyBasket?.address}`}
+                      href={props.lootboxPartyBasket.partyBasket.joinCommunityUrl}
                       style={{ textDecoration: 'none' }}
                     >
-                      👉 Redeem
+                      👉 Join Community
                     </$Link>
                   </$span>
                 )}
