@@ -212,6 +212,15 @@
     "defaultMessage": "Win up to...",
     "description": "Text indicating maximum amount that can be won, i.e. you can win up to 20 dollars"
   },
+  "bulkReferral.campaignName.title": {
+    "defaultMessage": "Campaign Name"
+  },
+  "bulkReferral.numReferrals.title": {
+    "defaultMessage": "Number of Links to Generate"
+  },
+  "bulkReferral.referrer.title": {
+    "defaultMessage": "Referrer ID"
+  },
   "buyShares.buyButton.buttonPrompt": {
     "defaultMessage": "Enter an amount",
     "description": "Input text for a user to enter an amount of crypto currency to buy from Lootbox"
@@ -1019,6 +1028,9 @@
   "generics.date": {
     "defaultMessage": "Date",
     "description": "Calendar date"
+  },
+  "generics.downloadCSVFile": {
+    "defaultMessage": "Click to download CSV file"
   },
   "generics.event": {
     "defaultMessage": "Event",
@@ -2023,9 +2035,6 @@
     "defaultMessage": "The gamer has not deposited any earnings yet. Come back later to claim your rewards.",
     "description": "Text displayed when the Lootbox owner has not deposited any earnings yet and so, the investor cannot redeem anything from their profit share NFTs."
   },
-  "tournament.analytics.download": {
-    "defaultMessage": "Click to download CSV file"
-  },
   "tournament.create.header": {
     "defaultMessage": "Create a Tournament",
     "description": "Button text for the create tournament form - these are e-sports tournaments and or 1v1 battles etc"
@@ -2047,6 +2056,14 @@
   },
   "tournament.edit.analytics.title": {
     "defaultMessage": "Tournament Analytics"
+  },
+  "tournament.edit.bulkReferral.description": {
+    "defaultMessage": "Generate a CSV filled with participation rewards. These are one-time invite links to redeem a lottery ticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link.",
+    "description": "Description for bulk referral"
+  },
+  "tournament.edit.bulkReferral.title": {
+    "defaultMessage": "Bulk Participation Rewards",
+    "description": "Title for the section to edit create bulk referral links"
   },
   "tournament.edit.createMagicLink.help": {
     "defaultMessage": "Magic Links help people sign up for your tournament by creating a special Lootbox with the settings you choose! {learnMoreHyperLink}",
