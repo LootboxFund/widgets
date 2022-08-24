@@ -480,7 +480,8 @@ export const $InputMedium = styled.input<{ width?: string }>`
 export const $InputLabel = styled.label`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.surpressedFontColor}ae;
+  color: ${COLORS.surpressedFontColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
 `
 
 export const $TextAreaMedium = styled.textarea`

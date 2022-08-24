@@ -773,7 +773,13 @@ const useWords = () => {
     defaultMessage: 'Advanced',
   })
 
+  const downloadCSVFile = intl.formatMessage({
+    id: 'generics.downloadCSVFile',
+    defaultMessage: 'Click to download CSV file',
+  })
+
   return {
+    downloadCSVFile,
     advanced,
     outOfStock,
     phone,
