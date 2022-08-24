@@ -2,18 +2,12 @@ import AuthGuard from '../../AuthGuard'
 import { $Vertical, $Divider, $Horizontal, $span, $h1, $h3, $p } from '../../Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import { LootboxList, $TournamentCover, StreamListItem, $TournamentSectionContainer } from '../common'
-import {
-  QueryTournamentArgs,
-  ResponseError,
-  Tournament,
-  TournamentResponse,
-  TournamentResponseSuccess,
-} from 'lib/api/graphql/generated/types'
+import { QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { useMutation, useQuery } from '@apollo/client'
-import { GET_MY_TOURNAMENT, DELETE_STREAM, MyTournamentFE } from './api.gql'
+import { useQuery } from '@apollo/client'
+import { GET_MY_TOURNAMENT, MyTournamentFE } from './api.gql'
 import { useEffect, useState } from 'react'
-import { StreamID, TournamentID } from 'lib/types'
+import { TournamentID } from 'lib/types'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
@@ -27,6 +21,7 @@ import { useTournamentWords } from '../common'
 import AddStream from './AddStream'
 import $Button from 'lib/components/Generics/Button'
 import TournamentAnalytics from './TournamentAnalytics'
+import BulkCreateReferral from 'lib/components/Referral/BulkCreateReferral'
 
 const LEARN_MORE_STREAM_LINK = 'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'
 
@@ -83,7 +78,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
       color={COLORS.trustFontColor}
       backgroundColor={`${COLORS.trustBackground}`}
       style={{
-        fontWeight: TYPOGRAPHY.fontWeight.light,
+        fontWeight: TYPOGRAPHY.fontWeight.regular,
         fontSize: TYPOGRAPHY.fontSize.large,
       }}
     >
@@ -295,21 +290,6 @@ const ManageTournament = (props: ManageTournamentProps) => {
           )}
         </$TournamentSectionContainer>
       ) : null}
-      <$TournamentSectionContainer screen={screen}>
-        <$Vertical spacing={4}>
-          <$h1>
-            <FormattedMessage id="tournament.edit.analytics.title" defaultMessage="Tournament Analytics" />
-          </$h1>
-          <$p style={{ marginTop: '0px' }}>
-            <FormattedMessage
-              id="tournament.edit.analytics.description"
-              defaultMessage="Track how many referral bounties have been claimed by your community."
-            />{' '}
-            <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
-          </$p>
-          <TournamentAnalytics tournamentId={tournament.id as TournamentID} />
-        </$Vertical>
-      </$TournamentSectionContainer>
 
       <$TournamentSectionContainer screen={screen}>
         <$Horizontal justifyContent="space-between" flexWrap>
@@ -364,7 +344,43 @@ const ManageTournament = (props: ManageTournamentProps) => {
             description="Title for the section to edit a Lootbox esports tournament"
           />
         </$h1>
+        <br />
         <EditTournament tournamentId={tournament.id as TournamentID} initialState={tournament} />
+      </$TournamentSectionContainer>
+
+      <$TournamentSectionContainer screen={screen}>
+        <$h1>
+          <FormattedMessage
+            id="tournament.edit.bulkReferral.title"
+            defaultMessage="Bulk Participation Rewards"
+            description="Title for the section to edit create bulk referral links"
+          />
+        </$h1>
+        <$p>
+          <FormattedMessage
+            id="tournament.edit.bulkReferral.description"
+            defaultMessage="Generate a CSV filled with participation rewards. These are one-time invite links to redeem a lottery ticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link."
+            description="Description for bulk referral"
+          />
+        </$p>
+        <br />
+        <BulkCreateReferral tournamentId={props.tournamentId} />
+      </$TournamentSectionContainer>
+
+      <$TournamentSectionContainer screen={screen}>
+        <$Vertical spacing={4}>
+          <$h1>
+            <FormattedMessage id="tournament.edit.analytics.title" defaultMessage="Tournament Analytics" />
+          </$h1>
+          <$p style={{ marginTop: '0px' }}>
+            <FormattedMessage
+              id="tournament.edit.analytics.description"
+              defaultMessage="Track how many referral bounties have been claimed by your community."
+            />{' '}
+            <$Link href={'#input-stream'}>{words.learnMore + '.'}</$Link>
+          </$p>
+          <TournamentAnalytics tournamentId={tournament.id as TournamentID} />
+        </$Vertical>
       </$TournamentSectionContainer>
 
       {lootboxSnapshots.length === 0 && (
