@@ -903,18 +903,13 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
               </$Vertical>
 
               <$Vertical spacing={2} width={screen === 'mobile' ? '80%' : '50%'}>
+                {screen === 'mobile' && <br />}
                 <span>
                   <$StepSubheading>
-                    <FormattedMessage
-                      id="partyBasket.manage.input.maxClaimsAllowed"
-                      defaultMessage="Maximum Number of Claims"
-                    />
+                    {words.maximumNumberOfClaims}
                     <HelpIcon tipID="pbMaxClaimsAllowed" />
                     <ReactTooltip id="pbMaxClaimsAllowed" place="right" effect="solid">
-                      <FormattedMessage
-                        id="partyBasket.manage.input.maxClaimsAllowed.descriptionTooltip"
-                        defaultMessage={`When the number of completed claims exceeds this number, the Party Basket status will automatically switch to Sold Out.`}
-                      />
+                      {words.maxNumberClaimsDescription}
                     </ReactTooltip>
                   </$StepSubheading>
                 </span>
