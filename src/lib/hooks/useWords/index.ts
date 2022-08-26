@@ -778,7 +778,21 @@ const useWords = () => {
     defaultMessage: 'Click to download CSV file',
   })
 
+  const maximumNumberOfClaims = intl.formatMessage({
+    id: 'generics.maximumNumberOfClaims',
+    defaultMessage: 'Maximum Number of Claims',
+    description: 'A claim is a right to receive a free Lootbox NFT',
+  })
+
+  const maxNumberClaimsDescription = intl.formatMessage({
+    defaultMessage:
+      'A claim is a right to receive a free Lootbox NFT. When the number of completed claims exceeds this number, the Party Basket status will automatically switch to Sold Out.',
+    id: 'generics.maximumNumberOfClaims.description',
+  })
+
   return {
+    maxNumberClaimsDescription,
+    maximumNumberOfClaims,
     downloadCSVFile,
     advanced,
     outOfStock,

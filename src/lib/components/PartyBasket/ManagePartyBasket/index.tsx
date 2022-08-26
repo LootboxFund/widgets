@@ -72,6 +72,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [localJoinCommunityUrl, setLocalJoinCommunityUrl] = useState<string>()
   const [localStatus, setLocalStatus] = useState<PartyBasketStatus>(PartyBasketStatus.Active)
   const [advancedError, setAdvancedError] = useState<string>()
+  const [localMaxClaimsAllowed, setLocalMaxClaimsAllowed] = useState<number>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
   const { user } = useAuth()
   const { screen } = useWindowSize()
@@ -102,6 +103,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       setLocalJoinCommunityUrl(_partyBasket.joinCommunityUrl)
       setLocalNFTBounty(_partyBasket.nftBountyValue)
       setLocalStatus(_partyBasket.status)
+      setLocalMaxClaimsAllowed(_partyBasket.maxClaimsAllowed)
     }
   }, [data])
 
@@ -211,20 +213,28 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       payload.status = localStatus
     }
 
+    if (localMaxClaimsAllowed !== partyBasket.maxClaimsAllowed) {
+      payload.maxClaimsAllowed = localMaxClaimsAllowed
+    }
+
     if (Object.keys(payload).length === 1) {
       setAdvancedError(words.noChangesMade)
       return
     }
 
-    const { data: responseData } = await editPartyBasket({
-      variables: {
-        payload,
-      },
-    })
+    try {
+      const { data: responseData } = await editPartyBasket({
+        variables: {
+          payload,
+        },
+      })
 
-    if (!responseData?.editPartyBasket || responseData?.editPartyBasket?.__typename === 'ResponseError') {
-      console.error(responseData)
-      setAdvancedError(words.anErrorOccured)
+      if (!responseData?.editPartyBasket || responseData?.editPartyBasket?.__typename === 'ResponseError') {
+        console.error(responseData)
+        throw new Error(words.anErrorOccured)
+      }
+    } catch (err) {
+      setAdvancedError(err?.message || words.anErrorOccured)
       return
     }
   }
@@ -834,16 +844,16 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 </div>
               </$InputWrapper>
             </$Vertical>
-
-            <$Vertical spacing={2}>
-              <span>
-                <$StepSubheading>
-                  <FormattedMessage id="partyBasket.manage.input.status" defaultMessage="Current Status" />
-                  <HelpIcon tipID="pbstatus" />
-                  <ReactTooltip id="pbstatus" place="right" effect="solid">
-                    <FormattedMessage
-                      id="partyBasket.manage.input.status.descriptionTooltip"
-                      defaultMessage={`
+            <$Horizontal flexWrap={screen === 'mobile'} width="100%" spacing={2}>
+              <$Vertical spacing={2} width={screen === 'mobile' ? '80%' : '50%'}>
+                <span>
+                  <$StepSubheading>
+                    <FormattedMessage id="partyBasket.manage.input.status" defaultMessage="Current Status" />
+                    <HelpIcon tipID="pbstatus" />
+                    <ReactTooltip id="pbstatus" place="right" effect="solid">
+                      <FormattedMessage
+                        id="partyBasket.manage.input.status.descriptionTooltip"
+                        defaultMessage={`
                       Active:{newline}{newline}
                         - party basket is browseable in the tournament pages{newline}
                         - party basket is in the viral referral program{newline}{newline}
@@ -857,36 +867,75 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                         - party basket still visible on tournament pages
 
                     `}
-                      values={{ newline: <br /> }}
-                    />
-                  </ReactTooltip>
-                </$StepSubheading>
-              </span>
+                        values={{ newline: <br /> }}
+                      />
+                    </ReactTooltip>
+                  </$StepSubheading>
+                </span>
 
-              <$InputWrapper
-                screen={screen}
-                marginRight="0px"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  maxWidth: '300px',
-                  fontWeight: TYPOGRAPHY.fontWeight.medium,
-                }}
-              >
-                <$Select
+                <$InputWrapper
                   screen={screen}
-                  style={{ fontWeight: TYPOGRAPHY.fontWeight.light, textTransform: 'capitalize' }}
-                  onChange={(e) => setLocalStatus(e.target.value as PartyBasketStatus)}
-                  value={localStatus}
+                  marginRight="0px"
+                  style={{
+                    // width: '100%',
+                    boxSizing: 'border-box',
+                    maxWidth: '300px',
+                    fontWeight: TYPOGRAPHY.fontWeight.medium,
+                  }}
                 >
-                  {Object.values(PartyBasketStatus).map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </$Select>
-              </$InputWrapper>
-            </$Vertical>
+                  <$Select
+                    screen={screen}
+                    style={{
+                      fontWeight: TYPOGRAPHY.fontWeight.light,
+                      textTransform: 'capitalize',
+                      height: screen === 'desktop' ? '70px' : '50px',
+                    }}
+                    onChange={(e) => setLocalStatus(e.target.value as PartyBasketStatus)}
+                    value={localStatus}
+                  >
+                    {Object.values(PartyBasketStatus).map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </$Select>
+                </$InputWrapper>
+              </$Vertical>
+
+              <$Vertical spacing={2} width={screen === 'mobile' ? '80%' : '50%'}>
+                {screen === 'mobile' && <br />}
+                <span>
+                  <$StepSubheading>
+                    {words.maximumNumberOfClaims}
+                    <HelpIcon tipID="pbMaxClaimsAllowed" />
+                    <ReactTooltip id="pbMaxClaimsAllowed" place="right" effect="solid">
+                      {words.maxNumberClaimsDescription}
+                    </ReactTooltip>
+                  </$StepSubheading>
+                </span>
+
+                <$InputWrapper
+                  screen={screen}
+                  marginRight="0px"
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    maxWidth: '300px',
+                    fontWeight: TYPOGRAPHY.fontWeight.medium,
+                  }}
+                >
+                  <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <$Input
+                      type="text"
+                      value={localMaxClaimsAllowed}
+                      onChange={(e) => setLocalMaxClaimsAllowed(Number(e?.target?.value || 0))}
+                      screen={screen}
+                      style={{ fontWeight: 'lighter' }}
+                    />
+                  </div>
+                </$InputWrapper>
+              </$Vertical>
+            </$Horizontal>
 
             <$AddWhitelistButton
               themeColor={network.themeColor}

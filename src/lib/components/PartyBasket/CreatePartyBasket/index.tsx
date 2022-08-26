@@ -38,6 +38,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
   const { screen } = useWindowSize()
   const [partyBasketName, setPartyBasketName] = useState('')
   const [joinCommunityUrl, setJoinCommunityUrl] = useState('')
+  const [maxClaimsAllowed, setMaxClaimsAllowed] = useState(1000)
   const [partyBasketSubmissionStatus, setPartyBasketSubmissionStatus] = useState<PartyBasketSubmission>({
     status: 'ready',
   })
@@ -95,6 +96,7 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
                   creatorAddress: data.creatorAddress,
                   nftBountyValue: bountyPrize,
                   joinCommunityUrl: joinCommunityUrl,
+                  maxClaimsAllowed: maxClaimsAllowed,
                 },
               },
             })
@@ -143,38 +145,66 @@ const CreatePartyBasket = (props: CreatePartyBasketProps) => {
           </div>
         </$InputWrapper>
       </$Vertical>
-      <$Vertical>
-        <$Horizontal verticalCenter>
-          <$StepSubheading style={{ width: 'auto', textTransform: 'capitalize' }}>
-            <FormattedMessage
-              id="partyBasket.create.form.prize.title"
-              defaultMessage="NFT prize value"
-              description="Input text for NFT Prize Value field"
-            />
-          </$StepSubheading>
-          <HelpIcon tipID="bountyPrize" />
-          <ReactTooltip id="bountyPrize" place="right" effect="solid">
-            <FormattedMessage
-              id="partyBasket.create.form.prize.tooltip"
-              defaultMessage='You determine how much each NFT bounty will be worth. You can specify crypto currencies like "10 Matic" or fiat like "$10 USD"'
-              description="Tooltip for NFT Prize Value field"
-            />
-          </ReactTooltip>
-        </$Horizontal>
+      <$Horizontal flexWrap={screen === 'mobile'}>
+        <$Vertical>
+          <$Horizontal verticalCenter>
+            <$StepSubheading style={{ width: 'auto', textTransform: 'capitalize' }}>
+              <FormattedMessage
+                id="partyBasket.create.form.prize.title"
+                defaultMessage="NFT prize value"
+                description="Input text for NFT Prize Value field"
+              />
+            </$StepSubheading>
+            <HelpIcon tipID="bountyPrize" />
+            <ReactTooltip id="bountyPrize" place="right" effect="solid">
+              <FormattedMessage
+                id="partyBasket.create.form.prize.tooltip"
+                defaultMessage='You determine how much each NFT bounty will be worth. You can specify crypto currencies like "10 Matic" or fiat like "$10 USD"'
+                description="Tooltip for NFT Prize Value field"
+              />
+            </ReactTooltip>
+          </$Horizontal>
 
-        <$InputWrapper screen={screen}>
-          <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
-            <$Input
-              type="text"
-              value={bountyPrize}
-              onChange={(e) => setBountyPrize(e.target.value)}
-              placeholder="e.g. 150 SLP"
-              screen={screen}
-              style={{ fontWeight: 'lighter' }}
-            />
-          </div>
-        </$InputWrapper>
-      </$Vertical>
+          <$InputWrapper screen={screen}>
+            <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+              <$Input
+                type="text"
+                value={bountyPrize}
+                onChange={(e) => setBountyPrize(e.target.value)}
+                placeholder="e.g. 150 SLP"
+                screen={screen}
+                style={{ fontWeight: 'lighter' }}
+              />
+            </div>
+          </$InputWrapper>
+        </$Vertical>
+
+        <$Vertical>
+          {screen === 'mobile' && <br />}
+          <$Horizontal verticalCenter>
+            <$StepSubheading style={{ width: 'auto', textTransform: 'capitalize' }}>
+              {words.maximumNumberOfClaims}
+            </$StepSubheading>
+            <HelpIcon tipID="maxClaimsDescription" />
+            <ReactTooltip id="maxClaimsDescription" place="right" effect="solid">
+              {words.maxNumberClaimsDescription}
+            </ReactTooltip>
+          </$Horizontal>
+
+          <$InputWrapper screen={screen}>
+            <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+              <$Input
+                type="text"
+                value={maxClaimsAllowed}
+                onChange={(e) => setMaxClaimsAllowed(Number(e.target.value))}
+                placeholder="e.g. 1000"
+                screen={screen}
+                style={{ fontWeight: 'lighter' }}
+              />
+            </div>
+          </$InputWrapper>
+        </$Vertical>
+      </$Horizontal>
 
       <$Vertical>
         <$Horizontal verticalCenter>
