@@ -1060,6 +1060,13 @@
     "defaultMessage": "Login to make a Party Basket",
     "description": "User prompt indicating that the user should login to make a Party Basket."
   },
+  "generics.maximumNumberOfClaims": {
+    "defaultMessage": "Maximum Number of Claims",
+    "description": "A claim is a right to receive a free Lootbox NFT"
+  },
+  "generics.maximumNumberOfClaims.description": {
+    "defaultMessage": "A claim is a right to receive a free Lootbox NFT. When the number of completed claims exceeds this number, the Party Basket status will automatically switch to Sold Out."
+  },
   "generics.networkNotSet": {
     "defaultMessage": "Network not set",
     "description": "Error message for user if they forgot to set a blockchain network"
