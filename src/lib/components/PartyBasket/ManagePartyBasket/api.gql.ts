@@ -14,6 +14,7 @@ export interface PartyBasketFE {
     nftBountyValue?: string
     joinCommunityUrl?: string
     status: PartyBasketStatus
+    maxClaimsAllowed?: number
     lootboxSnapshot: {
       name?: string
       address: Address
@@ -35,6 +36,7 @@ export const GET_PARTY_BASKET = gql`
           nftBountyValue
           joinCommunityUrl
           status
+          maxClaimsAllowed
           lootboxSnapshot {
             name
             address

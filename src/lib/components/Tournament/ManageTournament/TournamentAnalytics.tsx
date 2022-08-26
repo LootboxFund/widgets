@@ -25,9 +25,8 @@ const TournamentAnalytics = (props: TournamentAnalyticsProps) => {
     { payload: GenerateClaimsCsvPayload }
   >(GET_CLAIMS_CSV, {
     onCompleted: (data) => {
-      console.log('completed', data)
       if (data.generateClaimsCsv.__typename === 'GenerateClaimsCsvResponseSuccess') {
-        setFiles([...files, data.generateClaimsCsv.csv])
+        setFiles([data.generateClaimsCsv.csv, ...files])
       }
     },
   })
@@ -42,7 +41,7 @@ const TournamentAnalytics = (props: TournamentAnalyticsProps) => {
         <$span>
           👉{' '}
           <$Link href={file} key={`download-${idx}`} download style={{ fontStyle: 'italic' }}>
-            <FormattedMessage id="tournament.analytics.download" defaultMessage="Click to download CSV file" />
+            {words.downloadCSVFile}
           </$Link>
         </$span>
       ))}
@@ -61,7 +60,7 @@ const TournamentAnalytics = (props: TournamentAnalyticsProps) => {
             })
           }}
           style={{
-            fontWeight: TYPOGRAPHY.fontWeight.light,
+            fontWeight: TYPOGRAPHY.fontWeight.regular,
             fontSize: TYPOGRAPHY.fontSize.large,
           }}
         >

@@ -116,6 +116,7 @@ export const $Divider = styled.div<{ margin?: string; width?: string }>`
 `
 
 export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: string }>`
+  margin: 0 auto;
   max-width: 500px;
   width: 100%;
   height: 100vh;
@@ -132,11 +133,11 @@ export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: 
   background-position: center;
   overflow: hidden;
 `
-export const $ViralOnboardingSafeArea = styled.div`
+export const $ViralOnboardingSafeArea = styled.div<{ inline?: boolean }>`
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: ${(props) => (props.inline ? 'visible' : 'scroll')};
   padding: 3.5rem 2.2rem;
   box-sizing: border-box;
 `

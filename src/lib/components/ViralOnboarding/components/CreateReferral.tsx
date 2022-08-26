@@ -54,7 +54,7 @@ const CreateReferral = (props: CreateReferralProps) => {
       >
         👈 {words.back}
       </$SubHeading>
-      <QRCode referral={createdReferral} />
+      <QRCode referral={createdReferral} inline={false} />
     </div>
   )
 }

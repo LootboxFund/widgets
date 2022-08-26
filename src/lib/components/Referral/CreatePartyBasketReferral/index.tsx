@@ -163,7 +163,7 @@ const CreatePartyBasketReferral = (props: Props) => {
         onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
         style={{
           textTransform: 'lowercase',
-          color: `${COLORS.surpressedFontColor}66`,
+          color: `${COLORS.surpressedFontColor}26`,
           fontStyle: 'italic',
           textAlign: 'end',
           cursor: 'pointer',
@@ -184,7 +184,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             />
             <FormattedMessage
               id="inviteLink.modal.onetime.text"
-              defaultMessage="One time referral"
+              defaultMessage="Participation Reward"
               description="Checkbox label, referral can be claimed only once."
             />
           </$span>
@@ -277,7 +277,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
           ) : (
             <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
-              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} />
+              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} inline={true} />
             </div>
           )}
         </$Vertical>

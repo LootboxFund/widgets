@@ -21,6 +21,7 @@ import { manifest } from 'manifest'
 
 interface Props {
   referral: Referral
+  inline?: boolean
 }
 const QRCode = (props: Props) => {
   const intl = useIntl()
@@ -97,8 +98,8 @@ const QRCode = (props: Props) => {
   const shortlink = `${manifest.microfrontends.webflow.referral}?r=${props.referral.slug}`.replace('https://www.', '')
 
   return (
-    <$ViralOnboardingCard background={background1}>
-      <$ViralOnboardingSafeArea>
+    <$ViralOnboardingCard background={background1} style={{ height: props.inline ? 'auto' : '100vh' }}>
+      <$ViralOnboardingSafeArea inline={props.inline}>
         <$Vertical>
           <$SupressedParagraph>
             <FormattedMessage
