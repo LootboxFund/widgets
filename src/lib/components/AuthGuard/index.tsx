@@ -10,7 +10,7 @@ const AuthGuard = ({ children, ...props }: AuthGuardProps & any): JSX.Element =>
   if (user === undefined) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (!user) {
-    return <Authentication initialMode="login-password" {...props} />
+    return <Authentication initialMode="login-phone" {...props} />
   } else {
     return children
   }
