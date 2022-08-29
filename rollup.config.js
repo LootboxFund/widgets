@@ -165,7 +165,10 @@ const ViralOnboarding = widgetConfig('ViralOnboarding')
 
 const SignOut = widgetConfig('SignOut')
 
+const MyTickets = widgetConfig('MyTickets')
+
 export default [
+  MyTickets,
   CreateLootbox,
   InteractWithLootbox,
   ManageLootbox,
