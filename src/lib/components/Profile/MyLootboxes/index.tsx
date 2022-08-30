@@ -13,6 +13,7 @@ import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void
@@ -49,7 +50,11 @@ const LootboxList = ({ lootboxes, screen, onClickLootbox }: LootboxListProps) =>
               onClickLootbox && onClickLootbox(lootbox)
             }}
           >
-            <img alt={lootbox.name} src={lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP} width="100%" />
+            <img
+              alt={lootbox.name}
+              src={lootbox.stampImage ? convertFilenameToThumbnail(lootbox.stampImage, 'md') : TEMPLATE_LOOTBOX_STAMP}
+              width="100%"
+            />
           </$LootboxThumbailContainer>
         ))}
       </$Horizontal>
@@ -158,7 +163,7 @@ const MyLootboxes = () => {
 }
 
 const $LootboxThumbailContainer = styled.div<{ screen: ScreenSize }>`
-  max-width: ${(props) => (props.screen === 'mobile' ? '100%' : '32%')};
+  max-width: ${(props) => (props.screen === 'mobile' ? '300px' : '32%')};
   width: 100%;
   cursor: pointer;
   margin-bottom: 10px;

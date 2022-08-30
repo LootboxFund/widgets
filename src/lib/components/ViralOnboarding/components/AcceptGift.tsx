@@ -26,6 +26,7 @@ import {
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard } from './GenericCard'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   onNext: () => void
@@ -57,8 +58,15 @@ const AcceptGift = (props: Props) => {
         ? referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
         : undefined
       showCasedLootboxImages = !!showcased?.stampImage
-        ? [showcased.stampImage, secondary?.stampImage || TEMPLATE_LOOTBOX_STAMP]
-        : [...referral.tournament.lootboxSnapshots.map((snap) => snap.stampImage || TEMPLATE_LOOTBOX_STAMP)]
+        ? [
+            convertFilenameToThumbnail(showcased.stampImage, 'sm'),
+            secondary?.stampImage ? convertFilenameToThumbnail(secondary.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP,
+          ]
+        : [
+            ...referral.tournament.lootboxSnapshots.map((snap) =>
+              snap.stampImage ? convertFilenameToThumbnail(snap.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
+            ),
+          ]
     } else {
       showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
     }

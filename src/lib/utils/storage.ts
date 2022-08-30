@@ -21,7 +21,6 @@ export const THUMBS_FOLDER = 'thumbs'
  * @param size 'sm' | 'md'
  */
 export const convertFilenameToThumbnail = (file: string, size: 'sm' | 'md') => {
-  console.log(file)
   const decodedFile = decodeURIComponent(file)
   const fileparts = decodedFile.split('/')
   const filename = fileparts.pop()
@@ -35,6 +34,5 @@ export const convertFilenameToThumbnail = (file: string, size: 'sm' | 'md') => {
 
   const newFilename = `${originalFilenameWithoutExtension}_${sizeMapping[size]}.${extension}`
   const thumbnailFilename = [...fileparts, THUMBS_FOLDER, newFilename].join('/')
-  console.log(thumbnailFilename)
   return thumbnailFilename
 }

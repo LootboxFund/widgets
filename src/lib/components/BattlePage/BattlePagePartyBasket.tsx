@@ -17,6 +17,7 @@ import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasket
 import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
 import { BattlePageLootboxSnapshotFE } from './api.gql'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   lootboxPartyBasket: LootboxPartyBasket
@@ -197,7 +198,11 @@ const BattlePagePartyBasket = (props: Props) => {
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
           >
             <$BattleCardImage
-              src={props.lootboxPartyBasket.lootbox?.stampImage}
+              src={
+                props.lootboxPartyBasket.lootbox?.stampImage
+                  ? convertFilenameToThumbnail(props.lootboxPartyBasket.lootbox.stampImage, 'md')
+                  : TEMPLATE_LOOTBOX_STAMP
+              }
               cardNumber={0}
               style={{ position: 'relative', maxWidth: '100%' }}
             />
