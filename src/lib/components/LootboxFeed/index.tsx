@@ -51,10 +51,10 @@ const LootboxFeed = () => {
 
   return (
     <$Vertical spacing={4}>
-      <$Horizontal flexWrap spacing={2} justifyContent="center">
+      <$Horizontal flexWrap spacing={screen === 'mobile' ? undefined : 2} justifyContent="center">
         {lootboxes.map((lootbox, idx) => {
           return (
-            <$LootboxMainImageContainer screen={screen}>
+            <$LootboxMainImageContainer screen={screen} key={idx}>
               <a href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`}>
                 <$LootboxImage
                   screen={screen}
@@ -107,7 +107,8 @@ const $LootboxImage = styled.img<{ screen: ScreenSize }>`
 const $LootboxMainImageContainer = styled.div<{ screen: ScreenSize }>`
   width: ${(props) => (props.screen === 'mobile' ? '100%' : '24%')};
   min-width: 200px;
-  margin-bottom: 10px;
+  max-width: 300px;
+  margin: 0px auto 10px;
 `
 
 export default LootboxFeed
