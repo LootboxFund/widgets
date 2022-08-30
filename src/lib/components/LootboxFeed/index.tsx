@@ -17,6 +17,7 @@ import styled from 'styled-components'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
 import useWords from 'lib/hooks/useWords'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 const LootboxFeed = () => {
   const words = useWords()
@@ -57,7 +58,9 @@ const LootboxFeed = () => {
               <a href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`}>
                 <$LootboxImage
                   screen={screen}
-                  src={lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP}
+                  src={
+                    lootbox.stampImage ? convertFilenameToThumbnail(lootbox.stampImage, 'md') : TEMPLATE_LOOTBOX_STAMP
+                  }
                   alt={`${lootbox.name}`}
                 />
               </a>
