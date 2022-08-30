@@ -18,6 +18,7 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
 import useWords from 'lib/hooks/useWords'
 import { useIntl } from 'react-intl'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 const BattleFeed = () => {
   const words = useWords()
@@ -83,7 +84,11 @@ const BattleFeed = () => {
                         ?.map((snap, idx2) => {
                           return (
                             <$BattleCardImage
-                              src={snap.stampImage}
+                              src={
+                                snap.stampImage
+                                  ? convertFilenameToThumbnail(snap.stampImage, 'sm')
+                                  : TEMPLATE_LOOTBOX_STAMP
+                              }
                               cardNumber={idx2}
                               key={`${tourny.id}-img-${idx2}`}
                             />

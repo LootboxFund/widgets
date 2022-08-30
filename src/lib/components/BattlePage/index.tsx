@@ -26,6 +26,7 @@ import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/
 import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
 import $Button from '../Generics/Button'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 export interface LootboxPartyBasket {
   lootbox: BattlePageLootboxSnapshotFE
@@ -241,7 +242,11 @@ const BattlePage = (props: BattlePageParams) => {
                           return (
                             <$BattleCardBlessed
                               screen={screen}
-                              src={snap.lootbox.stampImage}
+                              src={
+                                snap?.lootbox?.stampImage
+                                  ? convertFilenameToThumbnail(snap.lootbox.stampImage, 'md')
+                                  : TEMPLATE_LOOTBOX_STAMP
+                              }
                               cardNumber={idx2}
                               key={`tournament-img-${idx2}`}
                             />

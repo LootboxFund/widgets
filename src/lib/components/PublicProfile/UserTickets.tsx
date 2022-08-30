@@ -24,6 +24,8 @@ import AuthGuard from '../AuthGuard'
 import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 interface MyLotteryTicketsProps {
   userId: UserID
@@ -292,7 +294,11 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                   <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
                     <$ImageContainer>
                       <img
-                        src={claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage || ''}
+                        src={
+                          claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
+                            ? convertFilenameToThumbnail(claim.chosenPartyBasket.lootboxSnapshot.stampImage, 'md')
+                            : TEMPLATE_LOOTBOX_STAMP
+                        }
                         style={{
                           width: '100%',
                           height: '100%',

@@ -18,6 +18,7 @@ import { Referral } from 'lib/api/graphql/generated/types'
 import QRCodeComponent from 'easyqrcodejs'
 import { useEffect } from 'react'
 import { manifest } from 'manifest'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   referral: Referral
@@ -67,8 +68,15 @@ const QRCode = (props: Props) => {
         ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
         : undefined
       showCasedLootboxImages = showcased
-        ? [showcased.stampImage, secondary?.stampImage || TEMPLATE_LOOTBOX_STAMP]
-        : [...props.referral.tournament.lootboxSnapshots.map((snap) => snap.stampImage)]
+        ? [
+            convertFilenameToThumbnail(showcased.stampImage, 'sm'),
+            secondary?.stampImage ? convertFilenameToThumbnail(secondary.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP,
+          ]
+        : [
+            ...props.referral.tournament.lootboxSnapshots.map((snap) =>
+              snap.stampImage ? convertFilenameToThumbnail(snap.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
+            ),
+          ]
     } else {
       showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
     }
