@@ -18,6 +18,8 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { useEffect, useMemo, useState } from 'react'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 const PAGE_SIZE = 6
 
@@ -144,7 +146,11 @@ const ChooseLottery = (props: Props) => {
                   )}
                   <$Horizontal spacing={2}>
                     <$PartyBasketImage
-                      src={data?.lootbox?.stampImage || ''}
+                      src={
+                        data?.lootbox?.stampImage
+                          ? convertFilenameToThumbnail(data.lootbox.stampImage, 'sm')
+                          : TEMPLATE_LOOTBOX_STAMP
+                      }
                       alt={data?.partyBasket?.name || 'Lootbox NFT'}
                     />
                     <$Vertical>

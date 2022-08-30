@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, background2 } from '../contants'
 import { useState } from 'react'
 import { ErrorCard } from './GenericCard'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   onNext: () => void
@@ -32,11 +33,11 @@ const CompleteOnboarding = (props: Props) => {
       )
     : undefined
 
-  const image =
-    !!chosenPartyBasket?.lootboxAddress && !!referral?.tournament?.lootboxSnapshots
-      ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-          ?.stampImage || TEMPLATE_LOOTBOX_STAMP
-      : TEMPLATE_LOOTBOX_STAMP
+  const _lb = !!chosenPartyBasket?.lootboxAddress
+    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+    : undefined
+
+  const image: string = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
 
   if (err) {
     return (

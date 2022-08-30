@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl'
 import { background2, $Heading, $SubHeading, $SupressedParagraph, $NextButton } from '../contants'
 import styled from 'styled-components'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   onNext: () => void
@@ -18,12 +19,11 @@ const SelectLottery = (props: Props) => {
   const formattedDate: string = referral?.tournament?.tournamentDate
     ? new Date(referral.tournament.tournamentDate).toDateString()
     : words.tournament
+  const _lb = !!chosenPartyBasket?.lootboxAddress
+    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+    : undefined
 
-  const image =
-    !!chosenPartyBasket?.lootboxAddress && !!referral?.tournament?.lootboxSnapshots
-      ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-          ?.stampImage || TEMPLATE_LOOTBOX_STAMP
-      : TEMPLATE_LOOTBOX_STAMP
+  const image: string = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
 
   return (
     <$ViralOnboardingCard background={background2}>
