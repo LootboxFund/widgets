@@ -36,6 +36,7 @@ const CreatePartyBasketReferral = (props: Props) => {
   const [createdReferrals, setCreatedReferrals] = useState<Referral[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [campaignName, setCampaignName] = useState('')
+  const [referrerId, setReferrerId] = useState('')
   const [referralType, setReferralType] = useState<ReferralType>(ReferralType.Viral)
   const [errorMessage, setErrorMessage] = useState('')
   const intl = useIntl()
@@ -67,6 +68,7 @@ const CreatePartyBasketReferral = (props: Props) => {
             partyBasketId: props.partyBasketId,
             tournamentId: props.tournamentId,
             type: referralType,
+            referrerId: !!referrerId ? referrerId : undefined,
           },
         },
       })
@@ -111,19 +113,11 @@ const CreatePartyBasketReferral = (props: Props) => {
           defaultMessage="You’ll BOTH get extra free lottery tickets for each person invited"
         />
       </span>
-      <input
+      <$InputMedium
         placeholder="Campaign Name (Optional)"
         value={campaignName}
         onChange={(e) => setCampaignName(e.target.value)}
-        style={{
-          margin: '5px 0px',
-          height: '20px',
-          backgroundColor: `rgba(0,0,0,0.05)`,
-          padding: '15px',
-          fontSize: '1rem',
-          border: '0px solid white',
-        }}
-      ></input>
+      ></$InputMedium>
       <br />
       <$span>
         <$Checkbox
@@ -173,6 +167,12 @@ const CreatePartyBasketReferral = (props: Props) => {
       </$span>
       {isAdvancedOpen && (
         <$Vertical>
+          <br />
+          <$InputMedium
+            placeholder="Referrer User ID"
+            value={referrerId}
+            onChange={(e) => setReferrerId(e.target.value)}
+          ></$InputMedium>
           <br />
           <$span style={{ textTransform: 'capitalize' }}>
             <$Checkbox
