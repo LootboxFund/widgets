@@ -13,17 +13,11 @@ import {
   $TournamentStampPreviewContainer,
   $TournamentStampPreviewImage,
 } from '../contants'
-import useWindowSize from 'lib/hooks/useScreenSize'
 import { COLORS } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useMutation } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
-import {
-  CreateClaimResponse,
-  CreateClaimResponseSuccess,
-  MutationCreateClaimArgs,
-  ResponseError,
-} from 'lib/api/graphql/generated/types'
+import { MutationCreateClaimArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import { ErrorCard } from './GenericCard'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
