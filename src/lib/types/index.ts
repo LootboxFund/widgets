@@ -18,6 +18,8 @@ export type PartyBasketID = string & { readonly _: unique symbol }
 export type ReferralSlug = string & { readonly _: unique symbol }
 export type ClaimID = string & { readonly _: unique symbol }
 export type ReferralID = string & { readonly _: unique symbol }
+export type AdID = string & { readonly _: unique symbol }
+export type CreativeID = string & { readonly _: unique symbol }
 
 // export type DeepPartial<T> = {
 //   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];

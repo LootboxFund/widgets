@@ -1,31 +1,19 @@
-import {
-  QueryReferralArgs,
-  Referral,
-  ReferralResponse,
-  ReferralResponseSuccess,
-  ResponseError,
-} from 'lib/api/graphql/generated/types'
-import ViralOnboardingProvider from 'lib/hooks/useViralOnboarding'
-import { useQuery, useMutation } from '@apollo/client'
+import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { ReactElement, useEffect, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ReferralSlug } from 'lib/types'
-import { GET_REFERRAL, ReferralFE, ReferralResponseFE } from './api.gql'
-import useWords from 'lib/hooks/useWords'
 import AcceptGift from './components/AcceptGift'
 import ChooseLottery from './components/ChooseLottery'
 import SelectLottery from './components/SelectLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
-import GenericCard, { LoadingCard, ErrorCard } from './components/GenericCard'
+import { LoadingCard, ErrorCard } from './components/GenericCard'
 import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
 
-interface ViralOnboardingProps {
-  referralSlug: ReferralSlug
-}
+interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
   | 'accept-gift'
   | 'browse-lottery'
@@ -35,27 +23,9 @@ type ViralOnboardingRoute =
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
+  const { ad } = useViralOnboarding()
+  console.log(ad)
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
-  const { data, loading, error } = useQuery<{ referral: ReferralResponseFE | ResponseError }, QueryReferralArgs>(
-    GET_REFERRAL,
-    {
-      variables: {
-        slug: props.referralSlug,
-      },
-    }
-  )
-  const words = useWords()
-
-  if (loading) {
-    return <LoadingCard />
-  } else if (error || !data) {
-    return <ErrorCard message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
-  } else if (data?.referral?.__typename === 'ResponseError') {
-    return <ErrorCard message={data?.referral?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
-  }
-
-  const referral: ReferralFE = (data.referral as ReferralResponseFE).referral
-
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
@@ -90,7 +60,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     }
   }
 
-  return <ViralOnboardingProvider referral={referral}>{renderRoute(route)}</ViralOnboardingProvider>
+  return renderRoute(route)
 }
 
 const ViralOnboardingPage = () => {
@@ -112,7 +82,11 @@ const ViralOnboardingPage = () => {
     return <LoadingCard />
   }
 
-  return <ViralOnboarding referralSlug={referralSlug as ReferralSlug}></ViralOnboarding>
+  return (
+    <ViralOnboardingProvider referralSlug={referralSlug as ReferralSlug}>
+      <ViralOnboarding />
+    </ViralOnboardingProvider>
+  )
 }
 
 export default ViralOnboardingPage
