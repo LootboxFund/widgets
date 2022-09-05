@@ -290,7 +290,8 @@ const RedeemBounty = (props: RedeemBountyProps) => {
         setRedeemState({ status: 'error', error: err?.data?.message || err?.message || `${words.anErrorOccured}!` })
       }
     } else {
-      console.error('NOT IMPLEMENTED')
+      // console.error('NOT IMPLEMENTED')
+      setRedeemState({ status: 'signature', error: undefined })
     }
   }
 
