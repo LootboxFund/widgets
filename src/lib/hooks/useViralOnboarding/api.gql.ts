@@ -68,7 +68,7 @@ export const GET_REFERRAL = gql`
 
 export interface CreativeFE {
   creativeType: CreativeType
-  creativeLink: string
+  creativeLinks: string[]
   callToActionText: string | null
   url: string
   clickUrl: string
@@ -102,7 +102,7 @@ export const GET_AD = gql`
           type
           creative {
             creativeType
-            creativeLink
+            creativeLinks
             callToActionText
             url
             clickUrl

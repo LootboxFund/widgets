@@ -71,18 +71,16 @@ const CompleteOnboardingNoobCup = (props: Props) => {
     // fluid: true,
     poster: ad?.creative?.thumbnail,
     // aspectRatio: ad?.creative?.creativeAspectRatio || '9:16',
-    sources: [
-      {
-        src: ad?.creative?.creativeLink || '',
-        type: `video/${
-          ad?.creative?.creativeLink?.toLowerCase().endsWith('webm')
-            ? 'webm'
-            : ad?.creative?.creativeLink?.toLowerCase().endsWith('ogv')
-            ? 'ogv'
-            : 'mp4'
-        }`,
-      },
-    ],
+    sources: ad?.creative?.creativeLinks
+      ? ad.creative.creativeLinks.map((link: string) => {
+          return {
+            src: link,
+            type: `video/${
+              link.toLowerCase().endsWith('webm') ? 'webm' : link.toLowerCase().endsWith('ogv') ? 'ogv' : 'mp4'
+            }`,
+          }
+        })
+      : [],
   }
 
   const toggleFinalScreen = () => {
@@ -189,7 +187,7 @@ const CompleteOnboardingNoobCup = (props: Props) => {
 
   return (
     <$ViralOnboardingCard style={{ position: 'relative' }}>
-      {ad?.creative?.creativeType === 'video' && ad?.creative?.creativeLink && (
+      {ad?.creative?.creativeType === 'video' && (
         <Video
           options={videoJsOptions}
           onReady={handlePlayerReady}
