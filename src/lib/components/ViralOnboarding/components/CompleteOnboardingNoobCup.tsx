@@ -107,12 +107,26 @@ const CompleteOnboardingNoobCup = (props: Props) => {
 
     player.on('ended', () => {
       console.log('DONE!')
+      setIsFinalScreen(true)
     })
   }
 
   const onCallToActionClick = () => {
     if (ad?.creative.url) {
       window.open(ad.creative.url, '_blank')
+    }
+  }
+
+  const handleVideoClick = () => {
+    if (!playerRef?.current) {
+      return
+    }
+    if (playerRef.current?.paused()) {
+      console.log('video not playing... playing')
+      playerRef.current.play()
+    } else if (!playerRef.current?.paused() && !!playerRef?.current) {
+      console.log('video playing... pausing')
+      playerRef.current.pause()
     }
   }
 
@@ -192,7 +206,7 @@ const CompleteOnboardingNoobCup = (props: Props) => {
         <$ViralOnboardingSafeArea>
           <$Vertical
             style={{ overflowY: 'scroll', height: '100%', justifyContent: 'center' }}
-            onClick={() => console.log('click!')}
+            onClick={handleVideoClick}
           >
             <$ContainerSlide slideOff delay={['2.5s']}>
               <$CenteredContent>
