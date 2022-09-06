@@ -115,7 +115,7 @@ export const $Divider = styled.div<{ margin?: string; width?: string }>`
   border-top: 1px solid rgba(0, 0, 0, 0.23);
 `
 
-export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: string }>`
+export const $ViralOnboardingCard = styled.div<{ backgroundColor?: string; background?: string; opacity?: string }>`
   margin: 0 auto;
   max-width: 500px;
   width: 100%;
@@ -123,6 +123,7 @@ export const $ViralOnboardingCard = styled.div<{ background?: string; opacity?: 
   background: #000000;
   background: -webkit-linear-gradient(to top, #000000, #2a2a2a);
   background: linear-gradient(to top, #000000, #2a2a2a);
+  ${(props) => props.backgroundColor && `background: ${props.backgroundColor};`}
   ${(props) => props.background && `background-image: url(${props.background});`}
   ${(props) =>
     props.background &&

@@ -110,3 +110,39 @@ export interface LocalClaim {
   partyBasketId?: string
   campaignName?: string
 }
+
+export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; preventDefault?: boolean }>`
+  position: absolute;
+  width: 100%;
+  bottom: ${(props) => (props.preventDefault ? '0px' : '-100%')} ;
+  height: 180px;
+
+  ${(props) =>
+    !props.preventDefault &&
+    `-webkit-animation: slideOnscreenFromBottom 1.5s forwards; 
+  animation: slideOnscreenFromBottom 1.5s forwards;
+
+  -webkit-animation-delay: ${props.delay};
+  animation-delay: ${props.delay};`}
+
+  z-index: 3;
+
+  background: ${(props) => `linear-gradient(
+      180deg,
+      rgba(0,0,0,0%) 0%,
+      ${props.themeColor} 40%,
+      ${props.themeColor} 100%
+    )`}};
+
+  @-webkit-keyframes slideOnscreenFromBottom {
+    100% {
+      bottom: 0;
+    }
+  };
+
+  @keyframes slideOnscreenFromBottom {
+    100% {
+      bottom: 0;
+    }
+  };
+`

@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { Address } from '@wormgraph/helpers'
-import { CreativeType } from 'lib/api/graphql/generated/types'
+import { AdType, CreativeType } from 'lib/api/graphql/generated/types'
 import { AdID, CreativeID, PartyBasketID, ReferralSlug, TournamentID } from 'lib/types'
 
 export interface OnboardingTournamentFE {
@@ -72,14 +72,16 @@ export interface CreativeFE {
   callToActionText: string | null
   url: string
   clickUrl: string
-  thumbnail: string
+  thumbnail?: string
   infographicLink: string | null
   creativeAspectRatio: string
+  themeColor?: string
 }
 
 export interface AdFE {
   id: AdID
   name: string | null
+  adType: AdType
   creativeId: CreativeID
   creative: CreativeFE
 }
@@ -97,6 +99,7 @@ export const GET_AD = gql`
           id
           name
           creativeId
+          type
           creative {
             creativeType
             creativeLink
@@ -106,6 +109,7 @@ export const GET_AD = gql`
             thumbnail
             infographicLink
             creativeAspectRatio
+            themeColor
           }
         }
       }

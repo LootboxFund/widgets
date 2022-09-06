@@ -16,6 +16,10 @@ export const DEFAULT_TICKET_IMAGE = `${manifest.storage.downloadUrl}/o/${manifes
 export const DEFAULT_TICKET_BACKGROUND = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-background.png?alt=media`
 export const TEMPLATE_LOOTBOX_STAMP = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FTemplateLootboxCard.png?alt=media`
 export const NEXT_STEPS_INFOGRAPHIC = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FNextStepsInfographic.png?alt=media`
+export const DEFAULT_NOOB_CUP_INFOGRAPHIC = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob_cup_template-compressed.png?alt=media`
+export const NOOB_CUP_YOUR_INVITED_IMG = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob-cup-invited-compressed.png?alt=media`
+export const NOOB_CUP_EMBLEM = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob_cup-compressed.png?alt=media`
+
 export const TOS_URL = 'https://www.lootbox.fund/terms-of-service'
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 export const NATIVE_ADDRESS = '0x0native' as Address

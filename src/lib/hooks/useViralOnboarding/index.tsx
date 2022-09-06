@@ -51,7 +51,6 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
       setAd(undefined)
     } else {
       if (data?.referral?.__typename === 'ReferralResponseSuccess') {
-        console.log('fetching ad')
         const _referral = data?.referral?.referral
         getAd({ variables: { tournamentId: _referral.tournamentId } })
           .then((res) => {
