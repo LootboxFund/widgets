@@ -37,6 +37,7 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
   User,
+  updateEmail,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -180,7 +181,7 @@ export const useAuth = () => {
     setPhoneConfirmationResult(confirmationResult)
   }
 
-  const signInPhoneWithCode = async (code: string) => {
+  const signInPhoneWithCode = async (code: string, email?: string) => {
     if (!phoneConfirmationResult) {
       console.error('No phone confirmation result')
       throw new Error(words.anErrorOccured)
@@ -189,6 +190,16 @@ export const useAuth = () => {
     const result = await phoneConfirmationResult.confirm(code)
 
     const { user } = result
+
+    // Update their email only if the user does not have an email listed
+    if (!user.email && !!email) {
+      try {
+        await updateEmail(user, email)
+      } catch (err) {
+        console.error('Error updating email')
+      }
+    }
+
     // Now create a user record
     const { data } = await createUserMutation()
 

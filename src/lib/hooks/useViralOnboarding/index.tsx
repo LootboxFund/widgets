@@ -9,6 +9,8 @@ interface ViralOnboardingContextType {
   setClaim: (claim: ClaimFE | undefined) => void
   chosenPartyBasket?: PartyBasketFE
   setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
+  email?: string
+  setEmail: (email: string) => void
 }
 
 const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(null)
@@ -29,6 +31,7 @@ interface ViralOnboardingProviderProps {
 const ViralOnboardingProvider = ({ referral, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
   const [claim, setClaim] = useState<ClaimFE>()
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
+  const [email, setEmail] = useState<string>()
   return (
     <ViralOnboardingContext.Provider
       value={{
@@ -37,6 +40,8 @@ const ViralOnboardingProvider = ({ referral, children }: PropsWithChildren<Viral
         setClaim,
         chosenPartyBasket,
         setChosenPartyBasket,
+        email,
+        setEmail,
       }}
     >
       {children}

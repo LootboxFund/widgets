@@ -192,12 +192,6 @@ export const useWords = () => {
       'Error message for user if they forgot to enter a valid themecolor which should be HEX format (i.e. #fefefe)',
   })
 
-  const invalidEmail = intl.formatMessage({
-    id: 'step.socials.email.invalid',
-    defaultMessage: 'Invalid email',
-    description: 'When a user enters an invalid email address, this message is shown.',
-  })
-
   const emailIsMandatory = intl.formatMessage({
     id: 'step.socials.email.empty',
     defaultMessage: 'Email is mandatory',
@@ -307,7 +301,6 @@ export const useWords = () => {
     pleaseUploadACoverPhoto,
     biographyMustBeAtLeast20Characters,
     themeColorMustBeAValidHexColor,
-    invalidEmail,
     emailIsMandatory,
     submittingElapsedTimeFn,
     preparingElapsedTimeFn,
