@@ -68,6 +68,7 @@ const CompleteOnboardingNoobCup = (props: Props) => {
     muted: true,
     responsive: true,
     loop: false,
+    retryOnError: true,
     // fluid: true,
     poster: ad?.creative?.thumbnail,
     // aspectRatio: ad?.creative?.creativeAspectRatio || '9:16',
