@@ -12,6 +12,7 @@ import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
+import CompleteOnboardingNoobCup from './components/CompleteOnboardingNoobCup'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -24,7 +25,6 @@ type ViralOnboardingRoute =
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const { ad } = useViralOnboarding()
-  console.log(ad)
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
@@ -42,21 +42,43 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         )
       case 'create-referral':
         return <CreateReferral goBack={() => setRoute('accept-gift')} />
-      case 'success':
-        return (
-          <CompleteOnboarding
-            onNext={() => {
-              // Send to public profile
-              const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
-              // navigate to url
-              window.location.href = url
-            }}
-            onBack={() => console.log('back')}
-          />
-        )
+      case 'success': {
+        if (!!ad) {
+          switch (ad.adType) {
+            case 'noob_cup':
+            default: {
+              return (
+                <CompleteOnboardingNoobCup
+                  onNext={() => {
+                    // // Send to public profile
+                    // const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+                    // // navigate to url
+                    // window.location.href = url
+                  }}
+                  onBack={() => console.log('back')}
+                />
+              )
+            }
+          }
+        } else {
+          return (
+            <CompleteOnboarding
+              onNext={() => {
+                // Send to public profile
+                const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+                // navigate to url
+                window.location.href = url
+              }}
+              onBack={() => console.log('back')}
+            />
+          )
+        }
+      }
+
       case 'accept-gift':
       default:
-        return <AcceptGift onNext={() => setRoute('browse-lottery')} onBack={() => console.log('back')} />
+        // return <AcceptGift onNext={() => setRoute('browse-lottery')} onBack={() => console.log('back')} />
+        return <AcceptGift onNext={() => setRoute('success')} onBack={() => console.log('back')} />
     }
   }
 
