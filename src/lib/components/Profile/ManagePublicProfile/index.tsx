@@ -8,6 +8,7 @@ import { LoadingText } from 'lib/components/Generics/Spinner'
 import { useAuth } from 'lib/hooks/useAuth'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { manifest } from 'manifest'
 import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -252,7 +253,7 @@ const ManagePublicProfile = (props: Props) => {
         >
           {words.userId}
         </$span>{' '}
-        {userIDP.id}
+        {userIDP.id} <CopyIcon text={userIDP.id} smallWidth={24} />
       </$span>
       <br />
       {screen === 'mobile' && renderAvatarSection()}

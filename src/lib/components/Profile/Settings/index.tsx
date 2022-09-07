@@ -12,6 +12,7 @@ import LogRocket from 'logrocket'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 const SettingsComponent = () => {
   const { user } = useAuth()
@@ -139,7 +140,7 @@ const SettingsComponent = () => {
           </$span> */}
         </$Horizontal>
       </$SettingContainer>
-      <$SettingContainer disabled>
+      <$SettingContainer>
         <$Horizontal
           justifyContent="flex-start"
           flexWrap
@@ -156,7 +157,9 @@ const SettingsComponent = () => {
           </$span>
           <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px" ellipsis>
             {user?.email ? (
-              <$span>{user?.email}</$span>
+              <$span>
+                {user.email} <CopyIcon text={user.email} smallWidth={24} />
+              </$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
                 {emailNotSetText}
