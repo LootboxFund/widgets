@@ -15,9 +15,7 @@ import CreateReferral from './components/CreateReferral'
 import AddEmail from './components/AddEmail'
 import CompleteOnboardingNoobCup from './components/CompleteOnboardingNoobCup'
 
-interface ViralOnboardingProps {
-  referralSlug: ReferralSlug
-}
+interface ViralOnboardingProps {}
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
@@ -76,8 +74,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
       case 'accept-gift':
       default:
-        // return <AcceptGift onNext={() => setRoute('browse-lottery')} onBack={() => console.log('back')} />
-        return <AcceptGift onNext={() => setRoute('success')} onBack={() => console.log('back')} />
+        return <AcceptGift onNext={() => setRoute('browse-lottery')} onBack={() => console.log('back')} />
     }
   }
 
