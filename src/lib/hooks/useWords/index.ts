@@ -801,6 +801,11 @@ const useWords = () => {
     description: 'When a user enters an invalid email address, this message is shown.',
   })
 
+  const newEmail = intl.formatMessage({
+    id: 'generics.newEmail',
+    defaultMessage: 'New email',
+  })
+
   return {
     maxNumberClaimsDescription,
     maximumNumberOfClaims,
@@ -930,6 +935,7 @@ const useWords = () => {
     soldOut,
     enterYourEmail,
     invalidEmail,
+    newEmail,
   }
 }
 

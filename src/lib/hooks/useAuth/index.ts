@@ -30,8 +30,6 @@ import {
   sendEmailVerification,
   browserSessionPersistence,
   browserLocalPersistence,
-  Persistence,
-  setPersistence as setPersistenceFirebase,
   setPersistence,
   signInWithPhoneNumber,
   RecaptchaVerifier,
@@ -209,6 +207,18 @@ export const useAuth = () => {
       throw new Error(words.anErrorOccured)
     }
 
+    // Send email verification only once on login
+    const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
+
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
+      sendEmailVerification(user)
+        .then(() => {
+          console.log('email verification sent')
+          localStorage.setItem(EMAIL_VERIFICATION_COOKIE_NAME, 'true')
+        })
+        .catch((err) => LogRocket.captureException(err))
+    }
+
     return data.createUserRecord as CreateUserResponse
   }
 
@@ -262,7 +272,7 @@ export const useAuth = () => {
 
     // Send email verification only once on login
     const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
-    if (!user.emailVerified && !verificationEmailAlreadySent) {
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
       sendEmailVerification(user)
         .then(() => {
           console.log('email verification sent')
@@ -287,7 +297,7 @@ export const useAuth = () => {
     // Send email verification only once on login
     const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
 
-    if (!user.emailVerified && !verificationEmailAlreadySent) {
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
       sendEmailVerification(user)
         .then(() => {
           console.log('email verification sent')

@@ -2,15 +2,33 @@ import Authentication from '../Authentication'
 import { useAuth } from 'lib/hooks/useAuth'
 import Spinner from '../Generics/Spinner'
 import { COLORS } from '@wormgraph/helpers'
+import { PropsWithChildren, useState } from 'react'
 
-type AuthGuardProps = { children: JSX.Element }
+/**
+ * strict = forces login
+ */
+type AuthGuardProps = PropsWithChildren<{ strict?: boolean } & any>
 
-const AuthGuard = ({ children, ...props }: AuthGuardProps & any): JSX.Element => {
+const AuthGuard = ({ children, strict, ...props }: AuthGuardProps): JSX.Element => {
+  const [hasLoggedIn, setHasLoggedIn] = useState(false)
   const { user } = useAuth()
+
   if (user === undefined) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
-  } else if (!user) {
-    return <Authentication initialMode="login-phone" {...props} />
+  } else if (!user || (!!strict && !hasLoggedIn)) {
+    return (
+      <Authentication
+        initialMode="login-phone"
+        {...props}
+        onSignupSuccess={
+          !!strict
+            ? () => {
+                setHasLoggedIn(true)
+              }
+            : undefined
+        }
+      />
+    )
   } else {
     return children
   }
