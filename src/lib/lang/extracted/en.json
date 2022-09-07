@@ -1032,6 +1032,9 @@
   "generics.downloadCSVFile": {
     "defaultMessage": "Click to download CSV file"
   },
+  "generics.enterYourEmail": {
+    "defaultMessage": "Enter your email"
+  },
   "generics.event": {
     "defaultMessage": "Event",
     "description": "Event, like an esports tournament"
@@ -1070,6 +1073,9 @@
   "generics.networkNotSet": {
     "defaultMessage": "Network not set",
     "description": "Error message for user if they forgot to set a blockchain network"
+  },
+  "generics.newEmail": {
+    "defaultMessage": "New email"
   },
   "generics.nextSteps": {
     "defaultMessage": "Next Steps"
@@ -2234,6 +2240,10 @@
     "defaultMessage": "Win a Free NFT",
     "description": "Prize message to win a free Lootbox NFT"
   },
+  "viralOnboarding.addEmail.header": {
+    "defaultMessage": "Where should we send your ticket?",
+    "description": "Prompt / header in the section for user to add email"
+  },
   "viralOnboarding.chooseLottery.description": {
     "defaultMessage": "Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
   },
@@ -2282,6 +2292,10 @@
     "defaultMessage": "Claim Ticket",
     "description": "Button to accept a gift"
   },
+  "viralOnboarding.signup.email.disclaimer": {
+    "defaultMessage": "You will NOT receiving marketing emails, we only notify if you win",
+    "description": "Disclaimer when collecting email"
+  },
   "viralOnboarding.signup.header": {
     "defaultMessage": "Almost Finished..."
   },
@@ -2294,6 +2308,10 @@
   },
   "viralOnboarding.youHaveAlreadyAcceptedInfo": {
     "defaultMessage": "You can only accept an initial invite once. {boldText}"
+  },
+  "viralonboarding.getMyTicket": {
+    "defaultMessage": "Get my ticket",
+    "description": "Ticket referring to NFT"
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",
