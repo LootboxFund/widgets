@@ -84,6 +84,7 @@ const Wallets = () => {
 
   const handleWalletConnect = async () => {
     setConnectLoading(true)
+    setConnectErrorMessage('')
     try {
       await connectWallet()
     } catch (err) {
