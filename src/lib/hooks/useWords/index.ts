@@ -790,6 +790,22 @@ const useWords = () => {
     id: 'generics.maximumNumberOfClaims.description',
   })
 
+  const enterYourEmail = intl.formatMessage({
+    defaultMessage: 'Enter your email',
+    id: 'generics.enterYourEmail',
+  })
+
+  const invalidEmail = intl.formatMessage({
+    id: 'step.socials.email.invalid',
+    defaultMessage: 'Invalid email',
+    description: 'When a user enters an invalid email address, this message is shown.',
+  })
+
+  const newEmail = intl.formatMessage({
+    id: 'generics.newEmail',
+    defaultMessage: 'New email',
+  })
+
   return {
     maxNumberClaimsDescription,
     maximumNumberOfClaims,
@@ -917,6 +933,9 @@ const useWords = () => {
     nextSteps,
     joinCommunity,
     soldOut,
+    enterYourEmail,
+    invalidEmail,
+    newEmail,
   }
 }
 

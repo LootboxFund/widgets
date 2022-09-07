@@ -12,16 +12,13 @@ import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
+import AddEmail from './components/AddEmail'
 import CompleteOnboardingNoobCup from './components/CompleteOnboardingNoobCup'
 
-interface ViralOnboardingProps {}
-type ViralOnboardingRoute =
-  | 'accept-gift'
-  | 'browse-lottery'
-  | 'select-lottery'
-  | 'sign-up'
-  | 'success'
-  | 'create-referral'
+interface ViralOnboardingProps {
+  referralSlug: ReferralSlug
+}
+type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const { ad } = useViralOnboarding()
@@ -29,9 +26,11 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
-        return <ChooseLottery onNext={() => setRoute('select-lottery')} onBack={() => console.log('back')} />
-      case 'select-lottery':
-        return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
+        return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+      // case 'select-lottery':
+      //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
+      case 'add-email':
+        return <AddEmail onNext={() => setRoute('sign-up')} onBack={() => setRoute('browse-lottery')} />
       case 'sign-up':
         return (
           <OnboardingSignUp

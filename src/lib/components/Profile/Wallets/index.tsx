@@ -26,6 +26,7 @@ import WalletButton from 'lib/components/WalletButton'
 import PopConfirm from 'lib/components/Generics/PopConfirm'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 const Wallets = () => {
   const intl = useIntl()
@@ -84,6 +85,7 @@ const Wallets = () => {
 
   const handleWalletConnect = async () => {
     setConnectLoading(true)
+    setConnectErrorMessage('')
     try {
       await connectWallet()
     } catch (err) {
@@ -130,8 +132,13 @@ const Wallets = () => {
             return (
               <$SettingContainer key={`wallet-${index}`}>
                 <$Horizontal key={wallet.id} justifyContent="space-between">
-                  <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">
-                    {truncateAddress((wallet.address || '') as Address)}
+                  <$span
+                    lineHeight={WALLET_CONTAINER_HEIGHT}
+                    width={screen === 'mobile' ? '50%' : '30%'}
+                    textAlign="center"
+                  >
+                    {truncateAddress((wallet.address || '') as Address)}{' '}
+                    <CopyIcon text={wallet.address} smallWidth={24} />
                   </$span>
                   {screen !== 'mobile' ? (
                     <$span lineHeight={WALLET_CONTAINER_HEIGHT} width="30%" textAlign="center">

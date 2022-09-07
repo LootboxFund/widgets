@@ -14,6 +14,8 @@ interface ViralOnboardingContextType {
   chosenPartyBasket?: PartyBasketFE
   setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
   ad?: AdFE
+  email?: string
+  setEmail: (email: string) => void
 }
 
 const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(null)
@@ -43,8 +45,9 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   const [ad, setAd] = useState<AdFE>()
   const [claim, setClaim] = useState<ClaimFE>()
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
-  const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
+  const [email, setEmail] = useState<string>()
   const words = useWords()
+  const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
 
   useEffect(() => {
     if (!data?.referral) {
@@ -85,6 +88,8 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         chosenPartyBasket,
         setChosenPartyBasket,
         ad,
+        email,
+        setEmail,
       }}
     >
       {children}
