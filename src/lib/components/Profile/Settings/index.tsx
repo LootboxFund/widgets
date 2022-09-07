@@ -1,10 +1,10 @@
 import { $Vertical, $h1, $Horizontal, $span } from 'lib/components/Generics'
 import AuthGuard from 'lib/components/AuthGuard'
-import styled from 'styled-components'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS } from '@wormgraph/helpers'
 import { $Link, $SettingContainer, Oopsies } from '../common'
 import { useAuth } from 'lib/hooks/useAuth'
 import ChangePassword from './changePassword'
+import ChangeEmail from './ChangeEmail'
 import { useEffect, useState } from 'react'
 import { auth } from 'lib/api/firebase/app'
 import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from 'firebase/auth'
@@ -12,12 +12,14 @@ import LogRocket from 'logrocket'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
 
 const SettingsComponent = () => {
   const { user } = useAuth()
   const { screen } = useWindowSize()
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false)
   const [passwordResetFormVisible, setPasswordResetFormVisible] = useState(false)
+  const [emailFormVisible, setEmailFormVisible] = useState(false)
   const intl = useIntl()
   const words = useWords()
 
@@ -38,6 +40,8 @@ const SettingsComponent = () => {
         })
     }
   }, [user])
+
+  const toggleEmailChange = () => setEmailFormVisible(!emailFormVisible)
 
   const sendPasswordReset = () => {
     // Send user email with password reset link
@@ -62,6 +66,10 @@ const SettingsComponent = () => {
   const passwordResetFormSuccessCallback = () => {
     setPasswordResetFormVisible(false)
     setNewPasswordStatus('success')
+  }
+
+  const changeEmailCallback = () => {
+    setEmailFormVisible(false)
   }
 
   const passwordNotSetText = intl.formatMessage({
@@ -114,9 +122,11 @@ const SettingsComponent = () => {
           </$span>
           <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
             {user?.phone ? (
-              <$span textAlign="start">{user?.phone}</$span>
+              <$span textAlign="start" ellipsis>
+                {user?.phone}
+              </$span>
             ) : (
-              <$span textAlign="start" color={COLORS.dangerFontColor}>
+              <$span textAlign="start" color={COLORS.dangerFontColor} ellipsis>
                 {`${phoneNotSetText} ⛔️`}
               </$span>
             )}
@@ -130,7 +140,7 @@ const SettingsComponent = () => {
           </$span> */}
         </$Horizontal>
       </$SettingContainer>
-      <$SettingContainer disabled>
+      <$SettingContainer>
         <$Horizontal
           justifyContent="flex-start"
           flexWrap
@@ -138,16 +148,38 @@ const SettingsComponent = () => {
             paddingLeft: screen === 'mobile' ? '0px' : '8%',
           }}
         >
-          <$span width="20%" lineHeight="40px" color={`${COLORS.surpressedFontColor}be`}>
+          <$span
+            width={screen === 'mobile' ? '35%' : '20%'}
+            lineHeight="40px"
+            color={`${COLORS.surpressedFontColor}be`}
+          >
             {words.email}
           </$span>
-          <$span width="80%" lineHeight="40px">
+          <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px" ellipsis>
             {user?.email ? (
-              <$span>{user?.email}</$span>
+              <$span>
+                {user.email} <CopyIcon text={user.email} smallWidth={24} />
+              </$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
                 {emailNotSetText}
               </$span>
+            )}
+          </$span>
+
+          <$span
+            textAlign={screen === 'mobile' ? 'start' : 'center'}
+            width={screen === 'mobile' ? '100%' : '30%'}
+            lineHeight="40px"
+          >
+            {!emailFormVisible ? (
+              <$Link style={{ fontStyle: 'normal' }} onClick={toggleEmailChange}>
+                {!user?.email ? words.newEmail : words.edit.toLowerCase()}
+              </$Link>
+            ) : (
+              <$Link style={{ fontStyle: 'normal', textTransform: 'lowercase' }} onClick={toggleEmailChange}>
+                {`👇 ${words.hide}`}
+              </$Link>
             )}
           </$span>
         </$Horizontal>
@@ -170,9 +202,11 @@ const SettingsComponent = () => {
             </$span>
             <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px">
               {isPasswordEnabled ? (
-                <$span textAlign="start">******************</$span>
+                <$span textAlign="start" ellipsis>
+                  ******************
+                </$span>
               ) : (
-                <$span textAlign="start" color={COLORS.dangerFontColor}>
+                <$span textAlign="start" color={COLORS.dangerFontColor} ellipsis>
                   {`${passwordNotSetText} ⛔️`}
                 </$span>
               )}
@@ -212,7 +246,14 @@ const SettingsComponent = () => {
         </$span>
       )}
       {passwordResetFormVisible && (
-        <ChangePassword mode={'create-password'} onSuccessCallback={passwordResetFormSuccessCallback} />
+        <AuthGuard strict loginTitle="Login again to change your password">
+          <ChangePassword mode={'create-password'} onSuccessCallback={passwordResetFormSuccessCallback} />
+        </AuthGuard>
+      )}
+      {emailFormVisible && (
+        <AuthGuard strict loginTitle="Login again to change your email">
+          <ChangeEmail onSuccessCallback={changeEmailCallback} />
+        </AuthGuard>
       )}
       {newPasswordStatus === 'success' && (
         <$span textAlign="end">

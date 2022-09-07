@@ -273,7 +273,7 @@ const QuickCreate = (props: QuickCreateProps) => {
       if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
-          email: wordsCreate.invalidEmail,
+          email: words.invalidEmail,
         })
       } else if (value.length === 0) {
         setErrors({

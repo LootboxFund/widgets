@@ -30,13 +30,12 @@ import {
   sendEmailVerification,
   browserSessionPersistence,
   browserLocalPersistence,
-  Persistence,
-  setPersistence as setPersistenceFirebase,
   setPersistence,
   signInWithPhoneNumber,
   RecaptchaVerifier,
   ConfirmationResult,
   User,
+  updateEmail,
 } from 'firebase/auth'
 import { Address } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -180,7 +179,7 @@ export const useAuth = () => {
     setPhoneConfirmationResult(confirmationResult)
   }
 
-  const signInPhoneWithCode = async (code: string) => {
+  const signInPhoneWithCode = async (code: string, email?: string) => {
     if (!phoneConfirmationResult) {
       console.error('No phone confirmation result')
       throw new Error(words.anErrorOccured)
@@ -189,6 +188,16 @@ export const useAuth = () => {
     const result = await phoneConfirmationResult.confirm(code)
 
     const { user } = result
+
+    // Update their email only if the user does not have an email listed
+    if (!user.email && !!email) {
+      try {
+        await updateEmail(user, email)
+      } catch (err) {
+        console.error('Error updating email')
+      }
+    }
+
     // Now create a user record
     const { data } = await createUserMutation()
 
@@ -196,6 +205,18 @@ export const useAuth = () => {
       console.error('Error creating user record', (data?.createUserRecord as ResponseError)?.error?.message)
       LogRocket.captureException(new Error('Error creating user record'))
       throw new Error(words.anErrorOccured)
+    }
+
+    // Send email verification only once on login
+    const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
+
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
+      sendEmailVerification(user)
+        .then(() => {
+          console.log('email verification sent')
+          localStorage.setItem(EMAIL_VERIFICATION_COOKIE_NAME, 'true')
+        })
+        .catch((err) => LogRocket.captureException(err))
     }
 
     return data.createUserRecord as CreateUserResponse
@@ -251,7 +272,7 @@ export const useAuth = () => {
 
     // Send email verification only once on login
     const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
-    if (!user.emailVerified && !verificationEmailAlreadySent) {
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
       sendEmailVerification(user)
         .then(() => {
           console.log('email verification sent')
@@ -276,7 +297,7 @@ export const useAuth = () => {
     // Send email verification only once on login
     const verificationEmailAlreadySent = localStorage.getItem(EMAIL_VERIFICATION_COOKIE_NAME)
 
-    if (!user.emailVerified && !verificationEmailAlreadySent) {
+    if (!!user.email && !user.emailVerified && !verificationEmailAlreadySent) {
       sendEmailVerification(user)
         .then(() => {
           console.log('email verification sent')

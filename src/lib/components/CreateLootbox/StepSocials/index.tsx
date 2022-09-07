@@ -12,6 +12,7 @@ import { ScreenSize } from '../../../hooks/useScreenSize/index'
 import { getSocials } from 'lib/hooks/constants'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useWords as useWordsCreate } from '../constants'
+import useWords from 'lib/hooks/useWords'
 
 export interface StepSocialsProps {
   stage: StepStage
@@ -48,6 +49,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
     web: '',
   }
   const wordsCreate = useWordsCreate()
+  const words = useWords()
   const SOCIALS = getSocials(intl)
   const [errors, setErrors] = useState(initialErrors)
 
@@ -57,7 +59,7 @@ const StepSocials = forwardRef((props: StepSocialsProps, ref: React.RefObject<HT
       if (!checkIfValidEmail(value)) {
         setErrors({
           ...errors,
-          email: wordsCreate.invalidEmail,
+          email: words.invalidEmail,
         })
         props.setValidity(false)
       } else if (value.length === 0) {

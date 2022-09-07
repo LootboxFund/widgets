@@ -10,9 +10,10 @@ import { $span } from '../Typography'
 interface PopConfirmProps {
   onOk: () => Promise<void>
   children: React.ReactNode
+  message?: string
   [key: string]: any
 }
-export const PopConfirm = ({ children, onOk, ...rest }: PopConfirmProps) => {
+export const PopConfirm = ({ children, onOk, message, ...rest }: PopConfirmProps) => {
   const [isVisible, setIsVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const words = useWords()
@@ -37,6 +38,7 @@ export const PopConfirm = ({ children, onOk, ...rest }: PopConfirmProps) => {
     return (
       <$ConfirmModalContainer>
         <$span bold>{words.areYouSure}</$span>
+        {message && [<br />, <$span>{message}</$span>]}
         <br />
         <$Horizontal spacing={2}>
           <$NoButton>{words.no}</$NoButton>

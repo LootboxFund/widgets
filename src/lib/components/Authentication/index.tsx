@@ -198,7 +198,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
           <LoginPhone
             onChangeMode={setRoute}
             onSignupSuccess={onSignupSuccess}
-            title={route === 'signup-phone' ? words.register : words.login}
+            title={!!loginTitle ? loginTitle : route === 'signup-phone' ? words.register : words.login}
           />
 
           <br />

@@ -52,7 +52,7 @@ const OnboardingSignUp = (props: Props) => {
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
-  const { claim, referral, chosenPartyBasket } = useViralOnboarding()
+  const { claim, referral, chosenPartyBasket, email } = useViralOnboarding()
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
   const [completeClaim, { loading: loadingMutation }] = useMutation<
@@ -122,7 +122,7 @@ const OnboardingSignUp = (props: Props) => {
     setErrorMessage('')
     try {
       setPersistence(auth, browserLocalPersistence)
-      await signInPhoneWithCode(confirmationCode)
+      await signInPhoneWithCode(confirmationCode, email)
     } catch (err) {
       setStatus('error')
       setErrorMessage(err?.message || words.anErrorOccured)
@@ -193,6 +193,7 @@ const OnboardingSignUp = (props: Props) => {
         style={{
           fontSize: TYPOGRAPHY.fontSize.small,
           marginTop: '40px',
+          lineHeight: TYPOGRAPHY.fontSize.medium,
           width: screen === 'mobile' ? '100%' : '80%',
           textAlign: 'start',
         }}

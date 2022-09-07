@@ -66,6 +66,7 @@ export const $span = styled.span<{
   textAlign?: 'center' | 'start' | 'end'
   color?: string
   bold?: boolean
+  ellipsis?: boolean
 }>`
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${(props) => props.lineHeight || TYPOGRAPHY.fontSize.large};
@@ -74,4 +75,5 @@ export const $span = styled.span<{
   color: ${(props) => props.color || COLORS.surpressedFontColor};
   ${(props) => props.width && `width: ${props.width};`}
   ${(props) => props.textAlign && `text-align: ${props.textAlign};`}
+  ${(props) => props.ellipsis && `white-space: nowrap;overflow: hidden;text-overflow: ellipsis;`}
 `
