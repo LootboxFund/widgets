@@ -365,7 +365,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
 
                         <$DropDownOption
                           href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
-                          target="_blank"
                           style={{ borderRadius: '0px 0px 10px 10px' }}
                         >
                           {words.redeemNFTText}
