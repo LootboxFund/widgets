@@ -15,6 +15,8 @@ import Video from './Video'
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { loadAdTrackingPixel } from 'lib/utils/pixel'
+import { AdEventAction } from 'lib/api/graphql/generated/types'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 const startingTime = 30 // seconds
@@ -25,7 +27,7 @@ interface Props {
 }
 const CompleteOnboardingNoobCup = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
-  const { referral, chosenPartyBasket, ad } = useViralOnboarding()
+  const { referral, chosenPartyBasket, ad, sessionId } = useViralOnboarding()
   const words = useWords()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [isFinalScreen, setIsFinalScreen] = useState(false)
@@ -101,6 +103,13 @@ const CompleteOnboardingNoobCup = (props: Props) => {
     })
 
     player.on('ready', () => {
+      if (ad) {
+        loadAdTrackingPixel({
+          adId: ad.id,
+          sessionId,
+          eventAction: AdEventAction.View,
+        })
+      }
       player.play()
     })
 

@@ -155,7 +155,6 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
               backgroundColor={color.background}
               color={color.color}
               onClick={() => {
-                console.log('setting', key)
                 setRoute(key)
               }}
             >

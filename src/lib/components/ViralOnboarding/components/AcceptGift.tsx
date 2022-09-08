@@ -29,7 +29,7 @@ interface Props {
 const AcceptGift = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
-  const { referral, setClaim } = useViralOnboarding()
+  const { referral, setClaim, sessionId } = useViralOnboarding()
   const [errorMessage, setErrorMessage] = useState<string>()
   const [createClaim, { loading }] = useMutation<
     { createClaim: CreateClaimResponseFE | ResponseError },

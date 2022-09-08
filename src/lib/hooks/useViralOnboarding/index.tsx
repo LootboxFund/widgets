@@ -6,8 +6,14 @@ import { useLazyQuery, useQuery } from '@apollo/client'
 import useWords from '../useWords'
 import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD } from './api.gql'
 import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
+import { v4 as uuid } from 'uuid'
+import { SessionID } from '@wormgraph/helpers'
+
+// Session Id should be unique within an ad but the same for ad events from the same user
+const sessionId = uuid() as SessionID
 
 interface ViralOnboardingContextType {
+  sessionId: SessionID
   referral: ReferralFE
   claim?: ClaimFE
   setClaim: (claim: ClaimFE | undefined) => void
@@ -82,6 +88,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   return (
     <ViralOnboardingContext.Provider
       value={{
+        sessionId,
         referral,
         claim,
         setClaim,
