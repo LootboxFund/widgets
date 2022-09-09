@@ -14,7 +14,7 @@ import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import Video from './Video'
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { ClaimID, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
 import { AdEventAction } from 'lib/api/graphql/generated/types'
 
@@ -27,7 +27,7 @@ interface Props {
 }
 const CompleteOnboardingNoobCup = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
-  const { referral, chosenPartyBasket, ad, sessionId } = useViralOnboarding()
+  const { referral, chosenPartyBasket, ad, sessionId, claim } = useViralOnboarding()
   const words = useWords()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [isFinalScreen, setIsFinalScreen] = useState(false)
@@ -108,6 +108,7 @@ const CompleteOnboardingNoobCup = (props: Props) => {
           adId: ad.id,
           sessionId,
           eventAction: AdEventAction.View,
+          claimId: claim?.id || ('' as ClaimID),
         })
       }
       player.play()
@@ -124,7 +125,12 @@ const CompleteOnboardingNoobCup = (props: Props) => {
       return
     }
 
-    loadAdTrackingPixel({ adId: ad.id, sessionId, eventAction: AdEventAction.Click })
+    loadAdTrackingPixel({
+      adId: ad.id,
+      sessionId,
+      eventAction: AdEventAction.Click,
+      claimId: claim?.id || ('' as ClaimID),
+    })
 
     if (ad?.creative.url) {
       window.open(ad.creative.url, '_blank')
