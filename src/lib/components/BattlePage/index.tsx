@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { PartyBasketStatus, QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
@@ -27,6 +27,11 @@ import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
 import $Button from '../Generics/Button'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { InitialUrlParams } from '../CreateLootbox/state'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
+import { initDApp, useWeb3Utils } from 'lib/hooks/useWeb3Api'
+import { initLogging } from 'lib/api/logrocket'
+import QuickCreate from '../QuickCreate'
 
 export interface LootboxPartyBasket {
   lootbox: BattlePageLootboxSnapshotFE
@@ -46,12 +51,49 @@ const BattlePage = (props: BattlePageParams) => {
       id: props.tournamentId,
     },
   })
+  const web3Utils = useWeb3Utils()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [magicLinkParams, setMagicLinkParams] = useState<InitialUrlParams>()
+  const [network, setNetwork] = useState<NetworkOption>()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const intl = useIntl()
   const words = useWords()
   const tournamentWords = useTournamentWords()
   const { screen } = useWindowSize()
   const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    console.log('here:', data)
+    if (data?.tournament?.__typename === 'TournamentResponseSuccess' && data?.tournament?.tournament?.magicLink) {
+      try {
+        const url = new URL(data?.tournament?.tournament?.magicLink)
+        const _magicLinkParams: InitialUrlParams = {
+          network: url.searchParams.get('network'),
+          type: url.searchParams.get('type'),
+          fundingTarget: url.searchParams.get('fundingTarget'),
+          fundingLimit: url.searchParams.get('fundingLimit'),
+          receivingWallet: url.searchParams.get('receivingWallet'),
+          returnsTarget: url.searchParams.get('returnsTarget'),
+          returnsDate: url.searchParams.get('returnsDate'),
+          logoImage: url.searchParams.get('logoImage'),
+          coverImage: url.searchParams.get('coverImage'),
+          campaignBio: url.searchParams.get('campaignBio'),
+          campaignWebsite: url.searchParams.get('campaignWebsite'),
+          themeColor: url.searchParams.get('themeColor'),
+          tournamentId: url.searchParams.get('tournamentId'),
+        }
+
+        setMagicLinkParams(_magicLinkParams)
+
+        const networkOption = matchNetworkByHex(_magicLinkParams.network as string)
+        if (networkOption) {
+          setNetwork(networkOption)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }, [data])
 
   const [lootboxPartyBaskets] = useMemo<[LootboxPartyBasket[]]>(() => {
     if (!data || data?.tournament?.__typename === 'ResponseError') {
@@ -90,7 +132,6 @@ const BattlePage = (props: BattlePageParams) => {
           }
         })
       } else {
-        console.log('no party baskets', snapshot.name)
         return
         // _noPartyBaskets.push({
         //   lootbox: snapshot,
@@ -140,6 +181,25 @@ const BattlePage = (props: BattlePageParams) => {
     },
   }
 
+  const quickCreateModalStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+  }
+
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
@@ -149,6 +209,8 @@ const BattlePage = (props: BattlePageParams) => {
   }
 
   const { tournament } = data.tournament as BattlePageResponseSuccessFE
+  console.log(network)
+  console.log(tournament)
 
   // Find the stream from  the URL params
   const stream: TournamentStreamsFE | undefined = props.streamId
@@ -304,7 +366,7 @@ const BattlePage = (props: BattlePageParams) => {
                             style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                             target="_blank"
                           >
-                            {tournamentWords.visitTournament}
+                            {tournamentWords.tournamentDetails}
                           </$Link>
                         </$span>
                       ) : null}
@@ -353,7 +415,7 @@ const BattlePage = (props: BattlePageParams) => {
                     </$p>
                   </$Vertical>
 
-                  <div>
+                  <$Horizontal spacing={4} flexWrap={screen === 'mobile'}>
                     <a
                       href={tournament?.communityURL || tournament.tournamentLink || publicTournamentUrl}
                       target="_blank"
@@ -377,7 +439,32 @@ const BattlePage = (props: BattlePageParams) => {
                         {words.joinCommunity}
                       </$Button>
                     </a>
-                  </div>
+                    {tournament.magicLink && network && (
+                      <$span
+                        color={`${COLORS.surpressedFontColor}5a`}
+                        style={{
+                          marginTop: '0.67em',
+                        }}
+                      >
+                        <$Link
+                          color={'inherit'}
+                          fontStyle="italic"
+                          onClick={() => {
+                            if (tournament.magicLink && network) {
+                              setCreateModalOpen(true)
+                            }
+                          }}
+                          style={{
+                            textDecoration: 'none',
+                            textTransform: 'lowercase',
+                            lineHeight: 'calc(20px + 1.4rem)',
+                          }}
+                        >
+                          {words.register}
+                        </$Link>
+                      </$span>
+                    )}
+                  </$Horizontal>
                 </$Horizontal>
               </$Horizontal>
             </$BattlePageSection>
@@ -450,6 +537,29 @@ const BattlePage = (props: BattlePageParams) => {
           </$Vertical>
         )}
       </Modal>
+      <Modal
+        isOpen={createModalOpen}
+        onRequestClose={() => setCreateModalOpen(false)}
+        contentLabel="Create Lootbox Modal"
+        style={quickCreateModalStyles}
+      >
+        <$Horizontal
+          justifyContent="flex-end"
+          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          <span onClick={() => setCreateModalOpen(false)}>X</span>
+        </$Horizontal>
+        {magicLinkParams && network && (
+          <QuickCreate
+            tournamentName={tournament.title || ''}
+            tournamentId={magicLinkParams.tournamentId as TournamentID}
+            receivingWallet={magicLinkParams.receivingWallet as Address}
+            network={network}
+            fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
+            fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
+          />
+        )}
+      </Modal>
     </$BattlePageContainer>
   )
 }
@@ -461,6 +571,15 @@ const BattlePageWrapper = () => {
   useEffect(() => {
     const { INITIAL_URL_PARAMS } = extractURLState_BattlePage()
     setParams(INITIAL_URL_PARAMS)
+    const load = async () => {
+      initLogging()
+      try {
+        await initDApp()
+      } catch (err) {
+        console.error('Error initializing DApp', err)
+      }
+    }
+    load()
   }, [])
 
   if (!params) {

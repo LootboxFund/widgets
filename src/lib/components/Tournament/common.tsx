@@ -137,6 +137,11 @@ export const useTournamentWords = () => {
     defaultMessage: 'Link to your Community',
   })
 
+  const tournamentDetails = intl.formatMessage({
+    id: 'tournament.tournamentDetails',
+    defaultMessage: 'Tournament details',
+  })
+
   return {
     titleRequired,
     descriptionRequired,
@@ -153,6 +158,7 @@ export const useTournamentWords = () => {
     // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
     communityURL,
+    tournamentDetails,
   }
 }
 

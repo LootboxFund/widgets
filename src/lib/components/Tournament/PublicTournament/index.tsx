@@ -5,21 +5,8 @@ import { useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { TournamentID } from 'lib/types'
 import Modal from 'react-modal'
-import {
-  LootboxTournamentSnapshot,
-  QueryTournamentArgs,
-  ResponseError,
-  TournamentResponse,
-  TournamentResponseSuccess,
-} from 'lib/api/graphql/generated/types'
-import {
-  $HideTings,
-  HiddenDescription,
-  $SearchInput,
-  LootboxList,
-  $TournamentCover,
-  $TournamentSectionContainer,
-} from '../common'
+import { QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { HiddenDescription, LootboxList, $TournamentCover, $TournamentSectionContainer } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'

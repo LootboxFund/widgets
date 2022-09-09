@@ -512,7 +512,12 @@ const ManageTournamentPage = () => {
   const words = useWords()
 
   useEffect(() => {
+    const tid = parseUrlParams('tid')
+    if (tid) {
+      setTournamentId(tid as TournamentID)
+    }
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {
@@ -521,14 +526,6 @@ const ManageTournamentPage = () => {
     }
     load()
   }, [])
-
-  useEffect(() => {
-    initLogging()
-    const tid = parseUrlParams('tid')
-    if (tid) {
-      setTournamentId(tid as TournamentID)
-    }
-  })
 
   return (
     <AuthGuard>
