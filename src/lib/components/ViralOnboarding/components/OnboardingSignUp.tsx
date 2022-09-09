@@ -35,6 +35,7 @@ import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
 import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
 interface Props {
   onNext: () => void
@@ -217,6 +218,12 @@ const OnboardingSignUp = (props: Props) => {
 
   const isAlreadyAccepted = errorMessage && errorMessage?.toLowerCase().includes('already accepted')
 
+  const _lb = !!chosenPartyBasket?.lootboxAddress
+    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+    : undefined
+
+  const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -308,7 +315,7 @@ const OnboardingSignUp = (props: Props) => {
             </$Vertical>
             {renderTOS()}
 
-            <$HandImage src={handIconImg} />
+            {!!chosenPartyBasket && !!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
           </$Vertical>
         )}
         {status === 'verification_sent' && (
@@ -386,6 +393,13 @@ const $Icon = styled.span`
   font-size: 50px;
   text-align: center;
   color: ${COLORS.white};
+`
+
+const $PartyBasketImage = styled.img` 
+  margin: auto auto -3.5rem;
+  max-width: 220px;
+  width: 100%;
+}
 `
 
 export default OnboardingSignUp

@@ -9,6 +9,8 @@ import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
+import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 interface Props {
   onNext: () => void
@@ -19,7 +21,7 @@ const OnboardingAddEmail = (props: Props) => {
   const { screen } = useWindowSize()
   const [email, setEmailLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const { setEmail } = useViralOnboarding()
+  const { setEmail, chosenPartyBasket, referral } = useViralOnboarding()
   const { user } = useAuth()
 
   useEffect(() => {
@@ -41,6 +43,12 @@ const OnboardingAddEmail = (props: Props) => {
     setEmail(email)
     props.onNext()
   }
+
+  const _lb = !!chosenPartyBasket?.lootboxAddress
+    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+    : undefined
+
+  const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -92,7 +100,7 @@ const OnboardingAddEmail = (props: Props) => {
               description="Disclaimer when collecting email"
             />
           </$SupressedParagraph>
-          <$HandImage src={handIconImg} />
+          {!!chosenPartyBasket && !!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
         </$Vertical>
       </$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>
@@ -110,6 +118,13 @@ const $InputMedium = styled.input`
 
 const $HandImage = styled.img`
   margin: auto 0 -3.5rem;
+`
+
+const $PartyBasketImage = styled.img` 
+  margin: auto auto -3.5rem;
+  max-width: 220px;
+  width: 100%;
+}
 `
 
 const $Icon = styled.span`
