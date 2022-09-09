@@ -287,7 +287,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
               const mainActionLink =
                 claim.chosenPartyBasket.joinCommunityUrl ||
                 claim.tournament?.tournamentLink ||
-                `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`
+                `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
 
               return (
                 <$ClaimCard key={claim.id}>
@@ -336,7 +336,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                           href={
                             claim.tournament?.tournamentLink
                               ? claim.tournament?.tournamentLink
-                              : `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${claim.tournamentId}`
+                              : `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
                           }
                           target="_blank"
                         >
@@ -357,7 +357,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                         ) : null}
 
                         <$DropDownOption
-                          href={`${manifest.microfrontends.webflow.battlePage}?tournament=${claim.tournamentId}`}
+                          href={`${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`}
                           target="_blank"
                         >
                           <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}

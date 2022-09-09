@@ -53,7 +53,7 @@ const StepPrefillDisclaimer = (props: StepPrefillDisclaimerProps) => {
                   values={{
                     link: (
                       <$Link
-                        href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${props.tournamentId}`}
+                        href={`${manifest.microfrontends.webflow.battlePage}?tid=${props.tournamentId}`}
                         target="_blank"
                       >
                         <FormattedMessage

@@ -170,7 +170,7 @@ const BattlePage = (props: BattlePageParams) => {
     )
   })
 
-  const publicTournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
+  const publicTournamentUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`
 
   const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
 
@@ -436,7 +436,7 @@ const BattlePage = (props: BattlePageParams) => {
               return (
                 <$StreamListItem style={{ cursor: 'pointer' }} key={stream.id}>
                   <a
-                    href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
+                    href={`${manifest.microfrontends.webflow.battlePage}?tid=${props.tournamentId}&stream=${stream.id}`}
                     style={{ textDecoration: 'none' }}
                   >
                     <$Horizontal spacing={2}>

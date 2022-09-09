@@ -70,8 +70,7 @@ const BattleFeed = () => {
           const daysDiff = tourny.tournamentDate
             ? Math.round((new Date(tourny.tournamentDate).valueOf() - new Date().valueOf()) / (1000 * 60 * 60 * 24))
             : undefined
-          // const tournamentPage = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tourny.id}`
-          const watchPage = `${manifest.microfrontends.webflow.battlePage}?tournament=${tourny.id}`
+          const watchPage = `${manifest.microfrontends.webflow.battlePage}?tid=${tourny.id}`
           return (
             <$BattleContainer key={`battle_${idx}`} screen={screen}>
               <a href={watchPage} style={{ textDecoration: 'none', display: 'block' }}>

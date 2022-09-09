@@ -113,7 +113,7 @@ const TournamentList = ({ tournaments }: { tournaments: Tournament[] }) => {
               >
                 <$span lineHeight="40px" style={{ paddingRight: '15px', whiteSpace: 'nowrap' }}>
                   <$Link
-                    href={`${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`}
+                    href={`${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`}
                     style={{ textDecoration: 'none', fontStyle: 'normal', textTransform: 'lowercase' }}
                   >
                     {words.view}
