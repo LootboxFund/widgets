@@ -120,6 +120,12 @@ const CompleteOnboardingNoobCup = (props: Props) => {
   }
 
   const onCallToActionClick = () => {
+    if (!ad) {
+      return
+    }
+
+    loadAdTrackingPixel({ adId: ad.id, sessionId, eventAction: AdEventAction.Click })
+
     if (ad?.creative.url) {
       window.open(ad.creative.url, '_blank')
     }
@@ -230,7 +236,7 @@ const CompleteOnboardingNoobCup = (props: Props) => {
               </$CenteredContent>
             </$ContainerSlide>
 
-            <$ContainerSlide slideOff slideOn delay={['2.5s', '6s']}>
+            {/* <$ContainerSlide slideOff slideOn delay={['2.5s', '6s']}>
               <$CenteredContent>
                 <$Emblem src={NOOB_CUP_YOUR_INVITED_IMG} alt="Your invited" />
               </$CenteredContent>
@@ -240,11 +246,11 @@ const CompleteOnboardingNoobCup = (props: Props) => {
               <$CenteredContent>
                 <$Emblem src={NOOB_CUP_EMBLEM} alt="Join the Beginner's Cup!" />
               </$CenteredContent>
-            </$ContainerSlide>
+            </$ContainerSlide> */}
           </$Vertical>
         </$ViralOnboardingSafeArea>
       </$FloatingCover>
-      <$SlideInFooter themeColor={themeColor} delay="8s">
+      <$SlideInFooter themeColor={themeColor} delay="3s">
         <$Vertical spacing={2}>
           <$NextButton
             onClick={onCallToActionClick}
