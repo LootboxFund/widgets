@@ -4,7 +4,7 @@ import { extractURLState_ViralOnboardingPage } from './utils'
 import { ReferralSlug } from 'lib/types'
 import AcceptGift from './components/AcceptGift'
 import ChooseLottery from './components/ChooseLottery'
-import SelectLottery from './components/SelectLottery'
+// import SelectLottery from './components/SelectLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
 import { LoadingCard, ErrorCard } from './components/GenericCard'
@@ -13,7 +13,7 @@ import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
 import AddEmail from './components/AddEmail'
-import CompleteOnboardingNoobCup from './components/CompleteOnboardingNoobCup'
+import AdTemplate1 from './components/AdTemplate1'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
@@ -42,10 +42,10 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       case 'success': {
         if (!!ad) {
           switch (ad.adType) {
-            case 'noob_cup':
+            case 'template_1':
             default: {
               return (
-                <CompleteOnboardingNoobCup
+                <AdTemplate1
                   onNext={() => {
                     // // Send to public profile
                     // const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`

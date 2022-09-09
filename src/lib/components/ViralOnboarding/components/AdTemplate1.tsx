@@ -25,7 +25,7 @@ interface Props {
   onNext: () => void
   onBack: () => void
 }
-const CompleteOnboardingNoobCup = (props: Props) => {
+const AdTemplate1 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
   const { referral, chosenPartyBasket, ad, sessionId, claim } = useViralOnboarding()
   const words = useWords()
@@ -413,4 +413,4 @@ const $Infographic = styled.img`
   margin-bottom: 150px;
 `
 
-export default CompleteOnboardingNoobCup
+export default AdTemplate1
