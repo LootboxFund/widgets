@@ -1,10 +1,5 @@
 import { $span, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
-import {
-  TEMPLATE_LOOTBOX_STAMP,
-  DEFAULT_NOOB_CUP_INFOGRAPHIC,
-  NOOB_CUP_YOUR_INVITED_IMG,
-  NOOB_CUP_EMBLEM,
-} from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP, DEFAULT_NOOB_CUP_INFOGRAPHIC } from 'lib/hooks/constants'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
@@ -12,7 +7,7 @@ import { $Heading, $NextButton, $SlideInFooter, $SubHeading } from '../contants'
 import { useEffect, useRef, useState } from 'react'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import Video from './Video'
-import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
+import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { ClaimID, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
@@ -73,6 +68,7 @@ const AdTemplate1 = (props: Props) => {
     muted: true,
     responsive: true,
     loop: false,
+    // bigPlayButton: true,
     retryOnError: true,
     // fluid: true,
     poster: ad?.creative?.thumbnail,
@@ -95,15 +91,6 @@ const AdTemplate1 = (props: Props) => {
 
   const handlePlayerReady = (player: VideoJsPlayer) => {
     playerRef.current = player
-
-    // You can handle player events here, for example:
-    player.on('waiting', () => {
-      console.log('player is waiting')
-    })
-
-    player.on('dispose', () => {
-      console.log('player will dispose')
-    })
 
     player.on('ready', () => {
       if (ad) {
@@ -246,18 +233,6 @@ const AdTemplate1 = (props: Props) => {
                 </$PaddingWrapper>
               </$CenteredContent>
             </$ContainerSlide>
-
-            {/* <$ContainerSlide slideOff slideOn delay={['2.5s', '6s']}>
-              <$CenteredContent>
-                <$Emblem src={NOOB_CUP_YOUR_INVITED_IMG} alt="Your invited" />
-              </$CenteredContent>
-            </$ContainerSlide>
-
-            <$ContainerSlide slideOff slideOn delay={['6s', '8.5s']}>
-              <$CenteredContent>
-                <$Emblem src={NOOB_CUP_EMBLEM} alt="Join the Beginner's Cup!" />
-              </$CenteredContent>
-            </$ContainerSlide> */}
           </$Vertical>
         </$ViralOnboardingSafeArea>
       </$FloatingCover>

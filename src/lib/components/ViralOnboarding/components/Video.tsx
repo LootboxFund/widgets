@@ -2,6 +2,7 @@
  * Example from https://videojs.com/guides/react/
  */
 import { useEffect, useRef } from 'react'
+import styled from 'styled-components'
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import 'video.js/dist/video-js.css'
 
@@ -50,9 +51,11 @@ export const Video = (props: VideoProps) => {
 
   return (
     <div data-vjs-player style={{ ...props.style }}>
-      <video ref={videoRef} className="video-js vjs-big-play-centered" />
+      <$Video ref={videoRef} className="video-js vjs-big-play-centered vjs-show-big-play-button-on-pause" />
     </div>
   )
 }
+
+const $Video = styled.video``
 
 export default Video
