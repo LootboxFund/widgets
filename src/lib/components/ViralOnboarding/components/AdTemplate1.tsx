@@ -17,6 +17,8 @@ import { LoadingText } from 'lib/components/Generics/Spinner'
 import { ClaimID, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
 import { AdEventAction } from 'lib/api/graphql/generated/types'
+import { useAuth } from 'lib/hooks/useAuth'
+import { manifest } from 'manifest'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 const startingTime = 30 // seconds
@@ -29,6 +31,7 @@ const AdTemplate1 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
   const { referral, chosenPartyBasket, ad, sessionId, claim } = useViralOnboarding()
   const words = useWords()
+  const { user } = useAuth()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
   const [isFinalScreen, setIsFinalScreen] = useState(false)
 
@@ -186,7 +189,10 @@ const AdTemplate1 = (props: Props) => {
                 text={ad?.creative.callToActionText || 'Download Game'}
               />
             </$NextButton>
-            {!isFinalScreen && (
+            <a
+              href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
+              style={{ textAlign: 'center' }}
+            >
               <$span
                 style={{
                   color: COLORS.white,
@@ -196,11 +202,10 @@ const AdTemplate1 = (props: Props) => {
                   fontWeight: TYPOGRAPHY.fontWeight.light,
                   cursor: 'pointer',
                 }}
-                onClick={toggleFinalScreen}
               >
                 skip
               </$span>
-            )}
+            </a>
           </$Vertical>
         </$SlideInFooter>
       </$ViralOnboardingCard>
@@ -267,21 +272,19 @@ const AdTemplate1 = (props: Props) => {
           >
             <LoadingText loading={false} color={COLORS.white} text={ad?.creative.callToActionText || 'Download Game'} />
           </$NextButton>
-          {!isFinalScreen && (
-            <$span
-              style={{
-                color: COLORS.white,
-                textDecoration: 'underline',
-                fontStyle: 'italic',
-                textAlign: 'center',
-                fontWeight: TYPOGRAPHY.fontWeight.light,
-                cursor: 'pointer',
-              }}
-              onClick={toggleFinalScreen}
-            >
-              skip
-            </$span>
-          )}
+          <$span
+            style={{
+              color: COLORS.white,
+              textDecoration: 'underline',
+              fontStyle: 'italic',
+              textAlign: 'center',
+              fontWeight: TYPOGRAPHY.fontWeight.light,
+              cursor: 'pointer',
+            }}
+            onClick={toggleFinalScreen}
+          >
+            skip
+          </$span>
         </$Vertical>
       </$SlideInFooter>
     </$ViralOnboardingCard>
