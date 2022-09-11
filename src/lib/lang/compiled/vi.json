@@ -572,6 +572,7 @@
   "tournament.stream.addCampaignCompleteUrl": "Liên kết với Cộng đồng của bạn",
   "tournament.stream.streamTypeCannotBeEmpty": "Loại luồng không được để trống",
   "tournament.stream.streamURLCannotBeEmpty": "URL luồng không được để trống",
+  "tournament.tournamentDetails": "Thông tin chi tiết về giải đấu",
   "tournament.visit.header": "Ghé thăm giải đấu",
   "tournamentAnalytics.button.downloadCSV": "Tạo CSV",
   "userClaims.invitedByUser": "Được mời bởi {username}",

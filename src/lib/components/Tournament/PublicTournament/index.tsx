@@ -5,21 +5,8 @@ import { useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import { TournamentID } from 'lib/types'
 import Modal from 'react-modal'
-import {
-  LootboxTournamentSnapshot,
-  QueryTournamentArgs,
-  ResponseError,
-  TournamentResponse,
-  TournamentResponseSuccess,
-} from 'lib/api/graphql/generated/types'
-import {
-  $HideTings,
-  HiddenDescription,
-  $SearchInput,
-  LootboxList,
-  $TournamentCover,
-  $TournamentSectionContainer,
-} from '../common'
+import { QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { HiddenDescription, LootboxList, $TournamentCover, $TournamentSectionContainer } from '../common'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import Spinner from 'lib/components/Generics/Spinner'
 import { manifest } from 'manifest'
@@ -41,7 +28,9 @@ interface PublicTournamentProps {
   tournamentId: TournamentID
 }
 
-/** Public Tournament Widget */
+/**
+ * @deprecated for battle page (AKA watch page)
+ */
 const PublicTournament = (props: PublicTournamentProps) => {
   const words = useWords()
   const web3Utils = useWeb3Utils()
@@ -141,7 +130,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
     </$Button>
   )
 
-  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tournament=${tournament.id}`
+  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`
 
   return (
     <$Vertical spacing={5} width="100%" maxWidth="720px" style={{ margin: '0 auto' }}>
@@ -240,7 +229,7 @@ const PublicTournament = (props: PublicTournamentProps) => {
             return (
               <$StreamListItem style={{ cursor: 'pointer', width: screen === 'mobile' ? '100%' : '80%' }}>
                 <a
-                  href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${stream.id}`}
+                  href={`${manifest.microfrontends.webflow.battlePage}?tid=${props.tournamentId}&stream=${stream.id}`}
                   style={{ textDecoration: 'none' }}
                 >
                   <$Horizontal spacing={2}>

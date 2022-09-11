@@ -12,8 +12,8 @@ import parseUrlParams from 'lib/utils/parseUrlParams'
 import { manifest } from 'manifest'
 import EditTournament from './EditTournament'
 import { $Link, Oopsies } from 'lib/components/Profile/common'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { initDApp } from 'lib/hooks/useWeb3Api'
+import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { initDApp, useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -22,6 +22,10 @@ import AddStream from './AddStream'
 import $Button from 'lib/components/Generics/Button'
 import TournamentAnalytics from './TournamentAnalytics'
 import BulkCreateReferral from 'lib/components/Referral/BulkCreateReferral'
+import QuickCreate from 'lib/components/QuickCreate'
+import Modal from 'react-modal'
+import { InitialUrlParams } from 'lib/components/CreateLootbox/state'
+import { matchNetworkByHex, NetworkOption } from 'lib/api/network'
 
 const LEARN_MORE_STREAM_LINK = 'https://www.youtube.com/playlist?list=PL9j6Okee96W4rEGvlTjAQ-DdW9gJZ1wjC'
 
@@ -33,7 +37,11 @@ interface ManageTournamentProps {
 const ManageTournament = (props: ManageTournamentProps) => {
   const intl = useIntl()
   const words = useWords()
+  const web3Utils = useWeb3Utils()
   const { screen } = useWindowSize()
+  const [network, setNetwork] = useState<NetworkOption>()
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [magicLinkParams, setMagicLinkParams] = useState<InitialUrlParams>()
   const { data, loading, error } = useQuery<{ myTournament: MyTournamentFE | ResponseError }, QueryTournamentArgs>(
     GET_MY_TOURNAMENT,
     {
@@ -50,6 +58,38 @@ const ManageTournament = (props: ManageTournamentProps) => {
     description: 'Text when no Lootboxes were found',
   })
 
+  useEffect(() => {
+    if (data?.myTournament?.__typename === 'MyTournamentResponseSuccess' && data?.myTournament?.tournament?.magicLink) {
+      try {
+        const url = new URL(data?.myTournament?.tournament?.magicLink)
+        const _magicLinkParams: InitialUrlParams = {
+          network: url.searchParams.get('network'),
+          type: url.searchParams.get('type'),
+          fundingTarget: url.searchParams.get('fundingTarget'),
+          fundingLimit: url.searchParams.get('fundingLimit'),
+          receivingWallet: url.searchParams.get('receivingWallet'),
+          returnsTarget: url.searchParams.get('returnsTarget'),
+          returnsDate: url.searchParams.get('returnsDate'),
+          logoImage: url.searchParams.get('logoImage'),
+          coverImage: url.searchParams.get('coverImage'),
+          campaignBio: url.searchParams.get('campaignBio'),
+          campaignWebsite: url.searchParams.get('campaignWebsite'),
+          themeColor: url.searchParams.get('themeColor'),
+          tournamentId: url.searchParams.get('tournamentId'),
+        }
+
+        setMagicLinkParams(_magicLinkParams)
+
+        const networkOption = matchNetworkByHex(_magicLinkParams.network as string)
+        if (networkOption) {
+          setNetwork(networkOption)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    }
+  }, [data])
+
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
@@ -60,17 +100,37 @@ const ManageTournament = (props: ManageTournamentProps) => {
 
   const { tournament } = data.myTournament as MyTournamentFE
   const createLootboxUrl = `${manifest.microfrontends.webflow.createPage}?tournamentId=${tournament.id}`
-  const tournamentUrl = `${manifest.microfrontends.webflow.tournamentPublicPage}?tid=${tournament.id}`
-  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tournament=${tournament.id}`
+  const watchUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`
 
   const lootboxSnapshots = [...(tournament?.lootboxSnapshots || [])]
+
+  const customStyles = {
+    content: {
+      display: 'flex',
+      flexDirection: 'column' as 'column',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px',
+      inset: screen === 'mobile' ? '10px' : '60px',
+    },
+    overlay: {
+      position: 'fixed' as 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    },
+  }
 
   const JoinButton = () => (
     <$Button
       screen={screen}
       onClick={() => {
-        if (tournament.magicLink) {
-          window.open(`${tournament.magicLink}`, '_self')
+        console.log(network, tournament.magicLink)
+        if (tournament.magicLink && network) {
+          // window.open(`${tournament.magicLink}`, '_self')
+          setCreateModalOpen(true)
         } else {
           window.open(createLootboxUrl, '_self')
         }
@@ -168,7 +228,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
                   <$Link
                     color={'inherit'}
                     fontStyle="italic"
-                    href={tournamentUrl}
+                    href={watchUrl}
                     style={{ marginRight: '15px', textDecoration: 'none', textTransform: 'capitalize' }}
                     target="_self"
                   >
@@ -419,6 +479,30 @@ const ManageTournament = (props: ManageTournamentProps) => {
           magicLink={tournament.magicLink ? tournament.magicLink : undefined}
         />
       )}
+
+      <Modal
+        isOpen={createModalOpen}
+        onRequestClose={() => setCreateModalOpen(false)}
+        contentLabel="Create Lootbox Modal"
+        style={customStyles}
+      >
+        <$Horizontal
+          justifyContent="flex-end"
+          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+        >
+          <span onClick={() => setCreateModalOpen(false)}>X</span>
+        </$Horizontal>
+        {magicLinkParams && network && (
+          <QuickCreate
+            tournamentName={tournament.title || ''}
+            tournamentId={magicLinkParams.tournamentId as TournamentID}
+            receivingWallet={magicLinkParams.receivingWallet as Address}
+            network={network}
+            fundraisingLimit={web3Utils.toBN(magicLinkParams.fundingLimit)}
+            fundraisingTarget={web3Utils.toBN(magicLinkParams.fundingTarget)}
+          />
+        )}
+      </Modal>
     </$Vertical>
   )
 }
@@ -428,7 +512,12 @@ const ManageTournamentPage = () => {
   const words = useWords()
 
   useEffect(() => {
+    const tid = parseUrlParams('tid')
+    if (tid) {
+      setTournamentId(tid as TournamentID)
+    }
     const load = async () => {
+      initLogging()
       try {
         await initDApp()
       } catch (err) {
@@ -437,14 +526,6 @@ const ManageTournamentPage = () => {
     }
     load()
   }, [])
-
-  useEffect(() => {
-    initLogging()
-    const tid = parseUrlParams('tid')
-    if (tid) {
-      setTournamentId(tid as TournamentID)
-    }
-  })
 
   return (
     <AuthGuard>

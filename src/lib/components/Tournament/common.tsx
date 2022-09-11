@@ -137,6 +137,11 @@ export const useTournamentWords = () => {
     defaultMessage: 'Link to your Community',
   })
 
+  const tournamentDetails = intl.formatMessage({
+    id: 'tournament.tournamentDetails',
+    defaultMessage: 'Tournament details',
+  })
+
   return {
     titleRequired,
     descriptionRequired,
@@ -153,6 +158,7 @@ export const useTournamentWords = () => {
     // streamURLNotValidUrl,
     streamTypeCannotBeEmpty,
     communityURL,
+    tournamentDetails,
   }
 }
 
@@ -582,7 +588,7 @@ export const StreamListItem = (props: StreamListItemProps) => {
               style={{ cursor: 'pointer', textTransform: 'lowercase', margin: 'auto', paddingRight: '10px' }}
             >
               <$Link
-                href={`${manifest.microfrontends.webflow.battlePage}?tournament=${props.tournamentId}&stream=${props.stream.id}`}
+                href={`${manifest.microfrontends.webflow.battlePage}?tid=${props.tournamentId}&stream=${props.stream.id}`}
                 target="_blank"
                 style={{ textDecoration: 'none', color: 'inherit', fontStyle: 'inherit' }}
               >

@@ -1,7 +1,7 @@
 import useWords from 'lib/hooks/useWords'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   background1,
@@ -29,7 +29,7 @@ interface Props {
 const AcceptGift = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
-  const { referral, setClaim } = useViralOnboarding()
+  const { referral, setClaim, sessionId } = useViralOnboarding()
   const [errorMessage, setErrorMessage] = useState<string>()
   const [createClaim, { loading }] = useMutation<
     { createClaim: CreateClaimResponseFE | ResponseError },

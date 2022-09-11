@@ -19,10 +19,11 @@ console.log(`
   env: ${process.env.NODE_ENV}
 `)
 
-const ViralOnboarding =
-  process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.js' : 'ViralOnboarding.js'
+const ViralOnboarding = process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.js' : 'ViralOnboarding.js'
+const ViralOnboardingCSS =
+  process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.css' : 'ViralOnboarding.js.css'
 
-const fileNames = [ViralOnboarding]
+const fileNames = [ViralOnboarding, ViralOnboardingCSS]
 
 fileNames.map((filename) => {
   uploadFile({

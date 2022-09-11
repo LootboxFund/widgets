@@ -1,14 +1,25 @@
-import { Claim, PartyBasket, Referral } from 'lib/api/graphql/generated/types'
-import { PartyBasketID } from 'lib/types'
-import { useState, createContext, useContext, PropsWithChildren } from 'react'
-import { ClaimFE, PartyBasketFE, ReferralFE } from 'lib/components/ViralOnboarding/api.gql'
+import { QueryDecisionAdApiBetaArgs, QueryReferralArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { ReferralSlug } from 'lib/types'
+import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
+import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
+import { useLazyQuery, useQuery } from '@apollo/client'
+import useWords from '../useWords'
+import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD } from './api.gql'
+import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
+import { v4 as uuid } from 'uuid'
+import { SessionID } from '@wormgraph/helpers'
+
+// Session Id should be unique within an ad but the same for ad events from the same user
+const sessionId = uuid() as SessionID
 
 interface ViralOnboardingContextType {
-  referral?: ReferralFE
+  sessionId: SessionID
+  referral: ReferralFE
   claim?: ClaimFE
   setClaim: (claim: ClaimFE | undefined) => void
   chosenPartyBasket?: PartyBasketFE
   setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
+  ad?: AdFE
   email?: string
   setEmail: (email: string) => void
 }
@@ -25,21 +36,65 @@ export const useViralOnboarding = () => {
 }
 
 interface ViralOnboardingProviderProps {
-  referral: ReferralFE
+  referralSlug: ReferralSlug
 }
 
-const ViralOnboardingProvider = ({ referral, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
+const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
+  const { data, loading, error } = useQuery<{ referral: ReferralResponseFE | ResponseError }, QueryReferralArgs>(
+    GET_REFERRAL,
+    {
+      variables: {
+        slug: referralSlug,
+      },
+    }
+  )
+  const [ad, setAd] = useState<AdFE>()
   const [claim, setClaim] = useState<ClaimFE>()
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
   const [email, setEmail] = useState<string>()
+  const words = useWords()
+  const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
+
+  useEffect(() => {
+    if (!data?.referral) {
+      setAd(undefined)
+    } else {
+      if (data?.referral?.__typename === 'ReferralResponseSuccess') {
+        const _referral = data?.referral?.referral
+        getAd({ variables: { tournamentId: _referral.tournamentId } })
+          .then((res) => {
+            if (!res?.data?.decisionAdApiBeta || res.data.decisionAdApiBeta.__typename === 'ResponseError') {
+              throw new Error('Error fetching ad')
+            } else {
+              const data = res.data.decisionAdApiBeta as GetAdFE
+              setAd(data.ad || undefined)
+            }
+          })
+          .catch((err) => console.error(err))
+      }
+    }
+  }, [data?.referral])
+
+  if (loading) {
+    return <LoadingCard />
+  } else if (error || !data) {
+    return <ErrorCard message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
+  } else if (data?.referral?.__typename === 'ResponseError') {
+    return <ErrorCard message={data?.referral?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
+  }
+
+  const referral: ReferralFE = (data.referral as ReferralResponseFE).referral
+
   return (
     <ViralOnboardingContext.Provider
       value={{
+        sessionId,
         referral,
         claim,
         setClaim,
         chosenPartyBasket,
         setChosenPartyBasket,
+        ad,
         email,
         setEmail,
       }}

@@ -564,6 +564,7 @@
   "tournament.stream.addCampaignCompleteUrl": "Link to your Community",
   "tournament.stream.streamTypeCannotBeEmpty": "Stream type cannot be empty",
   "tournament.stream.streamURLCannotBeEmpty": "Stream URL cannot be empty",
+  "tournament.tournamentDetails": "Tournament details",
   "tournament.visit.header": "Visit Tournament",
   "tournamentAnalytics.button.downloadCSV": "Generate CSV",
   "userClaims.invitedByUser": "Invited by {username}",

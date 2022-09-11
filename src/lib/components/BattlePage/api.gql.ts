@@ -54,7 +54,7 @@ export interface TournamentFE {
 }
 
 export interface BattlePageResponseSuccessFE {
-  __typename: 'BattlePageResponseSuccess'
+  __typename: 'TournamentResponseSuccess'
   tournament: TournamentFE
 }
 

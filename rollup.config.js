@@ -8,6 +8,7 @@ import builtins from 'rollup-plugin-node-builtins'
 import replace from '@rollup/plugin-replace'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 import svg from 'rollup-plugin-svg'
+import css from 'rollup-plugin-import-css'
 
 console.log(process.env.NODE_ENV)
 
@@ -71,6 +72,7 @@ const widgetConfig = (widgetName) => {
       }),
       svg(),
       json(), // enable JSON
+      css(),
       // globals(), // allows globals to be imported (process.env)
       builtins(), // allows builtins to be imported via require/import
     ],
@@ -184,6 +186,6 @@ export default [
   LootboxFeed,
   BattlePage,
   PublicProfile,
-  ViralOnboarding,
   SignOut,
+  ViralOnboarding,
 ]
