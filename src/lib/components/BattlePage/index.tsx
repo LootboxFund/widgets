@@ -209,8 +209,6 @@ const BattlePage = (props: BattlePageParams) => {
   }
 
   const { tournament } = data.tournament as BattlePageResponseSuccessFE
-  console.log(network)
-  console.log(tournament)
 
   // Find the stream from  the URL params
   const stream: TournamentStreamsFE | undefined = props.streamId

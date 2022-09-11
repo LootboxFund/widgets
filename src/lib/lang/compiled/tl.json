@@ -569,6 +569,7 @@
   "tournament.manage.noLootboxes.text": "Walang mga Lootbox",
   "tournament.stream.streamTypeCannotBeEmpty": "Hindi maaaring walang laman ang uri ng stream",
   "tournament.stream.streamURLCannotBeEmpty": "Hindi maaaring walang laman ang URL ng stream",
+  "tournament.tournamentDetails": "Mga detalye ng tournament",
   "tournament.visit.header": "Bisitahin ang Paligsahan",
   "tournamentAnalytics.button.downloadCSV": "Bumuo ng CSV",
   "userClaims.invitedByUser": "Inimbitahan ni {username}",

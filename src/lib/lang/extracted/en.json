@@ -2200,6 +2200,9 @@
     "defaultMessage": "Stream URL cannot be empty",
     "description": "Error message shown to user when they dont input a stream URL in a form"
   },
+  "tournament.tournamentDetails": {
+    "defaultMessage": "Tournament details"
+  },
   "tournament.visit.header": {
     "defaultMessage": "Visit Tournament",
     "description": "Button text for the user to navigate to the public page of a given tournament"
