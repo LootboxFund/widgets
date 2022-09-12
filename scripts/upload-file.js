@@ -1,9 +1,5 @@
 const { Storage } = require('@google-cloud/storage')
-// const express = require('express')
-// const app = new express()
 const storage = new Storage()
-// const { latest: Manifest } = require('@wormgraph/manifest')
-// const manifest = Manifest.default
 
 const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
   // Uploads a local file to the bucket
@@ -26,7 +22,8 @@ const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
   console.log(`${filename} uploaded to ${bucketName}.`)
   await storage.bucket(bucketName).file(filepath).makePublic()
   console.log(`${filename} made public`)
-  process.exit()
+  // process.exit()
+  return
 }
 
 module.exports = { uploadFile }
