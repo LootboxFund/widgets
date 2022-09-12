@@ -110,7 +110,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "0.1.13",
-    "@wormgraph/manifest": "0.3.127",
+    "@wormgraph/manifest": "0.3.128",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "countries-list": "^2.6.1",
