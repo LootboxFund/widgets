@@ -33,7 +33,7 @@ export const $Spinner = styled.div<{
 export const LoadingText = ({ loading, text, color }: { loading: boolean; text: string; color: string }) => {
   return (
     <$Horizontal justifyContent="center">
-      {loading ? <$Spinner color={color}></$Spinner> : null}
+      {loading ? <$Spinner color={color} margin="auto 12px auto 0px"></$Spinner> : null}
       {text}
     </$Horizontal>
   )

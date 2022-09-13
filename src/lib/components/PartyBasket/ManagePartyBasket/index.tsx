@@ -4,24 +4,25 @@ import { initDApp } from 'lib/hooks/useWeb3Api'
 import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { SyntheticEvent, useEffect, useState } from 'react'
 import parseUrlParams from 'lib/utils/parseUrlParams'
-import Spinner from 'lib/components/Generics/Spinner'
+import Spinner, { LoadingText } from 'lib/components/Generics/Spinner'
 import { useMutation, useQuery } from '@apollo/client'
 import {
   BULK_WHITELIST_MUTATION,
   EDIT_PARTY_BASKET,
   GET_PARTY_BASKET,
+  WHITELIST_UNASSIGNED_CLAIMS,
   PartyBasketFE,
   EditPartyBasketResponseFE,
+  WhitelistUnassignedClaimsFE,
 } from './api.gql'
 import {
   BulkWhitelistPayload,
   BulkWhitelistResponse,
   BulkWhitelistResponseSuccess,
   EditPartyBasketPayload,
-  GetPartyBasketResponse,
-  GetPartyBasketResponseSuccess,
   PartyBasketStatus,
   ResponseError,
+  WhitelistAllUnassignedClaimsPayload,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import styled from 'styled-components'
@@ -58,6 +59,12 @@ interface BulkWhitelistState {
   partialErrors?: string[]
 }
 
+interface AutoWhitelistState {
+  status: 'pending' | 'error' | 'success'
+  partialErrors?: string[]
+  data?: string[]
+}
+
 const CSV_UPLOAD_COLUMN_KEY = 'address'
 export const exampleCSV =
   'https://docs.google.com/spreadsheets/d/1eecK4uZB-9EVv2NGYUyOOXdZMUMwSW_Brq8FYttUUgE/edit?usp=sharing'
@@ -74,6 +81,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
   const [advancedError, setAdvancedError] = useState<string>()
   const [localMaxClaimsAllowed, setLocalMaxClaimsAllowed] = useState<number>()
   const [bulkWhitelistState, setBulkWhitelistState] = useState<BulkWhitelistState>()
+  const [autoWhitelistState, setAutoWhitelistState] = useState<AutoWhitelistState>()
   const { user } = useAuth()
   const { screen } = useWindowSize()
   const { data, loading, error } = useQuery<{
@@ -83,6 +91,10 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       partyBasketAddress: props.partyBasketAddress,
     },
   })
+  const [whitelistUnassignedClaims, { loading: whitelistUnassignedClaimsLoading }] = useMutation<
+    { whitelistAllUnassignedClaims: WhitelistUnassignedClaimsFE | ResponseError },
+    { payload: WhitelistAllUnassignedClaimsPayload }
+  >(WHITELIST_UNASSIGNED_CLAIMS)
   const [bulkWhitelistMutation, { loading: bulkWhitelistLoading }] = useMutation<
     {
       bulkWhitelist: BulkWhitelistResponse
@@ -186,6 +198,11 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
       'Error message when partial errors happened with bulk whitelisting submission. We display a list of errors after this message.',
   })
 
+  const autoWhitelistMessage = intl.formatMessage({
+    id: 'partyBasket.autoWhitelist',
+    defaultMessage: 'Auto Whitelist',
+  })
+
   const advancedSubmit = async () => {
     setAdvancedError('')
     const partyBasketId: PartyBasketID | undefined = (data?.getPartyBasket as PartyBasketFE)?.partyBasket?.id
@@ -249,6 +266,54 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
     }
 
     return address
+  }
+
+  const autoWhitelistClaims = async () => {
+    if (whitelistUnassignedClaimsLoading) {
+      return
+    }
+    const partyBasketId: PartyBasketID | undefined = (data?.getPartyBasket as PartyBasketFE)?.partyBasket?.id
+    if (!partyBasketId) {
+      console.error('No party basket id')
+      setAutoWhitelistState({
+        status: 'error',
+      })
+      return
+    }
+
+    try {
+      const res = await whitelistUnassignedClaims({
+        variables: {
+          payload: {
+            partyBasketId: partyBasketId,
+          },
+        },
+      })
+
+      if (!res || !res.data) {
+        console.error('no data')
+        throw new Error(words.anErrorOccured)
+      }
+      if (res?.data?.whitelistAllUnassignedClaims?.__typename === 'ResponseError') {
+        console.error('Server error...', res?.data?.whitelistAllUnassignedClaims?.error)
+        throw new Error(words.anErrorOccured)
+      }
+
+      const response = res?.data?.whitelistAllUnassignedClaims as WhitelistUnassignedClaimsFE
+
+      setAutoWhitelistState({
+        status: 'success',
+        partialErrors: response.errors,
+        data: response.signatures.map((sig) => {
+          const [uid, wallet] = sig.split('-').slice(0, 2)
+          return `user ${uid} - wallet ${wallet}`
+        }),
+      })
+    } catch (err) {
+      setAutoWhitelistState({
+        status: 'error',
+      })
+    }
   }
 
   const singleWhitelistAction = async () => {
@@ -572,8 +637,64 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 ✅ {successfullyWhitelisted}!
               </$StepSubheading>
             )}
-
             <br />
+            <$Vertical>
+              <$StepSubheading
+                style={{
+                  width: 'auto',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <FormattedMessage
+                  id="partyBasket.manage.authWhitelistClaims.header"
+                  defaultMessage="Auto Whitelist Claims"
+                  description="Title for bulk whitelisting section."
+                />
+                <HelpIcon tipID="autoWhitelist" />
+                <ReactTooltip id="autoWhitelist" place="right" effect="solid">
+                  <FormattedMessage
+                    id="partyBasket.manage.authWhitelistClaims.descriptionTooltip"
+                    defaultMessage="Clicking this will automatically whitelist all users with a completed Claim. The user must have attached a metamask wallet to their account for it to work. Clicking this button multiple times is SAFE and will not duplicate whitelists."
+                  />
+                </ReactTooltip>
+              </$StepSubheading>
+              <$BasketButton themeColor={chain.themeColor} screen={screen} onClick={autoWhitelistClaims}>
+                <LoadingText
+                  loading={whitelistUnassignedClaimsLoading}
+                  text={autoWhitelistMessage}
+                  color={chain.themeColor}
+                />
+              </$BasketButton>
+
+              {(autoWhitelistState?.status === 'success' ||
+                autoWhitelistState?.status === 'error' ||
+                (autoWhitelistState?.partialErrors && autoWhitelistState.partialErrors.length > 0)) && <br />}
+
+              {autoWhitelistState?.status === 'success' && (
+                <$StepSubheading style={{ display: 'inline' }}>
+                  ✅ {successfullyWhitelisted}!
+                  {autoWhitelistState?.data && autoWhitelistState.data.length >= 0
+                    ? ` (${autoWhitelistState?.data?.length} whitelists)`
+                    : ''}
+                </$StepSubheading>
+              )}
+              {autoWhitelistState?.status === 'error' && (
+                <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                  ❌ {`${words.anErrorOccured}!`}
+                </$StepSubheading>
+              )}
+              {autoWhitelistState?.partialErrors && autoWhitelistState.partialErrors.length > 0 && (
+                <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                  ⚠️ {`Some errors occured!\n\n${autoWhitelistState?.partialErrors?.join('\n')}`}
+                </$StepSubheading>
+              )}
+              {/* 
+              {autoWhitelistState?.data && (
+                <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                  {`Whitelisted:\n\n${autoWhitelistState?.data?.join('\n')}`}
+                </$StepSubheading>
+              )} */}
+            </$Vertical>
             <$Vertical>
               <$Horizontal>
                 <$StepSubheading

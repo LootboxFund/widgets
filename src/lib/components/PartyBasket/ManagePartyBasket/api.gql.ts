@@ -105,3 +105,26 @@ export const EDIT_PARTY_BASKET = gql`
     }
   }
 `
+
+export interface WhitelistUnassignedClaimsFE {
+  __typename: 'WhitelistAllUnassignedClaimsResponseSuccess'
+  signatures: string[]
+  errors?: string[]
+}
+
+export const WHITELIST_UNASSIGNED_CLAIMS = gql`
+  mutation WhitelistAllUnassignedClaims($payload: WhitelistAllUnassignedClaimsPayload!) {
+    whitelistAllUnassignedClaims(payload: $payload) {
+      ... on WhitelistAllUnassignedClaimsResponseSuccess {
+        signatures
+        errors
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
