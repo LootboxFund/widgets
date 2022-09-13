@@ -23,7 +23,6 @@ import {
   PartyBasketStatus,
   ResponseError,
   WhitelistAllUnassignedClaimsPayload,
-  WhitelistAllUnassignedClaimsResponse,
 } from 'lib/api/graphql/generated/types'
 import { Oopsies } from 'lib/components/Profile/common'
 import styled from 'styled-components'
@@ -63,6 +62,7 @@ interface BulkWhitelistState {
 interface AutoWhitelistState {
   status: 'pending' | 'error' | 'success'
   partialErrors?: string[]
+  data?: string[]
 }
 
 const CSV_UPLOAD_COLUMN_KEY = 'address'
@@ -301,16 +301,14 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
 
       const response = res?.data?.whitelistAllUnassignedClaims as WhitelistUnassignedClaimsFE
 
-      if (response.errors) {
-        setAutoWhitelistState({
-          status: 'success',
-          partialErrors: response.errors,
-        })
-      } else {
-        setAutoWhitelistState({
-          status: 'success',
-        })
-      }
+      setAutoWhitelistState({
+        status: 'success',
+        partialErrors: response.errors,
+        data: response.signatures.map((sig) => {
+          const [uid, wallet] = sig.split('-').slice(0, 2)
+          return `user ${uid} - wallet ${wallet}`
+        }),
+      })
     } catch (err) {
       setAutoWhitelistState({
         status: 'error',
@@ -673,7 +671,12 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                 (autoWhitelistState?.partialErrors && autoWhitelistState.partialErrors.length > 0)) && <br />}
 
               {autoWhitelistState?.status === 'success' && (
-                <$StepSubheading style={{ display: 'inline' }}>✅ {successfullyWhitelisted}!</$StepSubheading>
+                <$StepSubheading style={{ display: 'inline' }}>
+                  ✅ {successfullyWhitelisted}!
+                  {autoWhitelistState?.data && autoWhitelistState.data.length >= 0
+                    ? ` (${autoWhitelistState?.data?.length} whitelists)`
+                    : ''}
+                </$StepSubheading>
               )}
               {autoWhitelistState?.status === 'error' && (
                 <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
@@ -685,6 +688,12 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   ⚠️ {`Some errors occured!\n\n${autoWhitelistState?.partialErrors?.join('\n')}`}
                 </$StepSubheading>
               )}
+              {/* 
+              {autoWhitelistState?.data && (
+                <$StepSubheading style={{ display: 'inline', whiteSpace: 'pre-line' }}>
+                  {`Whitelisted:\n\n${autoWhitelistState?.data?.join('\n')}`}
+                </$StepSubheading>
+              )} */}
             </$Vertical>
             <$Vertical>
               <$Horizontal>

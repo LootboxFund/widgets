@@ -108,7 +108,7 @@ export const EDIT_PARTY_BASKET = gql`
 
 export interface WhitelistUnassignedClaimsFE {
   __typename: 'WhitelistAllUnassignedClaimsResponseSuccess'
-  signature: string[]
+  signatures: string[]
   errors?: string[]
 }
 
