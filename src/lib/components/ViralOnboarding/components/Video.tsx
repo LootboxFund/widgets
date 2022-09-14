@@ -10,6 +10,7 @@ interface VideoProps {
   onReady: (player: VideoJsPlayer) => void
   options: VideoJsPlayerOptions
   style: { [key: string]: string }
+  videoPosition?: 'top' | 'center'
 }
 export const Video = (props: VideoProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -51,11 +52,22 @@ export const Video = (props: VideoProps) => {
 
   return (
     <div data-vjs-player style={{ ...props.style }}>
-      <$Video ref={videoRef} className="video-js vjs-big-play-centered vjs-show-big-play-button-on-pause" />
+      <$Video
+        ref={videoRef}
+        videoPosition={props.videoPosition || 'center'}
+        className="video-js vjs-big-play-centered vjs-show-big-play-button-on-pause"
+      />
     </div>
   )
 }
 
-const $Video = styled.video``
+const $Video = styled.video<{ videoPosition: 'top' | 'center' }>`
+  .vjs-tech {
+    object-position: ${(props) => props.videoPosition};
+  }
+  .vjs-poster {
+    background-position: ${(props) => props.videoPosition};
+  }
+`
 
 export default Video
