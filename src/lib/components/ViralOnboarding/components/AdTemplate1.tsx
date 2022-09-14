@@ -72,6 +72,7 @@ const AdTemplate1 = (props: Props) => {
     retryOnError: true,
     // fluid: true,
     poster: ad?.creative?.thumbnail,
+    // fill: true,
     // aspectRatio: ad?.creative?.creativeAspectRatio || '9:16',
     sources: ad?.creative?.creativeLinks
       ? ad.creative.creativeLinks.map((link: string) => {
@@ -143,14 +144,19 @@ const AdTemplate1 = (props: Props) => {
   if (isFinalScreen) {
     return (
       <$ViralOnboardingCard style={{ position: 'relative' }} backgroundColor="#ffffff">
-        <$ViralOnboardingSafeArea>
+        <$ViralOnboardingSafeArea style={{ paddingTop: '0rem', overflowY: 'hidden' }}>
           <$Vertical>
             <$Vertical>
               <$Heading style={{ color: themeColor, marginBottom: '0px' }}>
                 {`0:${String(timeLeft).length > 1 ? String(timeLeft) : '0' + String(timeLeft)}`}
               </$Heading>
               <$SubHeading
-                style={{ color: themeColor, textTransform: 'uppercase', fontWeight: TYPOGRAPHY.fontWeight.light }}
+                style={{
+                  color: themeColor,
+                  textTransform: 'uppercase',
+                  fontWeight: TYPOGRAPHY.fontWeight.light,
+                  margin: '0.6rem auto',
+                }}
               >
                 OFFER ENDS
               </$SubHeading>
@@ -167,7 +173,7 @@ const AdTemplate1 = (props: Props) => {
               onClick={onCallToActionClick}
               color={COLORS.trustBackground}
               backgroundColor={COLORS.white}
-              style={{ marginTop: '60px', marginLeft: '15px', marginRight: '15px' }}
+              style={{ marginTop: '30px', marginLeft: '15px', marginRight: '15px' }}
               disabled={false}
             >
               <LoadingText
@@ -205,6 +211,7 @@ const AdTemplate1 = (props: Props) => {
         <Video
           options={videoJsOptions}
           onReady={handlePlayerReady}
+          videoPosition="top"
           style={{
             width: '100%',
             height: '100%',
@@ -215,11 +222,8 @@ const AdTemplate1 = (props: Props) => {
       )}
 
       <$FloatingCover>
-        <$ViralOnboardingSafeArea>
-          <$Vertical
-            style={{ overflowY: 'scroll', height: '100%', justifyContent: 'center' }}
-            onClick={handleVideoClick}
-          >
+        <$ViralOnboardingSafeArea style={{ overflowY: 'hidden' }}>
+          <$Vertical style={{ height: '100%', justifyContent: 'center' }} onClick={handleVideoClick}>
             <$ContainerSlide slideOff delay={['2.5s']}>
               <$CenteredContent>
                 <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
