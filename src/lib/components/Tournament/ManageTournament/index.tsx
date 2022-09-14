@@ -469,13 +469,9 @@ const ManageTournament = (props: ManageTournamentProps) => {
               lootbox.address &&
               window.open(`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`)
           }}
-          templateAction={
-            tournament.magicLink
-              ? () => {
-                  window.open(`${tournament.magicLink}`, '_self')
-                }
-              : undefined
-          }
+          templateAction={() => {
+            tournament.magicLink && network ? setCreateModalOpen(true) : window.open(createLootboxUrl, '_self')
+          }}
           magicLink={tournament.magicLink ? tournament.magicLink : undefined}
         />
       )}
