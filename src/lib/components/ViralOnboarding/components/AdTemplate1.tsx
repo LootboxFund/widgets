@@ -211,7 +211,6 @@ const AdTemplate1 = (props: Props) => {
         <Video
           options={videoJsOptions}
           onReady={handlePlayerReady}
-          videoPosition="top"
           style={{
             width: '100%',
             height: '100%',
