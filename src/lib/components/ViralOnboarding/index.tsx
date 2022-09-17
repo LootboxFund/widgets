@@ -24,7 +24,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
-        return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+        // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+        // PATCH ----- DO NOT SEND TO ADD_EMAIL YET BECAUSE OF BUG
+        return <ChooseLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
       // case 'select-lottery':
       //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
       case 'add-email':
