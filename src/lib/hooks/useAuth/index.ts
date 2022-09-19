@@ -8,6 +8,8 @@ import {
   ConnectWalletResponse,
   MutationConnectWalletArgs,
   ResponseError,
+  MutationCreateUserRecordArgs,
+  CreateUserRecordPayload,
 } from '../../api/graphql/generated/types'
 import { useSnapshot } from 'valtio'
 import { useEffect, useState } from 'react'
@@ -113,7 +115,9 @@ export const useAuth = () => {
     MutationAuthenticateWalletArgs
   >(GET_WALLET_LOGIN_TOKEN)
 
-  const [createUserMutation] = useMutation<{ createUserRecord: CreateUserResponse }>(CREATE_USER)
+  const [createUserMutation] = useMutation<{ createUserRecord: CreateUserResponse }, MutationCreateUserRecordArgs>(
+    CREATE_USER
+  )
 
   const [connectWalletMutation] = useMutation<{ connectWallet: ConnectWalletResponse }, MutationConnectWalletArgs>(
     CONNECT_WALLET,
@@ -189,17 +193,13 @@ export const useAuth = () => {
 
     const { user } = result
 
-    // Update their email only if the user does not have an email listed
+    // Now create a user record
+    const createUserPayload: CreateUserRecordPayload = {}
     if (!user.email && !!email) {
-      try {
-        await updateEmail(user, email)
-      } catch (err) {
-        console.error('Error updating email')
-      }
+      createUserPayload.email = email
     }
 
-    // Now create a user record
-    const { data } = await createUserMutation()
+    const { data } = await createUserMutation({ variables: { payload: createUserPayload } })
 
     if (!data || data.createUserRecord?.__typename === 'ResponseError') {
       console.error('Error creating user record', (data?.createUserRecord as ResponseError)?.error?.message)
@@ -379,6 +379,12 @@ export const useAuth = () => {
     setUser(null)
   }
 
+  const refreshUser = async () => {
+    await auth.currentUser?.reload()
+    const newUser = auth.currentUser ? convertUserToUserFE(auth.currentUser) : null
+    setUser(newUser)
+  }
+
   // const updatePassword = async (password: string, newPassword: string): Promise<void> => {
 
   return {
@@ -391,5 +397,6 @@ export const useAuth = () => {
     signInPhoneWithCode,
     connectWallet,
     logout,
+    refreshUser,
   }
 }

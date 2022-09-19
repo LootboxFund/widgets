@@ -15,6 +15,7 @@ export interface MySocialsFE {
 export interface MyProfileFE {
   __typename: 'GetMyProfileSuccess'
   user: {
+    email?: string
     username?: string
     avatar?: string
     biography?: string
@@ -32,6 +33,7 @@ export const GET_MY_PROFILE = gql`
           avatar
           biography
           headshot
+          email
           socials {
             twitter
             instagram

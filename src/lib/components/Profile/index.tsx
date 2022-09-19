@@ -82,7 +82,7 @@ const Profile = () => {
         <MySocials userSocials={userDB.socials} />
       </$ProfileSectionContainer>
       <$ProfileSectionContainer screen={screen}>
-        <Settings />
+        <Settings email={userDB.email} />
       </$ProfileSectionContainer>
       <$ProfileSectionContainer screen={screen}>
         <Wallets />
