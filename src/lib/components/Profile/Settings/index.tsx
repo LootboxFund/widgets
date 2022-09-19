@@ -1,24 +1,33 @@
 import { $Vertical, $h1, $Horizontal, $span } from 'lib/components/Generics'
 import AuthGuard from 'lib/components/AuthGuard'
-import { COLORS } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Link, $SettingContainer, Oopsies } from '../common'
 import { useAuth } from 'lib/hooks/useAuth'
 import ChangePassword from './changePassword'
 import ChangeEmail from './ChangeEmail'
 import { useEffect, useState } from 'react'
 import { auth } from 'lib/api/firebase/app'
-import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from 'firebase/auth'
+import { fetchSignInMethodsForEmail, sendPasswordResetEmail, updateEmail } from 'firebase/auth'
 import LogRocket from 'logrocket'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import $Button from 'lib/components/Generics/Button'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
-const SettingsComponent = () => {
-  const { user } = useAuth()
+interface SettingsProps {
+  email?: string
+}
+
+const SettingsComponent = (props: SettingsProps) => {
+  const { user, refreshUser } = useAuth()
   const { screen } = useWindowSize()
   const [isPasswordEnabled, setIsPasswordEnabled] = useState(false)
   const [passwordResetFormVisible, setPasswordResetFormVisible] = useState(false)
+  const [isConfirmEmailEnabled, setIsConfirmEmailEnabled] = useState(false)
+  const [loadingConfirmEmail, setLoadingConfirmEmail] = useState(false)
+  const [confirmEmailError, setConfirmEmailError] = useState('')
   const [emailFormVisible, setEmailFormVisible] = useState(false)
   const intl = useIntl()
   const words = useWords()
@@ -96,6 +105,30 @@ const SettingsComponent = () => {
     description: 'Message displayed when the user clicks to make a new password.',
   })
 
+  const updateIDPUserEmail = async () => {
+    setConfirmEmailError('')
+    try {
+      if (!auth.currentUser || !props.email) {
+        throw new Error('Something went wrong! Please try again later.')
+      }
+      setLoadingConfirmEmail(true)
+      await updateEmail(auth.currentUser, props.email)
+      setIsConfirmEmailEnabled(false)
+      await refreshUser()
+    } catch (err) {
+      console.error(err)
+      setConfirmEmailError(words.anErrorOccured)
+    } finally {
+      setLoadingConfirmEmail(false)
+    }
+  }
+
+  const toggleConfirmEmail = () => {
+    setIsConfirmEmailEnabled(!isConfirmEmailEnabled)
+  }
+
+  const userEmail = user?.email || props.email
+
   return (
     <$Vertical spacing={4}>
       <$h1>
@@ -156,9 +189,9 @@ const SettingsComponent = () => {
             {words.email}
           </$span>
           <$span width={screen === 'mobile' ? '65%' : '50%'} lineHeight="40px" ellipsis>
-            {user?.email ? (
+            {!!userEmail ? (
               <$span>
-                {user.email} <CopyIcon text={user.email} smallWidth={24} />
+                {userEmail} <CopyIcon text={userEmail} smallWidth={24} />
               </$span>
             ) : (
               <$span textAlign="start" color={COLORS.dangerFontColor}>
@@ -172,7 +205,11 @@ const SettingsComponent = () => {
             width={screen === 'mobile' ? '100%' : '30%'}
             lineHeight="40px"
           >
-            {!emailFormVisible ? (
+            {!user?.email && !!props.email ? (
+              <$Link style={{ fontStyle: 'normal', textTransform: 'lowercase' }} onClick={toggleConfirmEmail}>
+                {isConfirmEmailEnabled ? `👇 ${words.hide}` : `${words.confirm} ${words.email}`}
+              </$Link>
+            ) : !emailFormVisible ? (
               <$Link style={{ fontStyle: 'normal' }} onClick={toggleEmailChange}>
                 {!user?.email ? words.newEmail : words.edit.toLowerCase()}
               </$Link>
@@ -240,11 +277,6 @@ const SettingsComponent = () => {
           />
         </$span>
       )}
-      {passwordResetStatus === 'error' && (
-        <$span color={COLORS.dangerFontColor} textAlign="end">
-          {words.anErrorOccured}. {words.pleaseTryAgainLater}.
-        </$span>
-      )}
       {passwordResetFormVisible && (
         <AuthGuard strict loginTitle="Login again to change your password">
           <ChangePassword mode={'create-password'} onSuccessCallback={passwordResetFormSuccessCallback} />
@@ -253,6 +285,27 @@ const SettingsComponent = () => {
       {emailFormVisible && (
         <AuthGuard strict loginTitle="Login again to change your email">
           <ChangeEmail onSuccessCallback={changeEmailCallback} />
+        </AuthGuard>
+      )}
+      {isConfirmEmailEnabled && (
+        <AuthGuard strict loginTitle="Login again to confirm your email">
+          <div style={{ margin: '0 auto' }}>
+            <$Button
+              screen={screen}
+              onClick={updateIDPUserEmail}
+              backgroundColor={`${COLORS.trustBackground}C0`}
+              backgroundColorHover={`${COLORS.trustBackground}`}
+              color={COLORS.trustFontColor}
+              style={{
+                fontWeight: TYPOGRAPHY.fontWeight.regular,
+                fontSize: TYPOGRAPHY.fontSize.large,
+                boxShadow: `0px 3px 5px ${COLORS.surpressedBackground}`,
+              }}
+              disabled={loadingConfirmEmail}
+            >
+              <LoadingText loading={loadingConfirmEmail} text="Confirm your Email" color={COLORS.white} />
+            </$Button>
+          </div>
         </AuthGuard>
       )}
       {newPasswordStatus === 'success' && (
@@ -265,14 +318,19 @@ const SettingsComponent = () => {
           />
         </$span>
       )}
+      {(passwordResetStatus === 'error' || confirmEmailError) && (
+        <$span color={COLORS.dangerFontColor} textAlign="end" style={{ marginTop: '15px' }}>
+          {words.anErrorOccured}. {words.pleaseTryAgainLater}.
+        </$span>
+      )}
     </$Vertical>
   )
 }
 
-export const Settings = () => {
+export const Settings = (props: SettingsProps) => {
   return (
     <AuthGuard>
-      <SettingsComponent />
+      <SettingsComponent {...props} />
     </AuthGuard>
   )
 }

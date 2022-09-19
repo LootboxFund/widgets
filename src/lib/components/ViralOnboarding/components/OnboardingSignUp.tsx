@@ -211,7 +211,7 @@ const OnboardingSignUp = (props: Props) => {
 
   const reset = () => {
     setStatus('pending')
-    if (errorMessage?.toLowerCase()?.indexOf('sold out')) {
+    if (errorMessage?.toLowerCase()?.indexOf('sold out') > -1) {
       props.onBack()
     }
   }

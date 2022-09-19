@@ -82,28 +82,6 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
     return null
   }
 
-  const renderSwitchInnerRouteText = () => {
-    if (route === 'login-password') {
-      return <$ChangeMode onClick={() => setRoute('login-wallet')}>{orUseMetamaskWallet}</$ChangeMode>
-    } else if (route === 'login-wallet') {
-      return <$ChangeMode onClick={() => setRoute('login-password')}>{orUsePassword}</$ChangeMode>
-    } else if (route === 'signup-password') {
-      return <$ChangeMode onClick={() => setRoute('signup-wallet')}>{orUseMetamaskWallet}</$ChangeMode>
-    } else if (route === 'signup-wallet') {
-      return (
-        <$ChangeMode
-          onClick={() => {
-            setRoute('signup-password')
-          }}
-        >
-          {orUsePassword}
-        </$ChangeMode>
-      )
-    }
-
-    return null
-  }
-
   const AlternativeAuthOptions = ({ selectedRoute }: { selectedRoute: ModeOptions }) => {
     const isLogin = selectedRoute.includes('login')
     type Option = 'password' | 'wallet' | 'phone'

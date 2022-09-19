@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const CREATE_USER = gql`
-  mutation Mutation {
-    createUserRecord {
+  mutation Mutation($payload: CreateUserRecordPayload!) {
+    createUserRecord(payload: $payload) {
       ... on CreateUserResponseSuccess {
         user {
           id
