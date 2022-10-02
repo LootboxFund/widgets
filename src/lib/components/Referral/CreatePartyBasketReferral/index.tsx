@@ -5,7 +5,6 @@ import {
   Referral,
   ReferralType,
 } from 'lib/api/graphql/generated/types'
-import { PartyBasketID, TournamentID } from 'lib/types'
 import { CREATE_REFERRAL } from './api.gql'
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
@@ -13,9 +12,8 @@ import { $ErrorMessage, $Horizontal, $span, $Vertical } from 'lib/components/Gen
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $InputMedium } from 'lib/components/Tournament/common'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY, PartyBasketID, TournamentID } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
-import $Button from 'lib/components/Generics/Button'
 import Spinner, { LoadingText } from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { manifest } from 'manifest'

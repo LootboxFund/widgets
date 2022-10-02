@@ -39,7 +39,14 @@ import StepSocials from 'lib/components/CreateLootbox/StepSocials'
 import StepTermsConditions, { SubmitStatus } from 'lib/components/CreateLootbox/StepTermsConditions'
 import { matchNetworkByHex, NetworkOption, NETWORK_OPTIONS } from 'lib/api/network'
 import { BigNumber } from 'bignumber.js'
-import { Address, BLOCKCHAINS, chainIdHexToSlug, ContractAddress, convertDecimalToHex } from '@wormgraph/helpers'
+import {
+  Address,
+  BLOCKCHAINS,
+  chainIdHexToSlug,
+  ContractAddress,
+  convertDecimalToHex,
+  TournamentID,
+} from '@wormgraph/helpers'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { initLogging } from 'lib/api/logrocket'
@@ -51,7 +58,6 @@ import StepMagicLink, { validNetworks, validTypes } from 'lib/components/CreateL
 import { ethers } from 'ethers'
 import StepPrefillDisclaimer from './StepPrefillDisclaimer/index'
 import { uploadLootboxLogo, uploadLootboxCover, LOOTBOX_ASSET_FOLDER } from 'lib/api/firebase/storage'
-import { TournamentID } from 'lib/types'
 import { InitialUrlParams } from './state'
 import { getWords } from './constants'
 import useWords from 'lib/hooks/useWords'

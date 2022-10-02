@@ -39,9 +39,8 @@ import {
   User,
   updateEmail,
 } from 'firebase/auth'
-import { Address } from '@wormgraph/helpers'
+import { Address, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
-import { UserID } from 'lib/types'
 import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
 import LogRocket from 'logrocket'

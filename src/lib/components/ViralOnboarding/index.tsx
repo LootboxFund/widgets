@@ -1,7 +1,7 @@
 import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { ReactElement, useEffect, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
-import { ReferralSlug } from 'lib/types'
+import { ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
 import ChooseLottery from './components/ChooseLottery'
 // import SelectLottery from './components/SelectLottery'

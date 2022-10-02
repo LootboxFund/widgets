@@ -1,6 +1,5 @@
 import { $BattlePageSection, $BattleCardsContainer, $BattleCardImage } from './index'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { LootboxStatus, LootboxTournamentStatus } from 'lib/api/graphql/generated/types'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'

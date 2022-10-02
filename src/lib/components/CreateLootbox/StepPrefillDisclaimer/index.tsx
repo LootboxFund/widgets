@@ -5,7 +5,7 @@ import StepCard, { $StepHeading, $StepSubheading } from 'lib/components/CreateLo
 import { $Vertical } from 'lib/components/Generics'
 import HelpIcon from 'lib/theme/icons/Help.icon'
 import ReactTooltip from 'react-tooltip'
-import { TournamentID } from 'lib/types'
+import { TournamentID } from '@wormgraph/helpers'
 import { $Link } from 'lib/components/Profile/common'
 import { manifest } from 'manifest'
 import { FormattedMessage } from 'react-intl'

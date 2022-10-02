@@ -1,5 +1,4 @@
 import { QueryDecisionAdApiBetaArgs, QueryReferralArgs, ResponseError } from 'lib/api/graphql/generated/types'
-import { ReferralSlug } from 'lib/types'
 import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
 import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -7,7 +6,7 @@ import useWords from '../useWords'
 import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD } from './api.gql'
 import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
 import { v4 as uuid } from 'uuid'
-import { SessionID } from '@wormgraph/helpers'
+import { SessionID, ReferralSlug } from '@wormgraph/helpers'
 
 // Session Id should be unique within an ad but the same for ad events from the same user
 const sessionId = uuid() as SessionID
