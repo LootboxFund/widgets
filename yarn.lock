@@ -5754,18 +5754,35 @@
     axios "0.25.0"
     lodash "4.17.21"
 
-"@wormgraph/helpers@0.1.13":
-  version "0.1.13"
-  resolved "https://registry.yarnpkg.com/@wormgraph/helpers/-/helpers-0.1.13.tgz#b86fa3fae869c3381a6a26eccbc71cf52aa2e51d"
-  integrity sha512-SISm6MjHOJdnNldFp8+IrNNoYMaLZNrz0TF03hbDdkK6G4LpvfMkIiRYTZqU9i3gfCupxlVmwRGoMzaPgD3xxw==
+"@wormgraph/helpers@0.1.14-afn-alpha4":
+  version "0.1.14-afn-alpha4"
+  resolved "https://registry.yarnpkg.com/@wormgraph/helpers/-/helpers-0.1.14-afn-alpha4.tgz#d21256e54e2068418668dfc2a2ed63af6fd26973"
+  integrity sha512-h9Tv6tZ3lG8POy2GiZFH1qKwatoOjUGBCXLwjkfR4HiKkxB7JlOl3bgP75/xEXdVHSbcvj12dm93uQjsF2fCzw==
   dependencies:
     axios "0.25.0"
     lodash "4.17.21"
 
-"@wormgraph/manifest@0.3.128":
-  version "0.3.128"
-  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.3.128.tgz#e0d0b3159b2d19f5b12df97dce468f6aef4e03bb"
-  integrity sha512-A2IcXQd355pA4plkC7k+BHGfIa0cbK3wuuwd1C2K2E+pLvcIluNBWdyotPxb3xNFOBWPeMz9cOWf9B8z7CyVTg==
+"@wormgraph/helpers@0.2.0-afn-alpha71":
+  version "0.2.0-afn-alpha71"
+  resolved "https://registry.yarnpkg.com/@wormgraph/helpers/-/helpers-0.2.0-afn-alpha71.tgz#ab4cc6d5745e98feeb6dffd5bdcd6491df330940"
+  integrity sha512-jvgoDqcq0yAbzjEPK/WYllNdBP62RCEs4qKpeoUZjIT5Tbzibd0Jh98K4mSCZuuFI/hGCo6ACfapvKg1M3icyQ==
+  dependencies:
+    "@wormgraph/helpers" "0.1.14-afn-alpha4"
+    "@wormgraph/manifest" "0.4.0-afm-alpha1"
+    axios "0.25.0"
+    lodash "4.17.21"
+
+"@wormgraph/manifest@0.4.0-afm-alpha1":
+  version "0.4.0-afm-alpha1"
+  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.4.0-afm-alpha1.tgz#7e162c7f8d1a31352464ffb9fc38446bd98b5c29"
+  integrity sha512-+ki1chfkdI3pgNWnh4yN0TBPpac9spKVZtNYv6hp8yQwwH8SpSEPPaRrocfjLksY2y6uxNfeBFZLMoWmV8T1Eg==
+  dependencies:
+    "@wormgraph/helpers" "0.1.10"
+
+"@wormgraph/manifest@0.4.0-afm-alpha9":
+  version "0.4.0-afm-alpha9"
+  resolved "https://registry.yarnpkg.com/@wormgraph/manifest/-/manifest-0.4.0-afm-alpha9.tgz#ffc6f2649e6a42a77500632c03ef5daa67febdad"
+  integrity sha512-gW1YFNzKPXAZOHCPMhv78zMGxnPsyMwVisxyIW/5Ih3PiXElQU9JZUp8nZziuaTJwaqzuj1lQLlK4gxdtxLNvg==
   dependencies:
     "@wormgraph/helpers" "0.1.10"
 

@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client'
-import { UserSocials } from 'lib/api/graphql/generated/types'
 
 export interface MySocialsFE {
   twitter: string | null

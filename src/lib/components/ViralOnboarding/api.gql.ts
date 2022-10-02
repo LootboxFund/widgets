@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
+import { Address, ClaimID, ReferralID, PartyBasketID, ReferralSlug, TournamentID, UserID } from '@wormgraph/helpers'
 import { CreativeType, ClaimStatus, ClaimType, PartyBasketStatus } from 'lib/api/graphql/generated/types'
-import { ClaimID, ReferralID, PartyBasketID, ReferralSlug, TournamentID, UserID, AdID, CreativeID } from 'lib/types'
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {

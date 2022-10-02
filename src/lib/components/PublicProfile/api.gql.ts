@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
+import { Address, ClaimID, PartyBasketID, TournamentID, UserID } from '@wormgraph/helpers'
 import { ClaimType, UserSocials } from 'lib/api/graphql/generated/types'
-import { ClaimID, PartyBasketID, TournamentID, UserID } from 'lib/types'
 
 export type PublicUserGQLArgs = {
   publicUserId: UserID

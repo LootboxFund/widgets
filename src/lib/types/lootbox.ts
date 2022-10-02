@@ -1,6 +1,7 @@
 import { Address, TicketID } from '@wormgraph/helpers'
 import { LootboxMetadata } from 'lib/api/graphql/generated/types'
 
+/** @deprecated use Lootbox_Firestore or Lootbox type from helpers / GQL */
 export interface ILootbox {
   address: Address | undefined
   name: string | undefined
@@ -15,12 +16,14 @@ export interface ILootbox {
   ticketPurchaseFee: string | undefined
 }
 
+/** @deprecated use Lootbox_Firestore or Lootbox type from helpers / GQL */
 export interface ITicket {
   id: TicketID | undefined
   // @TODO make this correct ITicketMetadata type
   metadata: LootboxMetadata | undefined
 }
 
+/** @deprecated use Lootbox_Firestore or Lootbox type from helpers / GQL */
 export interface IDividend {
   tokenAddress: Address
   tokenAmount: string

@@ -1,9 +1,8 @@
 import { useQuery } from '@apollo/client'
-import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { PartyBasketStatus, QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { Address, COLORS, TYPOGRAPHY, TournamentID, StreamID } from '@wormgraph/helpers'
+import { PartyBasketStatus, QueryTournamentArgs, ResponseError, Tournament } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
-import { TournamentID, StreamID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -16,6 +15,7 @@ import {
   PartyBasketFE,
   BattlePageLootboxSnapshotFE,
   TournamentStreamsFE,
+  TournamentFE,
 } from './api.gql'
 import LiveStreamVideo from './LiveStreamVideo'
 import { extractURLState_BattlePage, BattlePageUrlParams } from './utils'
@@ -25,6 +25,7 @@ import Modal from 'react-modal'
 import { $StreamListItem, $StreamLogo, useTournamentWords } from '../Tournament/common'
 import { getStreamLogo } from 'lib/hooks/constants'
 import BattlePagePartyBasket from './BattlePagePartyBasket'
+import BattlePageLootbox from './BattlePageLootbox'
 import $Button from '../Generics/Button'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { InitialUrlParams } from '../CreateLootbox/state'
@@ -63,7 +64,6 @@ const BattlePage = (props: BattlePageParams) => {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    console.log('here:', data)
     if (data?.tournament?.__typename === 'TournamentResponseSuccess' && data?.tournament?.tournament?.magicLink) {
       try {
         const url = new URL(data?.tournament?.tournament?.magicLink)
@@ -95,16 +95,43 @@ const BattlePage = (props: BattlePageParams) => {
     }
   }, [data])
 
-  const [lootboxPartyBaskets] = useMemo<[LootboxPartyBasket[]]>(() => {
-    if (!data || data?.tournament?.__typename === 'ResponseError') {
-      return [[]]
+  const tournament = useMemo<TournamentFE | undefined>(() => {
+    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament
+  }, [data?.tournament])
+
+  const lootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {
+    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament?.lootboxSnapshots
+  }, [data?.tournament])
+
+  const filteredLootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {
+    if (!lootboxTournamentSnapshots) {
+      return []
+    }
+    return lootboxTournamentSnapshots.filter((lootboxSnapshot) => {
+      if (!searchTerm) {
+        return true
+      }
+
+      return (
+        lootboxSnapshot?.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lootboxSnapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })
+  }, [lootboxTournamentSnapshots, searchTerm])
+
+  console.log('snaps', filteredLootboxTournamentSnapshots, lootboxTournamentSnapshots)
+
+  /** @deprecated use lootboxTournamentSnapshots */
+  const lootboxPartyBaskets = useMemo<LootboxPartyBasket[]>(() => {
+    if (!tournament) {
+      return []
     }
 
     const _lootboxPartyBaskets: LootboxPartyBasket[] = []
     const _soldout: LootboxPartyBasket[] = []
     const _noPartyBaskets: LootboxPartyBasket[] = []
     let _first: LootboxPartyBasket | undefined
-    ;(data.tournament as BattlePageResponseSuccessFE).tournament.lootboxSnapshots?.forEach((snapshot) => {
+    tournament.lootboxSnapshots?.forEach((snapshot) => {
       if (snapshot.partyBaskets && snapshot.partyBaskets.length > 0) {
         snapshot.partyBaskets.forEach((partyBasket) => {
           if (partyBasket.status === PartyBasketStatus.Disabled) {
@@ -143,8 +170,34 @@ const BattlePage = (props: BattlePageParams) => {
       _lootboxPartyBaskets.unshift(_first)
     }
 
-    return [[..._lootboxPartyBaskets, ..._soldout, ..._noPartyBaskets]]
-  }, [data])
+    return [..._lootboxPartyBaskets, ..._soldout, ..._noPartyBaskets]
+  }, [tournament])
+
+  /** @deprecated use filteredLootboxTournamentSnapshots */
+  const filteredLootboxPartyBaskets: LootboxPartyBasket[] = useMemo<LootboxPartyBasket[]>(() => {
+    if (!lootboxPartyBaskets) {
+      return []
+    }
+    return lootboxPartyBaskets.filter((partyBasket) => {
+      if (!searchTerm) {
+        return true
+      }
+
+      return (
+        partyBasket.lootbox?.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partyBasket.partyBasket?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partyBasket.lootbox.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        partyBasket.partyBasket?.address.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    })
+  }, [lootboxPartyBaskets, searchTerm])
+
+  // Find the stream from  the URL params
+  const stream: TournamentStreamsFE | undefined = props.streamId
+    ? tournament?.streams?.find((stream) => stream.id === props.streamId)
+    : !!tournament?.streams
+    ? tournament?.streams[0]
+    : undefined
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
@@ -200,39 +253,26 @@ const BattlePage = (props: BattlePageParams) => {
     },
   }
 
+  // if (!tournament) {
+  //   return <div className="battle-page">no data</div>
+  // }
+
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || !data) {
     return <Oopsies message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   } else if (data?.tournament?.__typename === 'ResponseError') {
     return <Oopsies message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
+  } else if (!tournament) {
+    return <Oopsies message={words.notFound} title={words.notFound} icon="🧐" />
   }
-
-  const { tournament } = data.tournament as BattlePageResponseSuccessFE
-
-  // Find the stream from  the URL params
-  const stream: TournamentStreamsFE | undefined = props.streamId
-    ? tournament.streams?.find((stream) => stream.id === props.streamId)
-    : !!tournament.streams
-    ? tournament.streams[0]
-    : undefined
-
-  const filteredLootboxPartyBaskets = lootboxPartyBaskets.filter((partyBasket) => {
-    if (!searchTerm) {
-      return true
-    }
-
-    return (
-      partyBasket.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partyBasket.partyBasket?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partyBasket.lootbox.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      partyBasket.partyBasket?.address.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  })
 
   const publicTournamentUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`
 
+  const previewLootboxes = lootboxTournamentSnapshots.slice(0, 4) || []
+  /** @deprecated */
   const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
+  const previewTings = previewLootboxes || previewLootboxPartyBaskets
 
   return (
     <$BattlePageContainer>
@@ -285,26 +325,20 @@ const BattlePage = (props: BattlePageParams) => {
                     screen={screen}
                     width="220px"
                     style={{
-                      marginBottom:
-                        previewLootboxPartyBaskets?.length > 0
-                          ? `${previewLootboxPartyBaskets?.length * 12}px`
-                          : 'auto',
-                      marginLeft:
-                        previewLootboxPartyBaskets?.length > 0
-                          ? `${previewLootboxPartyBaskets?.length * 10}px`
-                          : 'auto',
+                      marginBottom: previewTings?.length > 0 ? `${previewTings?.length * 12}px` : 'auto',
+                      marginLeft: previewTings?.length > 0 ? `${previewTings?.length * 10}px` : 'auto',
                     }}
                   >
-                    {previewLootboxPartyBaskets?.length ? (
-                      previewLootboxPartyBaskets
+                    {previewTings?.length ? (
+                      previewTings
                         .reverse() // reversed because it renders in reverse order
                         ?.map((snap, idx2) => {
                           return (
                             <$BattleCardBlessed
                               screen={screen}
                               src={
-                                snap?.lootbox?.stampImage
-                                  ? convertFilenameToThumbnail(snap.lootbox.stampImage, 'md')
+                                snap?.stampImage
+                                  ? convertFilenameToThumbnail(snap.stampImage, 'md')
                                   : TEMPLATE_LOOTBOX_STAMP
                               }
                               cardNumber={idx2}
@@ -473,24 +507,35 @@ const BattlePage = (props: BattlePageParams) => {
                 description="Header indicating to user to receive a free NFT lottery ticket."
               />
             </$h1>
-            {(!lootboxPartyBaskets || lootboxPartyBaskets?.length === 0) && (
-              <Oopsies title={seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet} icon="🧐" />
-            )}
+            {(!lootboxPartyBaskets || lootboxPartyBaskets?.length === 0) &&
+              (!lootboxTournamentSnapshots || lootboxTournamentSnapshots.length === 0) && (
+                <Oopsies title={seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet} icon="🧐" />
+              )}
 
             <$SearchInput
               type="search"
               placeholder={`🔍 ${words.searchLootboxesByNameOrAddress}`}
               onChange={(e) => setSearchTerm(e.target.value || '')}
             />
-            {filteredLootboxPartyBaskets.map((data) => {
-              return (
-                <BattlePagePartyBasket
-                  lootboxPartyBasket={data}
-                  tournamentId={tournament.id as TournamentID}
-                  key={`${data.lootbox.address}_${data.partyBasket?.address || ''}`}
-                />
-              )
-            })}
+            {!tournament.isPostCosmic
+              ? filteredLootboxPartyBaskets.map((data) => {
+                  return (
+                    <BattlePagePartyBasket
+                      lootboxPartyBasket={data}
+                      tournamentId={tournament.id as TournamentID}
+                      key={`${data.lootbox.address}_${data.partyBasket?.address || ''}`}
+                    />
+                  )
+                })
+              : filteredLootboxTournamentSnapshots.map((data) => {
+                  return (
+                    <BattlePageLootbox
+                      key={`${data.address}_${data.address || ''}`}
+                      lootboxSnapshot={data}
+                      tournamentId={tournament.id}
+                    />
+                  )
+                })}
           </$Vertical>
         </$BattlePageBody>
       </$Vertical>

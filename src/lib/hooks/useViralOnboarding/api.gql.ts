@@ -1,7 +1,9 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
-import { AdType, CreativeType } from 'lib/api/graphql/generated/types'
-import { AdID, CreativeID, PartyBasketID, ReferralSlug, TournamentID } from 'lib/types'
+import { Address, AdID, CreativeID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+import {
+  // AdType,
+  CreativeType,
+} from 'lib/api/graphql/generated/types'
 
 export interface OnboardingTournamentFE {
   title?: string
@@ -81,7 +83,8 @@ export interface CreativeFE {
 export interface AdFE {
   id: AdID
   name: string | null
-  adType: AdType
+  // adType: AdType
+  adType: string
   creativeId: CreativeID
   creative: CreativeFE
 }

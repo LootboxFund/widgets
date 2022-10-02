@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
+import { Address, StreamID, TournamentID, UserID } from '@wormgraph/helpers'
 import { StreamType } from 'lib/api/graphql/generated/types'
-import { StreamID, TournamentID, UserID } from 'lib/types'
 
 export const DELETE_STREAM = gql`
   mutation deleteStream($id: ID!) {
