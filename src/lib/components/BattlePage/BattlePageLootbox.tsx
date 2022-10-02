@@ -1,29 +1,16 @@
-import { $SocialLogo, LootboxPartyBasket, $BattlePageSection, $BattleCardsContainer, $BattleCardImage } from './index'
-import { useQuery } from '@apollo/client'
-import {
-  COLORS,
-  ContractAddress,
-  LootboxStatus_Firestore,
-  LootboxTournamentStatus_Firestore,
-  TYPOGRAPHY,
-} from '@wormgraph/helpers'
-import {
-  LootboxTournamentSnapshot,
-  PartyBasketStatus,
-  LootboxStatus,
-  LootboxTournamentStatus,
-} from 'lib/api/graphql/generated/types'
-import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
+import { $BattlePageSection, $BattleCardsContainer, $BattleCardImage } from './index'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { LootboxStatus, LootboxTournamentStatus } from 'lib/api/graphql/generated/types'
+import useWindowSize from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
-import { $h1, $h2, $h3, $Horizontal, $p, $span, $Vertical } from '../Generics'
+import { $h1, $Horizontal, $p, $span, $Vertical } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
-import { getSocials, TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
-import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
 import { useState } from 'react'
-import { PartyBasketID, TournamentID } from '@wormgraph/helpers'
+import { TournamentID } from '@wormgraph/helpers'
 import CreateLootboxReferral from 'lib/components/Referral/CreateLootboxReferral'
 import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
@@ -36,10 +23,9 @@ interface Props {
 }
 
 const BattlePageLootbox = (props: Props) => {
-  const intl = useIntl()
   const words = useWords()
   const { screen } = useWindowSize()
-  const SOCIALS = getSocials(intl)
+  // const SOCIALS = getSocials(intl)
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
 
   const customStyles = {
@@ -119,12 +105,6 @@ const BattlePageLootbox = (props: Props) => {
     )
   }
 
-  const isInviteEnabled =
-    !!props.lootboxSnapshot.lootbox &&
-    props.lootboxSnapshot.lootbox?.status !== LootboxStatus.SoldOut &&
-    props.lootboxSnapshot.lootbox?.status !== LootboxStatus.Disabled &&
-    props.lootboxSnapshot.status !== LootboxTournamentStatus.Disabled
-
   return (
     <$BattlePageSection screen={screen}>
       <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={4}>
@@ -145,26 +125,6 @@ const BattlePageLootbox = (props: Props) => {
             />
             {/* {screen !== 'mobile' && <ClaimLotteryButton />} */}
           </$BattleCardsContainer>
-
-          {/* <span
-              style={{
-                textAlign: 'center',
-                width: '90%',
-                paddingBottom: screen === 'mobile' ? '12px' : 'auto',
-              }}
-            >
-              🎁{' '}
-              <$Link
-                href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxPartyBasket.lootbox.address}`}
-                style={{
-                  color: `${COLORS.surpressedFontColor}ce`,
-                  textDecoration: 'none',
-                }}
-                target="_blank"
-              >
-                {words.buyLootbox}
-              </$Link>
-            </span> */}
         </$Vertical>
         <$Vertical height="100%" width="100%" spacing={2}>
           <$Horizontal justifyContent="space-between" flexWrap={screen !== 'desktop'} spacing={2}>
@@ -221,37 +181,21 @@ const BattlePageLootbox = (props: Props) => {
               <div>
                 <$Button
                   screen={screen}
-                  onClick={() => isInviteEnabled && setIsInviteModalOpen(true)}
+                  onClick={() => setIsInviteModalOpen(true)}
                   style={{
                     textTransform: 'capitalize',
                     color: COLORS.trustFontColor,
-                    background: isInviteEnabled ? COLORS.trustBackground : `${COLORS.surpressedBackground}ae`,
+                    background: COLORS.trustBackground,
                     whiteSpace: 'nowrap',
                     marginTop: '0.67em',
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
-                    cursor: isInviteEnabled ? 'pointer' : 'not-allowed',
+                    cursor: 'pointer',
                     width: '100%',
                   }}
                 >
                   {words.inviteFriend}
                 </$Button>
-                {/* <p
-                    style={{
-                      color: COLORS.surpressedFontColor,
-                      textAlign: 'center',
-                      marginTop: '10px',
-                      fontSize: TYPOGRAPHY.fontSize.medium,
-                      lineHeight: TYPOGRAPHY.fontSize.large,
-                      fontFamily: TYPOGRAPHY.fontFamily.regular,
-                    }}
-                  >
-                    <FormattedMessage
-                      id="battlePage.button.inviteFriendRewardPrompt"
-                      defaultMessage="Both get a FREE lottery ticket"
-                      description="Text prompting user on why they should invite a friend"
-                    />
-                  </p> */}
                 <ClaimLotteryButton />
               </div>
             </$Vertical>
@@ -279,16 +223,6 @@ const BattlePageLootbox = (props: Props) => {
             qrcodeMargin={'0px -40px'}
           />
         </AuthGuard>
-        {/* {!props.lootboxSnapshot.partyBasket?.id && <Oopsies title={words.anErrorOccured} icon="🤕" />}
-        {props.lootboxPartyBasket.partyBasket?.id && (
-          <AuthGuard>
-            <CreatePartyBasketReferral
-              partyBasketId={props.lootboxPartyBasket.partyBasket.id as PartyBasketID}
-              tournamentId={props.tournamentId}
-              qrcodeMargin={'0px -40px'}
-            />
-          </AuthGuard>
-        )} */}
       </Modal>
     </$BattlePageSection>
   )
