@@ -3,8 +3,8 @@ import { ReactElement, useEffect, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
+import ChooseLotteryPartyBasket from './components/ChooseLotteryPartyBasket'
 import ChooseLottery from './components/ChooseLottery'
-// import SelectLottery from './components/SelectLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
 import { LoadingCard, ErrorCard } from './components/GenericCard'
@@ -19,12 +19,21 @@ interface ViralOnboardingProps {}
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
-  const { ad } = useViralOnboarding()
+  const { ad, referral } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
-        return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+        switch (referral.tournament.isPostCosmic) {
+          case false:
+          case undefined:
+          case null:
+            // DEPRECATED party baskets
+            return <ChooseLotteryPartyBasket onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+          case true:
+          default:
+            return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+        }
       // case 'select-lottery':
       //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
       case 'add-email':

@@ -1,9 +1,9 @@
-import { QueryDecisionAdApiBetaArgs, QueryReferralArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { Lootbox, QueryDecisionAdApiBetaArgs, QueryReferralArgs, ResponseError } from 'lib/api/graphql/generated/types'
 import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
 import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import useWords from '../useWords'
-import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD } from './api.gql'
+import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD, LootboxReferralFE } from './api.gql'
 import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
 import { v4 as uuid } from 'uuid'
 import { SessionID, ReferralSlug } from '@wormgraph/helpers'
@@ -16,11 +16,15 @@ interface ViralOnboardingContextType {
   referral: ReferralFE
   claim?: ClaimFE
   setClaim: (claim: ClaimFE | undefined) => void
-  chosenPartyBasket?: PartyBasketFE
-  setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
   ad?: AdFE
   email?: string
   setEmail: (email: string) => void
+  chosenLootbox?: LootboxReferralFE
+  setChosenLootbox: (lootbox: LootboxReferralFE) => void
+  /** @deprecated use chosenLootbox */
+  chosenPartyBasket?: PartyBasketFE
+  /** @deprecated use chosenLootbox */
+  setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
 }
 
 const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(null)
@@ -49,7 +53,9 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   )
   const [ad, setAd] = useState<AdFE>()
   const [claim, setClaim] = useState<ClaimFE>()
+  /** @deprecated */
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
+  const [chosenLootbox, setChosenLootbox] = useState<LootboxReferralFE>()
   const [email, setEmail] = useState<string>()
   const words = useWords()
   const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
@@ -91,11 +97,13 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         referral,
         claim,
         setClaim,
-        chosenPartyBasket,
-        setChosenPartyBasket,
         ad,
         email,
         setEmail,
+        chosenLootbox,
+        setChosenLootbox,
+        chosenPartyBasket,
+        setChosenPartyBasket,
       }}
     >
       {children}

@@ -1,14 +1,22 @@
 import { gql } from '@apollo/client'
-import { Address, AdID, CreativeID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+import { Address, AdID, CreativeID, LootboxID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
 import {
   // AdType,
   CreativeType,
 } from 'lib/api/graphql/generated/types'
 
+export interface LootboxReferralFE {
+  id: LootboxID
+  nftBountyValue?: string
+  address: Address
+  stampImage: string
+}
+
 export interface OnboardingTournamentFE {
   title?: string
   description?: string
   tournamentDate?: number
+  isPostCosmic?: boolean
   lootboxSnapshots: {
     address: Address
     stampImage?: string
@@ -17,11 +25,16 @@ export interface OnboardingTournamentFE {
 
 export interface ReferralFE {
   slug: ReferralSlug
-  seedPartyBasketId?: PartyBasketID
   nConversions?: number
   campaignName?: string
   tournamentId: TournamentID
   tournament: OnboardingTournamentFE
+  seedLootboxID?: LootboxID
+  seedLootbox?: LootboxReferralFE
+
+  /** @deprecated */
+  seedPartyBasketId?: PartyBasketID
+  /** @deprecated */
   seedPartyBasket: {
     nftBountyValue?: string
     lootboxAddress: Address
@@ -40,18 +53,27 @@ export const GET_REFERRAL = gql`
         referral {
           slug
           seedPartyBasketId
+          seedLootboxID
           nConversions
           campaignName
           tournamentId
+          seedLootbox {
+            id
+            nftBountyValue
+            address
+            stampImage
+          }
           tournament {
             title
             description
+            isPostCosmic
             tournamentDate
             lootboxSnapshots {
               address
               stampImage
             }
           }
+          # DEPRECATED
           seedPartyBasket {
             nftBountyValue
             lootboxAddress

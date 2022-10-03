@@ -42,7 +42,10 @@ const AcceptGift = (props: Props) => {
   })
 
   const LootboxSnapshots = () => {
-    const seedLootboxAddress = referral?.seedPartyBasket?.lootboxAddress
+    const seedLootboxAddress = referral.seedLootbox
+      ? referral.seedLootbox.address
+      : referral?.seedPartyBasket?.lootboxAddress
+
     let showCasedLootboxImages: string[]
     if (referral?.tournament?.lootboxSnapshots && referral?.tournament?.lootboxSnapshots?.length > 0) {
       const showcased = seedLootboxAddress
@@ -144,7 +147,9 @@ const AcceptGift = (props: Props) => {
               }}
             />
           </$SupressedParagraph>
-          <$GiantHeading>{referral?.seedPartyBasket?.nftBountyValue || defaultWinText}</$GiantHeading>
+          <$GiantHeading>
+            {referral.seedLootbox?.nftBountyValue || referral?.seedPartyBasket?.nftBountyValue || defaultWinText}
+          </$GiantHeading>
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.acceptGift.description"
