@@ -4,14 +4,12 @@ import {
   ResponseError,
   BulkCreateReferralResponseSuccess,
 } from 'lib/api/graphql/generated/types'
-import { PartyBasketID, TournamentID } from 'lib/types'
 import { BULK_CREATE_REFERRAL, BulkCreateReferralResponseFE } from './api.gql'
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { $ErrorMessage, $span, $Vertical } from 'lib/components/Generics'
-import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY, PartyBasketID, TournamentID } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'

@@ -12,7 +12,7 @@ import {
   LocalClaim,
 } from '../contants'
 import Spinner from 'lib/components/Generics/Spinner'
-import { createRef, useEffect, useState } from 'react'
+import { createRef, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
@@ -53,7 +53,7 @@ const OnboardingSignUp = (props: Props) => {
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
-  const { claim, referral, chosenPartyBasket, email } = useViralOnboarding()
+  const { claim, referral, chosenPartyBasket, chosenLootbox, email } = useViralOnboarding()
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
   const [completeClaim, { loading: loadingMutation }] = useMutation<
@@ -156,15 +156,19 @@ const OnboardingSignUp = (props: Props) => {
     if (!claim?.id) {
       console.error('no claim')
       throw new Error(words.anErrorOccured)
-    } else if (!chosenPartyBasket?.id) {
+    }
+
+    if (!chosenLootbox && !chosenPartyBasket) {
       console.error('no party basket')
       throw new Error(words.anErrorOccured)
     }
+
     const { data } = await completeClaim({
       variables: {
         payload: {
           claimId: claim.id,
-          chosenPartyBasketId: chosenPartyBasket.id,
+          chosenLootboxID: chosenLootbox?.id,
+          chosenPartyBasketId: chosenPartyBasket?.id,
         },
       },
     })
@@ -218,11 +222,20 @@ const OnboardingSignUp = (props: Props) => {
 
   const isAlreadyAccepted = errorMessage && errorMessage?.toLowerCase().includes('already accepted')
 
-  const _lb = !!chosenPartyBasket?.lootboxAddress
-    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-    : undefined
+  const image = useMemo(() => {
+    if (chosenLootbox) {
+      return convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
+    } else {
+      // DEPRECATED
+      const _lb = !!chosenPartyBasket?.lootboxAddress
+        ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
+        : undefined
 
-  const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
+      const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
+
+      return image
+    }
+  }, [chosenLootbox, chosenPartyBasket])
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -314,8 +327,11 @@ const OnboardingSignUp = (props: Props) => {
               </$NextButton>
             </$Vertical>
             {renderTOS()}
-
-            {!!chosenPartyBasket && !!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
+            {(!!chosenPartyBasket || !!chosenLootbox) && !!image ? (
+              <$PartyBasketImage src={image} />
+            ) : (
+              <$HandImage src={handIconImg} />
+            )}
           </$Vertical>
         )}
         {status === 'verification_sent' && (

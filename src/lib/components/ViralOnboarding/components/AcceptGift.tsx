@@ -42,7 +42,10 @@ const AcceptGift = (props: Props) => {
   })
 
   const LootboxSnapshots = () => {
-    const seedLootboxAddress = referral?.seedPartyBasket?.lootboxAddress
+    const seedLootboxAddress = referral.seedLootbox
+      ? referral.seedLootbox.address
+      : referral?.seedPartyBasket?.lootboxAddress
+
     let showCasedLootboxImages: string[]
     if (referral?.tournament?.lootboxSnapshots && referral?.tournament?.lootboxSnapshots?.length > 0) {
       const showcased = seedLootboxAddress
@@ -136,19 +139,21 @@ const AcceptGift = (props: Props) => {
           <$SupressedParagraph>
             <FormattedMessage
               id="viralOnboarding.acceptGift.invitationMessage"
-              defaultMessage="{name}{newline}Gifted you a Lottery Ticket"
-              description="Message to show when a user is gifted a free lottery ticket"
+              defaultMessage="{name}{newline}Gifted you a Lootbox Ticket"
+              description="Message to show when a user is gifted a free Lootbox Ticket"
               values={{
                 name: referral?.campaignName,
                 newline: <br />,
               }}
             />
           </$SupressedParagraph>
-          <$GiantHeading>{referral?.seedPartyBasket?.nftBountyValue || defaultWinText}</$GiantHeading>
+          <$GiantHeading>
+            {referral.seedLootbox?.nftBountyValue || referral?.seedPartyBasket?.nftBountyValue || defaultWinText}
+          </$GiantHeading>
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.acceptGift.description"
-              defaultMessage="Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}"
+              defaultMessage="Claim this FREE ESports Lootbox Ticket to win cash on {tournamentDate}"
               description="Description of the prize"
               values={{
                 tournamentDate: formattedDate,

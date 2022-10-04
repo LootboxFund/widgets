@@ -1,9 +1,8 @@
 import { useQuery } from '@apollo/client'
-import { COLORS } from '@wormgraph/helpers'
+import { COLORS, UserID } from '@wormgraph/helpers'
 import { ResponseError } from 'lib/api/graphql/generated/types'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
-import { UserID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Spinner from '../Generics/Spinner'
@@ -14,8 +13,6 @@ import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { FormattedMessage, useIntl } from 'react-intl'
 import Modal from 'react-modal'
-import AuthGuard from '../AuthGuard'
-import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import ProfileSocials from 'lib/components/ProfileSocials'
 import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
 import { manifest } from 'manifest'
@@ -31,7 +28,6 @@ const PublicProfile = (props: PublicProfileProps) => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [isSocialsOpen, setIsSocialsOpen] = useState(false)
-  const [latestClaim, setLatestClaim] = useState<PublicUserFEClaims>()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isNextStepsOpen, setIsNextStepsOpen] = useState(false)
   const intl = useIntl()
@@ -145,14 +141,7 @@ const PublicProfile = (props: PublicProfileProps) => {
       {isSocialsOpen && socials ? (
         <ProfileSocials userSocials={socials} onClose={() => setIsSocialsOpen(false)} />
       ) : (
-        <UserLotteryTickets
-          userId={props.userId}
-          onLookupComplete={(claims: PublicUserFEClaims[]) => {
-            if (claims.length > 0) {
-              setLatestClaim(claims[0])
-            }
-          }}
-        />
+        <UserLotteryTickets userId={props.userId} />
       )}
 
       <Modal
@@ -167,15 +156,6 @@ const PublicProfile = (props: PublicProfileProps) => {
         >
           <span onClick={() => setIsModalOpen(false)}>X</span>
         </$Horizontal>
-        {!!latestClaim && (
-          <AuthGuard>
-            <CreatePartyBasketReferral
-              partyBasketId={latestClaim.chosenPartyBasket.id}
-              tournamentId={latestClaim.tournamentId}
-              qrcodeMargin={'0px -40px'}
-            />
-          </AuthGuard>
-        )}
       </Modal>
       <Modal
         isOpen={isNextStepsOpen}

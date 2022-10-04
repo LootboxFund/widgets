@@ -1,7 +1,6 @@
 import { gql } from '@apollo/client'
-import { Address, ChainIDHex } from '@wormgraph/helpers'
+import { Address, ChainIDHex, PartyBasketID, UserID } from '@wormgraph/helpers'
 import { PartyBasketStatus } from 'lib/api/graphql/generated/types'
-import { PartyBasketID, UserID } from 'lib/types'
 
 export interface PartyBasketFE {
   __typename: 'PartyBasketResponseSuccess'

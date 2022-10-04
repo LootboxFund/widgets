@@ -1,9 +1,8 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
-import { PartyBasketID } from 'lib/types'
+import { Address, PartyBasketID } from '@wormgraph/helpers'
 
-export interface CreatePartyBasketFE { 
-  __typename: 'CreatePartyBasketResponseSuccess',
+export interface CreatePartyBasketFE {
+  __typename: 'CreatePartyBasketResponseSuccess'
   partyBasket: {
     id: PartyBasketID
     address: Address

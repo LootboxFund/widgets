@@ -1,7 +1,15 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
-import { CreativeType, ClaimStatus, ClaimType, PartyBasketStatus } from 'lib/api/graphql/generated/types'
-import { ClaimID, ReferralID, PartyBasketID, ReferralSlug, TournamentID, UserID, AdID, CreativeID } from 'lib/types'
+import {
+  Address,
+  ClaimID,
+  ReferralID,
+  PartyBasketID,
+  ReferralSlug,
+  TournamentID,
+  UserID,
+  LootboxID,
+} from '@wormgraph/helpers'
+import { CreativeType, ClaimStatus, ClaimType, PartyBasketStatus, LootboxStatus } from 'lib/api/graphql/generated/types'
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {
@@ -32,6 +40,7 @@ export const COMPLETE_CLAIM = gql`
   }
 `
 
+/** @deprecated */
 export interface PartyBasketFE {
   id: PartyBasketID
   name?: string
@@ -41,20 +50,73 @@ export interface PartyBasketFE {
   status?: PartyBasketStatus
 }
 
+export interface LootboxReferralSnapshot {
+  lootboxID?: LootboxID
+  address: Address
+  stampImage: string
+  lootbox: {
+    id: LootboxID
+    name?: string
+    description?: string
+    nftBountyValue?: string
+    status?: LootboxStatus
+  }
+}
+
+/** @deprecated use LootboxReferralSnapshot */
 export interface LootboxSnapshotFE {
   address: Address
   name?: string
   stampImage?: string
   description?: string
+  /** @deprecated */
   partyBaskets: PartyBasketFE[]
 }
+/** @deprecated use LotteryListingV2FE */
 export interface LotteryListingFE {
-  __typename: 'LotteryListingResponseSuccess'
+  __typename: 'TournamentResponseSuccess'
   tournament: {
     lootboxSnapshots: LootboxSnapshotFE[]
   }
 }
 
+export interface LotteryListingV2FE {
+  __typename: 'TournamentResponseSuccess'
+  tournament: {
+    lootboxSnapshots: LootboxReferralSnapshot[]
+  }
+}
+
+export const GET_LOTTERY_LISTINGS_V2 = gql`
+  query Query($id: ID!) {
+    tournament(id: $id) {
+      ... on TournamentResponseSuccess {
+        tournament {
+          lootboxSnapshots {
+            lootboxID
+            address
+            stampImage
+            lootbox {
+              id
+              name
+              description
+              nftBountyValue
+              status
+            }
+          }
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+/** @deprecated this uses party baskets */
 export const GET_LOTTERY_LISTINGS = gql`
   query Query($id: ID!) {
     tournament(id: $id) {

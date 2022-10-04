@@ -4,12 +4,11 @@ import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
 import { manifest } from '../../manifest'
 import { v4 as uuidv4 } from 'uuid'
 import { uploadLootboxLogo, uploadLootboxCover, uploadLootboxBadge } from 'lib/api/firebase/storage'
-import { Address, ChainIDHex, ContractAddress } from '@wormgraph/helpers'
+import { Address, ChainIDHex, ContractAddress, TournamentID } from '@wormgraph/helpers'
 import { decodeEVMLog } from 'lib/api/evm'
 import LogRocket from 'logrocket'
 import LOOTBOX_INSTANT_FACTORY_ABI from 'lib/abi/LootboxInstantFactory.json'
 import LOOTBOX_ESCROW_FACTORY_ABI from 'lib/abi/LootboxEscrowFactory.json'
-import { TournamentID } from 'lib/types'
 import { LootboxMetadata } from './graphql/generated/types'
 
 const SHARE_PRICE_WEI = '1000000000000' // HARDCODED FOR NOW

@@ -42,7 +42,7 @@ import { manifest } from 'manifest'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import { useAuth } from 'lib/hooks/useAuth'
-import { PartyBasketID } from 'lib/types'
+import { PartyBasketID } from '@wormgraph/helpers'
 
 interface ManagePartyBasketProps {
   partyBasketAddress: Address

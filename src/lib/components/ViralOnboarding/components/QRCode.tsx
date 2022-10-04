@@ -3,16 +3,14 @@ import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/c
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   background1,
-  $Heading,
   $GiantHeading,
   $SubHeading,
   $SupressedParagraph,
-  $NextButton,
   $TournamentStampPreviewContainer,
   $TournamentStampPreviewImage,
   $SmallText,
 } from '../contants'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, ReferralSlug, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { Referral } from 'lib/api/graphql/generated/types'
 import QRCodeComponent from 'easyqrcodejs'
@@ -20,8 +18,27 @@ import { useEffect } from 'react'
 import { manifest } from 'manifest'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 
+export interface QRCodeReferral {
+  slug: ReferralSlug
+  tournament?: {
+    title?: string
+    tournamentDate?: string | number
+    lootboxSnapshots?: {
+      address: Address
+      stampImage: string
+    }[]
+  }
+  seedLootbox?: {
+    address: Address
+  }
+  seedPartyBasket?: {
+    lootboxAddress: Address
+    nftBountyValue?: string
+  }
+}
+
 interface Props {
-  referral: Referral
+  referral: QRCodeReferral
   inline?: boolean
 }
 const QRCode = (props: Props) => {
@@ -58,7 +75,7 @@ const QRCode = (props: Props) => {
   }, [props.referral])
 
   const LootboxSnapshots = () => {
-    const seedLootboxAddress = props.referral?.seedPartyBasket?.lootboxAddress
+    const seedLootboxAddress = props.referral?.seedLootbox?.address || props.referral?.seedPartyBasket?.lootboxAddress
     let showCasedLootboxImages: string[]
     if (props.referral?.tournament?.lootboxSnapshots && props.referral?.tournament?.lootboxSnapshots?.length > 0) {
       const showcased = seedLootboxAddress
@@ -121,7 +138,7 @@ const QRCode = (props: Props) => {
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.qrcode.description"
-              defaultMessage="Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+              defaultMessage="Scan QR Code to accept a FREE Fan Lootbox Ticket for an ESports Tournament."
             />
           </$SubHeading>
           <$SubHeading>🔒 {shortlink}</$SubHeading>

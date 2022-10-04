@@ -1,6 +1,6 @@
 import { $SocialLogo, LootboxPartyBasket, $BattlePageSection, $BattleCardsContainer, $BattleCardImage } from './index'
 import { useQuery } from '@apollo/client'
-import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, ContractAddress, TYPOGRAPHY, PartyBasketID, TournamentID } from '@wormgraph/helpers'
 import { LootboxTournamentSnapshot, PartyBasketStatus } from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
@@ -12,7 +12,6 @@ import $Button from '../Generics/Button'
 import { manifest } from 'manifest'
 import { getSocialUrlLink, SocialType } from 'lib/utils/socials'
 import { useState } from 'react'
-import { PartyBasketID, SocialFragment, TournamentID } from 'lib/types'
 import CreatePartyBasketReferral from 'lib/components/Referral/CreatePartyBasketReferral'
 import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
@@ -23,6 +22,8 @@ interface Props {
   lootboxPartyBasket: LootboxPartyBasket
   tournamentId: TournamentID
 }
+
+/** @deprecated use BattlePageLootbox */
 const BattlePagePartyBasket = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
@@ -53,66 +54,66 @@ const BattlePagePartyBasket = (props: Props) => {
     },
   }
 
-  const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: BattlePageLootboxSnapshotFE }) => {
-    const flatSocials = Object.entries(lootboxSnapshot.socials)
-      .filter((fack) => fack[0] !== '__typename')
-      .filter((fack) => !!fack[1]) // Filter graphql ting
+  // const Socials = ({ lootboxSnapshot }: { lootboxSnapshot: BattlePageLootboxSnapshotFE }) => {
+  //   const flatSocials = Object.entries(lootboxSnapshot.socials)
+  //     .filter((fack) => fack[0] !== '__typename')
+  //     .filter((fack) => !!fack[1]) // Filter graphql ting
 
-    const data: SocialFragment[] = flatSocials
-      .map(([platform, value]) => {
-        const socialData = SOCIALS.find((soc) => soc.slug === platform.toLowerCase())
-        return socialData
-      })
-      .filter((d) => d != undefined) as SocialFragment[]
+  //   const data: SocialFragment[] = flatSocials
+  //     .map(([platform, value]) => {
+  //       const socialData = SOCIALS.find((soc) => soc.slug === platform.toLowerCase())
+  //       return socialData
+  //     })
+  //     .filter((d) => d != undefined) as SocialFragment[]
 
-    if (data.length === 0) {
-      return null
-    }
-    return (
-      <$Vertical spacing={4} style={{ paddingTop: screen === 'mobile' ? '10px' : 'auto' }}>
-        <$h3
-          style={{
-            textTransform: 'capitalize',
-            color: COLORS.black,
-          }}
-        >
-          <FormattedMessage
-            id="battlePage.socials.followSocials"
-            defaultMessage="Follow socials"
-            description="Text prompting user to follow social media"
-          />
-        </$h3>
-        <$Horizontal flexWrap justifyContent="flex-start">
-          {data.map((social) => {
-            const url = getSocialUrlLink(social.slug as SocialType, social.slug as string)
-            return (
-              <$Horizontal
-                key={`${props.lootboxPartyBasket.lootbox.address}-${social.slug}`}
-                spacing={2}
-                style={{ paddingBottom: '10px' }}
-              >
-                <$SocialLogo src={social.icon} />
-                <a
-                  href={url}
-                  style={{
-                    width: '100px',
-                    margin: 'auto 0',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    cursor: url ? 'pointer' : 'unset',
-                    textDecoration: 'none',
-                  }}
-                >
-                  <$span>{social.slug}</$span>
-                </a>
-              </$Horizontal>
-            )
-          })}
-        </$Horizontal>
-      </$Vertical>
-    )
-  }
+  //   if (data.length === 0) {
+  //     return null
+  //   }
+  //   return (
+  //     <$Vertical spacing={4} style={{ paddingTop: screen === 'mobile' ? '10px' : 'auto' }}>
+  //       <$h3
+  //         style={{
+  //           textTransform: 'capitalize',
+  //           color: COLORS.black,
+  //         }}
+  //       >
+  //         <FormattedMessage
+  //           id="battlePage.socials.followSocials"
+  //           defaultMessage="Follow socials"
+  //           description="Text prompting user to follow social media"
+  //         />
+  //       </$h3>
+  //       <$Horizontal flexWrap justifyContent="flex-start">
+  //         {data.map((social) => {
+  //           const url = getSocialUrlLink(social.slug as SocialType, social.slug as string)
+  //           return (
+  //             <$Horizontal
+  //               key={`${props.lootboxPartyBasket.lootbox.address}-${social.slug}`}
+  //               spacing={2}
+  //               style={{ paddingBottom: '10px' }}
+  //             >
+  //               <$SocialLogo src={social.icon} />
+  //               <a
+  //                 href={url}
+  //                 style={{
+  //                   width: '100px',
+  //                   margin: 'auto 0',
+  //                   whiteSpace: 'nowrap',
+  //                   overflow: 'hidden',
+  //                   textOverflow: 'ellipsis',
+  //                   cursor: url ? 'pointer' : 'unset',
+  //                   textDecoration: 'none',
+  //                 }}
+  //               >
+  //                 <$span>{social.slug}</$span>
+  //               </a>
+  //             </$Horizontal>
+  //           )
+  //         })}
+  //       </$Horizontal>
+  //     </$Vertical>
+  //   )
+  // }
 
   const ClaimLotteryButton = () => {
     return (
@@ -150,8 +151,8 @@ const BattlePagePartyBasket = (props: Props) => {
             {props.lootboxPartyBasket.partyBasket ? (
               <FormattedMessage
                 id="battlePage.button.claimLottery"
-                defaultMessage="Claim lottery"
-                description="Text prompting user to claim a lottery ticket"
+                defaultMessage="Claim Ticket"
+                description="Text prompting user to claim a Lootbox ticket"
               />
             ) : (
               <FormattedMessage
@@ -186,7 +187,7 @@ const BattlePagePartyBasket = (props: Props) => {
     props.lootboxPartyBasket.partyBasket?.status !== PartyBasketStatus.SoldOut &&
     props.lootboxPartyBasket.partyBasket?.status !== PartyBasketStatus.Disabled
 
-  props.lootboxPartyBasket.partyBasket?.id && props.lootboxPartyBasket.partyBasket.id !== '0'
+  // props.lootboxPartyBasket.partyBasket?.id && props.lootboxPartyBasket.partyBasket.id !== '0'
 
   return (
     <$BattlePageSection screen={screen}>
@@ -238,14 +239,14 @@ const BattlePagePartyBasket = (props: Props) => {
                   marginTop: screen === 'mobile' ? '35px' : undefined,
                 }}
               >
-                {props.lootboxPartyBasket?.partyBasket?.name || props.lootboxPartyBasket?.lootbox?.name}
+                {props.lootboxPartyBasket?.partyBasket?.name || props.lootboxPartyBasket?.lootbox?.lootbox?.name}
               </$h1>
               <$p style={{ color: COLORS.black }}>
-                {props.lootboxPartyBasket?.lootbox?.description &&
-                props.lootboxPartyBasket?.lootbox?.description?.length > 250
-                  ? props.lootboxPartyBasket?.lootbox?.description.slice(0, 250) + '...'
-                  : props.lootboxPartyBasket?.lootbox?.description
-                  ? props.lootboxPartyBasket?.lootbox?.description
+                {props.lootboxPartyBasket?.lootbox?.lootbox?.description &&
+                props.lootboxPartyBasket?.lootbox?.lootbox?.description?.length > 250
+                  ? props.lootboxPartyBasket?.lootbox?.lootbox?.description.slice(0, 250) + '...'
+                  : props.lootboxPartyBasket?.lootbox?.lootbox?.description
+                  ? props.lootboxPartyBasket?.lootbox?.lootbox?.description
                   : ''}
               </$p>
               <$Horizontal flexWrap justifyContent={'flex-start'}>
@@ -280,7 +281,7 @@ const BattlePagePartyBasket = (props: Props) => {
               width={screen === 'mobile' ? '100%' : '35%'}
               minWidth={screen !== 'desktop' ? '175px' : 'unset'}
             >
-              {screen === 'mobile' && <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />}
+              {/* {screen === 'mobile' && <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />} */}
               <div>
                 <$Button
                   screen={screen}
@@ -319,7 +320,7 @@ const BattlePagePartyBasket = (props: Props) => {
               </div>
             </$Vertical>
           </$Horizontal>
-          {screen !== 'mobile' && <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />}
+          {/* {screen !== 'mobile' && <Socials lootboxSnapshot={props.lootboxPartyBasket.lootbox} />} */}
         </$Vertical>
       </$Horizontal>
       <Modal

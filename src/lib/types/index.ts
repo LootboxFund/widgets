@@ -1,18 +1,4 @@
 export * from './lootbox'
-export {
-  UserID,
-  UserIdpID,
-  LootboxID,
-  WalletID,
-  TournamentID,
-  StreamID,
-  PartyBasketID,
-  ReferralSlug,
-  ClaimID,
-  ReferralID,
-  AdID,
-  CreativeID,
-} from '@wormgraph/helpers'
 
 export interface SocialFragment {
   slug: string

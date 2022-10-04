@@ -1,10 +1,15 @@
 import { useMutation } from '@apollo/client'
-import { MutationCreateReferralArgs, ReferralType, ResponseError } from 'lib/api/graphql/generated/types'
+import {
+  CreateReferralResponse,
+  CreateReferralResponseSuccess,
+  MutationCreateReferralArgs,
+  ReferralType,
+} from 'lib/api/graphql/generated/types'
 import AuthGuard from 'lib/components/AuthGuard'
-import { CREATE_REFERRAL, CreateReferralResponseFE } from 'lib/components/Referral/CreateLootboxReferral/api.gql'
+import { CREATE_REFERRAL } from 'lib/components/Referral/CreatePartyBasketReferral/api.gql'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { ErrorCard, LoadingCard } from './GenericCard'
 import QRCode, { QRCodeReferral } from './QRCode'
 import { $SubHeading } from '../contants'
@@ -13,17 +18,18 @@ import { COLORS } from '@wormgraph/helpers'
 interface CreateReferralProps {
   goBack: () => void
 }
-const CreateReferral = (props: CreateReferralProps) => {
+/** @deprecated */
+const CreateReferralPartyBasket = (props: CreateReferralProps) => {
   const words = useWords()
-  const { referral, chosenLootbox } = useViralOnboarding()
+  const { referral, chosenPartyBasket } = useViralOnboarding()
   const [createReferral, { data, error, loading: loadingCreateReferral }] = useMutation<
-    { createReferral: CreateReferralResponseFE | ResponseError },
+    { createReferral: CreateReferralResponse },
     MutationCreateReferralArgs
   >(CREATE_REFERRAL, {
     variables: {
       payload: {
         tournamentId: referral?.tournamentId || '',
-        lootboxID: chosenLootbox?.id || referral?.seedLootboxID,
+        partyBasketId: chosenPartyBasket?.id || referral?.seedPartyBasketId,
         type: ReferralType.Viral,
       },
     },
@@ -33,15 +39,13 @@ const CreateReferral = (props: CreateReferralProps) => {
     createReferral()
   }, [])
 
-  const createdReferral = useMemo(() => {
-    return (data?.createReferral as CreateReferralResponseFE)?.referral
-  }, [data?.createReferral])
-
   if (loadingCreateReferral) {
     return <LoadingCard />
   } else if (error || !data || data?.createReferral?.__typename === 'ResponseError') {
     return <ErrorCard message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
+
+  const createdReferral = (data?.createReferral as CreateReferralResponseSuccess)?.referral
 
   return (
     <div>
@@ -56,12 +60,13 @@ const CreateReferral = (props: CreateReferralProps) => {
   )
 }
 
-const CreateReferralPage = (props: CreateReferralProps) => {
+/** @deprecated */
+const CreateReferralPageDeprecated = (props: CreateReferralProps) => {
   return (
     <AuthGuard>
-      <CreateReferral {...props} />
+      <CreateReferralPartyBasket {...props} />
     </AuthGuard>
   )
 }
 
-export default CreateReferralPage
+export default CreateReferralPageDeprecated

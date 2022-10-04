@@ -2,7 +2,7 @@
  * This component doubles as a stream edit form when `initialParams` are passed in
  */
 
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY, StreamID, TournamentID } from '@wormgraph/helpers'
 import { useState } from 'react'
 import styled from 'styled-components'
 import AuthGuard from '../../AuthGuard'
@@ -19,7 +19,6 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import { useMutation } from '@apollo/client'
 import { ADD_STREAM, GET_MY_TOURNAMENT, EDIT_STREAM } from './api.gql'
 import { LoadingText } from '../../Generics/Spinner'
-import { StreamID, TournamentID } from 'lib/types'
 import { $ErrorMessage, $InputMedium, useTournamentWords } from '../common'
 import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'

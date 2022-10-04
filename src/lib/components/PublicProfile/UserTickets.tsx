@@ -1,8 +1,7 @@
 import { useQuery } from '@apollo/client'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { ResponseError } from 'lib/api/graphql/generated/types'
+import { COLORS, TYPOGRAPHY, UserID } from '@wormgraph/helpers'
+import { ClaimStatus, ResponseError } from 'lib/api/graphql/generated/types'
 import useWords from 'lib/hooks/useWords'
-import { UserID } from 'lib/types'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import Spinner from '../Generics/Spinner'
@@ -22,6 +21,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
 import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
+import CreateLootboxReferral from '../Referral/CreateLootboxReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
@@ -57,6 +57,31 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       }
     },
   })
+
+  const filteredUserClaims = useMemo(() => {
+    if (!userClaims) {
+      return []
+    }
+    const searchStringFMT = searchString.trim().toLowerCase()
+    if (!searchStringFMT) {
+      return userClaims
+    }
+    return userClaims.filter(
+      (claim) =>
+        (claim.chosenLootbox?.address?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
+        (claim.chosenLootbox?.name?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
+        // DEPRECATED:
+        (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
+        ((claim.chosenPartyBasket?.lootboxSnapshot.name || '').toLowerCase().indexOf(searchStringFMT) as number) > -1
+    )
+  }, [userClaims, searchString])
+
+  const pageInfo = useMemo(() => {
+    // Here we kinda coalesce the response into a predictable type
+    const { pageInfo: result } = (userData?.publicUser as PublicUserLotteriesFE)?.user?.claims || {}
+
+    return result
+  }, [userData?.publicUser])
 
   const participationReward = intl.formatMessage({
     id: 'userClaims.participationReward',
@@ -96,12 +121,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     setNotificationClaims(filteredClaims)
   }
 
-  // const bonusTicketText = intl.formatMessage({
-  //   id: 'profile.public.bothGetBonusTickets',
-  //   defaultMessage: 'Both get bonus FREE Lottery Tickets',
-  //   description: 'Reward caption for inviting friend',
-  // })
-
   const customStyles = {
     content: {
       display: 'flex',
@@ -125,15 +144,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       zIndex: 10000,
     },
   }
-
-  if (errorData) {
-    return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
-  } else if (userData?.publicUser?.__typename === 'ResponseError') {
-    return <Oopsies title={words.anErrorOccured} message={userData?.publicUser?.error?.message || ''} icon="🤕" />
-  }
-
-  // Here we kinda coalesce the response into a predictable type
-  const { pageInfo } = (userData?.publicUser as PublicUserLotteriesFE)?.user?.claims || {}
 
   const handleMore = () => {
     // fetchs another batch of claims
@@ -193,6 +203,12 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     return <$TicketBadge>{text}</$TicketBadge>
   }
 
+  if (errorData) {
+    return <Oopsies title={words.anErrorOccured} message={errorData?.message || ''} icon="🤕" />
+  } else if (userData?.publicUser?.__typename === 'ResponseError') {
+    return <Oopsies title={words.anErrorOccured} message={userData?.publicUser?.error?.message || ''} icon="🤕" />
+  }
+
   return (
     <$Vertical>
       <$Vertical>
@@ -205,7 +221,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           >
             <FormattedMessage
               id="profile.public.userLotteryTicketsLabel"
-              defaultMessage="My Lottery Tickets"
+              defaultMessage="My Lootbox Tickets"
               description="Label for list of lottery tickets"
             />
           </span>
@@ -213,7 +229,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           <ReactTooltip id="userLotteryTicketTip" place="right" effect="solid">
             <FormattedMessage
               id="profile.public.userLotteryTicketsTip"
-              defaultMessage="Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets."
+              defaultMessage="Your list of Lootbox Tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets."
               description="Tooltip for my lottery tickets list on Public Profile Page"
             />
           </ReactTooltip>
@@ -235,149 +251,103 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         ></input>
       </$Vertical>
       <$ClaimsGrid screen={screen}>
-        {/* <$ClaimCard onClick={() => console.log('Invite Friend')}>
-          <$InviteFriend screen={screen} onClick={() => setIsModalOpen(true)}>
-            <span
-              style={{
-                fontWeight: 'bold',
-                fontSize: screen === 'desktop' ? '5rem' : '2.5rem',
-                lineHeight: screen === 'desktop' ? '5rem' : '2.5rem',
-                color: 'rgba(0,0,0,0.5)',
-              }}
-            >
-              +
-            </span>
-            <span
-              style={{
-                fontWeight: 'normal',
-                fontSize: screen === 'desktop' ? '1.3rem' : '1rem',
-                textAlign: 'center',
-                color: 'rgba(0,0,0,0.7)',
-              }}
-            >
-              {words.inviteFriend}
-            </span>
-            <span
-              style={{
-                fontWeight: 'lighter',
-                fontSize: screen === 'desktop' ? '0.8rem' : '0.6rem',
-                textAlign: 'center',
-                color: 'rgba(0,0,0,0.7)',
-                marginTop: '5px',
-              }}
-            >
-              {bonusTicketText}
-            </span>
-          </$InviteFriend>
-        </$ClaimCard> */}
-        {userClaims &&
-          userClaims
-            .filter(
-              (claim) =>
-                (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchString.toLowerCase()) as number) > -1 ||
-                ((claim.chosenPartyBasket?.lootboxSnapshot.name || '')
-                  .toLowerCase()
-                  .indexOf(searchString.toLowerCase()) as number) > -1
-            )
-            .map((claim) => {
-              const elId = `dropdown${claim.id}`
-              const isNotifReq = notificationClaims.indexOf(claim.id) > -1
-              const joinNotif = isNotifReq && !!claim?.chosenPartyBasket?.joinCommunityUrl
-              const isNotif = !!joinNotif
-              const mainActionLink =
-                claim.chosenPartyBasket.joinCommunityUrl ||
-                claim.tournament?.tournamentLink ||
-                `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
+        {filteredUserClaims.map((claim) => {
+          const elId = `dropdown${claim.id}`
+          const isNotifReq = notificationClaims.indexOf(claim.id) > -1
+          const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl || claim?.chosenPartyBasket?.joinCommunityUrl
+          const joinNotif = isNotifReq && !!joinCommunityURL
+          const isNotif = !!joinNotif
+          const mainActionLink =
+            joinCommunityURL ||
+            claim.tournament?.tournamentLink ||
+            `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
+          const displayImage = claim?.chosenLootbox?.stampImage || claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
 
-              return (
-                <$ClaimCard key={claim.id}>
-                  <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
-                    <$ImageContainer>
-                      <img
-                        src={
-                          claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
-                            ? convertFilenameToThumbnail(claim.chosenPartyBasket.lootboxSnapshot.stampImage, 'md')
-                            : TEMPLATE_LOOTBOX_STAMP
-                        }
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          paddingBottom: '5px',
-                        }}
-                      />
-                      <TicketBadge claim={claim} />
-                    </$ImageContainer>
-                  </a>
-                  <$Vertical
-                    width="100%"
+          return (
+            <$ClaimCard key={claim.id}>
+              <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
+                <$ImageContainer>
+                  <img
+                    src={displayImage ? convertFilenameToThumbnail(displayImage, 'md') : TEMPLATE_LOOTBOX_STAMP}
                     style={{
-                      position: 'relative',
-                      display: 'inline-block',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      paddingBottom: '5px',
                     }}
-                  >
-                    <$Horizontal
-                      width="100%"
-                      style={{
-                        boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa`,
-                        borderRadius: '6px',
-                      }}
+                  />
+                  <TicketBadge claim={claim} />
+                </$ImageContainer>
+              </a>
+              <$Vertical
+                width="100%"
+                style={{
+                  position: 'relative',
+                  display: 'inline-block',
+                }}
+              >
+                <$Horizontal
+                  width="100%"
+                  style={{
+                    boxShadow: `0px 3px 4px ${COLORS.surpressedBackground}aa`,
+                    borderRadius: '6px',
+                  }}
+                >
+                  <$ActionsButton onClick={() => setChosenClaim(claim)}>{words.inviteFriend}</$ActionsButton>
+                  <$ActionsMenuButton onClick={(e) => handleButtonToggle(elId)}>
+                    {isNotif && <$ButtonBadge />}
+                    <div id={`btn${elId}`}>︙</div>
+                  </$ActionsMenuButton>
+                </$Horizontal>
+                <$DropDownContainer id={elId} className="dd-container">
+                  <$Vertical>
+                    <$DropDownOption
+                      style={{ borderRadius: '10px 10px 0px 0px' }}
+                      href={
+                        claim.tournament?.tournamentLink
+                          ? claim.tournament?.tournamentLink
+                          : `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
+                      }
+                      target="_blank"
                     >
-                      <$ActionsButton onClick={() => setChosenClaim(claim)}>{words.inviteFriend}</$ActionsButton>
-                      <$ActionsMenuButton onClick={(e) => handleButtonToggle(elId)}>
-                        {isNotif && <$ButtonBadge />}
-                        <div id={`btn${elId}`}>︙</div>
-                      </$ActionsMenuButton>
-                    </$Horizontal>
-                    <$DropDownContainer id={elId} className="dd-container">
-                      <$Vertical>
-                        <$DropDownOption
-                          style={{ borderRadius: '10px 10px 0px 0px' }}
-                          href={
-                            claim.tournament?.tournamentLink
-                              ? claim.tournament?.tournamentLink
-                              : `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
-                          }
-                          target="_blank"
-                        >
-                          <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
-                        </$DropDownOption>
+                      <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
+                    </$DropDownOption>
 
-                        {claim?.chosenPartyBasket?.joinCommunityUrl ? (
-                          <$DropDownOption
-                            href={claim.chosenPartyBasket.joinCommunityUrl}
-                            target="_blank"
-                            onClick={() => {
-                              removeClaimNotification(claim.id)
-                            }}
-                          >
-                            <FormattedMessage id="profile.public.joinCommunity" defaultMessage="Join Community" />
-                            {joinNotif && <$ButtonBadge inline />}
-                          </$DropDownOption>
-                        ) : null}
+                    {joinCommunityURL ? (
+                      <$DropDownOption
+                        href={joinCommunityURL}
+                        target="_blank"
+                        onClick={() => {
+                          removeClaimNotification(claim.id)
+                        }}
+                      >
+                        <FormattedMessage id="profile.public.joinCommunity" defaultMessage="Join Community" />
+                        {joinNotif && <$ButtonBadge inline />}
+                      </$DropDownOption>
+                    ) : null}
 
-                        <$DropDownOption
-                          href={`${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`}
-                          target="_blank"
-                        >
-                          <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
-                        </$DropDownOption>
+                    <$DropDownOption
+                      href={`${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`}
+                      target="_blank"
+                    >
+                      <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
+                    </$DropDownOption>
 
-                        <$DropDownOption
-                          href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket.address}`}
-                          style={{ borderRadius: '0px 0px 10px 10px' }}
-                        >
-                          {words.redeemNFTText}
-                        </$DropDownOption>
-                        {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>
+                    <$DropDownOption
+                      href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`}
+                      style={{ borderRadius: '0px 0px 10px 10px' }}
+                    >
+                      {words.redeemNFTText}
+                    </$DropDownOption>
+                    {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>
                           <FormattedMessage id="profile.public.viewLootbox" defaultMessage="View Lootbox" />
                         </$DropDownOption> */}
-                      </$Vertical>
-                    </$DropDownContainer>
                   </$Vertical>
-                </$ClaimCard>
-              )
-            })}
+                </$DropDownContainer>
+              </$Vertical>
+            </$ClaimCard>
+          )
+        })}
 
         {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
       </$ClaimsGrid>
@@ -404,13 +374,21 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         >
           <span onClick={closeModal}>X</span>
         </$Horizontal>
-        {!!userClaims && !!userClaims[0] && (
+        {chosenClaim && !!chosenClaim.chosenLootbox && (
+          <AuthGuard>
+            <CreateLootboxReferral
+              lootboxID={chosenClaim.chosenLootbox.id}
+              tournamentId={chosenClaim.tournamentId}
+              qrcodeMargin={'0px -40px'}
+            />
+          </AuthGuard>
+        )}
+
+        {chosenClaim && !!chosenClaim.chosenPartyBasket && (
           <AuthGuard>
             <CreatePartyBasketReferral
-              partyBasketId={
-                chosenClaim != undefined ? chosenClaim.chosenPartyBasket.id : userClaims[0].chosenPartyBasket.id
-              }
-              tournamentId={chosenClaim != undefined ? chosenClaim.tournamentId : userClaims[0].tournamentId}
+              partyBasketId={chosenClaim.chosenPartyBasket.id}
+              tournamentId={chosenClaim.tournamentId}
               qrcodeMargin={'0px -40px'}
             />
           </AuthGuard>

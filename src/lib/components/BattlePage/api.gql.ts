@@ -1,7 +1,12 @@
 import { gql } from '@apollo/client'
-import { Address } from '@wormgraph/helpers'
-import { PartyBasketStatus, StreamType, Tournament } from 'lib/api/graphql/generated/types'
-import { PartyBasketID, StreamID, TournamentID, UserID } from 'lib/types'
+import { Address, LootboxID, PartyBasketID, StreamID, TournamentID, UserID } from '@wormgraph/helpers'
+import {
+  LootboxStatus,
+  LootboxTournamentStatus,
+  PartyBasketStatus,
+  StreamType,
+  Tournament,
+} from 'lib/api/graphql/generated/types'
 
 export interface PartyBasketFE {
   id: PartyBasketID
@@ -14,20 +19,27 @@ export interface PartyBasketFE {
 
 export interface BattlePageLootboxSnapshotFE {
   address: Address
-  name?: string
+  lootboxID: LootboxID
   stampImage?: string
-  description?: string
-  socials: {
-    twitter?: string
-    instagram?: string
-    tiktok?: string
-    facebook?: string
-    discord?: string
-    youtube?: string
-    snapchat?: string
-    twitch?: string
-    web?: string
+  status?: LootboxTournamentStatus
+  lootbox: {
+    name?: string
+    description?: string
+    status?: LootboxStatus
+    nftBountyValue?: string
+    joinCommunityUrl?: string
   }
+  // socials: {
+  //   twitter?: string
+  //   instagram?: string
+  //   tiktok?: string
+  //   facebook?: string
+  //   discord?: string
+  //   youtube?: string
+  //   snapchat?: string
+  //   twitch?: string
+  //   web?: string
+  // }
   partyBaskets: PartyBasketFE[]
 }
 
@@ -37,6 +49,14 @@ export interface TournamentStreamsFE {
   type: StreamType
   url: string
   name?: string
+}
+
+export interface LootboxTournamentSnapshotFE {
+  address: Address
+  lootboxID: LootboxID
+  stampImage: string
+  status: LootboxTournamentStatus
+  name: string
 }
 
 export interface TournamentFE {
@@ -49,8 +69,18 @@ export interface TournamentFE {
   prize?: string
   coverPhoto?: string
   communityURL?: string
+  isPostCosmic?: boolean
   streams: TournamentStreamsFE[]
   lootboxSnapshots: BattlePageLootboxSnapshotFE[]
+  // paginateLootboxSnapshots: {
+  //   edges: {
+  //     node: LootboxTournamentSnapshotFE
+  //     cursor: LootboxTournamentSnapshotID
+  //   }[]
+  //   pageInfo: {
+  //     hasNextPage: boolean
+  //   }
+  // }
 }
 
 export interface BattlePageResponseSuccessFE {
@@ -59,6 +89,7 @@ export interface BattlePageResponseSuccessFE {
 }
 
 export const GET_TOURNAMENT_BATTLE_PAGE = gql`
+  # query Query($id: ID!, $first: Int = 30, $after: ID) {
   query Query($id: ID!) {
     tournament(id: $id) {
       ... on TournamentResponseSuccess {
@@ -71,6 +102,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
           coverPhoto
           prize
           communityURL
+          isPostCosmic
           streams {
             id
             creatorId
@@ -78,22 +110,45 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
             url
             name
           }
+          # paginateLootboxSnapshots(first: $first, after: $after) {
+          #   edges {
+          #     node {
+          #       address
+          #       lootboxID
+          #       stampImage
+          #       status
+          #       name
+          #     }
+          #     cursor
+          #   }
+          #   pageInfo {
+          #     hasNextPage
+          #   }
+          # }
           lootboxSnapshots {
             address
-            name
             stampImage
-            description
-            socials {
-              twitter
-              instagram
-              tiktok
-              facebook
-              discord
-              youtube
-              snapchat
-              twitch
-              web
+            status
+            lootboxID
+            lootbox {
+              name
+              status
+              description
+              nftBountyValue
+              joinCommunityUrl
             }
+            # socials {
+            #   twitter
+            #   instagram
+            #   tiktok
+            #   facebook
+            #   discord
+            #   youtube
+            #   snapchat
+            #   twitch
+            #   web
+            # }
+            # deprecated
             partyBaskets {
               id
               name

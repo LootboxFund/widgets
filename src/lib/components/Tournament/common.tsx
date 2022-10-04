@@ -1,22 +1,14 @@
 import styled from 'styled-components'
-import { Address, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, TYPOGRAPHY, StreamID, TournamentID } from '@wormgraph/helpers'
 import { useState } from 'react'
 import $Button from '../Generics/Button'
 import { ScreenSize } from 'lib/hooks/useScreenSize'
-import {
-  DeleteStreamResponse,
-  Lootbox,
-  LootboxTournamentSnapshot,
-  MutationDeleteStreamArgs,
-  Stream,
-  StreamType,
-} from 'lib/api/graphql/generated/types'
+import { DeleteStreamResponse, MutationDeleteStreamArgs, StreamType } from 'lib/api/graphql/generated/types'
 import { $Horizontal, $p, $h1, $span, $Vertical, $h3, $h2 } from '../Generics'
 import { $Link, Oopsies } from '../Profile/common'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
-import { StreamID, TournamentID } from 'lib/types'
 import PopConfirm from '../Generics/PopConfirm'
 import { getStreamLogo } from 'lib/hooks/constants'
 import AddStream from './ManageTournament/AddStream'
