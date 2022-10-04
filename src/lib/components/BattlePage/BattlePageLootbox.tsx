@@ -56,14 +56,13 @@ const BattlePageLootbox = (props: Props) => {
         <div style={{ textAlign: 'center' }}>
           <$Button
             screen={screen}
-            onClick={
-              () => {}
-              //   props.lootboxSnapshot &&
-              //   window.open(
-              //     `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${props.lootboxPartyBasket.partyBasket.address}`,
-              //     '_blank'
-              //   )
-            }
+            onClick={() => {
+              props.lootboxSnapshot &&
+                window.open(
+                  `${manifest.microfrontends.webflow.cosmicLootboxPage}?id=${props.lootboxSnapshot.lootboxID}`,
+                  '_blank'
+                )
+            }}
             style={{
               textTransform: 'capitalize',
               color: props.lootboxSnapshot.lootbox ? `${COLORS.trustBackground}B0` : `rgba(154, 154, 154, 0.682)`,

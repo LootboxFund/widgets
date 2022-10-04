@@ -1,4 +1,8 @@
-import { Lootbox, QueryDecisionAdApiBetaArgs, QueryReferralArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import {
+  // QueryDecisionAdApiBetaArgs,
+  QueryReferralArgs,
+  ResponseError,
+} from 'lib/api/graphql/generated/types'
 import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
 import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
 import { useLazyQuery, useQuery } from '@apollo/client'
@@ -58,27 +62,30 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   const [chosenLootbox, setChosenLootbox] = useState<LootboxReferralFE>()
   const [email, setEmail] = useState<string>()
   const words = useWords()
-  const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
 
-  useEffect(() => {
-    if (!data?.referral) {
-      setAd(undefined)
-    } else {
-      if (data?.referral?.__typename === 'ReferralResponseSuccess') {
-        const _referral = data?.referral?.referral
-        getAd({ variables: { tournamentId: _referral.tournamentId } })
-          .then((res) => {
-            if (!res?.data?.decisionAdApiBeta || res.data.decisionAdApiBeta.__typename === 'ResponseError') {
-              throw new Error('Error fetching ad')
-            } else {
-              const data = res.data.decisionAdApiBeta as GetAdFE
-              setAd(data.ad || undefined)
-            }
-          })
-          .catch((err) => console.error(err))
-      }
-    }
-  }, [data?.referral])
+  // TODO: UPDATE NEW AD
+
+  // const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
+
+  // useEffect(() => {
+  //   if (!data?.referral) {
+  //     setAd(undefined)
+  //   } else {
+  //     if (data?.referral?.__typename === 'ReferralResponseSuccess') {
+  //       const _referral = data?.referral?.referral
+  //       getAd({ variables: { tournamentId: _referral.tournamentId } })
+  //         .then((res) => {
+  //           if (!res?.data?.decisionAdApiBeta || res.data.decisionAdApiBeta.__typename === 'ResponseError') {
+  //             throw new Error('Error fetching ad')
+  //           } else {
+  //             const data = res.data.decisionAdApiBeta as GetAdFE
+  //             setAd(data.ad || undefined)
+  //           }
+  //         })
+  //         .catch((err) => console.error(err))
+  //     }
+  //   }
+  // }, [data?.referral])
 
   if (loading) {
     return <LoadingCard />

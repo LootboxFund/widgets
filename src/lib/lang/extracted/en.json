@@ -104,6 +104,10 @@
     "defaultMessage": "Claim lottery",
     "description": "Text prompting user to claim a lottery ticket"
   },
+  "battlePage.button.claimLottery2": {
+    "defaultMessage": "Claim lottery",
+    "description": "Text prompting user to claim a lottery ticket"
+  },
   "battlePage.button.noneAvailable": {
     "defaultMessage": "None available",
     "description": "Text indicating that something is not available"
@@ -123,10 +127,6 @@
   "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
     "defaultMessage": "Seems like this tournament does not have any lottery tickets yet",
     "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"
-  },
-  "battlePage.socials.followSocials": {
-    "defaultMessage": "Follow socials",
-    "description": "Text prompting user to follow social media"
   },
   "battlePage.streamText.switchStreamText": {
     "defaultMessage": "You are watching \"{streamName}\". To switch to another stream, {clickHereHyperlink}",
@@ -1148,7 +1148,15 @@
     "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
     "description": "Description of the invite link modal contents"
   },
+  "inviteLink.modal.description.postCosmic": {
+    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
+    "description": "Description of the invite link modal contents"
+  },
   "inviteLink.modal.enableBonusClaim": {
+    "defaultMessage": "Get Bonus Rewards for Referrals",
+    "description": "Checkbox label, when clicked, the user will get a reward if a referral signs up from them"
+  },
+  "inviteLink.modal.enableBonusClaim.postCosmic": {
     "defaultMessage": "Get Bonus Rewards for Referrals",
     "description": "Checkbox label, when clicked, the user will get a reward if a referral signs up from them"
   },
@@ -1160,17 +1168,34 @@
     "defaultMessage": "Invite Friends",
     "description": "Title of this modal for inviting friends"
   },
+  "inviteLink.modal.header.postCosmic": {
+    "defaultMessage": "Invite Friends",
+    "description": "Title of this modal for inviting friends"
+  },
   "inviteLink.modal.onetime.text": {
+    "defaultMessage": "Participation Reward",
+    "description": "Checkbox label, referral can be claimed only once."
+  },
+  "inviteLink.modal.onetime.text.postCosmic": {
     "defaultMessage": "Participation Reward",
     "description": "Checkbox label, referral can be claimed only once."
   },
   "inviteLink.modal.success.description": {
     "defaultMessage": "Copy the link and share it with your friends."
   },
+  "inviteLink.modal.success.description.postCosmic": {
+    "defaultMessage": "Copy the link and share it with your friends."
+  },
   "inviteLink.modal.success.header": {
     "defaultMessage": "Your Referral Link"
   },
+  "inviteLink.modal.success.header.postCosmic": {
+    "defaultMessage": "Your Referral Link"
+  },
   "inviteLink.modal.success.screenshotHeader": {
+    "defaultMessage": "Screenshot the QRCode and Share with Friends"
+  },
+  "inviteLink.modal.success.screenshotHeader.postCosmic": {
     "defaultMessage": "Screenshot the QRCode and Share with Friends"
   },
   "lootbox.manage.advanced.button": {
@@ -1849,6 +1874,9 @@
   "quickCreateLootbox.singleStep.subheadingDescription": {
     "defaultMessage": "Quickly join a Tournament using its predefined settings and your customized artwork for your Lootbox.",
     "description": "Info statement about quickly creating a Lootbox"
+  },
+  "referral.create.form.lootboxRequired": {
+    "defaultMessage": "Lootbox is required"
   },
   "referral.create.form.partyBasketRequired": {
     "defaultMessage": "Party Basket is required"

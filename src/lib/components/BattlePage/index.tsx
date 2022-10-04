@@ -253,9 +253,12 @@ const BattlePage = (props: BattlePageParams) => {
     },
   }
 
-  // if (!tournament) {
-  //   return <div className="battle-page">no data</div>
-  // }
+  const publicTournamentUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament?.id}`
+
+  const previewLootboxes = lootboxTournamentSnapshots.slice(0, 4) || []
+  /** @deprecated */
+  const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
+  const previewTings = previewLootboxes || previewLootboxPartyBaskets
 
   if (loading) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -266,13 +269,6 @@ const BattlePage = (props: BattlePageParams) => {
   } else if (!tournament) {
     return <Oopsies message={words.notFound} title={words.notFound} icon="🧐" />
   }
-
-  const publicTournamentUrl = `${manifest.microfrontends.webflow.battlePage}?tid=${tournament.id}`
-
-  const previewLootboxes = lootboxTournamentSnapshots.slice(0, 4) || []
-  /** @deprecated */
-  const previewLootboxPartyBaskets = lootboxPartyBaskets?.slice(0, 4) || []
-  const previewTings = previewLootboxes || previewLootboxPartyBaskets
 
   return (
     <$BattlePageContainer>

@@ -1,4 +1,28 @@
 import { gql } from '@apollo/client'
+import { Address, LootboxID, ReferralID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+
+export interface CreateReferralFE {
+  id: ReferralID
+  slug: ReferralSlug
+  seedLootboxID: LootboxID
+  nConversions: number
+  campaignName?: string
+  tournamentId: TournamentID
+  tournament?: {
+    title: string
+    description?: string
+    tournamentDate?: string | number
+    lootboxSnapshots?: {
+      address: Address
+      stampImage: string
+    }[]
+  }
+}
+
+export interface CreateReferralResponseFE {
+  __typename: 'CreateReferralResponseSuccess'
+  referral?: CreateReferralFE
+}
 
 export const CREATE_REFERRAL = gql`
   mutation Mutation($payload: CreateReferralPayload!) {
@@ -7,7 +31,7 @@ export const CREATE_REFERRAL = gql`
         referral {
           id
           slug
-          seedPartyBasketId
+          seedLootboxID
           nConversions
           campaignName
           tournamentId
@@ -19,10 +43,6 @@ export const CREATE_REFERRAL = gql`
               address
               stampImage
             }
-          }
-          seedPartyBasket {
-            nftBountyValue
-            lootboxAddress
           }
         }
       }

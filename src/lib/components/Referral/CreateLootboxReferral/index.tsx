@@ -4,9 +4,10 @@ import {
   MutationCreateReferralArgs,
   Referral,
   ReferralType,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { LootboxID, TournamentID } from '@wormgraph/helpers'
-import { CREATE_REFERRAL } from './api.gql'
+import { CREATE_REFERRAL, CreateReferralFE, CreateReferralResponseFE } from './api.gql'
 import { useMutation } from '@apollo/client'
 import { useState } from 'react'
 import { $ErrorMessage, $Horizontal, $span, $Vertical } from 'lib/components/Generics'
@@ -30,10 +31,10 @@ interface Props {
 const CreateLootboxReferral = (props: Props) => {
   const { screen } = useWindowSize()
   const [createReferral, { loading }] = useMutation<
-    { createReferral: CreateReferralResponse },
+    { createReferral: CreateReferralResponseFE | ResponseError },
     MutationCreateReferralArgs
   >(CREATE_REFERRAL)
-  const [createdReferrals, setCreatedReferrals] = useState<Referral[]>([])
+  const [createdReferrals, setCreatedReferrals] = useState<CreateReferralFE[]>([])
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
   const [campaignName, setCampaignName] = useState('')
   const [referrerId, setReferrerId] = useState('')
@@ -75,12 +76,13 @@ const CreateLootboxReferral = (props: Props) => {
         throw new Error(data?.createReferral.error?.message || words.anErrorOccured)
       }
 
-      const referral = (data.createReferral as CreateReferralResponseSuccess).referral as Referral
+      const referral = (data.createReferral as CreateReferralResponseFE).referral
 
       console.log('created referral', referral)
 
-      setCreatedReferrals([...createdReferrals, referral])
-
+      if (referral) {
+        setCreatedReferrals([...createdReferrals, referral])
+      }
       setCampaignName('')
     } catch (err) {
       console.error(err)
