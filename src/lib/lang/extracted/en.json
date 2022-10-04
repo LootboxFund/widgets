@@ -101,12 +101,12 @@
     "description": "Text indicating a tournament or something starts today"
   },
   "battlePage.button.claimLottery": {
-    "defaultMessage": "Claim lottery",
-    "description": "Text prompting user to claim a lottery ticket"
+    "defaultMessage": "Claim Ticket",
+    "description": "Text prompting user to claim a Lootbox ticket"
   },
   "battlePage.button.claimLottery2": {
-    "defaultMessage": "Claim lottery",
-    "description": "Text prompting user to claim a lottery ticket"
+    "defaultMessage": "Claim Ticket",
+    "description": "Text prompting user to claim a Lootbox ticket"
   },
   "battlePage.button.noneAvailable": {
     "defaultMessage": "None available",
@@ -117,15 +117,15 @@
     "description": "Header for live esports stream selection modal"
   },
   "battlePage.lotteryHeader": {
-    "defaultMessage": "Claim a Lottery Ticket",
-    "description": "Header indicating to user to receive a free NFT lottery ticket."
+    "defaultMessage": "Claim a Lootbox Ticket",
+    "description": "Header indicating to user to receive a free NFT Lootbox ticket."
   },
   "battlePage.noStreamsMessage": {
     "defaultMessage": "Tournament does not have any streams. Ask the Tournament host to add some.",
     "description": "Text prompting indicating that there are no streams for this tournament"
   },
   "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
-    "defaultMessage": "Seems like this tournament does not have any lottery tickets yet",
+    "defaultMessage": "Seems like this tournament does not have any Lootbox Tickets yet",
     "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"
   },
   "battlePage.streamText.switchStreamText": {
@@ -1145,11 +1145,11 @@
     "description": "Button prompt leading to the \"Manage\" Lootbox page (AKA: \"Edit\" lootbox page)"
   },
   "inviteLink.modal.description": {
-    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
+    "defaultMessage": "You’ll BOTH get extra free Lootbox Tickets for each person invited",
     "description": "Description of the invite link modal contents"
   },
   "inviteLink.modal.description.postCosmic": {
-    "defaultMessage": "You’ll BOTH get extra free lottery tickets for each person invited",
+    "defaultMessage": "You’ll BOTH get extra free Lootbox Tickets for each person invited",
     "description": "Description of the invite link modal contents"
   },
   "inviteLink.modal.enableBonusClaim": {
@@ -1679,7 +1679,7 @@
     "defaultMessage": "Edit profile pic"
   },
   "profile.button.viewLotteryTickets": {
-    "defaultMessage": "View Lottery Tickets"
+    "defaultMessage": "View Lootbox Tickets"
   },
   "profile.enterBiography": {
     "defaultMessage": "Enter your biography"
@@ -1741,11 +1741,11 @@
     "defaultMessage": "Join Community"
   },
   "profile.public.userLotteryTicketsLabel": {
-    "defaultMessage": "My Lottery Tickets",
+    "defaultMessage": "My Lootbox Tickets",
     "description": "Label for list of lottery tickets"
   },
   "profile.public.userLotteryTicketsTip": {
-    "defaultMessage": "Your list of lottery tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
+    "defaultMessage": "Your list of Lootbox Tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
     "description": "Tooltip for my lottery tickets list on Public Profile Page"
   },
   "profile.public.viewSocials": {
@@ -2262,12 +2262,12 @@
     "description": "Prompt for user to redeem their Lootbox NFTs in exchange for money"
   },
   "viralOnboarding.acceptGift.description": {
-    "defaultMessage": "Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}",
+    "defaultMessage": "Claim this FREE ESports Lootbox Ticket to win cash on {tournamentDate}",
     "description": "Description of the prize"
   },
   "viralOnboarding.acceptGift.invitationMessage": {
-    "defaultMessage": "{name}{newline}Gifted you a Lottery Ticket",
-    "description": "Message to show when a user is gifted a free lottery ticket"
+    "defaultMessage": "{name}{newline}Gifted you a Lootbox Ticket",
+    "description": "Message to show when a user is gifted a free Lootbox Ticket"
   },
   "viralOnboarding.acceptGift.nConversions": {
     "defaultMessage": "{nPeople} people already accepted this gift",
@@ -2308,7 +2308,7 @@
     "defaultMessage": "Winners Already Announced"
   },
   "viralOnboarding.qrcode.description": {
-    "defaultMessage": "Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+    "defaultMessage": "Scan QR Code to accept a FREE Fan Lootbox Ticket for an ESports Tournament."
   },
   "viralOnboarding.qrcode.screenshotAndShare": {
     "defaultMessage": "Screenshot & Share",
@@ -2326,7 +2326,7 @@
     "description": "Description of the prize"
   },
   "viralOnboarding.selectLottery.header": {
-    "defaultMessage": "Claim Lottery Ticket",
+    "defaultMessage": "Claim Lootbox Ticket",
     "description": "Header for lottery claim"
   },
   "viralOnboarding.selectLottery.next": {

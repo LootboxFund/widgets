@@ -201,7 +201,7 @@ const BattlePage = (props: BattlePageParams) => {
 
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
-    defaultMessage: 'Seems like this tournament does not have any lottery tickets yet',
+    defaultMessage: 'Seems like this tournament does not have any Lootbox Tickets yet',
     description: 'Text prompting indicating that there are no lottery tickets yet for this tournament',
   })
   const noStreamsMessage = intl.formatMessage({
@@ -499,8 +499,8 @@ const BattlePage = (props: BattlePageParams) => {
             <$h1>
               <FormattedMessage
                 id="battlePage.lotteryHeader"
-                defaultMessage="Claim a Lottery Ticket"
-                description="Header indicating to user to receive a free NFT lottery ticket."
+                defaultMessage="Claim a Lootbox Ticket"
+                description="Header indicating to user to receive a free NFT Lootbox ticket."
               />
             </$h1>
             {(!lootboxPartyBaskets || lootboxPartyBaskets?.length === 0) &&

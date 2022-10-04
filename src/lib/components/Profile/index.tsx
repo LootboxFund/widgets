@@ -62,7 +62,7 @@ const Profile = () => {
                 backgroundColorHover={`${COLORS.trustBackground}`}
                 color={COLORS.trustFontColor}
               >
-                <FormattedMessage id="profile.button.viewLotteryTickets" defaultMessage="View Lottery Tickets" />
+                <FormattedMessage id="profile.button.viewLotteryTickets" defaultMessage="View Lootbox Tickets" />
               </$ProfileButton>
             </a>
           </div>

@@ -79,8 +79,8 @@ const BattlePageLootbox = (props: Props) => {
           >
             <FormattedMessage
               id="battlePage.button.claimLottery2"
-              defaultMessage="Claim lottery"
-              description="Text prompting user to claim a lottery ticket"
+              defaultMessage="Claim Ticket"
+              description="Text prompting user to claim a Lootbox ticket"
             />
           </$Button>
         </div>

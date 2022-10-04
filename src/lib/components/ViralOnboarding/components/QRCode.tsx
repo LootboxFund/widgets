@@ -138,7 +138,7 @@ const QRCode = (props: Props) => {
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.qrcode.description"
-              defaultMessage="Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+              defaultMessage="Scan QR Code to accept a FREE Fan Lootbox Ticket for an ESports Tournament."
             />
           </$SubHeading>
           <$SubHeading>🔒 {shortlink}</$SubHeading>

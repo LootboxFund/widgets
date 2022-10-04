@@ -108,7 +108,7 @@ const CreateLootboxReferral = (props: Props) => {
         <FormattedMessage
           id="inviteLink.modal.description.postCosmic"
           description="Description of the invite link modal contents"
-          defaultMessage="You’ll BOTH get extra free lottery tickets for each person invited"
+          defaultMessage="You’ll BOTH get extra free Lootbox Tickets for each person invited"
         />
       </span>
       <$InputMedium
