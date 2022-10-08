@@ -262,6 +262,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
             claim.tournament?.tournamentLink ||
             `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
           const displayImage = claim?.chosenLootbox?.stampImage || claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
+          const redeemPageURL = claim?.chosenPartyBasket
+            ? `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`
+            : `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
           return (
             <$ClaimCard key={claim.id}>
@@ -333,10 +336,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                       <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
                     </$DropDownOption>
 
-                    <$DropDownOption
-                      href={`${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`}
-                      style={{ borderRadius: '0px 0px 10px 10px' }}
-                    >
+                    <$DropDownOption href={redeemPageURL} style={{ borderRadius: '0px 0px 10px 10px' }}>
                       {words.redeemNFTText}
                     </$DropDownOption>
                     {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>

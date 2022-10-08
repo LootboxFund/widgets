@@ -100,7 +100,7 @@ const BattlePage = (props: BattlePageParams) => {
   }, [data?.tournament])
 
   const lootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {
-    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament?.lootboxSnapshots
+    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament?.lootboxSnapshots || []
   }, [data?.tournament])
 
   const filteredLootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {

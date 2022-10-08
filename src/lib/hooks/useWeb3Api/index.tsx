@@ -1,4 +1,4 @@
-import react, { useEffect, useState } from 'react'
+import react, { useEffect, useMemo, useState } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
 import { userState } from 'lib/state/userState'
 import { DEFAULT_CHAIN_ID_HEX } from '../constants'
@@ -13,7 +13,8 @@ import {
 } from '@wormgraph/helpers'
 import { initTokenList } from 'lib/hooks/useTokenList'
 import Web3Utils from 'web3-utils'
-import { ethers as ethersObj } from 'ethers'
+import { ethers as ethersObj, providers } from 'ethers'
+import { manifest } from 'manifest'
 
 export const useWeb3Utils = () => {
   return window.web3 && window.web3.utils ? window.web3.utils : Web3Utils
@@ -44,7 +45,22 @@ export const useProvider = (): useProviderReturnType => {
   return [provider, loading]
 }
 
-// export const _useWeb3 = () => window.ethers
+interface ReadOnlyProviderParams {
+  chainIDHex: ChainIDHex
+}
+export const useReadOnlyProvider = ({ chainIDHex }: ReadOnlyProviderParams) => {
+  const provider = useMemo<providers.JsonRpcProvider | null>(() => {
+    const chainInfo = manifest.chains.find((chain) => chain.chainIdHex === chainIDHex)
+
+    if (!chainInfo) {
+      return null
+    }
+
+    return new providers.JsonRpcProvider(chainInfo.rpcUrls[0])
+  }, [chainIDHex])
+
+  return { provider }
+}
 
 export const useUserInfo = () => {
   const requestAccounts = async () => {
