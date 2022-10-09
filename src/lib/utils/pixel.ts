@@ -14,29 +14,29 @@ export const buildAdTrackingPixelUrl = (params: PixelTrackingParams) => {
   if (params.eventAction) {
     url += `&eventAction=${params.eventAction}`
   }
-  if (params.flightId) {
-    url += `&flightId=${params.flightId}`
+  if (params.flightID) {
+    url += `&flightID=${params.flightID}`
   }
-  if (params.userId) {
-    url += `&userId=${params.userId}`
+  if (params.userID) {
+    url += `&userID=${params.userID}`
   }
-  if (params.adId) {
-    url += `&adId=${params.adId}`
+  if (params.adID) {
+    url += `&adID=${params.adID}`
   }
-  if (params.adSetId) {
-    url += `&adSetId=${params.adSetId}`
+  if (params.adSetID) {
+    url += `&adSetID=${params.adSetID}`
   }
-  if (params.offerId) {
-    url += `&offerId=${params.offerId}`
+  if (params.offerID) {
+    url += `&offerID=${params.offerID}`
   }
-  if (params.claimId) {
-    url += `&claimId=${params.claimId}`
+  if (params.claimID) {
+    url += `&claimID=${params.claimID}`
   }
-  if (params.campaignId) {
-    url += `&campaignId=${params.campaignId}`
+  if (params.campaignID) {
+    url += `&campaignID=${params.campaignID}`
   }
-  if (params.tournamentId) {
-    url += `&tournamentId=${params.tournamentId}`
+  if (params.tournamentID) {
+    url += `&tournamentID=${params.tournamentID}`
   }
   if (params.organizerID) {
     url += `&organizerID=${params.organizerID}`
@@ -44,8 +44,8 @@ export const buildAdTrackingPixelUrl = (params: PixelTrackingParams) => {
   if (params.promoterID) {
     url += `&promoterID=${params.promoterID}`
   }
-  if (params.sessionId) {
-    url += `&sessionId=${params.sessionId}`
+  if (params.sessionID) {
+    url += `&sessionID=${params.sessionID}`
   }
   if (params.timeElapsed) {
     url += `&timeElapsed=${params.timeElapsed}`
