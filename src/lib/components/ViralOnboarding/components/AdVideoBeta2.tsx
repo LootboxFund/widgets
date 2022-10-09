@@ -9,11 +9,12 @@ import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import Video from './Video'
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { ClaimID, COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { AdID, AdSetID, AffiliateID, ClaimID, COLORS, FlightID, OfferID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
 import { AdEventAction } from 'lib/api/graphql/generated/types'
 import { useAuth } from 'lib/hooks/useAuth'
 import { manifest } from 'manifest'
+import { Affiliate } from '../../../api/graphql/generated/types'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 const startingTime = 30 // seconds
@@ -22,7 +23,7 @@ interface Props {
   onNext: () => void
   onBack: () => void
 }
-const AdTemplate1 = (props: Props) => {
+const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
   const { referral, chosenPartyBasket, ad, sessionId, claim } = useViralOnboarding()
   const words = useWords()
@@ -96,10 +97,20 @@ const AdTemplate1 = (props: Props) => {
     player.on('ready', () => {
       if (ad) {
         loadAdTrackingPixel({
-          adId: ad.id,
+          adId: ad.adID as AdID,
           sessionId,
           eventAction: AdEventAction.View,
-          claimId: claim?.id || ('' as ClaimID),
+          claimId: claim?.id,
+          userId: user?.id,
+          adSetId: ad.adSetID as AdSetID,
+          offerId: ad.offerID as OfferID,
+          campaignId: undefined,
+          tournamentId: referral?.tournamentId,
+          organizerID: undefined,
+          promoterID: referral.referrerId as AffiliateID,
+          flightId: ad.flightID as FlightID,
+          nonce: undefined,
+          timeElapsed: undefined,
         })
       }
       player.play()
@@ -117,14 +128,24 @@ const AdTemplate1 = (props: Props) => {
     }
 
     loadAdTrackingPixel({
-      adId: ad.id,
+      adId: ad.adID as AdID,
       sessionId,
       eventAction: AdEventAction.Click,
-      claimId: claim?.id || ('' as ClaimID),
+      claimId: claim?.id,
+      userId: user?.id,
+      adSetId: ad.adSetID as AdSetID,
+      offerId: ad.offerID as OfferID,
+      campaignId: undefined,
+      tournamentId: referral?.tournamentId,
+      organizerID: undefined,
+      promoterID: referral.referrerId as AffiliateID,
+      flightId: ad.flightID as FlightID,
+      nonce: undefined,
+      timeElapsed: undefined,
     })
 
-    if (ad?.creative.url) {
-      window.open(ad.creative.url, '_blank')
+    if (ad?.clickDestination) {
+      window.open(ad.clickDestination, '_blank')
     }
   }
 
@@ -171,15 +192,15 @@ const AdTemplate1 = (props: Props) => {
           <$Vertical spacing={2}>
             <$NextButton
               onClick={onCallToActionClick}
-              color={COLORS.trustBackground}
+              color={ad?.creative.themeColor || COLORS.trustBackground}
               backgroundColor={COLORS.white}
               style={{ marginTop: '30px', marginLeft: '15px', marginRight: '15px' }}
               disabled={false}
             >
               <LoadingText
                 loading={false}
-                color={COLORS.white}
-                text={ad?.creative.callToActionText || 'Download Game'}
+                color={ad?.creative.themeColor || COLORS.white}
+                text={ad?.creative.callToAction || 'Download Game'}
               />
             </$NextButton>
             <a
@@ -248,7 +269,7 @@ const AdTemplate1 = (props: Props) => {
             style={{ marginTop: '60px', marginLeft: '15px', marginRight: '15px' }}
             disabled={false}
           >
-            <LoadingText loading={false} color={COLORS.white} text={ad?.creative.callToActionText || 'Download Game'} />
+            <LoadingText loading={false} color={COLORS.white} text={ad?.creative.callToAction || 'Download Game'} />
           </$NextButton>
           <$span
             style={{
@@ -291,7 +312,6 @@ const $OpacityGradient = styled.div`
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 80%);
   position: absolute;
   width: 100%;
-}
 `
 
 const $Video = styled.video`
@@ -394,4 +414,4 @@ const $Infographic = styled.img`
   margin-bottom: 150px;
 `
 
-export default AdTemplate1
+export default AdVideoBeta2

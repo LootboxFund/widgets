@@ -1,5 +1,18 @@
 import { gql } from '@apollo/client'
-import { Address, AdID, CreativeID, LootboxID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+import {
+  Address,
+  AdID,
+  AdSetID,
+  AdvertiserID,
+  CreativeID,
+  FlightID,
+  LootboxID,
+  OfferID,
+  PartyBasketID,
+  ReferralSlug,
+  TournamentID,
+} from '@wormgraph/helpers'
+import { AdServed, Placement } from '../../api/graphql/generated/types'
 import {
   // AdType,
   CreativeType,
@@ -13,6 +26,7 @@ export interface LootboxReferralFE {
 }
 
 export interface OnboardingTournamentFE {
+  id: TournamentID
   title?: string
   description?: string
   tournamentDate?: number
@@ -25,6 +39,7 @@ export interface OnboardingTournamentFE {
 
 export interface ReferralFE {
   slug: ReferralSlug
+  referrerId: string
   nConversions?: number
   campaignName?: string
   tournamentId: TournamentID
@@ -52,6 +67,7 @@ export const GET_REFERRAL = gql`
       ... on ReferralResponseSuccess {
         referral {
           slug
+          referrerId
           seedPartyBasketId
           seedLootboxID
           nConversions
@@ -90,52 +106,36 @@ export const GET_REFERRAL = gql`
   }
 `
 
-export interface CreativeFE {
-  creativeType: CreativeType
-  creativeLinks: string[]
-  callToActionText: string | null
-  url: string
-  clickUrl: string
-  thumbnail?: string
-  infographicLink: string | null
-  creativeAspectRatio: string
-  themeColor?: string
-}
-
-export interface AdFE {
-  id: AdID
-  name: string | null
-  // adType: AdType
-  adType: string
-  creativeId: CreativeID
-  creative: CreativeFE
-}
-
 export interface GetAdFE {
-  __typename: 'DecisionAdApiBetaResponseSuccess'
-  ad: AdFE
+  __typename: 'DecisionAdApiBetaV2ResponseSuccess'
+  ad: AdServed
 }
 
-export const GET_AD = gql`
-  query DecisionAdApiBeta($tournamentId: ID!) {
-    decisionAdApiBeta(tournamentId: $tournamentId) {
-      ... on DecisionAdApiBetaResponseSuccess {
+export const GET_AD_BETA_V2 = gql`
+  query DecisionAdApiBetaV2($payload: DecisionAdApiBetaV2Payload!) {
+    decisionAdApiBetaV2(payload: $payload) {
+      ... on DecisionAdApiBetaV2ResponseSuccess {
         ad {
-          id
-          name
-          creativeId
-          type
+          adID
+          adSetID
+          advertiserID
+          advertiserName
+          offerID
           creative {
+            adID
+            advertiserID
             creativeType
             creativeLinks
-            callToActionText
-            url
-            clickUrl
+            callToAction
             thumbnail
             infographicLink
-            creativeAspectRatio
+            aspectRatio
             themeColor
           }
+          flightID
+          placement
+          pixelUrl
+          clickDestination
         }
       }
       ... on ResponseError {
