@@ -137,7 +137,7 @@ const AdVideoBeta2 = (props: Props) => {
       campaignID: undefined,
       tournamentID: referral?.tournamentId,
       organizerID: undefined,
-      promoterID: referral.referrerId as AffiliateID,
+      promoterID: referral.promoterId as AffiliateID,
       flightID: ad.flightID as FlightID,
       nonce: undefined,
       timeElapsed: undefined,
