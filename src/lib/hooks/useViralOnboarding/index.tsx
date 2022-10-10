@@ -85,7 +85,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
             payload: {
               claimID: claim.id,
               placement: Placement.AfterTicketClaim,
-              promoterID: _referral.referrerId,
+              promoterID: _referral.promoterId,
               sessionID: sessionId,
               tournamentID: _referral.tournamentId,
               userID: 'user.id',

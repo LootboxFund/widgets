@@ -4,6 +4,7 @@ import {
   AdID,
   AdSetID,
   AdvertiserID,
+  AffiliateID,
   CreativeID,
   FlightID,
   LootboxID,
@@ -30,6 +31,7 @@ export interface OnboardingTournamentFE {
   title?: string
   description?: string
   tournamentDate?: number
+  promoterId?: AffiliateID
   isPostCosmic?: boolean
   lootboxSnapshots: {
     address: Address
@@ -40,6 +42,7 @@ export interface OnboardingTournamentFE {
 export interface ReferralFE {
   slug: ReferralSlug
   referrerId: string
+  promoterId?: AffiliateID
   nConversions?: number
   campaignName?: string
   tournamentId: TournamentID
@@ -68,6 +71,7 @@ export const GET_REFERRAL = gql`
         referral {
           slug
           referrerId
+          promoterId
           seedPartyBasketId
           seedLootboxID
           nConversions
