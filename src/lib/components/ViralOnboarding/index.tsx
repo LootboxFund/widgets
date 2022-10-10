@@ -13,7 +13,7 @@ import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
 import AddEmail from './components/AddEmail'
-import AdTemplate1 from './components/AdTemplate1'
+import AdVideoBeta2 from './components/AdVideoBeta2'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
@@ -21,6 +21,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const { ad, referral } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
+  console.log(`--- ad `, ad)
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
@@ -37,12 +38,20 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       // case 'select-lottery':
       //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
       case 'add-email':
-        return <AddEmail onNext={() => setRoute('sign-up')} onBack={() => setRoute('browse-lottery')} />
+        return (
+          <AddEmail
+            onNext={() => {
+              setRoute('success')
+              // setRoute('sign-up')
+            }}
+            onBack={() => setRoute('browse-lottery')}
+          />
+        )
       case 'sign-up':
         return (
           <OnboardingSignUp
             onNext={() => setRoute('success')}
-            onBack={() => setRoute('accept-gift')}
+            onBack={() => setRoute('browse-lottery')}
             goToReferralCreation={() => setRoute('create-referral')}
           />
         )
@@ -50,22 +59,17 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return <CreateReferral goBack={() => setRoute('accept-gift')} />
       case 'success': {
         if (!!ad) {
-          switch (ad.adType) {
-            case 'template_1':
-            default: {
-              return (
-                <AdTemplate1
-                  onNext={() => {
-                    // // Send to public profile
-                    // const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
-                    // // navigate to url
-                    // window.location.href = url
-                  }}
-                  onBack={() => console.log('back')}
-                />
-              )
-            }
-          }
+          return (
+            <AdVideoBeta2
+              onNext={() => {
+                // Send to public profile
+                const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+                // navigate to url
+                window.location.href = url
+              }}
+              onBack={() => console.log('back')}
+            />
+          )
         } else {
           return (
             <CompleteOnboarding

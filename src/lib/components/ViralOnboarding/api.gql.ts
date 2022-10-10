@@ -8,6 +8,7 @@ import {
   TournamentID,
   UserID,
   LootboxID,
+  AffiliateID,
 } from '@wormgraph/helpers'
 import { CreativeType, ClaimStatus, ClaimType, PartyBasketStatus, LootboxStatus } from 'lib/api/graphql/generated/types'
 
@@ -19,6 +20,7 @@ export const COMPLETE_CLAIM = gql`
           id
           referralId
           referralSlug
+          promoterId
           tournamentId
           referrerId
           chosenPartyBasketId
@@ -151,6 +153,7 @@ export const GET_LOTTERY_LISTINGS = gql`
 export interface ClaimFE {
   id: ClaimID
   referralId: ReferralID
+  promoterId?: AffiliateID
   referralSlug: ReferralSlug
   tournamentId: TournamentID
   referrerId?: UserID
@@ -175,6 +178,7 @@ export const CREATE_CLAIM = gql`
         claim {
           id
           referralId
+          promoterId
           referralSlug
           tournamentId
           referrerId

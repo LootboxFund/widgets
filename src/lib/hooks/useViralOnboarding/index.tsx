@@ -1,4 +1,7 @@
 import {
+  AdServed,
+  Placement,
+  QueryDecisionAdApiBetaV2Args,
   // QueryDecisionAdApiBetaArgs,
   QueryReferralArgs,
   ResponseError,
@@ -7,10 +10,11 @@ import { useState, createContext, useContext, PropsWithChildren, useEffect } fro
 import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import useWords from '../useWords'
-import { GET_REFERRAL, ReferralResponseFE, ReferralFE, AdFE, GetAdFE, GET_AD, LootboxReferralFE } from './api.gql'
+import { GET_REFERRAL, ReferralResponseFE, ReferralFE, GetAdFE, LootboxReferralFE, GET_AD_BETA_V2 } from './api.gql'
 import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
 import { v4 as uuid } from 'uuid'
 import { SessionID, ReferralSlug } from '@wormgraph/helpers'
+import { useAuth } from '../useAuth'
 
 // Session Id should be unique within an ad but the same for ad events from the same user
 const sessionId = uuid() as SessionID
@@ -20,7 +24,7 @@ interface ViralOnboardingContextType {
   referral: ReferralFE
   claim?: ClaimFE
   setClaim: (claim: ClaimFE | undefined) => void
-  ad?: AdFE
+  ad?: AdServed
   email?: string
   setEmail: (email: string) => void
   chosenLootbox?: LootboxReferralFE
@@ -47,6 +51,7 @@ interface ViralOnboardingProviderProps {
 }
 
 const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<ViralOnboardingProviderProps>) => {
+  const { user } = useAuth()
   const { data, loading, error } = useQuery<{ referral: ReferralResponseFE | ResponseError }, QueryReferralArgs>(
     GET_REFERRAL,
     {
@@ -55,7 +60,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
       },
     }
   )
-  const [ad, setAd] = useState<AdFE>()
+  const [ad, setAd] = useState<AdServed>()
   const [claim, setClaim] = useState<ClaimFE>()
   /** @deprecated */
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
@@ -63,29 +68,42 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   const [email, setEmail] = useState<string>()
   const words = useWords()
 
-  // TODO: UPDATE NEW AD
+  const [getAdBetaV2] = useLazyQuery<{ decisionAdApiBetaV2: GetAdFE | ResponseError }, QueryDecisionAdApiBetaV2Args>(
+    GET_AD_BETA_V2
+  )
 
-  // const [getAd] = useLazyQuery<{ decisionAdApiBeta: GetAdFE | ResponseError }, QueryDecisionAdApiBetaArgs>(GET_AD)
-
-  // useEffect(() => {
-  //   if (!data?.referral) {
-  //     setAd(undefined)
-  //   } else {
-  //     if (data?.referral?.__typename === 'ReferralResponseSuccess') {
-  //       const _referral = data?.referral?.referral
-  //       getAd({ variables: { tournamentId: _referral.tournamentId } })
-  //         .then((res) => {
-  //           if (!res?.data?.decisionAdApiBeta || res.data.decisionAdApiBeta.__typename === 'ResponseError') {
-  //             throw new Error('Error fetching ad')
-  //           } else {
-  //             const data = res.data.decisionAdApiBeta as GetAdFE
-  //             setAd(data.ad || undefined)
-  //           }
-  //         })
-  //         .catch((err) => console.error(err))
-  //     }
-  //   }
-  // }, [data?.referral])
+  // new ad v2
+  useEffect(() => {
+    if (!data?.referral || !claim) {
+      // if (!data?.referral || !claim || !user?.id) {
+      setAd(undefined)
+    } else {
+      if (data?.referral?.__typename === 'ReferralResponseSuccess') {
+        const _referral = data?.referral?.referral
+        getAdBetaV2({
+          variables: {
+            payload: {
+              claimID: claim.id,
+              placement: Placement.AfterTicketClaim,
+              promoterID: _referral.promoterId,
+              sessionID: sessionId,
+              tournamentID: _referral.tournamentId,
+              userID: 'user.id',
+            },
+          },
+        })
+          .then((res) => {
+            if (!res?.data?.decisionAdApiBetaV2 || res.data.decisionAdApiBetaV2.__typename === 'ResponseError') {
+              throw new Error('Error fetching ad')
+            } else {
+              const data = res.data.decisionAdApiBetaV2 as GetAdFE
+              setAd(data.ad || undefined)
+            }
+          })
+          .catch((err) => console.error(err))
+      }
+    }
+  }, [data?.referral, claim, user?.id])
 
   if (loading) {
     return <LoadingCard />
