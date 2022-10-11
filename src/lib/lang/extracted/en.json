@@ -748,6 +748,10 @@
     "defaultMessage": "Confirm password",
     "description": "Password confirmation for a user account. Here they need to input the password again and make sure it is the same."
   },
+  "generic.connectMetamask": {
+    "defaultMessage": "Connect MetaMask",
+    "description": "User prompting them to connect their metamask wallet to our website"
+  },
   "generic.connectWalletToMetamask": {
     "defaultMessage": "Please connect your wallet with MetaMask",
     "description": "User prompting them to connect their metamask wallet to our website"

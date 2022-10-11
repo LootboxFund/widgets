@@ -188,6 +188,7 @@
   "generic.clickHere": "Click here",
   "generic.clickingHere": "Clicking here",
   "generic.confirmPassword": "Confirm password",
+  "generic.connectMetamask": "Connect MetaMask",
   "generic.connectWalletToMetamask": "Please connect your wallet with MetaMask",
   "generic.contractAddress": "Contract address",
   "generic.copiedToClipBoard": "Copied to clipboard",
