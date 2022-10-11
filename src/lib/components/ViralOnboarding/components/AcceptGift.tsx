@@ -31,6 +31,9 @@ const AcceptGift = (props: Props) => {
   const words = useWords()
   const { referral, setClaim, sessionId } = useViralOnboarding()
   const [errorMessage, setErrorMessage] = useState<string>()
+  useEffect(() => {
+    startFlight()
+  }, [])
   const [createClaim, { loading }] = useMutation<
     { createClaim: CreateClaimResponseFE | ResponseError },
     MutationCreateClaimArgs
@@ -111,7 +114,6 @@ const AcceptGift = (props: Props) => {
       const claim = (data.createClaim as CreateClaimResponseFE).claim
 
       setClaim(claim)
-      props.onNext()
     } catch (err) {
       console.error(err)
       setErrorMessage(err?.message || words.anErrorOccured)
@@ -162,7 +164,7 @@ const AcceptGift = (props: Props) => {
           </$SubHeading>
           <$Heading>
             <$NextButton
-              onClick={startFlight}
+              onClick={() => props.onNext()}
               color={COLORS.trustFontColor}
               backgroundColor={COLORS.trustBackground}
               style={{ width: '100%' }}
