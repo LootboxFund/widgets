@@ -15,6 +15,7 @@ import AuthGuard from '../AuthGuard'
 import Modal from 'react-modal'
 import { BattlePageLootboxSnapshotFE } from './api.gql'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { LootboxStatus } from 'lib/api/graphql/generated/types'
 
 interface Props {
   lootboxSnapshot: BattlePageLootboxSnapshotFE
@@ -103,6 +104,11 @@ const BattlePageLootbox = (props: Props) => {
     )
   }
 
+  const isInviteEnabled =
+    !!props?.lootboxSnapshot?.lootbox &&
+    props.lootboxSnapshot.lootbox.status !== LootboxStatus.SoldOut &&
+    props.lootboxSnapshot.lootbox.status !== LootboxStatus.Disabled
+
   return (
     <$BattlePageSection screen={screen}>
       <$Horizontal height="100%" width="100%" flexWrap={screen === 'mobile'} spacing={4}>
@@ -179,20 +185,20 @@ const BattlePageLootbox = (props: Props) => {
               <div>
                 <$Button
                   screen={screen}
-                  onClick={() => setIsInviteModalOpen(true)}
+                  onClick={() => isInviteEnabled && setIsInviteModalOpen(true)}
                   style={{
                     textTransform: 'capitalize',
                     color: COLORS.trustFontColor,
-                    background: COLORS.trustBackground,
+                    background: isInviteEnabled ? COLORS.trustBackground : `${COLORS.surpressedBackground}ae`,
                     whiteSpace: 'nowrap',
                     marginTop: '0.67em',
                     fontWeight: 'bold',
                     fontSize: '1.2rem',
-                    cursor: 'pointer',
+                    cursor: isInviteEnabled ? 'pointer' : 'not-allowed',
                     width: '100%',
                   }}
                 >
-                  {words.inviteFriend}
+                  {isInviteEnabled ? words.inviteFriend : words.soldOut}
                 </$Button>
                 <ClaimLotteryButton />
               </div>

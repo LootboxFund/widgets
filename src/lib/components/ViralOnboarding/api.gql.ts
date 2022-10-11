@@ -9,7 +9,14 @@ import {
   UserID,
   LootboxID,
 } from '@wormgraph/helpers'
-import { CreativeType, ClaimStatus, ClaimType, PartyBasketStatus, LootboxStatus } from 'lib/api/graphql/generated/types'
+import {
+  CreativeType,
+  ClaimStatus,
+  ClaimType,
+  PartyBasketStatus,
+  LootboxStatus,
+  LootboxTournamentStatus,
+} from 'lib/api/graphql/generated/types'
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {
@@ -54,6 +61,7 @@ export interface LootboxReferralSnapshot {
   lootboxID?: LootboxID
   address: Address
   stampImage: string
+  status: LootboxTournamentStatus
   lootbox: {
     id: LootboxID
     name?: string
@@ -96,6 +104,7 @@ export const GET_LOTTERY_LISTINGS_V2 = gql`
             lootboxID
             address
             stampImage
+            status
             lootbox {
               id
               name
