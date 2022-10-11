@@ -1,29 +1,27 @@
-import { manifest } from 'manifest'
 import LootboxCosmicABI from '@wormgraph/helpers/lib/abi/LootboxCosmic.json'
 import {
   Address,
-  AdEventNonce,
   ChainIDHex,
-  ChainInfo,
-  convertDecimalToHex,
   LootboxMintSignatureNonce,
   LootboxTicketDigest,
   LootboxTicketID_Web3,
 } from '@wormgraph/helpers'
 import { Contract, ContractTransaction, providers } from 'ethers'
 import { useEffect, useMemo, useState } from 'react'
-import { DEFAULT_CHAIN_ID_HEX, NATIVE_ADDRESS } from 'lib/hooks/constants'
+import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { useProvider, useReadOnlyProvider } from '../useWeb3Api'
 import { startLootboxOnMintListener } from 'lib/api/firebase/functions'
+import { promiseChainDelay } from 'lib/utils/promise'
+import { DepositFragment, Deposit, convertDepositFragmentToDeposit } from './utils'
 
 interface useLootboxFactoryResult {
   lootbox: Contract | null
   provider: providers.JsonRpcProvider | null
   loading: boolean
   proratedDeposits: TicketToDepositMapping
-  deposits: DepositFragment[]
-  loadProratedDeposits: (ticketID: LootboxTicketID_Web3) => void
-  getLootboxDeposits: () => Promise<DepositFragment[]>
+  deposits: Deposit[]
+  loadProratedDepositsIntoState: (ticketID: LootboxTicketID_Web3) => void
+  getLootboxDeposits: () => Promise<Deposit[]>
   mintTicket: (
     signature: string,
     nonce: LootboxMintSignatureNonce,
@@ -36,21 +34,15 @@ interface UseLootboxParams {
   lootboxAddress: Address
 }
 
-export interface DepositFragment {
-  tokenAddress: Address
-  tokenAmount: Address
-  isRedeemed: boolean
-}
-
 export interface TicketToDepositMapping {
-  [key: LootboxTicketID_Web3]: DepositFragment[]
+  [key: LootboxTicketID_Web3]: Deposit[]
 }
 
 export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): useLootboxFactoryResult => {
   const [loading, setLoading] = useState(false)
   const [injectedProvider] = useProvider()
   const { provider } = useReadOnlyProvider({ chainIDHex })
-  const [deposits, setDeposits] = useState<DepositFragment[]>([])
+  const [deposits, setDeposits] = useState<Deposit[]>([])
   const [proratedDeposits, setProratedDeposits] = useState<TicketToDepositMapping>({})
 
   useEffect(() => {
@@ -60,7 +52,6 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     if (!!lootboxAddress) {
       getLootboxDeposits()
         .then((deposits) => {
-          console.log('(callback) loaded ALL DEPOSITS', deposits)
           setDeposits([...deposits])
         })
         .catch((err) => console.error('Error loading deposits', err))
@@ -75,7 +66,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     return new Contract(lootboxAddress, LootboxCosmicABI, provider)
   }, [provider, lootboxAddress])
 
-  const getLootboxDeposits = async (): Promise<DepositFragment[]> => {
+  const getLootboxDeposits = async (): Promise<Deposit[]> => {
     console.log('loading all deposits', 'lootbox: ', lootbox?.address)
 
     if (!lootbox) {
@@ -103,8 +94,8 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
           })
         }
       }
-      console.log('loaded all deposits', res)
-      return res
+      const fullDeposits = await promiseChainDelay(res.map(convertDepositFragmentToDeposit))
+      return fullDeposits
     } catch (err) {
       console.error('Error loading deposits', err)
       return []
@@ -113,47 +104,55 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     }
   }
 
-  const loadProratedDeposits = (ticketID: LootboxTicketID_Web3) => {
-    console.log('loading prorated deposits', ticketID, lootboxAddress)
+  const loadProratedDeposits = async (ticketID: LootboxTicketID_Web3): Promise<Deposit[]> => {
     if (!lootbox) {
-      return
+      return []
     }
 
     setLoading(true)
-    lootbox
-      .viewProratedDepositsForTicket(ticketID)
-      .then((deposits: any) => {
-        const res: DepositFragment[] = []
-        for (let deposit of deposits) {
-          if (deposit?.nativeTokenAmount && deposit?.nativeTokenAmount?.gt('0')) {
-            res.push({
-              tokenAddress: NATIVE_ADDRESS,
-              tokenAmount: deposit.nativeTokenAmount.toString(),
-              isRedeemed: deposit.redeemed,
-            })
-          }
-          if (deposit?.erc20TokenAmount && deposit?.erc20TokenAmount?.gt('0')) {
-            res.push({
-              tokenAddress: deposit.erc20Token,
-              tokenAmount: deposit.erc20TokenAmount.toString(),
-              isRedeemed: deposit.redeemed,
-            })
-          }
+    try {
+      const _deposits = (await lootbox.viewProratedDepositsForTicket(ticketID)) || []
+
+      const frags: DepositFragment[] = []
+      for (let deposit of _deposits) {
+        if (deposit?.nativeTokenAmount && deposit?.nativeTokenAmount?.gt('0')) {
+          frags.push({
+            tokenAddress: NATIVE_ADDRESS,
+            tokenAmount: deposit.nativeTokenAmount.toString(),
+            isRedeemed: deposit.redeemed,
+          })
         }
-        console.log('retrieved prorated deposits', ticketID, res)
-        setProratedDeposits((prev) => {
-          return {
-            ...prev,
-            [ticketID]: prev[ticketID] ? [...prev[ticketID], ...res] : [...res],
-          }
-        })
+        if (deposit?.erc20TokenAmount && deposit?.erc20TokenAmount?.gt('0')) {
+          frags.push({
+            tokenAddress: deposit.erc20Token,
+            tokenAmount: deposit.erc20TokenAmount.toString(),
+            isRedeemed: deposit.redeemed,
+          })
+        }
+      }
+
+      const fullDeposits: Deposit[] = await promiseChainDelay(frags.map(convertDepositFragmentToDeposit))
+
+      fullDeposits.sort((a, b) => {
+        if (a.isRedeemed && b.isRedeemed) {
+          return 0
+        } else {
+          return a.isRedeemed ? 1 : -1
+        }
       })
-      .catch((err: any) => {
-        console.error('Err reading deposits', err)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+
+      return fullDeposits
+    } catch (err: any) {
+      console.error('Err reading deposits', err)
+      return []
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadProratedDepositsIntoState = async (ticketID: LootboxTicketID_Web3): Promise<void> => {
+    const deposits = await loadProratedDeposits(ticketID)
+    setProratedDeposits({ ...proratedDeposits, [ticketID]: deposits })
   }
 
   /**
@@ -170,35 +169,16 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     }
 
     const signer = injectedProvider.getSigner()
-
-    // if (!provider) {
-    //   throw new Error('No provider. Please login with MetaMask.')
-    // }
-    // const signer = provider.getSigner()
     const currentAccount = signer ? await signer.getAddress() : undefined
 
     if (!signer || !currentAccount) {
       throw new Error('Please login with MetaMask.')
     }
 
-    console.log('minting...')
     setLoading(true)
     try {
       const blockNum = await injectedProvider.getBlockNumber()
-      console.log(`
-      
-      Submitting mint transaction...
-
-      Digest: ${digest}
-      Nonce: ${nonce}
-      Block Number: ${blockNum}
-      Account: ${currentAccount}
-      Lootbox: ${lootbox.address}
-
-      
-      `)
       const tx = (await lootbox.connect(signer).mint(signature, nonce)) as ContractTransaction
-      console.log('Call backend... TODO...')
       // Call mint ticket enqueued task
       console.log('enqueing on mint: ', {
         fromBlock: blockNum,
@@ -232,7 +212,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     proratedDeposits,
     deposits,
     mintTicket,
-    loadProratedDeposits,
+    loadProratedDepositsIntoState,
     getLootboxDeposits,
   }
 }

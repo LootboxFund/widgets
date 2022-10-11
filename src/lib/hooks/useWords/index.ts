@@ -140,6 +140,12 @@ const useWords = () => {
     description: 'User prompting them to connect their metamask wallet to our website',
   })
 
+  const connectMetamask = intl.formatMessage({
+    id: 'generic.connectMetamask',
+    defaultMessage: 'Connect MetaMask',
+    description: 'User prompting them to connect their metamask wallet to our website',
+  })
+
   const email = intl.formatMessage({ id: 'generic.email', defaultMessage: 'Email', description: 'Email address' })
 
   const password = intl.formatMessage({
@@ -892,6 +898,7 @@ const useWords = () => {
     testnet,
     rewardSponsors,
     contractAddress,
+    connectMetamask,
     viewTransactionReceipt,
     bulkMintNFTs,
     receiverAddress,
