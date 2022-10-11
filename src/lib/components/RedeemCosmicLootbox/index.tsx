@@ -145,7 +145,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     if (!ticketID || proratedDeposits[ticketID] != undefined) {
       return
     }
-
     loadProratedDepositsIntoState(ticketID)
   }, [claimData?.whitelist?.lootboxTicket?.ticketID, proratedDeposits])
 
@@ -297,7 +296,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const truncatedProratedDeposits = showAllDeposits
     ? ticketProratedDeposits.slice()
     : ticketProratedDeposits.slice(0, 4)
-
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -305,7 +303,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           <$StampImg src={whitelistImg} alt={lootboxData.name} />
           <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
             {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
-            <CopyIcon text={lootboxData.address} smallWidth={24} />
+            <CopyIcon text={lootboxData.address} smallWidth={18} />
           </$RedeemCosmicSubtitle>
         </$Vertical>
 
@@ -324,6 +322,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
               ⚠️ Please connect wallet{' '}
               <b>{truncateAddress(claimData.whitelist.whitelistedAddress, { prefixLength: 6, suffixLength: 4 })}</b>
+              <CopyIcon text={claimData.whitelist.whitelistedAddress} smallWidth={18} />
             </$RedeemCosmicSubtitle>
           ) : lootboxData?.chainIdHex && lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
             <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
@@ -393,8 +392,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$Horizontal>
           )}
 
-          {errorMessage && <$ErrorText style={{ margin: '15px 0px 0px' }}>{errorMessage}</$ErrorText>}
-          <br />
+          {errorMessage && <$ErrorText style={{ margin: '15px 0px 15px' }}>{errorMessage}</$ErrorText>}
+
           {isPolling || loadingClaims || loadingLootboxWeb3 ? (
             <Spinner size="25px" margin="auto" color={`${COLORS.surpressedFontColor}3A`} />
           ) : status === 'no-claims' || nClaims === 0 ? (
@@ -416,6 +415,17 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$Vertical>
           ) : ticketProratedDeposits.length > 0 ? (
             <$Vertical spacing={2}>
+              <$Horizontal justifyContent="space-between">
+                <$RedeemCosmicSubtitle style={{ fontStyle: 'italic', color: `${COLORS.surpressedFontColor}AE` }}>
+                  Rewards for Ticket #{claimData?.whitelist?.lootboxTicket?.ticketID || '0'}
+                </$RedeemCosmicSubtitle>
+                {userSnapshot.currentAccount && (
+                  <$RedeemCosmicSubtitle style={{ fontStyle: 'italic', color: `${COLORS.surpressedFontColor}AE` }}>
+                    You ({truncateAddress(userSnapshot.currentAccount)}){' '}
+                    <CopyIcon text={`${userSnapshot.currentAccount}`} smallWidth={18} />
+                  </$RedeemCosmicSubtitle>
+                )}
+              </$Horizontal>
               {truncatedProratedDeposits.map((deposit, idx) => {
                 return (
                   <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
@@ -442,6 +452,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$Vertical>
           ) : (
             <$Vertical spacing={2}>
+              <$RedeemCosmicSubtitle style={{ fontStyle: 'italic' }}>All Lootbox Deposits</$RedeemCosmicSubtitle>
               {truncatedDeposits.map((deposit, idx) => {
                 return (
                   <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
@@ -502,12 +513,13 @@ const $RedeemCosmicContainer = styled.div<{
   width: auto;
   display: flex;
   flex-direction: column;
-  box-shadow: ${(props) => `0px 3px 20px ${props.themeColor}`};
-  border: ${(props) => `3px solid ${props.themeColor}`};
+  box-shadow: ${(props) => `0px 0px 10px ${COLORS.surpressedBackground}`};
   border-radius: 20px;
   padding: ${(props) => (props.screen === 'desktop' ? '40px' : '20px')};
   max-width: 800px;
   font-family: sans-serif;
+  background: ${(props) =>
+    `linear-gradient(117.52deg, ${props.themeColor}21 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
 `
 
 const $StampImg = styled.img`
@@ -588,6 +600,7 @@ const $EarningsContainer = styled.div<{}>`
   height: 224px;
 
   background: #f5f5f5;
+  background: ${COLORS.surpressedBackground}15;
   border-radius: 10px;
 
   display: flex;
@@ -596,6 +609,9 @@ const $EarningsContainer = styled.div<{}>`
 
   padding: 20px;
   box-sizing: border-box;
+
+  box-shadow: 0px 1px 5px ${COLORS.surpressedBackground};
+}
 `
 
 const $EarningsText = styled.p<{}>`
@@ -609,13 +625,12 @@ const $EarningsText = styled.p<{}>`
 
 export const $DividendRow = styled.section<{ isActive: boolean }>`
   height: 40px;
-  background: ${(props) => (props.isActive ? `${COLORS.trustBackground}1e` : `${COLORS.surpressedBackground}35`)};
+  background: ${(props) => (props.isActive ? `${COLORS.trustBackground}1e` : `${COLORS.surpressedBackground}15`)};
   border-radius: 5px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   padding: 10px 20px;
-  max-width: 320px;
 `
 
 export const $DividendOwed = styled.span`

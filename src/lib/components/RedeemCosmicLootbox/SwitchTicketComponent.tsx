@@ -43,7 +43,7 @@ const $TicketCounts = styled.div`
   width: 100px;
   height: 50px;
   line-height: 50px;
-  background-color: ${COLORS.surpressedBackground}1f;
+  background-color: ${COLORS.surpressedBackground}15;
   color: ${COLORS.surpressedFontColor}ae;
   font-size: 20px;
   text-align: center;
