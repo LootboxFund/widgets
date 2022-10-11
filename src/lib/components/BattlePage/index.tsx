@@ -1,6 +1,13 @@
 import { useQuery } from '@apollo/client'
 import { Address, COLORS, TYPOGRAPHY, TournamentID, StreamID } from '@wormgraph/helpers'
-import { PartyBasketStatus, QueryTournamentArgs, ResponseError, Tournament } from 'lib/api/graphql/generated/types'
+import {
+  LootboxStatus,
+  LootboxTournamentStatus,
+  PartyBasketStatus,
+  QueryTournamentArgs,
+  ResponseError,
+  Tournament,
+} from 'lib/api/graphql/generated/types'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import useWords from 'lib/hooks/useWords'
 import { useEffect, useMemo, useState } from 'react'
@@ -100,26 +107,42 @@ const BattlePage = (props: BattlePageParams) => {
   }, [data?.tournament])
 
   const lootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {
-    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament?.lootboxSnapshots
+    return (data?.tournament as BattlePageResponseSuccessFE)?.tournament?.lootboxSnapshots || []
   }, [data?.tournament])
 
   const filteredLootboxTournamentSnapshots = useMemo<BattlePageLootboxSnapshotFE[]>(() => {
     if (!lootboxTournamentSnapshots) {
       return []
     }
-    return lootboxTournamentSnapshots.filter((lootboxSnapshot) => {
-      if (!searchTerm) {
-        return true
+    const _lootboxTournamentSnapshots = lootboxTournamentSnapshots
+      .filter((lootboxSnapshot) => {
+        return lootboxSnapshot.status !== LootboxTournamentStatus.Disabled
+      })
+      .filter((lootboxSnapshot) => {
+        if (!searchTerm) {
+          return true
+        }
+
+        return (
+          lootboxSnapshot?.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          lootboxSnapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      })
+
+    _lootboxTournamentSnapshots.sort((a, b) => {
+      if (a.lootbox.status === LootboxStatus.SoldOut) {
+        return 1
       }
 
-      return (
-        lootboxSnapshot?.lootbox?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lootboxSnapshot?.address?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    })
-  }, [lootboxTournamentSnapshots, searchTerm])
+      if (b.lootbox.status === LootboxStatus.SoldOut) {
+        return -1
+      }
 
-  console.log('snaps', filteredLootboxTournamentSnapshots, lootboxTournamentSnapshots)
+      return 0
+    })
+
+    return _lootboxTournamentSnapshots
+  }, [lootboxTournamentSnapshots, searchTerm])
 
   /** @deprecated use lootboxTournamentSnapshots */
   const lootboxPartyBaskets = useMemo<LootboxPartyBasket[]>(() => {

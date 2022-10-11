@@ -4,7 +4,12 @@ import { $Heading, $SubHeading, background1, $Heading2, $SmallText, $NextButton 
 import { GET_LOTTERY_LISTINGS_V2, LotteryListingV2FE, LootboxReferralSnapshot } from '../api.gql'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useQuery } from '@apollo/client'
-import { LootboxStatus, QueryTournamentArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import {
+  LootboxStatus,
+  LootboxTournamentStatus,
+  QueryTournamentArgs,
+  ResponseError,
+} from 'lib/api/graphql/generated/types'
 import { ErrorCard, LoadingCard } from './GenericCard'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
@@ -41,19 +46,29 @@ const ChooseLottery = (props: Props) => {
       return [[], false]
     }
 
-    const tickets = [...tournament.lootboxSnapshots.filter((t) => t.lootbox.status !== LootboxStatus.Disabled)]
+    const tickets = [
+      ...tournament.lootboxSnapshots.filter(
+        (t) => t.status !== LootboxTournamentStatus.Disabled && t.lootbox.status !== LootboxStatus.Disabled
+      ),
+    ]
     tickets.sort((a, b) => {
-      if (a.lootbox.status === b.lootbox.status) {
-        return 0
+      if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
+        // Bring to begining of array
+        return -1
       }
-      if (a.lootbox.status === LootboxStatus.Active) {
+
+      if (a.lootbox.status === LootboxStatus.SoldOut) {
         return 1
       }
 
-      return -1
+      if (b.lootbox.status === LootboxStatus.SoldOut) {
+        return -1
+      }
+
+      return 0
     })
 
-    console.log(tickets, tournament.lootboxSnapshots)
+    console.log('received tickets', tickets)
 
     const paginated = tickets.slice(0, PAGE_SIZE * (page + 1))
 

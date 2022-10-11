@@ -3,7 +3,7 @@ import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/c
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
-import { FormattedMessage, useIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, background2 } from '../contants'
 import { useState } from 'react'
@@ -15,7 +15,7 @@ interface Props {
   onBack: () => void
 }
 const CompleteOnboarding = (props: Props) => {
-  const { referral, chosenPartyBasket, claim } = useViralOnboarding()
+  const { referral, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const words = useWords()
   const [err, setErr] = useState<string>()
 
@@ -33,11 +33,16 @@ const CompleteOnboarding = (props: Props) => {
       )
     : undefined
 
+  /** @deprecated */
   const _lb = !!chosenPartyBasket?.lootboxAddress
     ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
     : undefined
 
-  const image: string = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
+  const image: string = chosenLootbox?.stampImage
+    ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
+    : _lb?.stampImage
+    ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
+    : TEMPLATE_LOOTBOX_STAMP
 
   if (err) {
     return (
@@ -83,6 +88,13 @@ const CompleteOnboarding = (props: Props) => {
           <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <$PartyBasketImage src={image} />
           </$PaddingWrapper>
+          {!!chosenLootbox?.nftBountyValue && (
+            <$PaddingWrapper>
+              <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
+                {chosenLootbox.nftBountyValue}
+              </$SupressedParagraph>
+            </$PaddingWrapper>
+          )}
           {!!chosenPartyBasket?.nftBountyValue && (
             <$PaddingWrapper>
               <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
@@ -144,7 +156,7 @@ const CompleteOnboarding = (props: Props) => {
               {words.prize}:
               <$SmallText style={{ textAlign: 'start', marginTop: '0px', display: 'inline' }}>
                 {' '}
-                {chosenPartyBasket?.nftBountyValue || words.freeNFT}
+                {chosenLootbox?.nftBountyValue || chosenPartyBasket?.nftBountyValue || words.freeNFT}
               </$SmallText>
             </$SmallText>
           </$PaddingWrapper>

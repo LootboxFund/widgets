@@ -21,7 +21,7 @@ const OnboardingAddEmail = (props: Props) => {
   const { screen } = useWindowSize()
   const [email, setEmailLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const { setEmail, chosenPartyBasket, referral } = useViralOnboarding()
+  const { setEmail, chosenLootbox, chosenPartyBasket, referral } = useViralOnboarding()
   const { user } = useAuth()
 
   useEffect(() => {
@@ -48,7 +48,11 @@ const OnboardingAddEmail = (props: Props) => {
     ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
     : undefined
 
-  const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
+  const image: string | null = chosenLootbox?.stampImage
+    ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
+    : _lb?.stampImage
+    ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
+    : null
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -100,7 +104,7 @@ const OnboardingAddEmail = (props: Props) => {
               description="Disclaimer when collecting email"
             />
           </$SupressedParagraph>
-          {!!chosenPartyBasket && !!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
+          {!!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
         </$Vertical>
       </$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>

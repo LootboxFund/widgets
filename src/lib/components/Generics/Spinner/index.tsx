@@ -12,8 +12,7 @@ export const $Spinner = styled.div<{
   height: ${(props) => props.size || '16px'};
   margin-right: 12px;
   border: 4px solid transparent;
-  border-top-color: #ffffff;
-  border-top-color: ${(props) => (props.color ? props.color : '#ffffff')};
+  border-top-color: ${(props) => props.color || '#ffffff'};
   border-radius: 50%;
   ${(props) => props.margin && `margin: ${props.margin};`}
 

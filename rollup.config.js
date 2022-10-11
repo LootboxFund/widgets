@@ -169,6 +169,8 @@ const SignOut = widgetConfig('SignOut')
 
 const MyTickets = widgetConfig('MyTickets')
 
+const RedeemCosmicLootbox = widgetConfig('RedeemCosmicLootbox')
+
 export default [
   MyTickets,
   CreateLootbox,
@@ -188,4 +190,5 @@ export default [
   PublicProfile,
   SignOut,
   ViralOnboarding,
+  RedeemCosmicLootbox,
 ]
