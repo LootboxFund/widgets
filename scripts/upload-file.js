@@ -22,8 +22,8 @@ const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
   console.log(`${filename} uploaded to ${bucketName}.`)
   await storage.bucket(bucketName).file(filepath).makePublic()
   console.log(`${filename} made public`)
-  // process.exit()
-  return
+  process.exit()
+  // return
 }
 
 module.exports = { uploadFile }
