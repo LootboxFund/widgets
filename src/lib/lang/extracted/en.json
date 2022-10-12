@@ -2234,11 +2234,11 @@
     "description": "Prompt for user to redeem their Lootbox NFTs in exchange for money"
   },
   "viralOnboarding.acceptGift.description": {
-    "defaultMessage": "Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}",
+    "defaultMessage": "Claim this FREE ESports Reward Ticket to win cash on {tournamentDate}",
     "description": "Description of the prize"
   },
   "viralOnboarding.acceptGift.invitationMessage": {
-    "defaultMessage": "{name}{newline}Gifted you a Lottery Ticket",
+    "defaultMessage": "{name}{newline}Gifted you a Fan Reward",
     "description": "Message to show when a user is gifted a free lottery ticket"
   },
   "viralOnboarding.acceptGift.nConversions": {
@@ -2261,8 +2261,8 @@
     "defaultMessage": "Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
   },
   "viralOnboarding.chooseLottery.heading": {
-    "defaultMessage": "Choose Your FREE Lottery",
-    "description": "Heading for lottery gift"
+    "defaultMessage": "Choose Your FREE Fan Reward Ticket",
+    "description": "Heading for Fan rewards gift"
   },
   "viralOnboarding.completeOnboarding.error.subheading": {
     "defaultMessage": "Or, go to your profile"
@@ -2280,7 +2280,7 @@
     "defaultMessage": "Winners Already Announced"
   },
   "viralOnboarding.qrcode.description": {
-    "defaultMessage": "Scan QR Code to accept a FREE Fan Lottery Ticket for an ESports Tournament."
+    "defaultMessage": "Scan QR Code to accept a FREE Fan Reward Ticket for an ESports Tournament."
   },
   "viralOnboarding.qrcode.screenshotAndShare": {
     "defaultMessage": "Screenshot & Share",
@@ -2298,7 +2298,7 @@
     "description": "Description of the prize"
   },
   "viralOnboarding.selectLottery.header": {
-    "defaultMessage": "Claim Lottery Ticket",
+    "defaultMessage": "Claim Fan Reward Ticket",
     "description": "Header for lottery claim"
   },
   "viralOnboarding.selectLottery.next": {

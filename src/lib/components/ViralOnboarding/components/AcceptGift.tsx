@@ -136,7 +136,7 @@ const AcceptGift = (props: Props) => {
           <$SupressedParagraph>
             <FormattedMessage
               id="viralOnboarding.acceptGift.invitationMessage"
-              defaultMessage="{name}{newline}Gifted you a Lottery Ticket"
+              defaultMessage="{name}{newline}Gifted you a Fan Reward"
               description="Message to show when a user is gifted a free lottery ticket"
               values={{
                 name: referral?.campaignName,
@@ -148,7 +148,7 @@ const AcceptGift = (props: Props) => {
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.acceptGift.description"
-              defaultMessage="Claim this FREE ESports Lottery Ticket to win cash on {tournamentDate}"
+              defaultMessage="Claim this FREE ESports Reward Ticket to win cash on {tournamentDate}"
               description="Description of the prize"
               values={{
                 tournamentDate: formattedDate,

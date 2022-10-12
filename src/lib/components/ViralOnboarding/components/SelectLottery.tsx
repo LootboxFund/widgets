@@ -33,7 +33,7 @@ const SelectLottery = (props: Props) => {
           <$Heading>
             <FormattedMessage
               id="viralOnboarding.selectLottery.header"
-              defaultMessage="Claim Lottery Ticket"
+              defaultMessage="Claim Fan Reward Ticket"
               description="Header for lottery claim"
             />
           </$Heading>
