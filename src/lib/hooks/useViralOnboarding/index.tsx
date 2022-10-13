@@ -102,7 +102,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
           .catch((err) => console.error(err))
       }
     }
-  }, [data?.referral, claim, user?.id])
+  }, [user?.id])
 
   if (loading) {
     return <LoadingCard />
