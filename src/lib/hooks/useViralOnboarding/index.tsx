@@ -74,8 +74,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
 
   // new ad v2
   useEffect(() => {
-    if (!data?.referral || !claim) {
-      // if (!data?.referral || !claim || !user?.id) {
+    if (!data?.referral || !claim || !user?.id) {
       setAd(undefined)
     } else {
       if (data?.referral?.__typename === 'ReferralResponseSuccess') {
@@ -88,7 +87,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
               promoterID: _referral.promoterId,
               sessionID: sessionId,
               tournamentID: _referral.tournamentId,
-              userID: 'user.id',
+              userID: user.id,
             },
           },
         })
