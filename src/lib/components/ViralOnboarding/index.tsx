@@ -41,8 +41,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <AddEmail
             onNext={() => {
-              setRoute('success')
-              // setRoute('sign-up')
+              setRoute('sign-up')
             }}
             onBack={() => setRoute('browse-lottery')}
           />
