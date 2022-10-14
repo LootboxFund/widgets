@@ -23,6 +23,7 @@ export interface BattlePageLootboxSnapshotFE {
   stampImage?: string
   status?: LootboxTournamentStatus
   lootbox: {
+    id: LootboxID
     name?: string
     description?: string
     status?: LootboxStatus
@@ -131,6 +132,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
             status
             lootboxID
             lootbox {
+              id
               name
               status
               description

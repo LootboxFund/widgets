@@ -165,7 +165,7 @@ const BattlePageLootbox = (props: Props) => {
                   <$span style={{ margin: '10px 10px 10px 0px' }}>
                     <$Link
                       color={'inherit'}
-                      href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${props.lootboxSnapshot.address}`}
+                      href={`${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${props.lootboxSnapshot.lootbox.id}`}
                       style={{ textDecoration: 'none' }}
                     >
                       👉 View Lootbox
