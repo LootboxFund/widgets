@@ -1,5 +1,5 @@
 import useWords from 'lib/hooks/useWords'
-import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useContext, useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
@@ -63,6 +63,17 @@ const AcceptGift = (props: Props) => {
           ]
     } else {
       showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
+    }
+
+    if (referral.tournamentId === 'VlRdMinhhUrWF2VZZGNm') {
+      return (
+        <$Horizontal justifyContent="center" style={{ marginBottom: '20px' }}>
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/advertiser-assets%2Fadvertiser%2FLs3l10KbqhZEp7WtVY5r%2Fcampaign-image%2Funknown%2Fcabcity.png?alt=media"
+            style={{ width: '80%' }}
+          />
+        </$Horizontal>
+      )
     }
 
     return (
@@ -172,7 +183,7 @@ const AcceptGift = (props: Props) => {
               defaultMessage="{nPeople} people already accepted this gift"
               description="Counts how many users accepted the gift"
               values={{
-                nPeople: referral?.nConversions,
+                nPeople: referral.tournamentId === 'VlRdMinhhUrWF2VZZGNm' ? 289 : referral?.nConversions,
               }}
             />
           </$SupressedParagraph>
