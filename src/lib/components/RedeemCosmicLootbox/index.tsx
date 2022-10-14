@@ -3,7 +3,7 @@ import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import LogRocket from 'logrocket'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import AuthGuard from '../AuthGuard'
 import { Oopsies } from '../Profile/common'
 import {
@@ -37,6 +37,7 @@ import { $Button } from 'lib/components/Generics/Button'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { withdrawCosmic } from 'lib/api/redeemNFT'
 import { parseEth } from 'lib/utils/bnConversion'
+import { awaitPollResult } from 'lib/utils/promise'
 import { Deposit } from 'lib/hooks/useLootbox/utils'
 import { useAuth } from 'lib/hooks/useAuth'
 
@@ -58,12 +59,14 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { connectWallet } = useAuth()
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
-  const [isPolling, setIsPolling] = useState(false)
+  const isPolling = useRef<boolean>(false)
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [cursor, setCursor] = useState<UserClaimsCursor>({
     startAfter: null,
     endBefore: null,
   })
+  const snapUser = useSnapshot(userState)
+  const isWalletConnected = snapUser.accounts.length > 0
 
   const {
     data: dataLootbox,
@@ -88,13 +91,24 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           const [newClaimData] = data?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
 
           if (
-            isPolling &&
+            isPolling.current &&
             claimData?.id === newClaimData?.id &&
             newClaimData?.whitelist?.isRedeemed &&
-            !!newClaimData?.whitelist?.lootboxTicket
+            !!newClaimData?.whitelist?.lootboxTicket &&
+            status === 'not-minted'
           ) {
+            // Minting Condition
             stopPolling()
-            setIsPolling(false)
+            isPolling.current = false
+          } else if (
+            isPolling.current &&
+            claimData?.id === newClaimData?.id &&
+            newClaimData?.whitelist &&
+            status === 'no-whitelist'
+          ) {
+            // Wallet connect condition which generate whitelists
+            stopPolling()
+            isPolling.current = false
           }
         }
       },
@@ -157,7 +171,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   }, [proratedDeposits, claimData?.whitelist?.lootboxTicket?.ticketID])
 
   const incrementClaimIdx = (incrementAmount: number) => {
-    if (loadingClaimCountQuery) {
+    if (loadingClaimCountQuery || nClaims <= 1) {
       return
     }
     setErrorMessage('')
@@ -178,7 +192,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   }
 
   const decrementClaimIdx = (decrementAmount: number) => {
-    if (loadingClaimCountQuery) {
+    if (loadingClaimCountQuery || nClaims <= 1) {
       return
     }
     setErrorMessage('')
@@ -200,18 +214,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     }
   }
 
-  const getRedeemType = (): RedeemState => {
-    if (!claimData || nClaims === 0) {
-      return 'no-claims'
-    } else if (claimData && !claimData.whitelist) {
-      return 'no-whitelist'
-    } else if (claimData?.whitelist && !claimData?.whitelist?.lootboxTicket) {
-      return 'not-minted'
-    } else {
-      return 'ready'
-    }
-  }
-
   const mintNFT = async () => {
     setErrorMessage('')
     if (!claimData?.whitelist?.signature || !claimData?.whitelist?.nonce || !claimData?.whitelist?.digest) {
@@ -221,7 +223,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     setIsLoading(true)
     try {
       await mintTicket(claimData.whitelist.signature, claimData.whitelist.nonce, claimData.whitelist.digest)
-      setIsPolling(true)
+      isPolling.current = true
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
     } catch (err) {
       if (err?.code !== 4001) {
@@ -263,6 +265,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     setErrorMessage('')
     try {
       await connectWallet()
+      isPolling.current = true
+      startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
+      await awaitPollResult(isPolling.current)
     } catch (err) {
       if (err?.code !== 4001) {
         setErrorMessage(err?.message || `${words.anErrorOccured}!`)
@@ -271,6 +276,52 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       setIsLoading(false)
     }
   }
+
+  const renderAllDeposits = () => {
+    if (allDeposits.length === 0) {
+      return null
+    }
+    return (
+      <$Vertical spacing={2}>
+        <$RedeemCosmicSubtitle style={{ fontStyle: 'italic' }}>All Lootbox Deposits</$RedeemCosmicSubtitle>
+        {truncatedDeposits.map((deposit, idx) => {
+          return (
+            <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
+              <$DividendOwed>
+                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
+              </$DividendOwed>
+              <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
+            </$DividendRow>
+          )
+        })}
+        {showAllDeposits && truncatedDeposits.length >= allDeposits.length ? (
+          <div>
+            <$RedeemCosmicButton onClick={() => setShowAllDeposits(false)} theme="link">
+              {words.hide}
+            </$RedeemCosmicButton>
+          </div>
+        ) : !showAllDeposits && truncatedDeposits.length < allDeposits.length ? (
+          <div>
+            <$RedeemCosmicButton onClick={() => setShowAllDeposits(true)} theme="link">
+              {words.seeMore}
+            </$RedeemCosmicButton>
+          </div>
+        ) : null}
+      </$Vertical>
+    )
+  }
+
+  const status = useMemo(() => {
+    if (!claimData || nClaims === 0) {
+      return 'no-claims'
+    } else if (claimData && !claimData.whitelist) {
+      return 'no-whitelist'
+    } else if (claimData?.whitelist && !claimData?.whitelist?.lootboxTicket) {
+      return 'not-minted'
+    } else {
+      return 'ready'
+    }
+  }, [claimData, nClaims])
 
   if (loadingLootboxQuery) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
@@ -284,9 +335,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     ? convertFilenameToThumbnail(claimData?.whitelist?.lootboxTicket?.stampImage, 'md')
     : convertFilenameToThumbnail(lootboxData.stampImage, 'md')
 
-  const watchPage = `${manifest.microfrontends.webflow.battlePage}?tid=${lootboxData.id}`
+  const watchPage = claimData ? `${manifest.microfrontends.webflow.battlePage}?tid=${claimData?.tournamentId}` : null
   const getTicketsPage = lootboxData?.joinCommunityUrl || watchPage
-  const status = getRedeemType()
   const isWrongWallet =
     claimData?.whitelist?.whitelistedAddress &&
     userSnapshot.currentAccount &&
@@ -296,6 +346,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const truncatedProratedDeposits = showAllDeposits
     ? ticketProratedDeposits.slice()
     : ticketProratedDeposits.slice(0, 4)
+
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -315,16 +366,30 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
               {nClaims} Ticket{nClaims > 1 ? 's' : null}
             </b>
             &nbsp;to claim&nbsp;&nbsp;&nbsp;
-            <a style={{ cursor: 'pointer', fontStyle: 'italic', textDecoration: 'underline' }}>View Event</a>
+            {getTicketsPage && (
+              <a
+                href={getTicketsPage}
+                style={{
+                  cursor: 'pointer',
+                  fontStyle: 'italic',
+                  textDecoration: 'underline',
+                  textDecorationColor: COLORS.surpressedFontColor,
+                }}
+              >
+                <$RedeemCosmicSubtitle>View Event</$RedeemCosmicSubtitle>
+              </a>
+            )}
           </$RedeemCosmicSubtitle>
           <br />
-          {isWrongWallet && claimData?.whitelist ? (
+          {isWalletConnected && isWrongWallet && claimData?.whitelist ? (
             <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
               ⚠️ Please connect wallet{' '}
               <b>{truncateAddress(claimData.whitelist.whitelistedAddress, { prefixLength: 6, suffixLength: 4 })}</b>
               <CopyIcon text={claimData.whitelist.whitelistedAddress} smallWidth={18} />
             </$RedeemCosmicSubtitle>
-          ) : lootboxData?.chainIdHex && lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
+          ) : isWalletConnected &&
+            lootboxData?.chainIdHex &&
+            lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
             <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
               ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
             </$RedeemCosmicSubtitle>
@@ -342,17 +407,17 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
                       <$Button
                         screen={screen}
                         onClick={!allLoading ? handleWalletConnect : undefined}
-                        color={`${COLORS.dangerFontColor}90`}
-                        colorHover={COLORS.dangerFontColor}
-                        backgroundColor={`${COLORS.dangerBackground}80`}
-                        backgroundColorHover={`${COLORS.dangerBackground}`}
+                        color={`${COLORS.warningFontColor}`}
+                        colorHover={`${COLORS.warningFontColor}90`}
+                        backgroundColor={`${COLORS.warningBackground}`}
+                        backgroundColorHover={`${COLORS.warningBackground}80`}
                         style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
                         disabled={allLoading}
                       >
                         <LoadingText
                           loading={allLoading}
-                          color={`${COLORS.dangerFontColor}90`}
-                          text={words.connectMetamask}
+                          color={`${COLORS.warningFontColor}`}
+                          text={'Confirm Wallet'}
                         />
                       </$Button>
                     ) : status === 'not-minted' ? (
@@ -394,21 +459,24 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
 
           {errorMessage && <$ErrorText style={{ margin: '15px 0px 15px' }}>{errorMessage}</$ErrorText>}
 
-          {isPolling || loadingClaims || loadingLootboxWeb3 ? (
-            <Spinner size="25px" margin="auto" color={`${COLORS.surpressedFontColor}3A`} />
+          {isPolling.current || loadingClaims || loadingLootboxWeb3 ? (
+            <Spinner size="25px" margin="30px auto auto" color={`${COLORS.surpressedFontColor}3A`} />
           ) : status === 'no-claims' || nClaims === 0 ? (
-            <$Vertical>
+            <$Vertical spacing={2}>
               <$EarningsContainer>
-                <$EarningsText style={{ marginTop: 'auto' }}>You do not own any tickets for this Lootbox</$EarningsText>
-                <div style={{ margin: '10px auto auto auto' }}>
-                  <a href={getTicketsPage} target="_blank">
-                    <$RedeemCosmicButton theme="ghost">GET TICKETS</$RedeemCosmicButton>
-                  </a>
-                </div>
+                <$EarningsText style={{ margin: 'auto' }}>You do not own any tickets for this Lootbox</$EarningsText>
+                {getTicketsPage && (
+                  <div style={{ margin: '10px auto auto auto' }}>
+                    <a href={getTicketsPage} target="_blank">
+                      <$RedeemCosmicButton theme="ghost">GET TICKETS</$RedeemCosmicButton>
+                    </a>
+                  </div>
+                )}
               </$EarningsContainer>
+              {renderAllDeposits()}
             </$Vertical>
           ) : !allDeposits || allDeposits.length === 0 ? (
-            <$Vertical>
+            <$Vertical style={{ paddingTop: '20px' }}>
               <$EarningsContainer>
                 <$EarningsText> No rewards have been deposited yet</$EarningsText>
               </$EarningsContainer>
@@ -451,32 +519,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
               ) : null}
             </$Vertical>
           ) : (
-            <$Vertical spacing={2}>
-              <$RedeemCosmicSubtitle style={{ fontStyle: 'italic' }}>All Lootbox Deposits</$RedeemCosmicSubtitle>
-              {truncatedDeposits.map((deposit, idx) => {
-                return (
-                  <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
-                    <$DividendOwed>
-                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
-                    </$DividendOwed>
-                    <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
-                  </$DividendRow>
-                )
-              })}
-              {showAllDeposits && truncatedDeposits.length >= allDeposits.length ? (
-                <div>
-                  <$RedeemCosmicButton onClick={() => setShowAllDeposits(false)} theme="link">
-                    {words.hide}
-                  </$RedeemCosmicButton>
-                </div>
-              ) : !showAllDeposits && truncatedDeposits.length < allDeposits.length ? (
-                <div>
-                  <$RedeemCosmicButton onClick={() => setShowAllDeposits(true)} theme="link">
-                    {words.seeMore}
-                  </$RedeemCosmicButton>
-                </div>
-              ) : null}
-            </$Vertical>
+            renderAllDeposits()
           )}
           {screen === 'mobile' && <br />}
         </$Vertical>
@@ -510,6 +553,7 @@ const $RedeemCosmicContainer = styled.div<{
   screen: ScreenSize
 }>`
   height: auto;
+  min-height: 320px;
   width: auto;
   display: flex;
   flex-direction: column;
@@ -541,6 +585,7 @@ const $RedeemCosmicSubtitle = styled.span`
   line-height: ${TYPOGRAPHY.fontSize.xlarge};
   font-weight: ${TYPOGRAPHY.fontWeight.light};
   color: ${COLORS.surpressedFontColor};
+  text-decoration-color: initial;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   word-break: break-word;
 `
@@ -597,7 +642,7 @@ const $ErrorText = styled.span`
 
 const $EarningsContainer = styled.div<{}>`
   width: 100%;
-  height: 224px;
+  min-height: 124px;
 
   background: #f5f5f5;
   background: ${COLORS.surpressedBackground}15;

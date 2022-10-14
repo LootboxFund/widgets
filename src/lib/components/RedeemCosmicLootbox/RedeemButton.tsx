@@ -117,15 +117,17 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
     )
   } else if (
     props.targetWalletAddress &&
-    snapUser.currentAccount?.toLowerCase() !== props.targetWalletAddress.toLowerCase()
+    snapUser.currentAccount?.toLowerCase() !== props.targetWalletAddress?.toLowerCase()
   ) {
     return (
       <$Button
         screen={screen}
         // onClick={switchChain}
-        color={`${COLORS.warningFontColor}`}
-        backgroundColor={`${COLORS.warningBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
+        color={COLORS.white}
+        // color={`${COLORS.warningFontColor}`}
+        // backgroundColor={`${COLORS.warningBackground}`}
+        backgroundColor={COLORS.surpressedBackground}
+        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', cursor: 'not-allowed' }}
         disabled={loading}
       >
         Wrong Account
