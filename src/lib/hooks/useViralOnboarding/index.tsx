@@ -74,36 +74,31 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
 
   // new ad v2
   useEffect(() => {
-    if (!data?.referral || !claim) {
-      // if (!data?.referral || !claim || !user?.id) {
-      setAd(undefined)
-    } else {
-      if (data?.referral?.__typename === 'ReferralResponseSuccess') {
-        const _referral = data?.referral?.referral
-        getAdBetaV2({
-          variables: {
-            payload: {
-              claimID: claim.id,
-              placement: Placement.AfterTicketClaim,
-              promoterID: _referral.promoterId,
-              sessionID: sessionId,
-              tournamentID: _referral.tournamentId,
-              userID: 'user.id',
-            },
+    if (data?.referral?.__typename === 'ReferralResponseSuccess' && claim && claim.id && user && user.id && !ad) {
+      const _referral = data?.referral?.referral
+      getAdBetaV2({
+        variables: {
+          payload: {
+            claimID: claim.id,
+            placement: Placement.AfterTicketClaim,
+            promoterID: _referral.promoterId,
+            sessionID: sessionId,
+            tournamentID: _referral.tournamentId,
+            userID: user.id,
           },
+        },
+      })
+        .then((res) => {
+          if (!res?.data?.decisionAdApiBetaV2 || res.data.decisionAdApiBetaV2.__typename === 'ResponseError') {
+            throw new Error('Error fetching ad')
+          } else {
+            const data = res.data.decisionAdApiBetaV2 as GetAdFE
+            setAd(data.ad || undefined)
+          }
         })
-          .then((res) => {
-            if (!res?.data?.decisionAdApiBetaV2 || res.data.decisionAdApiBetaV2.__typename === 'ResponseError') {
-              throw new Error('Error fetching ad')
-            } else {
-              const data = res.data.decisionAdApiBetaV2 as GetAdFE
-              setAd(data.ad || undefined)
-            }
-          })
-          .catch((err) => console.error(err))
-      }
+        .catch((err) => console.error(err))
     }
-  }, [data?.referral, claim, user?.id])
+  }, [data?.referral, claim?.id, user?.id])
 
   if (loading) {
     return <LoadingCard />

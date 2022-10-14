@@ -8,12 +8,13 @@ import {
   LootboxTicketDigest,
   LootboxTicketID,
   LootboxTicketID_Web3,
-  WhitelistSignatureID,
+  TournamentID,
 } from '@wormgraph/helpers'
 import { LootboxStatus, ResponseError } from 'lib/api/graphql/generated/types'
 
 export interface UserClaimFE {
   id: ClaimID
+  tournamentId: TournamentID
   timestamps: {
     createdAt: number
   }
@@ -148,6 +149,7 @@ export const GET_LOOTBOX_CLAIMS_TO_REDEEM = gql`
             edges {
               node {
                 id
+                tournamentId
                 timestamps {
                   createdAt
                 }

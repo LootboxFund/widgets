@@ -48,13 +48,14 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
   useEffect(() => {
     console.log('Lootbox Address change', lootboxAddress)
     // Reset the state
-    // setProratedDeposits({})
     if (!!lootboxAddress) {
+      setLoading(true)
       getLootboxDeposits()
         .then((deposits) => {
           setDeposits([...deposits])
         })
         .catch((err) => console.error('Error loading deposits', err))
+        .finally(() => [setLoading(false)])
     }
   }, [lootboxAddress])
 

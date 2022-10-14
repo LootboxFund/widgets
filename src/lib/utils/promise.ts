@@ -16,3 +16,33 @@ export const promiseChainDelay = async (promises: (Promise<any> | undefined)[], 
   }
   return res
 }
+
+/**
+ *
+ * @param waitCondition Boolean, if true, we await it to turn to false.
+ * @param defaultTimeout Milliseconds for a timeout. If this timeout is reached before waitCondition, an error is thrown
+ * @returns
+ */
+export const awaitPollResult = async (waitCondition: boolean, defaultTimeout: number = 1000 * 60 * 5) => {
+  const isDone: boolean = await new Promise(async (res, rej) => {
+    const timer = setTimeout(() => {
+      res(false)
+    }, defaultTimeout)
+    let i = 0
+    while (waitCondition) {
+      i++
+      await new Promise((resolve, reject) =>
+        setTimeout(() => {
+          resolve(null)
+        }, 2000)
+      )
+    }
+    clearInterval(timer)
+    res(true)
+  })
+
+  if (!isDone) {
+    throw new Error('Timed out waiting for Lootbox to be created')
+  }
+  return true
+}
