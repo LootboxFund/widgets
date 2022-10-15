@@ -68,8 +68,6 @@ const ChooseLottery = (props: Props) => {
       return 0
     })
 
-    console.log('received tickets', tickets)
-
     const paginated = tickets.slice(0, PAGE_SIZE * (page + 1))
 
     return [paginated, paginated.length < tickets.length]
