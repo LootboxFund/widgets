@@ -382,7 +382,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           </$RedeemCosmicSubtitle>
           <br />
           {isWalletConnected && isWrongWallet && claimData?.whitelist ? (
-            <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
+            <$RedeemCosmicSubtitle
+              style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large, paddingTop: '0px' }}
+            >
               ⚠️ Please connect wallet{' '}
               <b>{truncateAddress(claimData.whitelist.whitelistedAddress, { prefixLength: 6, suffixLength: 4 })}</b>
               <CopyIcon text={claimData.whitelist.whitelistedAddress} smallWidth={18} />
@@ -390,7 +392,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           ) : isWalletConnected &&
             lootboxData?.chainIdHex &&
             lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
-            <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
+            <$RedeemCosmicSubtitle
+              style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large, paddingTop: '0px' }}
+            >
               ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
             </$RedeemCosmicSubtitle>
           ) : null}
