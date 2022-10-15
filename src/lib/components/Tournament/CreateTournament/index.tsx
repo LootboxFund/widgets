@@ -193,7 +193,7 @@ const CreateTournament = ({ onSuccessCallback }: CreateTournamentProps) => {
             <$span>{words.description}</$span>
             <$TextAreaMedium
               onChange={(e) => parseDescription(e.target.value)}
-              value={tournamentPayload.description}
+              value={tournamentPayload.description || ''}
               rows={4}
               style={{
                 color: `${COLORS.black}ca`,

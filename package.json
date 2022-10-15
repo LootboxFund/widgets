@@ -44,6 +44,7 @@
     "deploy:cosmiclootbox": "NODE_ENV=production node scripts/deploy-cosmic-lootbox.js",
     "deploy:nerds": "yarn deploy:euler && yarn deploy:cassini && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:signout && yarn deploy:tangris && yarn deploy:cosmiclootbox && yarn deploy:viralonboarding && yarn deploy:mytickets",
     "deploy:nerdsdeprecated": "yarn deploy:newton && yarn deploy:terran && yarn deploy:kepler && yarn deploy:sagan && yarn deploy:cassini && yarn deploy:euler && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:tangris && yarn deploy:galileo && yarn deploy:armstrong && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:viralonboarding && yarn deploy:signout",
+    "deploy:nerdstmp": "yarn deploy:euler && yarn deploy:cassini && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:signout && yarn deploy:tangris && yarn deploy:cosmiclootbox && yarn deploy:viralonboarding && yarn deploy:mytickets && yarn deploy:terran && yarn deploy:newton && yarn deploy:bessel && yarn deploy:copernicus && yarn deploy:halley && yarn deploy:galileo && yarn deploy:armstrong",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
@@ -112,7 +113,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "0.7.0-prod",
-    "@wormgraph/manifest": "0.7.0-prod-3",
+    "@wormgraph/manifest": "0.7.0-prod-5",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "countries-list": "^2.6.1",
