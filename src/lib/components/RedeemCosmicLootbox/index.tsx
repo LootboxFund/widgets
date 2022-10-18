@@ -56,7 +56,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const { screen } = useScreenSize()
   const words = useWords()
   const userSnapshot = useSnapshot(userState)
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>()
   const [isLoading, setIsLoading] = useState(false)
   const { connectWallet } = useAuth()
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
@@ -289,7 +289,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           return (
             <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
               <$DividendOwed>
-                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
+                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal), 22)}`}
               </$DividendOwed>
               <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
             </$DividendRow>
@@ -476,7 +476,11 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$Horizontal>
           )}
 
-          {errorMessage && <$ErrorText style={{ margin: '15px 0px 15px' }}>{errorMessage}</$ErrorText>}
+          {errorMessage && (
+            <$ErrorText style={{ margin: '15px 0px 15px' }}>
+              {errorMessage.length > 220 ? errorMessage.slice(0, 220) + '...' : errorMessage}
+            </$ErrorText>
+          )}
 
           {isPolling.current || loadingClaims || loadingLootboxWeb3 ? (
             <Spinner size="25px" margin="30px auto auto" color={`${COLORS.surpressedFontColor}3A`} />
@@ -517,7 +521,11 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
                 return (
                   <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
                     <$DividendOwed>
-                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
+                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(
+                        deposit.tokenAmount,
+                        Number(deposit.decimal),
+                        22
+                      )}`}
                     </$DividendOwed>
                     <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
                   </$DividendRow>
@@ -583,6 +591,7 @@ export const $RedeemCosmicContainer = styled.div<{
   font-family: sans-serif;
   background: ${(props) =>
     `linear-gradient(117.52deg, ${props.themeColor}21 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
+  overflow: hidden;
 `
 
 export const $StampImg = styled.img`
@@ -657,6 +666,7 @@ export const $ErrorText = styled.span`
   text-align: start;
   margin-top: 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
+  word-break: break-word;
 `
 
 export const $EarningsContainer = styled.div<{}>`
