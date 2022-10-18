@@ -1,36 +1,22 @@
 import { useAuth } from 'lib/hooks/useAuth'
 import Spinner from '../Generics/Spinner'
 import { COLORS, LootboxID } from '@wormgraph/helpers'
-import { PropsWithChildren, useMemo, useState } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 import {
   GetLootboxRedeemPageResponseFE,
   GetLootboxRedeemPageResponseFESuccess,
   GET_LOOTBOX_REDEEM_PAGE,
   LootboxRedemptionFE,
 } from './api.gql'
-import {
-  $DividendOwed,
-  $DividendRow,
-  $DividendTokenSymbol,
-  $EarningsContainer,
-  $EarningsText,
-  $RedeemCosmicButton,
-  $RedeemCosmicContainer,
-  $RedeemCosmicSubtitle,
-  $RedeemCosmicTitle,
-  $StampImg,
-} from '.'
+import { $RedeemCosmicContainer, $RedeemCosmicSubtitle, $StampImg } from '.'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $Horizontal, $Vertical } from '../Generics'
 import { truncateAddress } from 'lib/api/helpers'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
-import { useLootbox } from 'lib/hooks/useLootbox'
-import { parseEth } from 'lib/utils/bnConversion'
 import useWords from 'lib/hooks/useWords'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { useQuery } from '@apollo/client'
 import { QueryGetLootboxByIdArgs } from 'lib/api/graphql/generated/types'
-import AuthGuard from 'lib/components/AuthGuard'
 import { Oopsies } from 'lib/components/Profile/common'
 import Authentication from 'lib/components/Authentication'
 
@@ -52,7 +38,6 @@ const CosmicAuthGuard = ({ lootboxID, children, ...props }: AuthGuardProps): JSX
     const lootboxData = (dataLootbox?.getLootboxByID as GetLootboxRedeemPageResponseFESuccess)?.lootbox || null
     return { lootboxData }
   }, [dataLootbox?.getLootboxByID])
-  console.log('lootbox data', lootboxData)
 
   //   const { deposits: allDeposits } = useLootbox({
   //     lootboxAddress: lootboxData?.address,

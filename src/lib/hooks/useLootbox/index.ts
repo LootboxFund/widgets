@@ -22,6 +22,7 @@ interface useLootboxFactoryResult {
   deposits: Deposit[]
   loadProratedDepositsIntoState: (ticketID: LootboxTicketID_Web3) => void
   getLootboxDeposits: () => Promise<Deposit[]>
+  loadAllDepositsIntoState: () => void
   mintTicket: (
     signature: string,
     nonce: LootboxMintSignatureNonce,
@@ -44,20 +45,6 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
   const { provider } = useReadOnlyProvider({ chainIDHex })
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [proratedDeposits, setProratedDeposits] = useState<TicketToDepositMapping>({})
-
-  useEffect(() => {
-    console.log('Lootbox Address change', lootboxAddress)
-    // Reset the state
-    if (!!lootboxAddress) {
-      setLoading(true)
-      getLootboxDeposits()
-        .then((deposits) => {
-          setDeposits([...deposits])
-        })
-        .catch((err) => console.error('Error loading deposits', err))
-        .finally(() => [setLoading(false)])
-    }
-  }, [lootboxAddress])
 
   const lootbox = useMemo(() => {
     if (!provider || !lootboxAddress) {
@@ -156,6 +143,11 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     setProratedDeposits({ ...proratedDeposits, [ticketID]: deposits })
   }
 
+  const loadAllDepositsIntoState = async (): Promise<void> => {
+    const deposits = await getLootboxDeposits()
+    setDeposits(deposits)
+  }
+
   /**
    * Mint a lootbox ticket given a whitelisted signature & nonce
    * This will throw if shit is fucked
@@ -215,5 +207,6 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
     mintTicket,
     loadProratedDepositsIntoState,
     getLootboxDeposits,
+    loadAllDepositsIntoState,
   }
 }

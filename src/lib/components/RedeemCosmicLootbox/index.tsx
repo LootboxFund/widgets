@@ -60,7 +60,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { connectWallet } = useAuth()
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
-  const isPolling = useRef<boolean>(false)
+  const [isPolling, setIsPolling] = useState<boolean>(false)
+  const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [cursor, setCursor] = useState<UserClaimsCursor>({
     startAfter: null,
@@ -90,26 +91,29 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       onCompleted: (data) => {
         if (data?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
           const [newClaimData] = data?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
-
           if (
-            isPolling.current &&
+            isPolling &&
             claimData?.id === newClaimData?.id &&
             newClaimData?.whitelist?.isRedeemed &&
             !!newClaimData?.whitelist?.lootboxTicket &&
-            status === 'not-minted'
+            pollStatus.current === 'not-minted'
           ) {
+            console.log('STOPPING MINT POLL')
             // Minting Condition
             stopPolling()
-            isPolling.current = false
+            setIsPolling(false)
+            pollStatus.current = undefined
           } else if (
-            isPolling.current &&
+            isPolling &&
             claimData?.id === newClaimData?.id &&
-            newClaimData?.whitelist &&
-            status === 'no-whitelist'
+            !!newClaimData?.whitelist &&
+            pollStatus.current === 'no-whitelist'
           ) {
+            console.log('STOPPING WHITELIST POLL')
             // Wallet connect condition which generate whitelists
             stopPolling()
-            isPolling.current = false
+            setIsPolling(false)
+            pollStatus.current = undefined
           }
         }
       },
@@ -137,11 +141,16 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     proratedDeposits,
     deposits: allDeposits,
     loadProratedDepositsIntoState,
+    loadAllDepositsIntoState,
     mintTicket,
   } = useLootbox({
     lootboxAddress: lootboxData?.address,
     chainIDHex: lootboxData?.chainIdHex,
   })
+
+  useEffect(() => {
+    loadAllDepositsIntoState()
+  }, [])
 
   const allLoading = loadingLootboxWeb3 || isLoading
 
@@ -170,6 +179,10 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       return []
     }
   }, [proratedDeposits, claimData?.whitelist?.lootboxTicket?.ticketID])
+
+  const noDepositsAvailable: boolean = useMemo(() => {
+    return ticketProratedDeposits.length === 0 || ticketProratedDeposits.every((deposit) => deposit.isRedeemed)
+  }, [ticketProratedDeposits])
 
   const incrementClaimIdx = (incrementAmount: number) => {
     if (loadingClaimCountQuery || nClaims <= 1) {
@@ -224,7 +237,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     setIsLoading(true)
     try {
       await mintTicket(claimData.whitelist.signature, claimData.whitelist.nonce, claimData.whitelist.digest)
-      isPolling.current = true
+      setIsPolling(true)
+      pollStatus.current = status
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
     } catch (err) {
       if (err?.code !== 4001) {
@@ -266,9 +280,10 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     setErrorMessage('')
     try {
       await connectWallet()
-      isPolling.current = true
+      setIsPolling(true)
+      pollStatus.current = status
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
-      await awaitPollResult(isPolling.current)
+      await awaitPollResult(isPolling)
     } catch (err) {
       if (err?.code !== 4001) {
         setErrorMessage(err?.message || `${words.anErrorOccured}!`)
@@ -412,7 +427,12 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             >
               ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
             </$RedeemCosmicSubtitle>
+          ) : ticketProratedDeposits.length > 0 && noDepositsAvailable ? (
+            <$RedeemCosmicSubtitle style={{ paddingTop: '0px' }}>
+              ✅ All deposits have been redeemed
+            </$RedeemCosmicSubtitle>
           ) : null}
+
           {claimData && (
             <$Horizontal spacing={4} flexWrap={screen === 'mobile'} justifyContent="space-between">
               <div>
@@ -455,9 +475,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
                         screen={screen}
                         onClick={!allLoading ? withdrawEarnings : undefined}
                         color={COLORS.white}
-                        backgroundColor={COLORS.successFontColor}
+                        backgroundColor={noDepositsAvailable ? COLORS.surpressedBackground : COLORS.successFontColor}
                         style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
-                        disabled={allLoading}
+                        disabled={allLoading || noDepositsAvailable}
                       >
                         <LoadingText loading={allLoading} color={COLORS.white} text={'Redeem Rewards'} />
                       </$Button>
@@ -482,7 +502,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$ErrorText>
           )}
 
-          {isPolling.current || loadingClaims || loadingLootboxWeb3 ? (
+          {isPolling || loadingClaims || loadingLootboxWeb3 ? (
             <Spinner size="25px" margin="30px auto auto" color={`${COLORS.surpressedFontColor}3A`} />
           ) : status === 'no-claims' || nClaims === 0 ? (
             <$Vertical spacing={2}>
