@@ -20,8 +20,9 @@ interface AuthenticationProps {
   onSignupSuccess?: () => void
   loginTitle?: string
   width?: string
+  ghost: boolean
 }
-const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: AuthenticationProps) => {
+const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
   const { screen } = useWindowSize()
   const intl = useIntl()
@@ -150,8 +151,8 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width }: Aut
       width={width ? width : screen == 'mobile' ? '100%' : '420px'}
       padding="1.6rem"
       style={{
-        background: '#FFFFFF',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+        background: ghost ? 'transparent' : '#FFFFFF',
+        boxShadow: ghost ? 'none' : '0px 4px 4px rgba(0, 0, 0, 0.25)',
         borderRadius: '21px',
         justifyContent: 'space-between',
         boxSizing: 'border-box',

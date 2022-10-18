@@ -40,6 +40,7 @@ import { parseEth } from 'lib/utils/bnConversion'
 import { awaitPollResult } from 'lib/utils/promise'
 import { Deposit } from 'lib/hooks/useLootbox/utils'
 import { useAuth } from 'lib/hooks/useAuth'
+import CosmicAuthGuard from './CosmicAuthGuard'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -326,7 +327,21 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   if (loadingLootboxQuery) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
-    return <Oopsies icon="🤕" title={words.anErrorOccured} />
+    const isNotFound =
+      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
+        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
+        : false
+    if (isNotFound) {
+      return <Oopsies icon="🧐" title={words.notFound} />
+    }
+    return (
+      <Oopsies
+        icon="🤕"
+        title={words.anErrorOccured}
+        // @ts-ignore
+        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
+      />
+    )
   } else if (!lootboxData) {
     return <Oopsies icon="🧐" title={words.notFound} />
   }
@@ -545,13 +560,13 @@ const RedeemCosmicLootboxPage = () => {
   }
 
   return (
-    <AuthGuard loginTitle={'Login to redeem your FREE rewards'}>
+    <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
       <RedeemCosmicLootbox lootboxID={lootboxID} />
-    </AuthGuard>
+    </CosmicAuthGuard>
   )
 }
 
-const $RedeemCosmicContainer = styled.div<{
+export const $RedeemCosmicContainer = styled.div<{
   themeColor: string
   boxShadow?: string
   screen: ScreenSize
@@ -570,11 +585,11 @@ const $RedeemCosmicContainer = styled.div<{
     `linear-gradient(117.52deg, ${props.themeColor}21 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
 `
 
-const $StampImg = styled.img`
+export const $StampImg = styled.img`
   max-width: 240px;
 `
 
-const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
+export const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   color: ${COLORS.black};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
@@ -583,7 +598,7 @@ const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
   line-height: ${(props) => (props.screen === 'desktop' ? '2rem' : '1.5rem')};
 `
 
-const $RedeemCosmicSubtitle = styled.span`
+export const $RedeemCosmicSubtitle = styled.span`
   padding: 10px 0px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.xlarge};
@@ -594,7 +609,7 @@ const $RedeemCosmicSubtitle = styled.span`
   word-break: break-word;
 `
 
-const $RedeemCosmicButton = styled.button<{
+export const $RedeemCosmicButton = styled.button<{
   theme: 'primary' | 'warn' | 'trust' | 'ghost' | 'link'
   disabled?: boolean
 }>`
@@ -636,7 +651,7 @@ const $RedeemCosmicButton = styled.button<{
   font-style: ${(props) => (props.theme === 'link' ? 'italic' : 'normal')};
 `
 
-const $ErrorText = styled.span`
+export const $ErrorText = styled.span`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   color: ${COLORS.dangerFontColor};
   text-align: start;
@@ -644,7 +659,7 @@ const $ErrorText = styled.span`
   font-size: ${TYPOGRAPHY.fontSize.medium};
 `
 
-const $EarningsContainer = styled.div<{}>`
+export const $EarningsContainer = styled.div<{}>`
   width: 100%;
   min-height: 124px;
 
@@ -663,7 +678,7 @@ const $EarningsContainer = styled.div<{}>`
 }
 `
 
-const $EarningsText = styled.p<{}>`
+export const $EarningsText = styled.p<{}>`
   margin-top: 5px;
   text-align: center;
   font-size: ${TYPOGRAPHY.fontSize.large};
