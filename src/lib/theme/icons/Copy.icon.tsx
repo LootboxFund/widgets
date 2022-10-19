@@ -11,7 +11,7 @@ const CopyIcon = ({
   text: string
   fill?: string
   tipID?: string
-  smallWidth?: number
+  smallWidth?: number | string
 }) => {
   const [color, setColor] = useState(fill)
   return (

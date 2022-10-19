@@ -14,20 +14,22 @@ import { startLootboxOnMintListener } from 'lib/api/firebase/functions'
 import { promiseChainDelay } from 'lib/utils/promise'
 import { DepositFragment, Deposit, convertDepositFragmentToDeposit } from './utils'
 
-interface useLootboxFactoryResult {
+interface UseLootboxResult {
   lootbox: Contract | null
   provider: providers.JsonRpcProvider | null
-  loading: boolean
+  status: UseLootboxStatus
   proratedDeposits: TicketToDepositMapping
   deposits: Deposit[]
+  lastTx?: ContractTransaction
   loadProratedDepositsIntoState: (ticketID: LootboxTicketID_Web3) => void
   getLootboxDeposits: () => Promise<Deposit[]>
-  loadAllDepositsIntoState: () => void
+  loadAllDepositsIntoState: () => Promise<void>
   mintTicket: (
     signature: string,
     nonce: LootboxMintSignatureNonce,
     digest: LootboxTicketDigest
   ) => Promise<ContractTransaction>
+  withdrawCosmic: (ticketID: LootboxTicketID_Web3) => Promise<ContractTransaction>
 }
 
 interface UseLootboxParams {
@@ -38,13 +40,14 @@ interface UseLootboxParams {
 export interface TicketToDepositMapping {
   [key: LootboxTicketID_Web3]: Deposit[]
 }
-
-export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): useLootboxFactoryResult => {
-  const [loading, setLoading] = useState(false)
+type UseLootboxStatus = 'loading' | 'pending-wallet' | 'ready'
+export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): UseLootboxResult => {
   const [injectedProvider] = useProvider()
   const { provider } = useReadOnlyProvider({ chainIDHex })
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [proratedDeposits, setProratedDeposits] = useState<TicketToDepositMapping>({})
+  const [status, setStatus] = useState<UseLootboxStatus>('ready')
+  const [lastTx, setLastTx] = useState<ContractTransaction>()
 
   const lootbox = useMemo(() => {
     if (!provider || !lootboxAddress) {
@@ -55,13 +58,11 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
   }, [provider, lootboxAddress])
 
   const getLootboxDeposits = async (): Promise<Deposit[]> => {
-    console.log('loading all deposits', 'lootbox: ', lootbox?.address)
-
     if (!lootbox) {
       return []
     }
 
-    setLoading(true)
+    setStatus('loading')
     try {
       const deposits = await lootbox.viewAllDeposits()
 
@@ -88,7 +89,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
       console.error('Error loading deposits', err)
       return []
     } finally {
-      setLoading(false)
+      setStatus('ready')
     }
   }
 
@@ -97,7 +98,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
       return []
     }
 
-    setLoading(true)
+    setStatus('loading')
     try {
       const _deposits = (await lootbox.viewProratedDepositsForTicket(ticketID)) || []
 
@@ -134,7 +135,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
       console.error('Err reading deposits', err)
       return []
     } finally {
-      setLoading(false)
+      setStatus('ready')
     }
   }
 
@@ -168,10 +169,12 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
       throw new Error('Please login with MetaMask.')
     }
 
-    setLoading(true)
+    setStatus('pending-wallet')
     try {
       const blockNum = await injectedProvider.getBlockNumber()
       const tx = (await lootbox.connect(signer).mint(signature, nonce)) as ContractTransaction
+      setLastTx(tx)
+      setStatus('loading')
       // Call mint ticket enqueued task
       console.log('enqueing on mint: ', {
         fromBlock: blockNum,
@@ -194,19 +197,58 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): us
       // THROW THE ERROR
       throw err
     } finally {
-      setLoading(false)
+      setStatus('ready')
+    }
+  }
+
+  const withdrawCosmic = async (ticketID: LootboxTicketID_Web3): Promise<ContractTransaction> => {
+    if (!lootbox || !injectedProvider) {
+      throw new Error('No lootbox or signer provider')
+    }
+
+    const signer = injectedProvider.getSigner()
+    const currentAccount = signer ? await signer.getAddress() : undefined
+
+    if (!signer || !currentAccount) {
+      throw new Error('Please login with MetaMask.')
+    }
+
+    console.log(`
+  
+      Submitting redeemNFT transaction...
+  
+      lootboxAddress: ${lootboxAddress}
+      ticketID: ${ticketID}
+      currentAccount: ${currentAccount}
+  
+    `)
+    setStatus('pending-wallet')
+    try {
+      const tx = await lootbox.connect(signer).withdrawEarnings(ticketID)
+      setLastTx(tx)
+      setStatus('loading')
+
+      await tx.wait()
+
+      return tx
+    } catch (err) {
+      throw err
+    } finally {
+      setStatus('ready')
     }
   }
 
   return {
     lootbox,
     provider,
-    loading,
+    status,
     proratedDeposits,
     deposits,
+    lastTx,
     mintTicket,
     loadProratedDepositsIntoState,
     getLootboxDeposits,
     loadAllDepositsIntoState,
+    withdrawCosmic,
   }
 }
