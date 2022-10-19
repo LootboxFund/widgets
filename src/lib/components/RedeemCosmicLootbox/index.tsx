@@ -394,9 +394,11 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     return <Oopsies icon="🧐" title={words.notFound} />
   }
 
+  const lootboxImage = convertFilenameToThumbnail(lootboxData.stampImage, 'md')
+
   const whitelistImg = claimData?.whitelist?.lootboxTicket?.stampImage
     ? convertFilenameToThumbnail(claimData?.whitelist?.lootboxTicket?.stampImage, 'md')
-    : convertFilenameToThumbnail(lootboxData.stampImage, 'md')
+    : lootboxImage
 
   const watchPage = claimData ? `${manifest.microfrontends.webflow.battlePage}?tid=${claimData?.tournamentId}` : null
   const getTicketsPage = lootboxData?.joinCommunityUrl || watchPage
@@ -422,7 +424,11 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
         <$Vertical spacing={2}>
-          <$StampImg src={whitelistImg} alt={lootboxData.name} />
+          <$StampImgObject data={whitelistImg} type="image/png">
+            <$StampImg src={lootboxImage} alt={lootboxData.name} />
+          </$StampImgObject>
+
+          {/* <$StampImg src={whitelistImg} alt={lootboxData.name} /> */}
           <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
             {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
             <CopyIcon text={lootboxData.address} smallWidth={18} />
@@ -680,11 +686,15 @@ export const $RedeemCosmicContainer = styled.div<{
   max-width: 800px;
   font-family: sans-serif;
   background: ${(props) =>
-    `linear-gradient(117.52deg, ${props.themeColor}21 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
+    `linear-gradient(117.52deg,${props.themeColor}44 7%,${props.themeColor}30 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
   overflow: hidden;
 `
 
 export const $StampImg = styled.img`
+  max-width: 240px;
+`
+
+export const $StampImgObject = styled.object`
   max-width: 240px;
 `
 
