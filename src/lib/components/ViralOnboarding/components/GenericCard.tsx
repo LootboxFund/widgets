@@ -1,10 +1,11 @@
-import { COLORS } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import Spinner from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
-import { PropsWithChildren } from 'react'
+import { manifest } from 'manifest'
+import { PropsWithChildren, useState } from 'react'
 import styled from 'styled-components'
-import { background1, $Heading, $SubHeading } from '../contants'
+import { background1, $Heading, $SubHeading, $NextButton } from '../contants'
 
 const GenericCard = ({ children }: PropsWithChildren<{}>) => {
   return (
@@ -46,6 +47,38 @@ export const ErrorCard = ({ title, icon = '🤕', children, message }: PropsWith
     </$ViralOnboardingCard>
   )
 }
+
+export const EnterCodeCard = () => {
+  const [code, setCode] = useState('')
+  const url = `${manifest.microfrontends.webflow.referral}?r=${code}`
+  return (
+    <ErrorCard title="Referral not found" icon="🧐" message="Please enter another referral code">
+      <$Vertical style={{ maxWidth: '320px', margin: '0 auto', width: '100%' }}>
+        <$InputMedium placeholder="Referral Code" value={code} onChange={(e) => setCode(e.target.value)} />
+        <br />
+        <a href={url}>
+          <$NextButton
+            color={COLORS.trustFontColor}
+            backgroundColor={COLORS.trustBackground}
+            // style={{ padding: '15px 50px', margin: '0 auto' }}
+            style={{ width: '100%' }}
+          >
+            Go
+          </$NextButton>
+        </a>
+      </$Vertical>
+    </ErrorCard>
+  )
+}
+
+const $InputMedium = styled.input`
+  background-color: ${`${COLORS.white}`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  height: 40px;
+`
 
 const $Icon = styled.span`
   font-size: 50px;

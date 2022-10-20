@@ -7,7 +7,7 @@ import ChooseLotteryPartyBasket from './components/ChooseLotteryPartyBasket'
 import ChooseLottery from './components/ChooseLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
-import { LoadingCard, ErrorCard } from './components/GenericCard'
+import { LoadingCard, ErrorCard, EnterCodeCard } from './components/GenericCard'
 import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
@@ -20,6 +20,7 @@ type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'si
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const { ad, referral } = useViralOnboarding()
+  console.log('tooooo referral', referral)
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   console.log(`--- ad `, ad)
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
@@ -109,7 +110,7 @@ const ViralOnboardingPage = () => {
   }, [])
 
   if (!referralSlug) {
-    return <LoadingCard />
+    return <EnterCodeCard />
   }
 
   return (

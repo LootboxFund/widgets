@@ -35,11 +35,13 @@ import { SwitchTicketComponent } from './SwitchTicketComponent'
 import { truncateAddress } from 'lib/api/helpers'
 import { $Button } from 'lib/components/Generics/Button'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
-import { withdrawCosmic } from 'lib/api/redeemNFT'
 import { parseEth } from 'lib/utils/bnConversion'
 import { awaitPollResult } from 'lib/utils/promise'
 import { Deposit } from 'lib/hooks/useLootbox/utils'
 import { useAuth } from 'lib/hooks/useAuth'
+import CosmicAuthGuard from './CosmicAuthGuard'
+import { getBlockExplorerUrl } from 'lib/utils/chain'
+import { ContractTransaction } from 'ethers'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -55,12 +57,17 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const { screen } = useScreenSize()
   const words = useWords()
   const userSnapshot = useSnapshot(userState)
-  const [errorMessage, setErrorMessage] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(false)
   const { connectWallet } = useAuth()
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
-  const isPolling = useRef<boolean>(false)
+  const [isPolling, setIsPolling] = useState<boolean>(false)
+  const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
+  const [connectingWallet, setConnectingWallet] = useState(false)
+  const [notification, setNotification] = useState<{
+    message: string
+    type: 'loading' | 'info' | 'error' | 'success'
+    tx?: ContractTransaction
+  }>()
   const [cursor, setCursor] = useState<UserClaimsCursor>({
     startAfter: null,
     endBefore: null,
@@ -89,26 +96,37 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       onCompleted: (data) => {
         if (data?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
           const [newClaimData] = data?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
-
           if (
-            isPolling.current &&
+            isPolling &&
             claimData?.id === newClaimData?.id &&
             newClaimData?.whitelist?.isRedeemed &&
             !!newClaimData?.whitelist?.lootboxTicket &&
-            status === 'not-minted'
+            pollStatus.current === 'not-minted'
           ) {
+            console.log('STOPPING MINT POLL')
             // Minting Condition
             stopPolling()
-            isPolling.current = false
+            setIsPolling(false)
+            setNotification({
+              type: 'success',
+              message: "You're LOOTBOX NFT has been minted!",
+            })
+            pollStatus.current = undefined
           } else if (
-            isPolling.current &&
+            isPolling &&
             claimData?.id === newClaimData?.id &&
-            newClaimData?.whitelist &&
-            status === 'no-whitelist'
+            !!newClaimData?.whitelist &&
+            pollStatus.current === 'no-whitelist'
           ) {
+            console.log('STOPPING WHITELIST POLL')
             // Wallet connect condition which generate whitelists
             stopPolling()
-            isPolling.current = false
+            setIsPolling(false)
+            // setNotification({
+            //   type: 'success',
+            //   message: 'You have been whitelisted. You can now mint your LOOTBOX NFT.',
+            // })
+            pollStatus.current = undefined
           }
         }
       },
@@ -132,17 +150,41 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   }, [claimCountData?.getLootboxByID])
 
   const {
-    loading: loadingLootboxWeb3,
+    status: web3LootboxStatus,
     proratedDeposits,
     deposits: allDeposits,
+    lastTx,
     loadProratedDepositsIntoState,
+    loadAllDepositsIntoState,
     mintTicket,
+    withdrawCosmic,
   } = useLootbox({
     lootboxAddress: lootboxData?.address,
     chainIDHex: lootboxData?.chainIdHex,
   })
 
-  const allLoading = loadingLootboxWeb3 || isLoading
+  useEffect(() => {
+    loadAllDepositsIntoState().finally(() => {
+      setNotification(undefined)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (web3LootboxStatus === 'pending-wallet') {
+      setNotification({
+        type: 'info',
+        message: 'Open your MetaMask Wallet and confirm the transaction',
+      })
+    } else if (web3LootboxStatus === 'loading') {
+      if (status === 'not-minted' || status === 'ready') {
+        setNotification({ type: 'loading', message: 'Please wait while we confirm the transaction', tx: lastTx })
+      } else {
+        setNotification({ type: 'loading', message: 'Loading...' })
+      }
+    } else if (web3LootboxStatus === 'ready' && notification?.type === 'loading') {
+      setNotification(undefined)
+    }
+  }, [web3LootboxStatus])
 
   const claimData: UserClaimFE | undefined = useMemo(() => {
     if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
@@ -170,11 +212,15 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     }
   }, [proratedDeposits, claimData?.whitelist?.lootboxTicket?.ticketID])
 
+  const noDepositsAvailable: boolean = useMemo(() => {
+    return ticketProratedDeposits.length === 0 || ticketProratedDeposits.every((deposit) => deposit.isRedeemed)
+  }, [ticketProratedDeposits])
+
   const incrementClaimIdx = (incrementAmount: number) => {
     if (loadingClaimCountQuery || nClaims <= 1) {
       return
     }
-    setErrorMessage('')
+    setNotification(undefined)
     if (claimIdx + incrementAmount >= nClaims) {
       // start at begining
       setCursor({
@@ -195,7 +241,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     if (loadingClaimCountQuery || nClaims <= 1) {
       return
     }
-    setErrorMessage('')
+    setNotification(undefined)
     if (claimIdx - decrementAmount < 0) {
       // start at end
       setCursor({
@@ -215,65 +261,68 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   }
 
   const mintNFT = async () => {
-    setErrorMessage('')
     if (!claimData?.whitelist?.signature || !claimData?.whitelist?.nonce || !claimData?.whitelist?.digest) {
+      setNotification({ type: 'error', message: 'Something went wrong! Please try again later.' })
       console.error('No signature or nonce')
       return
     }
-    setIsLoading(true)
     try {
-      await mintTicket(claimData.whitelist.signature, claimData.whitelist.nonce, claimData.whitelist.digest)
-      isPolling.current = true
+      const tx = await mintTicket(claimData.whitelist.signature, claimData.whitelist.nonce, claimData.whitelist.digest)
+      setIsPolling(true)
+      pollStatus.current = status
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
     } catch (err) {
       if (err?.code !== 4001) {
         console.error('error trying to mint', err)
-        setErrorMessage(err?.data?.message || err?.message || words.anErrorOccured)
+        setNotification({ type: 'error', message: err?.data?.message || err?.message || words.anErrorOccured })
+      } else {
+        setNotification(undefined)
       }
-    } finally {
-      setIsLoading(false)
     }
   }
 
   const withdrawEarnings = async () => {
-    setErrorMessage('')
     if (!claimData?.whitelist?.lootboxTicket?.ticketID) {
+      setNotification({ type: 'error', message: 'Something went wrong! Please try again later.' })
       console.error('No Ticket')
       return
     }
-
-    setIsLoading(true)
     try {
-      await withdrawCosmic({
-        lootboxAddress: lootboxData.address,
-        ticketID: claimData.whitelist.lootboxTicket.ticketID,
-      })
+      await withdrawCosmic(claimData.whitelist.lootboxTicket.ticketID)
       // Refetch the deposit (which should be marked as redeemed)
       loadProratedDepositsIntoState(claimData.whitelist.lootboxTicket.ticketID)
     } catch (err) {
       if (err?.code !== 4001) {
         console.error('Error withdrawing', err)
-        setErrorMessage(err?.message || words.anErrorOccured)
+        setNotification({ type: 'error', message: err?.message || words.anErrorOccured })
+      } else {
+        setNotification(undefined)
       }
-    } finally {
-      setIsLoading(false)
     }
   }
 
   const handleWalletConnect = async () => {
-    setIsLoading(true)
-    setErrorMessage('')
+    setConnectingWallet(true)
+    setNotification({ type: 'info', message: 'Open your MetaMask Wallet and sign the message' })
     try {
       await connectWallet()
-      isPolling.current = true
+      setNotification({ type: 'loading', message: 'Please wait as we generate a whitelist for your wallet' })
+      setIsPolling(true)
+      pollStatus.current = status
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
-      await awaitPollResult(isPolling.current)
+      await awaitPollResult(isPolling)
+      setNotification({ type: 'success', message: 'You have been whitelisted!' })
+      setTimeout(() => {
+        setNotification(undefined)
+      }, 3000)
     } catch (err) {
       if (err?.code !== 4001) {
-        setErrorMessage(err?.message || `${words.anErrorOccured}!`)
+        setNotification({ type: 'error', message: err?.message || words.anErrorOccured })
+      } else {
+        setNotification(undefined)
       }
     } finally {
-      setIsLoading(false)
+      setConnectingWallet(false)
     }
   }
 
@@ -288,7 +337,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           return (
             <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
               <$DividendOwed>
-                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
+                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal), 22)}`}
               </$DividendOwed>
               <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
             </$DividendRow>
@@ -326,14 +375,30 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   if (loadingLootboxQuery) {
     return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
   } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
-    return <Oopsies icon="🤕" title={words.anErrorOccured} />
+    const isNotFound =
+      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
+        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
+        : false
+    if (isNotFound) {
+      return <Oopsies icon="🧐" title={words.notFound} />
+    }
+    return (
+      <Oopsies
+        icon="🤕"
+        title={words.anErrorOccured}
+        // @ts-ignore
+        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
+      />
+    )
   } else if (!lootboxData) {
     return <Oopsies icon="🧐" title={words.notFound} />
   }
 
+  const lootboxImage = convertFilenameToThumbnail(lootboxData.stampImage, 'md')
+
   const whitelistImg = claimData?.whitelist?.lootboxTicket?.stampImage
     ? convertFilenameToThumbnail(claimData?.whitelist?.lootboxTicket?.stampImage, 'md')
-    : convertFilenameToThumbnail(lootboxData.stampImage, 'md')
+    : lootboxImage
 
   const watchPage = claimData ? `${manifest.microfrontends.webflow.battlePage}?tid=${claimData?.tournamentId}` : null
   const getTicketsPage = lootboxData?.joinCommunityUrl || watchPage
@@ -347,18 +412,30 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     ? ticketProratedDeposits.slice()
     : ticketProratedDeposits.slice(0, 4)
 
+  const isLoading =
+    notification?.type === 'loading' ||
+    web3LootboxStatus === 'loading' ||
+    web3LootboxStatus === 'pending-wallet' ||
+    isPolling ||
+    loadingClaims
+
+  const blockExplorerURL = getBlockExplorerUrl(lootboxData.chainIdHex)
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
         <$Vertical spacing={2}>
-          <$StampImg src={whitelistImg} alt={lootboxData.name} />
+          <$StampImgObject data={whitelistImg} type="image/png">
+            <$StampImg src={lootboxImage} alt={lootboxData.name} />
+          </$StampImgObject>
+
+          {/* <$StampImg src={whitelistImg} alt={lootboxData.name} /> */}
           <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
             {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
             <CopyIcon text={lootboxData.address} smallWidth={18} />
           </$RedeemCosmicSubtitle>
         </$Vertical>
 
-        <$Vertical spacing={2}>
+        <$Vertical spacing={2} width="100%">
           <$RedeemCosmicTitle screen={screen}>{lootboxData.name}</$RedeemCosmicTitle>
           <$RedeemCosmicSubtitle>
             You have&nbsp;
@@ -381,23 +458,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             )}
           </$RedeemCosmicSubtitle>
           <br />
-          {isWalletConnected && isWrongWallet && claimData?.whitelist ? (
-            <$RedeemCosmicSubtitle
-              style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large, paddingTop: '0px' }}
-            >
-              ⚠️ Please connect wallet{' '}
-              <b>{truncateAddress(claimData.whitelist.whitelistedAddress, { prefixLength: 6, suffixLength: 4 })}</b>
-              <CopyIcon text={claimData.whitelist.whitelistedAddress} smallWidth={18} />
-            </$RedeemCosmicSubtitle>
-          ) : isWalletConnected &&
-            lootboxData?.chainIdHex &&
-            lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
-            <$RedeemCosmicSubtitle
-              style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large, paddingTop: '0px' }}
-            >
-              ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
-            </$RedeemCosmicSubtitle>
-          ) : null}
           {claimData && (
             <$Horizontal spacing={4} flexWrap={screen === 'mobile'} justifyContent="space-between">
               <div>
@@ -410,41 +470,37 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
                     status === 'no-whitelist' ? (
                       <$Button
                         screen={screen}
-                        onClick={!allLoading ? handleWalletConnect : undefined}
+                        onClick={!isLoading ? handleWalletConnect : undefined}
                         color={`${COLORS.warningFontColor}`}
                         colorHover={`${COLORS.warningFontColor}90`}
                         backgroundColor={`${COLORS.warningBackground}`}
                         backgroundColorHover={`${COLORS.warningBackground}80`}
                         style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
-                        disabled={allLoading}
+                        disabled={isLoading || connectingWallet}
                       >
-                        <LoadingText
-                          loading={allLoading}
-                          color={`${COLORS.warningFontColor}`}
-                          text={'Confirm Wallet'}
-                        />
+                        <LoadingText loading={isLoading} color={`${COLORS.warningFontColor}`} text={'Confirm Wallet'} />
                       </$Button>
                     ) : status === 'not-minted' ? (
                       <$Button
                         screen={screen}
-                        onClick={!allLoading ? mintNFT : undefined}
+                        onClick={!isLoading ? mintNFT : undefined}
                         color={COLORS.trustFontColor}
                         backgroundColor={COLORS.trustBackground}
                         style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
-                        disabled={allLoading}
+                        disabled={isLoading}
                       >
-                        <LoadingText loading={allLoading} color={COLORS.trustFontColor} text={'Claim Ticket'} />
+                        <LoadingText loading={isLoading} color={COLORS.trustFontColor} text={'Claim Ticket'} />
                       </$Button>
                     ) : (
                       <$Button
                         screen={screen}
-                        onClick={!allLoading ? withdrawEarnings : undefined}
+                        onClick={!isLoading ? withdrawEarnings : undefined}
                         color={COLORS.white}
-                        backgroundColor={COLORS.successFontColor}
+                        backgroundColor={noDepositsAvailable ? COLORS.surpressedBackground : COLORS.successFontColor}
                         style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
-                        disabled={allLoading}
+                        disabled={isLoading || noDepositsAvailable}
                       >
-                        <LoadingText loading={allLoading} color={COLORS.white} text={'Redeem Rewards'} />
+                        <LoadingText loading={isLoading} color={COLORS.white} text={'Redeem Rewards'} />
                       </$Button>
                     )
                   }
@@ -461,11 +517,70 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$Horizontal>
           )}
 
-          {errorMessage && <$ErrorText style={{ margin: '15px 0px 15px' }}>{errorMessage}</$ErrorText>}
+          {isWalletConnected && isWrongWallet && claimData?.whitelist ? (
+            <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large }}>
+              ⚠️ Please connect wallet{' '}
+              <b>{truncateAddress(claimData.whitelist.whitelistedAddress, { prefixLength: 6, suffixLength: 4 })}</b>
+              <CopyIcon text={claimData.whitelist.whitelistedAddress} smallWidth={18} />
+            </$RedeemCosmicSubtitle>
+          ) : isWalletConnected &&
+            lootboxData?.chainIdHex &&
+            lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
+            <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large }}>
+              ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
+            </$RedeemCosmicSubtitle>
+          ) : ticketProratedDeposits.length > 0 && noDepositsAvailable ? (
+            <$RedeemCosmicSubtitle>✅ All deposits have been redeemed</$RedeemCosmicSubtitle>
+          ) : null}
 
-          {isPolling.current || loadingClaims || loadingLootboxWeb3 ? (
-            <Spinner size="25px" margin="30px auto auto" color={`${COLORS.surpressedFontColor}3A`} />
-          ) : status === 'no-claims' || nClaims === 0 ? (
+          {notification && notification.type === 'error' ? (
+            <$RedeemCosmicSubtitle style={{ color: COLORS.dangerFontColor }}>
+              🚨&nbsp;
+              {notification.message.length > 220 ? notification.message.slice(0, 220) + '...' : notification.message}
+            </$RedeemCosmicSubtitle>
+          ) : notification && notification.type === 'info' ? (
+            <$RedeemCosmicSubtitle>
+              ℹ️&nbsp;{notification.message}{' '}
+              {notification && notification.tx ? (
+                <span style={{ display: 'inline' }}>
+                  &nbsp;👉&nbsp;
+                  <$Link href={`${blockExplorerURL}/tx/${notification.tx.hash}`} target="_blank">
+                    {words.viewOnBlockExplorer}
+                  </$Link>
+                  &nbsp;
+                </span>
+              ) : null}
+            </$RedeemCosmicSubtitle>
+          ) : notification && notification.type === 'success' ? (
+            <$RedeemCosmicSubtitle>
+              ✅&nbsp;{notification.message}
+              {notification && notification.tx ? (
+                <span style={{ display: 'inline' }}>
+                  &nbsp;👉&nbsp;
+                  <$Link href={`${blockExplorerURL}/tx/${notification.tx.hash}`} target="_blank">
+                    {words.viewOnBlockExplorer}
+                  </$Link>
+                  &nbsp;
+                </span>
+              ) : null}
+            </$RedeemCosmicSubtitle>
+          ) : isLoading ? (
+            <$RedeemCosmicSubtitle>
+              <Spinner size="0.75rem" color={`${COLORS.surpressedFontColor}3A`} style={{ display: 'inline-block' }} />
+              &nbsp;{notification?.message || 'Loading... Please wait.'}
+              {notification && notification.tx ? (
+                <span style={{ display: 'inline' }}>
+                  &nbsp;👉&nbsp;
+                  <$Link href={`${blockExplorerURL}/tx/${notification.tx.hash}`} target="_blank">
+                    {words.viewOnBlockExplorer}
+                  </$Link>
+                  &nbsp;
+                </span>
+              ) : null}
+            </$RedeemCosmicSubtitle>
+          ) : null}
+
+          {isLoading ? null : status === 'no-claims' || nClaims === 0 ? (
             <$Vertical spacing={2}>
               <$EarningsContainer>
                 <$EarningsText style={{ margin: 'auto' }}>You do not own any tickets for this Lootbox</$EarningsText>
@@ -502,7 +617,11 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
                 return (
                   <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
                     <$DividendOwed>
-                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal))}`}
+                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(
+                        deposit.tokenAmount,
+                        Number(deposit.decimal),
+                        22
+                      )}`}
                     </$DividendOwed>
                     <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
                   </$DividendRow>
@@ -545,13 +664,13 @@ const RedeemCosmicLootboxPage = () => {
   }
 
   return (
-    <AuthGuard loginTitle={'Login to redeem your FREE rewards'}>
+    <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
       <RedeemCosmicLootbox lootboxID={lootboxID} />
-    </AuthGuard>
+    </CosmicAuthGuard>
   )
 }
 
-const $RedeemCosmicContainer = styled.div<{
+export const $RedeemCosmicContainer = styled.div<{
   themeColor: string
   boxShadow?: string
   screen: ScreenSize
@@ -567,14 +686,19 @@ const $RedeemCosmicContainer = styled.div<{
   max-width: 800px;
   font-family: sans-serif;
   background: ${(props) =>
-    `linear-gradient(117.52deg, ${props.themeColor}21 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
+    `linear-gradient(117.52deg,${props.themeColor}44 7%,${props.themeColor}30 15%, ${props.themeColor}11 26%, rgba(217, 217, 217, 0) 60%)`};
+  overflow: hidden;
 `
 
-const $StampImg = styled.img`
+export const $StampImg = styled.img`
   max-width: 240px;
 `
 
-const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
+export const $StampImgObject = styled.object`
+  max-width: 240px;
+`
+
+export const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   color: ${COLORS.black};
   font-family: ${TYPOGRAPHY.fontFamily.regular};
@@ -583,7 +707,7 @@ const $RedeemCosmicTitle = styled.h1<{ screen: ScreenSize }>`
   line-height: ${(props) => (props.screen === 'desktop' ? '2rem' : '1.5rem')};
 `
 
-const $RedeemCosmicSubtitle = styled.span`
+export const $RedeemCosmicSubtitle = styled.span`
   padding: 10px 0px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: ${TYPOGRAPHY.fontSize.xlarge};
@@ -594,7 +718,19 @@ const $RedeemCosmicSubtitle = styled.span`
   word-break: break-word;
 `
 
-const $RedeemCosmicButton = styled.button<{
+export const $Link = styled.a`
+  padding: 10px 0px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.light};
+  color: #2cb1ea;
+  text-decoration-color: initial;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  word-break: break-word;
+  font-style: italic;
+`
+
+export const $RedeemCosmicButton = styled.button<{
   theme: 'primary' | 'warn' | 'trust' | 'ghost' | 'link'
   disabled?: boolean
 }>`
@@ -636,15 +772,16 @@ const $RedeemCosmicButton = styled.button<{
   font-style: ${(props) => (props.theme === 'link' ? 'italic' : 'normal')};
 `
 
-const $ErrorText = styled.span`
-  font-family: ${TYPOGRAPHY.fontFamily.regular};
-  color: ${COLORS.dangerFontColor};
-  text-align: start;
-  margin-top: 10px;
-  font-size: ${TYPOGRAPHY.fontSize.medium};
-`
+// export const $ErrorText = styled.span`
+//   font-family: ${TYPOGRAPHY.fontFamily.regular};
+//   color: ${COLORS.dangerFontColor};
+//   text-align: start;
+//   margin-top: 10px;
+//   font-size: ${TYPOGRAPHY.fontSize.medium};
+//   word-break: break-word;
+// `
 
-const $EarningsContainer = styled.div<{}>`
+export const $EarningsContainer = styled.div<{}>`
   width: 100%;
   min-height: 124px;
 
@@ -663,7 +800,7 @@ const $EarningsContainer = styled.div<{}>`
 }
 `
 
-const $EarningsText = styled.p<{}>`
+export const $EarningsText = styled.p<{}>`
   margin-top: 5px;
   text-align: center;
   font-size: ${TYPOGRAPHY.fontSize.large};
