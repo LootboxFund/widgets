@@ -33,6 +33,7 @@ export interface OnboardingTournamentFE {
   tournamentDate?: number
   promoterId?: AffiliateID
   isPostCosmic?: boolean
+  runningCompletedClaims: number
   lootboxSnapshots: {
     address: Address
     stampImage?: string
@@ -88,7 +89,8 @@ export const GET_REFERRAL = gql`
             description
             isPostCosmic
             tournamentDate
-            lootboxSnapshots {
+            runningCompletedClaims
+            lootboxSnapshots(status: active) {
               address
               stampImage
             }

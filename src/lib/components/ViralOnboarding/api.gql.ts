@@ -11,7 +11,6 @@ import {
   AffiliateID,
 } from '@wormgraph/helpers'
 import {
-  CreativeType,
   ClaimStatus,
   ClaimType,
   PartyBasketStatus,
@@ -102,7 +101,7 @@ export const GET_LOTTERY_LISTINGS_V2 = gql`
     tournament(id: $id) {
       ... on TournamentResponseSuccess {
         tournament {
-          lootboxSnapshots {
+          lootboxSnapshots(status: active) {
             lootboxID
             address
             stampImage
