@@ -29,7 +29,7 @@ interface Props {
 const AcceptGift = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
-  const { referral, setClaim, sessionId } = useViralOnboarding()
+  const { referral, setClaim } = useViralOnboarding()
   const [errorMessage, setErrorMessage] = useState<string>()
   useEffect(() => {
     startFlight()
@@ -179,7 +179,7 @@ const AcceptGift = (props: Props) => {
               defaultMessage="{nPeople} people already accepted this gift"
               description="Counts how many users accepted the gift"
               values={{
-                nPeople: referral?.nConversions,
+                nPeople: referral?.tournament?.runningCompletedClaims || 0,
               }}
             />
           </$SupressedParagraph>
