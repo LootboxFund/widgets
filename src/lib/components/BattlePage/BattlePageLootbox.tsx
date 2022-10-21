@@ -161,17 +161,15 @@ const BattlePageLootbox = (props: Props) => {
                     </$Link>
                   </$span>
                 )}
-                {props.lootboxSnapshot?.address && (
-                  <$span style={{ margin: '10px 10px 10px 0px' }}>
-                    <$Link
-                      color={'inherit'}
-                      href={`${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${props.lootboxSnapshot.lootbox.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      👉 View Lootbox
-                    </$Link>
-                  </$span>
-                )}
+                <$span style={{ margin: '10px 10px 10px 0px' }}>
+                  <$Link
+                    color={'inherit'}
+                    href={`${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${props.lootboxSnapshot.lootbox.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    👉 View Lootbox
+                  </$Link>
+                </$span>
               </$Horizontal>
             </$Vertical>
             <$Vertical

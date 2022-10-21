@@ -20,9 +20,7 @@ type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'si
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user } = useAuth()
   const { ad, referral } = useViralOnboarding()
-  console.log('tooooo referral', referral)
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
-  console.log(`--- ad `, ad)
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
