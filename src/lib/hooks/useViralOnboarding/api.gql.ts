@@ -90,7 +90,7 @@ export const GET_REFERRAL = gql`
             isPostCosmic
             tournamentDate
             runningCompletedClaims
-            lootboxSnapshots {
+            lootboxSnapshots(status: active) {
               address
               stampImage
             }

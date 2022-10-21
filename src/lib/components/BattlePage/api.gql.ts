@@ -126,7 +126,7 @@ export const GET_TOURNAMENT_BATTLE_PAGE = gql`
           #     hasNextPage
           #   }
           # }
-          lootboxSnapshots {
+          lootboxSnapshots(status: active) {
             address
             stampImage
             status
