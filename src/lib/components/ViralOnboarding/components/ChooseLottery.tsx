@@ -25,6 +25,7 @@ interface Props {
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
+  const [searchString, setSearchString] = useState('')
   const [page, setPage] = useState(0)
   const { referral, setChosenLootbox } = useViralOnboarding()
   const words = useWords()
@@ -51,6 +52,7 @@ const ChooseLottery = (props: Props) => {
         (t) => t.status !== LootboxTournamentStatus.Disabled && t.lootbox.status !== LootboxStatus.Disabled
       ),
     ]
+
     tickets.sort((a, b) => {
       if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
         // Bring to begining of array
@@ -68,10 +70,18 @@ const ChooseLottery = (props: Props) => {
       return 0
     })
 
-    const paginated = tickets.slice(0, PAGE_SIZE * (page + 1))
+    if (searchString.length > 0) {
+      const paginated = tickets.filter((t) => {
+        return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
+      })
 
-    return [paginated, paginated.length < tickets.length]
-  }, [page, tournament?.lootboxSnapshots, referral?.seedLootboxID])
+      return [paginated, false]
+    } else {
+      const paginated = tickets.slice(0, PAGE_SIZE * (page + 1))
+
+      return [paginated, paginated.length < tickets.length]
+    }
+  }, [page, tournament?.lootboxSnapshots, referral?.seedLootboxID, searchString])
 
   if (loading) {
     return <LoadingCard />
@@ -98,6 +108,13 @@ const ChooseLottery = (props: Props) => {
               defaultMessage="Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
             />
           </$SubHeading>
+          <$InputMedium
+            value={searchString}
+            onChange={(e) => setSearchString(e.target.value)}
+            placeholder="Search by team name"
+          />
+          <br />
+          <br />
           <$Vertical spacing={4} style={{ margin: '0px -10px' }}>
             {tickets.map((ticket, idx) => {
               const description = !ticket?.lootbox?.description
@@ -177,6 +194,15 @@ const ChooseLottery = (props: Props) => {
     </$ViralOnboardingCard>
   )
 }
+
+const $InputMedium = styled.input`
+  background-color: ${`${COLORS.white}`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  height: 40px;
+`
 
 const $LotteryContainer = styled.div<{ type?: 'default' | 'highlight' | 'locked' }>`
   width: 100%;
