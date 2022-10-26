@@ -185,7 +185,7 @@ export const GET_LOOTBOX_CLAIMS_TO_REDEEM = gql`
   }
 `
 
-export type RedeemLootboxTicketMutationResponseFE = {
+export type WhitelistLootboxClaimsResponseFE = {
   whitelistMyLootboxClaims:
     | ResponseError
     | { __typename: 'WhitelistMyLootboxClaimsResponseSuccess'; signatures: [{ id: LootboxMintWhitelistID }] }
