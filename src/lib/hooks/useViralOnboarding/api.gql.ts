@@ -1,28 +1,11 @@
 import { gql } from '@apollo/client'
-import {
-  Address,
-  AdID,
-  AdSetID,
-  AdvertiserID,
-  AffiliateID,
-  CreativeID,
-  FlightID,
-  LootboxID,
-  OfferID,
-  PartyBasketID,
-  ReferralSlug,
-  TournamentID,
-} from '@wormgraph/helpers'
-import { AdServed, Placement } from '../../api/graphql/generated/types'
-import {
-  // AdType,
-  CreativeType,
-} from 'lib/api/graphql/generated/types'
+import { Address, AffiliateID, LootboxID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+import { AdServed } from '../../api/graphql/generated/types'
 
 export interface LootboxReferralFE {
   id: LootboxID
   nftBountyValue?: string
-  address: Address
+  address: Address | null
   stampImage: string
 }
 
@@ -35,7 +18,8 @@ export interface OnboardingTournamentFE {
   isPostCosmic?: boolean
   runningCompletedClaims: number
   lootboxSnapshots: {
-    address: Address
+    lootboxID: LootboxID
+    address: Address | null
     stampImage?: string
   }[]
 }
@@ -91,6 +75,7 @@ export const GET_REFERRAL = gql`
             tournamentDate
             runningCompletedClaims
             lootboxSnapshots(status: active) {
+              lootboxID
               address
               stampImage
             }

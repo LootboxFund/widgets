@@ -435,7 +435,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           </$RedeemCosmicSubtitle>
         </$Vertical>
 
-        <$Vertical spacing={2} width="100%">
+        <$Vertical spacing={2} width="100%" style={{ maxWidth: screen === 'desktop' ? '420px' : '100%' }}>
           <$RedeemCosmicTitle screen={screen}>{lootboxData.name}</$RedeemCosmicTitle>
           <$RedeemCosmicSubtitle>
             You have&nbsp;
