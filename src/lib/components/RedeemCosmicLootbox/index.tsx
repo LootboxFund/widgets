@@ -1,10 +1,9 @@
-import { Address, chainIdHexToName, COLORS, LootboxID, LootboxTicketID_Web3, TYPOGRAPHY } from '@wormgraph/helpers'
+import { chainIdHexToName, COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
 import LogRocket from 'logrocket'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import AuthGuard from '../AuthGuard'
 import { Oopsies } from '../Profile/common'
 import {
   GET_LOOTBOX_REDEEM_PAGE,
@@ -17,6 +16,8 @@ import {
   GetUserClaimCountFESuccess,
   GetLootboxRedemptionClaimsFE,
   GET_LOOTBOX_CLAIMS_TO_REDEEM,
+  WHITELIST_ALL_LOOTBOX_CLAIMS,
+  WhitelistLootboxClaimsResponseFE,
 } from './api.gql'
 import { useQuery } from '@apollo/client'
 import { LootboxUserClaimsArgs, QueryGetLootboxByIdArgs, UserClaimsCursor } from 'lib/api/graphql/generated/types'
@@ -159,8 +160,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     mintTicket,
     withdrawCosmic,
   } = useLootbox({
-    lootboxAddress: lootboxData?.address,
-    chainIDHex: lootboxData?.chainIdHex,
+    lootboxAddress: lootboxData?.address || undefined,
+    chainIDHex: lootboxData?.chainIdHex || undefined,
   })
 
   useEffect(() => {
@@ -419,7 +420,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     isPolling ||
     loadingClaims
 
-  const blockExplorerURL = getBlockExplorerUrl(lootboxData.chainIdHex)
+  const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -428,11 +429,12 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             <$StampImg src={lootboxImage} alt={lootboxData.name} />
           </$StampImgObject>
 
-          {/* <$StampImg src={whitelistImg} alt={lootboxData.name} /> */}
-          <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
-            {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
-            <CopyIcon text={lootboxData.address} smallWidth={18} />
-          </$RedeemCosmicSubtitle>
+          {lootboxData?.address && (
+            <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
+              {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
+              <CopyIcon text={lootboxData.address} smallWidth={18} />
+            </$RedeemCosmicSubtitle>
+          )}
         </$Vertical>
 
         <$Vertical spacing={2} width="100%" style={{ maxWidth: screen === 'desktop' ? '420px' : '100%' }}>
@@ -462,7 +464,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             <$Horizontal spacing={4} flexWrap={screen === 'mobile'} justifyContent="space-between">
               <div>
                 <RedeemButton
-                  targetNetwork={lootboxData.chainIdHex}
+                  targetNetwork={lootboxData?.chainIdHex || undefined}
                   targetWalletAddress={claimData?.whitelist?.whitelistedAddress}
                 >
                   {

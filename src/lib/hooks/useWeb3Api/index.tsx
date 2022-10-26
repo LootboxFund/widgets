@@ -46,7 +46,7 @@ export const useProvider = (): useProviderReturnType => {
 }
 
 interface ReadOnlyProviderParams {
-  chainIDHex: ChainIDHex
+  chainIDHex?: ChainIDHex
 }
 export const useReadOnlyProvider = ({ chainIDHex }: ReadOnlyProviderParams) => {
   const provider = useMemo<providers.JsonRpcProvider | null>(() => {
