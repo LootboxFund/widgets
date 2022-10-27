@@ -49,6 +49,7 @@ import { useAuth } from 'lib/hooks/useAuth'
 import CosmicAuthGuard from './CosmicAuthGuard'
 import { getBlockExplorerUrl } from 'lib/utils/chain'
 import { ContractTransaction } from 'ethers'
+import BN from 'bignumber.js'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -200,9 +201,33 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     loadProratedDepositsIntoState(ticketID)
   }, [claimData?.whitelist?.lootboxTicket?.ticketID, proratedDeposits])
 
+  const sortDeposits = (a: Deposit, b: Deposit) => {
+    if (a.isRedeemed && b.isRedeemed) {
+      return 0
+    } else {
+      return a.isRedeemed ? 1 : -1
+    }
+  }
+
   const ticketProratedDeposits: Deposit[] = useMemo(() => {
     if (proratedDeposits && claimData?.whitelist?.lootboxTicket?.ticketID) {
-      return proratedDeposits[claimData.whitelist.lootboxTicket.ticketID] || []
+      const deposits = proratedDeposits[claimData.whitelist.lootboxTicket.ticketID]
+      if (!deposits) {
+        return []
+      }
+      // Merges deposits of the same token
+      return deposits
+        .reduce<Deposit[]>((a, b) => {
+          const deposit = a.find((d) => d.tokenAddress === b.tokenAddress && d.isRedeemed === b.isRedeemed)
+          console.log('deposit', deposit)
+          if (deposit) {
+            deposit.tokenAmount = new BN(deposit.tokenAmount).plus(new BN(b.tokenAmount)).toString()
+          } else {
+            a.push(b)
+          }
+          return a
+        }, [])
+        .sort(sortDeposits)
     } else {
       return []
     }
@@ -466,7 +491,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
           {lootboxData?.address && screen !== 'mobile' && renderLootboxAddress()}
         </$Vertical>
 
-        <$Vertical spacing={2} width="100%" style={{ maxWidth: screen === 'desktop' ? '420px' : '100%' }}>
+        <$Vertical spacing={2} width="100%" style={{ maxWidth: screen === 'desktop' ? '460px' : '100%' }}>
           <$RedeemCosmicTitle screen={screen}>{lootboxData.name}</$RedeemCosmicTitle>
           {lootboxData?.address && screen === 'mobile' && renderLootboxAddress()}
           <$RedeemCosmicSubtitle>
