@@ -10,7 +10,7 @@ import {
   $TournamentStampPreviewImage,
   $SmallText,
 } from '../contants'
-import { Address, COLORS, ReferralSlug, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, LootboxID, ReferralSlug, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { Referral } from 'lib/api/graphql/generated/types'
 import QRCodeComponent from 'easyqrcodejs'
@@ -24,10 +24,12 @@ export interface QRCodeReferral {
     title?: string
     tournamentDate?: string | number
     lootboxSnapshots?: {
-      address: Address
+      lootboxID: LootboxID
+      address: Address | null
       stampImage: string
     }[]
   }
+  seedLootboxID?: LootboxID
   seedLootbox?: {
     address: Address
   }
@@ -75,16 +77,17 @@ const QRCode = (props: Props) => {
   }, [props.referral])
 
   const LootboxSnapshots = () => {
-    const seedLootboxAddress = props.referral?.seedLootbox?.address || props.referral?.seedPartyBasket?.lootboxAddress
+    const seedLootboxID = props.referral.seedLootboxID
+
     let showCasedLootboxImages: string[]
     if (props.referral?.tournament?.lootboxSnapshots && props.referral?.tournament?.lootboxSnapshots?.length > 0) {
-      const showcased = seedLootboxAddress
-        ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.address === seedLootboxAddress)
+      const showcased = seedLootboxID
+        ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID === seedLootboxID)
         : undefined
-      const secondary = seedLootboxAddress
-        ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
+      const secondary = seedLootboxID
+        ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID !== seedLootboxID)
         : undefined
-      showCasedLootboxImages = showcased
+      showCasedLootboxImages = !!showcased?.stampImage
         ? [
             convertFilenameToThumbnail(showcased.stampImage, 'sm'),
             secondary?.stampImage ? convertFilenameToThumbnail(secondary.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP,
@@ -97,6 +100,29 @@ const QRCode = (props: Props) => {
     } else {
       showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
     }
+
+    // const seedLootboxAddress = props.referral?.seedLootbox?.address || props.referral?.seedPartyBasket?.lootboxAddress
+    // let showCasedLootboxImages: string[]
+    // if (props.referral?.tournament?.lootboxSnapshots && props.referral?.tournament?.lootboxSnapshots?.length > 0) {
+    //   const showcased = seedLootboxAddress
+    //     ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.address === seedLootboxAddress)
+    //     : undefined
+    //   const secondary = seedLootboxAddress
+    //     ? props.referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
+    //     : undefined
+    //   showCasedLootboxImages = showcased
+    //     ? [
+    //         convertFilenameToThumbnail(showcased.stampImage, 'sm'),
+    //         secondary?.stampImage ? convertFilenameToThumbnail(secondary.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP,
+    //       ]
+    //     : [
+    //         ...props.referral.tournament.lootboxSnapshots.map((snap) =>
+    //           snap.stampImage ? convertFilenameToThumbnail(snap.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
+    //         ),
+    //       ]
+    // } else {
+    //   showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
+    // }
 
     return (
       <$TournamentStampPreviewContainer style={{ marginLeft: '30%', padding: '2rem 0px', boxSizing: 'content-box' }}>

@@ -81,7 +81,7 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         onClick={!loading ? openMetamaskInstallLink : undefined}
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
+        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
         disabled={loading}
       >
         <LoadingText loading={loading} color={`${COLORS.warningFontColor}`} text={words.pleaseInstallMetamask} />
@@ -96,10 +96,10 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         colorHover={COLORS.dangerFontColor}
         backgroundColor={`${COLORS.dangerBackground}80`}
         backgroundColorHover={`${COLORS.dangerBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
+        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
         disabled={loading}
       >
-        <LoadingText loading={loading} color={`${COLORS.dangerFontColor}90`} text={words.connectMetamask} />
+        <LoadingText loading={loading} color={`${COLORS.dangerFontColor}90`} text="Connect" />
       </$Button>
     )
   } else if (props.targetNetwork && snapUserState.network.currentNetworkIdHex !== props.targetNetwork) {
@@ -109,7 +109,7 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         onClick={!loading ? switchChain : undefined}
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px' }}
+        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
         disabled={loading}
       >
         <LoadingText loading={loading} color={COLORS.warningFontColor} text={words.switchNetwork} />
@@ -127,7 +127,13 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         // color={`${COLORS.warningFontColor}`}
         // backgroundColor={`${COLORS.warningBackground}`}
         backgroundColor={COLORS.surpressedBackground}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', cursor: 'not-allowed' }}
+        style={{
+          textTransform: 'uppercase',
+          height: '60px',
+          maxWidth: '300px',
+          minWidth: '200px',
+          cursor: 'not-allowed',
+        }}
         disabled={loading}
       >
         Wrong Account

@@ -33,8 +33,8 @@ interface UseLootboxResult {
 }
 
 interface UseLootboxParams {
-  chainIDHex: ChainIDHex
-  lootboxAddress: Address
+  chainIDHex?: ChainIDHex
+  lootboxAddress?: Address
 }
 
 export interface TicketToDepositMapping {
@@ -158,7 +158,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     nonce: LootboxMintSignatureNonce,
     digest: LootboxTicketDigest
   ): Promise<ContractTransaction> => {
-    if (!lootbox || !injectedProvider) {
+    if (!lootbox || !injectedProvider || !lootboxAddress || !chainIDHex) {
       throw new Error('No lootbox or signer provider')
     }
 

@@ -1,7 +1,7 @@
 import useWords from 'lib/hooks/useWords'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   background1,
@@ -45,17 +45,15 @@ const AcceptGift = (props: Props) => {
   })
 
   const LootboxSnapshots = () => {
-    const seedLootboxAddress = referral.seedLootbox
-      ? referral.seedLootbox.address
-      : referral?.seedPartyBasket?.lootboxAddress
+    const seedLootboxID = referral.seedLootboxID
 
     let showCasedLootboxImages: string[]
     if (referral?.tournament?.lootboxSnapshots && referral?.tournament?.lootboxSnapshots?.length > 0) {
-      const showcased = seedLootboxAddress
-        ? referral.tournament.lootboxSnapshots.find((snap) => snap.address === seedLootboxAddress)
+      const showcased = seedLootboxID
+        ? referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID === seedLootboxID)
         : undefined
-      const secondary = seedLootboxAddress
-        ? referral.tournament.lootboxSnapshots.find((snap) => snap.address !== seedLootboxAddress)
+      const secondary = seedLootboxID
+        ? referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID !== seedLootboxID)
         : undefined
       showCasedLootboxImages = !!showcased?.stampImage
         ? [

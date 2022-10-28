@@ -112,12 +112,13 @@ const CosmicAuthGuard = ({ lootboxID, children, ...props }: AuthGuardProps): JSX
         <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
           <$Vertical spacing={2}>
             <$StampImg src={lootboxImage} alt={lootboxData.name} />
-            <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
-              {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
-              <CopyIcon text={lootboxData.address} smallWidth={18} />
-            </$RedeemCosmicSubtitle>
+            {lootboxData?.address && (
+              <$RedeemCosmicSubtitle style={{ color: `${COLORS.surpressedFontColor}AE` }}>
+                {truncateAddress(lootboxData.address, { prefixLength: 10, suffixLength: 8 })}{' '}
+                <CopyIcon text={lootboxData.address} smallWidth={18} />
+              </$RedeemCosmicSubtitle>
+            )}
           </$Vertical>
-
           <$Vertical spacing={2}>
             {/* <$RedeemCosmicTitle screen={screen}>{lootboxData.name}</$RedeemCosmicTitle> */}
             {/* <br /> */}

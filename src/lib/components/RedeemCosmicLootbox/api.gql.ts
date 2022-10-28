@@ -5,6 +5,7 @@ import {
   ClaimID,
   LootboxID,
   LootboxMintSignatureNonce,
+  LootboxMintWhitelistID,
   LootboxTicketDigest,
   LootboxTicketID,
   LootboxTicketID_Web3,
@@ -40,8 +41,8 @@ export interface UserClaimFE {
 
 export interface LootboxRedemptionFE {
   id: LootboxID
-  address: Address
-  chainIdHex: ChainIDHex
+  address: Address | null
+  chainIdHex: ChainIDHex | null
   description: string
   status: LootboxStatus
   nftBountyValue?: string
@@ -50,7 +51,7 @@ export interface LootboxRedemptionFE {
   stampImage: string
   runningCompletedClaims: number
   name: string
-  symbol: string
+  symbol: string | null
   themeColor: string
 }
 
@@ -172,6 +173,30 @@ export const GET_LOOTBOX_CLAIMS_TO_REDEEM = gql`
               }
             }
           }
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export type WhitelistLootboxClaimsResponseFE = {
+  whitelistMyLootboxClaims:
+    | ResponseError
+    | { __typename: 'WhitelistMyLootboxClaimsResponseSuccess'; signatures: [{ id: LootboxMintWhitelistID }] }
+}
+
+export const WHITELIST_ALL_LOOTBOX_CLAIMS = gql`
+  mutation WhitelistMyLootboxClaims($payload: WhitelistMyLootboxClaimsPayload!) {
+    whitelistMyLootboxClaims(payload: $payload) {
+      ... on WhitelistMyLootboxClaimsResponseSuccess {
+        signatures {
+          id
         }
       }
       ... on ResponseError {

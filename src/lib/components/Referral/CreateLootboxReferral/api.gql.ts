@@ -13,7 +13,8 @@ export interface CreateReferralFE {
     description?: string
     tournamentDate?: string | number
     lootboxSnapshots?: {
-      address: Address
+      lootboxID: LootboxID
+      address: Address | null
       stampImage: string
     }[]
   }
@@ -40,6 +41,7 @@ export const CREATE_REFERRAL = gql`
             description
             tournamentDate
             lootboxSnapshots {
+              lootboxID
               address
               stampImage
             }
