@@ -25,7 +25,7 @@ export type PublicUserFEClaims = {
   }
   chosenLootbox?: {
     id: LootboxID
-    address: Address
+    address: Address | null
     name?: string
     joinCommunityUrl?: string
     stampImage: string

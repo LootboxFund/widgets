@@ -617,7 +617,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
             </$RedeemCosmicSubtitle>
           ) : isWalletConnected &&
             lootboxData?.chainIdHex &&
-            lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex ? (
+            lootboxData?.chainIdHex !== userSnapshot.network.currentNetworkIdHex &&
+            status !== 'no-claims' ? (
             <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground, fontSize: TYPOGRAPHY.fontSize.large }}>
               ⚠️ Please change MetaMask to: <b>{chainIdHexToName(lootboxData.chainIdHex)}</b>
             </$RedeemCosmicSubtitle>
@@ -671,11 +672,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
               ) : null}
             </$RedeemCosmicSubtitle>
           ) : null}
+
           {isLoading ? null : !allDeposits || allDeposits.length === 0 ? (
             <$Vertical spacing={2}>
-              <$RedeemCosmicSubtitle style={{ color: COLORS.warningBackground }}>
-                ⚠️ Please check back after the tournament has ended
-              </$RedeemCosmicSubtitle>
               <$EarningsContainer>
                 <$EarningsText> No rewards have been deposited yet</$EarningsText>
                 {socialsURL && (

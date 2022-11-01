@@ -172,13 +172,13 @@ const MyTickets = widgetConfig('MyTickets')
 const RedeemCosmicLootbox = widgetConfig('RedeemCosmicLootbox')
 
 export default [
-  MyProfile,
-  Authentication,
-  LootboxFeed,
-  BattlePage,
-  PublicProfile,
-  SignOut,
-  BattleFeed,
+  // MyProfile,
+  // Authentication,
+  // LootboxFeed,
+  // BattlePage,
+  // PublicProfile,
+  // SignOut,
+  // BattleFeed,
   ViralOnboarding,
   RedeemCosmicLootbox,
   // OLD SHIT -------------
