@@ -2354,10 +2354,6 @@
   "viralOnboarding.youHaveAlreadyAcceptedInfo": {
     "defaultMessage": "You can only accept an initial invite once. {boldText}"
   },
-  "viralonboarding.getMyTicket": {
-    "defaultMessage": "Get my ticket",
-    "description": "Ticket referring to NFT"
-  },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",
     "description": "Prompt to user to connect their MetaMask wallet to the website"

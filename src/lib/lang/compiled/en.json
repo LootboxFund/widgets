@@ -608,7 +608,6 @@
   "viralOnboarding.verification.sentTo": "Sent to {userPhoneNumber}",
   "viralOnboarding.youHaveAlreadyAccepted": "You have already accepted this referral.",
   "viralOnboarding.youHaveAlreadyAcceptedInfo": "You can only accept an initial invite once. {boldText}",
-  "viralonboarding.getMyTicket": "Get my ticket",
   "wallet-button.connect-wallet": "Connect Wallet",
   "walletButton.connected": "Connected"
 }

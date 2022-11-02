@@ -165,6 +165,8 @@ const PublicProfile = widgetConfig('PublicProfile')
 
 const ViralOnboarding = widgetConfig('ViralOnboarding')
 
+const AuthenticateAnonUsers = widgetConfig('AuthenticateAnonUsers')
+
 const SignOut = widgetConfig('SignOut')
 
 const MyTickets = widgetConfig('MyTickets')
@@ -181,6 +183,7 @@ export default [
   // BattleFeed,
   ViralOnboarding,
   RedeemCosmicLootbox,
+  AuthenticateAnonUsers,
   // OLD SHIT -------------
   // CreateLootbox,
   // InteractWithLootbox,
