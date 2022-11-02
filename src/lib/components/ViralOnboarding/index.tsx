@@ -32,7 +32,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             return <ChooseLotteryPartyBasket onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
           case true:
           default:
-            return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+            return <ChooseLottery onNext={() => setRoute('success')} onBack={() => console.log('back')} />
+          // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
         }
       // case 'select-lottery':
       //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
@@ -56,6 +57,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       case 'create-referral':
         return <CreateReferral goBack={() => setRoute('accept-gift')} />
       case 'success': {
+        console.log(`----> ad`)
+        console.log(ad)
         if (!!ad) {
           return (
             <AdVideoBeta2

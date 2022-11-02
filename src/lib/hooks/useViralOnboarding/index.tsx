@@ -75,6 +75,8 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   // new ad v2
   useEffect(() => {
     if (data?.referral?.__typename === 'ReferralResponseSuccess' && claim && claim.id && user && user.id && !ad) {
+      // uncomment me for dev without auth
+      // if (data?.referral?.__typename === 'ReferralResponseSuccess' && claim && claim.id && !ad) {
       const _referral = data?.referral?.referral
       getAdBetaV2({
         variables: {
@@ -84,7 +86,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
             promoterID: _referral.promoterId,
             sessionID: sessionId,
             tournamentID: _referral.tournamentId,
-            userID: user.id,
+            userID: 'user.id',
           },
         },
       })
@@ -98,7 +100,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         })
         .catch((err) => console.error(err))
     }
-  }, [data?.referral, claim?.id, user?.id])
+  }, [data?.referral, claim, user])
 
   if (loading) {
     return <LoadingCard />
