@@ -29,7 +29,7 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 
 // type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
 type Status = 'loading' | 'error' | 'pending' | 'confirm_phone' | 'verification_sent' | 'complete'
-const LinkCredentialWidget = () => {
+const AuthenticateAnonUsers = () => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [status, setStatus] = useState<Status>('pending')
@@ -414,4 +414,4 @@ const $PartyBasketImage = styled.img`
 }
 `
 
-export default LinkCredentialWidget
+export default AuthenticateAnonUsers

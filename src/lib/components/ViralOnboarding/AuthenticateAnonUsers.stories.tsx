@@ -6,11 +6,11 @@ import Profile from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
-import LinkCredentialWidget from './LinkCredentialWidget'
+import AuthenticateAnonUsers from './AuthenticateAnonUsers'
 
 export default {
-  title: 'LinkCredentialWidget',
-  component: LinkCredentialWidget,
+  title: 'AuthenticateAnonUsers',
+  component: AuthenticateAnonUsers,
 }
 
 const Template = () => {
@@ -29,7 +29,7 @@ const Template = () => {
     <ApolloProvider client={client}>
       <LocalizationWrapper>
         <$ViralOnboardingCard>
-          <LinkCredentialWidget />
+          <AuthenticateAnonUsers />
           <br />
           <br />
         </$ViralOnboardingCard>
