@@ -1,6 +1,6 @@
 {
   "name": "@guildfx/widgets",
-  "version": "0.7.0-prod",
+  "version": "0.7.2-demo",
   "main": "lib/index.js",
   "browser": "lib/index.js",
   "author": "0xterran",
@@ -112,8 +112,8 @@
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
-    "@wormgraph/helpers": "0.7.1-demo-7",
-    "@wormgraph/manifest": "0.7.1-prod-1",
+    "@wormgraph/helpers": "0.7.1-prod-3",
+    "@wormgraph/manifest": "0.7.2-demo-1",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "countries-list": "^2.6.1",

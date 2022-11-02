@@ -30,6 +30,7 @@ import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
   sendEmailVerification,
+  signInAnonymously as signInAnonymouslyFirebase,
   browserSessionPersistence,
   browserLocalPersistence,
   setPersistence,
@@ -38,6 +39,8 @@ import {
   ConfirmationResult,
   User,
   updateEmail,
+  sendSignInLinkToEmail,
+  ActionCodeSettings,
 } from 'firebase/auth'
 import { Address, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -47,6 +50,7 @@ import LogRocket from 'logrocket'
 import { throwInvalidPasswords } from 'lib/utils/password'
 import { useIntl } from 'react-intl'
 import useWords, { useSignatures } from 'lib/hooks/useWords'
+import { manifest } from 'manifest'
 
 interface FrontendUser {
   id: UserID
@@ -281,6 +285,55 @@ export const useAuth = () => {
     }
   }
 
+  const signInAnonymously = async (email?: string): Promise<User> => {
+    // Sign in anonymously
+    const { user } = await signInAnonymouslyFirebase(auth)
+    // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+
+      // TODO: MOVE TO MANIFEST
+      url: `${'https://staging.go.lootbox.fund/finishSignUp'}?u=${user.uid}`,
+      // This must be true.
+      handleCodeInApp: true,
+      //   iOS: {
+      //     bundleId: 'com.example.ios',
+      //   },
+      //   android: {
+      //     packageName: 'com.example.android',
+      //     installApp: true,
+      //     minimumVersion: '12',
+      //   },
+      // TODO: MOVE TO MANIFEST
+      // dynamicLinkDomain: 'staging.go.lootbox.fund',
+    }
+
+    // Send login email
+    if (email) {
+      try {
+        console.log('sending sign in email...')
+        await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+        console.log('success sending email')
+      } catch (err) {
+        console.log('error sending email', err)
+        LogRocket.captureException(err)
+      }
+    }
+
+    // Now create a user record
+    const createUserPayload: CreateUserRecordPayload = {}
+    if (!user.email && !!email) {
+      createUserPayload.email = email
+    }
+
+    console.log('creating user db model...')
+    const { data } = await createUserMutation({ variables: { payload: createUserPayload } })
+    console.log('finished db model', data)
+
+    return user
+  }
+
   const signInWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
     if (!email) {
       throw new Error(emailIsRequiredText)
@@ -388,6 +441,7 @@ export const useAuth = () => {
 
   return {
     user,
+    signInAnonymously,
     signInWithWallet,
     signUpWithWallet,
     signInWithEmailAndPassword,

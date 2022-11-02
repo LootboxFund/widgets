@@ -14,13 +14,76 @@ import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
 import AddEmail from './components/AddEmail'
 import AdVideoBeta2 from './components/AdVideoBeta2'
+import { useMutation } from '@apollo/client'
+import {
+  CompleteClaimResponse,
+  CompleteClaimResponseSuccess,
+  MutationCompleteClaimArgs,
+} from 'lib/api/graphql/generated/types'
+import { COMPLETE_CLAIM } from './api.gql'
+import useWords from 'lib/hooks/useWords'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface ViralOnboardingProps {}
-type ViralOnboardingRoute = 'accept-gift' | 'browse-lottery' | 'add-email' | 'sign-up' | 'success' | 'create-referral'
+type ViralOnboardingRoute =
+  | 'accept-gift'
+  | 'browse-lottery'
+  | 'sign-up-anon'
+  | 'add-email'
+  | 'sign-up'
+  | 'success'
+  | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
-  const { user } = useAuth()
-  const { ad, referral } = useViralOnboarding()
+  const { user, signInAnonymously } = useAuth()
+  const words = useWords()
+  const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
+  const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
+  const [completeClaim, { loading: loadingMutation }] = useMutation<
+    { completeClaim: CompleteClaimResponse },
+    MutationCompleteClaimArgs
+  >(COMPLETE_CLAIM)
+
+  const completeClaimRequest = async () => {
+    if (!claim?.id) {
+      console.error('no claim')
+      throw new Error(words.anErrorOccured)
+    }
+
+    if (!chosenLootbox && !chosenPartyBasket) {
+      console.error('no party basket')
+      throw new Error(words.anErrorOccured)
+    }
+
+    const { data } = await completeClaim({
+      variables: {
+        payload: {
+          claimId: claim.id,
+          chosenLootboxID: chosenLootbox?.id,
+          chosenPartyBasketId: chosenPartyBasket?.id,
+        },
+      },
+    })
+
+    if (!data || data?.completeClaim?.__typename === 'ResponseError') {
+      // @ts-ignore
+      throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
+    }
+
+    // Add notification to local storage
+    // this notification shows a notif on the user profile page
+
+    try {
+      if ((data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id) {
+        setNotificationClaims([...notificationClaims, (data?.completeClaim as CompleteClaimResponseSuccess)?.claim?.id])
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    return
+  }
+
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'browse-lottery':
@@ -32,15 +95,30 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             return <ChooseLotteryPartyBasket onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
           case true:
           default:
-            return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+            // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+            return <ChooseLottery onNext={() => setRoute('sign-up-anon')} onBack={() => console.log('back')} />
         }
-      // case 'select-lottery':
-      //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
+      case 'sign-up-anon':
+        return (
+          <AddEmail
+            onNext={async (email) => {
+              if (!user) {
+                await signInAnonymously(email)
+              }
+              await completeClaimRequest()
+              setRoute('success')
+
+              return
+            }}
+            onBack={() => setRoute('browse-lottery')}
+          />
+        )
       case 'add-email':
         return (
           <AddEmail
-            onNext={() => {
+            onNext={async () => {
               setRoute('sign-up')
+              return
             }}
             onBack={() => setRoute('browse-lottery')}
           />

@@ -11,9 +11,10 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { LoadingText } from 'lib/components/Generics/Spinner'
 
 interface Props {
-  onNext: () => void
+  onNext: (email?: string) => Promise<void>
   onBack: () => void
 }
 const OnboardingAddEmail = (props: Props) => {
@@ -23,15 +24,16 @@ const OnboardingAddEmail = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState('')
   const { setEmail, chosenLootbox, chosenPartyBasket, referral } = useViralOnboarding()
   const { user } = useAuth()
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      console.log('already done - skip')
-      props.onNext()
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (user) {
+  //     console.log('already done - skip')
+  //     handleNext()
+  //   }
+  // }, [user])
 
-  const submitEmail = () => {
+  const submitEmail = async () => {
     // just ad it to memory
     // it will be added to user object in next page
     const isValid = checkIfValidEmail(email)
@@ -41,7 +43,15 @@ const OnboardingAddEmail = (props: Props) => {
     }
 
     setEmail(email)
-    props.onNext()
+    setLoading(true)
+    try {
+      // Sign user in anonymously and send magic link
+      await props.onNext(email)
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const _lb = !!chosenPartyBasket?.lootboxAddress
@@ -80,12 +90,13 @@ const OnboardingAddEmail = (props: Props) => {
               }}
             />
 
-            <$NextButton onClick={submitEmail} color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground}>
-              <FormattedMessage
-                id="viralonboarding.getMyTicket"
-                defaultMessage="Get my ticket"
-                description="Ticket referring to NFT"
-              />
+            <$NextButton
+              disabled={loading}
+              onClick={submitEmail}
+              color={COLORS.trustFontColor}
+              backgroundColor={COLORS.trustBackground}
+            >
+              <LoadingText loading={loading} text="Get my Ticket" color={COLORS.white}></LoadingText>
             </$NextButton>
             {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
           </$Vertical>
