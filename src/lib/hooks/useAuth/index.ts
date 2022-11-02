@@ -41,6 +41,8 @@ import {
   updateEmail,
   sendSignInLinkToEmail,
   ActionCodeSettings,
+  EmailAuthCredential,
+  reauthenticateWithCredential,
 } from 'firebase/auth'
 import { Address, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -59,12 +61,13 @@ interface FrontendUser {
   isEmailVerified: boolean
   username: string | null
   avatar: string | null
+  isAnonymous: boolean
 }
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 const convertUserToUserFE = (user: User): FrontendUser => {
-  const { uid, email, phoneNumber, displayName, photoURL, emailVerified } = user
+  const { uid, email, phoneNumber, displayName, photoURL, emailVerified, isAnonymous } = user
   const userData: FrontendUser = {
     id: uid as UserID,
     email: email,
@@ -72,6 +75,7 @@ const convertUserToUserFE = (user: User): FrontendUser => {
     isEmailVerified: emailVerified,
     username: displayName,
     avatar: photoURL,
+    isAnonymous,
   }
   return userData
 }
@@ -437,6 +441,17 @@ export const useAuth = () => {
     setUser(newUser)
   }
 
+  const linkCredentials = async (credential: EmailAuthCredential) => {
+    const _user = auth.currentUser
+    if (!_user) {
+      throw new Error('No user logged in')
+    }
+    console.log('linking user credential', credential)
+    const res = await reauthenticateWithCredential(_user, credential)
+    console.log('done', res)
+    return
+  }
+
   // const updatePassword = async (password: string, newPassword: string): Promise<void> => {
 
   return {
@@ -451,5 +466,6 @@ export const useAuth = () => {
     connectWallet,
     logout,
     refreshUser,
+    linkCredentials,
   }
 }

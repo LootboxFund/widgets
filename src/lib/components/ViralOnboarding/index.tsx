@@ -39,6 +39,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
+  const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [completeClaim, { loading: loadingMutation }] = useMutation<
     { completeClaim: CompleteClaimResponse },
     MutationCompleteClaimArgs
@@ -102,6 +103,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <AddEmail
             onNext={async (email) => {
+              setEmailForSignup(email || '')
               if (!user) {
                 await signInAnonymously(email)
               }
