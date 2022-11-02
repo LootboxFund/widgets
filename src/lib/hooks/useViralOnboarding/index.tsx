@@ -86,7 +86,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
             promoterID: _referral.promoterId,
             sessionID: sessionId,
             tournamentID: _referral.tournamentId,
-            userID: 'user.id',
+            userID: user.id,
           },
         },
       })
@@ -100,7 +100,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         })
         .catch((err) => console.error(err))
     }
-  }, [data?.referral, claim, user])
+  }, [data?.referral, claim?.id, user?.id])
 
   if (loading) {
     return <LoadingCard />
