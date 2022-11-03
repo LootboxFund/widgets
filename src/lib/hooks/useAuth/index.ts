@@ -42,7 +42,10 @@ import {
   sendSignInLinkToEmail,
   ActionCodeSettings,
   EmailAuthCredential,
+  linkWithCredential,
   reauthenticateWithCredential,
+  PhoneAuthCredential,
+  PhoneAuthProvider,
 } from 'firebase/auth'
 import { Address, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
@@ -190,6 +193,18 @@ export const useAuth = () => {
     setPhoneConfirmationResult(confirmationResult)
   }
 
+  const getPhoneAuthCredentialFromCode = (code: string): PhoneAuthCredential => {
+    if (!phoneConfirmationResult) {
+      console.log('error, no confirmation result')
+      throw new Error(words.anErrorOccured)
+    }
+
+    const verificationID = phoneConfirmationResult.verificationId
+    const credential = PhoneAuthProvider.credential(verificationID, code)
+
+    return credential
+  }
+
   const signInPhoneWithCode = async (code: string, email?: string) => {
     if (!phoneConfirmationResult) {
       console.error('No phone confirmation result')
@@ -331,9 +346,7 @@ export const useAuth = () => {
       createUserPayload.email = email
     }
 
-    console.log('creating user db model...')
-    const { data } = await createUserMutation({ variables: { payload: createUserPayload } })
-    console.log('finished db model', data)
+    await createUserMutation({ variables: { payload: createUserPayload } })
 
     return user
   }
@@ -441,15 +454,14 @@ export const useAuth = () => {
     setUser(newUser)
   }
 
-  const linkCredentials = async (credential: EmailAuthCredential) => {
+  const linkCredentials = async (credential: EmailAuthCredential | PhoneAuthCredential): Promise<User> => {
     const _user = auth.currentUser
     if (!_user) {
       throw new Error('No user logged in')
     }
-    console.log('linking user credential', credential)
-    const res = await reauthenticateWithCredential(_user, credential)
-    console.log('done', res)
-    return
+    await linkWithCredential(_user, credential)
+
+    return _user
   }
 
   // const updatePassword = async (password: string, newPassword: string): Promise<void> => {
@@ -467,5 +479,6 @@ export const useAuth = () => {
     logout,
     refreshUser,
     linkCredentials,
+    getPhoneAuthCredentialFromCode,
   }
 }

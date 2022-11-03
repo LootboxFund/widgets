@@ -11,13 +11,21 @@ import {
   handIconImg,
 } from './contants'
 import Spinner from 'lib/components/Generics/Spinner'
-import { createRef, useEffect, useMemo, useState } from 'react'
+import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { EmailAuthCredential, EmailAuthProvider } from 'firebase/auth'
+import {
+  browserLocalPersistence,
+  EmailAuthCredential,
+  EmailAuthProvider,
+  linkWithCredential,
+  PhoneAuthCredential,
+  PhoneAuthProvider,
+  setPersistence,
+} from 'firebase/auth'
 import CountrySelect from 'lib/components/CountrySelect'
 import { useAuthWords } from 'lib/components/Authentication/Shared/index'
 import useWindowSize from 'lib/hooks/useScreenSize'
@@ -26,6 +34,8 @@ import { TOS_URL } from 'lib/hooks/constants'
 import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { checkIfValidEmail } from 'lib/api/helpers'
+import { auth } from 'lib/api/firebase/app'
+import { manifest } from 'manifest'
 
 // type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
 type Status = 'loading' | 'error' | 'pending' | 'confirm_phone' | 'verification_sent' | 'complete'
@@ -38,16 +48,22 @@ const AuthenticateAnonUsers = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
-  const { user, sendPhoneVerification, signInPhoneWithCode, linkCredentials, signInAnonymously } = useAuth()
+  const {
+    user,
+    sendPhoneVerification,
+    signInPhoneWithCode,
+    linkCredentials,
+    signInAnonymously,
+    getPhoneAuthCredentialFromCode,
+  } = useAuth()
   const captchaRef = createRef<HTMLDivElement>()
   const intl = useIntl()
   const authWords = useAuthWords()
   const [email, setEmailLocal] = useState('')
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
+  const hasRunInit = useRef(false)
 
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
-
-  console.log('user object', user)
 
   useEffect(() => {
     if (status === 'verification_sent') {
@@ -59,25 +75,37 @@ const AuthenticateAnonUsers = () => {
   }, [status])
 
   useEffect(() => {
+    if (hasRunInit.current) {
+      // ensures this only runs once
+      console.log('already run')
+      return
+    }
+
     if (!emailForSignup) {
       console.log('no email to signup')
       return
     }
 
-    console.log('email from loc', emailForSignup)
+    if (!user) {
+      console.log('no user signed in')
+      return
+    }
+
+    if (!user.isAnonymous) {
+      console.log('user is not anonymous')
+      return
+    }
 
     let credential: EmailAuthCredential
     try {
       credential = EmailAuthProvider.credentialWithLink(emailForSignup, window.location.href)
-      console.log('credential', credential)
       // Link user email credentials
     } catch (err) {
       console.log('error linking credentials', err)
-      //   setStatus('error')
-      //   setErrorMessage(err?.message || words.anErrorOccured)
       return
     }
 
+    hasRunInit.current = true
     setStatus('loading')
     linkCredentials(credential)
       .then(() => {
@@ -86,10 +114,13 @@ const AuthenticateAnonUsers = () => {
       })
       .catch((e) => {
         console.log('error linking credentials', e)
-        setStatus('error')
-        setErrorMessage(e?.message || words.anErrorOccured)
+        // TODO:
+        // show error if user with email exists (auth/email-already-in-use)
+        // setStatus('error')
+        // setErrorMessage(e?.message || words.anErrorOccured)
+        setStatus('pending')
       })
-  }, [])
+  }, [user, emailForSignup, hasRunInit.current])
 
   useEffect(() => {
     const focusEl = document.getElementById('sms-verf')
@@ -99,22 +130,27 @@ const AuthenticateAnonUsers = () => {
   }, [])
 
   const handleCodeSubmit = async () => {
-    console.log('code submit [NOT IMPLEMENTED]')
-    // if (loading) {
-    //   return
-    // }
-    // setLoading(true)
-    // setErrorMessage('')
-    // try {
-    //   setPersistence(auth, browserLocalPersistence)
-    //   await signInPhoneWithCode(confirmationCode, email)
-    // } catch (err) {
-    //   setStatus('error')
-    //   setErrorMessage(err?.message || words.anErrorOccured)
-    //   LogRocket.captureException(err)
-    // } finally {
-    //   setLoading(false)
-    // }
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    setErrorMessage('')
+    try {
+      setPersistence(auth, browserLocalPersistence)
+      console.log('fetching phone credentials...')
+      const credential = getPhoneAuthCredentialFromCode(confirmationCode)
+      console.log('linking credentials...')
+      const userObject = await linkCredentials(credential)
+      // Good work... send them on their merry way
+      console.log('done onboarding!!!')
+      setStatus('complete')
+    } catch (err) {
+      setStatus('error')
+      setErrorMessage(err?.message || words.anErrorOccured)
+      LogRocket.captureException(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleVerificationRequest = async () => {
@@ -380,6 +416,19 @@ const AuthenticateAnonUsers = () => {
               </$NextButton>
             </$Vertical>
             {renderTOS()}
+          </$Vertical>
+        )}
+        {status === 'complete' && (
+          <$Vertical style={{ marginTop: '5vh' }}>
+            <$Icon>{'🎉'}</$Icon>
+            <$Heading>Your account is ready</$Heading>
+            {/* <$SubHeading style={{ marginTop: '0px' }}>Go to your profile?</$SubHeading> */}
+            <a
+              href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id || ''}`}
+              style={{ textDecoration: 'none' }}
+            >
+              <$NextButton>Go to Profile</$NextButton>
+            </a>
           </$Vertical>
         )}
         <div id="recaptcha-container" ref={captchaRef} />
