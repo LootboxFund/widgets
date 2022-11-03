@@ -11,33 +11,31 @@ import {
   handIconImg,
 } from './contants'
 import Spinner from 'lib/components/Generics/Spinner'
-import { createRef, useEffect, useMemo, useRef, useState } from 'react'
+import { createRef, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import {
-  browserLocalPersistence,
-  EmailAuthCredential,
-  EmailAuthProvider,
-  linkWithCredential,
-  PhoneAuthCredential,
-  PhoneAuthProvider,
-  setPersistence,
-} from 'firebase/auth'
+import { browserLocalPersistence, EmailAuthCredential, EmailAuthProvider, setPersistence } from 'firebase/auth'
 import CountrySelect from 'lib/components/CountrySelect'
 import { useAuthWords } from 'lib/components/Authentication/Shared/index'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
-import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { checkIfValidEmail } from 'lib/api/helpers'
 import { auth } from 'lib/api/firebase/app'
 import { manifest } from 'manifest'
 
-// type Status = 'error' | 'pending' | 'verification_sent' | 'initializing'
+type FirebaseAuthError = string
+// https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
+const ACCOUNT_ALREADY_EXISTS: FirebaseAuthError[] = [
+  'auth/provider-already-linked',
+  'auth/credential-already-in-use',
+  'auth/email-already-in-use',
+]
+
 type Status = 'loading' | 'error' | 'pending' | 'confirm_phone' | 'verification_sent' | 'complete'
 const AuthenticateAnonUsers = () => {
   const words = useWords()
@@ -114,11 +112,14 @@ const AuthenticateAnonUsers = () => {
       })
       .catch((e) => {
         console.log('error linking credentials', e)
-        // TODO:
-        // show error if user with email exists (auth/email-already-in-use)
-        // setStatus('error')
-        // setErrorMessage(e?.message || words.anErrorOccured)
-        setStatus('pending')
+        console.log(e.code, e.message)
+        if (ACCOUNT_ALREADY_EXISTS.includes(e.code)) {
+          // show error if user with email exists
+          setStatus('error')
+          setErrorMessage(e?.message || words.anErrorOccured)
+        } else {
+          setStatus('pending')
+        }
       })
   }, [user, emailForSignup, hasRunInit.current])
 
@@ -193,7 +194,11 @@ const AuthenticateAnonUsers = () => {
   }
 
   const reset = () => {
-    setStatus('pending')
+    if (status === 'confirm_phone' || status === 'verification_sent') {
+      setStatus('confirm_phone')
+    } else {
+      setStatus('pending')
+    }
   }
 
   const submitEmail = () => {
@@ -313,7 +318,7 @@ const AuthenticateAnonUsers = () => {
               {words.anErrorOccured}
             </$Heading>
             {errorMessage ? (
-              <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(intl, errorMessage)}</$SubHeading>
+              <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
             ) : null}
 
             <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
@@ -435,6 +440,20 @@ const AuthenticateAnonUsers = () => {
       </$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>
   )
+}
+
+const parseAuthError = (message: string) => {
+  // Tries to turn errors from https://firebase.google.com/docs/reference/js/auth#autherrorcodes into something more readable
+  // First remove "Firebase: "
+  message = message.replace(/^Firebase: /, '')
+
+  if (ACCOUNT_ALREADY_EXISTS.some((code) => message.indexOf(code) > -1)) {
+    return 'This account already exists. Please log in or use a different email address / phone number.'
+  } else {
+    const parsedMessage = message.replace(/auth\//, '')
+    // This won't be localized. Displays the error message as-is from firebase.
+    return parsedMessage
+  }
 }
 
 const $InputMedium = styled.input`

@@ -115,6 +115,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             onBack={() => setRoute('browse-lottery')}
           />
         )
+      // This one is not used anymore lol
       case 'add-email':
         return (
           <AddEmail
@@ -141,7 +142,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             <AdVideoBeta2
               onNext={() => {
                 // Send to public profile
-                const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+                const url = user?.isAnonymous
+                  ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
+                  : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
                 // navigate to url
                 window.location.href = url
               }}
@@ -153,7 +156,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             <CompleteOnboarding
               onNext={() => {
                 // Send to public profile
-                const url = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+                const url = user?.isAnonymous
+                  ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
+                  : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
                 // navigate to url
                 window.location.href = url
               }}

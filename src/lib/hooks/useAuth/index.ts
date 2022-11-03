@@ -313,7 +313,7 @@ export const useAuth = () => {
       // URL must be in the authorized domains list in the Firebase Console.
 
       // TODO: MOVE TO MANIFEST
-      url: `${'https://staging.go.lootbox.fund/finishSignUp'}?u=${user.uid}`,
+      url: `${manifest.microfrontends.webflow.anonSignup}?u=${user.uid}`,
       // This must be true.
       handleCodeInApp: true,
       //   iOS: {
