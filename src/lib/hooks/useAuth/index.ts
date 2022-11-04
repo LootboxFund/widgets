@@ -38,12 +38,10 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
   User,
-  updateEmail,
   sendSignInLinkToEmail,
   ActionCodeSettings,
   EmailAuthCredential,
   linkWithCredential,
-  reauthenticateWithCredential,
   PhoneAuthCredential,
   PhoneAuthProvider,
 } from 'firebase/auth'
@@ -307,29 +305,23 @@ export const useAuth = () => {
   const signInAnonymously = async (email?: string): Promise<User> => {
     // Sign in anonymously
     const { user } = await signInAnonymouslyFirebase(auth)
-    // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
-    const emailActionCodeSettings: ActionCodeSettings = {
-      // URL you want to redirect back to. The domain (www.example.com) for this
-      // URL must be in the authorized domains list in the Firebase Console.
-
-      // TODO: MOVE TO MANIFEST
-      url: `${manifest.microfrontends.webflow.anonSignup}?u=${user.uid}`,
-      // This must be true.
-      handleCodeInApp: true,
-      //   iOS: {
-      //     bundleId: 'com.example.ios',
-      //   },
-      //   android: {
-      //     packageName: 'com.example.android',
-      //     installApp: true,
-      //     minimumVersion: '12',
-      //   },
-      // TODO: MOVE TO MANIFEST
-      // dynamicLinkDomain: 'staging.go.lootbox.fund',
-    }
-
     // Send login email
     if (email) {
+      const idToken = await auth.currentUser?.getIdToken(true)
+      if (!idToken) {
+        console.log('not logged in while generating ID token')
+        throw new Error(words.anErrorOccured)
+      }
+      // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+      const emailActionCodeSettings: ActionCodeSettings = {
+        // URL you want to redirect back to. The domain (www.example.com) for this
+        // URL must be in the authorized domains list in the Firebase Console.
+
+        url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}`,
+        // This must be true.
+        handleCodeInApp: true,
+      }
+
       try {
         console.log('sending sign in email...')
         await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)

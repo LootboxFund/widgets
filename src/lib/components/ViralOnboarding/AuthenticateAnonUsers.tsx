@@ -1,32 +1,31 @@
 import useWords from 'lib/hooks/useWords'
 import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage, useIntl } from 'react-intl'
-import {
-  $Heading,
-  $Heading2,
-  $NextButton,
-  $SubHeading,
-  $SupressedParagraph,
-  background3,
-  handIconImg,
-} from './contants'
+import { $Heading, $NextButton, $SubHeading, $SupressedParagraph, background3, handIconImg } from './contants'
 import Spinner from 'lib/components/Generics/Spinner'
-import { createRef, useEffect, useRef, useState } from 'react'
+import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { browserLocalPersistence, EmailAuthCredential, EmailAuthProvider, setPersistence } from 'firebase/auth'
+import {
+  browserLocalPersistence,
+  EmailAuthCredential,
+  EmailAuthProvider,
+  setPersistence,
+  signInWithCustomToken,
+} from 'firebase/auth'
 import CountrySelect from 'lib/components/CountrySelect'
 import { useAuthWords } from 'lib/components/Authentication/Shared/index'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
-import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { checkIfValidEmail } from 'lib/api/helpers'
 import { auth } from 'lib/api/firebase/app'
 import { manifest } from 'manifest'
+import { GetAnonTokenResponseSuccessFE, GET_ANON_TOKEN } from './api.gql'
+import { useQuery } from '@apollo/client'
+import { QueryGetAnonTokenArgs, ResponseError } from '../../api/graphql/generated/types'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -46,89 +45,81 @@ const AuthenticateAnonUsers = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
-  const {
-    user,
-    sendPhoneVerification,
-    signInPhoneWithCode,
-    linkCredentials,
-    signInAnonymously,
-    getPhoneAuthCredentialFromCode,
-  } = useAuth()
+  const { user, sendPhoneVerification, linkCredentials, getPhoneAuthCredentialFromCode } = useAuth()
   const captchaRef = createRef<HTMLDivElement>()
-  const intl = useIntl()
   const authWords = useAuthWords()
-  const [email, setEmailLocal] = useState('')
-  const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
+  // No longer needed - stored in backend
+  // const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const hasRunInit = useRef(false)
+  const { idToken } = useMemo(() => {
+    return extractURLState_AuthenticateAnonUsers()
+  }, [])
 
+  const { data } = useQuery<GetAnonTokenResponseSuccessFE | { getAnonToken: ResponseError }, QueryGetAnonTokenArgs>(
+    GET_ANON_TOKEN,
+    {
+      variables: { idToken: idToken || '' },
+      skip: !idToken || hasRunInit.current,
+      onCompleted: async (data) => {
+        console.log('data', data)
+        if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
+          const { token, email } = data.getAnonToken
+
+          // Make sure the credentials are valid from the email link
+          let credential: EmailAuthCredential
+          try {
+            console.log('generating credentials')
+            credential = EmailAuthProvider.credentialWithLink(email, window.location.href)
+          } catch (err) {
+            console.log('error generating credentials', err)
+            return
+          }
+          console.log('siginin with custom token')
+          try {
+            await auth.signOut()
+            console.log('signing in to anon account....')
+            await signInWithCustomToken(auth, token)
+            console.log('successfully signed into anon account')
+          } catch (err) {
+            console.error('error signing in', err)
+            return
+          }
+
+          hasRunInit.current = true // make sure dosent run twice
+          try {
+            // link user credentials...
+            await linkCredentials(credential)
+            setStatus('confirm_phone')
+          } catch (err) {
+            console.log('error linking credentials', err)
+            console.log(err?.code, err?.message)
+            if (ACCOUNT_ALREADY_EXISTS.includes(err?.code)) {
+              // show error if user with email exists
+              setStatus('error')
+              setErrorMessage(err?.message || words.anErrorOccured)
+            } else {
+              setStatus('pending')
+            }
+          }
+        }
+      },
+    }
+  )
+
+  const email = data?.getAnonToken?.__typename === 'GetAnonTokenResponseSuccess' ? data.getAnonToken.email : null
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
   useEffect(() => {
+    let el: HTMLElement | null = null
     if (status === 'verification_sent') {
-      const el = document.getElementById('verification-input')
-      if (el) {
-        el.focus()
-      }
+      el = document.getElementById('verification-input')
+    } else if (status === 'confirm_phone') {
+      el = document.getElementById('sms-verf')
+    }
+    if (el) {
+      el.focus()
     }
   }, [status])
-
-  useEffect(() => {
-    if (hasRunInit.current) {
-      // ensures this only runs once
-      console.log('already run')
-      return
-    }
-
-    if (!emailForSignup) {
-      console.log('no email to signup')
-      return
-    }
-
-    if (!user) {
-      console.log('no user signed in')
-      return
-    }
-
-    if (!user.isAnonymous) {
-      console.log('user is not anonymous')
-      return
-    }
-
-    let credential: EmailAuthCredential
-    try {
-      credential = EmailAuthProvider.credentialWithLink(emailForSignup, window.location.href)
-      // Link user email credentials
-    } catch (err) {
-      console.log('error linking credentials', err)
-      return
-    }
-
-    hasRunInit.current = true
-    setStatus('loading')
-    linkCredentials(credential)
-      .then(() => {
-        console.log('done linking credential')
-        setStatus('confirm_phone')
-      })
-      .catch((e) => {
-        console.log('error linking credentials', e)
-        console.log(e.code, e.message)
-        if (ACCOUNT_ALREADY_EXISTS.includes(e.code)) {
-          // show error if user with email exists
-          setStatus('error')
-          setErrorMessage(e?.message || words.anErrorOccured)
-        } else {
-          setStatus('pending')
-        }
-      })
-  }, [user, emailForSignup, hasRunInit.current])
-
-  useEffect(() => {
-    const focusEl = document.getElementById('sms-verf')
-    if (focusEl) {
-      focusEl.focus()
-    }
-  }, [])
 
   const handleCodeSubmit = async () => {
     if (loading) {
@@ -201,38 +192,14 @@ const AuthenticateAnonUsers = () => {
     }
   }
 
-  const submitEmail = () => {
-    const isValid = checkIfValidEmail(email)
-    if (!isValid) {
-      setStatus('error')
-      setErrorMessage(words.invalidEmail)
-      return
-    }
-    if (!email) {
-      setStatus('error')
-      setErrorMessage(words.enterYourEmail)
-      return
-    }
-    setStatus('loading')
-    signInAnonymously(email)
-      .then(() => {
-        setStatus('pending')
-        setEmailForSignup(email)
-      })
-      .catch((e) => {
-        setStatus('error')
-        setErrorMessage(e?.message || words.anErrorOccured)
-      })
-  }
-
   return (
     <$ViralOnboardingCard background={background3} opacity={['0.7', '0.55']}>
       <$ViralOnboardingSafeArea>
-        {status === 'pending' && !emailForSignup && (
+        {/* {status === 'pending' && !emailForSignup && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Heading2 style={{ textAlign: 'start', marginTop: '50px' }}>{words.enterYourEmail}</$Heading2>
             <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>
-              You'll receive a one-time validation email
+              This should be the same email as before
             </$SubHeading>
             <$Vertical spacing={3}>
               <$InputMedium
@@ -254,7 +221,7 @@ const AuthenticateAnonUsers = () => {
                 color={COLORS.trustFontColor}
                 backgroundColor={COLORS.trustBackground}
               >
-                <LoadingText loading={loading} text="Get my Ticket" color={COLORS.white}></LoadingText>
+                <LoadingText loading={loading} text="Submit" color={COLORS.white}></LoadingText>
               </$NextButton>
               {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
             </$Vertical>
@@ -275,8 +242,8 @@ const AuthenticateAnonUsers = () => {
             </$SupressedParagraph>
             <$HandImage src={handIconImg} />
           </$Vertical>
-        )}
-        {status === 'pending' && emailForSignup && (
+        )} */}
+        {status === 'pending' && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Icon>{'📧'}</$Icon>
             <$Heading
@@ -288,9 +255,9 @@ const AuthenticateAnonUsers = () => {
             >
               Check your email for a magic link
             </$Heading>
-            {emailForSignup && (
+            {email && (
               <$SubHeading style={{ marginTop: '0px' }}>
-                Sent to {emailForSignup}. <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b> Can't find it?{' '}
+                Sent to {email}. <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b> Can't find it?{' '}
                 <$Link href={'#'} target="_blank">
                   resend
                 </$Link>
@@ -328,11 +295,11 @@ const AuthenticateAnonUsers = () => {
         )}
 
         {status === 'confirm_phone' && (
-          <$Vertical height="100%">
-            <Spinner size="30px" color={`${COLORS.white}66`} />
-            <$Heading2 style={{ textAlign: 'start' }}>
+          <$Vertical height="100%" style={{ marginTop: '5vh' }}>
+            <$Icon>{'🚀'}</$Icon>
+            <$Heading style={{ textAlign: 'start' }}>
               <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
-            </$Heading2>
+            </$Heading>
             <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}*</$SubHeading>
             <$Vertical spacing={3}>
               <$Horizontal>
@@ -372,25 +339,9 @@ const AuthenticateAnonUsers = () => {
           </$Vertical>
         )}
         {status === 'verification_sent' && (
-          <$Vertical>
-            <br />
-            <br />
-            <br />
+          <$Vertical style={{ marginTop: '5vh' }}>
             <$SubHeading style={{ textAlign: 'start' }}>
-              {/* <FormattedMessage
-                id="viralOnboarding.verification.sentTo"
-                defaultMessage="Sent to {userPhoneNumber}"
-                description="Indicating a confirmation code was sent to a number"
-                values={{
-                  userPhoneNumber: (
-                    <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
-                  ),
-                }}
-              />{' '} */}
-              {words.codeSentToFn(
-                parsedPhone
-                // <$SupressedParagraph style={{ display: 'inline' }}>{parsedPhone}</$SupressedParagraph>
-              )}{' '}
+              {words.codeSentToFn(parsedPhone)}{' '}
               <$SubHeading
                 onClick={reset}
                 style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}
@@ -427,12 +378,17 @@ const AuthenticateAnonUsers = () => {
           <$Vertical style={{ marginTop: '5vh' }}>
             <$Icon>{'🎉'}</$Icon>
             <$Heading>Your account is ready</$Heading>
-            {/* <$SubHeading style={{ marginTop: '0px' }}>Go to your profile?</$SubHeading> */}
             <a
               href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id || ''}`}
               style={{ textDecoration: 'none' }}
             >
-              <$NextButton>Go to Profile</$NextButton>
+              <$NextButton
+                color={COLORS.trustFontColor}
+                backgroundColor={COLORS.trustBackground}
+                style={{ width: '100%' }}
+              >
+                Go to Profile
+              </$NextButton>
             </a>
           </$Vertical>
         )}
@@ -454,6 +410,20 @@ const parseAuthError = (message: string) => {
     // This won't be localized. Displays the error message as-is from firebase.
     return parsedMessage
   }
+}
+
+interface URLState {
+  idToken: string | null
+  // uid: string | null
+}
+const extractURLState_AuthenticateAnonUsers = () => {
+  const url = new URL(window.location.href)
+
+  const state: URLState = {
+    idToken: url.searchParams.get('t'),
+  }
+
+  return state
 }
 
 const $InputMedium = styled.input`
