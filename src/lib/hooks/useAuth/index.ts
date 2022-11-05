@@ -45,7 +45,7 @@ import {
   PhoneAuthCredential,
   PhoneAuthProvider,
 } from 'firebase/auth'
-import { Address, UserID } from '@wormgraph/helpers'
+import { Address, ClaimID, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
@@ -302,6 +302,28 @@ export const useAuth = () => {
     }
   }
 
+  const sendClaimValidationEmail = async (email: string, claimID: ClaimID, claimImgURL: string): Promise<void> => {
+    // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+
+      url: `${manifest.microfrontends.webflow.validateUntrustedClaim}?img=${claimImgURL}&c=${claimID}`,
+      // This must be true.
+      handleCodeInApp: true,
+    }
+
+    try {
+      console.log('sending sign in email...')
+      await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+      console.log('success sending email')
+    } catch (err) {
+      console.log('error sending email', err)
+      LogRocket.captureException(err)
+    }
+    return
+  }
+
   const signInAnonymously = async (email?: string): Promise<User> => {
     // Sign in anonymously
     const { user } = await signInAnonymouslyFirebase(auth)
@@ -472,5 +494,6 @@ export const useAuth = () => {
     refreshUser,
     linkCredentials,
     getPhoneAuthCredentialFromCode,
+    sendClaimValidationEmail,
   }
 }

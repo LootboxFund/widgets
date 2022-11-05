@@ -292,3 +292,31 @@ export const CHECK_PHONE_AUTH = gql`
     }
   }
 `
+
+export type CompleteUntrustedClaimResponseFE = {
+  completeUntrustedClaim:
+    | {
+        __typename: 'CompleteClaimResponseSuccess'
+        claim: {
+          id: ClaimID
+        }
+      }
+    | ResponseError
+}
+export const COMPLETE_UNTRUSTED_CLAIM = gql`
+  mutation Mutation($payload: CompleteUntrustedClaimPayload!) {
+    completeUntrustedClaim(payload: $payload) {
+      ... on CompleteClaimResponseSuccess {
+        claim {
+          id
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

@@ -1,7 +1,7 @@
 import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { ReactElement, useEffect, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
-import { ReferralSlug } from '@wormgraph/helpers'
+import { ClaimID, LootboxID, ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
 import ChooseLotteryPartyBasket from './components/ChooseLotteryPartyBasket'
 import ChooseLottery from './components/ChooseLottery'
@@ -32,6 +32,7 @@ import useWords from 'lib/hooks/useWords'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { fetchSignInMethodsForEmail } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
+import { handIconImg } from './contants'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -43,7 +44,7 @@ type ViralOnboardingRoute =
   | 'success'
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
-  const { user, signInAnonymously } = useAuth()
+  const { user, signInAnonymously, sendClaimValidationEmail } = useAuth()
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
@@ -61,22 +62,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
 
-  const handleTransitionClaimToUntrusted = async (email: string) => {
-    if (!claim?.id) {
-      console.error('no claim')
-      throw new Error(words.anErrorOccured)
-    }
-
-    if (!chosenLootbox) {
-      console.error('no lootbox')
-      throw new Error(words.anErrorOccured)
-    }
-
+  const handleTransitionClaimToUntrusted = async (email: string, claimID: ClaimID, lootboxID: LootboxID) => {
     const { data } = await pendingToUntrustedClaim({
       variables: {
         payload: {
-          chosenLootboxID: chosenLootbox.id,
-          claimId: claim.id,
+          chosenLootboxID: lootboxID,
+          claimId: claimID,
           targetUserEmail: email,
         },
       },
@@ -90,22 +81,19 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     return
   }
 
-  const completeClaimRequest = async () => {
-    if (!claim?.id) {
-      console.error('no claim')
-      throw new Error(words.anErrorOccured)
-    }
-
-    if (!chosenLootbox && !chosenPartyBasket) {
-      console.error('no party basket')
+  const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
+    console.log('completing claim')
+    if (!lootboxID) {
+      console.error('no lootbox')
       throw new Error(words.anErrorOccured)
     }
 
     const { data } = await completeClaim({
       variables: {
         payload: {
-          claimId: claim.id,
-          chosenLootboxID: chosenLootbox?.id,
+          claimId: claimID,
+          chosenLootboxID: lootboxID,
+          // DEPRECATED
           chosenPartyBasketId: chosenPartyBasket?.id,
         },
       },
@@ -144,11 +132,11 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
             return (
               <ChooseLottery
-                onNext={async () => {
-                  if (user) {
+                onNext={async (lootboxID: LootboxID) => {
+                  if (user && claim?.id) {
                     // user already logged in - complete claim & move on automatically
                     console.log('user already logged in... completing claim...')
-                    await completeClaimRequest()
+                    await completeClaimRequest(claim.id, lootboxID)
                     setRoute('success')
                   } else {
                     setRoute('sign-up-anon')
@@ -162,10 +150,18 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <AddEmail
             onNext={async (email) => {
+              if (!claim?.id) {
+                console.error('no claim')
+                throw new Error(words.anErrorOccured)
+              }
+              if (!chosenLootbox) {
+                console.error('no lootbox')
+                throw new Error(words.anErrorOccured)
+              }
               // if user is already logged in, complete claim & move on automatically
               if (user) {
                 console.log('user already logged in... completing claim...')
-                await completeClaimRequest()
+                await completeClaimRequest(claim.id, chosenLootbox.id)
                 setRoute('success')
                 return
               }
@@ -182,12 +178,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
               // See if user exists with given email. If so, create an "untrusted" claim and move on
               if (emailSignInMethods.length > 0) {
+                console.log('existing email friend')
                 // Sends a link to the email which will async confirm the claim on click
                 // this creates an 'untrusted' claim
-                await handleTransitionClaimToUntrusted(email)
-                // TODO: SEND SIGN IN EMAIL
-                throw new Error('TODO: SEND SIGN IN EMAIL')
-
+                await handleTransitionClaimToUntrusted(email, claim.id, chosenLootbox.id)
+                await sendClaimValidationEmail(email, claim.id, chosenLootbox?.stampImage || handIconImg)
+                setRoute('success')
                 return
               }
 
@@ -208,14 +204,16 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
               }
 
               if (isPhoneAuthEnabled) {
+                console.log('phone friend')
                 // Just get them to login via phone
                 setRoute('onboard-phone')
                 return
               }
 
+              console.log('anonymous friend')
               // Default is anonymous case
               await signInAnonymously(email)
-              await completeClaimRequest()
+              await completeClaimRequest(claim.id, chosenLootbox.id)
               setRoute('success')
               return
             }}

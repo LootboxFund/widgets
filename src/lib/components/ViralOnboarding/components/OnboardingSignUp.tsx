@@ -159,7 +159,7 @@ const OnboardingSignUp = (props: Props) => {
     }
 
     if (!chosenLootbox && !chosenPartyBasket) {
-      console.error('no party basket')
+      console.error('no lootbox / party basket')
       throw new Error(words.anErrorOccured)
     }
 

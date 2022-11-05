@@ -11,7 +11,7 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard, LoadingCard } from './GenericCard'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { useMemo, useState } from 'react'
@@ -21,7 +21,7 @@ import { convertFilenameToThumbnail } from 'lib/utils/storage'
 const PAGE_SIZE = 6
 
 interface Props {
-  onNext: () => Promise<void>
+  onNext: (lootboxID: LootboxID) => Promise<void>
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
@@ -152,7 +152,7 @@ const ChooseLottery = (props: Props) => {
                     })
                     setLocalLoading(true)
                     try {
-                      await props.onNext()
+                      await props.onNext(ticket.lootbox.id)
                     } catch (err) {
                       console.error(err)
                       setErrorMessage(err.message)
