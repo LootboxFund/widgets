@@ -16,7 +16,22 @@ import {
   PartyBasketStatus,
   LootboxStatus,
   LootboxTournamentStatus,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
+
+export type CompleteClaimResponseSuccessFE = {
+  completeClaim:
+    | {
+        __typename: 'CompleteClaimResponseSuccess'
+        claim: {
+          id: ClaimID
+        }
+      }
+    | {
+        __typename: 'ResponseError'
+        error: ResponseError
+      }
+}
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {
@@ -24,18 +39,6 @@ export const COMPLETE_CLAIM = gql`
       ... on CompleteClaimResponseSuccess {
         claim {
           id
-          referralId
-          referralSlug
-          promoterId
-          tournamentId
-          referrerId
-          chosenPartyBasketId
-          chosenPartyBasketAddress
-          lootboxAddress
-          rewardFromClaim
-          claimerUserId
-          status
-          type
         }
       }
       ... on ResponseError {
@@ -223,6 +226,62 @@ export const GET_ANON_TOKEN = gql`
       ... on GetAnonTokenResponseSuccess {
         token
         email
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export type PendingToUntrustedClaimResponseFE = {
+  pendingClaimToUntrusted:
+    | {
+        __typename: 'CompleteClaimResponseSuccess'
+        claim: {
+          id: ClaimID
+        }
+      }
+    | {
+        __typename: 'ResponseError'
+        error: ResponseError
+      }
+}
+
+export const PENDING_TO_UNTRUSTED_CLAIM = gql`
+  mutation Mutation($payload: PendingClaimToUntrustedPayload!) {
+    pendingClaimToUntrusted(payload: $payload) {
+      ... on CompleteClaimResponseSuccess {
+        claim {
+          id
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export type CheckPhoneEnabledResponseFE = {
+  checkPhoneEnabled:
+    | {
+        __typename: 'CheckPhoneEnabledResponseSuccess'
+        isEnabled: boolean
+      }
+    | ResponseError
+}
+export const CHECK_PHONE_AUTH = gql`
+  query Query($email: String!) {
+    checkPhoneEnabled(email: $email) {
+      ... on CheckPhoneEnabledResponseSuccess {
+        isEnabled
       }
       ... on ResponseError {
         error {

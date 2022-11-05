@@ -307,7 +307,7 @@ export const useAuth = () => {
     const { user } = await signInAnonymouslyFirebase(auth)
     // Send login email
     if (email) {
-      const idToken = await auth.currentUser?.getIdToken(true)
+      const idToken = await user.getIdToken(true)
       if (!idToken) {
         console.log('not logged in while generating ID token')
         throw new Error(words.anErrorOccured)

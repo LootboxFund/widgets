@@ -14,7 +14,7 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 
 interface Props {
-  onNext: (email?: string) => Promise<void>
+  onNext: (email: string) => Promise<void>
   onBack: () => void
 }
 const OnboardingAddEmail = (props: Props) => {
@@ -25,13 +25,6 @@ const OnboardingAddEmail = (props: Props) => {
   const { setEmail, chosenLootbox, chosenPartyBasket, referral } = useViralOnboarding()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-
-  // useEffect(() => {
-  //   if (user) {
-  //     console.log('already done - skip')
-  //     handleNext()
-  //   }
-  // }, [user])
 
   const submitEmail = async () => {
     // just ad it to memory
