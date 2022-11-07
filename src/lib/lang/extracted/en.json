@@ -68,6 +68,10 @@
     "defaultMessage": "Password is required",
     "description": "Error message when user tries to sign up without a password"
   },
+  "auth.privacyPoligy": {
+    "defaultMessage": "Privacy Policy",
+    "description": "Link to privacy policy"
+  },
   "auth.provider.accountAlreadyExists": {
     "defaultMessage": "This account already exists!",
     "description": "Error message when user tries to sign up with an email that already exists"
@@ -91,10 +95,6 @@
   "auth.termsOfService": {
     "defaultMessage": "Terms of Service",
     "description": "Link to terms of service"
-  },
-  "auth.privacyPoligy": {
-    "defaultMessage": "Privacy Policy",
-    "description": "Link to privacy policy"
   },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
@@ -2341,13 +2341,12 @@
     "defaultMessage": "Claim Ticket",
     "description": "Button to accept a gift"
   },
+  "viralOnboarding.signup.email.consentDataSharing": {
+    "defaultMessage": "By providing your email, you also agree to share your data with the event organizer who may email you for marketing purposes, according to our {privacyPolicy} and {termsOfService}. You can cancel this at any time."
+  },
   "viralOnboarding.signup.email.disclaimer": {
     "defaultMessage": "You will NOT receiving marketing emails, we only notify if you win",
     "description": "Disclaimer when collecting email"
-  },
-  "viralOnboarding.signup.email.consentDataSharing": {
-    "defaultMessage": "By providing your email, you also agree to share your data with the event organizer who may email you for marketing purposes, according to our {privacyPolicy} and {termsOfService}. You can cancel this at any time.",
-    "description": "Data sharing consent"
   },
   "viralOnboarding.signup.header": {
     "defaultMessage": "Almost Finished..."

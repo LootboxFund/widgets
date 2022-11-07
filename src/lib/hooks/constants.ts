@@ -21,8 +21,8 @@ export const NOOB_CUP_YOUR_INVITED_IMG = `${manifest.storage.downloadUrl}/${mani
 export const NOOB_CUP_EMBLEM = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob_cup-compressed.png?alt=media`
 
 export const TOS_URL = 'https://www.lootbox.fund/terms-of-service'
-export const PRIVACY_URL_DATASHARING = 'https://www.lootbox.fund/terms-of-service-ds'
-export const TOS_URL_DATASHARING = 'https://www.lootbox.fund/terms-of-service-ds'
+export const PRIVACY_URL_DATASHARING = 'https://lootbox.fyi/privacy-policy-ds-w3ph1'
+export const TOS_URL_DATASHARING = 'https://lootbox.fyi/terms-and-conditions-ds-w3ph1'
 export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 export const NATIVE_ADDRESS = '0x0native' as Address
 export const twitterIcon =
