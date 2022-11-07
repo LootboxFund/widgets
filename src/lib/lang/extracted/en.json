@@ -92,6 +92,10 @@
     "defaultMessage": "Terms of Service",
     "description": "Link to terms of service"
   },
+  "auth.privacyPoligy": {
+    "defaultMessage": "Privacy Policy",
+    "description": "Link to privacy policy"
+  },
   "battleFeed.msg.battleFinished": {
     "defaultMessage": "Battle finished",
     "description": "Text indicating a tournament is finished"
@@ -2286,7 +2290,7 @@
     "description": "Prize message to win a free Lootbox NFT"
   },
   "viralOnboarding.addEmail.header": {
-    "defaultMessage": "Where should we send your ticket?",
+    "defaultMessage": "Where should we send your FREE ticket?",
     "description": "Prompt / header in the section for user to add email"
   },
   "viralOnboarding.chooseLottery.description": {
@@ -2341,6 +2345,10 @@
     "defaultMessage": "You will NOT receiving marketing emails, we only notify if you win",
     "description": "Disclaimer when collecting email"
   },
+  "viralOnboarding.signup.email.consentDataSharing": {
+    "defaultMessage": "By providing your email, you also agree to share your data with the event organizer who may email you for marketing purposes, according to our {privacyPolicy} and {termsOfService}. You can cancel this at any time.",
+    "description": "Data sharing consent"
+  },
   "viralOnboarding.signup.header": {
     "defaultMessage": "Almost Finished..."
   },
@@ -2357,6 +2365,10 @@
   "viralonboarding.getMyTicket": {
     "defaultMessage": "Get my ticket",
     "description": "Ticket referring to NFT"
+  },
+  "viralonboarding.getMyTicketWithDataSharingConsent": {
+    "defaultMessage": "Agree & Claim Ticket",
+    "description": "Ticket referring to NFT with data sharing consent"
   },
   "wallet-button.connect-wallet": {
     "defaultMessage": "Connect Wallet",
