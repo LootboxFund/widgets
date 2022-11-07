@@ -72,6 +72,7 @@ const OnboardingAddEmail = (props: Props) => {
     'LGT4JtA6sV73KhXVcCEH' as TournamentID, // Cash Giveaway 2
     'G0ESRAL0O4OcgZ7Bw38M' as TournamentID, // Cash Giveaway 3
     'C3msweDHfYCesJ2SWxeC' as TournamentID, // Cash Giveaway 4
+    'LFqlqg3UcPx8E0pu0mTu' as TournamentID, // Prod Test
   ]
   const needsDataSharingConsent = hardcodedTournamentsWithDataSharing.includes(referral.tournamentId)
   // const needsDataSharingConsent = true

@@ -1,6 +1,6 @@
 const express = require('express')
 const app = new express()
-const { Manifest_v0_7_1_demo: Manifest } = require('@wormgraph/manifest')
+const { latest: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 
@@ -27,15 +27,23 @@ const fileNames = [ViralOnboarding, ViralOnboardingCSS]
 // const fileNames = [ViralOnboarding]
 // const fileNames = [ViralOnboardingCSS]
 
-fileNames.map((filename) => {
-  uploadFile({
-    filename,
-    semver,
-    absPath,
-    bucketName,
-  })
-})
+const run = async () => {
+  console.log(`running...`)
+  await Promise.all(
+    fileNames.map((filename) => {
+      return uploadFile({
+        filename,
+        semver,
+        absPath,
+        bucketName,
+      })
+    })
+  )
+  process.exit()
+  return
+}
 
 app.listen(process.env.PORT || 8088, () => {
   console.log('node server running')
+  run()
 })

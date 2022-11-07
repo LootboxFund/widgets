@@ -119,7 +119,7 @@ const AdVideoBeta2 = (props: Props) => {
       player.play()
       setTimeout(() => {
         player.muted(false)
-      }, 2000)
+      }, 5000)
     })
 
     player.on('ended', () => {
