@@ -25,7 +25,7 @@ interface Props {
 }
 const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
-  const { referral, chosenPartyBasket, ad, sessionId, claim } = useViralOnboarding()
+  const { referral, chosenPartyBasket, chosenLootbox, ad, sessionId, claim } = useViralOnboarding()
   const words = useWords()
   const { user } = useAuth()
   const [timeLeft, setTimeLeft] = useState<number | null>(null)
@@ -61,7 +61,11 @@ const AdVideoBeta2 = (props: Props) => {
     ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
     : undefined
 
-  const image: string = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
+  const image: string = chosenLootbox?.stampImage
+    ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
+    : _lb?.stampImage
+    ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
+    : TEMPLATE_LOOTBOX_STAMP
 
   const videoJsOptions: VideoJsPlayerOptions = {
     autoplay: true,

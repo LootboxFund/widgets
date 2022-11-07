@@ -73,8 +73,8 @@ const OnboardingAddEmail = (props: Props) => {
     'G0ESRAL0O4OcgZ7Bw38M' as TournamentID, // Cash Giveaway 3
     'C3msweDHfYCesJ2SWxeC' as TournamentID, // Cash Giveaway 4
   ]
-  // const needsDataSharingConsent = hardcodedTournamentsWithDataSharing.includes(referral.tournamentId)
-  const needsDataSharingConsent = true
+  const needsDataSharingConsent = hardcodedTournamentsWithDataSharing.includes(referral.tournamentId)
+  // const needsDataSharingConsent = true
 
   return (
     <$ViralOnboardingCard background={background1}>
@@ -148,6 +148,8 @@ const OnboardingAddEmail = (props: Props) => {
                     backgroundColor: 'gray',
                     marginRight: '10px',
                     cursor: 'pointer',
+                    width: '30px !important',
+                    height: '30px !important',
                   }}
                 />
                 {authWords.consentDataSharingLinks(
