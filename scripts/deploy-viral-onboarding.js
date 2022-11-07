@@ -10,7 +10,7 @@ const { uploadFile } = require('./upload-file')
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 console.log(`
 
@@ -27,15 +27,23 @@ const fileNames = [ViralOnboarding, ViralOnboardingCSS]
 // const fileNames = [ViralOnboarding]
 // const fileNames = [ViralOnboardingCSS]
 
-fileNames.map((filename) => {
-  uploadFile({
-    filename,
-    semver,
-    absPath,
-    bucketName,
-  })
-})
+const run = async () => {
+  console.log(`running...`)
+  await Promise.all(
+    fileNames.map((filename) => {
+      return uploadFile({
+        filename,
+        semver,
+        absPath,
+        bucketName,
+      })
+    })
+  )
+  process.exit()
+  return
+}
 
 app.listen(process.env.PORT || 8088, () => {
   console.log('node server running')
+  run()
 })

@@ -219,7 +219,6 @@ const $OpacityGradient = styled.div`
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 80%);
   position: absolute;
   width: 100%;
-}
 `
 
 export default CompleteOnboarding

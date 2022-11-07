@@ -33,6 +33,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           case true:
           default:
             return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+          // uncomment me for dev without auth
+          // return <ChooseLottery onNext={() => setRoute('success')} onBack={() => console.log('back')} />
         }
       // case 'select-lottery':
       //   return <SelectLottery onNext={() => setRoute('sign-up')} onBack={() => console.log('back')} />
