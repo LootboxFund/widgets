@@ -145,6 +145,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                 onBack={() => console.log('back')}
               />
             )
+          // uncomment me for dev without auth
+          // return <ChooseLottery onNext={() => setRoute('success')} onBack={() => console.log('back')} />
         }
       case 'sign-up-anon':
         return (

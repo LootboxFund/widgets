@@ -75,6 +75,8 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   // new ad v2
   useEffect(() => {
     if (data?.referral?.__typename === 'ReferralResponseSuccess' && claim && claim.id && user && user.id && !ad) {
+      // uncomment me for dev without auth
+      // if (data?.referral?.__typename === 'ReferralResponseSuccess' && claim && claim.id && !ad) {
       const _referral = data?.referral?.referral
       getAdBetaV2({
         variables: {

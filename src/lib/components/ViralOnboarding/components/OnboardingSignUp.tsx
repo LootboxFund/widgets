@@ -411,11 +411,10 @@ const $Icon = styled.span`
   color: ${COLORS.white};
 `
 
-const $PartyBasketImage = styled.img` 
+const $PartyBasketImage = styled.img`
   margin: auto auto -3.5rem;
   max-width: 220px;
   width: 100%;
-}
 `
 
 export default OnboardingSignUp

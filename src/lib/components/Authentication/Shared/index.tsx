@@ -26,17 +26,46 @@ export const useAuthWords = () => {
     defaultMessage: 'Terms of Service',
     description: 'Link to terms of service',
   })
+  const privacyPolicy = intl.formatMessage({
+    id: 'auth.privacyPoligy',
+    defaultMessage: 'Privacy Policy',
+    description: 'Link to privacy policy',
+  })
 
-  const signupWithPhoneTerms = (termsHyperlink: any) =>
-    intl.formatMessage(
-      {
-        id: 'auth.method.signupWithPhoneTerms',
-        defaultMessage: 'By verifying your phone number, you are agreeing to our {termsOfService}.',
-      },
-      {
-        termsOfService: termsHyperlink,
-      }
+  const consentDataSharingLinks = (privacyPolicyHyperlink: any, termsHyperlink: any) => {
+    return (
+      <span>
+        {intl.formatMessage(
+          {
+            id: 'viralOnboarding.signup.email.consentDataSharing',
+            defaultMessage:
+              'By providing your email, you also agree to share your data with the event organizer who may email you for marketing purposes, according to our {privacyPolicy} and {termsOfService}. You can cancel this at any time.',
+          },
+          {
+            termsOfService: termsHyperlink,
+            privacyPolicy: privacyPolicyHyperlink,
+          }
+        )}
+      </span>
     )
+  }
+
+  const signupWithPhoneTerms = (termsHyperlink: any) => {
+    return (
+      <span>
+        {intl.formatMessage(
+          {
+            id: 'auth.method.signupWithPhoneTerms',
+            defaultMessage: 'By verifying your phone number, you are agreeing to our {termsOfService}.',
+          },
+          {
+            termsOfService: termsHyperlink,
+          }
+        )}
+      </span>
+    )
+  }
+
   // const loginWithMetaMaskWallet = intl.formatMessage({
   //   id: 'auth.method.loginWithMetaMaskWallet',
   //   defaultMessage: 'Login with MetaMask Wallet',
@@ -75,6 +104,8 @@ export const useAuthWords = () => {
     emailAndPassword,
     signupWithPhoneTerms,
     termsOfService,
+    privacyPolicy,
+    consentDataSharingLinks,
   }
 }
 

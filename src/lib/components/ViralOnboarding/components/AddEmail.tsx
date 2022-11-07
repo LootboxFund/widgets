@@ -1,10 +1,11 @@
 import useWords from 'lib/hooks/useWords'
-import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage } from 'react-intl'
 import { $Heading2, $NextButton, $SubHeading, $SupressedParagraph, background1, handIconImg } from '../contants'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { useIntl } from 'react-intl'
+import { COLORS, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import { checkIfValidEmail } from 'lib/api/helpers'
@@ -12,6 +13,10 @@ import { useAuth } from 'lib/hooks/useAuth'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { useAuthWords } from 'lib/components/Authentication/Shared'
+import { $Link } from 'lib/components/Profile/common'
+import { TOS_URL_DATASHARING } from 'lib/hooks/constants'
+import { PRIVACY_URL_DATASHARING } from 'lib/hooks/constants'
 
 interface Props {
   onNext: (email: string) => Promise<void>
@@ -19,6 +24,7 @@ interface Props {
 }
 const OnboardingAddEmail = (props: Props) => {
   const words = useWords()
+  const intl = useIntl()
   const { screen } = useWindowSize()
   const [email, setEmailLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -26,7 +32,11 @@ const OnboardingAddEmail = (props: Props) => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
 
-  const submitEmail = async () => {
+  const authWords = useAuthWords()
+  const [consentDataSharing, setConsentDataSharing] = useState(false)
+
+  const submitEmail = () => {
+    setConsentDataSharing(true)
     // just ad it to memory
     // it will be added to user object in next page
     const isValid = checkIfValidEmail(email)
@@ -57,6 +67,20 @@ const OnboardingAddEmail = (props: Props) => {
     ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
     : null
 
+  const hardcodedTournamentsWithDataSharing: TournamentID[] = [
+    '1qKLXgaRXviPP110ZHLe' as TournamentID, // Angkas
+    'RV09iGE02V7nOgEbq8hW' as TournamentID, // GCash
+    'tX5tCISFjDcWmctvILnk' as TournamentID, // MetaCare
+    'fPxO1FXLyu6p39FTf9yq' as TournamentID, // Binance
+    'pMkl6CSOuEsyQDvJzvA5' as TournamentID, // Cash Giveaway 1
+    'LGT4JtA6sV73KhXVcCEH' as TournamentID, // Cash Giveaway 2
+    'G0ESRAL0O4OcgZ7Bw38M' as TournamentID, // Cash Giveaway 3
+    'C3msweDHfYCesJ2SWxeC' as TournamentID, // Cash Giveaway 4
+    'LFqlqg3UcPx8E0pu0mTu' as TournamentID, // Prod Test
+  ]
+  const needsDataSharingConsent = hardcodedTournamentsWithDataSharing.includes(referral.tournamentId)
+  // const needsDataSharingConsent = true
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -64,7 +88,7 @@ const OnboardingAddEmail = (props: Props) => {
           <$Heading2 style={{ textAlign: 'start', marginTop: '50px' }}>
             <FormattedMessage
               id="viralOnboarding.addEmail.header"
-              defaultMessage="Where should we send your ticket?"
+              defaultMessage="Where should we send your FREE ticket?"
               description="Prompt / header in the section for user to add email"
             />
           </$Heading2>
@@ -82,14 +106,20 @@ const OnboardingAddEmail = (props: Props) => {
                 }
               }}
             />
-
-            <$NextButton
-              disabled={loading}
-              onClick={submitEmail}
-              color={COLORS.trustFontColor}
-              backgroundColor={COLORS.trustBackground}
-            >
-              <LoadingText loading={loading} text="Get my Ticket" color={COLORS.white}></LoadingText>
+            <$NextButton onClick={submitEmail} color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground}>
+              {needsDataSharingConsent ? (
+                <FormattedMessage
+                  id="viralonboarding.getMyTicketWithDataSharingConsent"
+                  defaultMessage="Agree & Claim Ticket"
+                  description="Ticket referring to NFT with data sharing consent"
+                />
+              ) : (
+                <FormattedMessage
+                  id="viralonboarding.getMyTicket"
+                  defaultMessage="Get my ticket"
+                  description="Ticket referring to NFT"
+                />
+              )}
             </$NextButton>
             {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
           </$Vertical>
@@ -97,16 +127,53 @@ const OnboardingAddEmail = (props: Props) => {
             style={{
               fontSize: TYPOGRAPHY.fontSize.small,
               lineHeight: TYPOGRAPHY.fontSize.medium,
-              marginTop: '40px',
-              width: screen === 'mobile' ? '100%' : '80%',
+              marginTop: '20px',
+              width: '100%',
               textAlign: 'start',
             }}
           >
-            <FormattedMessage
-              id="viralOnboarding.signup.email.disclaimer"
-              defaultMessage="You will NOT receiving marketing emails, we only notify if you win"
-              description="Disclaimer when collecting email"
-            />
+            {needsDataSharingConsent ? (
+              <div
+                onClick={() => setConsentDataSharing(!consentDataSharing)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={consentDataSharing}
+                  onClick={(e: any) => setConsentDataSharing(e.target.checked)}
+                  style={{
+                    fontSize: '1.5rem',
+                    backgroundColor: 'gray',
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                    width: '30px !important',
+                    height: '30px !important',
+                  }}
+                />
+                {authWords.consentDataSharingLinks(
+                  <span>
+                    <$Link href={PRIVACY_URL_DATASHARING} target="_blank">
+                      {authWords.privacyPolicy}
+                    </$Link>
+                  </span>,
+                  <$Link href={TOS_URL_DATASHARING} target="_blank">
+                    {authWords.termsOfService}
+                  </$Link>
+                )}
+              </div>
+            ) : (
+              <FormattedMessage
+                id="viralOnboarding.signup.email.disclaimer"
+                defaultMessage="You will NOT receiving marketing emails, we only notify if you win"
+                description="Disclaimer when collecting email"
+              />
+            )}
           </$SupressedParagraph>
           {!!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
         </$Vertical>
@@ -128,11 +195,10 @@ const $HandImage = styled.img`
   margin: auto 0 -3.5rem;
 `
 
-const $PartyBasketImage = styled.img` 
+const $PartyBasketImage = styled.img`
   margin: auto auto -3.5rem;
   max-width: 220px;
   width: 100%;
-}
 `
 
 const $Icon = styled.span`

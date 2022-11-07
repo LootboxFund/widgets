@@ -51,18 +51,13 @@ export const Video = (props: VideoProps) => {
 
   return (
     <div data-vjs-player style={{ ...props.style }}>
-      <$Video ref={videoRef} className="video-js vjs-big-play-centered vjs-show-big-play-button-on-pause" />
+      <video
+        ref={videoRef}
+        className="vjs-poster vjs-tech video-js vjs-big-play-centered vjs-show-big-play-button-on-pause"
+        playsInline
+      ></video>
     </div>
   )
 }
-
-const $Video = styled.video`
-  .vjs-tech {
-    object-fit: cover;
-  }
-  .vjs-poster {
-    object-fit: cover;
-  }
-`
 
 export default Video
