@@ -15,6 +15,7 @@ import useWords from 'lib/hooks/useWords'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import $Button from 'lib/components/Generics/Button'
 import { LoadingText } from 'lib/components/Generics/Spinner'
+import { manifest } from 'manifest'
 
 interface SettingsProps {
   email?: string
@@ -164,13 +165,20 @@ const SettingsComponent = (props: SettingsProps) => {
               </$span>
             )}
           </$span>
-          {/* <$span
+          <$span
             textAlign={screen === 'mobile' ? 'start' : 'center'}
             width={screen === 'mobile' ? '100%' : '30%'}
             lineHeight="40px"
           >
-            {!user?.phone && <$Link style={{ fontStyle: 'normal' }}>Add phone</$Link>}
-          </$span> */}
+            {!user?.phone && (
+              <$Link
+                style={{ fontStyle: 'normal', textDecoration: 'none' }}
+                href={manifest.microfrontends.webflow.anonSignup}
+              >
+                add phone
+              </$Link>
+            )}
+          </$span>
         </$Horizontal>
       </$SettingContainer>
       <$SettingContainer>

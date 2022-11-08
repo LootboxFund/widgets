@@ -13,6 +13,7 @@ import {
   browserLocalPersistence,
   EmailAuthCredential,
   EmailAuthProvider,
+  isSignInWithEmailLink,
   setPersistence,
   signInWithCustomToken,
 } from 'firebase/auth'
@@ -55,12 +56,20 @@ const AuthenticateAnonUsers = () => {
   const { idToken } = useMemo(() => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
+  const runonce = useRef(false)
+
+  useEffect(() => {
+    if (user && user.isEmailVerified && !isSignInWithEmailLink(auth, window.location.href) && !runonce.current) {
+      setStatus('confirm_phone')
+      runonce.current = true
+    }
+  }, [user, status])
 
   const { data } = useQuery<GetAnonTokenResponseSuccessFE | { getAnonToken: ResponseError }, QueryGetAnonTokenArgs>(
     GET_ANON_TOKEN,
     {
       variables: { idToken: idToken || '' },
-      skip: !idToken || hasRunInit.current,
+      skip: !idToken || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
       onCompleted: async (data) => {
         console.log('data', data)
         if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
