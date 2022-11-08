@@ -343,7 +343,7 @@ export const GET_LOOTBOX_VIRAL_ONBOARDING = gql`
 export type SyncProviderUserResponseFE = {
   syncProviderUser:
     | {
-        __typename: 'syncProviderUserResponseSuccess'
+        __typename: 'SyncProviderUserResponseSuccess'
         user: {
           phoneNumber: string | null
           email: string | null
@@ -356,7 +356,7 @@ export type SyncProviderUserResponseFE = {
 export const SYNC_PROVIDER_USER = gql`
   mutation syncProviderUser {
     syncProviderUser {
-      ... on syncProviderUserResponseSuccess {
+      ... on SyncProviderUserResponseSuccess {
         user {
           phoneNumber
           email
