@@ -24,8 +24,13 @@ import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
 import { auth } from 'lib/api/firebase/app'
 import { manifest } from 'manifest'
-import { GetAnonTokenResponseSuccessFE, GET_ANON_TOKEN } from './api.gql'
-import { useQuery } from '@apollo/client'
+import {
+  GetAnonTokenResponseSuccessFE,
+  GET_ANON_TOKEN,
+  SyncProviderUserResponseFE,
+  SYNC_PROVIDER_USER,
+} from './api.gql'
+import { useMutation, useQuery } from '@apollo/client'
 import { QueryGetAnonTokenArgs, ResponseError } from '../../api/graphql/generated/types'
 
 type FirebaseAuthError = string
@@ -57,6 +62,7 @@ const AuthenticateAnonUsers = () => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
   const runonce = useRef(false)
+  const [syncUserMutation] = useMutation<SyncProviderUserResponseFE>(SYNC_PROVIDER_USER)
 
   useEffect(() => {
     if (user && user.isEmailVerified && !isSignInWithEmailLink(auth, window.location.href) && !runonce.current) {
@@ -100,6 +106,7 @@ const AuthenticateAnonUsers = () => {
             // link user credentials...
             console.log('linking credentials')
             await linkCredentials(credential)
+            await syncUserMutation()
             console.log('done linking')
             setStatus('confirm_phone')
           } catch (err) {
@@ -149,6 +156,7 @@ const AuthenticateAnonUsers = () => {
       const credential = getPhoneAuthCredentialFromCode(confirmationCode)
       console.log('linking credentials...')
       const userObject = await linkCredentials(credential)
+      await syncUserMutation()
       // Good work... send them on their merry way
       console.log('done onboarding!!!')
       setStatus('complete')
