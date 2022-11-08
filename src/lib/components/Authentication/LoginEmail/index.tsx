@@ -10,7 +10,12 @@ import { $InputMedium, $ChangeMode, ModeOptions, $Checkbox } from '../Shared'
 import { $Header, $ErrorMessage, $span } from '../../Generics/Typography'
 import { parseAuthError } from 'lib/utils/firebase'
 import { auth } from 'lib/api/firebase/app'
-import { browserSessionPersistence, browserLocalPersistence, setPersistence } from 'firebase/auth'
+import {
+  browserSessionPersistence,
+  browserLocalPersistence,
+  setPersistence,
+  fetchSignInMethodsForEmail,
+} from 'firebase/auth'
 import { $Link } from 'lib/components/Profile/common'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
@@ -21,7 +26,7 @@ interface LoginEmailProps {
   title?: string
 }
 const LoginEmail = (props: LoginEmailProps) => {
-  const { signInWithEmailAndPassword } = useAuth()
+  const { signInWithEmailAndPassword, sendBasicSignInEmail } = useAuth()
   const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,6 +38,7 @@ const LoginEmail = (props: LoginEmailProps) => {
   const [persistenceChecked, setPersistenceChecked] = useState(persistence === 'local')
   const intl = useIntl()
   const words = useWords()
+  const [status, setStatus] = useState<'pending' | 'email-link' | 'password'>('pending')
 
   const parseEmail = (inputEmail: string) => {
     setEmail(inputEmail)
@@ -42,18 +48,41 @@ const LoginEmail = (props: LoginEmailProps) => {
     setPassword(inputPassword)
   }
 
-  const handleLoginWithEmailAndPassword = async () => {
+  const handleLoginWithEmail = async () => {
     setLoading(true)
-    try {
-      await signInWithEmailAndPassword(email, password)
-      setErrorMessage('')
-      props.onSignupSuccess && props.onSignupSuccess()
-    } catch (err) {
-      setErrorMessage(err?.message || words.anErrorOccured)
-      LogRocket.captureException(err)
-    } finally {
-      setLoading(false)
+    if (status === 'password') {
+      try {
+        await signInWithEmailAndPassword(email, password)
+        setErrorMessage('')
+        props.onSignupSuccess && props.onSignupSuccess()
+      } catch (err) {
+        setErrorMessage(err?.message || words.anErrorOccured)
+        LogRocket.captureException(err)
+      }
+    } else {
+      // Fetch sign in methods...
+      let emailSignInMethods: string[] = []
+      try {
+        emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
+      } catch (err) {
+        console.log('error fethcing sign in methods', err)
+        LogRocket.captureException(err)
+      }
+      if (emailSignInMethods.includes('password')) {
+        setStatus('password')
+      } else if (emailSignInMethods.includes('emailLink')) {
+        try {
+          await sendBasicSignInEmail(email)
+          setStatus('email-link')
+        } catch (err) {
+          setErrorMessage(err?.message || words.anErrorOccured)
+          LogRocket.captureException(err)
+        }
+      } else {
+        setErrorMessage('No sign in methods found. Try logging in using your Phone Number, create a new account.')
+      }
     }
+    setLoading(false)
   }
 
   const clickRememberMe = (e: ChangeEvent<HTMLInputElement>) => {
@@ -79,27 +108,39 @@ const LoginEmail = (props: LoginEmailProps) => {
           value={email}
           placeholder={words.email}
         ></$InputMedium>
-        <$InputMedium
-          onChange={(e) => parsePassword(e.target.value)}
-          value={password}
-          placeholder={words.password}
-          type="password"
-        ></$InputMedium>
-        <$Button
-          screen={screen}
-          onClick={handleLoginWithEmailAndPassword}
-          backgroundColor={`${COLORS.trustBackground}C0`}
-          backgroundColorHover={`${COLORS.trustBackground}`}
-          color={COLORS.trustFontColor}
-          style={{
-            boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
-            fontWeight: TYPOGRAPHY.fontWeight.regular,
-            fontSize: TYPOGRAPHY.fontSize.large,
-          }}
-          disabled={loading}
-        >
-          <LoadingText loading={loading} text={words.login} color={COLORS.trustFontColor} />
-        </$Button>
+        {status === 'password' && (
+          <$InputMedium
+            onChange={(e) => parsePassword(e.target.value)}
+            value={password}
+            placeholder={words.password}
+            type="password"
+          ></$InputMedium>
+        )}
+        {status === 'email-link' ? (
+          <$span>
+            ✅ Login email sent to {email}. <mark>Check your spam folder.</mark>
+          </$span>
+        ) : (
+          <$Button
+            screen={screen}
+            onClick={handleLoginWithEmail}
+            backgroundColor={`${COLORS.trustBackground}C0`}
+            backgroundColorHover={`${COLORS.trustBackground}`}
+            color={COLORS.trustFontColor}
+            style={{
+              boxShadow: '0px 4px 4px rgb(0 0 0 / 10%)',
+              fontWeight: TYPOGRAPHY.fontWeight.regular,
+              fontSize: TYPOGRAPHY.fontSize.large,
+            }}
+            disabled={loading}
+          >
+            <LoadingText
+              loading={loading}
+              text={status === 'pending' ? 'Next' : words.login}
+              color={COLORS.trustFontColor}
+            />
+          </$Button>
+        )}
       </$Vertical>
       <$Horizontal spacing={2} flexWrap justifyContent="space-between">
         <$span textAlign="start" style={{ display: 'flex', alignItems: 'center' }}>

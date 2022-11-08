@@ -33,14 +33,6 @@
     "defaultMessage": "Login with Wallet",
     "description": "Button text for user to login using their MetaMask wallet instead of their email and password"
   },
-  "auth.method.orUseMetamaskWallet": {
-    "defaultMessage": "Or use your MetaMask wallet",
-    "description": "Hyperlink message to user allowing them to signin / signup with using their Metamask wallet"
-  },
-  "auth.method.orUsePassword": {
-    "defaultMessage": "Or use a password",
-    "description": "Hyperlink message to user allowing them to signin / signup with a password"
-  },
   "auth.method.signupWithPhoneTerms": {
     "defaultMessage": "By verifying your phone number, you are agreeing to our {termsOfService}."
   },
@@ -1707,18 +1699,6 @@
   "profile.onboarding.checkSpamFolderText": {
     "defaultMessage": "Check your spam folder.",
     "description": "This is the text that tells the user to check their spam folder."
-  },
-  "profile.onboarding.learnHeader": {
-    "defaultMessage": "Learn about Lootbox",
-    "description": "Header for onboarding step. Part of onboarding is a user needs to learn how to use Lootbox."
-  },
-  "profile.onboarding.learnText": {
-    "defaultMessage": "Start off by checking out our youtube channel. Find us here 👉 {lootboxYoutubeLink}",
-    "description": "This is the message that tells the user to learn about Lootbox via our Youtube channel."
-  },
-  "profile.onboarding.lootboxYoutubeLink": {
-    "defaultMessage": "Getting started with Lootbox.",
-    "description": "This is the link that will take the user to the Youtube channel."
   },
   "profile.onboarding.resendVerificationEmailLink": {
     "defaultMessage": "Resend verification email.",
