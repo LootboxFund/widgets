@@ -1,5 +1,5 @@
 import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useEffect, useMemo, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ClaimID, LootboxID, ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
@@ -14,25 +14,20 @@ import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
 import AddEmail from './components/AddEmail'
 import AdVideoBeta2 from './components/AdVideoBeta2'
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import {
-  MutationCompleteClaimArgs,
-  MutationPendingClaimToUntrustedArgs,
-  QueryCheckPhoneEnabledArgs,
-} from 'lib/api/graphql/generated/types'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import { MutationCompleteClaimArgs, QueryCheckPhoneEnabledArgs } from 'lib/api/graphql/generated/types'
 import {
   CompleteClaimResponseSuccessFE,
   COMPLETE_CLAIM,
-  PendingToUntrustedClaimResponseFE,
-  PENDING_TO_UNTRUSTED_CLAIM,
   CheckPhoneEnabledResponseFE,
   CHECK_PHONE_AUTH,
 } from './api.gql'
 import useWords from 'lib/hooks/useWords'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { fetchSignInMethodsForEmail } from 'firebase/auth'
+import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { handIconImg } from './contants'
+import WaitForAuth from './components/WaitForAuth'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -40,14 +35,19 @@ type ViralOnboardingRoute =
   | 'browse-lottery'
   | 'sign-up-anon'
   | 'add-email'
+  | 'wait-for-auth'
   | 'onboard-phone'
   | 'success'
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
-  const { user, signInAnonymously, sendClaimValidationEmail } = useAuth()
+  const { user, signInAnonymously, sendSignInEmailForViralOnboarding } = useAuth()
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
-  const [route, setRoute] = useState<ViralOnboardingRoute>('accept-gift')
+  const [route, setRoute] = useState<ViralOnboardingRoute>(
+    isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'accept-gift'
+    // // DEV
+    // 'wait-for-auth'
+  )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [completeClaim, { loading: loadingMutation }] = useMutation<
@@ -55,31 +55,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     MutationCompleteClaimArgs
   >(COMPLETE_CLAIM)
 
-  const [pendingToUntrustedClaim, { loading: loadingPendingToUntrusted }] = useMutation<
-    PendingToUntrustedClaimResponseFE,
-    MutationPendingClaimToUntrustedArgs
-  >(PENDING_TO_UNTRUSTED_CLAIM)
-
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
-
-  const handleTransitionClaimToUntrusted = async (email: string, claimID: ClaimID, lootboxID: LootboxID) => {
-    const { data } = await pendingToUntrustedClaim({
-      variables: {
-        payload: {
-          chosenLootboxID: lootboxID,
-          claimId: claimID,
-          targetUserEmail: email,
-        },
-      },
-    })
-
-    if (!data || data?.pendingClaimToUntrusted?.__typename === 'ResponseError') {
-      // @ts-ignore
-      throw new Error(data?.pendingClaimToUntrusted?.error?.message || words.anErrorOccured)
-    }
-
-    return
-  }
 
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
     console.log('completing claim')
@@ -106,7 +82,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
     // Add notification to local storage
     // this notification shows a notif on the user profile page
-
     try {
       if (data?.completeClaim?.claim?.id) {
         setNotificationClaims([...notificationClaims, data.completeClaim.claim.id])
@@ -160,31 +135,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                 console.error('no lootbox')
                 throw new Error(words.anErrorOccured)
               }
+              setEmailForSignup(email)
+
               // if user is already logged in, complete claim & move on automatically
               if (user) {
                 console.log('user already logged in... completing claim...')
                 await completeClaimRequest(claim.id, chosenLootbox.id)
-                setRoute('success')
-                return
-              }
-
-              setEmailForSignup(email)
-
-              // Fetch sign in methods...
-              let emailSignInMethods: string[] = []
-              try {
-                emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
-              } catch (err) {
-                console.log('error fethcing sign in methods', err)
-              }
-
-              // See if user exists with given email. If so, create an "untrusted" claim and move on
-              if (emailSignInMethods.length > 0) {
-                console.log('existing email friend')
-                // Sends a link to the email which will async confirm the claim on click
-                // this creates an 'untrusted' claim
-                await handleTransitionClaimToUntrusted(email, claim.id, chosenLootbox.id)
-                await sendClaimValidationEmail(email, claim.id, chosenLootbox?.stampImage || handIconImg)
                 setRoute('success')
                 return
               }
@@ -209,6 +165,23 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                 console.log('phone friend')
                 // Just get them to login via phone
                 setRoute('onboard-phone')
+                return
+              }
+
+              // Fetch sign in methods...
+              let emailSignInMethods: string[] = []
+              try {
+                emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
+              } catch (err) {
+                console.log('error fethcing sign in methods', err)
+              }
+
+              // See if user exists with given email. If so, send them a validation email to click
+              if (emailSignInMethods.length > 0) {
+                console.log('existing email friend')
+                // Sends a link to the email which will async confirm the claim on click
+                await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
+                setRoute('wait-for-auth')
                 return
               }
 
@@ -243,6 +216,26 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         )
       case 'create-referral':
         return <CreateReferral goBack={() => setRoute('accept-gift')} />
+      case 'wait-for-auth':
+        return (
+          <WaitForAuth
+            onNext={async (claimID: ClaimID, lootboxID: LootboxID) => {
+              if (!claimID) {
+                console.error('no claim')
+                throw new Error(words.anErrorOccured)
+              }
+              if (!lootboxID) {
+                console.error('no lootbox')
+                throw new Error(words.anErrorOccured)
+              }
+              await completeClaimRequest(claimID, lootboxID)
+              setRoute('success')
+              return
+            }}
+            onRestart={() => setRoute('accept-gift')}
+            onBack={() => setRoute('browse-lottery')}
+          />
+        )
       case 'success': {
         if (!!ad) {
           return (
@@ -285,11 +278,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 }
 
 const ViralOnboardingPage = () => {
-  const [referralSlug, setReferralSlug] = useState<string | null>(null)
-
-  useEffect(() => {
+  const referralSlug = useMemo(() => {
     const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
-    setReferralSlug(INITIAL_URL_PARAMS.referralSlug)
+    return INITIAL_URL_PARAMS.referralSlug
   }, [])
 
   useEffect(() => {

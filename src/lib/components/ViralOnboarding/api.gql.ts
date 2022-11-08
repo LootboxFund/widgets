@@ -18,6 +18,7 @@ import {
   LootboxTournamentStatus,
   ResponseError,
 } from 'lib/api/graphql/generated/types'
+import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
 
 export type CompleteClaimResponseSuccessFE = {
   completeClaim:
@@ -237,38 +238,6 @@ export const GET_ANON_TOKEN = gql`
   }
 `
 
-export type PendingToUntrustedClaimResponseFE = {
-  pendingClaimToUntrusted:
-    | {
-        __typename: 'CompleteClaimResponseSuccess'
-        claim: {
-          id: ClaimID
-        }
-      }
-    | {
-        __typename: 'ResponseError'
-        error: ResponseError
-      }
-}
-
-export const PENDING_TO_UNTRUSTED_CLAIM = gql`
-  mutation Mutation($payload: PendingClaimToUntrustedPayload!) {
-    pendingClaimToUntrusted(payload: $payload) {
-      ... on CompleteClaimResponseSuccess {
-        claim {
-          id
-        }
-      }
-      ... on ResponseError {
-        error {
-          code
-          message
-        }
-      }
-    }
-  }
-`
-
 export type CheckPhoneEnabledResponseFE = {
   checkPhoneEnabled:
     | {
@@ -293,22 +262,72 @@ export const CHECK_PHONE_AUTH = gql`
   }
 `
 
-export type CompleteUntrustedClaimResponseFE = {
-  completeUntrustedClaim:
+export interface ClaimByIDResponse {
+  claimByID:
     | {
-        __typename: 'CompleteClaimResponseSuccess'
-        claim: {
-          id: ClaimID
-        }
+        __typename: 'ClaimByIDResponseSuccess'
+        claim: ClaimFE
       }
-    | ResponseError
+    | {
+        __typename: 'ResponseError'
+        error: ResponseError
+      }
 }
-export const COMPLETE_UNTRUSTED_CLAIM = gql`
-  mutation Mutation($payload: CompleteUntrustedClaimPayload!) {
-    completeUntrustedClaim(payload: $payload) {
-      ... on CompleteClaimResponseSuccess {
+
+export const CLAIM_BY_ID = gql`
+  query GetClaimByID($claimID: ID!) {
+    claimByID(claimID: $claimID) {
+      ... on ClaimByIDResponseSuccess {
         claim {
           id
+          referralId
+          promoterId
+          referralSlug
+          tournamentId
+          referrerId
+          chosenPartyBasketId
+          chosenPartyBasketAddress
+          lootboxAddress
+          rewardFromClaim
+          claimerUserId
+          status
+          type
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export interface GetLootboxViralOnboardingResponse {
+  getLootboxByID:
+    | {
+        __typename: 'LootboxResponseSuccess'
+        lootbox: LootboxReferralFE
+      }
+    | {
+        __typename: 'ResponseError'
+        error: {
+          code: string
+          message: string
+        }
+      }
+}
+
+export const GET_LOOTBOX_VIRAL_ONBOARDING = gql`
+  query GetLootboxByID($id: ID!) {
+    getLootboxByID(id: $id) {
+      ... on LootboxResponseSuccess {
+        lootbox {
+          id
+          nftBountyValue
+          address
+          stampImage
         }
       }
       ... on ResponseError {

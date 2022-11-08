@@ -47,6 +47,7 @@ const AuthenticateAnonUsers = () => {
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, linkCredentials, getPhoneAuthCredentialFromCode } = useAuth()
   const captchaRef = createRef<HTMLDivElement>()
+  const targetRoute = useRef<Status>('pending')
   const authWords = useAuthWords()
   // No longer needed - stored in backend
   // const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
@@ -63,8 +64,9 @@ const AuthenticateAnonUsers = () => {
       onCompleted: async (data) => {
         console.log('data', data)
         if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
-          const { token, email } = data.getAnonToken
+          hasRunInit.current = true // make sure dosent run twice
 
+          const { token, email } = data.getAnonToken
           // Make sure the credentials are valid from the email link
           let credential: EmailAuthCredential
           try {
@@ -85,10 +87,11 @@ const AuthenticateAnonUsers = () => {
             return
           }
 
-          hasRunInit.current = true // make sure dosent run twice
           try {
             // link user credentials...
+            console.log('linking credentials')
             await linkCredentials(credential)
+            console.log('done linking')
             setStatus('confirm_phone')
           } catch (err) {
             console.log('error linking credentials', err)
@@ -110,6 +113,10 @@ const AuthenticateAnonUsers = () => {
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
   useEffect(() => {
+    if (status === 'confirm_phone' || status === 'verification_sent') {
+      targetRoute.current = 'confirm_phone'
+    }
+
     let el: HTMLElement | null = null
     if (status === 'verification_sent') {
       el = document.getElementById('verification-input')
@@ -185,8 +192,8 @@ const AuthenticateAnonUsers = () => {
   }
 
   const reset = () => {
-    if (status === 'confirm_phone' || status === 'verification_sent') {
-      setStatus('confirm_phone')
+    if (targetRoute) {
+      setStatus(targetRoute.current)
     } else {
       setStatus('pending')
     }

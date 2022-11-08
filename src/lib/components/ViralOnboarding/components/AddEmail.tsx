@@ -1,22 +1,18 @@
 import useWords from 'lib/hooks/useWords'
-import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import { FormattedMessage } from 'react-intl'
 import { $Heading2, $NextButton, $SubHeading, $SupressedParagraph, background1, handIconImg } from '../contants'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
 import { COLORS, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import useWindowSize from 'lib/hooks/useScreenSize'
 import { checkIfValidEmail } from 'lib/api/helpers'
-import { useAuth } from 'lib/hooks/useAuth'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
-import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import { LoadingText } from 'lib/components/Generics/Spinner'
 import { useAuthWords } from 'lib/components/Authentication/Shared'
 import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL_DATASHARING } from 'lib/hooks/constants'
 import { PRIVACY_URL_DATASHARING } from 'lib/hooks/constants'
+import { $Spinner } from 'lib/components/Generics/Spinner'
 
 interface Props {
   onNext: (email: string) => Promise<void>
@@ -24,18 +20,19 @@ interface Props {
 }
 const OnboardingAddEmail = (props: Props) => {
   const words = useWords()
-  const intl = useIntl()
-  const { screen } = useWindowSize()
   const [email, setEmailLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const { setEmail, chosenLootbox, chosenPartyBasket, referral } = useViralOnboarding()
-  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
 
   const authWords = useAuthWords()
   const [consentDataSharing, setConsentDataSharing] = useState(false)
 
-  const submitEmail = () => {
+  const submitEmail = async () => {
+    if (loading) {
+      return
+    }
+
     setConsentDataSharing(true)
     // just ad it to memory
     // it will be added to user object in next page
@@ -107,19 +104,22 @@ const OnboardingAddEmail = (props: Props) => {
               }}
             />
             <$NextButton onClick={submitEmail} color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground}>
-              {needsDataSharingConsent ? (
-                <FormattedMessage
-                  id="viralonboarding.getMyTicketWithDataSharingConsent"
-                  defaultMessage="Agree & Claim Ticket"
-                  description="Ticket referring to NFT with data sharing consent"
-                />
-              ) : (
-                <FormattedMessage
-                  id="viralonboarding.getMyTicket"
-                  defaultMessage="Get my ticket"
-                  description="Ticket referring to NFT"
-                />
-              )}
+              <span>
+                {loading && <$Spinner margin="auto 12px auto 0px" style={{ display: 'inline-block' }} />}
+                {needsDataSharingConsent ? (
+                  <FormattedMessage
+                    id="viralonboarding.getMyTicketWithDataSharingConsent"
+                    defaultMessage="Agree & Claim Ticket"
+                    description="Ticket referring to NFT with data sharing consent"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="viralonboarding.getMyTicket"
+                    defaultMessage="Get my ticket"
+                    description="Ticket referring to NFT"
+                  />
+                )}
+              </span>
             </$NextButton>
             {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
           </$Vertical>
