@@ -23,7 +23,7 @@ interface AuthenticationProps {
   onSignupSuccess?: () => void
   loginTitle?: string
   width?: string
-  ghost: boolean
+  ghost?: boolean
 }
 const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost }: AuthenticationProps) => {
   const [route, setRoute] = useState<ModeOptions>(
