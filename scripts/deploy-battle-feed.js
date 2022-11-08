@@ -23,15 +23,21 @@ const BattleFeed = process.env.NODE_ENV === 'production' ? 'BattleFeed.productio
 
 const fileNames = [BattleFeed]
 
-fileNames.map((filename) => {
-  uploadFile({
-    filename,
-    semver,
-    absPath,
-    bucketName,
-  })
-})
-
+const run = async () => {
+  await Promise.all(
+    fileNames.map((filename) => {
+      return uploadFile({
+        filename,
+        semver,
+        absPath,
+        bucketName,
+      })
+    })
+  )
+  process.exit()
+  return
+}
 app.listen(process.env.PORT || 8088, () => {
   console.log('node server running')
+  run()
 })

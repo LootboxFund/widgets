@@ -24,13 +24,17 @@ const ManageLootbox = process.env.NODE_ENV === 'production' ? 'ManageLootbox.pro
 
 const fileNames = [ManageLootbox]
 
-fileNames.map((filename) => {
-  uploadFile({
+fileNames.map((filename, idx) => {
+  return uploadFile({
     filename,
     semver,
     absPath,
     bucketName,
   })
+  if (idx === fileNames.length - 1) {
+    process.exit()
+  }
+  return
 })
 
 app.listen(process.env.PORT || 8088, () => {

@@ -25,7 +25,7 @@ const SearchBar = process.env.NODE_ENV === 'production' ? 'SearchBar.production.
 const fileNames = [SearchBar]
 
 fileNames.map((filename) => {
-  uploadFile({
+  return uploadFile({
     filename,
     semver,
     absPath,

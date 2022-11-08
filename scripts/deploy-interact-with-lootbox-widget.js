@@ -24,13 +24,17 @@ const InteractWithLootbox =
 // true ? 'InteractWithLootbox.production.js' : 'InteractWithLootbox.js' // Hack for production
 const fileNames = [InteractWithLootbox]
 
-fileNames.map((filename) => {
-  uploadFile({
+fileNames.map((filename, idx) => {
+  return uploadFile({
     filename,
     semver,
     absPath,
     bucketName,
   })
+  if (idx === fileNames.length - 1) {
+    process.exit()
+  }
+  return
 })
 
 app.listen(process.env.PORT || 8088, () => {
