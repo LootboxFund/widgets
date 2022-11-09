@@ -1,6 +1,6 @@
 import useWords from 'lib/hooks/useWords'
 import { $Horizontal, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
-import { FormattedMessage, useIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import { $Heading, $NextButton, $SubHeading, $SupressedParagraph, background3, handIconImg } from './contants'
 import Spinner from 'lib/components/Generics/Spinner'
 import { createRef, useEffect, useMemo, useRef, useState } from 'react'
@@ -49,7 +49,7 @@ const AuthenticateAnonUsers = () => {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneCode, setPhoneCode] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [loadingPrecise, setLoadingPrecise] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, linkCredentials, getPhoneAuthCredentialFromCode } = useAuth()
   const captchaRef = createRef<HTMLDivElement>()
@@ -80,7 +80,7 @@ const AuthenticateAnonUsers = () => {
         console.log('data', data)
         if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
           hasRunInit.current = true // make sure dosent run twice
-
+          setStatus('loading')
           const { token, email } = data.getAnonToken
           // Make sure the credentials are valid from the email link
           let credential: EmailAuthCredential
@@ -89,6 +89,7 @@ const AuthenticateAnonUsers = () => {
             credential = EmailAuthProvider.credentialWithLink(email, window.location.href)
           } catch (err) {
             console.log('error generating credentials', err)
+            reset()
             return
           }
           console.log('siginin with custom token')
@@ -99,6 +100,7 @@ const AuthenticateAnonUsers = () => {
             console.log('successfully signed into anon account')
           } catch (err) {
             console.error('error signing in', err)
+            reset()
             return
           }
 
@@ -145,10 +147,11 @@ const AuthenticateAnonUsers = () => {
   }, [status])
 
   const handleCodeSubmit = async () => {
-    if (loading) {
+    if (status === 'loading' || loadingPrecise) {
       return
     }
-    setLoading(true)
+    setLoadingPrecise(true)
+    setStatus('loading')
     setErrorMessage('')
     try {
       setPersistence(auth, browserLocalPersistence)
@@ -165,16 +168,17 @@ const AuthenticateAnonUsers = () => {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     } finally {
-      setLoading(false)
+      setLoadingPrecise(false)
     }
   }
 
   const handleVerificationRequest = async () => {
-    if (loading) {
+    if (status === 'loading' || loadingPrecise) {
       return
     }
+    setLoadingPrecise(true)
+    setStatus('loading')
     setErrorMessage('')
-    setLoading(true)
     try {
       await sendPhoneVerification(parsedPhone)
       setStatus('verification_sent')
@@ -183,7 +187,7 @@ const AuthenticateAnonUsers = () => {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)
     } finally {
-      setLoading(false)
+      setLoadingPrecise(false)
     }
   }
 
@@ -365,7 +369,7 @@ const AuthenticateAnonUsers = () => {
                   backgroundColor={COLORS.trustBackground}
                   style={{ width: '100%' }}
                 >
-                  <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
+                  <LoadingText loading={loadingPrecise} text={words.sendCode} color={COLORS.white} />
                 </$NextButton>
               </$Vertical>
               {renderTOS()}
@@ -399,9 +403,9 @@ const AuthenticateAnonUsers = () => {
                   color={COLORS.trustFontColor}
                   backgroundColor={COLORS.trustBackground}
                   style={{ width: '100%' }}
-                  disabled={loading}
+                  disabled={loadingPrecise}
                 >
-                  <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
+                  <LoadingText loading={loadingPrecise} text={words.confirm} color={COLORS.white} />
                 </$NextButton>
               </$Vertical>
               {renderTOS()}

@@ -4,7 +4,6 @@ import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
 import Spinner, { LoadingText } from 'lib/components/Generics/Spinner'
-import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import useWords from 'lib/hooks/useWords'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
@@ -18,7 +17,6 @@ import {
 } from '../api.gql'
 import { QueryClaimByIdArgs, QueryGetLootboxByIdArgs } from '../../../api/graphql/generated/types'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import useWindowSize from 'lib/hooks/useScreenSize'
 
 interface WaitForAuthProps {
   onNext: (claimID: ClaimID, lootboxID: LootboxID) => Promise<void>
@@ -27,13 +25,20 @@ interface WaitForAuthProps {
 }
 
 const WaitForAuth = (props: WaitForAuthProps) => {
-  const { screen } = useWindowSize()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const { setClaim, setChosenLootbox } = useViralOnboarding()
   const words = useWords()
-  const [localEmail, setLocalEmail] = useState(emailForSignup || '')
+  const { claimID, lootboxID, email } = useMemo(() => {
+    const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
+    return {
+      claimID: INITIAL_URL_PARAMS.claimID,
+      lootboxID: INITIAL_URL_PARAMS.lootboxID,
+      email: INITIAL_URL_PARAMS.email,
+    }
+  }, [])
+  const [emailToUse, setEmailToUse] = useState(email || '')
+  const [localEmail, setLocalEmail] = useState(email || '')
   const status = useMemo(() => {
     if (loading) {
       return 'loading'
@@ -41,19 +46,11 @@ const WaitForAuth = (props: WaitForAuthProps) => {
     if (errorMessage) {
       return 'error'
     }
-    if (!emailForSignup) {
+    if (!emailToUse) {
       return 'no-email'
     }
     return 'pending'
-  }, [loading, errorMessage, emailForSignup])
-
-  const { claimID, lootboxID } = useMemo(() => {
-    const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
-    return {
-      claimID: INITIAL_URL_PARAMS.claimID,
-      lootboxID: INITIAL_URL_PARAMS.lootboxID,
-    }
-  }, [])
+  }, [loading, errorMessage, emailToUse])
 
   useQuery<GetLootboxViralOnboardingResponse, QueryGetLootboxByIdArgs>(GET_LOOTBOX_VIRAL_ONBOARDING, {
     skip: !lootboxID,
@@ -85,7 +82,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
   }, [])
 
   const handleAuthenticateDynamicLink = async () => {
-    let emailToUse = emailForSignup || localEmail
+    let emailToLogin = emailToUse || localEmail
 
     if (isSignInWithEmailLink(auth, window.location.href) && emailToUse) {
       setLoading(true)
@@ -103,7 +100,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
       try {
         // The client SDK will parse the code from the link for you.
         // setStatus('loading')
-        await signInWithEmailLink(auth, emailToUse, window.location.href)
+        await signInWithEmailLink(auth, emailToLogin, window.location.href)
 
         const {
           INITIAL_URL_PARAMS: { claimID, lootboxID },
@@ -116,7 +113,6 @@ const WaitForAuth = (props: WaitForAuthProps) => {
         }
 
         await props.onNext(claimID as ClaimID, lootboxID as LootboxID)
-        setEmailForSignup('')
         return
       } catch (err) {
         console.error(err)
@@ -129,7 +125,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
   }
 
   const submitEmail = () => {
-    setEmailForSignup(localEmail)
+    setEmailToUse(localEmail)
     handleAuthenticateDynamicLink()
   }
 
@@ -204,8 +200,8 @@ const WaitForAuth = (props: WaitForAuthProps) => {
               Check you Email
             </$Heading>
             <$SubHeading style={{ marginTop: '0px' }}>
-              {emailForSignup
-                ? `Check your spam folder. A login email was sent to ${emailForSignup}.`
+              {emailToUse
+                ? `Check your spam folder. A login email was sent to ${emailToUse}.`
                 : 'Check your spam folder. A login link was sent to your email'}
             </$SubHeading>
           </$Vertical>

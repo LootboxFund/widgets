@@ -306,7 +306,7 @@ export const useAuth = () => {
     const emailActionCodeSettings: ActionCodeSettings = {
       // URL you want to redirect back to. The domain (www.example.com) for this
       // URL must be in the authorized domains list in the Firebase Console.
-      url: `${manifest.microfrontends.webflow.myProfilePage}`,
+      url: `${manifest.microfrontends.webflow.myProfilePage}?email=${email}`,
       handleCodeInApp: true,
     }
 
@@ -330,7 +330,7 @@ export const useAuth = () => {
     const emailActionCodeSettings: ActionCodeSettings = {
       // URL you want to redirect back to. The domain (www.example.com) for this
       // URL must be in the authorized domains list in the Firebase Console.
-      url: `${manifest.microfrontends.webflow.referral}?r=${referralSlug}&l=${lootboxID}&c=${claimID}`,
+      url: `${manifest.microfrontends.webflow.referral}?r=${referralSlug}&l=${lootboxID}&c=${claimID}&email=${email}`,
       handleCodeInApp: true,
     }
 
