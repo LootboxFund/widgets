@@ -369,32 +369,6 @@ export const useAuth = () => {
   const signInAnonymously = async (email?: string): Promise<User> => {
     // Sign in anonymously
     const { user } = await signInAnonymouslyFirebase(auth)
-    // Send login email
-    if (email) {
-      const idToken = await user.getIdToken(true)
-      if (!idToken) {
-        console.log('not logged in while generating ID token')
-        throw new Error(words.anErrorOccured)
-      }
-      // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
-      const emailActionCodeSettings: ActionCodeSettings = {
-        // URL you want to redirect back to. The domain (www.example.com) for this
-        // URL must be in the authorized domains list in the Firebase Console.
-
-        url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}`,
-        // This must be true.
-        handleCodeInApp: true,
-      }
-
-      try {
-        console.log('sending sign in email...')
-        await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
-        console.log('success sending email')
-      } catch (err) {
-        console.log('error sending email', err)
-        LogRocket.captureException(err)
-      }
-    }
 
     // Now create a user record
     const createUserPayload: CreateUserRecordPayload = {}
@@ -405,6 +379,38 @@ export const useAuth = () => {
     await createUserMutation({ variables: { payload: createUserPayload } })
 
     return user
+  }
+
+  const sendSignInEmailAnon = async (email: string, img?: string): Promise<void> => {
+    if (!auth.currentUser) {
+      throw new Error('User not signed in')
+    }
+    // Send login email
+    const idToken = await auth.currentUser.getIdToken(true)
+    if (!idToken) {
+      console.log('not logged in while generating ID token')
+      throw new Error(words.anErrorOccured)
+    }
+    // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+
+      url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}${img ? `&img=${encodeURIComponent(img)}` : ''}`,
+      // This must be true.
+      handleCodeInApp: true,
+    }
+
+    try {
+      console.log('sending sign in email...')
+      await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+      console.log('success sending email')
+    } catch (err) {
+      console.log('error sending email', err)
+      LogRocket.captureException(err)
+    }
+
+    return
   }
 
   const signInWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
@@ -538,5 +544,6 @@ export const useAuth = () => {
     getPhoneAuthCredentialFromCode,
     sendSignInEmailForViralOnboarding,
     sendBasicSignInEmail,
+    sendSignInEmailAnon,
   }
 }

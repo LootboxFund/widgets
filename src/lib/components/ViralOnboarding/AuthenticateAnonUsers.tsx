@@ -58,7 +58,7 @@ const AuthenticateAnonUsers = () => {
   // No longer needed - stored in backend
   // const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const hasRunInit = useRef(false)
-  const { idToken } = useMemo(() => {
+  const { idToken, stampImg } = useMemo(() => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
   const runonce = useRef(false)
@@ -219,7 +219,8 @@ const AuthenticateAnonUsers = () => {
   return (
     <$ViralOnboardingCard background={background3} opacity={['0.7', '0.55']}>
       <$ViralOnboardingSafeArea>
-        {/* {status === 'pending' && !emailForSignup && (
+        <$Vertical height="100%">
+          {/* {status === 'pending' && !emailForSignup && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Heading2 style={{ textAlign: 'start', marginTop: '50px' }}>{words.enterYourEmail}</$Heading2>
             <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>
@@ -267,156 +268,167 @@ const AuthenticateAnonUsers = () => {
             <$HandImage src={handIconImg} />
           </$Vertical>
         )} */}
-        {status === 'pending' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
-            <$Icon>{'📧'}</$Icon>
-            <$Heading
-              style={{
-                textTransform: 'none',
-                fontSize: TYPOGRAPHY.fontSize.xlarge,
-                lineHeight: TYPOGRAPHY.fontSize.xxlarge,
-              }}
-            >
-              Check your email for a magic link
-            </$Heading>
-            {email && (
+          {status === 'pending' && (
+            <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+              <$Icon>{'📧'}</$Icon>
+              <$Heading
+                style={{
+                  textTransform: 'none',
+                  fontSize: TYPOGRAPHY.fontSize.xlarge,
+                  lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+                }}
+              >
+                Check your email to finish registration
+              </$Heading>
               <$SubHeading style={{ marginTop: '0px' }}>
-                Sent to {email}. <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b> Can't find it?{' '}
-                <$Link href={'#'} target="_blank">
-                  resend
-                </$Link>
+                Can't find it? <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b>
               </$SubHeading>
-            )}
-            {/* <$SubHeading style={{ marginTop: '0px' }}>
+              {email && <$SubHeading style={{ marginTop: '0px' }}>Sent to {email}.</$SubHeading>}
+              {/* <ul>
+                <li>
+                  <$SubHeading style={{ marginTop: '0px' }}>
+                    ☑️ We sent a magic link to <b>{email ? email : 'your email'}</b>
+                  </$SubHeading>
+                </li>
+                <li>
+                  <$SubHeading style={{ marginTop: '0px' }}>☑️ Add your phone number</$SubHeading>
+                </li>
+              </ul> */}
+              {/* <$SubHeading style={{ marginTop: '0px' }}>
               Check your spam folder. Can't find it?{' '}
               <$Link href={TOS_URL} target="_blank">
                 resend
               </$Link>
             </$SubHeading> */}
-          </$Vertical>
-        )}
-        {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
-        {status === 'error' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
-            <$Icon>{'🤕'}</$Icon>
-            <$Heading
-              style={{
-                textTransform: 'none',
-                fontSize: TYPOGRAPHY.fontSize.xlarge,
-                lineHeight: TYPOGRAPHY.fontSize.xxlarge,
-              }}
-            >
-              {words.anErrorOccured}
-            </$Heading>
-            {errorMessage ? (
-              <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
-            ) : null}
+            </$Vertical>
+          )}
+          {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
+          {status === 'error' && (
+            <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+              <$Icon>{'🤕'}</$Icon>
+              <$Heading
+                style={{
+                  textTransform: 'none',
+                  fontSize: TYPOGRAPHY.fontSize.xlarge,
+                  lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+                }}
+              >
+                {words.anErrorOccured}
+              </$Heading>
+              {errorMessage ? (
+                <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
+              ) : null}
 
-            <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
-              {words.retry + '?'}
-            </$SubHeading>
-          </$Vertical>
-        )}
+              <$SubHeading
+                onClick={reset}
+                style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+              >
+                {words.retry + '?'}
+              </$SubHeading>
+            </$Vertical>
+          )}
 
-        {status === 'confirm_phone' && (
-          <$Vertical height="100%" style={{ marginTop: '5vh' }}>
-            <$Icon>{'🚀'}</$Icon>
-            <$Heading style={{ textAlign: 'start' }}>
-              <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
-            </$Heading>
-            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}*</$SubHeading>
-            <$Vertical spacing={3}>
-              <$Horizontal>
-                <CountrySelect onChange={setPhoneCode} backgroundColor="#ffffff" />
+          {status === 'confirm_phone' && (
+            <$Vertical height="100%" style={{ marginTop: '5vh' }}>
+              <$Icon>{'🚀'}</$Icon>
+              <$Heading style={{ textAlign: 'start' }}>
+                <FormattedMessage id="viralOnboarding.signup.header" defaultMessage="Almost Finished..." />
+              </$Heading>
+              <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>{words.verifyYourPhoneNumber}*</$SubHeading>
+              <$Vertical spacing={3}>
+                <$Horizontal>
+                  <CountrySelect onChange={setPhoneCode} backgroundColor="#ffffff" />
+                  <$InputMedium
+                    id="sms-verf"
+                    type="tel"
+                    name="phone"
+                    placeholder="123-456-7890"
+                    value={phoneNumber}
+                    // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+                    // required
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    style={{
+                      borderRadius: '0px 10px 10px 0px',
+                      borderLeft: `${COLORS.surpressedBackground}ae 1px solid`,
+                      width: '100%',
+                    }}
+                    onKeyUp={(event) => {
+                      if (event.key == 'Enter') {
+                        handleVerificationRequest()
+                      }
+                    }}
+                  />
+                </$Horizontal>
+                <$NextButton
+                  onClick={handleVerificationRequest}
+                  color={COLORS.trustFontColor}
+                  backgroundColor={COLORS.trustBackground}
+                  style={{ width: '100%' }}
+                >
+                  <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
+                </$NextButton>
+              </$Vertical>
+              {renderTOS()}
+            </$Vertical>
+          )}
+          {status === 'verification_sent' && (
+            <$Vertical style={{ marginTop: '5vh' }}>
+              <$SubHeading style={{ textAlign: 'start' }}>
+                {words.codeSentToFn(parsedPhone)}{' '}
+                <$SubHeading
+                  onClick={reset}
+                  style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}
+                >
+                  [{words.edit}]
+                </$SubHeading>
+              </$SubHeading>
+              <$Vertical spacing={3}>
                 <$InputMedium
-                  id="sms-verf"
-                  type="tel"
-                  name="phone"
-                  placeholder="123-456-7890"
-                  value={phoneNumber}
-                  // pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-                  // required
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  style={{
-                    borderRadius: '0px 10px 10px 0px',
-                    borderLeft: `${COLORS.surpressedBackground}ae 1px solid`,
-                    width: '100%',
-                  }}
+                  id="verification-input"
+                  placeholder={words.verificationCode}
+                  onChange={(e) => setConfirmationCode(e.target.value)}
+                  type="number"
                   onKeyUp={(event) => {
                     if (event.key == 'Enter') {
-                      handleVerificationRequest()
+                      handleCodeSubmit()
                     }
                   }}
                 />
-              </$Horizontal>
-              <$NextButton
-                onClick={handleVerificationRequest}
-                color={COLORS.trustFontColor}
-                backgroundColor={COLORS.trustBackground}
-                style={{ width: '100%' }}
-              >
-                <LoadingText loading={loading} text={words.sendCode} color={COLORS.white} />
-              </$NextButton>
+                <$NextButton
+                  onClick={handleCodeSubmit}
+                  color={COLORS.trustFontColor}
+                  backgroundColor={COLORS.trustBackground}
+                  style={{ width: '100%' }}
+                  disabled={loading}
+                >
+                  <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
+                </$NextButton>
+              </$Vertical>
+              {renderTOS()}
             </$Vertical>
-            {renderTOS()}
-            <$HandImage src={handIconImg} />
-          </$Vertical>
-        )}
-        {status === 'verification_sent' && (
-          <$Vertical style={{ marginTop: '5vh' }}>
-            <$SubHeading style={{ textAlign: 'start' }}>
-              {words.codeSentToFn(parsedPhone)}{' '}
-              <$SubHeading
-                onClick={reset}
-                style={{ display: 'inline', textTransform: 'lowercase', fontStyle: 'italic', cursor: 'pointer' }}
+          )}
+          {status === 'complete' && (
+            <$Vertical style={{ marginTop: '5vh' }}>
+              <$Icon>{'🎉'}</$Icon>
+              <$Heading>Your account is ready</$Heading>
+              <br />
+              <a
+                href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id || ''}`}
+                style={{ textDecoration: 'none' }}
               >
-                [{words.edit}]
-              </$SubHeading>
-            </$SubHeading>
-            <$Vertical spacing={3}>
-              <$InputMedium
-                id="verification-input"
-                placeholder={words.verificationCode}
-                onChange={(e) => setConfirmationCode(e.target.value)}
-                type="number"
-                onKeyUp={(event) => {
-                  if (event.key == 'Enter') {
-                    handleCodeSubmit()
-                  }
-                }}
-              />
-              <$NextButton
-                onClick={handleCodeSubmit}
-                color={COLORS.trustFontColor}
-                backgroundColor={COLORS.trustBackground}
-                style={{ width: '100%' }}
-                disabled={loading}
-              >
-                <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
-              </$NextButton>
+                <$NextButton
+                  color={COLORS.trustFontColor}
+                  backgroundColor={COLORS.trustBackground}
+                  style={{ width: '100%' }}
+                >
+                  Go to Profile
+                </$NextButton>
+              </a>
             </$Vertical>
-            {renderTOS()}
-          </$Vertical>
-        )}
-        {status === 'complete' && (
-          <$Vertical style={{ marginTop: '5vh' }}>
-            <$Icon>{'🎉'}</$Icon>
-            <$Heading>Your account is ready</$Heading>
-            <a
-              href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id || ''}`}
-              style={{ textDecoration: 'none' }}
-            >
-              <$NextButton
-                color={COLORS.trustFontColor}
-                backgroundColor={COLORS.trustBackground}
-                style={{ width: '100%' }}
-              >
-                Go to Profile
-              </$NextButton>
-            </a>
-          </$Vertical>
-        )}
-        <div id="recaptcha-container" ref={captchaRef} />
+          )}
+          {stampImg ? <$PartyBasketImage src={stampImg} /> : <$HandImage src={handIconImg} />}
+          <div id="recaptcha-container" ref={captchaRef} />
+        </$Vertical>
       </$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>
   )
@@ -438,13 +450,14 @@ const parseAuthError = (message: string) => {
 
 interface URLState {
   idToken: string | null
-  // uid: string | null
+  stampImg: string | null
 }
 const extractURLState_AuthenticateAnonUsers = () => {
   const url = new URL(window.location.href)
 
   const state: URLState = {
     idToken: url.searchParams.get('t'),
+    stampImg: url.searchParams.get('img'),
   }
 
   return state
@@ -469,11 +482,11 @@ const $Icon = styled.span`
   color: ${COLORS.white};
 `
 
-const $PartyBasketImage = styled.img` 
+const $PartyBasketImage = styled.img`
   margin: auto auto -3.5rem;
   max-width: 220px;
   width: 100%;
-}
+  filter: drop-shadow(0px 0px 25px #ffffff);
 `
 
 export default AuthenticateAnonUsers

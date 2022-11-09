@@ -40,7 +40,7 @@ type ViralOnboardingRoute =
   | 'success'
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
-  const { user, signInAnonymously, sendSignInEmailForViralOnboarding } = useAuth()
+  const { user, signInAnonymously, sendSignInEmailForViralOnboarding, sendSignInEmailAnon } = useAuth()
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
@@ -188,7 +188,10 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
               console.log('anonymous friend')
               // Default is anonymous case
               await signInAnonymously(email)
-              await completeClaimRequest(claim.id, chosenLootbox.id)
+              await Promise.all([
+                sendSignInEmailAnon(email, chosenLootbox.stampImage),
+                completeClaimRequest(claim.id, chosenLootbox.id),
+              ])
               setRoute('success')
               return
             }}
