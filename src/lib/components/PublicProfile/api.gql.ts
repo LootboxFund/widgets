@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { Address, ClaimID, LootboxID, PartyBasketID, TournamentID, UserID } from '@wormgraph/helpers'
-import { ClaimType, UserSocials } from 'lib/api/graphql/generated/types'
+import { ClaimStatus, ClaimType, UserSocials } from 'lib/api/graphql/generated/types'
 
 export type PublicUserGQLArgs = {
   publicUserId: UserID
@@ -16,6 +16,7 @@ export type PublicUserFEClaims = {
   id: ClaimID
   tournamentId: TournamentID
   type: ClaimType
+  status: ClaimStatus
   userLink: {
     id: UserID
     username?: string
@@ -93,6 +94,7 @@ export const PUBLIC_USER_CLAIMS = gql`
                 id
                 tournamentId
                 type
+                status
                 userLink {
                   id
                   username

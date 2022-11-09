@@ -191,7 +191,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
   const TicketBadge = ({ claim }: { claim: PublicUserFEClaims }) => {
     let text = ''
 
-    if (claim.type === 'reward') {
+    if (claim.status === 'unverified') {
+      text = 'UNVERIFIED'
+    } else if (claim.type === 'reward') {
       text = referredUser(claim?.userLink?.username || 'User')
     } else if (claim.type === 'referral') {
       text = invitedByUser(claim?.userLink?.username || 'User')
@@ -266,10 +268,32 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
             ? `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`
             : `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
+          const isUnverifiedClaim = claim.status === 'unverified'
+          const isExpired = claim.status === 'expired'
+
           return (
             <$ClaimCard key={claim.id}>
               <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
                 <$ImageContainer>
+                  {isUnverifiedClaim && (
+                    <a href={manifest.microfrontends.webflow.myProfilePage}>
+                      <$UnverifiedBadge data-tip data-for={'unverified-tip'}>
+                        Pending Phone Verification
+                      </$UnverifiedBadge>
+                    </a>
+                  )}
+                  <ReactTooltip id="unverified-tip" place="top" effect="float">
+                    Claims can only be redeemed with a verified phone number. Go to the private profile and add your
+                    phone number.
+                  </ReactTooltip>
+                  {isExpired && (
+                    <$ExpiredBadge data-tip data-for={'expired-tip'}>
+                      Expired
+                    </$ExpiredBadge>
+                  )}
+                  <ReactTooltip id="expired-tip" place="top" effect="float">
+                    This claim has expired and cannot be used.
+                  </ReactTooltip>
                   <img
                     src={displayImage ? convertFilenameToThumbnail(displayImage, 'md') : TEMPLATE_LOOTBOX_STAMP}
                     style={{
@@ -277,6 +301,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                       height: '100%',
                       objectFit: 'cover',
                       paddingBottom: '5px',
+                      filter: isUnverifiedClaim || isExpired ? 'brightness(40%)' : 'none',
                     }}
                   />
                   <TicketBadge claim={claim} />
@@ -556,6 +581,75 @@ const $TicketBadge = styled.div`
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   padding: 0px 5px;
   box-sizing: border-box;
+  z-index: 100;
 `
+
+const $UnverifiedBadge = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  background-color: ${COLORS.dangerBackground};
+  text-align: center;
+  color: ${COLORS.dangerFontColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: 25px;
+  border-radius: 8px 8px 0px 0px;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  padding: 0px 5px;
+  box-sizing: border-box;
+  z-index: 100;
+`
+
+const $ExpiredBadge = styled.div`
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  background-color: ${COLORS.warningBackground};
+  text-align: center;
+  color: ${COLORS.warningFontColor};
+  font-weight: ${TYPOGRAPHY.fontWeight.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  line-height: 25px;
+  border-radius: 8px 8px 0px 0px;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  padding: 0px 5px;
+  box-sizing: border-box;
+  z-index: 100;
+`
+
+// const $UnverifiedBadge = styled.div`
+//   :before {
+//     font-size: 4.5rem;
+//     content: '📱';
+//     position: absolute;
+//     top: 20px;
+//     z-index: 100;
+//     width: 100%;
+//     text-align: center;
+//   }
+//   :after {
+//     content: 'Verify Phone';
+//     font-size: 1.5rem;
+//     top: 7.5rem;
+//     text-align: center;
+//     width: 100%;
+//     color: #ffffff;
+//     position: absolute;
+//     z-index: 100;
+//   }
+// `
+
+// const $ExpiredBadge = styled.div`
+//   :before {
+//     font-size: 100px;
+//     content: '🚫';
+//     position: absolute;
+//     top: 20px;
+//     z-index: 100;
+//     width: 100%;
+//     text-align: center;
+//   }
+// `
 
 export default UserLotteryTickets

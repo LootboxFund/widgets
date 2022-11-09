@@ -2,7 +2,7 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { $Divider, $span, $Vertical } from '../Generics'
-import { $ChangeMode, ModeOptions, useAuthWords } from './Shared'
+import { ModeOptions, useAuthWords } from './Shared'
 import SignupEmail from './SignupEmail'
 import SignupWallet from './SignupWallet'
 import LoginWallet from './LoginWallet'
@@ -11,35 +11,27 @@ import ResetPassword from './ResetPassword'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { initLogging } from 'lib/api/logrocket'
-import { FormattedMessage, useIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import LoginPhone from './LoginPhone'
+import EmailLinkAuth from './EmailLinkAuth'
+import { isSignInWithEmailLink } from 'firebase/auth'
+import { auth } from 'lib/api/firebase/app'
 
 interface AuthenticationProps {
   initialMode?: ModeOptions
   onSignupSuccess?: () => void
   loginTitle?: string
   width?: string
-  ghost: boolean
+  ghost?: boolean
 }
 const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost }: AuthenticationProps) => {
-  const [route, setRoute] = useState<ModeOptions>(initialMode || 'signup-password')
+  const [route, setRoute] = useState<ModeOptions>(
+    isSignInWithEmailLink(auth, window.location.href) ? 'email-link' : initialMode || 'signup-password'
+  )
   const { screen } = useWindowSize()
-  const intl = useIntl()
   const words = useWords()
   const authWords = useAuthWords()
-
-  const orUsePassword = intl.formatMessage({
-    id: 'auth.method.orUsePassword',
-    defaultMessage: 'Or use a password',
-    description: 'Hyperlink message to user allowing them to signin / signup with a password',
-  })
-
-  const orUseMetamaskWallet = intl.formatMessage({
-    id: 'auth.method.orUseMetamaskWallet',
-    defaultMessage: 'Or use your MetaMask wallet',
-    description: 'Hyperlink message to user allowing them to signin / signup with using their Metamask wallet',
-  })
 
   useEffect(() => {
     const load = async () => {
@@ -178,10 +170,10 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
             onSignupSuccess={onSignupSuccess}
             title={!!loginTitle ? loginTitle : route === 'signup-phone' ? words.register : words.login}
           />
-
           <br />
         </div>
       )}
+      {route === 'email-link' && <EmailLinkAuth onSignupSuccess={onSignupSuccess} />}
 
       {route === 'forgot-password' && <ResetPassword onChangeMode={setRoute} />}
 

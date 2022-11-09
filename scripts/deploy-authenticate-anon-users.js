@@ -19,13 +19,14 @@ console.log(`
   env: ${process.env.NODE_ENV}
 `)
 
-const BattleFeed = process.env.NODE_ENV === 'production' ? 'BattleFeed.production.js' : 'BattleFeed.js'
+const AuthenticateAnonUsers =
+  process.env.NODE_ENV === 'production' ? 'AuthenticateAnonUsers.production.js' : 'AuthenticateAnonUsers.js'
 
-const fileNames = [BattleFeed]
+const fileNames = [AuthenticateAnonUsers]
 
 const run = async () => {
   await Promise.all(
-    fileNames.map((filename) => {
+    fileNames.map((filename, idx) => {
       return uploadFile({
         filename,
         semver,
@@ -37,6 +38,7 @@ const run = async () => {
   process.exit()
   return
 }
+
 app.listen(process.env.PORT || 8088, () => {
   console.log('node server running')
   run()

@@ -115,7 +115,11 @@ export const $Divider = styled.div<{ margin?: string; width?: string }>`
   border-top: 1px solid rgba(0, 0, 0, 0.23);
 `
 
-export const $ViralOnboardingCard = styled.div<{ backgroundColor?: string; background?: string; opacity?: string }>`
+export const $ViralOnboardingCard = styled.div<{
+  backgroundColor?: string
+  background?: string
+  opacity?: string | string[]
+}>`
   margin: 0 auto;
   max-width: 500px;
   width: 100%;
@@ -127,8 +131,10 @@ export const $ViralOnboardingCard = styled.div<{ backgroundColor?: string; backg
   ${(props) => props.background && `background-image: url(${props.background});`}
   ${(props) =>
     props.background &&
-    `background: linear-gradient(rgba(0, 0, 0, ${props.opacity ? props.opacity : 0.6}), rgba(0, 0, 0, ${
-      props.opacity ? props.opacity : 0.6
+    `background: linear-gradient(rgba(0, 0, 0, ${
+      props.opacity && Array.isArray(props.opacity) ? props.opacity[0] : props.opacity || 0.6
+    }), rgba(0, 0, 0, ${
+      props.opacity && Array.isArray(props.opacity) ? props.opacity[1] || props.opacity[0] : props.opacity || 0.6
     })), url(${props.background});`}
   background-size: cover;
   background-position: center;

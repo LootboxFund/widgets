@@ -6,6 +6,7 @@ import styled from 'styled-components'
 export const handIconImg = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FhandIcon.png?alt=media`
 export const background1 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG1-compressed.png?alt=media`
 export const background2 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG2.png?alt=media`
+export const background3 = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FViralOnboardingBG3.png?alt=media`
 
 export const $Heading = styled.h1`
   color: ${COLORS.white};

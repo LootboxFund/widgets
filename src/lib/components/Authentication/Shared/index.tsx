@@ -144,3 +144,4 @@ export type ModeOptions =
   | 'signup-wallet'
   | 'signup-phone'
   | 'forgot-password'
+  | 'email-link'

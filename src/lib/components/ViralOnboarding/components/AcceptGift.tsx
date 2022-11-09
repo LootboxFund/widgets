@@ -151,14 +151,15 @@ const AcceptGift = (props: Props) => {
             {referral.seedLootbox?.nftBountyValue || referral?.seedPartyBasket?.nftBountyValue || defaultWinText}
           </$GiantHeading>
           <$SubHeading>
-            <FormattedMessage
+            Claim this FREE Lootbox Ticket for a chance to win
+            {/* <FormattedMessage
               id="viralOnboarding.acceptGift.description"
               defaultMessage="Claim this FREE ESports Lootbox Ticket to win cash on {tournamentDate}"
               description="Description of the prize"
               values={{
                 tournamentDate: formattedDate,
               }}
-            />
+            /> */}
           </$SubHeading>
           <$Heading>
             <$NextButton

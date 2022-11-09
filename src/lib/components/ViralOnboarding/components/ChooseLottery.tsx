@@ -11,7 +11,7 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard, LoadingCard } from './GenericCard'
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { useMemo, useState } from 'react'
@@ -21,7 +21,7 @@ import { convertFilenameToThumbnail } from 'lib/utils/storage'
 const PAGE_SIZE = 6
 
 interface Props {
-  onNext: () => void
+  onNext: (lootboxID: LootboxID) => Promise<void>
   onBack: () => void
 }
 const ChooseLottery = (props: Props) => {
@@ -29,6 +29,8 @@ const ChooseLottery = (props: Props) => {
   const [page, setPage] = useState(0)
   const { referral, setChosenLootbox } = useViralOnboarding()
   const words = useWords()
+  const [errorMessage, setErrorMessage] = useState('')
+  const [localLoading, setLocalLoading] = useState(false)
   const { data, loading, error } = useQuery<{ tournament: LotteryListingV2FE | ResponseError }, QueryTournamentArgs>(
     GET_LOTTERY_LISTINGS_V2,
     {
@@ -83,10 +85,18 @@ const ChooseLottery = (props: Props) => {
     }
   }, [page, tournament?.lootboxSnapshots, referral?.seedLootboxID, searchString])
 
-  if (loading) {
+  if (loading || localLoading) {
     return <LoadingCard />
-  } else if (error || !data) {
-    return <ErrorCard message={error?.message || ''} title={words.anErrorOccured} icon="🤕" />
+  } else if (error || errorMessage || !data) {
+    return (
+      <ErrorCard message={errorMessage || error?.message || ''} title={words.anErrorOccured} icon="🤕">
+        {errorMessage && (
+          <$SubHeading onClick={() => setErrorMessage('')} style={{ fontStyle: 'italic', textTransform: 'lowercase' }}>
+            {words.retry + '?'}
+          </$SubHeading>
+        )}
+      </ErrorCard>
+    )
   } else if (data?.tournament?.__typename === 'ResponseError') {
     return <ErrorCard message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
@@ -127,7 +137,9 @@ const ChooseLottery = (props: Props) => {
                 [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(ticket.lootbox.status) > -1
               return (
                 <$LotteryContainer
-                  onClick={() => {
+                  onClick={async () => {
+                    setErrorMessage('')
+
                     if (isDisabled) {
                       return
                     }
@@ -138,7 +150,15 @@ const ChooseLottery = (props: Props) => {
                       id: ticket.lootbox.id,
                       stampImage: ticket.stampImage,
                     })
-                    props.onNext()
+                    setLocalLoading(true)
+                    try {
+                      await props.onNext(ticket.lootbox.id)
+                    } catch (err) {
+                      console.error(err)
+                      setErrorMessage(err.message)
+                    } finally {
+                      setLocalLoading(false)
+                    }
                   }}
                   key={`selection-${idx}`}
                   type={ticket?.lootboxID === referral?.seedLootboxID ? 'highlight' : 'default'}

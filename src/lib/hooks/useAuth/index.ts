@@ -30,6 +30,7 @@ import {
   signInWithCustomToken,
   signInWithEmailAndPassword as signInWithEmailAndPasswordFirebase,
   sendEmailVerification,
+  signInAnonymously as signInAnonymouslyFirebase,
   browserSessionPersistence,
   browserLocalPersistence,
   setPersistence,
@@ -37,9 +38,14 @@ import {
   RecaptchaVerifier,
   ConfirmationResult,
   User,
-  updateEmail,
+  sendSignInLinkToEmail,
+  ActionCodeSettings,
+  EmailAuthCredential,
+  linkWithCredential,
+  PhoneAuthCredential,
+  PhoneAuthProvider,
 } from 'firebase/auth'
-import { Address, UserID } from '@wormgraph/helpers'
+import { Address, ClaimID, LootboxID, ReferralSlug, UserID } from '@wormgraph/helpers'
 import { getProvider } from 'lib/hooks/useWeb3Api'
 import client from 'lib/api/graphql/client'
 import { GET_MY_WALLETS } from 'lib/components/Profile/Wallets/api.gql'
@@ -47,6 +53,7 @@ import LogRocket from 'logrocket'
 import { throwInvalidPasswords } from 'lib/utils/password'
 import { useIntl } from 'react-intl'
 import useWords, { useSignatures } from 'lib/hooks/useWords'
+import { manifest } from 'manifest'
 
 interface FrontendUser {
   id: UserID
@@ -55,12 +62,13 @@ interface FrontendUser {
   isEmailVerified: boolean
   username: string | null
   avatar: string | null
+  isAnonymous: boolean
 }
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
 const convertUserToUserFE = (user: User): FrontendUser => {
-  const { uid, email, phoneNumber, displayName, photoURL, emailVerified } = user
+  const { uid, email, phoneNumber, displayName, photoURL, emailVerified, isAnonymous } = user
   const userData: FrontendUser = {
     id: uid as UserID,
     email: email,
@@ -68,6 +76,7 @@ const convertUserToUserFE = (user: User): FrontendUser => {
     isEmailVerified: emailVerified,
     username: displayName,
     avatar: photoURL,
+    isAnonymous,
   }
   return userData
 }
@@ -182,6 +191,18 @@ export const useAuth = () => {
     setPhoneConfirmationResult(confirmationResult)
   }
 
+  const getPhoneAuthCredentialFromCode = (code: string): PhoneAuthCredential => {
+    if (!phoneConfirmationResult) {
+      console.log('error, no confirmation result')
+      throw new Error(words.anErrorOccured)
+    }
+
+    const verificationID = phoneConfirmationResult.verificationId
+    const credential = PhoneAuthProvider.credential(verificationID, code)
+
+    return credential
+  }
+
   const signInPhoneWithCode = async (code: string, email?: string) => {
     if (!phoneConfirmationResult) {
       console.error('No phone confirmation result')
@@ -279,6 +300,119 @@ export const useAuth = () => {
         })
         .catch((err) => LogRocket.captureException(err))
     }
+  }
+
+  const sendBasicSignInEmail = async (email: string): Promise<void> => {
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+      url: `${manifest.microfrontends.webflow.myProfilePage}?email=${encodeURIComponent(email)}`,
+      handleCodeInApp: true,
+    }
+
+    try {
+      console.log('sending sign in email...')
+      await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+      console.log('success sending email')
+    } catch (err) {
+      console.log('error sending email', err)
+      LogRocket.captureException(err)
+    }
+    return
+  }
+
+  const sendSignInEmailForViralOnboarding = async (
+    email: string,
+    claimID: ClaimID,
+    referralSlug: ReferralSlug,
+    lootboxID: LootboxID
+  ) => {
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+      url: `${
+        manifest.microfrontends.webflow.referral
+      }?r=${referralSlug}&l=${lootboxID}&c=${claimID}&email=${encodeURIComponent(email)}`,
+      handleCodeInApp: true,
+    }
+
+    try {
+      console.log('sending sign in email...')
+      await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+      console.log('success sending email')
+    } catch (err) {
+      console.log('error sending email', err)
+      LogRocket.captureException(err)
+    }
+    return
+  }
+  // const sendClaimValidationEmail = async (email: string, claimID: ClaimID, claimImgURL: string): Promise<void> => {
+  //   // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+  //   const emailActionCodeSettings: ActionCodeSettings = {
+  //     // URL you want to redirect back to. The domain (www.example.com) for this
+  //     // URL must be in the authorized domains list in the Firebase Console.
+
+  //     url: `${manifest.microfrontends.webflow.validateUntrustedClaim}?img=${claimImgURL}&c=${claimID}`,
+  //     // This must be true.
+  //     handleCodeInApp: true,
+  //   }
+
+  //   try {
+  //     console.log('sending sign in email...')
+  //     await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+  //     console.log('success sending email')
+  //   } catch (err) {
+  //     console.log('error sending email', err)
+  //     LogRocket.captureException(err)
+  //   }
+  //   return
+  // }
+
+  const signInAnonymously = async (email?: string): Promise<User> => {
+    // Sign in anonymously
+    const { user } = await signInAnonymouslyFirebase(auth)
+
+    // Now create a user record
+    const createUserPayload: CreateUserRecordPayload = {}
+    if (!user.email && !!email) {
+      createUserPayload.email = email
+    }
+
+    await createUserMutation({ variables: { payload: createUserPayload } })
+
+    return user
+  }
+
+  const sendSignInEmailAnon = async (email: string, img?: string): Promise<void> => {
+    if (!auth.currentUser) {
+      throw new Error('User not signed in')
+    }
+    // Send login email
+    const idToken = await auth.currentUser.getIdToken(true)
+    if (!idToken) {
+      console.log('not logged in while generating ID token')
+      throw new Error(words.anErrorOccured)
+    }
+    // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
+    const emailActionCodeSettings: ActionCodeSettings = {
+      // URL you want to redirect back to. The domain (www.example.com) for this
+      // URL must be in the authorized domains list in the Firebase Console.
+
+      url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}${img ? `&img=${encodeURIComponent(img)}` : ''}`,
+      // This must be true.
+      handleCodeInApp: true,
+    }
+
+    try {
+      console.log('sending sign in email...')
+      await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
+      console.log('success sending email')
+    } catch (err) {
+      console.log('error sending email', err)
+      LogRocket.captureException(err)
+    }
+
+    return
   }
 
   const signInWithEmailAndPassword = async (email: string, password: string): Promise<void> => {
@@ -384,10 +518,21 @@ export const useAuth = () => {
     setUser(newUser)
   }
 
+  const linkCredentials = async (credential: EmailAuthCredential | PhoneAuthCredential): Promise<User> => {
+    const _user = auth.currentUser
+    if (!_user) {
+      throw new Error('No user logged in')
+    }
+    await linkWithCredential(_user, credential)
+
+    return _user
+  }
+
   // const updatePassword = async (password: string, newPassword: string): Promise<void> => {
 
   return {
     user,
+    signInAnonymously,
     signInWithWallet,
     signUpWithWallet,
     signInWithEmailAndPassword,
@@ -397,5 +542,10 @@ export const useAuth = () => {
     connectWallet,
     logout,
     refreshUser,
+    linkCredentials,
+    getPhoneAuthCredentialFromCode,
+    sendSignInEmailForViralOnboarding,
+    sendBasicSignInEmail,
+    sendSignInEmailAnon,
   }
 }

@@ -10,7 +10,7 @@ const { uploadFile } = require('./upload-file')
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
+const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
 
 console.log(`
 

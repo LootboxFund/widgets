@@ -16,7 +16,23 @@ import {
   PartyBasketStatus,
   LootboxStatus,
   LootboxTournamentStatus,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
+import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
+
+export type CompleteClaimResponseSuccessFE = {
+  completeClaim:
+    | {
+        __typename: 'CompleteClaimResponseSuccess'
+        claim: {
+          id: ClaimID
+        }
+      }
+    | {
+        __typename: 'ResponseError'
+        error: ResponseError
+      }
+}
 
 export const COMPLETE_CLAIM = gql`
   mutation Mutation($payload: CompleteClaimPayload!) {
@@ -24,18 +40,6 @@ export const COMPLETE_CLAIM = gql`
       ... on CompleteClaimResponseSuccess {
         claim {
           id
-          referralId
-          referralSlug
-          promoterId
-          tournamentId
-          referrerId
-          chosenPartyBasketId
-          chosenPartyBasketAddress
-          lootboxAddress
-          rewardFromClaim
-          claimerUserId
-          status
-          type
         }
       }
       ... on ResponseError {
@@ -197,6 +201,166 @@ export const CREATE_CLAIM = gql`
           claimerUserId
           status
           type
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export interface GetAnonTokenResponseSuccessFE {
+  getAnonToken: {
+    __typename: 'GetAnonTokenResponseSuccess'
+    token: string
+    email: string
+  }
+}
+
+export const GET_ANON_TOKEN = gql`
+  query GetAnonToken($idToken: ID!) {
+    getAnonToken(idToken: $idToken) {
+      ... on GetAnonTokenResponseSuccess {
+        token
+        email
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export type CheckPhoneEnabledResponseFE = {
+  checkPhoneEnabled:
+    | {
+        __typename: 'CheckPhoneEnabledResponseSuccess'
+        isEnabled: boolean
+      }
+    | ResponseError
+}
+export const CHECK_PHONE_AUTH = gql`
+  query Query($email: String!) {
+    checkPhoneEnabled(email: $email) {
+      ... on CheckPhoneEnabledResponseSuccess {
+        isEnabled
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export interface ClaimByIDResponse {
+  claimByID:
+    | {
+        __typename: 'ClaimByIDResponseSuccess'
+        claim: ClaimFE
+      }
+    | {
+        __typename: 'ResponseError'
+        error: ResponseError
+      }
+}
+
+export const CLAIM_BY_ID = gql`
+  query GetClaimByID($claimID: ID!) {
+    claimByID(claimID: $claimID) {
+      ... on ClaimByIDResponseSuccess {
+        claim {
+          id
+          referralId
+          promoterId
+          referralSlug
+          tournamentId
+          referrerId
+          chosenPartyBasketId
+          chosenPartyBasketAddress
+          lootboxAddress
+          rewardFromClaim
+          claimerUserId
+          status
+          type
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export interface GetLootboxViralOnboardingResponse {
+  getLootboxByID:
+    | {
+        __typename: 'LootboxResponseSuccess'
+        lootbox: LootboxReferralFE
+      }
+    | {
+        __typename: 'ResponseError'
+        error: {
+          code: string
+          message: string
+        }
+      }
+}
+
+export const GET_LOOTBOX_VIRAL_ONBOARDING = gql`
+  query GetLootboxByID($id: ID!) {
+    getLootboxByID(id: $id) {
+      ... on LootboxResponseSuccess {
+        lootbox {
+          id
+          nftBountyValue
+          address
+          stampImage
+        }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export type SyncProviderUserResponseFE = {
+  syncProviderUser:
+    | {
+        __typename: 'SyncProviderUserResponseSuccess'
+        user: {
+          phoneNumber: string | null
+          email: string | null
+          id: UserID
+        }
+      }
+    | ResponseError
+}
+
+export const SYNC_PROVIDER_USER = gql`
+  mutation syncProviderUser {
+    syncProviderUser {
+      ... on SyncProviderUserResponseSuccess {
+        user {
+          phoneNumber
+          email
+          id
         }
       }
       ... on ResponseError {

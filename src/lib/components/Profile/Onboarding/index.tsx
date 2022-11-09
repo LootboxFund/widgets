@@ -9,12 +9,14 @@ import { COLORS } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
 import useWindowSize from 'lib/hooks/useScreenSize'
+import { manifest } from 'manifest'
 
 const Onboarding = () => {
   const { user } = useAuth()
   const { screen } = useWindowSize()
-  const isOnboardYoutube = localStorage.getItem('user.onboard.youtube')
+  // const isOnboardYoutube = localStorage.getItem('user.onboard.youtube')
   const showEmailVerification = !!user?.email && !user?.isEmailVerified
+  const showPhone = !user?.phone
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [errorSendingEmail, setErrorSendingEmail] = useState(false)
   const intl = useIntl()
@@ -26,13 +28,13 @@ const Onboarding = () => {
     description: 'Header for onboarding step. Part of onboarding is a user needs to verify their email address.',
   })
 
-  const learnHeader = intl.formatMessage({
-    id: 'profile.onboarding.learnHeader',
-    defaultMessage: 'Learn about Lootbox',
-    description: 'Header for onboarding step. Part of onboarding is a user needs to learn how to use Lootbox.',
-  })
+  // const learnHeader = intl.formatMessage({
+  //   id: 'profile.onboarding.learnHeader',
+  //   defaultMessage: 'Learn about Lootbox',
+  //   description: 'Header for onboarding step. Part of onboarding is a user needs to learn how to use Lootbox.',
+  // })
 
-  if (!showEmailVerification && isOnboardYoutube) {
+  if (!showEmailVerification && !showPhone) {
     return null
   }
 
@@ -52,16 +54,14 @@ const Onboarding = () => {
     }
   }
 
-  const handleYoutubeClick = () => {
-    localStorage.setItem('user.onboard.youtube', 'true')
-  }
+  // const handleYoutubeClick = () => {
+  //   localStorage.setItem('user.onboard.youtube', 'true')
+  // }
 
   return (
     <$ProfileSectionContainer screen={screen}>
       <$Vertical spacing={4}>
-        <$h1 style={{ fontStyle: 'italic' }}>
-          {words.yourAlmostSetup}
-        </$h1>
+        <$h1 style={{ fontStyle: 'italic' }}>{words.yourAlmostSetup}</$h1>
         {showEmailVerification ? (
           <Oopsies
             icon="📧"
@@ -110,7 +110,22 @@ const Onboarding = () => {
           />
         ) : null}
 
-        {!isOnboardYoutube ? (
+        {showPhone ? (
+          <Oopsies
+            icon="📲"
+            title="Add Phone Number"
+            message={
+              <span>
+                <b>You cannot claim your rewards</b> until you add a phone number to your account.
+                <$Link href={manifest.microfrontends.webflow.anonSignup} style={{ textDecoration: 'underline' }}>
+                  Click here to add your Phone Number.
+                </$Link>
+              </span>
+            }
+          />
+        ) : null}
+
+        {/* {!isOnboardYoutube ? (
           <Oopsies
             icon="👨‍🎓"
             title={learnHeader}
@@ -137,7 +152,7 @@ const Onboarding = () => {
               />
             }
           />
-        ) : null}
+        ) : null} */}
       </$Vertical>
     </$ProfileSectionContainer>
   )
