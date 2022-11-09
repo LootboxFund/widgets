@@ -271,12 +271,16 @@ const AdVideoBeta2 = (props: Props) => {
         <$Vertical spacing={2}>
           <$NextButton
             onClick={onCallToActionClick}
-            color={COLORS.trustBackground}
+            color={ad?.creative.themeColor || COLORS.trustBackground}
             backgroundColor={COLORS.white}
             style={{ marginTop: '60px', marginLeft: '15px', marginRight: '15px' }}
             disabled={false}
           >
-            <LoadingText loading={false} color={COLORS.white} text={ad?.creative.callToAction || 'Download Game'} />
+            <LoadingText
+              loading={false}
+              color={ad?.creative.themeColor || COLORS.white}
+              text={ad?.creative.callToAction || 'Download Game'}
+            />
           </$NextButton>
           <$span
             style={{
