@@ -170,7 +170,7 @@ const OnboardingAddEmail = (props: Props) => {
             ) : (
               <FormattedMessage
                 id="viralOnboarding.signup.email.disclaimer"
-                defaultMessage="You will NOT receiving marketing emails, we only notify if you win"
+                defaultMessage="You will NOT receive marketing emails, we only notify if you win"
                 description="Disclaimer when collecting email"
               />
             )}

@@ -11,7 +11,6 @@ import { auth } from 'lib/api/firebase/app'
 import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { useIntl } from 'react-intl'
 import useWords from 'lib/hooks/useWords'
-import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 interface LoginEmailProps {
   onSignupSuccess?: () => void
@@ -26,7 +25,6 @@ const LoginEmailLinkAuth = (props: LoginEmailProps) => {
     const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
     return { email: INITIAL_URL_PARAMS.email }
   }, [])
-  //   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
 
   useEffect(() => {
     handleAuthenticateDynamicLink()
