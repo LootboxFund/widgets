@@ -20,6 +20,7 @@ const DEFAULT_THEME_COLOR = COLORS.trustBackground
 const startingTime = 30 // seconds
 
 interface Props {
+  nextUrl: string
   onNext: () => void
   onBack: () => void
 }
@@ -210,7 +211,7 @@ const AdVideoBeta2 = (props: Props) => {
               />
             </$NextButton>
             <a
-              href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
+              href={props.nextUrl || `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
               style={{ textAlign: 'center' }}
             >
               <$span

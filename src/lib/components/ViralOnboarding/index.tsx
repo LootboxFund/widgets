@@ -240,17 +240,18 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           />
         )
       case 'success': {
+        const nextUrl = user?.isAnonymous
+          ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
+          : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
         if (!!ad) {
           return (
             <AdVideoBeta2
               onNext={() => {
                 // Send to public profile
-                const url = user?.isAnonymous
-                  ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
-                  : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
                 // navigate to url
-                window.location.href = url
+                window.location.href = nextUrl
               }}
+              nextUrl={nextUrl}
               onBack={() => console.log('back')}
             />
           )
@@ -259,11 +260,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             <CompleteOnboarding
               onNext={() => {
                 // Send to public profile
-                const url = user?.isAnonymous
-                  ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
-                  : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
                 // navigate to url
-                window.location.href = url
+                window.location.href = nextUrl
               }}
               onBack={() => console.log('back')}
             />

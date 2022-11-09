@@ -3,11 +3,11 @@ import { ClaimID, COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
-import Spinner, { LoadingText } from 'lib/components/Generics/Spinner'
+import Spinner from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { $Heading, $Heading2, $NextButton, $SubHeading, $SupressedParagraph, background1 } from '../contants'
+import { $Heading, $SubHeading, background1, handIconImg } from '../contants'
 import { extractURLState_ViralOnboardingPage } from '../utils'
 import {
   ClaimByIDResponse,
@@ -27,7 +27,7 @@ interface WaitForAuthProps {
 const WaitForAuth = (props: WaitForAuthProps) => {
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const { setClaim, setChosenLootbox } = useViralOnboarding()
+  const { setClaim, setChosenLootbox, chosenLootbox } = useViralOnboarding()
   const words = useWords()
   const { claimID, lootboxID, email } = useMemo(() => {
     const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
@@ -37,8 +37,6 @@ const WaitForAuth = (props: WaitForAuthProps) => {
       email: INITIAL_URL_PARAMS.email,
     }
   }, [])
-  const [emailToUse, setEmailToUse] = useState(email || '')
-  const [localEmail, setLocalEmail] = useState(email || '')
   const status = useMemo(() => {
     if (loading) {
       return 'loading'
@@ -46,11 +44,8 @@ const WaitForAuth = (props: WaitForAuthProps) => {
     if (errorMessage) {
       return 'error'
     }
-    if (!emailToUse) {
-      return 'no-email'
-    }
     return 'pending'
-  }, [loading, errorMessage, emailToUse])
+  }, [loading, errorMessage])
 
   useQuery<GetLootboxViralOnboardingResponse, QueryGetLootboxByIdArgs>(GET_LOOTBOX_VIRAL_ONBOARDING, {
     skip: !lootboxID,
@@ -82,9 +77,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
   }, [])
 
   const handleAuthenticateDynamicLink = async () => {
-    let emailToLogin = emailToUse || localEmail
-
-    if (isSignInWithEmailLink(auth, window.location.href) && emailToUse) {
+    if (isSignInWithEmailLink(auth, window.location.href) && email) {
       setLoading(true)
       // Additional state parameters can also be passed via URL.
       // This can be used to continue the user's intended action before triggering
@@ -100,7 +93,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
       try {
         // The client SDK will parse the code from the link for you.
         // setStatus('loading')
-        await signInWithEmailLink(auth, emailToLogin, window.location.href)
+        await signInWithEmailLink(auth, email, window.location.href)
 
         const {
           INITIAL_URL_PARAMS: { claimID, lootboxID },
@@ -124,15 +117,13 @@ const WaitForAuth = (props: WaitForAuthProps) => {
     }
   }
 
-  const submitEmail = () => {
-    setEmailToUse(localEmail)
-    handleAuthenticateDynamicLink()
-  }
+  const stampImg = chosenLootbox?.stampImage
 
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
-        {status === 'no-email' && (
+        <$Vertical height="100%">
+          {/* {status === 'no-email' && (
           <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
             <$Heading2 style={{ textAlign: 'start', marginTop: '50px' }}>{words.enterYourEmail}</$Heading2>
             <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>
@@ -163,52 +154,52 @@ const WaitForAuth = (props: WaitForAuthProps) => {
               </$NextButton>
             </$Vertical>
           </$Vertical>
-        )}
-        {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
-        {status === 'error' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
-            <$Icon>{'🤕'}</$Icon>
-            <$Heading
-              style={{
-                textTransform: 'none',
-                fontSize: TYPOGRAPHY.fontSize.xlarge,
-                lineHeight: TYPOGRAPHY.fontSize.xxlarge,
-              }}
-            >
-              {words.anErrorOccured}
-            </$Heading>
-            {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
+        )} */}
+          {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
+          {status === 'error' && (
+            <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+              <$Icon>{'🤕'}</$Icon>
+              <$Heading
+                style={{
+                  textTransform: 'none',
+                  fontSize: TYPOGRAPHY.fontSize.xlarge,
+                  lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+                }}
+              >
+                {words.anErrorOccured}
+              </$Heading>
+              {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
 
-            <$SubHeading
-              onClick={props.onBack}
-              style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
-            >
-              {words.retry + '?'}
-            </$SubHeading>
-          </$Vertical>
-        )}
-        {status === 'pending' && (
-          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
-            <$Icon>{'📧'}</$Icon>
-            <$Heading
-              style={{
-                textTransform: 'none',
-                fontSize: TYPOGRAPHY.fontSize.xlarge,
-                lineHeight: TYPOGRAPHY.fontSize.xxlarge,
-              }}
-            >
-              Check you Email
-            </$Heading>
-            <$SubHeading style={{ marginTop: '0px' }}>
-              {emailToUse
-                ? `Check your spam folder. A login email was sent to ${emailToUse}.`
-                : 'Check your spam folder. A login link was sent to your email'}
-            </$SubHeading>
-          </$Vertical>
-        )}
+              <$SubHeading
+                onClick={props.onBack}
+                style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
+              >
+                {words.retry + '?'}
+              </$SubHeading>
+            </$Vertical>
+          )}
+          {status === 'pending' && (
+            <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
+              <$Icon>{'📧'}</$Icon>
+              <$Heading
+                style={{
+                  textTransform: 'none',
+                  fontSize: TYPOGRAPHY.fontSize.xlarge,
+                  lineHeight: TYPOGRAPHY.fontSize.xxlarge,
+                }}
+              >
+                Check you email
+              </$Heading>
+              <$SubHeading style={{ marginTop: '0px' }}>
+                {email
+                  ? `Check your spam folder. A login email was sent to ${email}.`
+                  : 'Check your spam folder. A login link was sent to your email'}
+              </$SubHeading>
+            </$Vertical>
+          )}
+          {stampImg ? <$PartyBasketImage src={stampImg} /> : <$HandImage src={handIconImg} />}
+        </$Vertical>
       </$ViralOnboardingSafeArea>
-
-      <$ViralOnboardingSafeArea>WAIT BITCH</$ViralOnboardingSafeArea>
     </$ViralOnboardingCard>
   )
 }
@@ -226,6 +217,16 @@ const $InputMedium = styled.input`
   padding: 5px 10px;
   font-size: ${TYPOGRAPHY.fontSize.medium};
   height: 40px;
+`
+
+const $PartyBasketImage = styled.img`
+  margin: auto auto -3.5rem;
+  max-width: 220px;
+  width: 100%;
+  filter: drop-shadow(0px 0px 25px #ffffff);
+`
+const $HandImage = styled.img`
+  margin: auto 0 -3.5rem;
 `
 
 export default WaitForAuth
