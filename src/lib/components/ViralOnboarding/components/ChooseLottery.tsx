@@ -11,7 +11,7 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { ErrorCard, LoadingCard } from './GenericCard'
-import { COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { useMemo, useState } from 'react'
@@ -101,6 +101,19 @@ const ChooseLottery = (props: Props) => {
     return <ErrorCard message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
   }
 
+  const hardcodedTournamentsNonEsports: TournamentID[] = [
+    '1qKLXgaRXviPP110ZHLe' as TournamentID, // Angkas
+    'RV09iGE02V7nOgEbq8hW' as TournamentID, // GCash
+    'tX5tCISFjDcWmctvILnk' as TournamentID, // MetaCare
+    'fPxO1FXLyu6p39FTf9yq' as TournamentID, // Binance
+    'pMkl6CSOuEsyQDvJzvA5' as TournamentID, // Cash Giveaway 1
+    'LGT4JtA6sV73KhXVcCEH' as TournamentID, // Cash Giveaway 2
+    'G0ESRAL0O4OcgZ7Bw38M' as TournamentID, // Cash Giveaway 3
+    'C3msweDHfYCesJ2SWxeC' as TournamentID, // Cash Giveaway 4
+    'LFqlqg3UcPx8E0pu0mTu' as TournamentID, // Prod Test
+  ]
+  const nonEsportsEvents = hardcodedTournamentsNonEsports.includes(referral.tournamentId)
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -108,15 +121,20 @@ const ChooseLottery = (props: Props) => {
           <$Heading2 style={{ textAlign: 'start' }}>
             <FormattedMessage
               id="viralOnboarding.chooseLottery.heading"
-              defaultMessage="Choose Your FREE Lottery"
-              description="Heading for lottery gift"
+              defaultMessage="Choose Your FREE Ticket"
+              description="Heading for ticket gift"
             />
           </$Heading2>
+
           <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>
-            <FormattedMessage
-              id="viralOnboarding.chooseLottery.description"
-              defaultMessage="Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
-            />
+            {nonEsportsEvents ? (
+              'Each Ticket has a chance to win the prize. Share with friends to get more tickets.'
+            ) : (
+              <FormattedMessage
+                id="viralOnboarding.chooseLottery.description"
+                defaultMessage="Each Ticket is a Team competing in a cash prize tournament. You only win money if your chosen team wins."
+              />
+            )}
           </$SubHeading>
           <$InputMedium
             value={searchString}

@@ -1,6 +1,6 @@
 const express = require('express')
 const app = new express()
-const { Manifest_v0_7_1_prod: Manifest } = require('@wormgraph/manifest')
+const { Manifest_v0_7_2_prod: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 
@@ -10,7 +10,7 @@ const { uploadFile } = require('./upload-file')
  */
 const bucketName = manifest.storage.buckets.widgets.id || 'guildfx-exchange.appspot.com'
 const semver = manifest.semver.id || '0.2.0-sandbox'
-const absPath = '/Users/starship420/repo/lootbox/widgets/iife/'
+const absPath = '/Users/kangzeroo/Projects/Lootbox/widgets/iife/'
 
 console.log(`
 

@@ -2249,10 +2249,6 @@
     "defaultMessage": "Redeem Profit Sharing NFTs",
     "description": "Prompt for user to redeem their Lootbox NFTs in exchange for money"
   },
-  "viralOnboarding.acceptGift.description": {
-    "defaultMessage": "Claim this FREE Lootbox Ticket for a chance to win",
-    "description": "Description of the prize"
-  },
   "viralOnboarding.acceptGift.invitationMessage": {
     "defaultMessage": "{name}{newline}Gifted you a Lootbox Ticket",
     "description": "Message to show when a user is gifted a free Lootbox Ticket"
