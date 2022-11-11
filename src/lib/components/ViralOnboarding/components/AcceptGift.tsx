@@ -13,7 +13,7 @@ import {
   $TournamentStampPreviewContainer,
   $TournamentStampPreviewImage,
 } from '../contants'
-import { COLORS } from '@wormgraph/helpers'
+import { COLORS, TournamentID } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useMutation } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
@@ -154,7 +154,7 @@ const AcceptGift = (props: Props) => {
             Claim this FREE Lootbox Ticket for a chance to win
             {/* <FormattedMessage
               id="viralOnboarding.acceptGift.description"
-              defaultMessage="Claim this FREE ESports Lootbox Ticket to win cash on {tournamentDate}"
+              defaultMessage="Claim this FREE Lootbox Ticket for a chance to win"
               description="Description of the prize"
               values={{
                 tournamentDate: formattedDate,
