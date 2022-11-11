@@ -579,6 +579,7 @@
   "userClaims.participationReward": "Participation Reward",
   "userClaims.referredUser": "Referred {username}",
   "userTickets.title": "Redeem Profit Sharing NFTs",
+  "viralOnboarding.acceptGift.description": "Claim this FREE Lootbox Ticket for a chance to win",
   "viralOnboarding.acceptGift.invitationMessage": "{name}{newline}Gifted you a Lootbox Ticket",
   "viralOnboarding.acceptGift.nConversions": "{nPeople} people already accepted this gift",
   "viralOnboarding.acceptGift.next": "Accept Gift",
