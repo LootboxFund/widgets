@@ -97,7 +97,7 @@ const ChooseLotteryPartyBasket = (props: Props) => {
           <$Heading2 style={{ textAlign: 'start' }}>
             <FormattedMessage
               id="viralOnboarding.chooseLottery.heading"
-              defaultMessage="Choose Your FREE Lottery"
+              defaultMessage="Choose Your FREE Ticket"
               description="Heading for lottery gift"
             />
           </$Heading2>
