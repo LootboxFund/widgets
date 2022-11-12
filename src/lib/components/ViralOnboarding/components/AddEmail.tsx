@@ -21,12 +21,41 @@ interface Props {
 const OnboardingAddEmail = (props: Props) => {
   const words = useWords()
   const [email, setEmailLocal] = useState('')
+  const [phone, setPhoneLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const { setEmail, chosenLootbox, chosenPartyBasket, referral } = useViralOnboarding()
+  const { setEmail, chosenLootbox, chosenPartyBasket, referral, sessionId } = useViralOnboarding()
   const [loading, setLoading] = useState(false)
 
   const authWords = useAuthWords()
   const [consentDataSharing, setConsentDataSharing] = useState(false)
+
+  const logToGoogleSheets = async () => {
+    const url = 'https://eo7vkun3q05rf2q.m.pipedream.net'
+    const response = await fetch(url, {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: 'same-origin', // include, *same-origin, omit
+      headers: {
+        'Content-Type': 'application/json',
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify({
+        tournamentId: referral.tournamentId,
+        email: email,
+        phone: phone,
+        sessionID: sessionId,
+        userID: 'anon',
+        campaignName: referral.campaignName,
+        referrerId: referral.campaignName,
+        promoterId: referral.promoterId,
+        tournament: referral.tournament.title,
+      }), // body data type must match "Content-Type" header
+    })
+    return response
+  }
 
   const submitEmail = async () => {
     if (loading) {
@@ -45,6 +74,9 @@ const OnboardingAddEmail = (props: Props) => {
     setEmail(email)
     setLoading(true)
     try {
+      if (needsPhoneNumber) {
+        await logToGoogleSheets()
+      }
       // Sign user in anonymously and send magic link
       await props.onNext(email)
     } catch (err) {
@@ -79,6 +111,17 @@ const OnboardingAddEmail = (props: Props) => {
   const needsDataSharingConsent = hardcodedTournamentsWithDataSharing.includes(referral.tournamentId)
   // const needsDataSharingConsent = true
 
+  const needsPhoneNumberArray: string[] = [
+    '1qKLXgaRXviPP110ZHLe' as TournamentID, // Angkas
+    'RV09iGE02V7nOgEbq8hW' as TournamentID, // GCash
+    'pMkl6CSOuEsyQDvJzvA5' as TournamentID, // Cash Giveaway 1
+    'LGT4JtA6sV73KhXVcCEH' as TournamentID, // Cash Giveaway 2
+    'G0ESRAL0O4OcgZ7Bw38M' as TournamentID, // Cash Giveaway 3
+    'C3msweDHfYCesJ2SWxeC' as TournamentID, // Cash Giveaway 4
+  ]
+  const needsPhoneNumber = needsPhoneNumberArray.includes(referral.tournamentId)
+  // const needsPhoneNumber = true
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -99,11 +142,25 @@ const OnboardingAddEmail = (props: Props) => {
               value={email}
               onChange={(e) => setEmailLocal(e.target.value)}
               onKeyUp={(event) => {
-                if (event.key == 'Enter') {
+                if (event.key == 'Enter' && !needsPhoneNumber) {
                   submitEmail()
                 }
               }}
             />
+            {needsPhoneNumber && (
+              <$InputMedium
+                type="phone"
+                name="phone"
+                placeholder={referral.tournamentId === 'RV09iGE02V7nOgEbq8hW' ? 'GCash Number' : 'Phone'}
+                value={phone}
+                onChange={(e) => setPhoneLocal(e.target.value)}
+                onKeyUp={(event) => {
+                  if (event.key == 'Enter') {
+                    submitEmail()
+                  }
+                }}
+              />
+            )}
             <$NextButton onClick={submitEmail} color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground}>
               <span>
                 {loading && <$Spinner margin="auto 12px auto 0px" style={{ display: 'inline-block' }} />}
@@ -183,7 +240,9 @@ const OnboardingAddEmail = (props: Props) => {
   )
 }
 
-const $InputMedium = styled.input`
+const $InputMedium = styled.input.attrs((props) => ({
+  type: props.type,
+}))`
   background-color: ${`${COLORS.white}`};
   border: none;
   border-radius: 10px;
