@@ -65,7 +65,7 @@ const AuthenticateAnonUsers = () => {
   const [syncUserMutation] = useMutation<SyncProviderUserResponseFE>(SYNC_PROVIDER_USER)
 
   useEffect(() => {
-    if (user && user.isEmailVerified && !isSignInWithEmailLink(auth, window.location.href) && !runonce.current) {
+    if (user && user.isEmailVerified && !runonce.current) {
       setStatus('confirm_phone')
       runonce.current = true
     }
