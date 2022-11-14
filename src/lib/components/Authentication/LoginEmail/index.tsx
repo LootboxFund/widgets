@@ -49,11 +49,11 @@ const LoginEmail = (props: LoginEmailProps) => {
   }
 
   const handleLoginWithEmail = async () => {
+    setErrorMessage('')
     setLoading(true)
     if (status === 'password') {
       try {
         await signInWithEmailAndPassword(email, password)
-        setErrorMessage('')
         props.onSignupSuccess && props.onSignupSuccess()
       } catch (err) {
         setErrorMessage(err?.message || words.anErrorOccured)
@@ -79,7 +79,7 @@ const LoginEmail = (props: LoginEmailProps) => {
           LogRocket.captureException(err)
         }
       } else {
-        setErrorMessage('No sign in methods found. Try logging in using your Phone Number, create a new account.')
+        setErrorMessage('No sign in methods found. Try logging in using your Phone Number or create a new account.')
       }
     }
     setLoading(false)

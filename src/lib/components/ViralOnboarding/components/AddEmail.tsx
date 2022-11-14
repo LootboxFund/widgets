@@ -73,10 +73,10 @@ const OnboardingAddEmail = (props: Props) => {
 
     setEmail(email)
     setLoading(true)
+    if (needsPhoneNumber) {
+      logToGoogleSheets()
+    }
     try {
-      if (needsPhoneNumber) {
-        await logToGoogleSheets()
-      }
       // Sign user in anonymously and send magic link
       await props.onNext(email)
     } catch (err) {

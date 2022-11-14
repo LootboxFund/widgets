@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { COLORS, UserID } from '@wormgraph/helpers'
+import { COLORS, TYPOGRAPHY, UserID } from '@wormgraph/helpers'
 import { ResponseError } from 'lib/api/graphql/generated/types'
 import { initLogging } from 'lib/api/logrocket'
 import useWords from 'lib/hooks/useWords'
@@ -75,104 +75,108 @@ const PublicProfile = (props: PublicProfileProps) => {
   const { username, socials, biography, avatar } = (userData?.publicUser as PublicUserFE)?.user || {}
 
   return (
-    <$PublicProfilePageContainer screen={screen}>
-      <$Horizontal justifyContent="space-between">
-        <$ProfileImage src={avatar ? avatar : DEFAULT_PROFILE_PICTURE} alt={`Avatar ${username}`} />
-        <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
-          <$InviteButton onClick={() => setIsNextStepsOpen(true)}>{words.nextSteps}</$InviteButton>
-          {/* <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
+    <$PageContainer>
+      <$Banner screen={screen}>Giveaways can take a day to process. Check your email for updates.</$Banner>
+      <br />
+      <$PublicProfilePageContainer screen={screen}>
+        <$Horizontal justifyContent="space-between">
+          <$ProfileImage src={avatar ? avatar : DEFAULT_PROFILE_PICTURE} alt={`Avatar ${username}`} />
+          <$Vertical justifyContent="flex-start" spacing={2} style={{ marginLeft: '20px', alignItems: 'center' }}>
+            <$InviteButton onClick={() => setIsNextStepsOpen(true)}>{words.nextSteps}</$InviteButton>
+            {/* <span style={{ fontSize: '0.8rem', fontWeight: 200, color: 'rgba(0,0,0,0.5)', textAlign: 'center' }}>
             {bonusTicketText}
           </span> */}
-        </$Vertical>
-      </$Horizontal>
-      <$Vertical style={{ marginTop: '10px' }}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: screen === 'mobile' ? 'column' : 'row',
-          }}
-        >
-          <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{username || 'Human'}</b>
-          <br />
-          <span
+          </$Vertical>
+        </$Horizontal>
+        <$Vertical style={{ marginTop: '10px' }}>
+          <div
             style={{
-              margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
-              fontStyle: 'italic',
-              fontSize: screen === 'mobile' ? '0.7rem' : '0.8rem',
+              display: 'flex',
+              flexDirection: screen === 'mobile' ? 'column' : 'row',
             }}
           >
-            <a onClick={() => setIsSocialsOpen(true)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+            <b style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{username || 'Human'}</b>
+            <br />
+            <span
+              style={{
+                margin: screen === 'mobile' ? '5px 0px' : '0px 10px',
+                fontStyle: 'italic',
+                fontSize: screen === 'mobile' ? '0.7rem' : '0.8rem',
+              }}
+            >
+              <a onClick={() => setIsSocialsOpen(true)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                <FormattedMessage
+                  id="profile.public.viewSocials"
+                  defaultMessage="View Socials"
+                  description="Public Profile Page link to view socials"
+                />
+              </a>
+              <span>{` | `}</span>
+              <a href={`${manifest.microfrontends.webflow.myProfilePage}`} style={{ textDecoration: 'none' }}>
+                <FormattedMessage
+                  id="profile.public.editProfile"
+                  defaultMessage="Edit Profile"
+                  description="Public Profile Page link to edit profile"
+                />
+              </a>
+            </span>
+          </div>
+          <span
+            style={{
+              fontWeight: 'lighter',
+              color: 'rgba(0,0,0,0.7)',
+              margin: '10px 0px 30px 0px',
+              width: '100%',
+              maxWidth: '600px',
+            }}
+          >
+            {biography ? (
+              biography
+            ) : (
               <FormattedMessage
-                id="profile.public.viewSocials"
-                defaultMessage="View Socials"
-                description="Public Profile Page link to view socials"
+                id="profile.public.aboutMe"
+                defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
               />
-            </a>
-            <span>{` | `}</span>
-            <a href={`${manifest.microfrontends.webflow.myProfilePage}`} style={{ textDecoration: 'none' }}>
-              <FormattedMessage
-                id="profile.public.editProfile"
-                defaultMessage="Edit Profile"
-                description="Public Profile Page link to edit profile"
-              />
-            </a>
+            )}
           </span>
-        </div>
-        <span
-          style={{
-            fontWeight: 'lighter',
-            color: 'rgba(0,0,0,0.7)',
-            margin: '10px 0px 30px 0px',
-            width: '100%',
-            maxWidth: '600px',
-          }}
-        >
-          {biography ? (
-            biography
-          ) : (
-            <FormattedMessage
-              id="profile.public.aboutMe"
-              defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
-            />
-          )}
-        </span>
-      </$Vertical>
+        </$Vertical>
 
-      {isSocialsOpen && socials ? (
-        <ProfileSocials userSocials={socials} onClose={() => setIsSocialsOpen(false)} />
-      ) : (
-        <UserLotteryTickets userId={props.userId} />
-      )}
+        {isSocialsOpen && socials ? (
+          <ProfileSocials userSocials={socials} onClose={() => setIsSocialsOpen(false)} />
+        ) : (
+          <UserLotteryTickets userId={props.userId} />
+        )}
 
-      <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
-        contentLabel="Share Ticket Modal"
-        style={customStyles}
-      >
-        <$Horizontal
-          justifyContent="flex-end"
-          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={() => setIsModalOpen(false)}
+          contentLabel="Share Ticket Modal"
+          style={customStyles}
         >
-          <span onClick={() => setIsModalOpen(false)}>X</span>
-        </$Horizontal>
-      </Modal>
-      <Modal
-        isOpen={isNextStepsOpen}
-        onRequestClose={() => setIsNextStepsOpen(false)}
-        contentLabel="Next Steps Modal"
-        style={customStyles}
-      >
-        <$Horizontal
-          justifyContent="flex-end"
-          style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+          <$Horizontal
+            justifyContent="flex-end"
+            style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <span onClick={() => setIsModalOpen(false)}>X</span>
+          </$Horizontal>
+        </Modal>
+        <Modal
+          isOpen={isNextStepsOpen}
+          onRequestClose={() => setIsNextStepsOpen(false)}
+          contentLabel="Next Steps Modal"
+          style={customStyles}
         >
-          <span onClick={() => setIsNextStepsOpen(false)}>X</span>
-        </$Horizontal>
-        <$NextStepsInfographic src={NEXT_STEPS_INFOGRAPHIC} />
-        <$OkayButton onClick={() => setIsNextStepsOpen(false)}> OKAY </$OkayButton>
-      </Modal>
-    </$PublicProfilePageContainer>
+          <$Horizontal
+            justifyContent="flex-end"
+            style={{ fontFamily: 'sans-serif', width: '100%', padding: '10px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <span onClick={() => setIsNextStepsOpen(false)}>X</span>
+          </$Horizontal>
+          <$NextStepsInfographic src={NEXT_STEPS_INFOGRAPHIC} />
+          <$OkayButton onClick={() => setIsNextStepsOpen(false)}> OKAY </$OkayButton>
+        </Modal>
+      </$PublicProfilePageContainer>
+    </$PageContainer>
   )
 }
 
@@ -196,15 +200,40 @@ const PublicProfilePage = () => {
   return <PublicProfile userId={userId as UserID} />
 }
 
-const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
-  font-family: sans-serif;
-  padding: ${(props) => (props.screen === 'mobile' ? '5px' : '10px')};
+const $PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   max-width: 920px;
   margin: 0 auto;
+`
+
+const $Banner = styled.div<{ screen: ScreenSize }>`
+  padding: ${(props) => (props.screen === 'mobile' ? '10px 20px' : '20px 40px')};
+  background: #00b0fb; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4286f4, #00b0fb); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #4286f4,
+    #00b0fb
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+  color: ${COLORS.white};
+  text-align: center;
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 4px;
+`
+
+const $PublicProfilePageContainer = styled.div<{ screen: ScreenSize }>`
+  font-family: sans-serif;
   background: #ffffff;
   box-shadow: 0px 3px 4px ${COLORS.surpressedBackground}aa;
   border-radius: 10px;
   padding: ${(props) => (props.screen === 'mobile' ? '1.5rem 1rem 2.2rem' : '1.2rem 1.6rem 3.4rem')};
+  width: 100%;
+  box-sizing: border-box;
 `
 
 export const $ProfileImage = styled.img`

@@ -36,6 +36,7 @@ import { TOS_URL } from 'lib/hooks/constants'
 import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { manifest } from 'manifest'
 
 interface Props {
   onNext: () => void
@@ -237,6 +238,21 @@ const OnboardingSignUp = (props: Props) => {
     }
   }, [chosenLootbox, chosenPartyBasket])
 
+  const GoToProfile = () => {
+    if (!user) {
+      return null
+    }
+    return (
+      <a href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user.id}`} style={{ textDecoration: 'none' }}>
+        <$SubHeading
+          style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer', marginBottom: '0px' }}
+        >
+          Go to Profile
+        </$SubHeading>
+      </a>
+    )
+  }
+
   return (
     <$ViralOnboardingCard background={background1}>
       <$ViralOnboardingSafeArea>
@@ -253,10 +269,10 @@ const OnboardingSignUp = (props: Props) => {
             >
               {words.anErrorOccured}
             </$Heading>
-            {errorMessage ? (
+            {errorMessage && errorMessage?.toLowerCase() !== words.anErrorOccured.toLowerCase() ? (
               <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(intl, errorMessage)}</$SubHeading>
             ) : null}
-
+            <GoToProfile />
             <$SubHeading onClick={reset} style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}>
               {words.retry + '?'}
             </$SubHeading>
@@ -277,6 +293,8 @@ const OnboardingSignUp = (props: Props) => {
             >
               {words.generateInviteLinkText}
             </$NextButton>
+            <br />
+            <GoToProfile />
             <$SubHeading
               onClick={() => props.onBack()}
               style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer', margin: '30px 0px' }}

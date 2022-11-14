@@ -17,6 +17,8 @@ import {
 } from '../api.gql'
 import { QueryClaimByIdArgs, QueryGetLootboxByIdArgs } from '../../../api/graphql/generated/types'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
+import { useAuth } from 'lib/hooks/useAuth'
+import { manifest } from 'manifest'
 
 interface WaitForAuthProps {
   onNext: (claimID: ClaimID, lootboxID: LootboxID) => Promise<void>
@@ -29,6 +31,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
   const [errorMessage, setErrorMessage] = useState('')
   const { setClaim, setChosenLootbox, chosenLootbox } = useViralOnboarding()
   const words = useWords()
+  const { user } = useAuth()
   const { claimID, lootboxID, email } = useMemo(() => {
     const { INITIAL_URL_PARAMS } = extractURLState_ViralOnboardingPage()
     return {
@@ -117,6 +120,21 @@ const WaitForAuth = (props: WaitForAuthProps) => {
     }
   }
 
+  const GoToProfile = () => {
+    if (!user) {
+      return null
+    }
+    return (
+      <a href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user.id}`} style={{ textDecoration: 'none' }}>
+        <$SubHeading
+          style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer', marginBottom: '0px' }}
+        >
+          Go to Profile
+        </$SubHeading>
+      </a>
+    )
+  }
+
   const stampImg = chosenLootbox?.stampImage
 
   return (
@@ -169,7 +187,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
                 {words.anErrorOccured}
               </$Heading>
               {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
-
+              <GoToProfile />
               <$SubHeading
                 onClick={props.onBack}
                 style={{ fontStyle: 'italic', textTransform: 'lowercase', cursor: 'pointer' }}
