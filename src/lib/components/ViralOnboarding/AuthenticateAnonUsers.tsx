@@ -292,6 +292,11 @@ const AuthenticateAnonUsers = () => {
                 Can't find it? <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b>
               </$SubHeading>
               {email && <$SubHeading style={{ marginTop: '0px' }}>Sent to {email}.</$SubHeading>}
+              <br />
+              <$SubHeading style={{ marginTop: '0px' }}>
+                Giveaways for Angkas, GCash & Web3 Festival will be emailed to you daily. Message&nbsp;
+                <i>support@lootbox.fund</i>&nbsp;if you have questions
+              </$SubHeading>
               {/* <ul>
                 <li>
                   <$SubHeading style={{ marginTop: '0px' }}>
