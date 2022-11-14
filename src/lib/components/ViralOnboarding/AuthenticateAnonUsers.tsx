@@ -40,6 +40,7 @@ const ACCOUNT_ALREADY_EXISTS: FirebaseAuthError[] = [
   'auth/credential-already-in-use',
   'auth/email-already-in-use',
 ]
+const hardcodedErrorText = "There's an issue with your link. Please look for a more recent email link and use that."
 
 type Status = 'loading' | 'error' | 'pending' | 'confirm_phone' | 'verification_sent' | 'complete'
 const AuthenticateAnonUsers = () => {
@@ -82,7 +83,13 @@ const AuthenticateAnonUsers = () => {
       skip: !idToken || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
       onCompleted: async (data) => {
         console.log('data', data)
-        if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
+        if (data.getAnonToken.__typename === 'ResponseError' && !user) {
+          // Note: we dont show this is the user already exists, because the UI should show
+          // existing users the phone confirmation step
+          setStatus('error')
+          setErrorMessage(hardcodedErrorText)
+          return
+        } else if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
           hasRunInit.current = true // make sure dosent run twice
           setStatus('loading')
           const { token, email } = data.getAnonToken
@@ -98,7 +105,7 @@ const AuthenticateAnonUsers = () => {
           }
           console.log('siginin with custom token')
           try {
-            await auth.signOut()
+            // await auth.signOut()
             console.log('signing in to anon account....')
             await signInWithCustomToken(auth, token)
             console.log('successfully signed into anon account')
