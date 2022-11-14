@@ -66,7 +66,11 @@ const AuthenticateAnonUsers = () => {
 
   useEffect(() => {
     if (user && user.isEmailVerified && !runonce.current) {
-      setStatus('confirm_phone')
+      if (user.phone) {
+        setStatus('complete')
+      } else {
+        setStatus('confirm_phone')
+      }
       runonce.current = true
     }
   }, [user, status])
