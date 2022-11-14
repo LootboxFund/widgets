@@ -209,13 +209,12 @@ const $PageContainer = styled.div`
 
 const $Banner = styled.div<{ screen: ScreenSize }>`
   padding: ${(props) => (props.screen === 'mobile' ? '10px 20px' : '20px 40px')};
-  background: #0f2027; /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #2c5364, #203a43, #0f2027); /* Chrome 10-25, Safari 5.1-6 */
+  background: #00b0fb; /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4286f4, #00b0fb); /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(
     to right,
-    #2c5364,
-    #203a43,
-    #0f2027
+    #4286f4,
+    #00b0fb
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
   color: ${COLORS.white};
