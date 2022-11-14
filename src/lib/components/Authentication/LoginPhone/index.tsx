@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { useAuth } from 'lib/hooks/useAuth'
 import { $Button } from '../../Generics/Button'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
@@ -186,7 +186,7 @@ const LoginPhone = (props: SignUpEmailProps) => {
               textTransform: 'uppercase',
             }}
           >
-            {words.confirm}
+            <LoadingText loading={loading} text={words.confirm} color={COLORS.white} />
           </$Button>
         </$Vertical>
       )}
