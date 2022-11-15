@@ -158,11 +158,11 @@ const ChooseLottery = (props: Props) => {
               />
             )}
           </$SubHeading>
-          <$InputMedium
+          {/* <$InputMedium
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             placeholder="Search by team name"
-          />
+          /> */}
           <br />
           <br />
           <$Vertical spacing={4} style={{ margin: '0px -10px' }}>
