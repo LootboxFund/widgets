@@ -182,8 +182,8 @@ export default [
   // SignOut,
   // BattleFeed,
   ViralOnboarding,
-  RedeemCosmicLootbox,
-  AuthenticateAnonUsers,
+  // RedeemCosmicLootbox,
+  // AuthenticateAnonUsers,
   // OLD SHIT -------------
   // CreateLootbox,
   // InteractWithLootbox,

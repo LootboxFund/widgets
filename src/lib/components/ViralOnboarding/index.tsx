@@ -26,7 +26,6 @@ import useWords from 'lib/hooks/useWords'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
-import { handIconImg } from './contants'
 import WaitForAuth from './components/WaitForAuth'
 
 interface ViralOnboardingProps {}
@@ -45,8 +44,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
     isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'accept-gift'
-    // // DEV
-    // 'wait-for-auth'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
