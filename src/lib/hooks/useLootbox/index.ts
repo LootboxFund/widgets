@@ -170,11 +170,10 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     }
 
     setStatus('pending-wallet')
+
     try {
-      const blockNum = await injectedProvider.getBlockNumber()
-      const tx = (await lootbox.connect(signer).mint(signature, nonce)) as ContractTransaction
-      setLastTx(tx)
       setStatus('loading')
+      const blockNum = await injectedProvider.getBlockNumber()
       // Call mint ticket enqueued task
       console.log('enqueing on mint: ', {
         fromBlock: blockNum,
@@ -182,14 +181,16 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
         nonce: nonce,
         chainIDHex: chainIDHex,
       })
-      startLootboxOnMintListener({
+      await startLootboxOnMintListener({
         fromBlock: blockNum,
         lootboxAddress: lootboxAddress,
         nonce: nonce,
         chainIDHex: chainIDHex,
         digest: digest,
       })
-
+      console.log('Calling blockchain on mint')
+      const tx = (await lootbox.connect(signer).mint(signature, nonce)) as ContractTransaction
+      setLastTx(tx)
       console.log('awaiting...')
       await tx.wait()
       return tx
