@@ -9,7 +9,6 @@ export const HOME_IMG_URL = `${manifest.storage.downloadUrl}/${manifest.storage.
 
 const NavBar = () => {
   const { screen } = useWindowSize()
-  const { user } = useAuth()
   const [isMobileExpanded, setIsMobileExpanded] = useState(false)
   return (
     <$NavBarContainer>
@@ -35,23 +34,13 @@ const NavBar = () => {
 
         {((screen === 'mobile' && isMobileExpanded) || screen !== 'mobile') && [
           <$NavLI key="nav-auth" float="right" type={screen === 'mobile' ? 'vertical' : 'horizontal'}>
-            {user ? (
-              <$NavA
-                href={manifest.microfrontends.webflow.logout}
-                screen={screen}
-                type={screen === 'mobile' ? 'vertical' : 'horizontal'}
-              >
-                Logout
-              </$NavA>
-            ) : (
-              <$NavA
-                href={manifest.microfrontends.webflow.myProfilePage}
-                screen={screen}
-                type={screen === 'mobile' ? 'vertical' : 'horizontal'}
-              >
-                Login
-              </$NavA>
-            )}
+            <$NavA
+              href={manifest.microfrontends.webflow.logout}
+              screen={screen}
+              type={screen === 'mobile' ? 'vertical' : 'horizontal'}
+            >
+              Logout
+            </$NavA>
           </$NavLI>,
           <$NavLI key="nav-my-tickets" float="right" type={screen === 'mobile' ? 'vertical' : 'horizontal'}>
             <$NavA

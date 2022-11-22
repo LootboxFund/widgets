@@ -1,7 +1,5 @@
 import { $CardViewport } from '../Generics'
 import NavBar from './index'
-import { ApolloProvider } from '@apollo/client'
-import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
 
 export default {
@@ -11,13 +9,11 @@ export default {
 
 const Template = () => {
   return (
-    <ApolloProvider client={client}>
-      <LocalizationWrapper>
-        <$CardViewport width="100%">
-          <NavBar />
-        </$CardViewport>
-      </LocalizationWrapper>
-    </ApolloProvider>
+    <LocalizationWrapper>
+      <$CardViewport width="100%">
+        <NavBar />
+      </$CardViewport>
+    </LocalizationWrapper>
   )
 }
 
