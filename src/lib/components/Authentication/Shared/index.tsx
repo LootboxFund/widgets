@@ -137,10 +137,10 @@ export const $Checkbox = styled.input`
 `
 
 export type ModeOptions =
-  | 'login-password'
+  | 'login-email'
   | 'login-wallet'
   | 'login-phone'
-  | 'signup-password'
+  | 'signup-email'
   | 'signup-wallet'
   | 'signup-phone'
   | 'forgot-password'

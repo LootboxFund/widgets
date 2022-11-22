@@ -18,7 +18,7 @@ const AuthGuard = ({ children, strict, ...props }: AuthGuardProps): JSX.Element 
   } else if (!user || (!!strict && !hasLoggedIn)) {
     return (
       <Authentication
-        initialMode="login-phone"
+        initialMode="login-email"
         {...props}
         onSignupSuccess={
           !!strict

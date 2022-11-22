@@ -4,7 +4,7 @@ import { manifest } from 'manifest'
 const AuthenticationPage = () => {
   return (
     <Authentication
-      initialMode="signup-password"
+      initialMode="signup-email"
       onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')}
     />
   )

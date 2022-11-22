@@ -275,7 +275,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
               <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
                 <$ImageContainer>
                   {isUnverifiedClaim && (
-                    <a href={manifest.microfrontends.webflow.myProfilePage}>
+                    <a href={`${manifest.microfrontends.webflow.myProfilePage}?m=email`}>
                       <$UnverifiedBadge data-tip data-for={'unverified-tip'}>
                         Pending Phone Verification
                       </$UnverifiedBadge>
