@@ -114,7 +114,7 @@
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
     "@wormgraph/helpers": "0.7.2-prod-2",
-    "@wormgraph/manifest": "0.7.2-prod-1",
+    "@wormgraph/manifest": "0.7.2-prod-7",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",
     "countries-list": "^2.6.1",
