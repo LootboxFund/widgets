@@ -24,8 +24,6 @@ const ViralOnboardingCSS =
   process.env.NODE_ENV === 'production' ? 'ViralOnboarding.production.css' : 'ViralOnboarding.js.css'
 
 const fileNames = [ViralOnboarding, ViralOnboardingCSS]
-// const fileNames = [ViralOnboarding]
-// const fileNames = [ViralOnboardingCSS]
 
 const run = async () => {
   console.log(`running...`)

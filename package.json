@@ -45,7 +45,7 @@
     "deploy:cosmiclootbox": "NODE_ENV=production node scripts/deploy-cosmic-lootbox.js",
     "deploy:navbar": "NODE_ENV=production node scripts/deploy-nav-bar.js",
     "deploy:nerds": "yarn deploy:euler && yarn deploy:cassini && yarn deploy:degrasse && yarn deploy:lagrange && yarn deploy:publicprofile && yarn deploy:signout && yarn deploy:tangris && yarn deploy:cosmiclootbox && yarn deploy:viralonboarding && yarn deploy:mytickets && yarn deploy:authanon",
-    "deploy:hostingwidgets": "yarn deploy:euler && yarn deploy:publicprofile && yarn deploy:signout && yarn deploy:viralonboarding && yarn deploy:navbar && yarn deploy:cosmiclootbox && yarn deploy:authanon",
+    "deploy:hostingwidgets": "yarn deploy:euler && yarn deploy:publicprofile && yarn deploy:signout && yarn deploy:viralonboarding && yarn deploy:navbar && yarn deploy:cosmiclootbox && yarn deploy:authanon && yarn deploy:mytickets",
     "logrocket:upload": "bash ./logrocket-deploy.sh",
     "sandbox": "surge --domain=https://______.surge.sh"
   },
