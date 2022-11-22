@@ -173,6 +173,8 @@ const MyTickets = widgetConfig('MyTickets')
 
 const RedeemCosmicLootbox = widgetConfig('RedeemCosmicLootbox')
 
+const NavBar = widgetConfig('NavBar')
+
 export default [
   // MyProfile,
   // Authentication,
@@ -181,7 +183,8 @@ export default [
   // PublicProfile,
   // SignOut,
   // BattleFeed,
-  ViralOnboarding,
+  // ViralOnboarding,
+  NavBar,
   // RedeemCosmicLootbox,
   // AuthenticateAnonUsers,
   // OLD SHIT -------------
