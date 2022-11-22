@@ -26,12 +26,14 @@ import { auth } from 'lib/api/firebase/app'
 import { manifest } from 'manifest'
 import {
   GetAnonTokenResponseSuccessFE,
+  GetAnonTokenV2ResponseSuccessFE,
   GET_ANON_TOKEN,
+  GET_ANON_TOKEN_V2,
   SyncProviderUserResponseFE,
   SYNC_PROVIDER_USER,
 } from './api.gql'
 import { useMutation, useQuery } from '@apollo/client'
-import { QueryGetAnonTokenArgs, ResponseError } from '../../api/graphql/generated/types'
+import { QueryGetAnonTokenArgs, ResponseError, QueryGetAnonTokenV2Args } from '../../api/graphql/generated/types'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -59,7 +61,7 @@ const AuthenticateAnonUsers = () => {
   // No longer needed - stored in backend
   // const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const hasRunInit = useRef(false)
-  const { idToken, stampImg } = useMemo(() => {
+  const { idToken, stampImg, userID, truncatedEmail } = useMemo(() => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
   const runonce = useRef(false)
@@ -76,69 +78,91 @@ const AuthenticateAnonUsers = () => {
     }
   }, [user, status])
 
-  const { data } = useQuery<GetAnonTokenResponseSuccessFE | { getAnonToken: ResponseError }, QueryGetAnonTokenArgs>(
-    GET_ANON_TOKEN,
+  const handleTokenFetched = async (signInToken: string, email: string) => {
+    hasRunInit.current = true // make sure dosent run twice
+    setStatus('loading')
+    // Make sure the credentials are valid from the email link
+    let credential: EmailAuthCredential
+    try {
+      console.log('generating credentials')
+      credential = EmailAuthProvider.credentialWithLink(email, window.location.href)
+    } catch (err) {
+      console.log('error generating credentials', err)
+      reset()
+      return
+    }
+    console.log('siginin with custom token')
+    try {
+      // await auth.signOut()
+      console.log('signing in to anon account....')
+      await signInWithCustomToken(auth, signInToken)
+      console.log('successfully signed into anon account')
+    } catch (err) {
+      console.error('error signing in', err)
+      reset()
+      return
+    }
+
+    try {
+      // link user credentials...
+      console.log('linking credentials')
+      await linkCredentials(credential)
+      await syncUserMutation()
+      console.log('done linking')
+      setStatus('confirm_phone')
+    } catch (err) {
+      console.log('error linking credentials', err)
+      console.log(err?.code, err?.message)
+      if (ACCOUNT_ALREADY_EXISTS.includes(err?.code)) {
+        // show error if user with email exists
+        setStatus('error')
+        setErrorMessage(err?.message || words.anErrorOccured)
+      } else {
+        setStatus('pending')
+      }
+    }
+  }
+
+  /**
+   * @deprecated - use dataV2 below
+   */
+  useQuery<GetAnonTokenResponseSuccessFE | { getAnonToken: ResponseError }, QueryGetAnonTokenArgs>(GET_ANON_TOKEN, {
+    variables: { idToken: idToken || '' },
+    skip: !idToken || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
+    onCompleted: async (res) => {
+      console.log('data', res)
+      if (res.getAnonToken.__typename === 'ResponseError' && !user) {
+        // Note: we dont show this is the user already exists, because the UI should show
+        // existing users the phone confirmation step
+        setStatus('error')
+        setErrorMessage(hardcodedErrorText)
+        return
+      } else if (res.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
+        handleTokenFetched(res.getAnonToken.token, res.getAnonToken.email)
+      }
+    },
+  })
+
+  useQuery<GetAnonTokenV2ResponseSuccessFE | { getAnonTokenV2: ResponseError }, QueryGetAnonTokenV2Args>(
+    GET_ANON_TOKEN_V2,
     {
-      variables: { idToken: idToken || '' },
-      skip: !idToken || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
-      onCompleted: async (data) => {
-        console.log('data', data)
-        if (data.getAnonToken.__typename === 'ResponseError' && !user) {
+      variables: { userID: userID || '' },
+      skip: !userID || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
+      onCompleted: async (res) => {
+        console.log('data', res)
+        if (res.getAnonTokenV2.__typename === 'ResponseError' && !user) {
           // Note: we dont show this is the user already exists, because the UI should show
           // existing users the phone confirmation step
           setStatus('error')
           setErrorMessage(hardcodedErrorText)
           return
-        } else if (data.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
-          hasRunInit.current = true // make sure dosent run twice
-          setStatus('loading')
-          const { token, email } = data.getAnonToken
-          // Make sure the credentials are valid from the email link
-          let credential: EmailAuthCredential
-          try {
-            console.log('generating credentials')
-            credential = EmailAuthProvider.credentialWithLink(email, window.location.href)
-          } catch (err) {
-            console.log('error generating credentials', err)
-            reset()
-            return
-          }
-          console.log('siginin with custom token')
-          try {
-            // await auth.signOut()
-            console.log('signing in to anon account....')
-            await signInWithCustomToken(auth, token)
-            console.log('successfully signed into anon account')
-          } catch (err) {
-            console.error('error signing in', err)
-            reset()
-            return
-          }
-
-          try {
-            // link user credentials...
-            console.log('linking credentials')
-            await linkCredentials(credential)
-            await syncUserMutation()
-            console.log('done linking')
-            setStatus('confirm_phone')
-          } catch (err) {
-            console.log('error linking credentials', err)
-            console.log(err?.code, err?.message)
-            if (ACCOUNT_ALREADY_EXISTS.includes(err?.code)) {
-              // show error if user with email exists
-              setStatus('error')
-              setErrorMessage(err?.message || words.anErrorOccured)
-            } else {
-              setStatus('pending')
-            }
-          }
+        } else if (res.getAnonTokenV2.__typename === 'GetAnonTokenResponseSuccess') {
+          handleTokenFetched(res.getAnonTokenV2.token, res.getAnonTokenV2.email)
         }
       },
     }
   )
 
-  const email = data?.getAnonToken?.__typename === 'GetAnonTokenResponseSuccess' ? data.getAnonToken.email : null
   const parsedPhone = `${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`
 
   useEffect(() => {
@@ -235,54 +259,6 @@ const AuthenticateAnonUsers = () => {
     <$ViralOnboardingCard background={background3} opacity={['0.7', '0.55']}>
       <$ViralOnboardingSafeArea>
         <$Vertical height="100%">
-          {/* {status === 'pending' && !emailForSignup && (
-          <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
-            <$Heading2 style={{ textAlign: 'start', marginTop: '50px' }}>{words.enterYourEmail}</$Heading2>
-            <$SubHeading style={{ marginTop: '0px', textAlign: 'start' }}>
-              This should be the same email as before
-            </$SubHeading>
-            <$Vertical spacing={3}>
-              <$InputMedium
-                type="email"
-                name="email"
-                placeholder={words.email}
-                value={email}
-                onChange={(e) => setEmailLocal(e.target.value)}
-                onKeyUp={(event) => {
-                  if (event.key == 'Enter') {
-                    submitEmail()
-                  }
-                }}
-              />
-
-              <$NextButton
-                disabled={loading}
-                onClick={submitEmail}
-                color={COLORS.trustFontColor}
-                backgroundColor={COLORS.trustBackground}
-              >
-                <LoadingText loading={loading} text="Submit" color={COLORS.white}></LoadingText>
-              </$NextButton>
-              {errorMessage ? <$SubHeading style={{ marginTop: '0px' }}>{errorMessage}</$SubHeading> : null}
-            </$Vertical>
-            <$SupressedParagraph
-              style={{
-                fontSize: TYPOGRAPHY.fontSize.small,
-                lineHeight: TYPOGRAPHY.fontSize.medium,
-                marginTop: '40px',
-                width: screen === 'mobile' ? '100%' : '80%',
-                textAlign: 'start',
-              }}
-            >
-              <FormattedMessage
-                id="viralOnboarding.signup.email.disclaimer"
-                defaultMessage="You will NOT receiving marketing emails, we only notify if you win"
-                description="Disclaimer when collecting email"
-              />
-            </$SupressedParagraph>
-            <$HandImage src={handIconImg} />
-          </$Vertical>
-        )} */}
           {status === 'pending' && (
             <$Vertical justifyContent="center" style={{ marginTop: '5vh' }}>
               <$Icon>{'📧'}</$Icon>
@@ -298,28 +274,8 @@ const AuthenticateAnonUsers = () => {
               <$SubHeading style={{ marginTop: '0px' }}>
                 Can't find it? <b style={{ fontStyle: 'italic' }}>Check your spam folder.</b>
               </$SubHeading>
-              {email && <$SubHeading style={{ marginTop: '0px' }}>Sent to {email}.</$SubHeading>}
+              {truncatedEmail && <$SubHeading style={{ marginTop: '0px' }}>Sent to {truncatedEmail}.</$SubHeading>}
               <br />
-              <$SubHeading style={{ marginTop: '0px' }}>
-                Giveaways for Angkas, GCash & Web3 Festival will be emailed to you daily. Message&nbsp;
-                <i>support@lootbox.fund</i>&nbsp;if you have questions
-              </$SubHeading>
-              {/* <ul>
-                <li>
-                  <$SubHeading style={{ marginTop: '0px' }}>
-                    ☑️ We sent a magic link to <b>{email ? email : 'your email'}</b>
-                  </$SubHeading>
-                </li>
-                <li>
-                  <$SubHeading style={{ marginTop: '0px' }}>☑️ Add your phone number</$SubHeading>
-                </li>
-              </ul> */}
-              {/* <$SubHeading style={{ marginTop: '0px' }}>
-              Check your spam folder. Can't find it?{' '}
-              <$Link href={TOS_URL} target="_blank">
-                resend
-              </$Link>
-            </$SubHeading> */}
             </$Vertical>
           )}
           {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
@@ -471,6 +427,8 @@ const parseAuthError = (message: string) => {
 interface URLState {
   idToken: string | null
   stampImg: string | null
+  userID: string | null
+  truncatedEmail: string | null
 }
 const extractURLState_AuthenticateAnonUsers = () => {
   const url = new URL(window.location.href)
@@ -478,6 +436,8 @@ const extractURLState_AuthenticateAnonUsers = () => {
   const state: URLState = {
     idToken: url.searchParams.get('t'),
     stampImg: url.searchParams.get('img'),
+    userID: url.searchParams.get('u'),
+    truncatedEmail: url.searchParams.get('e'),
   }
 
   return state

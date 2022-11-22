@@ -238,6 +238,31 @@ export const GET_ANON_TOKEN = gql`
   }
 `
 
+export interface GetAnonTokenV2ResponseSuccessFE {
+  getAnonTokenV2: {
+    __typename: 'GetAnonTokenResponseSuccess'
+    token: string
+    email: string
+  }
+}
+
+export const GET_ANON_TOKEN_V2 = gql`
+  query GetAnonTokenV2($userID: ID!) {
+    getAnonTokenV2(userID: $userID) {
+      ... on GetAnonTokenResponseSuccess {
+        token
+        email
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export type CheckPhoneEnabledResponseFE = {
   checkPhoneEnabled:
     | {
