@@ -173,18 +173,25 @@ const MyTickets = widgetConfig('MyTickets')
 
 const RedeemCosmicLootbox = widgetConfig('RedeemCosmicLootbox')
 
+const NavBar = widgetConfig('NavBar')
+
 export default [
-  // MyProfile,
   // Authentication,
   // LootboxFeed,
-  // BattlePage,
-  // PublicProfile,
-  // SignOut,
   // BattleFeed,
+  // BattlePage,
+
+  // ---- Firebase hosting widgets ---
+  MyProfile,
+  PublicProfile,
+  SignOut,
   ViralOnboarding,
-  // RedeemCosmicLootbox,
-  // AuthenticateAnonUsers,
-  // OLD SHIT -------------
+  NavBar,
+  RedeemCosmicLootbox,
+  AuthenticateAnonUsers,
+  MyTickets,
+
+  // ---- OLD SHIT ----
   // CreateLootbox,
   // InteractWithLootbox,
   // ManageLootbox,
