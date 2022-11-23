@@ -87,12 +87,12 @@ const Profile = () => {
       <$ProfileSectionContainer screen={screen}>
         <Wallets />
       </$ProfileSectionContainer>
-      <$ProfileSectionContainer screen={screen}>
+      {/* <$ProfileSectionContainer screen={screen}>
         <MyTournaments />
       </$ProfileSectionContainer>
       <$ProfileSectionContainer screen={screen}>
         <MyLootboxes />
-      </$ProfileSectionContainer>
+      </$ProfileSectionContainer> */}
       {user && (
         <$Link
           onClick={logout}
