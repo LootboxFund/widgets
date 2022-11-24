@@ -397,3 +397,28 @@ export const SYNC_PROVIDER_USER = gql`
     }
   }
 `
+
+export interface TruncatedEmailByPhoneResponseFE {
+  truncatedEmailByPhone:
+    | {
+        __typename: 'TruncatedEmailByPhoneResponseSuccess'
+        email: string
+      }
+    | ResponseError
+}
+
+export const TRUNCATED_EMAIL_BY_PHONE = gql`
+  query TruncatedEmailByPhone($phoneNumber: String!) {
+    truncatedEmailByPhone(phoneNumber: $phoneNumber) {
+      ... on TruncatedEmailByPhoneResponseSuccess {
+        email
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

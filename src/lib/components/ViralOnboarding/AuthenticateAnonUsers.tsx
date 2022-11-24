@@ -31,9 +31,16 @@ import {
   GET_ANON_TOKEN_V2,
   SyncProviderUserResponseFE,
   SYNC_PROVIDER_USER,
+  TruncatedEmailByPhoneResponseFE,
+  TRUNCATED_EMAIL_BY_PHONE,
 } from './api.gql'
-import { useMutation, useQuery } from '@apollo/client'
-import { QueryGetAnonTokenArgs, ResponseError, QueryGetAnonTokenV2Args } from '../../api/graphql/generated/types'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import {
+  QueryGetAnonTokenArgs,
+  ResponseError,
+  QueryGetAnonTokenV2Args,
+  QueryTruncatedEmailByPhoneArgs,
+} from '../../api/graphql/generated/types'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -64,8 +71,23 @@ const AuthenticateAnonUsers = () => {
   const { idToken, stampImg, userID, truncatedEmail } = useMemo(() => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
+  const [truncatedEmailByPhone, setTruncatedEmailByPhone] = useState('')
   const runonce = useRef(false)
   const [syncUserMutation] = useMutation<SyncProviderUserResponseFE>(SYNC_PROVIDER_USER)
+  const [getTruncatedEmailByPhone] = useLazyQuery<TruncatedEmailByPhoneResponseFE, QueryTruncatedEmailByPhoneArgs>(
+    TRUNCATED_EMAIL_BY_PHONE,
+    {
+      onCompleted: (data) => {
+        console.log('fetched data', data)
+        if (
+          data?.truncatedEmailByPhone &&
+          data.truncatedEmailByPhone.__typename === 'TruncatedEmailByPhoneResponseSuccess'
+        ) {
+          setTruncatedEmailByPhone(data.truncatedEmailByPhone.email)
+        }
+      },
+    }
+  )
 
   useEffect(() => {
     if (user && user.isEmailVerified && !runonce.current) {
@@ -115,6 +137,15 @@ const AuthenticateAnonUsers = () => {
       console.log(err?.code, err?.message)
       if (ACCOUNT_ALREADY_EXISTS.includes(err?.code)) {
         // show error if user with email exists
+
+        // look up the truncated email
+        console.log('fetching truncated email')
+        getTruncatedEmailByPhone({
+          variables: {
+            phoneNumber: parsedPhone,
+          },
+        })
+
         setStatus('error')
         setErrorMessage(err?.message || words.anErrorOccured)
       } else {
@@ -292,7 +323,14 @@ const AuthenticateAnonUsers = () => {
                 {words.anErrorOccured}
               </$Heading>
               {errorMessage ? (
-                <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
+                <$Vertical spacing={2}>
+                  <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
+                  {truncatedEmail && (
+                    <$SubHeading style={{ marginTop: '0px' }}>
+                      This phone number is already linked to an email "{truncatedEmail}".
+                    </$SubHeading>
+                  )}
+                </$Vertical>
               ) : null}
 
               <$SubHeading
