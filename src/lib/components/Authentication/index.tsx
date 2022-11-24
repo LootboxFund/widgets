@@ -1,5 +1,5 @@
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { $Divider, $span, $Vertical } from '../Generics'
 import { ModeOptions, useAuthWords } from './Shared'
@@ -26,8 +26,13 @@ interface AuthenticationProps {
   ghost?: boolean
 }
 const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost }: AuthenticationProps) => {
+  const { mode } = useMemo(() => {
+    const { INITIAL_URL_PARAMS } = extractURLState_Authentication()
+    return { mode: parseMode(INITIAL_URL_PARAMS.mode) }
+  }, [])
+
   const [route, setRoute] = useState<ModeOptions>(
-    isSignInWithEmailLink(auth, window.location.href) ? 'email-link' : initialMode || 'signup-password'
+    isSignInWithEmailLink(auth, window.location.href) ? 'email-link' : mode || initialMode || 'signup-email'
   )
   const { screen } = useWindowSize()
   const words = useWords()
@@ -46,9 +51,9 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
   }, [])
 
   const renderSwitchRouteText = (): React.ReactElement | null => {
-    if (route === 'login-password' || route === 'login-wallet' || route === 'login-phone') {
+    if (route === 'login-email' || route === 'login-wallet' || route === 'login-phone') {
       const destinationRoute =
-        route === 'login-password' ? 'signup-password' : route === 'login-wallet' ? 'signup-wallet' : 'signup-phone'
+        route === 'login-email' ? 'signup-email' : route === 'login-wallet' ? 'signup-wallet' : 'signup-phone'
       return (
         <FormattedMessage
           id="auth.link.switchToSignup"
@@ -59,9 +64,9 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
           description="Message to user allowing them to switch to signup with nested hyperlink"
         />
       )
-    } else if (route === 'signup-password' || route === 'signup-wallet' || route === 'signup-phone') {
+    } else if (route === 'signup-email' || route === 'signup-wallet' || route === 'signup-phone') {
       const destinationRoute =
-        route === 'signup-password' ? 'login-password' : route === 'signup-wallet' ? 'login-wallet' : 'login-phone'
+        route === 'signup-email' ? 'login-email' : route === 'signup-wallet' ? 'login-wallet' : 'login-phone'
       return (
         <FormattedMessage
           id="auth.link.switchToLogin"
@@ -77,10 +82,10 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
 
   const AlternativeAuthOptions = ({ selectedRoute }: { selectedRoute: ModeOptions }) => {
     const isLogin = selectedRoute.includes('login')
-    type Option = 'password' | 'wallet' | 'phone'
-    const options: Option[] = ['password', 'wallet', 'phone']
+    type Option = 'email' | 'wallet' | 'phone'
+    const options: Option[] = !!mode ? [] : ['email', 'wallet', 'phone']
     const getColor = (option: Option): { background: string; color: string; icon: string } => {
-      if (option === 'password') {
+      if (option === 'email') {
         return {
           background: `${COLORS.black}ce`,
           color: COLORS.white,
@@ -113,11 +118,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
           }
 
           const word =
-            option === 'password'
-              ? authWords.emailAndPassword
-              : option === 'wallet'
-              ? authWords.metaMaskWallet
-              : authWords.phoneNumber
+            option === 'email' ? 'Email' : option === 'wallet' ? authWords.metaMaskWallet : authWords.phoneNumber
 
           return (
             <$AuthButton
@@ -155,14 +156,14 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
       {route === 'login-wallet' && (
         <LoginWallet onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} title={loginTitle} />
       )}
-      {route === 'login-password' && (
+      {route === 'login-email' && (
         <div>
           <LoginEmail onChangeMode={setRoute} onSignupSuccess={onSignupSuccess} title={loginTitle} />
           <br />
         </div>
       )}
       {route === 'signup-wallet' && <SignupWallet onChangeMode={setRoute} />}
-      {route === 'signup-password' && <SignupEmail onChangeMode={setRoute} />}
+      {route === 'signup-email' && <SignupEmail onChangeMode={setRoute} />}
       {(route === 'signup-phone' || route === 'login-phone') && (
         <div>
           <LoginPhone
@@ -179,7 +180,7 @@ const Authentication = ({ initialMode, onSignupSuccess, loginTitle, width, ghost
 
       <$span textAlign="center">{renderSwitchRouteText()}</$span>
 
-      <$Divider />
+      {!mode && <$Divider />}
 
       {route !== 'forgot-password' && <AlternativeAuthOptions selectedRoute={route} />}
     </$Vertical>
@@ -220,5 +221,27 @@ const $Link = styled.span`
   font-style: italic;
   cursor: pointer;
 `
+
+export interface AuthenticationURLParams {
+  mode: string | null
+}
+
+export const extractURLState_Authentication = () => {
+  const url = new URL(window.location.href)
+  const params: AuthenticationURLParams = {
+    mode: url.searchParams.get('m'),
+  }
+
+  return { INITIAL_URL_PARAMS: params }
+}
+
+const parseMode = (modeUnknown: string | null): ModeOptions | null => {
+  switch (modeUnknown) {
+    case 'email':
+      return 'login-email'
+    default:
+      return null
+  }
+}
 
 export default Authentication

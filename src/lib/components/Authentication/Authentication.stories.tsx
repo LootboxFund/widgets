@@ -30,7 +30,7 @@ const Template = () => {
       <LocalizationWrapper>
         <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
           <Authentication
-            initialMode="signup-phone"
+            initialMode="login-email"
             onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')}
           />
         </$CardViewport>

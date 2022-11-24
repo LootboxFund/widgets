@@ -54,6 +54,7 @@ import { throwInvalidPasswords } from 'lib/utils/password'
 import { useIntl } from 'react-intl'
 import useWords, { useSignatures } from 'lib/hooks/useWords'
 import { manifest } from 'manifest'
+import { truncateEmail } from 'lib/utils/email'
 
 interface FrontendUser {
   id: UserID
@@ -388,17 +389,20 @@ export const useAuth = () => {
       throw new Error('User not signed in')
     }
     // Send login email
-    const idToken = await auth.currentUser.getIdToken(true)
-    if (!idToken) {
-      console.log('not logged in while generating ID token')
-      throw new Error(words.anErrorOccured)
-    }
+    // const idToken = await auth.currentUser.getIdToken(true)
+    // if (!idToken) {
+    //   console.log('not logged in while generating ID token')
+    //   throw new Error(words.anErrorOccured)
+    // }
     // More info: https://firebase.google.com/docs/auth/web/email-link-auth?hl=en&authuser=1#linkingre-authentication_with_email_link
     const emailActionCodeSettings: ActionCodeSettings = {
       // URL you want to redirect back to. The domain (www.example.com) for this
       // URL must be in the authorized domains list in the Firebase Console.
 
-      url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}${img ? `&img=${encodeURIComponent(img)}` : ''}`,
+      // url: `${manifest.microfrontends.webflow.anonSignup}?t=${idToken}${img ? `&img=${encodeURIComponent(img)}` : ''}`,
+      url: `${manifest.microfrontends.webflow.anonSignup}?u=${auth.currentUser.uid}&e=${truncateEmail(email)}${
+        img ? `&img=${encodeURIComponent(img)}` : ''
+      }`,
       // This must be true.
       handleCodeInApp: true,
     }

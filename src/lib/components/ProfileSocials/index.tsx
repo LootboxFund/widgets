@@ -41,6 +41,7 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
             >
               <$SocialLogo src={social.icon} />
               <$ProfilePageInput
+                disabled
                 defaultValue={props.userSocials[social.slug as keyof UserSocials] || ''}
                 style={{ width: '100%' }}
                 value={props.userSocials[social.slug as keyof UserSocials] || ''}

@@ -27,6 +27,7 @@ import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import WaitForAuth from './components/WaitForAuth'
+import { truncateEmail } from 'lib/utils/email'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -238,7 +239,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         )
       case 'success': {
         const nextUrl = user?.isAnonymous
-          ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}`
+          ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
+              emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''
+            }`
           : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
         if (!!ad) {
           return (

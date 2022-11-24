@@ -259,14 +259,13 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl || claim?.chosenPartyBasket?.joinCommunityUrl
           const joinNotif = isNotifReq && !!joinCommunityURL
           const isNotif = !!joinNotif
-          const mainActionLink =
-            joinCommunityURL ||
-            claim.tournament?.tournamentLink ||
-            `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
+
           const displayImage = claim?.chosenLootbox?.stampImage || claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
           const redeemPageURL = claim?.chosenPartyBasket
             ? `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`
             : `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
+
+          const mainActionLink = joinCommunityURL || claim.tournament?.tournamentLink || redeemPageURL
 
           const isUnverifiedClaim = claim.status === 'unverified'
           const isExpired = claim.status === 'expired'
@@ -276,15 +275,14 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
               <a href={mainActionLink} target="_blank" style={{ display: 'block', cursor: 'pointer' }}>
                 <$ImageContainer>
                   {isUnverifiedClaim && (
-                    <a href={manifest.microfrontends.webflow.myProfilePage}>
+                    <a href={`${manifest.microfrontends.webflow.myProfilePage}?m=email`}>
                       <$UnverifiedBadge data-tip data-for={'unverified-tip'}>
                         Pending Phone Verification
                       </$UnverifiedBadge>
                     </a>
                   )}
-                  <ReactTooltip id="unverified-tip" place="top" effect="float">
-                    Claims can only be redeemed with a verified phone number. Go to the private profile and add your
-                    phone number.
+                  <ReactTooltip id="unverified-tip" place="top" effect="solid">
+                    Claims can only be redeemed with a verified phone number. <b>Click to add your phone number</b>.
                   </ReactTooltip>
                   {isExpired && (
                     <$ExpiredBadge data-tip data-for={'expired-tip'}>
@@ -329,17 +327,15 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                 </$Horizontal>
                 <$DropDownContainer id={elId} className="dd-container">
                   <$Vertical>
-                    <$DropDownOption
-                      style={{ borderRadius: '10px 10px 0px 0px' }}
-                      href={
-                        claim.tournament?.tournamentLink
-                          ? claim.tournament?.tournamentLink
-                          : `${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`
-                      }
-                      target="_blank"
-                    >
-                      <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
-                    </$DropDownOption>
+                    {claim?.tournament?.tournamentLink && (
+                      <$DropDownOption
+                        style={{ borderRadius: '10px 10px 0px 0px' }}
+                        href={claim.tournament.tournamentLink}
+                        target="_blank"
+                      >
+                        <FormattedMessage id="profile.public.eventDetails" defaultMessage="Event Details" />
+                      </$DropDownOption>
+                    )}
 
                     {joinCommunityURL ? (
                       <$DropDownOption
@@ -354,28 +350,21 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
                       </$DropDownOption>
                     ) : null}
 
-                    <$DropDownOption
-                      href={`${manifest.microfrontends.webflow.battlePage}?tid=${claim.tournamentId}`}
-                      target="_blank"
-                    >
-                      <FormattedMessage id="profile.public.watchStream" defaultMessage="Watch Stream" />{' '}
-                    </$DropDownOption>
-
                     <$DropDownOption href={redeemPageURL} style={{ borderRadius: '0px 0px 10px 10px' }}>
-                      {words.redeemNFTText}
+                      Redeem Prize
                     </$DropDownOption>
-                    {/* <$DropDownOption href="#" style={{ borderRadius: '0px 0px 10px 10px' }}>
-                          <FormattedMessage id="profile.public.viewLootbox" defaultMessage="View Lootbox" />
-                        </$DropDownOption> */}
                   </$Vertical>
                 </$DropDownContainer>
               </$Vertical>
             </$ClaimCard>
           )
         })}
-
-        {loadingData && <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />}
       </$ClaimsGrid>
+      {loadingData && [
+        <br key="br1" />,
+        <br key="br2" />,
+        <Spinner key="spin1" color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="auto" />,
+      ]}
       {pageInfo?.hasNextPage && (
         <$Vertical>
           <br />
@@ -594,7 +583,7 @@ const $UnverifiedBadge = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: 25px;
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 6px 6px 0px 0px;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   padding: 0px 5px;
   box-sizing: border-box;
@@ -611,7 +600,7 @@ const $ExpiredBadge = styled.div`
   font-weight: ${TYPOGRAPHY.fontWeight.regular};
   font-size: ${TYPOGRAPHY.fontSize.medium};
   line-height: 25px;
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 6px 6px 0px 0px;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   padding: 0px 5px;
   box-sizing: border-box;

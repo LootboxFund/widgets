@@ -238,6 +238,31 @@ export const GET_ANON_TOKEN = gql`
   }
 `
 
+export interface GetAnonTokenV2ResponseSuccessFE {
+  getAnonTokenV2: {
+    __typename: 'GetAnonTokenResponseSuccess'
+    token: string
+    email: string
+  }
+}
+
+export const GET_ANON_TOKEN_V2 = gql`
+  query GetAnonTokenV2($userID: ID!) {
+    getAnonTokenV2(userID: $userID) {
+      ... on GetAnonTokenResponseSuccess {
+        token
+        email
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
 export type CheckPhoneEnabledResponseFE = {
   checkPhoneEnabled:
     | {
@@ -362,6 +387,31 @@ export const SYNC_PROVIDER_USER = gql`
           email
           id
         }
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
+
+export interface TruncatedEmailByPhoneResponseFE {
+  truncatedEmailByPhone:
+    | {
+        __typename: 'TruncatedEmailByPhoneResponseSuccess'
+        email: string
+      }
+    | ResponseError
+}
+
+export const TRUNCATED_EMAIL_BY_PHONE = gql`
+  query TruncatedEmailByPhone($phoneNumber: String!) {
+    truncatedEmailByPhone(phoneNumber: $phoneNumber) {
+      ... on TruncatedEmailByPhoneResponseSuccess {
+        email
       }
       ... on ResponseError {
         error {

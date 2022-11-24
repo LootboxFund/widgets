@@ -44,7 +44,7 @@ const SignupEmail = (props: SignUpEmailProps) => {
     try {
       await signUpWithEmailAndPassword(email, password, passwordConfirmation)
       setErrorMessage('')
-      props.onChangeMode('login-password')
+      props.onChangeMode('login-email')
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)
       LogRocket.captureException(err)

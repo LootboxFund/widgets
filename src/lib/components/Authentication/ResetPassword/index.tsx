@@ -36,7 +36,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
   }
 
   const navBack = () => {
-    props.onChangeMode('login-password')
+    props.onChangeMode('login-email')
   }
 
   return (

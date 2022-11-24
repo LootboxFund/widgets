@@ -123,7 +123,7 @@ const CosmicAuthGuard = ({ lootboxID, children, ...props }: AuthGuardProps): JSX
             {/* <$RedeemCosmicTitle screen={screen}>{lootboxData.name}</$RedeemCosmicTitle> */}
             {/* <br /> */}
             <Authentication
-              initialMode="login-phone"
+              initialMode="login-email"
               loginTitle={`Login to Redeem "${lootboxData.name}" Tickets`}
               width="100%"
               ghost
