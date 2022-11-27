@@ -1740,9 +1740,6 @@
     "defaultMessage": "View Socials",
     "description": "Public Profile Page link to view socials"
   },
-  "profile.public.watchStream": {
-    "defaultMessage": "Watch Stream"
-  },
   "profile.settings.changePassword.title": {
     "defaultMessage": "Add a Password",
     "description": "Title for the page that allows a user to add a password"
