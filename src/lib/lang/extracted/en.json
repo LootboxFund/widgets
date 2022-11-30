@@ -2233,6 +2233,9 @@
   "tournamentAnalytics.button.downloadCSV": {
     "defaultMessage": "Generate CSV"
   },
+  "userClaims.airdropText": {
+    "defaultMessage": "Airdrop Reward"
+  },
   "userClaims.invitedByUser": {
     "defaultMessage": "Invited by {username}"
   },
