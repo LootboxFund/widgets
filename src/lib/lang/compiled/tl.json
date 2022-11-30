@@ -574,6 +574,7 @@
   "tournamentAnalytics.button.downloadCSV": "Bumuo ng CSV",
   "userClaims.invitedByUser": "Inimbitahan ni {username}",
   "userClaims.participationReward": "Gantimpala sa Pakikilahok",
+  "userClaims.airdropText": "Airdrop Reward",
   "userClaims.referredUser": "Tinukoy si {username}",
   "userTickets.title": "Kuhanin ang mga NFT sa Pagbabahagi ng Kita",
   "viralOnboarding.acceptGift.description": "I-claim itong LIBRENG ESports Lottery Ticket para manalo ng cash {tournamentDate}",

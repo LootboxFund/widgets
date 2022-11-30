@@ -577,6 +577,7 @@
   "tournamentAnalytics.button.downloadCSV": "Tạo CSV",
   "userClaims.invitedByUser": "Được mời bởi {username}",
   "userClaims.participationReward": "Phần thưởng tham gia",
+  "userClaims.airdropText": "Airdrop Reward",
   "userClaims.referredUser": "{username} giới thiệu",
   "userTickets.title": "Đổi NFT chia sẻ lợi nhuận",
   "viralOnboarding.acceptGift.description": "Yêu cầu Vé xổ số ESports MIỄN PHÍ này để giành tiền mặt {tournamentDate}",

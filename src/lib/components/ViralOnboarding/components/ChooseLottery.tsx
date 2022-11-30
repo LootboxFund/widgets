@@ -19,6 +19,10 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { useAuth } from 'lib/hooks/useAuth'
 import { manifest } from 'manifest'
+import {
+  ListAvailableLootboxesForClaimResponse,
+  QueryListAvailableLootboxesForClaimArgs,
+} from '../../../api/graphql/generated/types'
 
 const PAGE_SIZE = 6
 
@@ -34,41 +38,40 @@ const ChooseLottery = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState('')
   const [localLoading, setLocalLoading] = useState(false)
   const { user } = useAuth()
-  const { data, loading, error } = useQuery<{ tournament: LotteryListingV2FE | ResponseError }, QueryTournamentArgs>(
-    GET_LOTTERY_LISTINGS_V2,
-    {
-      variables: {
-        id: referral?.tournamentId || '',
-      },
-    }
-  )
+  const { data, loading, error } = useQuery<
+    { listAvailableLootboxesForClaim: ListAvailableLootboxesForClaimResponse | ResponseError },
+    QueryListAvailableLootboxesForClaimArgs
+  >(GET_LOTTERY_LISTINGS_V2, {
+    variables: {
+      tournamentID: referral?.tournamentId || '',
+    },
+  })
 
-  const tournament = useMemo(() => {
-    return data?.tournament?.__typename === 'TournamentResponseSuccess' ? data.tournament.tournament : null
+  const lootboxOptions = useMemo(() => {
+    return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
+      ? data.listAvailableLootboxesForClaim.lootboxOptions
+      : null
   }, [data])
 
+  console.log(`lootboxOptions`, lootboxOptions)
+
+  // @ts-ignore
   const [tickets, hasNextPage] = useMemo<[LootboxReferralSnapshot[], boolean]>(() => {
-    if (!tournament) {
+    if (!lootboxOptions) {
       return [[], false]
     }
-
-    const tickets = [
-      ...tournament.lootboxSnapshots.filter(
-        (t) => t.status !== LootboxTournamentStatus.Disabled && t.lootbox.status !== LootboxStatus.Disabled
-      ),
-    ]
-
-    tickets.sort((a, b) => {
+    const ticketOptions = lootboxOptions.slice()
+    ticketOptions.sort((a, b) => {
       if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
         // Bring to begining of array
         return -1
       }
 
-      if (a.lootbox.status === LootboxStatus.SoldOut) {
+      if (a.lootbox?.status === LootboxStatus.SoldOut) {
         return 1
       }
 
-      if (b.lootbox.status === LootboxStatus.SoldOut) {
+      if (b.lootbox?.status === LootboxStatus.SoldOut) {
         return -1
       }
 
@@ -76,17 +79,17 @@ const ChooseLottery = (props: Props) => {
     })
 
     if (searchString.length > 0) {
-      const paginated = tickets.filter((t) => {
+      const paginated = ticketOptions.filter((t) => {
         return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
       })
 
       return [paginated, false]
     } else {
-      const paginated = tickets.slice(0, PAGE_SIZE * (page + 1))
+      const paginated = ticketOptions.slice(0, PAGE_SIZE * (page + 1))
 
-      return [paginated, paginated.length < tickets.length]
+      return [paginated, paginated.length < ticketOptions.length]
     }
-  }, [page, tournament?.lootboxSnapshots, referral?.seedLootboxID, searchString])
+  }, [page, lootboxOptions, referral?.seedLootboxID, searchString])
 
   const GoToProfile = () => {
     if (!user) {
@@ -119,8 +122,14 @@ const ChooseLottery = (props: Props) => {
         )}
       </ErrorCard>
     )
-  } else if (data?.tournament?.__typename === 'ResponseError') {
-    return <ErrorCard message={data?.tournament?.error?.message || ''} title={words.anErrorOccured} icon="🤕" />
+  } else if (data?.listAvailableLootboxesForClaim?.__typename === 'ResponseError') {
+    return (
+      <ErrorCard
+        message={data?.listAvailableLootboxesForClaim?.error?.message || ''}
+        title={words.anErrorOccured}
+        icon="🤕"
+      />
+    )
   }
 
   const hardcodedTournamentsNonEsports: TournamentID[] = [
@@ -158,7 +167,7 @@ const ChooseLottery = (props: Props) => {
               />
             )}
           </$SubHeading>
-          {tournament?.lootboxSnapshots && tournament.lootboxSnapshots.length > PAGE_SIZE && (
+          {lootboxOptions && lootboxOptions.length > PAGE_SIZE && (
             <$InputMedium
               value={searchString}
               onChange={(e) => setSearchString(e.target.value)}
@@ -177,6 +186,7 @@ const ChooseLottery = (props: Props) => {
               const isDisabled =
                 ticket?.lootbox?.status &&
                 [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(ticket.lootbox.status) > -1
+              if (ticket.lootbox.status === LootboxStatus.Disabled) return null
               return (
                 <$LotteryContainer
                   onClick={async () => {

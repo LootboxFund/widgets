@@ -88,6 +88,11 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     defaultMessage: 'Participation Reward',
   })
 
+  const airdropText = intl.formatMessage({
+    id: 'userClaims.airdropText',
+    defaultMessage: 'Airdrop Reward',
+  })
+
   const referredUser = (username: string) =>
     intl.formatMessage(
       {
@@ -197,6 +202,8 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
       text = referredUser(claim?.userLink?.username || 'User')
     } else if (claim.type === 'referral') {
       text = invitedByUser(claim?.userLink?.username || 'User')
+    } else if (claim.type === 'airdrop') {
+      text = airdropText
     } else {
       // else if (claim.type === 'one-time') {
       text = participationReward

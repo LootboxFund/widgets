@@ -2,6 +2,7 @@ import LootboxCosmicABI from '@wormgraph/helpers/lib/abi/LootboxCosmic.json'
 import {
   Address,
   ChainIDHex,
+  ClaimID,
   LootboxMintSignatureNonce,
   LootboxTicketDigest,
   LootboxTicketID_Web3,
@@ -13,6 +14,13 @@ import { useProvider, useReadOnlyProvider } from '../useWeb3Api'
 import { startLootboxOnMintListener } from 'lib/api/firebase/functions'
 import { promiseChainDelay } from 'lib/utils/promise'
 import { DepositFragment, Deposit, convertDepositFragmentToDeposit } from './utils'
+import { useMutation } from '@apollo/client'
+import { MARK_CLAIM_AS_REWARDED } from 'lib/components/RedeemCosmicLootbox/api.gql'
+import {
+  MutationUpdateClaimAsRewardedArgs,
+  ResponseError,
+  UpdateClaimAsRewardedResponse,
+} from 'lib/api/graphql/generated/types'
 
 interface UseLootboxResult {
   lootbox: Contract | null
@@ -29,7 +37,7 @@ interface UseLootboxResult {
     nonce: LootboxMintSignatureNonce,
     digest: LootboxTicketDigest
   ) => Promise<ContractTransaction>
-  withdrawCosmic: (ticketID: LootboxTicketID_Web3) => Promise<ContractTransaction>
+  withdrawCosmic: (ticketID: LootboxTicketID_Web3, claimID: ClaimID) => Promise<ContractTransaction>
 }
 
 interface UseLootboxParams {
@@ -48,6 +56,11 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
   const [proratedDeposits, setProratedDeposits] = useState<TicketToDepositMapping>({})
   const [status, setStatus] = useState<UseLootboxStatus>('ready')
   const [lastTx, setLastTx] = useState<ContractTransaction>()
+
+  const [markClaimAsRewarded] = useMutation<
+    { markClaimAsRewarded: ResponseError | UpdateClaimAsRewardedResponse },
+    MutationUpdateClaimAsRewardedArgs
+  >(MARK_CLAIM_AS_REWARDED)
 
   const lootbox = useMemo(() => {
     if (!provider || !lootboxAddress) {
@@ -202,7 +215,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     }
   }
 
-  const withdrawCosmic = async (ticketID: LootboxTicketID_Web3): Promise<ContractTransaction> => {
+  const withdrawCosmic = async (ticketID: LootboxTicketID_Web3, claimID: ClaimID): Promise<ContractTransaction> => {
     if (!lootbox || !injectedProvider) {
       throw new Error('No lootbox or signer provider')
     }
@@ -230,7 +243,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
       setStatus('loading')
 
       await tx.wait()
-
+      await markClaimAsRewarded({ variables: { claimID } })
       return tx
     } catch (err) {
       throw err

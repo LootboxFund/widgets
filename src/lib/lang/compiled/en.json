@@ -576,6 +576,7 @@
   "tournamentAnalytics.button.downloadCSV": "Generate CSV",
   "userClaims.invitedByUser": "Invited by {username}",
   "userClaims.participationReward": "Participation Reward",
+  "userClaims.airdropText": "Airdrop Reward",
   "userClaims.referredUser": "Referred {username}",
   "userTickets.title": "Redeem Profit Sharing NFTs",
   "viralOnboarding.acceptGift.invitationMessage": "{name}{newline}Gifted you a Lootbox Ticket",
