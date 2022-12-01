@@ -408,7 +408,7 @@
   "partyBasket.manage.details.address.descriptionTooltip": "This is the address of the Party Basket. It is a smart contract on the blockchain.",
   "partyBasket.manage.helpHyperlink": "This one",
   "partyBasket.manage.helpTooltip": "This is your Party Basket for \"{lootboxName}\". You can bulk mint NFTs to this contract address, and then bulk whitelist people (with a CSV upload) to pick them up for FREE (AKA: Redeem a bounty)!",
-  "partyBasket.manage.input.communityUrl.descriptionTooltip": "URL of the community to join. Users will be directed to this link after accepting the lootbox fan ticket.",
+  "partyBasket.manage.input.communityUrl.descriptionTooltip": "URL of the community to join. Users will be directed to this link after accepting thelootbox fanticket.",
   "partyBasket.manage.input.joinCommunity": "Community URL",
   "partyBasket.manage.input.name": "Party Basket Name",
   "partyBasket.manage.input.nftBountyValue": "Bounty Value",
