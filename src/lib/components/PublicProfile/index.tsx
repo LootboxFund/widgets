@@ -135,7 +135,7 @@ const PublicProfile = (props: PublicProfileProps) => {
             ) : (
               <FormattedMessage
                 id="profile.public.aboutMe"
-                defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+                defaultMessage="Follow tournament organizers on social media to be updated on when you can redeem your lootbox fan tickets if you win."
               />
             )}
           </span>

@@ -309,7 +309,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       return
     }
     try {
-      await withdrawCosmic(claimData.whitelist.lootboxTicket.ticketID)
+      await withdrawCosmic(claimData.whitelist.lootboxTicket.ticketID, claimData.id)
       // Refetch the deposit (which should be marked as redeemed)
       loadProratedDepositsIntoState(claimData.whitelist.lootboxTicket.ticketID)
     } catch (err) {
@@ -902,7 +902,6 @@ export const $EarningsContainer = styled.div<{}>`
   box-sizing: border-box;
 
   box-shadow: 0px 1px 5px ${COLORS.surpressedBackground};
-}
 `
 
 export const $EarningsText = styled.p<{}>`

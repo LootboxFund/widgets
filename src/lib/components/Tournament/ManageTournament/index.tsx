@@ -418,7 +418,7 @@ const ManageTournament = (props: ManageTournamentProps) => {
         <$p>
           <FormattedMessage
             id="tournament.edit.bulkReferral.description"
-            defaultMessage="Generate a CSV filled with participation rewards. These are one-time invite links to redeem a lottery ticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link."
+            defaultMessage="Generate a CSV filled with participation rewards. These are one-time invite links to redeem a lootbox fan ticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link."
             description="Description for bulk referral"
           />
         </$p>

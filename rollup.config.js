@@ -182,13 +182,13 @@ export default [
   // BattlePage,
 
   // ---- Firebase hosting widgets ---
-  MyProfile,
+  // MyProfile,
   PublicProfile,
-  SignOut,
+  // SignOut,
   ViralOnboarding,
-  NavBar,
+  // NavBar,
   RedeemCosmicLootbox,
-  AuthenticateAnonUsers,
+  // AuthenticateAnonUsers,
   MyTickets,
 
   // ---- OLD SHIT ----

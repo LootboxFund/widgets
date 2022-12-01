@@ -101,29 +101,42 @@ export interface LotteryListingV2FE {
 }
 
 export const GET_LOTTERY_LISTINGS_V2 = gql`
-  query Query($id: ID!) {
-    tournament(id: $id) {
-      ... on TournamentResponseSuccess {
-        tournament {
-          lootboxSnapshots(status: active) {
-            lootboxID
-            address
-            stampImage
-            status
-            lootbox {
-              id
-              name
-              description
-              nftBountyValue
-              status
-            }
-          }
-        }
-      }
+  query ListAvailableLootboxesForClaim($tournamentID: ID!) {
+    listAvailableLootboxesForClaim(tournamentID: $tournamentID) {
       ... on ResponseError {
         error {
           code
           message
+        }
+      }
+      ... on ListAvailableLootboxesForClaimResponseSuccess {
+        lootboxOptions {
+          id
+          address
+          lootboxID
+          lootboxCreatorID
+          creatorID
+          description
+          name
+          stampImage
+          status
+          timestamps {
+            createdAt
+          }
+          lootbox {
+            id
+            name
+            symbol
+            description
+            status
+            nftBountyValue
+            stampImage
+            logo
+            backgroundImage
+            themeColor
+          }
+          impressionPriority
+          type
         }
       }
     }
