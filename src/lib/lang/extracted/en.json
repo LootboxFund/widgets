@@ -122,7 +122,7 @@
   },
   "battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet": {
     "defaultMessage": "Seems like this tournament does not have any Lootbox Tickets yet",
-    "description": "Text prompting indicating that there are no lottery tickets yet for this tournament"
+    "description": "Text prompting indicating that there are no lootbox fan tickets yet for this tournament"
   },
   "battlePage.streamText.switchStreamText": {
     "defaultMessage": "You are watching \"{streamName}\". To switch to another stream, {clickHereHyperlink}",
@@ -1598,7 +1598,7 @@
     "description": "Information message about the Party Basket"
   },
   "partyBasket.manage.input.communityUrl.descriptionTooltip": {
-    "defaultMessage": "URL of the community to join. Users will be directed to this link after accepting the lottery ticket."
+    "defaultMessage": "URL of the community to join. Users will be directed to this link after accepting the lootbox fan ticket."
   },
   "partyBasket.manage.input.joinCommunity": {
     "defaultMessage": "Community URL"
@@ -1716,7 +1716,7 @@
     "description": "This is the message that tells the user to verify their email address."
   },
   "profile.public.aboutMe": {
-    "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem your lottery tickets if you win."
+    "defaultMessage": "Follow tournament organizers on social media to be updated on when you can redeem yourlootbox fantickets if you win."
   },
   "profile.public.editProfile": {
     "defaultMessage": "Edit Profile",
@@ -1730,11 +1730,11 @@
   },
   "profile.public.userLotteryTicketsLabel": {
     "defaultMessage": "My Lootbox Tickets",
-    "description": "Label for list of lottery tickets"
+    "description": "Label for list oflootbox fantickets"
   },
   "profile.public.userLotteryTicketsTip": {
     "defaultMessage": "Your list of Lootbox Tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets.",
-    "description": "Tooltip for my lottery tickets list on Public Profile Page"
+    "description": "Tooltip for mylootbox fantickets list on Public Profile Page"
   },
   "profile.public.viewSocials": {
     "defaultMessage": "View Socials",
@@ -2094,7 +2094,7 @@
     "defaultMessage": "Tournament Analytics"
   },
   "tournament.edit.bulkReferral.description": {
-    "defaultMessage": "Generate a CSV filled with participation rewards. These are one-time invite links to redeem a lottery ticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link.",
+    "defaultMessage": "Generate a CSV filled with participation rewards. These are one-time invite links to redeem alootbox fanticket. Give this link to any fan you want. Once claimed, this link cannot be used again. Only tournament admins can generate this link.",
     "description": "Description for bulk referral"
   },
   "tournament.edit.bulkReferral.title": {
@@ -2274,7 +2274,7 @@
   },
   "viralOnboarding.chooseLottery.heading": {
     "defaultMessage": "Choose Your FREE Ticket",
-    "description": "Heading for lottery gift"
+    "description": "Heading forlootbox fangift"
   },
   "viralOnboarding.completeOnboarding.error.subheading": {
     "defaultMessage": "Or, go to your profile"
@@ -2311,7 +2311,7 @@
   },
   "viralOnboarding.selectLottery.header": {
     "defaultMessage": "Claim Lootbox Ticket",
-    "description": "Header for lottery claim"
+    "description": "Header forlootbox fanclaim"
   },
   "viralOnboarding.selectLottery.next": {
     "defaultMessage": "Claim Ticket",

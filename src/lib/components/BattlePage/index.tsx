@@ -225,7 +225,7 @@ const BattlePage = (props: BattlePageParams) => {
   const seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet = intl.formatMessage({
     id: 'battlePage.seemsLikeThisTournamentDoesNotHaveAnyLotteryTicketsYet',
     defaultMessage: 'Seems like this tournament does not have any Lootbox Tickets yet',
-    description: 'Text prompting indicating that there are no lottery tickets yet for this tournament',
+    description: 'Text prompting indicating that there are nolootbox fantickets yet for this tournament',
   })
   const noStreamsMessage = intl.formatMessage({
     id: 'battlePage.noStreamsMessage',

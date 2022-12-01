@@ -34,7 +34,7 @@ const SelectLottery = (props: Props) => {
             <FormattedMessage
               id="viralOnboarding.selectLottery.header"
               defaultMessage="Claim Lootbox Ticket"
-              description="Header for lottery claim"
+              description="Header for lootbox claim"
             />
           </$Heading>
           <$SubHeading style={{ marginTop: '0px' }}>

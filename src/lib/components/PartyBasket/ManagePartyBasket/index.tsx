@@ -940,7 +940,7 @@ const ManagePartyBasket = (props: ManagePartyBasketProps) => {
                   <ReactTooltip id="pbcommunity" place="right" effect="solid">
                     <FormattedMessage
                       id="partyBasket.manage.input.communityUrl.descriptionTooltip"
-                      defaultMessage={`URL of the community to join. Users will be directed to this link after accepting the lottery ticket.`}
+                      defaultMessage={`URL of the community to join. Users will be directed to this link after accepting thelootbox fanticket.`}
                     />
                   </ReactTooltip>
                 </$StepSubheading>

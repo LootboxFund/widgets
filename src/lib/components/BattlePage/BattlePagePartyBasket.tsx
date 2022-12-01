@@ -312,7 +312,7 @@ const BattlePagePartyBasket = (props: Props) => {
                 >
                   <FormattedMessage
                     id="battlePage.button.inviteFriendRewardPrompt"
-                    defaultMessage="Both get a FREE lottery ticket"
+                    defaultMessage="Both get a FREElootbox fanticket"
                     description="Text prompting user on why they should invite a friend"
                   />
                 </p> */}

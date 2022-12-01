@@ -231,7 +231,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
             <FormattedMessage
               id="profile.public.userLotteryTicketsLabel"
               defaultMessage="My Lootbox Tickets"
-              description="Label for list of lottery tickets"
+              description="Label for list of lootbox fan tickets"
             />
           </span>
           <HelpIcon tipID="userLotteryTicketTip" />
@@ -239,7 +239,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
             <FormattedMessage
               id="profile.public.userLotteryTicketsTip"
               defaultMessage="Your list of Lootbox Tickets are only claims - these are unverified tickets. The tournament host is responsible for verification and they have the final say on winners. Ask your tournament host for their list of verified tickets."
-              description="Tooltip for my lottery tickets list on Public Profile Page"
+              description="Tooltip for my lootbox fan tickets list on Public Profile Page"
             />
           </ReactTooltip>
         </$Horizontal>
