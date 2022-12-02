@@ -9,6 +9,7 @@ import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, ba
 import { useState } from 'react'
 import { ErrorCard } from './GenericCard'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { detectMobileAddressBarSettings } from 'lib/api/helpers'
 
 interface Props {
   onNext: () => void
@@ -83,7 +84,7 @@ const CompleteOnboarding = (props: Props) => {
           paddingBottom: '8rem',
         }}
       >
-        <$Vertical style={{ overflowY: 'scroll', height: '100%' }}>
+        <$Vertical style={{ overflowY: 'scroll', height: '85%' }}>
           <div style={{ paddingTop: '3.5rem' }} />
           <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <$PartyBasketImage src={image} />

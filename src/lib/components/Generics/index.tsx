@@ -147,4 +147,5 @@ export const $ViralOnboardingSafeArea = styled.div<{ inline?: boolean }>`
   overflow-y: ${(props) => (props.inline ? 'visible' : 'scroll')};
   padding: 3.5rem 2.2rem;
   box-sizing: border-box;
+  padding-bottom: 50px;
 `

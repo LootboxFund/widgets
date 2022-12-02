@@ -1,0 +1,413 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400&display=swap');
+body {
+  margin: 0;
+  line-height: normal;
+  width: 100%;
+}
+
+.lootbox-span {
+  font-weight: 900;
+}
+.powered-by-banner-text {
+  flex: 1;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  font-size: 0.7rem;
+}
+.powered-by-banner {
+  align-self: stretch;
+  background-color: #4baff5;
+  flex: 0 0 auto; /* This will make the div have a static height */
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  padding: 5px 0;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.host-logo-icon {
+  position: relative;
+  border-radius: 41.5px;
+  width: 88px;
+  height: 83px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.host-logo-image {
+  border-radius: 25px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.main-heading-b,
+.social-proof-oneliner {
+  position: relative;
+  display: inline-block;
+}
+.social-proof-oneliner {
+  font-size: 14px;
+  color: #818181;
+}
+.main-info-text {
+  flex-direction: column;
+  padding: 0 10px;
+  justify-content: center;
+  gap: 6px;
+}
+.cover-info-div,
+.frame-div,
+.main-info-text {
+  align-self: stretch;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+}
+.cover-info-div {
+  flex-direction: column;
+  padding: 0 10px;
+  justify-content: flex-start;
+  gap: 18px;
+  text-align: center;
+}
+.email-field-input,
+.frame-div {
+  justify-content: center;
+}
+.email-field-input {
+  border: 0;
+  font-family: sans-serif;
+  font-size: 1.3rem;
+  background-color: #f6f6f6;
+  border-radius: 10px;
+  flex-direction: row;
+  padding: 15px 15px;
+  text-align: center;
+  width: 100%;
+}
+.team-search-input {
+  border: 0;
+  font-family: sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  background-color: #f6f6f6;
+  border-radius: 10px;
+  flex-direction: row;
+  padding: 10px 10px;
+  text-align: center;
+  width: 100%;
+}
+.frame-div {
+  flex-direction: column;
+  padding: 10px 10px;
+}
+.terms-and-conditions-input-che {
+  cursor: pointer;
+  position: relative;
+  border-radius: 3px;
+  background-color: #fbfbfb;
+  border: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.i-accept-the {
+  color: #9a9a9a;
+}
+.span {
+  color: #000;
+}
+.terms-and-conditions {
+  text-decoration: underline;
+  opacity: 0.5;
+}
+.terms-and-conditions-fine-prin {
+  text-decoration: none;
+  flex: 1;
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+  color: inherit;
+}
+.terms-and-conditions-checkbox {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.email-input-div,
+.frame-div1 {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 10px 0;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.email-input-div {
+  padding: 0 10px;
+  align-items: center;
+  gap: 0;
+  font-size: 12px;
+  color: #38b1f5;
+}
+.primer-heading-div {
+  align-self: stretch;
+  position: relative;
+  display: inline-block;
+}
+.you-will-receive {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+.primer-subheading-div {
+  align-self: stretch;
+  position: relative;
+  font-size: 12px;
+  font-weight: 300;
+  color: #6b6b6b;
+  display: inline-block;
+  height: 34px;
+  flex-shrink: 0;
+}
+.faq-primer-div {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 9px;
+}
+.lootbox-preview-image {
+  position: relative;
+  width: 82px;
+  height: 118px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.lootbox-prize-value {
+  position: relative;
+  font-size: 0.8rem;
+  font-weight: 300;
+  display: inline-block;
+  width: auto;
+}
+.error-message {
+  color: red;
+  margin: 10px auto;
+  font-size: 0.8rem;
+}
+.lootbox-description-div,
+.lootbox-name-div {
+  position: relative;
+  font-weight: 500;
+  display: inline-block;
+  color: #575757;
+  width: auto;
+  font-size: 1rem;
+}
+.lootbox-description-div {
+  font-weight: 300;
+  color: #6b6b6b;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+}
+.lootbox-option-article,
+.lootbox-option-article1,
+.lootbox-option-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.lootbox-option-info {
+  flex: 1;
+  flex-direction: column;
+}
+.lootbox-option-article,
+.lootbox-option-article {
+  align-self: stretch;
+  background-color: #fafafa;
+  flex-direction: row;
+  padding: 18px 12px;
+  box-sizing: border-box;
+  text-align: left;
+  font-size: 12px;
+  color: #000;
+  font-family: sans-serif;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.lootbox-option-article:hover {
+  box-shadow: 0px 4px 15px #4baff5;
+}
+.lootbox-options-list {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-bottom: 100px;
+}
+.lootbox-selection-list {
+  padding-top: 50px;
+}
+.lootbox-selection-list,
+.main-layout-div {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.lootbox-selection-list,
+.main-layout-div {
+  padding: 0 10px;
+  box-sizing: border-box;
+  gap: 27px;
+  font-size: 16px;
+  color: #606060;
+}
+.main-layout-div {
+  height: 500px;
+  flex-shrink: 0;
+  padding: 10px;
+  gap: 10px;
+  text-align: left;
+  font-size: 32px;
+  color: #000;
+  width: 100%;
+  flex: 1; /* This will make the div take up the remaining space */
+  overflow-y: scroll;
+  flex-shrink: 0;
+  align-items: flex-start;
+  gap: 7px;
+}
+.email-submit-button-text {
+  position: relative;
+  font-size: 24px;
+  display: inline-block;
+  font-family: sans-serif;
+  color: #fff;
+  text-align: center;
+}
+.action-button-div,
+.email-submit-button {
+  align-self: stretch;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.email-submit-button {
+  cursor: pointer;
+  border: 0;
+  padding: 10px 118px;
+  background-color: #4baff5;
+  border-radius: 10px;
+  flex-direction: row;
+  z-index: 0;
+}
+.action-button-div {
+  background-color: #fff;
+  flex: 0 0 auto; /* This will make the div have a static height */
+  flex-shrink: 0;
+  flex-direction: column;
+  padding: 10px;
+  z-index: 10;
+  justify-content: flex-start;
+}
+.see-more-button {
+  padding: 10px;
+  z-index: 10;
+  align-self: stretch;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: 0px solid rgba(0, 0, 0, 0.1);
+  color: #818181;
+  text-align: center;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 400;
+  background-color: #f6f6f6;
+}
+
+.lootbox-selected {
+  background-color: #4baff5;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+}
+
+.lootbox-not-selected {
+  height: 100%;
+}
+.invite-loop-wrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+.viral-invite-loop-intro-slid {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-family: sans-serif;
+  max-width: 500px;
+}
+.viral-invite-loop-intro-slid {
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+  align-items: flex-start;
+  text-align: flex-start;
+  font-size: 10px;
+  color: #fff;
+  font-family: sans-serif;
+}
+@media screen and (max-width: 1200px) {
+  .powered-by-banner {
+    width: 100%;
+    height: 5%;
+    z-index: 10;
+  }
+  .email-field-input,
+  .lootbox-option-article {
+    width: 100%;
+  }
+  .lootbox-selection-list {
+    width: 100%;
+    height: 100%;
+    padding-top: 30px;
+  }
+  .email-submit-button {
+    width: 100%;
+  }
+  .viral-invite-loop-intro-slid {
+    height: 100vh;
+  }
+}
