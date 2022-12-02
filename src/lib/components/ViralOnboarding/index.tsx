@@ -28,9 +28,11 @@ import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink 
 import { auth } from 'lib/api/firebase/app'
 import WaitForAuth from './components/WaitForAuth'
 import { truncateEmail } from 'lib/utils/email'
+import OnePager from './components/OnePager'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
+  | 'one-pager'
   | 'accept-gift'
   | 'browse-lottery'
   | 'sign-up-anon'
@@ -44,7 +46,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
-    isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'accept-gift'
+    isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
@@ -93,6 +95,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
+      case 'one-pager':
+        return <OnePager onNext={() => setRoute('success')} onBack={() => console.log('back')} />
       case 'browse-lottery':
         switch (referral.tournament.isPostCosmic) {
           case false:
