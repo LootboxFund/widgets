@@ -216,7 +216,7 @@ const AdVideoBeta2 = (props: Props) => {
       )}
 
       <$FloatingCover>
-        <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '90%' }}>
+        <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '100%' }}>
           <$Vertical style={{ height: '100%', justifyContent: 'center' }} onClick={handleVideoClick}>
             <$ContainerSlide slideOff delay={['2.5s']}>
               <$CenteredContent>
