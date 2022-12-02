@@ -101,23 +101,19 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             onNext={async (lootboxID: LootboxID, email: string) => {
               if (user && claim?.id) {
                 // user already logged in - complete claim & move on automatically
-                console.log('user already logged in... completing claim...')
+
                 await completeClaimRequest(claim.id, lootboxID)
                 setRoute('success')
               } else {
                 if (!claim?.id) {
-                  console.error('no claim')
                   throw new Error(words.anErrorOccured)
                 }
                 if (!chosenLootbox) {
-                  console.error('no lootbox')
                   throw new Error(words.anErrorOccured)
                 }
-                console.log(`About to set emailForSignup to ${email}`)
 
                 // if user is already logged in, complete claim & move on automatically
                 if (user) {
-                  console.log('user already logged in... completing claim...')
                   await completeClaimRequest(claim.id, chosenLootbox.id)
                   setRoute('success')
                   return
@@ -140,7 +136,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                 }
 
                 if (isPhoneAuthEnabled) {
-                  console.log('phone friend')
                   // Just get them to login via phone
                   setRoute('onboard-phone')
                   return
@@ -156,14 +151,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
                 // See if user exists with given email. If so, send them a validation email to click
                 if (emailSignInMethods.length > 0) {
-                  console.log('existing email friend')
                   // Sends a link to the email which will async confirm the claim on click
                   await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
                   setRoute('wait-for-auth')
                   return
                 }
 
-                console.log('anonymous friend')
                 // Default is anonymous case
                 await signInAnonymously(email)
                 await Promise.all([
@@ -192,7 +185,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                 onNext={async (lootboxID: LootboxID) => {
                   if (user && claim?.id) {
                     // user already logged in - complete claim & move on automatically
-                    console.log('user already logged in... completing claim...')
+
                     await completeClaimRequest(claim.id, lootboxID)
                     setRoute('success')
                   } else {
@@ -221,7 +214,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
               // if user is already logged in, complete claim & move on automatically
               if (user) {
-                console.log('user already logged in... completing claim...')
                 await completeClaimRequest(claim.id, chosenLootbox.id)
                 setRoute('success')
                 return
@@ -244,7 +236,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
               }
 
               if (isPhoneAuthEnabled) {
-                console.log('phone friend')
                 // Just get them to login via phone
                 setRoute('onboard-phone')
                 return
@@ -260,14 +251,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
               // See if user exists with given email. If so, send them a validation email to click
               if (emailSignInMethods.length > 0) {
-                console.log('existing email friend')
                 // Sends a link to the email which will async confirm the claim on click
                 await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
                 setRoute('wait-for-auth')
                 return
               }
 
-              console.log('anonymous friend')
               // Default is anonymous case
               await signInAnonymously(email)
               await Promise.all([

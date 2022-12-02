@@ -88,17 +88,7 @@ const OnePager = (props: Props) => {
   useEffect(() => {
     startFlight()
   }, [])
-  console.log('user', user)
-  console.log(`user?.email = ${user?.email}`)
-  console.log(`emailForSignup = ${emailForSignup}`)
   useEffect(() => {
-    console.log(`
-    
-     emailForSignup = ${emailForSignup}
-      user?.email = ${user?.email}
-      email = ${email}
-
-    `)
     if (!email) {
       if (emailForSignup) {
         setEmailLocal(emailForSignup)
@@ -148,7 +138,6 @@ const OnePager = (props: Props) => {
       .filter((t) => t.status !== LootboxTournamentStatus.Disabled && t.status !== LootboxStatus.Disabled)
 
     if (!chosenLootbox && ticketOptions[0] && ticketOptions[0].lootbox) {
-      console.log(`ticketOptions[0]`, ticketOptions[0])
       setChosenLootbox({
         nftBountyValue: ticketOptions[0].lootbox.nftBountyValue || undefined,
         address: (ticketOptions[0].address as Address) || null,
@@ -238,12 +227,7 @@ const OnePager = (props: Props) => {
 
     const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
     const stateVsUserAuthEmailDiffers = user?.email && email !== user?.email
-    console.log(`
-      
-      stateVsLocalStorageEmailDiffers = ${stateVsLocalStorageEmailDiffers}
-      stateVsUserAuthEmailDiffers = ${stateVsUserAuthEmailDiffers}
 
-    `)
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
       setEmailForSignup('')
