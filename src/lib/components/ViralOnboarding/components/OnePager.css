@@ -4,7 +4,7 @@
 body {
   margin: 0;
   line-height: normal;
-  position: fixed;
+  width: 100%;
 }
 
 .lootbox-span {
@@ -84,12 +84,25 @@ body {
 .email-field-input {
   border: 0;
   font-family: sans-serif;
-  font-size: 20px;
+  font-size: 1.3rem;
   background-color: #f6f6f6;
   border-radius: 10px;
   flex-direction: row;
   padding: 15px 15px;
   text-align: center;
+  width: 100%;
+}
+.team-search-input {
+  border: 0;
+  font-family: sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  background-color: #f6f6f6;
+  border-radius: 10px;
+  flex-direction: row;
+  padding: 10px 10px;
+  text-align: center;
+  width: 100%;
 }
 .frame-div {
   flex-direction: column;
@@ -114,6 +127,7 @@ body {
 }
 .terms-and-conditions {
   text-decoration: underline;
+  opacity: 0.5;
 }
 .terms-and-conditions-fine-prin {
   text-decoration: none;
@@ -184,17 +198,24 @@ body {
 }
 .lootbox-prize-value {
   position: relative;
-  font-size: 8px;
+  font-size: 0.8rem;
   font-weight: 300;
   display: inline-block;
   width: auto;
+}
+.error-message {
+  color: red;
+  margin: 10px auto;
+  font-size: 0.8rem;
 }
 .lootbox-description-div,
 .lootbox-name-div {
   position: relative;
   font-weight: 500;
   display: inline-block;
+  color: #575757;
   width: auto;
+  font-size: 1rem;
 }
 .lootbox-description-div {
   font-weight: 300;
@@ -216,7 +237,7 @@ body {
   flex-direction: column;
 }
 .lootbox-option-article,
-.lootbox-option-article1 {
+.lootbox-option-article {
   align-self: stretch;
   background-color: #fafafa;
   flex-direction: row;
@@ -226,8 +247,24 @@ body {
   font-size: 12px;
   color: #000;
   font-family: sans-serif;
+  cursor: pointer;
+  border-radius: 5px;
 }
-.lootbox-options-list,
+.lootbox-option-article:hover {
+  box-shadow: 0px 4px 15px #4baff5;
+}
+.lootbox-options-list {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-bottom: 100px;
+}
+.lootbox-selection-list {
+  padding-top: 50px;
+}
 .lootbox-selection-list,
 .main-layout-div {
   align-self: stretch;
@@ -294,15 +331,53 @@ body {
   z-index: 10;
   justify-content: flex-start;
 }
+.see-more-button {
+  padding: 10px;
+  z-index: 10;
+  align-self: stretch;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: 0px solid rgba(0, 0, 0, 0.1);
+  color: #818181;
+  text-align: center;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 400;
+  background-color: #f6f6f6;
+}
 
+.lootbox-selected {
+  background-color: #4baff5;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
+  vertical-align: middle;
+  height: 100%;
+}
+
+.lootbox-not-selected {
+  height: 100%;
+}
+.invite-loop-wrapper {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
 .viral-invite-loop-intro-slid {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   font-family: sans-serif;
-  position: fixed;
-  top: 0;
-  bottom: 0;
+  max-width: 500px;
 }
 .viral-invite-loop-intro-slid {
   position: relative;

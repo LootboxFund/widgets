@@ -112,6 +112,6 @@ export const detectMobileAddressBarSettings = (): detectMobileAddressBarSettings
   return {
     userAgent: 'other',
     addressBarlocation: 'hidden',
-    addressBarHeight: 0,
+    addressBarHeight: 100,
   }
 }

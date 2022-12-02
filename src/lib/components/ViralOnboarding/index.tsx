@@ -96,7 +96,87 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'one-pager':
-        return <OnePager onNext={() => setRoute('success')} onBack={() => console.log('back')} />
+        return (
+          <OnePager
+            onNext={async (lootboxID: LootboxID, email: string) => {
+              if (user && claim?.id) {
+                // user already logged in - complete claim & move on automatically
+                console.log('user already logged in... completing claim...')
+                await completeClaimRequest(claim.id, lootboxID)
+                setRoute('success')
+              } else {
+                if (!claim?.id) {
+                  console.error('no claim')
+                  throw new Error(words.anErrorOccured)
+                }
+                if (!chosenLootbox) {
+                  console.error('no lootbox')
+                  throw new Error(words.anErrorOccured)
+                }
+                setEmailForSignup(email)
+
+                // if user is already logged in, complete claim & move on automatically
+                if (user) {
+                  console.log('user already logged in... completing claim...')
+                  await completeClaimRequest(claim.id, chosenLootbox.id)
+                  setRoute('success')
+                  return
+                }
+
+                // No email sign in methods. So we check if email is associated to phone
+                let isPhoneAuthEnabled = false
+                try {
+                  const { data } = await checkPhoneAuth({ variables: { email } })
+                  if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
+                    throw new Error('error checking phone auth')
+                  }
+                  isPhoneAuthEnabled =
+                    data?.checkPhoneEnabled?.__typename === 'CheckPhoneEnabledResponseSuccess'
+                      ? data.checkPhoneEnabled.isEnabled
+                      : false
+                } catch (err) {
+                  console.error(err)
+                  isPhoneAuthEnabled = false
+                }
+
+                if (isPhoneAuthEnabled) {
+                  console.log('phone friend')
+                  // Just get them to login via phone
+                  setRoute('onboard-phone')
+                  return
+                }
+
+                // Fetch sign in methods...
+                let emailSignInMethods: string[] = []
+                try {
+                  emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
+                } catch (err) {
+                  console.log('error fethcing sign in methods', err)
+                }
+
+                // See if user exists with given email. If so, send them a validation email to click
+                if (emailSignInMethods.length > 0) {
+                  console.log('existing email friend')
+                  // Sends a link to the email which will async confirm the claim on click
+                  await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
+                  setRoute('wait-for-auth')
+                  return
+                }
+
+                console.log('anonymous friend')
+                // Default is anonymous case
+                await signInAnonymously(email)
+                await Promise.all([
+                  sendSignInEmailAnon(email, chosenLootbox.stampImage),
+                  completeClaimRequest(claim.id, chosenLootbox.id),
+                ])
+                setRoute('success')
+                return
+              }
+            }}
+            onBack={() => console.log('back')}
+          />
+        )
       case 'browse-lottery':
         switch (referral.tournament.isPostCosmic) {
           case false:

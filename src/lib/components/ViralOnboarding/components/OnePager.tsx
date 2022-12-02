@@ -1,7 +1,7 @@
 import useWords from 'lib/hooks/useWords'
-import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea, $Horizontal } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { useEffect, useState } from 'react'
+import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { FormattedMessage, useIntl } from 'react-intl'
 import {
   background1,
@@ -13,82 +13,138 @@ import {
   $TournamentStampPreviewContainer,
   $TournamentStampPreviewImage,
 } from '../contants'
-import { COLORS, TournamentID } from '@wormgraph/helpers'
+import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import { useMutation } from '@apollo/client'
-import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
-import { MutationCreateClaimArgs, ResponseError } from 'lib/api/graphql/generated/types'
+import { useMutation, useQuery } from '@apollo/client'
+import { CreateClaimResponseFE, CREATE_CLAIM, GET_LOTTERY_LISTINGS_V2, LootboxReferralSnapshot } from '../api.gql'
+import {
+  ListAvailableLootboxesForClaimResponse,
+  LootboxStatus,
+  MutationCreateClaimArgs,
+  QueryListAvailableLootboxesForClaimArgs,
+  ResponseError,
+} from 'lib/api/graphql/generated/types'
 import { ErrorCard } from './GenericCard'
 import { LoadingText } from 'lib/components/Generics/Spinner'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import './OnePager.css'
-import { detectMobileAddressBarSettings } from 'lib/api/helpers'
+import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpers'
+import { $InputMedium } from 'lib/components/Tournament/common'
+import { LootboxTournamentStatus } from '../../../api/graphql/generated/types'
+import styled from 'styled-components'
+
+const PAGE_SIZE = 3
+
+const $SoldOut = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${COLORS.white};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-weight: ${TYPOGRAPHY.fontWeight.bold};
+  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  text-transform: uppercase;
+  z-index: 11;
+`
 
 interface Props {
-  onNext: () => void
+  onNext: (lootboxID: LootboxID, email: string) => Promise<void>
   onBack: () => void
 }
-const AcceptGift = (props: Props) => {
-  const { onNext } = props
+const OnePager = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
-  const { referral, setClaim } = useViralOnboarding()
-  const [errorMessage, setErrorMessage] = useState<string>()
+  const [page, setPage] = useState(0)
+  const emailInputRef = useRef(null)
+  const [searchString, setSearchString] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const { setEmail, chosenLootbox, setChosenLootbox, referral, setClaim, sessionId } = useViralOnboarding()
+  const [email, setEmailLocal] = useState('')
+  const [loading, setLoading] = useState(false)
+  const {
+    data,
+    loading: loadingLootboxOptions,
+    error,
+  } = useQuery<
+    { listAvailableLootboxesForClaim: ListAvailableLootboxesForClaimResponse | ResponseError },
+    QueryListAvailableLootboxesForClaimArgs
+  >(GET_LOTTERY_LISTINGS_V2, {
+    variables: {
+      tournamentID: referral?.tournamentId || '',
+    },
+  })
   useEffect(() => {
     startFlight()
   }, [])
-  const [createClaim, { loading }] = useMutation<
+  const [createClaim, { loading: loadingClaim }] = useMutation<
     { createClaim: CreateClaimResponseFE | ResponseError },
     MutationCreateClaimArgs
   >(CREATE_CLAIM)
-  const acceptGiftText = intl.formatMessage({
-    id: 'viralOnboarding.acceptGift.next',
-    defaultMessage: 'Accept Gift',
-    description: 'Button to accept a gift',
-  })
 
-  const LootboxSnapshots = () => {
-    const seedLootboxID = referral.seedLootboxID
+  const lootboxOptions = useMemo(() => {
+    return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
+      ? data.listAvailableLootboxesForClaim.lootboxOptions
+      : null
+  }, [data])
 
-    let showCasedLootboxImages: string[]
-    if (referral?.tournament?.lootboxSnapshots && referral?.tournament?.lootboxSnapshots?.length > 0) {
-      const showcased = seedLootboxID
-        ? referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID === seedLootboxID)
-        : undefined
-      const secondary = seedLootboxID
-        ? referral.tournament.lootboxSnapshots.find((snap) => snap.lootboxID !== seedLootboxID)
-        : undefined
-      showCasedLootboxImages = !!showcased?.stampImage
-        ? [
-            convertFilenameToThumbnail(showcased.stampImage, 'sm'),
-            secondary?.stampImage ? convertFilenameToThumbnail(secondary.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP,
-          ]
-        : [
-            ...referral.tournament.lootboxSnapshots.map((snap) =>
-              snap.stampImage ? convertFilenameToThumbnail(snap.stampImage, 'sm') : TEMPLATE_LOOTBOX_STAMP
-            ),
-          ]
-    } else {
-      showCasedLootboxImages = [TEMPLATE_LOOTBOX_STAMP, TEMPLATE_LOOTBOX_STAMP]
+  // @ts-ignore
+  const [tickets, hasNextPage] = useMemo<[LootboxReferralSnapshot[], boolean]>(() => {
+    if (!lootboxOptions) {
+      return [[], false]
+    }
+    const ticketOptions = lootboxOptions.slice()
+    ticketOptions
+      .sort((a, b) => {
+        if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
+          // Bring to begining of array
+          return -1
+        }
+
+        if (a.lootbox?.status === LootboxStatus.SoldOut) {
+          return 1
+        }
+
+        const isDisabled =
+          b?.lootbox?.status && [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(b.lootbox.status) > -1
+        if (isDisabled) {
+          return -1
+        }
+
+        return 0
+      })
+      // @ts-ignore
+      .filter((t) => t.status !== LootboxTournamentStatus.Disabled && t.status !== LootboxStatus.Disabled)
+
+    if (!chosenLootbox && ticketOptions[0] && ticketOptions[0].lootbox) {
+      console.log(`ticketOptions[0]`, ticketOptions[0])
+      setChosenLootbox({
+        nftBountyValue: ticketOptions[0].lootbox.nftBountyValue || undefined,
+        address: (ticketOptions[0].address as Address) || null,
+        id: ticketOptions[0].lootbox.id as LootboxID,
+        stampImage: ticketOptions[0].stampImage,
+      })
     }
 
-    return (
-      <$TournamentStampPreviewContainer style={{ marginLeft: '30%', padding: '2rem 0px', boxSizing: 'content-box' }}>
-        {showCasedLootboxImages.slice(0, 2).map((img, idx) => (
-          <$TournamentStampPreviewImage key={`tournament-${idx}`} src={img} cardNumber={idx as 0 | 1} />
-        ))}
-      </$TournamentStampPreviewContainer>
-    )
-  }
-  const defaultWinText = intl.formatMessage({
-    id: 'viralOnboarding.acceptGift.winAFreeNFT',
-    defaultMessage: 'Win a Free NFT',
-    description: 'Prize message to win a free Lootbox NFT',
-  })
+    if (searchString.length > 0) {
+      const paginated = ticketOptions.filter((t) => {
+        return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
+      })
 
-  const formattedDate: string = referral?.tournament?.tournamentDate
-    ? new Date(referral.tournament.tournamentDate).toDateString()
-    : words.tournament
+      return [paginated, false]
+    } else {
+      const paginated = ticketOptions.slice(0, PAGE_SIZE * (page + 1))
+
+      return [paginated, paginated.length < ticketOptions.length]
+    }
+  }, [page, lootboxOptions, referral?.seedLootboxID, searchString, chosenLootbox])
 
   const startFlight = async () => {
     try {
@@ -121,107 +177,237 @@ const AcceptGift = (props: Props) => {
     }
   }
 
-  if (errorMessage) {
-    return (
-      <ErrorCard title={words.anErrorOccured} message={errorMessage} icon="🤕">
-        <$SubHeading
-          onClick={() => setErrorMessage(undefined)}
-          style={{ fontStyle: 'italic', textTransform: 'lowercase' }}
-        >
-          {words.retry + '?'}
-        </$SubHeading>
-      </ErrorCard>
-    )
+  const submitForm = async () => {
+    setLoading(true)
+    setAgreeTerms(true)
+
+    if (!chosenLootbox) {
+      setErrorMessage('Please choose a Lootbox')
+      setLoading(false)
+      return
+    }
+    if (!email) {
+      setErrorMessage('Please enter your email')
+      if (emailInputRef.current) {
+        // @ts-ignore
+        emailInputRef.current.focus()
+      }
+      setLoading(false)
+      return
+    }
+
+    // just ad it to memory
+    // it will be added to user object in next page
+    const isValid = checkIfValidEmail(email)
+    if (!isValid) {
+      setErrorMessage('Please enter a valid email')
+      if (emailInputRef.current) {
+        // @ts-ignore
+        emailInputRef.current.focus()
+      }
+      setLoading(false)
+      return
+    }
+    // @ts-ignore
+    emailInputRef.current.blur()
+    setErrorMessage('')
+
+    setEmail(email)
+    try {
+      // Sign user in anonymously and send magic link
+      await props.onNext(chosenLootbox.id, email)
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    } finally {
+      setLoading(false)
+    }
   }
+
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
   return (
-    <div
-      className="viral-invite-loop-intro-slid"
-      style={{
-        maxHeight: screen.availHeight - addressBarHeight,
-      }}
-    >
-      <div className="powered-by-banner" id="fan-rewards-banner">
-        <div className="powered-by-banner-text">
-          <span>Fan Rewards Powered by</span>
-          <b>{` 🎁 `}</b>
-          <span className="lootbox-span">LOOTBOX</span>
-        </div>
-      </div>
-      <div className="main-layout-div">
-        <div className="cover-info-div">
-          <div className="host-logo-image">
-            <img
-              className="host-logo-icon"
-              alt="event organizer logo"
-              src="https://s2.coinmarketcap.com/static/img/coins/200x200/10688.png"
-            />
-          </div>
-          <div className="main-info-text">
-            <b className="main-heading-b">Win $5 Cash</b>
-            <i className="social-proof-oneliner">28 people already accepted</i>
+    <div className="invite-loop-wrapper">
+      <div
+        className="viral-invite-loop-intro-slid"
+        style={{
+          // @ts-ignore
+          maxHeight: screen.availHeight - addressBarHeight,
+          height: screen.availHeight - addressBarHeight,
+        }}
+      >
+        <div className="powered-by-banner" id="fan-rewards-banner">
+          <div className="powered-by-banner-text">
+            <span>Fan Rewards Powered by</span>
+            <b>{` 🎁 `}</b>
+            <span className="lootbox-span">LOOTBOX</span>
           </div>
         </div>
-        <div className="email-input-div">
-          <div className="frame-div">
-            <input className="email-field-input" type="email" placeholder="enter your email" required autoFocus />
-          </div>
-          <div className="frame-div1">
-            <div className="terms-and-conditions-checkbox">
-              <input className="terms-and-conditions-input-che" type="checkbox" required />
-              <a className="terms-and-conditions-fine-prin" href="https://lootbox.fund/terms" target="_blank">
-                <span className="i-accept-the">I accept the</span>
-                <span className="span">{` `}</span>
-                <span className="terms-and-conditions">terms and conditions</span>
-              </a>
+        <div className="main-layout-div">
+          <div className="cover-info-div">
+            <div className="host-logo-image">
+              <img
+                className="host-logo-icon"
+                alt="event organizer logo"
+                src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Flogo.jpeg?alt=media"
+              />
+            </div>
+            <div className="main-info-text">
+              <b className="main-heading-b">Win $5 Cash</b>
+              <i className="social-proof-oneliner">{`${
+                referral?.tournament?.runningCompletedClaims || 0
+              } people already accepted`}</i>
             </div>
           </div>
-        </div>
-        <div className="lootbox-selection-list">
-          <div className="faq-primer-div">
-            <div className="primer-heading-div">How will I know if I won?</div>
-            <div className="primer-subheading-div">
-              <p className="you-will-receive">
-                You will receive an email after the event if your chosen team wins the competition. Scroll down for
-                more.
-              </p>
+          <div className="email-input-div">
+            <div className="frame-div">
+              {errorMessage ? <span className="error-message">{errorMessage}</span> : null}
+              <input
+                className="email-field-input"
+                id="email-input-mandatory"
+                type="email"
+                ref={emailInputRef}
+                placeholder="enter your email"
+                required
+                autoFocus
+                onChange={(e) => setEmailLocal(e.target.value)}
+                onKeyUp={(event) => {
+                  if (event.key == 'Enter') {
+                    submitForm()
+                  }
+                }}
+              />
+            </div>
+            <div className="frame-div1">
+              <div className="terms-and-conditions-checkbox">
+                <input
+                  className="terms-and-conditions-input-che"
+                  type="checkbox"
+                  required
+                  checked={agreeTerms}
+                  onChange={() => setAgreeTerms(!agreeTerms)}
+                />
+                <span className="terms-and-conditions-fine-prin">
+                  <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+                    I accept the
+                  </span>
+                  <span className="span">{` `}</span>
+                  <a className="terms-and-conditions" href="https://lootbox.fund/terms" target="_blank">
+                    terms and conditions
+                  </a>
+                </span>
+              </div>
             </div>
           </div>
-          <div className="lootbox-options-list">
-            <article className="lootbox-option-article">
-              <img
-                className="lootbox-preview-image"
-                alt=""
-                src="https://storage.googleapis.com/lootbox-stamp-staging/tnGJdz1rL8Cr0Oo9hcar/thumbs/lootbox_160x224.png?alt=media"
-              />
-              <div className="lootbox-option-info">
-                <div className="lootbox-prize-value">Win $5 USD</div>
-                <div className="lootbox-name-div">Freya Guild</div>
-                <div className="lootbox-description-div">Lorem ipsum solar descarte simpar fie valor decorum.</div>
+          <div className="lootbox-selection-list">
+            <div className="faq-primer-div">
+              <div className="primer-heading-div">How will I know if I won?</div>
+              <div className="primer-subheading-div">
+                <p className="you-will-receive">
+                  You will receive an email after the event if your chosen team wins the competition. Scroll down for
+                  more.
+                </p>
               </div>
-            </article>
-            <article className="lootbox-option-article1">
-              <img
-                className="lootbox-preview-image"
-                alt=""
-                src="https://storage.googleapis.com/lootbox-stamp-staging/tnGJdz1rL8Cr0Oo9hcar/thumbs/lootbox_160x224.png?alt=media"
-              />
-              <div className="lootbox-option-info">
-                <div className="lootbox-prize-value">Win $5 USD</div>
-                <div className="lootbox-name-div">Freya Guild</div>
-                <div className="lootbox-description-div">Lorem ipsum solar descarte simpar fie valor decorum.</div>
+            </div>
+            {lootboxOptions ? (
+              <div className="lootbox-options-list">
+                {lootboxOptions && lootboxOptions.length > PAGE_SIZE && (
+                  <input
+                    className="team-search-input"
+                    value={searchString}
+                    onChange={(e) => setSearchString(e.target.value)}
+                    placeholder="Search by team name"
+                  />
+                )}
+                {tickets.map((ticket, idx) => {
+                  const description = !ticket?.lootbox?.description
+                    ? ''
+                    : ticket.lootbox.description.length > 80
+                    ? ticket.lootbox.description.slice(0, 80) + '...'
+                    : ticket?.lootbox?.description
+                  const isChosen = chosenLootbox && chosenLootbox?.id === ticket.lootboxID
+
+                  const isDisabled =
+                    ticket?.lootbox?.status &&
+                    [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(ticket.lootbox.status) > -1
+                  if (ticket?.lootbox?.status === LootboxStatus.Disabled) return null
+                  return (
+                    <article
+                      className="lootbox-option-article"
+                      style={{
+                        boxShadow: isChosen ? '0px 4px 15px #4baff5' : '',
+                        cursor: !isDisabled ? 'pointer' : 'not-allowed',
+                        position: 'relative',
+                      }}
+                      onClick={() => {
+                        if (!isDisabled && !loading) {
+                          setChosenLootbox({
+                            nftBountyValue: ticket.lootbox.nftBountyValue,
+                            address: ticket.address,
+                            id: ticket.lootbox.id,
+                            stampImage: ticket.stampImage,
+                          })
+                        }
+                      }}
+                    >
+                      <img
+                        className="lootbox-preview-image"
+                        alt=""
+                        src={
+                          ticket?.stampImage
+                            ? convertFilenameToThumbnail(ticket.stampImage, 'sm')
+                            : TEMPLATE_LOOTBOX_STAMP
+                        }
+                      />
+                      <div className="lootbox-option-info">
+                        <$Horizontal justifyContent="space-between" style={{ height: '15px', width: '100%' }}>
+                          <div className="lootbox-prize-value">{`${words.win} ${ticket?.lootbox?.nftBountyValue}`}</div>
+                          {isChosen ? (
+                            <div className="lootbox-selected">Selected</div>
+                          ) : (
+                            <div className="lootbox-not-selected"></div>
+                          )}
+                        </$Horizontal>
+
+                        <div className="lootbox-name-div">{ticket?.lootbox?.name}</div>
+                        <div className="lootbox-description-div">{description}</div>
+                      </div>
+                      {ticket.lootbox.status === LootboxStatus.SoldOut && (
+                        <$SoldOut>{`📦 ${words.outOfStock} 📦`}</$SoldOut>
+                      )}
+                    </article>
+                  )
+                })}
+
+                {hasNextPage && (
+                  <button onClick={() => setPage(page + 1)} className="see-more-button">
+                    {words.seeMore}
+                  </button>
+                )}
               </div>
-            </article>
+            ) : (
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Floading-gif.gif?alt=media"
+                height="30px"
+                width="auto"
+              />
+            )}
           </div>
         </div>
-      </div>
-      <div className="action-button-div">
-        <button onClick={() => onNext()} className="email-submit-button">
-          <b className="email-submit-button-text">FINISH</b>
-        </button>
+        <div className="action-button-div">
+          <button disabled={loading} onClick={submitForm} className="email-submit-button">
+            {loading || loadingLootboxOptions || loadingClaim ? (
+              <img
+                src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Floading-gif.gif?alt=media"
+                height="30px"
+                width="auto"
+              />
+            ) : (
+              <b className="email-submit-button-text">FINISH</b>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-export default AcceptGift
+export default OnePager
