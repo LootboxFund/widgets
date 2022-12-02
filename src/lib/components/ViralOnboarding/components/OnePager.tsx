@@ -32,6 +32,8 @@ import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpe
 import { $InputMedium } from 'lib/components/Tournament/common'
 import { LootboxTournamentStatus } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
+import { useAuth } from 'lib/hooks/useAuth'
+import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 
 const PAGE_SIZE = 3
 
@@ -61,10 +63,12 @@ interface Props {
 const OnePager = (props: Props) => {
   const intl = useIntl()
   const words = useWords()
+  const { user, logout, signInAnonymously } = useAuth()
   const [page, setPage] = useState(0)
   const emailInputRef = useRef(null)
   const [searchString, setSearchString] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [agreeTerms, setAgreeTerms] = useState(false)
   const { setEmail, chosenLootbox, setChosenLootbox, referral, setClaim, sessionId } = useViralOnboarding()
   const [email, setEmailLocal] = useState('')
@@ -84,6 +88,26 @@ const OnePager = (props: Props) => {
   useEffect(() => {
     startFlight()
   }, [])
+  console.log('user', user)
+  console.log(`user?.email = ${user?.email}`)
+  console.log(`emailForSignup = ${emailForSignup}`)
+  useEffect(() => {
+    console.log(`
+    
+     emailForSignup = ${emailForSignup}
+      user?.email = ${user?.email}
+      email = ${email}
+
+    `)
+    if (!email) {
+      if (emailForSignup) {
+        setEmailLocal(emailForSignup)
+      }
+      if (user?.email) {
+        setEmailLocal(user.email)
+      }
+    }
+  }, [user?.email, emailForSignup])
   const [createClaim, { loading: loadingClaim }] = useMutation<
     { createClaim: CreateClaimResponseFE | ResponseError },
     MutationCreateClaimArgs
@@ -212,6 +236,21 @@ const OnePager = (props: Props) => {
     emailInputRef.current.blur()
     setErrorMessage('')
 
+    const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
+    const stateVsUserAuthEmailDiffers = user?.email && email !== user?.email
+    console.log(`
+      
+      stateVsLocalStorageEmailDiffers = ${stateVsLocalStorageEmailDiffers}
+      stateVsUserAuthEmailDiffers = ${stateVsUserAuthEmailDiffers}
+
+    `)
+    if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
+      await logout()
+      setEmailForSignup('')
+      await signInAnonymously(email)
+    }
+
+    setEmailForSignup(email)
     setEmail(email)
     try {
       // Sign user in anonymously and send magic link
@@ -267,8 +306,10 @@ const OnePager = (props: Props) => {
                 ref={emailInputRef}
                 placeholder="enter your email"
                 required
-                autoFocus
-                onChange={(e) => setEmailLocal(e.target.value)}
+                value={email}
+                onChange={(e) => {
+                  setEmailLocal(e.target.value)
+                }}
                 onKeyUp={(event) => {
                   if (event.key == 'Enter') {
                     submitForm()

@@ -113,7 +113,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                   console.error('no lootbox')
                   throw new Error(words.anErrorOccured)
                 }
-                setEmailForSignup(email)
+                console.log(`About to set emailForSignup to ${email}`)
 
                 // if user is already logged in, complete claim & move on automatically
                 if (user) {

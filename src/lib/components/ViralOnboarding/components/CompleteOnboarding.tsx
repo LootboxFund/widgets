@@ -71,7 +71,7 @@ const CompleteOnboarding = (props: Props) => {
       </ErrorCard>
     )
   }
-  const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
+
   return (
     <$ViralOnboardingCard background={background2} opacity={'0.65'}>
       <$ViralOnboardingSafeArea

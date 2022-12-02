@@ -116,7 +116,7 @@ export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; pr
   position: absolute;
   width: 100%;
   bottom: ${(props) => (props.preventDefault ? '0px' : '-100%')} ;
-  height: 170px;
+  height: 200px;
 
   ${(props) =>
     !props.preventDefault &&
