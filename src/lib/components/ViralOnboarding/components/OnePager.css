@@ -95,6 +95,7 @@ body {
 .input-wrapper {
   display: flex;
   position: relative;
+  width: 100%;
 }
 input#email-input-mandatory {
   flex-grow: 1;
@@ -114,7 +115,7 @@ button#submit-arrow-button {
 }
 .submit-arrow-icon {
   font-size: 1.1rem;
-  color: #afafaf;
+  color: #4baff5;
 }
 .submit-loading-icon {
   -webkit-animation: spin 1.5s linear infinite;
