@@ -283,23 +283,32 @@ const OnePager = (props: Props) => {
           <div className="email-input-div">
             <div className="frame-div">
               {errorMessage ? <span className="error-message">{errorMessage}</span> : null}
-              <input
-                className="email-field-input"
-                id="email-input-mandatory"
-                type="email"
-                ref={emailInputRef}
-                placeholder="enter your email"
-                required
-                value={email}
-                onChange={(e) => {
-                  setEmailLocal(e.target.value)
-                }}
-                onKeyUp={(event) => {
-                  if (event.key == 'Enter') {
-                    submitForm()
-                  }
-                }}
-              />
+              <div className="input-wrapper">
+                <input
+                  className="email-field-input"
+                  id="email-input-mandatory"
+                  type="email"
+                  ref={emailInputRef}
+                  placeholder="enter your email"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmailLocal(e.target.value)
+                  }}
+                  onKeyUp={(event) => {
+                    if (event.key == 'Enter') {
+                      submitForm()
+                    }
+                  }}
+                />
+                <button id="submit-arrow-button" onClick={submitForm} disabled={loading}>
+                  {loading || loadingLootboxOptions || loadingClaim ? (
+                    <div className="submit-loading-icon"></div>
+                  ) : (
+                    <span className="submit-arrow-icon">{`▶`}</span>
+                  )}
+                </button>
+              </div>
             </div>
             <div className="frame-div1">
               <div className="terms-and-conditions-checkbox">

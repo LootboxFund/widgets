@@ -92,6 +92,58 @@ body {
   text-align: center;
   width: 100%;
 }
+.input-wrapper {
+  display: flex;
+  position: relative;
+}
+input#email-input-mandatory {
+  flex-grow: 1;
+  padding: 0.5em;
+  border: none;
+  border-radius: 0.25em 0 0 0.25em;
+}
+
+button#submit-arrow-button {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  padding: 0.5em;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+.submit-arrow-icon {
+  font-size: 1.1rem;
+  color: #afafaf;
+}
+.submit-loading-icon {
+  -webkit-animation: spin 1.5s linear infinite;
+  animation: spin 1s linear infinite;
+  font-size: 0.3rem;
+  color: #afafaf;
+  width: 0.5rem;
+  height: 0.5rem;
+  border: 0.3rem solid #f3f3f3;
+  border-radius: 50%;
+  border-right: 0.3rem solid #afafaf;
+  border-bottom: 0.3rem solid #afafaf;
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 .team-search-input {
   border: 0;
   font-family: sans-serif;
