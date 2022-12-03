@@ -95,6 +95,7 @@ body {
 .input-wrapper {
   display: flex;
   position: relative;
+  width: 100%;
 }
 input#email-input-mandatory {
   flex-grow: 1;
@@ -105,21 +106,21 @@ input#email-input-mandatory {
 
 button#submit-arrow-button {
   position: absolute;
-  top: 0.5em;
-  right: 0.5em;
-  padding: 0.5em;
+  top: 0;
+  right: 0;
   border: none;
   background-color: transparent;
   cursor: pointer;
+  height: 100%;
 }
 .submit-arrow-icon {
-  font-size: 1.1rem;
-  color: #afafaf;
+  font-size: 1.5rem;
+  color: #4baff5;
 }
 .submit-loading-icon {
   -webkit-animation: spin 1.5s linear infinite;
   animation: spin 1s linear infinite;
-  font-size: 0.3rem;
+  font-size: 0.5rem;
   color: #afafaf;
   width: 0.5rem;
   height: 0.5rem;
