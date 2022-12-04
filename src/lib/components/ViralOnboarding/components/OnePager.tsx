@@ -34,6 +34,7 @@ import { LootboxTournamentStatus } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
+import { auth } from 'lib/api/firebase/app'
 
 const PAGE_SIZE = 3
 
@@ -241,24 +242,26 @@ const OnePager = (props: Props) => {
     `)
     console.log(`user`, user)
 
+    setEmailForSignup(email)
+    setEmail(email)
     // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
-      setEmailForSignup('')
-      await signInAnonymously(email)
-      console.log(`user`, user)
+      auth.onAuthStateChanged(async (user) => {
+        if (user === null) {
+          location.reload()
+        }
+      })
+    } else {
+      try {
+        // Sign user in anonymously and send magic link
+        await props.onNext(chosenLootbox.id, email)
+      } catch (err) {
+        setErrorMessage(err?.message || words.anErrorOccured)
+      } finally {
+        setLoading(false)
+      }
     }
-
-    setEmailForSignup(email)
-    setEmail(email)
-    // try {
-    //   // Sign user in anonymously and send magic link
-    //   await props.onNext(chosenLootbox.id, email)
-    // } catch (err) {
-    //   setErrorMessage(err?.message || words.anErrorOccured)
-    // } finally {
-    //   setLoading(false)
-    // }
   }
 
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
@@ -324,6 +327,7 @@ const OnePager = (props: Props) => {
                   )}
                 </button>
               </div>
+              <span>{user?.id}</span>
             </div>
             <div className="frame-div1">
               <div className="terms-and-conditions-checkbox">
