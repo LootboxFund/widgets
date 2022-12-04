@@ -228,22 +228,37 @@ const OnePager = (props: Props) => {
     const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
     const stateVsUserAuthEmailDiffers = user?.email && email !== user?.email
 
+    console.log(`
+      
+      stateVsLocalStorageEmailDiffers: ${stateVsLocalStorageEmailDiffers}
+      stateVsUserAuthEmailDiffers: ${stateVsUserAuthEmailDiffers}
+
+      emailForSignup: ${emailForSignup}
+      email: ${email}
+      user?.email: ${user?.email}
+      user?.id: ${user?.id}
+
+    `)
+    console.log(`user`, user)
+
+    // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
       setEmailForSignup('')
       await signInAnonymously(email)
+      console.log(`user`, user)
     }
 
     setEmailForSignup(email)
     setEmail(email)
-    try {
-      // Sign user in anonymously and send magic link
-      await props.onNext(chosenLootbox.id, email)
-    } catch (err) {
-      setErrorMessage(err?.message || words.anErrorOccured)
-    } finally {
-      setLoading(false)
-    }
+    // try {
+    //   // Sign user in anonymously and send magic link
+    //   await props.onNext(chosenLootbox.id, email)
+    // } catch (err) {
+    //   setErrorMessage(err?.message || words.anErrorOccured)
+    // } finally {
+    //   setLoading(false)
+    // }
   }
 
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
@@ -285,7 +300,7 @@ const OnePager = (props: Props) => {
               {errorMessage ? <span className="error-message">{errorMessage}</span> : null}
               <div className="input-wrapper">
                 <input
-                  className="email-field-input"
+                  className={`email-field-input ${email.length === 0 && ' glowing-action'}`}
                   id="email-input-mandatory"
                   type="email"
                   ref={emailInputRef}
@@ -367,7 +382,7 @@ const OnePager = (props: Props) => {
                     <article
                       className="lootbox-option-article"
                       style={{
-                        boxShadow: isChosen ? '0px 4px 15px #4baff5' : '',
+                        boxShadow: isChosen && email.length !== 0 ? '0px 4px 15px #4baff5' : '',
                         cursor: !isDisabled ? 'pointer' : 'not-allowed',
                         position: 'relative',
                       }}
@@ -395,7 +410,14 @@ const OnePager = (props: Props) => {
                         <$Horizontal justifyContent="space-between" style={{ height: '15px', width: '100%' }}>
                           <div className="lootbox-prize-value">{`${words.win} ${ticket?.lootbox?.nftBountyValue}`}</div>
                           {isChosen ? (
-                            <div className="lootbox-selected">Selected</div>
+                            <div
+                              className="lootbox-selected"
+                              style={{
+                                backgroundColor: email.length === 0 ? '#e9e9e9' : '#4baff5',
+                              }}
+                            >
+                              Selected
+                            </div>
                           ) : (
                             <div className="lootbox-not-selected"></div>
                           )}

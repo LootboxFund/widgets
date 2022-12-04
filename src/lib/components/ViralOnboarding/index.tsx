@@ -99,12 +99,16 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <OnePager
             onNext={async (lootboxID: LootboxID, email: string) => {
+              console.log(`claim`, claim)
+              console.log(`user`, user)
               if (user && claim?.id) {
+                console.log(`User already logged in!`)
                 // user already logged in - complete claim & move on automatically
-
                 await completeClaimRequest(claim.id, lootboxID)
-                setRoute('success')
+                console.log(`Completed claim`)
+                // setRoute('success')
               } else {
+                console.log(`Not claimed and lgoged`)
                 if (!claim?.id) {
                   throw new Error(words.anErrorOccured)
                 }
@@ -114,15 +118,20 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
                 // if user is already logged in, complete claim & move on automatically
                 if (user) {
+                  console.log(`User already ogged in with claim`)
                   await completeClaimRequest(claim.id, chosenLootbox.id)
-                  setRoute('success')
+                  // setRoute('success')
                   return
                 }
 
+                console.log(`User not yet logged in `)
+                console.log(`Wea re talking about ${email}`)
                 // No email sign in methods. So we check if email is associated to phone
                 let isPhoneAuthEnabled = false
                 try {
+                  console.log(`checking if phone auth already`)
                   const { data } = await checkPhoneAuth({ variables: { email } })
+                  console.log(`checkPhoneAuth`, data)
                   if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
                     throw new Error('error checking phone auth')
                   }
@@ -134,36 +143,45 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
                   console.error(err)
                   isPhoneAuthEnabled = false
                 }
+                console.log(`phohne auth enabled? = ${isPhoneAuthEnabled}`)
 
                 if (isPhoneAuthEnabled) {
                   // Just get them to login via phone
-                  setRoute('onboard-phone')
+                  // setRoute('onboard-phone')
                   return
                 }
 
+                console.log(`fetchcing sign in methods...`)
                 // Fetch sign in methods...
                 let emailSignInMethods: string[] = []
                 try {
                   emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
+                  console.log(`emailSignInMethods`, emailSignInMethods)
                 } catch (err) {
                   console.log('error fethcing sign in methods', err)
                 }
 
                 // See if user exists with given email. If so, send them a validation email to click
                 if (emailSignInMethods.length > 0) {
+                  console.log(`sending sign in email`)
                   // Sends a link to the email which will async confirm the claim on click
                   await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
-                  setRoute('wait-for-auth')
+                  // setRoute('wait-for-auth')
+                  console.log(`check your meail`)
                   return
                 }
 
+                console.log(`was anon case`)
                 // Default is anonymous case
                 await signInAnonymously(email)
+                console.log(`signed in anon user`, user)
+                console.log(`email`, email)
                 await Promise.all([
                   sendSignInEmailAnon(email, chosenLootbox.stampImage),
                   completeClaimRequest(claim.id, chosenLootbox.id),
                 ])
-                setRoute('success')
+                console.log(`signed in anon wiht claim completed`)
+                // setRoute('success')
                 return
               }
             }}
