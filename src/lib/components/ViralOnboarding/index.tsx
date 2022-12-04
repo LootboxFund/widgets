@@ -55,6 +55,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     MutationCompleteClaimArgs
   >(COMPLETE_CLAIM)
 
+  console.log(`viral invite index user`, user)
+
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
 
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
@@ -99,8 +101,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return (
           <OnePager
             onNext={async (lootboxID: LootboxID, email: string) => {
-              console.log(`claim`, claim)
-              console.log(`user`, user)
+              console.log(`onNext user`, user)
               if (user && claim?.id) {
                 console.log(`User already logged in!`)
                 // user already logged in - complete claim & move on automatically

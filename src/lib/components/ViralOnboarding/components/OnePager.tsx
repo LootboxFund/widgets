@@ -248,23 +248,24 @@ const OnePager = (props: Props) => {
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
       auth.onAuthStateChanged(async (user) => {
+        console.log(`user from onepager component`, user)
         if (user === null) {
           // handleAnonUser(email)
-          location.reload()
+          // location.reload()
         }
       })
     }
 
     setEmailForSignup(email)
     setEmail(email)
-    // try {
-    //   // Sign user in anonymously and send magic link
-    //   await props.onNext(chosenLootbox.id, email)
-    // } catch (err) {
-    //   setErrorMessage(err?.message || words.anErrorOccured)
-    // } finally {
-    //   setLoading(false)
-    // }
+    try {
+      // Sign user in anonymously and send magic link
+      await props.onNext(chosenLootbox.id, email)
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()

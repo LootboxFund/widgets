@@ -159,6 +159,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      console.log(`auth.onAuthStateChanged`, user)
       if (user) {
         const userData = convertUserToUserFE(user)
         setUser(userData)
