@@ -35,7 +35,6 @@ import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { auth } from 'lib/api/firebase/app'
-import { useAnonUserOddity } from '../anonAuthOddity'
 
 const PAGE_SIZE = 3
 
@@ -70,7 +69,6 @@ const OnePager = (props: Props) => {
   const emailInputRef = useRef(null)
   const [searchString, setSearchString] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const { handleAnonUser } = useAnonUserOddity()
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [agreeTerms, setAgreeTerms] = useState(false)
   const { setEmail, chosenLootbox, setChosenLootbox, referral, setClaim, sessionId } = useViralOnboarding()

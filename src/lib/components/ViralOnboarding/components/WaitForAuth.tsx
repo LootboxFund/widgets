@@ -40,7 +40,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
       email: INITIAL_URL_PARAMS.email,
     }
   }, [])
-  console.log(`onboarding user <ViralOnboarding/WaitForAuth>`, email)
+
   const status = useMemo(() => {
     if (loading) {
       return 'loading'
