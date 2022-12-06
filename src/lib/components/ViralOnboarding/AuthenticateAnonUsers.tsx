@@ -71,6 +71,7 @@ const AuthenticateAnonUsers = () => {
   const { idToken, stampImg, userID, truncatedEmail } = useMemo(() => {
     return extractURLState_AuthenticateAnonUsers()
   }, [])
+  console.log(`truncatedEmail = `, truncatedEmail)
   const [truncatedEmailByPhone, setTruncatedEmailByPhone] = useState('')
   const runonce = useRef(false)
   const [syncUserMutation] = useMutation<SyncProviderUserResponseFE>(SYNC_PROVIDER_USER)

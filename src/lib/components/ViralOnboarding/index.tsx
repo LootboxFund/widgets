@@ -43,9 +43,7 @@ type ViralOnboardingRoute =
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user, signInAnonymously, sendSignInEmailForViralOnboarding, sendSignInEmailAnon } = useAuth()
-  const userRef = useRef()
-  // @ts-ignore
-  userRef.current = user
+
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
@@ -59,6 +57,19 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   >(COMPLETE_CLAIM)
 
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
+
+  const userRef = useRef()
+  const chosenLootboxRef = useRef()
+  const chosenEmailForSignupRef = useRef()
+  // @ts-ignore
+  userRef.current = user
+  // @ts-ignore
+  chosenLootboxRef.current = chosenLootbox
+  // @ts-ignore
+  chosenEmailForSignupRef.current = emailForSignup
+
+  console.log(`emailForSignup refresh`, emailForSignup)
+  console.log(`chosenLootbox refresh`, chosenLootbox?.id)
 
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
     console.log('completing claim')
@@ -98,13 +109,18 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const onePagerNext = async (lootboxID: LootboxID, email: string) => {
     // @ts-ignore
     const user = userRef.current
+    // @ts-ignore
+    const chosenLootbox = chosenLootboxRef.current
     console.log(`user is... -->`, user)
+    console.log(`email from local memory is -->`, email)
+    // @ts-ignore
+    console.log(`lootbox chosen is -->`, chosenLootbox?.id)
     if (user && claim?.id) {
       console.log(`User already logged in!`)
       // user already logged in - complete claim & move on automatically
       await completeClaimRequest(claim.id, lootboxID)
       console.log(`Completed claim`)
-      // setRoute('success')
+      setRoute('success')
     } else {
       console.log(`Not claimed and lgoged`)
       if (!claim?.id) {
@@ -117,8 +133,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       // if user is already logged in, complete claim & move on automatically
       if (user) {
         console.log(`User already ogged in with claim`)
+        // @ts-ignore
         await completeClaimRequest(claim.id, chosenLootbox.id)
-        // setRoute('success')
+        setRoute('success')
         return
       }
 
@@ -163,8 +180,14 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       if (emailSignInMethods.length > 0) {
         console.log(`sending sign in email`)
         // Sends a link to the email which will async confirm the claim on click
-        await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
-        // setRoute('wait-for-auth')
+        await sendSignInEmailForViralOnboarding(
+          email,
+          claim.id,
+          referral.slug,
+          // @ts-ignore
+          chosenLootbox.id
+        )
+        setRoute('wait-for-auth')
         return
       }
 
@@ -174,114 +197,39 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       console.log(`signed in anon user`, user)
       console.log(`email`, email)
       await Promise.all([
-        sendSignInEmailAnon(email, chosenLootbox.stampImage),
-        completeClaimRequest(claim.id, chosenLootbox.id),
+        sendSignInEmailAnon(
+          email,
+          // @ts-ignore
+          chosenLootbox.stampImage
+        ),
+        completeClaimRequest(
+          claim.id,
+          // @ts-ignore
+          chosenLootbox.id
+        ),
       ])
       console.log(`signed in anon wiht claim completed`)
-      // setRoute('success')
+      setRoute('success')
       return
     }
   }
 
-  console.log(`Always refersh user`, user)
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
-    console.log(`Innside render outside swtich user`, user)
-    console.log(`How about the ref? `, userRef.current)
-    if (route === 'one-pager') {
-      return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
-    }
+    // @ts-ignore
+    const emailForSignup = chosenEmailForSignupRef.current
+    const emailForSignupLocal = localStorage.getItem('emailForSignup')
+
+    console.log(`
+      
+      emailForSignup: ${emailForSignup}
+      emailForSignupLocal: ${emailForSignupLocal}
+      user?.email: ${user?.email}
+      user?.id: ${user?.id}
+
+    `)
     switch (route) {
-      // case 'one-pager':
-      //   return (
-      //     <OnePager
-      //       onNext={async (lootboxID: LootboxID, email: string) => {
-      //         console.log(`user is...`, user)
-      //         if (user && claim?.id) {
-      //           console.log(`User already logged in!`)
-      //           // user already logged in - complete claim & move on automatically
-      //           await completeClaimRequest(claim.id, lootboxID)
-      //           console.log(`Completed claim`)
-      //           // setRoute('success')
-      //         } else {
-      //           console.log(`Not claimed and lgoged`)
-      //           if (!claim?.id) {
-      //             throw new Error(words.anErrorOccured)
-      //           }
-      //           if (!chosenLootbox) {
-      //             throw new Error(words.anErrorOccured)
-      //           }
-
-      //           // if user is already logged in, complete claim & move on automatically
-      //           if (user) {
-      //             console.log(`User already ogged in with claim`)
-      //             await completeClaimRequest(claim.id, chosenLootbox.id)
-      //             // setRoute('success')
-      //             return
-      //           }
-
-      //           console.log(`User not yet logged in `)
-      //           console.log(`Wea re talking about ${email}`)
-      //           // No email sign in methods. So we check if email is associated to phone
-      //           let isPhoneAuthEnabled = false
-      //           try {
-      //             console.log(`checking if phone auth already`)
-      //             const { data } = await checkPhoneAuth({ variables: { email } })
-      //             console.log(`checkPhoneAuth`, data)
-      //             if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
-      //               throw new Error('error checking phone auth')
-      //             }
-      //             isPhoneAuthEnabled =
-      //               data?.checkPhoneEnabled?.__typename === 'CheckPhoneEnabledResponseSuccess'
-      //                 ? data.checkPhoneEnabled.isEnabled
-      //                 : false
-      //           } catch (err) {
-      //             console.error(err)
-      //             isPhoneAuthEnabled = false
-      //           }
-      //           console.log(`phohne auth enabled? = ${isPhoneAuthEnabled}`)
-
-      //           if (isPhoneAuthEnabled) {
-      //             // Just get them to login via phone
-      //             setRoute('onboard-phone')
-      //             return
-      //           }
-
-      //           console.log(`fetchcing sign in methods...`)
-      //           // Fetch sign in methods...
-      //           let emailSignInMethods: string[] = []
-      //           try {
-      //             emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
-      //             console.log(`emailSignInMethods`, emailSignInMethods)
-      //           } catch (err) {
-      //             console.log('error fethcing sign in methods', err)
-      //           }
-
-      //           // See if user exists with given email. If so, send them a validation email to click
-      //           if (emailSignInMethods.length > 0) {
-      //             console.log(`sending sign in email`)
-      //             // Sends a link to the email which will async confirm the claim on click
-      //             await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
-      //             // setRoute('wait-for-auth')
-      //             return
-      //           }
-
-      //           console.log(`was anon case`)
-      //           // Default is anonymous case
-      //           await signInAnonymously(email)
-      //           console.log(`signed in anon user`, user)
-      //           console.log(`email`, email)
-      //           await Promise.all([
-      //             sendSignInEmailAnon(email, chosenLootbox.stampImage),
-      //             completeClaimRequest(claim.id, chosenLootbox.id),
-      //           ])
-      //           console.log(`signed in anon wiht claim completed`)
-      //           // setRoute('success')
-      //           return
-      //         }
-      //       }}
-      //       onBack={() => console.log('back')}
-      //     />
-      //   )
+      case 'one-pager':
+        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
       case 'browse-lottery':
         switch (referral.tournament.isPostCosmic) {
           case false:
@@ -423,6 +371,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           />
         )
       case 'success': {
+        const emailForSignup = localStorage.getItem('emailForSignup')
+        console.log(`Locslly truncate: `, emailForSignup)
         const nextUrl = user?.isAnonymous
           ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
               emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''

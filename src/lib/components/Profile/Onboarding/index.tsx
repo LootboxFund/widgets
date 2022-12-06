@@ -13,6 +13,7 @@ import { manifest } from 'manifest'
 
 const Onboarding = () => {
   const { user } = useAuth()
+  console.log(`onboarding user <Profile/Onboarding>`, user)
   const { screen } = useWindowSize()
   // const isOnboardYoutube = localStorage.getItem('user.onboard.youtube')
   const showEmailVerification = !!user?.email && !user?.isEmailVerified
