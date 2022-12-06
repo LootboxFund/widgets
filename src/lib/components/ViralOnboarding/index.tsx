@@ -68,11 +68,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   // @ts-ignore
   chosenEmailForSignupRef.current = emailForSignup
 
-  console.log(`emailForSignup refresh`, emailForSignup)
-  console.log(`chosenLootbox refresh`, chosenLootbox?.id)
-
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
-    console.log('completing claim')
     if (!lootboxID) {
       console.error('no lootbox')
       throw new Error(words.anErrorOccured)
@@ -111,18 +107,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     const user = userRef.current
     // @ts-ignore
     const chosenLootbox = chosenLootboxRef.current
-    console.log(`user is... -->`, user)
-    console.log(`email from local memory is -->`, email)
-    // @ts-ignore
-    console.log(`lootbox chosen is -->`, chosenLootbox?.id)
     if (user && claim?.id) {
-      console.log(`User already logged in!`)
       // user already logged in - complete claim & move on automatically
       await completeClaimRequest(claim.id, lootboxID)
-      console.log(`Completed claim`)
+
       setRoute('success')
     } else {
-      console.log(`Not claimed and lgoged`)
       if (!claim?.id) {
         throw new Error(words.anErrorOccured)
       }
@@ -132,21 +122,17 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
       // if user is already logged in, complete claim & move on automatically
       if (user) {
-        console.log(`User already ogged in with claim`)
         // @ts-ignore
         await completeClaimRequest(claim.id, chosenLootbox.id)
         setRoute('success')
         return
       }
 
-      console.log(`User not yet logged in `)
-      console.log(`Wea re talking about ${email}`)
       // No email sign in methods. So we check if email is associated to phone
       let isPhoneAuthEnabled = false
       try {
-        console.log(`checking if phone auth already`)
         const { data } = await checkPhoneAuth({ variables: { email } })
-        console.log(`checkPhoneAuth`, data)
+
         if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
           throw new Error('error checking phone auth')
         }
@@ -158,7 +144,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         console.error(err)
         isPhoneAuthEnabled = false
       }
-      console.log(`phohne auth enabled? = ${isPhoneAuthEnabled}`)
 
       if (isPhoneAuthEnabled) {
         // Just get them to login via phone
@@ -166,7 +151,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return
       }
 
-      console.log(`fetchcing sign in methods...`)
       // Fetch sign in methods...
       let emailSignInMethods: string[] = []
       try {
@@ -191,11 +175,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         return
       }
 
-      console.log(`was anon case`)
       // Default is anonymous case
       await signInAnonymously(email)
-      console.log(`signed in anon user`, user)
-      console.log(`email`, email)
       await Promise.all([
         sendSignInEmailAnon(
           email,
@@ -208,25 +189,12 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           chosenLootbox.id
         ),
       ])
-      console.log(`signed in anon wiht claim completed`)
       setRoute('success')
       return
     }
   }
 
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
-    // @ts-ignore
-    const emailForSignup = chosenEmailForSignupRef.current
-    const emailForSignupLocal = localStorage.getItem('emailForSignup')
-
-    console.log(`
-      
-      emailForSignup: ${emailForSignup}
-      emailForSignupLocal: ${emailForSignupLocal}
-      user?.email: ${user?.email}
-      user?.id: ${user?.id}
-
-    `)
     switch (route) {
       case 'one-pager':
         return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
@@ -372,7 +340,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         )
       case 'success': {
         const emailForSignup = localStorage.getItem('emailForSignup')
-        console.log(`Locslly truncate: `, emailForSignup)
+
         const nextUrl = user?.isAnonymous
           ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
               emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''

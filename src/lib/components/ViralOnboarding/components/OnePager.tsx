@@ -14,7 +14,7 @@ import {
   $TournamentStampPreviewImage,
 } from '../contants'
 import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
-import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP, TOS_URL_DATASHARING } from 'lib/hooks/constants'
 import { useMutation, useQuery } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM, GET_LOTTERY_LISTINGS_V2, LootboxReferralSnapshot } from '../api.gql'
 import {
@@ -231,24 +231,10 @@ const OnePager = (props: Props) => {
     const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
     const stateVsUserAuthEmailDiffers = user?.email && email !== user?.email
 
-    console.log(`
-      
-      stateVsLocalStorageEmailDiffers: ${stateVsLocalStorageEmailDiffers}
-      stateVsUserAuthEmailDiffers: ${stateVsUserAuthEmailDiffers}
-
-      emailForSignup: ${emailForSignup}
-      email: ${email}
-      user?.email: ${user?.email}
-      user?.id: ${user?.id}
-
-    `)
-    console.log(`user`, user)
-
     // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
       auth.onAuthStateChanged(async (user) => {
-        console.log(`User is loggeed out? `, user)
         if (user === null) {
           setEmailForSignup(email)
           setEmail(email)
@@ -355,7 +341,7 @@ const OnePager = (props: Props) => {
                     I accept the
                   </span>
                   <span className="span">{` `}</span>
-                  <a className="terms-and-conditions" href="https://lootbox.fund/terms" target="_blank">
+                  <a className="terms-and-conditions" href={TOS_URL_DATASHARING} target="_blank">
                     terms and conditions
                   </a>
                 </span>
