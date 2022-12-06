@@ -4,6 +4,7 @@ import AuthenticateAnonUsers from 'lib/components/ViralOnboarding/AuthenticateAn
 import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
 import LocalizationWrapper from 'lib/components/LocalizationWrapper'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export const inject = () => {
   const targetInjectionPoint = document.getElementById('authenticate-anon-users')
@@ -11,7 +12,9 @@ export const inject = () => {
     <React.StrictMode>
       <ApolloProvider client={client}>
         <LocalizationWrapper>
-          <AuthenticateAnonUsers />
+          <AuthProvider>
+            <AuthenticateAnonUsers />
+          </AuthProvider>
         </LocalizationWrapper>
       </ApolloProvider>
     </React.StrictMode>,
