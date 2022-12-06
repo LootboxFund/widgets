@@ -186,10 +186,10 @@ export default [
   // SignOut,
   // MyTickets,
   // MyProfile,
-  // PublicProfile,
-  // RedeemCosmicLootbox,
+  PublicProfile,
+  RedeemCosmicLootbox,
   ViralOnboarding,
-  // NavBar,
+  NavBar,
 
   // ---- OLD SHIT ----
   // CreateLootbox,

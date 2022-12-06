@@ -311,9 +311,7 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
     }
 
     try {
-      console.log('sending sign in email...')
       await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
-      console.log('success sending email')
     } catch (err) {
       console.log('error sending email', err)
       LogRocket.captureException(err)
@@ -337,9 +335,7 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
     }
 
     try {
-      console.log('sending sign in email...')
       await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
-      console.log('success sending email')
     } catch (err) {
       console.log('error sending email', err)
       LogRocket.captureException(err)
@@ -407,9 +403,7 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
     }
 
     try {
-      console.log('sending sign in email...')
       await sendSignInLinkToEmail(auth, email, emailActionCodeSettings)
-      console.log('success sending email')
     } catch (err) {
       console.log('error sending email', err)
       LogRocket.captureException(err)

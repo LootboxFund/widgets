@@ -323,7 +323,6 @@ const OnePager = (props: Props) => {
                   )}
                 </button>
               </div>
-              <span>{user?.id}</span>
             </div>
             <div className="frame-div1">
               <div className="terms-and-conditions-checkbox">

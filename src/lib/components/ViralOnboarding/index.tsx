@@ -155,7 +155,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       let emailSignInMethods: string[] = []
       try {
         emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
-        console.log(`emailSignInMethods`, emailSignInMethods)
       } catch (err) {
         console.log('error fethcing sign in methods', err)
       }
