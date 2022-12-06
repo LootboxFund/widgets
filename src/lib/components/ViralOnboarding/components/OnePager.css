@@ -105,6 +105,7 @@ input#email-input-mandatory {
 }
 .glowing-action {
   animation: glowing 3s infinite;
+  -webkit-animation: glowing 3s infinite;
 }
 button#submit-arrow-button {
   position: absolute;
