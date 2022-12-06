@@ -103,7 +103,10 @@ input#email-input-mandatory {
   border: none;
   border-radius: 0.25em 0 0 0.25em;
 }
-
+.glowing-action {
+  animation: glowing 3s infinite;
+  -webkit-animation: glowing 3s infinite;
+}
 button#submit-arrow-button {
   position: absolute;
   top: 0;
@@ -112,10 +115,22 @@ button#submit-arrow-button {
   background-color: transparent;
   cursor: pointer;
   height: 100%;
+  padding-left: 10px;
 }
 .submit-arrow-icon {
   font-size: 1.5rem;
   color: #4baff5;
+}
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 5px #4baff5;
+  }
+  50% {
+    box-shadow: 0 0 20px #4baff5;
+  }
+  100% {
+    box-shadow: 0 0 5px #4baff5;
+  }
 }
 .submit-loading-icon {
   -webkit-animation: spin 1.5s linear infinite;

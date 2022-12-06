@@ -7,6 +7,7 @@ import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
 import ViralOnboarding from './index'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export default {
   title: 'ViralOnboarding',
@@ -28,11 +29,13 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$ViralOnboardingCard>
-          <ViralOnboarding />
-          <br />
-          <br />
-        </$ViralOnboardingCard>
+        <AuthProvider>
+          <$ViralOnboardingCard>
+            <ViralOnboarding />
+            <br />
+            <br />
+          </$ViralOnboardingCard>
+        </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>
   )

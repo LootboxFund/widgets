@@ -14,7 +14,7 @@ import {
   $TournamentStampPreviewImage,
 } from '../contants'
 import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
-import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP, TOS_URL_DATASHARING } from 'lib/hooks/constants'
 import { useMutation, useQuery } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM, GET_LOTTERY_LISTINGS_V2, LootboxReferralSnapshot } from '../api.gql'
 import {
@@ -34,6 +34,7 @@ import { LootboxTournamentStatus } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
+import { auth } from 'lib/api/firebase/app'
 
 const PAGE_SIZE = 3
 
@@ -228,21 +229,34 @@ const OnePager = (props: Props) => {
     const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
     const stateVsUserAuthEmailDiffers = user?.email && email !== user?.email
 
+    // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
-      setEmailForSignup('')
-      await signInAnonymously(email)
-    }
-
-    setEmailForSignup(email)
-    setEmail(email)
-    try {
-      // Sign user in anonymously and send magic link
-      await props.onNext(chosenLootbox.id, email)
-    } catch (err) {
-      setErrorMessage(err?.message || words.anErrorOccured)
-    } finally {
-      setLoading(false)
+      auth.onAuthStateChanged(async (user) => {
+        if (user === null) {
+          setEmailForSignup(email)
+          setEmail(email)
+          try {
+            // Sign user in anonymously and send magic link
+            await props.onNext(chosenLootbox.id, email)
+          } catch (err) {
+            setErrorMessage(err?.message || words.anErrorOccured)
+          } finally {
+            setLoading(false)
+          }
+        }
+      })
+    } else {
+      setEmailForSignup(email)
+      setEmail(email)
+      try {
+        // Sign user in anonymously and send magic link
+        await props.onNext(chosenLootbox.id, email)
+      } catch (err) {
+        setErrorMessage(err?.message || words.anErrorOccured)
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -285,7 +299,7 @@ const OnePager = (props: Props) => {
               {errorMessage ? <span className="error-message">{errorMessage}</span> : null}
               <div className="input-wrapper">
                 <input
-                  className="email-field-input"
+                  className={`email-field-input ${email.length === 0 && ' glowing-action'}`}
                   id="email-input-mandatory"
                   type="email"
                   ref={emailInputRef}
@@ -309,6 +323,7 @@ const OnePager = (props: Props) => {
                   )}
                 </button>
               </div>
+              <span>{user?.id}</span>
             </div>
             <div className="frame-div1">
               <div className="terms-and-conditions-checkbox">
@@ -324,7 +339,7 @@ const OnePager = (props: Props) => {
                     I accept the
                   </span>
                   <span className="span">{` `}</span>
-                  <a className="terms-and-conditions" href="https://lootbox.fund/terms" target="_blank">
+                  <a className="terms-and-conditions" href={TOS_URL_DATASHARING} target="_blank">
                     terms and conditions
                   </a>
                 </span>
@@ -367,7 +382,7 @@ const OnePager = (props: Props) => {
                     <article
                       className="lootbox-option-article"
                       style={{
-                        boxShadow: isChosen ? '0px 4px 15px #4baff5' : '',
+                        boxShadow: isChosen && email.length !== 0 ? '0px 4px 15px #4baff5' : '',
                         cursor: !isDisabled ? 'pointer' : 'not-allowed',
                         position: 'relative',
                       }}
@@ -395,7 +410,14 @@ const OnePager = (props: Props) => {
                         <$Horizontal justifyContent="space-between" style={{ height: '15px', width: '100%' }}>
                           <div className="lootbox-prize-value">{`${words.win} ${ticket?.lootbox?.nftBountyValue}`}</div>
                           {isChosen ? (
-                            <div className="lootbox-selected">Selected</div>
+                            <div
+                              className="lootbox-selected"
+                              style={{
+                                backgroundColor: email.length === 0 ? '#e9e9e9' : '#4baff5',
+                              }}
+                            >
+                              Selected
+                            </div>
                           ) : (
                             <div className="lootbox-not-selected"></div>
                           )}

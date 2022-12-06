@@ -40,6 +40,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
       email: INITIAL_URL_PARAMS.email,
     }
   }, [])
+
   const status = useMemo(() => {
     if (loading) {
       return 'loading'

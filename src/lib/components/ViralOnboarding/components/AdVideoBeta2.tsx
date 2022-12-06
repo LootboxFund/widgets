@@ -214,6 +214,11 @@ const AdVideoBeta2 = (props: Props) => {
           }}
         />
       )}
+      {ad?.creative.creativeType === 'image' && (
+        <div>
+          <img src={ad?.creative?.creativeLinks[0]} style={{ width: '100%', height: '100%' }} />
+        </div>
+      )}
 
       <$FloatingCover>
         <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '100%' }}>
@@ -246,7 +251,7 @@ const AdVideoBeta2 = (props: Props) => {
             <LoadingText
               loading={false}
               color={ad?.creative.themeColor || COLORS.white}
-              text={ad?.creative.callToAction || 'Download Game'}
+              text={ad?.creative.callToAction || 'Get Offer'}
             />
           </$NextButton>
           <$span

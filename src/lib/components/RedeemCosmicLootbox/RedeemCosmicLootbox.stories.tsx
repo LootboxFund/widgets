@@ -6,6 +6,7 @@ import RedeemCosmicLootbox from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export default {
   title: 'RedeemCosmicLootbox',
@@ -27,11 +28,13 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="920px" margin="0 auto">
-          <RedeemCosmicLootbox />
-          <br />
-          <br />
-        </$CardViewport>
+        <AuthProvider>
+          <$CardViewport width="100%" maxWidth="920px" margin="0 auto">
+            <RedeemCosmicLootbox />
+            <br />
+            <br />
+          </$CardViewport>
+        </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>
   )

@@ -1,5 +1,5 @@
 import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { ReactElement, useEffect, useMemo, useState } from 'react'
+import { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ClaimID, LootboxID, ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
@@ -43,6 +43,7 @@ type ViralOnboardingRoute =
   | 'create-referral'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user, signInAnonymously, sendSignInEmailForViralOnboarding, sendSignInEmailAnon } = useAuth()
+
   const words = useWords()
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
@@ -57,8 +58,17 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
 
+  const userRef = useRef()
+  const chosenLootboxRef = useRef()
+  const chosenEmailForSignupRef = useRef()
+  // @ts-ignore
+  userRef.current = user
+  // @ts-ignore
+  chosenLootboxRef.current = chosenLootbox
+  // @ts-ignore
+  chosenEmailForSignupRef.current = emailForSignup
+
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
-    console.log('completing claim')
     if (!lootboxID) {
       console.error('no lootbox')
       throw new Error(words.anErrorOccured)
@@ -92,84 +102,102 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
     return
   }
+  const onePagerNext = async (lootboxID: LootboxID, email: string) => {
+    // @ts-ignore
+    const user = userRef.current
+    // @ts-ignore
+    const chosenLootbox = chosenLootboxRef.current
+    if (user && claim?.id) {
+      // user already logged in - complete claim & move on automatically
+      await completeClaimRequest(claim.id, lootboxID)
+
+      setRoute('success')
+    } else {
+      if (!claim?.id) {
+        throw new Error(words.anErrorOccured)
+      }
+      if (!chosenLootbox) {
+        throw new Error(words.anErrorOccured)
+      }
+
+      // if user is already logged in, complete claim & move on automatically
+      if (user) {
+        // @ts-ignore
+        await completeClaimRequest(claim.id, chosenLootbox.id)
+        setRoute('success')
+        return
+      }
+
+      // No email sign in methods. So we check if email is associated to phone
+      let isPhoneAuthEnabled = false
+      try {
+        const { data } = await checkPhoneAuth({ variables: { email } })
+
+        if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
+          throw new Error('error checking phone auth')
+        }
+        isPhoneAuthEnabled =
+          data?.checkPhoneEnabled?.__typename === 'CheckPhoneEnabledResponseSuccess'
+            ? data.checkPhoneEnabled.isEnabled
+            : false
+      } catch (err) {
+        console.error(err)
+        isPhoneAuthEnabled = false
+      }
+
+      if (isPhoneAuthEnabled) {
+        // Just get them to login via phone
+        setRoute('onboard-phone')
+        return
+      }
+
+      // Fetch sign in methods...
+      let emailSignInMethods: string[] = []
+      try {
+        emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
+        console.log(`emailSignInMethods`, emailSignInMethods)
+      } catch (err) {
+        console.log('error fethcing sign in methods', err)
+      }
+
+      // See if user exists with given email. If so, send them a validation email to click
+      if (emailSignInMethods.length > 0) {
+        console.log(`sending sign in email`)
+        // Sends a link to the email which will async confirm the claim on click
+        await sendSignInEmailForViralOnboarding(
+          email,
+          claim.id,
+          referral.slug,
+          // @ts-ignore
+          chosenLootbox.id
+        )
+        setRoute('wait-for-auth')
+        return
+      }
+
+      // Default is anonymous case
+      await signInAnonymously(email)
+      await Promise.all([
+        sendSignInEmailAnon(
+          email,
+          // @ts-ignore
+          chosenLootbox.stampImage
+        ),
+        completeClaimRequest(
+          claim.id,
+          // @ts-ignore
+          chosenLootbox.id
+        ),
+      ])
+      setRoute('success')
+      return
+    }
+  }
 
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
       case 'one-pager':
-        return (
-          <OnePager
-            onNext={async (lootboxID: LootboxID, email: string) => {
-              if (user && claim?.id) {
-                // user already logged in - complete claim & move on automatically
-
-                await completeClaimRequest(claim.id, lootboxID)
-                setRoute('success')
-              } else {
-                if (!claim?.id) {
-                  throw new Error(words.anErrorOccured)
-                }
-                if (!chosenLootbox) {
-                  throw new Error(words.anErrorOccured)
-                }
-
-                // if user is already logged in, complete claim & move on automatically
-                if (user) {
-                  await completeClaimRequest(claim.id, chosenLootbox.id)
-                  setRoute('success')
-                  return
-                }
-
-                // No email sign in methods. So we check if email is associated to phone
-                let isPhoneAuthEnabled = false
-                try {
-                  const { data } = await checkPhoneAuth({ variables: { email } })
-                  if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
-                    throw new Error('error checking phone auth')
-                  }
-                  isPhoneAuthEnabled =
-                    data?.checkPhoneEnabled?.__typename === 'CheckPhoneEnabledResponseSuccess'
-                      ? data.checkPhoneEnabled.isEnabled
-                      : false
-                } catch (err) {
-                  console.error(err)
-                  isPhoneAuthEnabled = false
-                }
-
-                if (isPhoneAuthEnabled) {
-                  // Just get them to login via phone
-                  setRoute('onboard-phone')
-                  return
-                }
-
-                // Fetch sign in methods...
-                let emailSignInMethods: string[] = []
-                try {
-                  emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
-                } catch (err) {
-                  console.log('error fethcing sign in methods', err)
-                }
-
-                // See if user exists with given email. If so, send them a validation email to click
-                if (emailSignInMethods.length > 0) {
-                  // Sends a link to the email which will async confirm the claim on click
-                  await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
-                  setRoute('wait-for-auth')
-                  return
-                }
-
-                // Default is anonymous case
-                await signInAnonymously(email)
-                await Promise.all([
-                  sendSignInEmailAnon(email, chosenLootbox.stampImage),
-                  completeClaimRequest(claim.id, chosenLootbox.id),
-                ])
-                setRoute('success')
-                return
-              }
-            }}
-            onBack={() => console.log('back')}
-          />
-        )
+        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
       case 'browse-lottery':
         switch (referral.tournament.isPostCosmic) {
           case false:
@@ -311,6 +339,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           />
         )
       case 'success': {
+        const emailForSignup = localStorage.getItem('emailForSignup')
+
         const nextUrl = user?.isAnonymous
           ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
               emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''

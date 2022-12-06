@@ -6,6 +6,7 @@ import MyTickets from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export default {
   title: 'PublicProfileRedirect',
@@ -16,11 +17,13 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
-          <MyTickets />
-          <br />
-          <br />
-        </$CardViewport>
+        <AuthProvider>
+          <$CardViewport width="100%" maxWidth="720px" margin="0 auto">
+            <MyTickets />
+            <br />
+            <br />
+          </$CardViewport>
+        </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>
   )
