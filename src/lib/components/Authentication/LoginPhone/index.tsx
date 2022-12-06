@@ -15,6 +15,7 @@ import styled from 'styled-components'
 import { browserLocalPersistence, browserSessionPersistence, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import CountrySelect from 'lib/components/CountrySelect'
+import { useRecaptcha } from 'lib/hooks/useRecaptcha'
 
 interface SignUpEmailProps {
   onChangeMode: (mode: ModeOptions) => void
@@ -22,6 +23,7 @@ interface SignUpEmailProps {
   title?: string
 }
 const LoginPhone = (props: SignUpEmailProps) => {
+  const { recaptchaVerifier } = useRecaptcha()
   const [status, setStatus] = useState<'pending' | 'verification_sent' | 'complete'>('pending')
   const { sendPhoneVerification, signInPhoneWithCode } = useAuth()
   const { screen } = useWindowSize()
@@ -58,10 +60,15 @@ const LoginPhone = (props: SignUpEmailProps) => {
     if (loading) {
       return
     }
+    if (!recaptchaVerifier) {
+      LogRocket.captureException(new Error("No recaptcha verifier, can't send verification"))
+      setErrorMessage(words.anErrorOccured)
+      return
+    }
     setLoading(true)
     setErrorMessage('')
     try {
-      await sendPhoneVerification(`${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`)
+      await sendPhoneVerification(`${phoneCode ? `+${phoneCode}` : ''}${phoneNumber}`, recaptchaVerifier)
       setStatus('verification_sent')
     } catch (err) {
       setErrorMessage(err?.message || words.anErrorOccured)

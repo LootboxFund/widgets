@@ -75,7 +75,7 @@ export interface AuthContextType {
   signUpWithWallet: (email: string) => Promise<void>
   signInWithEmailAndPassword: (email: string, password: string) => Promise<void>
   signUpWithEmailAndPassword: (email: string, password: string, passwordConfirmation: string) => Promise<void>
-  sendPhoneVerification: (phoneNumber: string) => Promise<void>
+  sendPhoneVerification: (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => Promise<void>
   signInPhoneWithCode: (code: string, email?: string) => Promise<CreateUserResponse>
   connectWallet: () => Promise<void>
   logout: () => Promise<void>
@@ -106,22 +106,7 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
   const userStateSnapshot = useSnapshot(userState)
   const intl = useIntl()
   const signatureWords = useSignatures()
-  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
   const [phoneConfirmationResult, setPhoneConfirmationResult] = useState<ConfirmationResult | null>(null)
-
-  useEffect(() => {
-    const el = document.getElementById('recaptcha-container')
-    if (!!el) {
-      const recaptchaVerifier = new RecaptchaVerifier(
-        'recaptcha-container',
-        {
-          size: 'invisible',
-        },
-        auth
-      )
-      setRecaptchaVerifier(recaptchaVerifier)
-    }
-  }, [])
 
   const [signUpWithWalletMutation] = useMutation<
     { createUserWithWallet: CreateUserResponse },
@@ -187,7 +172,7 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
     }
   }, [])
 
-  const sendPhoneVerification = async (phoneNumber: string) => {
+  const sendPhoneVerification = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
     if (!phoneNumber) {
       throw new Error(words.pleaseEnterYourPhoneNumber)
     }

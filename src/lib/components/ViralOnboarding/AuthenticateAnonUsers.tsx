@@ -41,6 +41,7 @@ import {
   QueryGetAnonTokenV2Args,
   QueryTruncatedEmailByPhoneArgs,
 } from '../../api/graphql/generated/types'
+import { useRecaptcha } from 'lib/hooks/useRecaptcha'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -62,6 +63,7 @@ const AuthenticateAnonUsers = () => {
   const [loadingPrecise, setLoadingPrecise] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, linkCredentials, getPhoneAuthCredentialFromCode } = useAuth()
+  const { recaptchaVerifier } = useRecaptcha()
   const captchaRef = createRef<HTMLDivElement>()
   const targetRoute = useRef<Status>('pending')
   const authWords = useAuthWords()
@@ -243,11 +245,16 @@ const AuthenticateAnonUsers = () => {
     if (status === 'loading' || loadingPrecise) {
       return
     }
+    if (!recaptchaVerifier) {
+      LogRocket.captureException(new Error("No recaptcha verifier, can't send verification"))
+      setErrorMessage(words.anErrorOccured)
+      return
+    }
     setLoadingPrecise(true)
     setStatus('loading')
     setErrorMessage('')
     try {
-      await sendPhoneVerification(parsedPhone)
+      await sendPhoneVerification(parsedPhone, recaptchaVerifier)
       setStatus('verification_sent')
     } catch (err) {
       setStatus('error')

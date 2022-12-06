@@ -37,6 +37,7 @@ import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { manifest } from 'manifest'
+import { useRecaptcha } from 'lib/hooks/useRecaptcha'
 
 interface Props {
   onNext: () => void
@@ -54,6 +55,7 @@ const OnboardingSignUp = (props: Props) => {
   const [loading, setLoading] = useState(false)
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
+  const { recaptchaVerifier } = useRecaptcha()
   const { claim, referral, chosenPartyBasket, chosenLootbox, email } = useViralOnboarding()
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
@@ -138,10 +140,15 @@ const OnboardingSignUp = (props: Props) => {
     if (loading) {
       return
     }
+    if (!recaptchaVerifier) {
+      LogRocket.captureException(new Error("No recaptcha verifier, can't send verification"))
+      setErrorMessage(words.anErrorOccured)
+      return
+    }
     setErrorMessage('')
     setLoading(true)
     try {
-      await sendPhoneVerification(parsedPhone)
+      await sendPhoneVerification(parsedPhone, recaptchaVerifier)
       setStatus('verification_sent')
     } catch (err) {
       setStatus('error')
