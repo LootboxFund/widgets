@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,700;0,900;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,500;1,700&display=swap');
+
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+.lootbox-image-icon1 {
+  position: relative;
+  width: 145px;
+  height: 217px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.subtitle-div,
+.title-h1 {
+  position: relative;
+  display: inline-block;
+  width: 338px;
+}
+.title-h1 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: 700;
+  font-family: inherit;
+}
+.subtitle-div {
+  font-size: 18px;
+  color: #bfbfbf;
+}
+.prize-showcase-div,
+.showcase-text-div {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.prize-showcase-div {
+  background-color: #333;
+  height: 430px;
+  flex-shrink: 0;
+  padding: 0 15px;
+  box-sizing: border-box;
+  gap: 40px;
+  text-align: center;
+  font-size: 32px;
+  color: #fff;
+}
+.congrats-heading-h2,
+.receival-subheading-div {
+  align-self: stretch;
+  position: relative;
+  display: inline-block;
+}
+.congrats-heading-h2 {
+  margin: 0;
+  font-size: inherit;
+  font-style: italic;
+  font-weight: 500;
+  font-family: inherit;
+}
+.receival-subheading-div {
+  font-size: 18px;
+  color: #4a4a4a;
+  height: 45px;
+  flex-shrink: 0;
+}
+.congrats-div {
+  align-self: stretch;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 15px 15px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.sponsor-wants-heading,
+.sponsor-wants-subheading {
+  align-self: stretch;
+  position: relative;
+  display: inline-block;
+  height: 27px;
+  flex-shrink: 0;
+}
+.sponsor-wants-subheading {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  color: #6f6f6f;
+  height: 62px;
+}
+.callout-div,
+.sponsor-wants-div {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  box-sizing: border-box;
+}
+.callout-div {
+  border-radius: 10px;
+  background-color: #f2f2f2;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 13px;
+}
+.sponsor-wants-div {
+  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #8a8a8a;
+}
+.how-to-redeem-heading {
+  margin: 0;
+  flex: 1;
+  position: relative;
+  font-size: inherit;
+  display: inline-block;
+  font-style: italic;
+  font-weight: 500;
+  font-family: inherit;
+}
+.how-to-redeem {
+  align-self: stretch;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  padding: 15px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: flex-start;
+}
+.step-1-heading {
+  margin: 0;
+  font-size: inherit;
+  line-height: 30px;
+  display: inline-block;
+  font-style: italic;
+  font-weight: 700;
+  font-family: inherit;
+  height: 28px;
+}
+.step-1-heading,
+.step-1-subheading,
+.step-1-video {
+  align-self: stretch;
+  position: relative;
+  flex-shrink: 0;
+}
+.step-1-subheading {
+  font-size: 18px;
+  color: #4a4a4a;
+  display: inline-block;
+  height: 70px;
+}
+.step-1-video {
+  height: 280px;
+  background-image: url(https://lootbox.fund/step1video@3x.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top;
+}
+.action-button-text {
+  position: relative;
+  font-size: 28px;
+  display: inline-block;
+  font-family: Roboto;
+  color: #fff;
+  text-align: center;
+}
+.action-button {
+  cursor: pointer;
+  border: 0;
+  padding: 23px 0;
+  background-color: #51abff;
+  align-self: stretch;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+.step-2-heading,
+.step-one-section {
+  align-self: stretch;
+  font-size: 24px;
+  color: #6f6f6f;
+}
+.step-one-section {
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  box-sizing: border-box;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 10px;
+}
+.step-2-heading {
+  margin: 0;
+  position: relative;
+  line-height: 30px;
+  display: inline-block;
+  font-style: italic;
+  font-weight: 700;
+  font-family: inherit;
+  height: 28px;
+  flex-shrink: 0;
+}
+.step-2-subheading {
+  color: #4a4a4a;
+  display: inline-block;
+  height: 49px;
+  flex-shrink: 0;
+}
+.answer-input,
+.question,
+.step-2-subheading {
+  align-self: stretch;
+  position: relative;
+}
+.question {
+  display: inline-block;
+}
+.answer-input {
+  border: 0;
+  background-color: #f5f5f5;
+  height: 63px;
+  flex-shrink: 0;
+}
+.questionset-div {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 9px;
+}
+.beforeairdropclaim-questions-div,
+.step-two-section {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  justify-content: flex-start;
+}
+.step-two-section {
+  align-self: stretch;
+  padding: 15px;
+  align-items: flex-end;
+  gap: 10px;
+  font-size: 18px;
+  color: #000;
+}
+.beforeairdropclaim-questions-div {
+  position: relative;
+  background-color: #fff;
+  width: 100%;
+  padding: 0 0 20px;
+  align-items: center;
+  gap: 0;
+  text-align: left;
+  font-size: 36px;
+  color: #bc18aa;
+  font-family: Roboto;
+}

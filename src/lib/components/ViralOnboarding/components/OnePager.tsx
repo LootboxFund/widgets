@@ -379,6 +379,7 @@ const OnePager = (props: Props) => {
                   if (ticket?.lootbox?.status === LootboxStatus.Disabled) return null
                   return (
                     <article
+                      key={ticket.lootboxID}
                       className="lootbox-option-article"
                       style={{
                         boxShadow: isChosen && email.length !== 0 ? '0px 4px 15px #4baff5' : '',
