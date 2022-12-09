@@ -1,6 +1,15 @@
-import { LootboxAirdropMetadata, LootboxID } from '@wormgraph/helpers'
-import { LootboxAirdropMetadataQuestion } from 'lib/api/graphql/generated/types'
-import { FunctionComponent } from 'react'
+import { useMutation } from '@apollo/client'
+import { COLORS, LootboxAirdropMetadata, LootboxID } from '@wormgraph/helpers'
+import {
+  AnswerAirdropQuestionResponseSuccess,
+  LootboxAirdropMetadataQuestion,
+  MutationAnswerAirdropQuestionArgs,
+  ResponseError,
+} from 'lib/api/graphql/generated/types'
+import { FunctionComponent, useEffect, useState } from 'react'
+import $Spinner from '../Generics/Spinner'
+import { CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS } from '../RedeemCosmicLootbox/api.gql'
+import { ANSWER_QUESTIONS } from './api.gql'
 import './index.css'
 
 interface BeforeAirdropClaimQuestionsProps {
@@ -12,7 +21,44 @@ interface BeforeAirdropClaimQuestionsProps {
   airdropQuestions: LootboxAirdropMetadataQuestion[]
 }
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  useEffect(() => {
+    setAnswers(
+      props.airdropQuestions.reduce((acc, curr) => {
+        return {
+          ...acc,
+          [curr.id]: '',
+        }
+      }, {} as Record<string, string>)
+    )
+  }, [])
+  const [answerQuestionsMutation] = useMutation<{ answerAirdropQuestion: any }, MutationAnswerAirdropQuestionArgs>(
+    ANSWER_QUESTIONS,
+    {
+      refetchQueries: [{ query: CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, variables: { lootboxID: props.lootboxID } }],
+    }
+  )
+  const answersInput = Object.keys(answers).map((a) => {
+    return {
+      questionID: a,
+      lootboxID: props.lootboxID,
+      answer: answers[a],
+    }
+  })
+  const answerQuestions = async () => {
+    setIsSubmitting(true)
+    await answerQuestionsMutation({
+      variables: {
+        payload: {
+          lootboxID: props.lootboxID,
+          answers: answersInput,
+        },
+      },
+    })
+  }
   const questionsToCollect = props.airdropQuestions.slice().sort((a, b) => (b.order || 99) - (a.order || 99))
+  const filledAllAnswers = Object.values(answers).some((a) => !a)
   return (
     <div className="beforeairdropclaim-questions-div">
       <div className="prize-showcase-div">
@@ -65,12 +111,31 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           return (
             <div key={q.id} className="questionset-div">
               <i className="question">{q.question}</i>
-              <input className="answer-input" type="text" />
+              <input
+                className="answer-input"
+                value={answers[q.id]}
+                onChange={(e) =>
+                  setAnswers({
+                    ...answers,
+                    [q.id]: e.target.value,
+                  })
+                }
+                type="text"
+              />
             </div>
           )
         })}
-        <button className="action-button">
-          <b className="action-button-text">REDEEM PRIZE</b>
+        <button
+          onClick={() => answerQuestions()}
+          disabled={isSubmitting || filledAllAnswers}
+          className="action-button"
+          style={{ opacity: filledAllAnswers ? 0.1 : 1, cursor: filledAllAnswers ? 'not-allowed' : 'pointer' }}
+        >
+          {isSubmitting ? (
+            <$Spinner color={COLORS.white} margin="auto auto 20px" />
+          ) : (
+            <b className="action-button-text">REDEEM PRIZE</b>
+          )}
         </button>
       </div>
     </div>

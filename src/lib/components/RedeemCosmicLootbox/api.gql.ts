@@ -245,3 +245,19 @@ export const MARK_CLAIM_AS_REWARDED = gql`
     }
   }
 `
+
+export const CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS = gql`
+  query CheckIfUserAnsweredAirdropQuestions($lootboxID: ID!) {
+    checkIfUserAnsweredAirdropQuestions(lootboxID: $lootboxID) {
+      ... on CheckIfUserAnsweredAirdropQuestionsResponseSuccess {
+        status
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`

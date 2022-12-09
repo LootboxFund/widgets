@@ -51,6 +51,11 @@ import { getBlockExplorerUrl } from 'lib/utils/chain'
 import { ContractTransaction } from 'ethers'
 import BN from 'bignumber.js'
 import BeforeAirdropClaimQuestions from '../BeforeAirdropClaim'
+import { CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS } from './api.gql'
+import {
+  QueryCheckIfUserAnsweredAirdropQuestionsArgs,
+  CheckIfUserAnsweredAirdropQuestionsResponse,
+} from '../../api/graphql/generated/types'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -131,8 +136,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     }
   )
 
-  const { data: dataAirdropQuestionsAnswered } = { data: false }
-
   const {
     data: claimCountData,
     loading: loadingClaimCountQuery,
@@ -148,6 +151,24 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const nClaims: number = useMemo<number>(() => {
     return (claimCountData?.getLootboxByID as GetUserClaimCountFESuccess)?.lootbox?.userClaims?.totalCount || 0
   }, [claimCountData?.getLootboxByID])
+
+  const {
+    data: checkIfUserAnsweredAirdropQuestionsData,
+    loading: checkIfUserAnsweredAirdropQuestionsLoading,
+    error: errorCheckIfUserAnsweredAirdropQuestions,
+  } = useQuery<
+    { checkIfUserAnsweredAirdropQuestions: CheckIfUserAnsweredAirdropQuestionsResponse },
+    QueryCheckIfUserAnsweredAirdropQuestionsArgs
+  >(CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, {
+    variables: { lootboxID: lootboxID },
+  })
+
+  const statusAirdropQuestionsAnswered =
+    checkIfUserAnsweredAirdropQuestionsData &&
+    checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.__typename ===
+      'CheckIfUserAnsweredAirdropQuestionsResponseSuccess'
+      ? checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.status
+      : false
 
   const {
     status: web3LootboxStatus,
@@ -484,7 +505,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
 
-  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !dataAirdropQuestionsAnswered) {
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !statusAirdropQuestionsAnswered) {
     return (
       <BeforeAirdropClaimQuestions
         lootboxID={lootboxID}
