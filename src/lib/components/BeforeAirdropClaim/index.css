@@ -95,6 +95,7 @@ body {
   font-weight: 700;
   color: #6f6f6f;
   height: 62px;
+  text-align: center;
 }
 .callout-div,
 .sponsor-wants-div {
@@ -175,6 +176,10 @@ body {
   font-family: Roboto;
   color: #fff;
   text-align: center;
+  text-decoration: none;
+}
+a#action-button-text-id {
+  text-decoration: none;
 }
 .action-button {
   cursor: pointer;
@@ -188,6 +193,8 @@ body {
   box-sizing: border-box;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  text-decoration: none;
 }
 .step-2-heading,
 .step-one-section {
@@ -230,12 +237,15 @@ body {
 }
 .question {
   display: inline-block;
+  color: gray;
 }
 .answer-input {
   border: 0;
   background-color: #f5f5f5;
   height: 63px;
   flex-shrink: 0;
+  font-size: 1.2rem;
+  padding: 0px 15px;
 }
 .questionset-div {
   align-self: stretch;

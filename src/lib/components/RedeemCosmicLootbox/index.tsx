@@ -1,4 +1,4 @@
-import { chainIdHexToName, COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { chainIdHexToName, COLORS, LootboxAirdropMetadata, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -50,6 +50,7 @@ import CosmicAuthGuard from './CosmicAuthGuard'
 import { getBlockExplorerUrl } from 'lib/utils/chain'
 import { ContractTransaction } from 'ethers'
 import BN from 'bignumber.js'
+import BeforeAirdropClaimQuestions from '../BeforeAirdropClaim'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -129,6 +130,8 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       },
     }
   )
+
+  const { data: dataAirdropQuestionsAnswered } = { data: false }
 
   const {
     data: claimCountData,
@@ -480,6 +483,20 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
+
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !dataAirdropQuestionsAnswered) {
+    return (
+      <BeforeAirdropClaimQuestions
+        lootboxID={lootboxID}
+        name={lootboxData.name}
+        nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
+        stampImage={lootboxData.stampImage}
+        airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
+        airdropQuestions={lootboxData?.airdropQuestions || []}
+      />
+    )
+  }
+
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>

@@ -11,7 +11,8 @@ import {
   LootboxTicketID_Web3,
   TournamentID,
 } from '@wormgraph/helpers'
-import { LootboxStatus, ResponseError } from 'lib/api/graphql/generated/types'
+import { LootboxAirdropMetadata, LootboxStatus, ResponseError } from 'lib/api/graphql/generated/types'
+import { LootboxAirdropMetadataQuestion } from '../../api/graphql/generated/types'
 
 export interface UserClaimFE {
   id: ClaimID
@@ -53,6 +54,8 @@ export interface LootboxRedemptionFE {
   name: string
   symbol: string | null
   themeColor: string
+  airdropMetadata?: LootboxAirdropMetadata
+  airdropQuestions?: LootboxAirdropMetadataQuestion[]
 }
 
 export interface LootboxRedemptionClaimsFE {
@@ -125,6 +128,24 @@ export const GET_LOOTBOX_REDEEM_PAGE = gql`
           name
           symbol
           themeColor
+          airdropMetadata {
+            title
+            oneLiner
+            value
+            instructionsLink
+            instructionsCallToAction
+            callToActionLink
+            tournamentID
+            organizerID
+            advertiserName
+          }
+          airdropQuestions {
+            id
+            batch
+            order
+            question
+            type
+          }
         }
       }
       ... on ResponseError {
