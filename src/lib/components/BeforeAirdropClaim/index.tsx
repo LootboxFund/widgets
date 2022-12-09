@@ -91,7 +91,14 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between you
           and sponsor.
         </div>
-        <iframe className="step-1-video" src={props.airdropMetadata.instructionsLink} frameBorder="0" allowFullScreen />
+        <iframe
+          className="step-1-video"
+          src={props.airdropMetadata.instructionsLink}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
         <a
           id="action-button-text-id"
           href={props.airdropMetadata.callToActionLink}
