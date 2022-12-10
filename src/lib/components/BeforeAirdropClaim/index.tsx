@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client'
-import { COLORS, LootboxAirdropMetadata, LootboxID } from '@wormgraph/helpers'
+import { COLORS, LootboxAirdropMetadata, LootboxID, QuestionFieldType } from '@wormgraph/helpers'
 import {
   AnswerAirdropQuestionResponseSuccess,
   LootboxAirdropMetadataQuestion,
@@ -22,15 +22,18 @@ interface BeforeAirdropClaimQuestionsProps {
 }
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answers, setAnswers] = useState<Record<string, { answer: string; type: QuestionFieldType }>>({})
   useEffect(() => {
     setAnswers(
       props.airdropQuestions.reduce((acc, curr) => {
         return {
           ...acc,
-          [curr.id]: '',
+          [curr.id]: {
+            answer: '',
+            type: curr.type,
+          },
         }
-      }, {} as Record<string, string>)
+      }, {} as Record<string, { answer: string; type: QuestionFieldType }>)
     )
   }, [])
   const [answerQuestionsMutation] = useMutation<{ answerAirdropQuestion: any }, MutationAnswerAirdropQuestionArgs>(
@@ -43,7 +46,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     return {
       questionID: a,
       lootboxID: props.lootboxID,
-      answer: answers[a],
+      answer: (answers[a]?.answer || '').toString(),
     }
   })
   const answerQuestions = async () => {
@@ -57,8 +60,32 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
       },
     })
   }
+  const determineInputType = (type: QuestionFieldType) => {
+    if (type === QuestionFieldType.Date) {
+      return 'date'
+    } else if (type === QuestionFieldType.Number) {
+      return 'number'
+    } else if (type === QuestionFieldType.Phone) {
+      return 'tel'
+    } else if (type === QuestionFieldType.Email) {
+      return 'email'
+    } else if (type === QuestionFieldType.Address) {
+      return 'text'
+    } else if (type === QuestionFieldType.DateTime) {
+      return 'datetime-local'
+    } else if (type === QuestionFieldType.File) {
+      return 'file'
+    } else if (type === QuestionFieldType.Range) {
+      return 'range'
+    } else if (type === QuestionFieldType.Screenshot) {
+      return 'image'
+    } else if (type === QuestionFieldType.Link) {
+      return 'url'
+    }
+    return 'text'
+  }
   const questionsToCollect = props.airdropQuestions.slice().sort((a, b) => (b.order || 99) - (a.order || 99))
-  const filledAllAnswers = Object.values(answers).some((a) => !a)
+  const filledAllAnswers = Object.values(answers).some((a) => !a.answer)
   return (
     <div className="beforeairdropclaim-questions-div">
       <div className="prize-showcase-div">
@@ -120,14 +147,17 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
               <i className="question">{q.question}</i>
               <input
                 className="answer-input"
-                value={answers[q.id]}
+                value={answers[q.id]?.answer || ''}
                 onChange={(e) =>
                   setAnswers({
                     ...answers,
-                    [q.id]: e.target.value,
+                    [q.id]: {
+                      ...answers[q.id],
+                      answer: e.target.value,
+                    },
                   })
                 }
-                type="text"
+                type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
               />
             </div>
           )

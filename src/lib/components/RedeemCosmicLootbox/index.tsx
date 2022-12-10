@@ -67,7 +67,7 @@ export const onloadWidget = async () => {
 }
 
 export type RedeemState = 'lootbox-not-deployed' | 'no-claims' | 'no-whitelist' | 'not-minted' | 'ready'
-const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
+const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; answered: boolean }) => {
   const { screen } = useScreenSize()
   const words = useWords()
   const userSnapshot = useSnapshot(userState)
@@ -151,24 +151,6 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const nClaims: number = useMemo<number>(() => {
     return (claimCountData?.getLootboxByID as GetUserClaimCountFESuccess)?.lootbox?.userClaims?.totalCount || 0
   }, [claimCountData?.getLootboxByID])
-
-  const {
-    data: checkIfUserAnsweredAirdropQuestionsData,
-    loading: checkIfUserAnsweredAirdropQuestionsLoading,
-    error: errorCheckIfUserAnsweredAirdropQuestions,
-  } = useQuery<
-    { checkIfUserAnsweredAirdropQuestions: CheckIfUserAnsweredAirdropQuestionsResponse },
-    QueryCheckIfUserAnsweredAirdropQuestionsArgs
-  >(CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, {
-    variables: { lootboxID: lootboxID },
-  })
-
-  const statusAirdropQuestionsAnswered =
-    checkIfUserAnsweredAirdropQuestionsData &&
-    checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.__typename ===
-      'CheckIfUserAnsweredAirdropQuestionsResponseSuccess'
-      ? checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.status
-      : false
 
   const {
     status: web3LootboxStatus,
@@ -505,7 +487,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
 
-  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !statusAirdropQuestionsAnswered) {
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !answered) {
     return (
       <BeforeAirdropClaimQuestions
         lootboxID={lootboxID}
@@ -793,7 +775,26 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
 
 const RedeemCosmicLootboxPage = () => {
   const seedLootboxID = parseUrlParams('lid') || parseUrlParams('lootbox') || parseUrlParams('id')
+  const { user } = useAuth()
   const [lootboxID, setLootboxID] = useState<LootboxID | undefined>(seedLootboxID as LootboxID | undefined)
+
+  const {
+    data: checkIfUserAnsweredAirdropQuestionsData,
+    loading: checkIfUserAnsweredAirdropQuestionsLoading,
+    error: errorCheckIfUserAnsweredAirdropQuestions,
+  } = useQuery<
+    { checkIfUserAnsweredAirdropQuestions: CheckIfUserAnsweredAirdropQuestionsResponse },
+    QueryCheckIfUserAnsweredAirdropQuestionsArgs
+  >(CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, {
+    variables: { lootboxID: (seedLootboxID || '') as LootboxID },
+  })
+
+  const statusAirdropQuestionsAnswered =
+    checkIfUserAnsweredAirdropQuestionsData &&
+    checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.__typename ===
+      'CheckIfUserAnsweredAirdropQuestionsResponseSuccess'
+      ? checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.status
+      : false
 
   useEffect(() => {
     onloadWidget().catch((err) => console.error('Error initializing DApp', err))
@@ -803,10 +804,40 @@ const RedeemCosmicLootboxPage = () => {
     return <Oopsies title={'Please enter a Lootbox'} icon="🎁" />
   }
 
+  const renderTutorial = () => {
+    const tutorial = (
+      <iframe
+        width="100%"
+        height="auto"
+        src="https://www.youtube.com/embed/Xbsra2Ji-4g?start=50"
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        style={{
+          maxWidth: '560',
+          marginTop: '50px',
+          minHeight: '600px',
+        }}
+      ></iframe>
+    )
+    if (!user) {
+      return tutorial
+    }
+    if (statusAirdropQuestionsAnswered) {
+      return tutorial
+    }
+    return null
+  }
+
   return (
-    <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
-      <RedeemCosmicLootbox lootboxID={lootboxID} />
-    </CosmicAuthGuard>
+    <div>
+      <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
+        <RedeemCosmicLootbox lootboxID={lootboxID} answered={statusAirdropQuestionsAnswered} />
+      </CosmicAuthGuard>
+      <br />
+      {renderTutorial()}
+    </div>
   )
 }
 
