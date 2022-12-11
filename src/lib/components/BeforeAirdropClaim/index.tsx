@@ -1,19 +1,26 @@
 import { useMutation } from '@apollo/client'
-import { COLORS, LootboxAirdropMetadata, LootboxID, QuestionFieldType } from '@wormgraph/helpers'
+import { ClaimID, COLORS, LootboxAirdropMetadata, LootboxID, QuestionFieldType } from '@wormgraph/helpers'
 import {
   AnswerAirdropQuestionResponseSuccess,
+  ClaimRedemptionStatus,
   LootboxAirdropMetadataQuestion,
   MutationAnswerAirdropQuestionArgs,
+  MutationUpdateClaimRedemptionStatusArgs,
   ResponseError,
+  UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
 import { FunctionComponent, useEffect, useState } from 'react'
 import $Spinner from '../Generics/Spinner'
-import { CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS } from '../RedeemCosmicLootbox/api.gql'
+import {
+  CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS,
+  UPDATE_CLAIM_REDEMPTION_STATUS,
+} from '../RedeemCosmicLootbox/api.gql'
 import { ANSWER_QUESTIONS } from './api.gql'
 import './index.css'
 
 interface BeforeAirdropClaimQuestionsProps {
   name: string
+  claimID?: ClaimID
   nftBountyValue: string
   stampImage: string
   lootboxID: LootboxID
@@ -23,6 +30,10 @@ interface BeforeAirdropClaimQuestionsProps {
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [answers, setAnswers] = useState<Record<string, { answer: string; type: QuestionFieldType }>>({})
+  const [updateClaimRedemptionStatus] = useMutation<
+    { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
+    MutationUpdateClaimRedemptionStatusArgs
+  >(UPDATE_CLAIM_REDEMPTION_STATUS)
   useEffect(() => {
     setAnswers(
       props.airdropQuestions.reduce((acc, curr) => {
@@ -55,6 +66,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
       variables: {
         payload: {
           lootboxID: props.lootboxID,
+          claimID: props.claimID,
           answers: answersInput,
         },
       },
@@ -131,6 +143,13 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           href={props.airdropMetadata.callToActionLink}
           target="_blank"
           rel="noreferrer"
+          onClick={() => {
+            if (props.claimID) {
+              updateClaimRedemptionStatus({
+                variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+              })
+            }
+          }}
           style={{ width: '100%' }}
         >
           <button className="action-button">
@@ -148,7 +167,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
               <input
                 className="answer-input"
                 value={answers[q.id]?.answer || ''}
-                onChange={(e) =>
+                onChange={(e) => {
                   setAnswers({
                     ...answers,
                     [q.id]: {
@@ -156,7 +175,14 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
                       answer: e.target.value,
                     },
                   })
-                }
+                  const someAnswered = Object.values(answers).some((v) => v.answer)
+
+                  if (!someAnswered && props.claimID) {
+                    updateClaimRedemptionStatus({
+                      variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+                    })
+                  }
+                }}
                 type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
               />
             </div>

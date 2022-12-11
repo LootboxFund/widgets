@@ -18,6 +18,7 @@ import {
   GET_LOOTBOX_CLAIMS_TO_REDEEM,
   WHITELIST_ALL_LOOTBOX_CLAIMS,
   WhitelistLootboxClaimsResponseFE,
+  UPDATE_CLAIM_REDEMPTION_STATUS,
 } from './api.gql'
 import { useQuery, useMutation } from '@apollo/client'
 import {
@@ -26,6 +27,10 @@ import {
   QueryGetLootboxByIdArgs,
   UserClaimsCursor,
   MutationWhitelistMyLootboxClaimsArgs,
+  ClaimRedemptionStatus,
+  MutationUpdateClaimRedemptionStatusArgs,
+  UpdateClaimRedemptionStatusResponse,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
 import Spinner, { LoadingText } from '../Generics/Spinner'
 import { $Horizontal, $Vertical } from '../Generics'
@@ -73,6 +78,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const userSnapshot = useSnapshot(userState)
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
   const [isPolling, setIsPolling] = useState<boolean>(false)
+
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [notification, setNotification] = useState<{
@@ -85,7 +91,10 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     endBefore: null,
   })
   const isWalletConnected = userSnapshot.accounts.length > 0
-
+  const [updateClaimRedemptionStatus] = useMutation<
+    { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
+    MutationUpdateClaimRedemptionStatusArgs
+  >(UPDATE_CLAIM_REDEMPTION_STATUS)
   const {
     data: dataLootbox,
     loading: loadingLootboxQuery,
@@ -192,6 +201,9 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const claimData: UserClaimFE | undefined = useMemo(() => {
     if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
       const [claimData] = dataClaims?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
+      updateClaimRedemptionStatus({
+        variables: { payload: { claimID: claimData.id, status: ClaimRedemptionStatus.Started } },
+      })
       return claimData
     } else {
       return undefined
@@ -225,7 +237,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       return deposits
         .reduce<Deposit[]>((a, b) => {
           const deposit = a.find((d) => d.tokenAddress === b.tokenAddress && d.isRedeemed === b.isRedeemed)
-          console.log('deposit', deposit)
+
           if (deposit) {
             deposit.tokenAmount = new BN(deposit.tokenAmount).plus(new BN(b.tokenAmount)).toString()
           } else {
@@ -491,6 +503,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     return (
       <BeforeAirdropClaimQuestions
         lootboxID={lootboxID}
+        claimID={claimData?.id}
         name={lootboxData.name}
         nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
         stampImage={lootboxData.stampImage}

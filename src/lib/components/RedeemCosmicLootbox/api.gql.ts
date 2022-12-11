@@ -230,10 +230,10 @@ export const WHITELIST_ALL_LOOTBOX_CLAIMS = gql`
   }
 `
 
-export const MARK_CLAIM_AS_REWARDED = gql`
-  mutation UpdateClaimAsRewarded($claimID: ID!) {
-    updateClaimAsRewarded(claimID: $claimID) {
-      ... on UpdateClaimAsRewardedResponseSuccess {
+export const UPDATE_CLAIM_REDEMPTION_STATUS = gql`
+  mutation UpdateClaimRedemptionStatus($payload: UpdateClaimRedemptionStatusPayload!) {
+    updateClaimRedemptionStatus(payload: $payload) {
+      ... on UpdateClaimRedemptionStatusResponseSuccess {
         claimID
       }
       ... on ResponseError {
