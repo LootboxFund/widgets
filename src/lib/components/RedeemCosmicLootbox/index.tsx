@@ -1,4 +1,4 @@
-import { chainIdHexToName, COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { chainIdHexToName, COLORS, LootboxAirdropMetadata, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -18,6 +18,7 @@ import {
   GET_LOOTBOX_CLAIMS_TO_REDEEM,
   WHITELIST_ALL_LOOTBOX_CLAIMS,
   WhitelistLootboxClaimsResponseFE,
+  UPDATE_CLAIM_REDEMPTION_STATUS,
 } from './api.gql'
 import { useQuery, useMutation } from '@apollo/client'
 import {
@@ -26,6 +27,10 @@ import {
   QueryGetLootboxByIdArgs,
   UserClaimsCursor,
   MutationWhitelistMyLootboxClaimsArgs,
+  ClaimRedemptionStatus,
+  MutationUpdateClaimRedemptionStatusArgs,
+  UpdateClaimRedemptionStatusResponse,
+  ResponseError,
 } from 'lib/api/graphql/generated/types'
 import Spinner, { LoadingText } from '../Generics/Spinner'
 import { $Horizontal, $Vertical } from '../Generics'
@@ -50,6 +55,12 @@ import CosmicAuthGuard from './CosmicAuthGuard'
 import { getBlockExplorerUrl } from 'lib/utils/chain'
 import { ContractTransaction } from 'ethers'
 import BN from 'bignumber.js'
+import BeforeAirdropClaimQuestions from '../BeforeAirdropClaim'
+import { CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS } from './api.gql'
+import {
+  QueryCheckIfUserAnsweredAirdropQuestionsArgs,
+  CheckIfUserAnsweredAirdropQuestionsResponse,
+} from '../../api/graphql/generated/types'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -61,12 +72,13 @@ export const onloadWidget = async () => {
 }
 
 export type RedeemState = 'lootbox-not-deployed' | 'no-claims' | 'no-whitelist' | 'not-minted' | 'ready'
-const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
+const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; answered: boolean }) => {
   const { screen } = useScreenSize()
   const words = useWords()
   const userSnapshot = useSnapshot(userState)
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
   const [isPolling, setIsPolling] = useState<boolean>(false)
+
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [notification, setNotification] = useState<{
@@ -79,7 +91,10 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
     endBefore: null,
   })
   const isWalletConnected = userSnapshot.accounts.length > 0
-
+  const [updateClaimRedemptionStatus] = useMutation<
+    { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
+    MutationUpdateClaimRedemptionStatusArgs
+  >(UPDATE_CLAIM_REDEMPTION_STATUS)
   const {
     data: dataLootbox,
     loading: loadingLootboxQuery,
@@ -186,6 +201,9 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
   const claimData: UserClaimFE | undefined = useMemo(() => {
     if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
       const [claimData] = dataClaims?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
+      updateClaimRedemptionStatus({
+        variables: { payload: { claimID: claimData.id, status: ClaimRedemptionStatus.Started } },
+      })
       return claimData
     } else {
       return undefined
@@ -219,7 +237,7 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
       return deposits
         .reduce<Deposit[]>((a, b) => {
           const deposit = a.find((d) => d.tokenAddress === b.tokenAddress && d.isRedeemed === b.isRedeemed)
-          console.log('deposit', deposit)
+
           if (deposit) {
             deposit.tokenAmount = new BN(deposit.tokenAmount).plus(new BN(b.tokenAmount)).toString()
           } else {
@@ -480,6 +498,21 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
+
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !answered) {
+    return (
+      <BeforeAirdropClaimQuestions
+        lootboxID={lootboxID}
+        claimID={claimData?.id}
+        name={lootboxData.name}
+        nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
+        stampImage={lootboxData.stampImage}
+        airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
+        airdropQuestions={lootboxData?.airdropQuestions || []}
+      />
+    )
+  }
+
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -755,7 +788,26 @@ const RedeemCosmicLootbox = ({ lootboxID }: { lootboxID: LootboxID }) => {
 
 const RedeemCosmicLootboxPage = () => {
   const seedLootboxID = parseUrlParams('lid') || parseUrlParams('lootbox') || parseUrlParams('id')
+  const { user } = useAuth()
   const [lootboxID, setLootboxID] = useState<LootboxID | undefined>(seedLootboxID as LootboxID | undefined)
+
+  const {
+    data: checkIfUserAnsweredAirdropQuestionsData,
+    loading: checkIfUserAnsweredAirdropQuestionsLoading,
+    error: errorCheckIfUserAnsweredAirdropQuestions,
+  } = useQuery<
+    { checkIfUserAnsweredAirdropQuestions: CheckIfUserAnsweredAirdropQuestionsResponse },
+    QueryCheckIfUserAnsweredAirdropQuestionsArgs
+  >(CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, {
+    variables: { lootboxID: (seedLootboxID || '') as LootboxID },
+  })
+
+  const statusAirdropQuestionsAnswered =
+    checkIfUserAnsweredAirdropQuestionsData &&
+    checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.__typename ===
+      'CheckIfUserAnsweredAirdropQuestionsResponseSuccess'
+      ? checkIfUserAnsweredAirdropQuestionsData.checkIfUserAnsweredAirdropQuestions.status
+      : false
 
   useEffect(() => {
     onloadWidget().catch((err) => console.error('Error initializing DApp', err))
@@ -765,10 +817,40 @@ const RedeemCosmicLootboxPage = () => {
     return <Oopsies title={'Please enter a Lootbox'} icon="🎁" />
   }
 
+  const renderTutorial = () => {
+    const tutorial = (
+      <iframe
+        width="100%"
+        height="auto"
+        src="https://www.youtube.com/embed/Xbsra2Ji-4g?start=50"
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        style={{
+          maxWidth: '560',
+          marginTop: '50px',
+          minHeight: '600px',
+        }}
+      ></iframe>
+    )
+    if (!user) {
+      return tutorial
+    }
+    if (statusAirdropQuestionsAnswered) {
+      return tutorial
+    }
+    return null
+  }
+
   return (
-    <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
-      <RedeemCosmicLootbox lootboxID={lootboxID} />
-    </CosmicAuthGuard>
+    <div>
+      <CosmicAuthGuard loginTitle={'Login to redeem your FREE rewards'} lootboxID={lootboxID}>
+        <RedeemCosmicLootbox lootboxID={lootboxID} answered={statusAirdropQuestionsAnswered} />
+      </CosmicAuthGuard>
+      <br />
+      {renderTutorial()}
+    </div>
   )
 }
 

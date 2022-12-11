@@ -15,11 +15,12 @@ import { startLootboxOnMintListener } from 'lib/api/firebase/functions'
 import { promiseChainDelay } from 'lib/utils/promise'
 import { DepositFragment, Deposit, convertDepositFragmentToDeposit } from './utils'
 import { useMutation } from '@apollo/client'
-import { MARK_CLAIM_AS_REWARDED } from 'lib/components/RedeemCosmicLootbox/api.gql'
+import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
 import {
-  MutationUpdateClaimAsRewardedArgs,
+  ClaimRedemptionStatus,
+  MutationUpdateClaimRedemptionStatusArgs,
   ResponseError,
-  UpdateClaimAsRewardedResponse,
+  UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
 
 interface UseLootboxResult {
@@ -57,10 +58,10 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
   const [status, setStatus] = useState<UseLootboxStatus>('ready')
   const [lastTx, setLastTx] = useState<ContractTransaction>()
 
-  const [markClaimAsRewarded] = useMutation<
-    { markClaimAsRewarded: ResponseError | UpdateClaimAsRewardedResponse },
-    MutationUpdateClaimAsRewardedArgs
-  >(MARK_CLAIM_AS_REWARDED)
+  const [updateClaimRedemptionStatus] = useMutation<
+    { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
+    MutationUpdateClaimRedemptionStatusArgs
+  >(UPDATE_CLAIM_REDEMPTION_STATUS)
 
   const lootbox = useMemo(() => {
     if (!provider || !lootboxAddress) {
@@ -243,7 +244,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
       setStatus('loading')
 
       await tx.wait()
-      await markClaimAsRewarded({ variables: { claimID } })
+      await updateClaimRedemptionStatus({ variables: { payload: { claimID, status: ClaimRedemptionStatus.Rewarded } } })
       return tx
     } catch (err) {
       throw err
