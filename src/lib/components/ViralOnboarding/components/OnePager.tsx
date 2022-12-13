@@ -14,7 +14,7 @@ import {
   $TournamentStampPreviewImage,
 } from '../contants'
 import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
-import { TEMPLATE_LOOTBOX_STAMP, TOS_URL_DATASHARING } from 'lib/hooks/constants'
+import { TEMPLATE_LOOTBOX_STAMP, TermsOfService } from 'lib/hooks/constants'
 import { useMutation, useQuery } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM, GET_LOTTERY_LISTINGS_V2, LootboxReferralSnapshot } from '../api.gql'
 import {
@@ -30,7 +30,7 @@ import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import './OnePager.css'
 import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpers'
 import { $InputMedium } from 'lib/components/Tournament/common'
-import { LootboxTournamentStatus } from '../../../api/graphql/generated/types'
+import { LootboxTournamentStatus, Tournament, TournamentPrivacyScope } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
@@ -108,6 +108,12 @@ const OnePager = (props: Props) => {
     return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
       ? data.listAvailableLootboxesForClaim.lootboxOptions
       : null
+  }, [data])
+
+  const termsOfService = useMemo(() => {
+    return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
+      ? data.listAvailableLootboxesForClaim.termsOfService
+      : []
   }, [data])
 
   // @ts-ignore
@@ -260,6 +266,72 @@ const OnePager = (props: Props) => {
     }
   }
 
+  const determineToS = () => {
+    if (
+      termsOfService.includes(TournamentPrivacyScope.DataSharing) &&
+      termsOfService.includes(TournamentPrivacyScope.MarketingEmails)
+    ) {
+      return (
+        <span className="terms-and-conditions-fine-prin">
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            I accept the
+          </span>
+          <span className="span">{` `}</span>
+          <a className="terms-and-conditions" href={TermsOfService.dataSharingAndMarketingEmails} target="_blank">
+            terms and conditions
+          </a>
+          <span className="span">{` `}</span>
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            with potential marketing emails and data sharing with 3rd parties
+          </span>
+        </span>
+      )
+    } else if (termsOfService.includes(TournamentPrivacyScope.DataSharing)) {
+      return (
+        <span className="terms-and-conditions-fine-prin">
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            I accept the
+          </span>
+          <span className="span">{` `}</span>
+          <a className="terms-and-conditions" href={TermsOfService.dataSharingOnly} target="_blank">
+            terms and conditions
+          </a>
+          <span className="span">{` `}</span>
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            with potential data sharing with 3rd parties
+          </span>
+        </span>
+      )
+    } else if (termsOfService.includes(TournamentPrivacyScope.MarketingEmails)) {
+      return (
+        <span className="terms-and-conditions-fine-prin">
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            I accept the
+          </span>
+          <span className="span">{` `}</span>
+          <a className="terms-and-conditions" href={TermsOfService.marketingEmailsOnly} target="_blank">
+            terms and conditions
+          </a>
+          <span className="span">{` `}</span>
+          <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+            with potential marketing emails
+          </span>
+        </span>
+      )
+    }
+    return (
+      <span className="terms-and-conditions-fine-prin">
+        <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
+          I accept the
+        </span>
+        <span className="span">{` `}</span>
+        <a className="terms-and-conditions" href={TermsOfService.vanilla} target="_blank">
+          terms and conditions
+        </a>
+      </span>
+    )
+  }
+
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
   return (
     <div className="invite-loop-wrapper">
@@ -288,7 +360,7 @@ const OnePager = (props: Props) => {
               />
             </div>
             <div className="main-info-text">
-              <b className="main-heading-b">{`Win ${tickets[0].lootbox.nftBountyValue || 'Cash Prize'}`}</b>
+              <b className="main-heading-b">{`Win ${tickets[0]?.lootbox.nftBountyValue || 'Cash Prize'}`}</b>
               <i className="social-proof-oneliner">{`${
                 referral?.tournament?.runningCompletedClaims || 0
               } people already accepted`}</i>
@@ -333,15 +405,7 @@ const OnePager = (props: Props) => {
                   checked={agreeTerms}
                   onChange={() => setAgreeTerms(!agreeTerms)}
                 />
-                <span className="terms-and-conditions-fine-prin">
-                  <span className="i-accept-the" onClick={() => setAgreeTerms(!agreeTerms)}>
-                    I accept the
-                  </span>
-                  <span className="span">{` `}</span>
-                  <a className="terms-and-conditions" href={TOS_URL_DATASHARING} target="_blank">
-                    terms and conditions
-                  </a>
-                </span>
+                {determineToS()}
               </div>
             </div>
           </div>
