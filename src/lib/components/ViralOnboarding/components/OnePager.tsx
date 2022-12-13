@@ -288,7 +288,7 @@ const OnePager = (props: Props) => {
               />
             </div>
             <div className="main-info-text">
-              <b className="main-heading-b">Win $5 Cash</b>
+              <b className="main-heading-b">{`Win ${tickets[0].lootbox.nftBountyValue || 'Cash Prize'}`}</b>
               <i className="social-proof-oneliner">{`${
                 referral?.tournament?.runningCompletedClaims || 0
               } people already accepted`}</i>

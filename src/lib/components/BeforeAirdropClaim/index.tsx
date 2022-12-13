@@ -98,6 +98,8 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   }
   const questionsToCollect = props.airdropQuestions.slice().sort((a, b) => (b.order || 99) - (a.order || 99))
   const filledAllAnswers = Object.values(answers).some((a) => !a.answer)
+  const showPartOne = props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink
+  const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0
   return (
     <div className="beforeairdropclaim-questions-div">
       <div className="prize-showcase-div">
@@ -113,94 +115,101 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           You received a FREE gift from a sponsor “{props.airdropMetadata.advertiserName || 'Unknown'}”.
         </div>
       </div>
-      <div className="sponsor-wants-div">
-        <div className="callout-div">
-          <i className="sponsor-wants-heading">The Sponsor wants you to...</i>
-          <i className="sponsor-wants-subheading">
-            {props.airdropMetadata.oneLiner || 'Redeem Gift, no strings attached'}
-          </i>
+      {props.airdropMetadata.oneLiner && (
+        <div className="sponsor-wants-div">
+          <div className="callout-div">
+            <i className="sponsor-wants-heading">The Sponsor wants you to...</i>
+            <i className="sponsor-wants-subheading">
+              {props.airdropMetadata.oneLiner || 'Redeem Gift, no strings attached'}
+            </i>
+          </div>
         </div>
-      </div>
+      )}
+
       <div className="how-to-redeem">
         <h2 className="how-to-redeem-heading">How to Redeem</h2>
       </div>
-      <div className="step-one-section">
-        <h3 className="step-1-heading">Step 1</h3>
-        <div className="step-1-subheading">
-          Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between you
-          and sponsor.
+      {showPartOne && (
+        <div className="step-one-section">
+          <h3 className="step-1-heading">Step 1</h3>
+          <div className="step-1-subheading">
+            Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between
+            you and sponsor.
+          </div>
+          <iframe
+            className="step-1-video"
+            src={props.airdropMetadata.instructionsLink}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+          <a
+            id="action-button-text-id"
+            href={props.airdropMetadata.callToActionLink}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              if (props.claimID) {
+                updateClaimRedemptionStatus({
+                  variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+                })
+              }
+            }}
+            style={{ width: '100%' }}
+          >
+            <button className="action-button">
+              <b className="action-button-text">{props.airdropMetadata.instructionsCallToAction || 'Complete Task'}</b>
+            </button>
+          </a>
         </div>
-        <iframe
-          className="step-1-video"
-          src={props.airdropMetadata.instructionsLink}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-        <a
-          id="action-button-text-id"
-          href={props.airdropMetadata.callToActionLink}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => {
-            if (props.claimID) {
-              updateClaimRedemptionStatus({
-                variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
-              })
-            }
-          }}
-          style={{ width: '100%' }}
-        >
-          <button className="action-button">
-            <b className="action-button-text">{props.airdropMetadata.instructionsCallToAction || 'Complete Task'}</b>
-          </button>
-        </a>
-      </div>
-      <div className="step-two-section">
-        <h3 className="step-2-heading">Step 2</h3>
-        <div className="step-2-subheading">Answer the two questions here for the advertiser.</div>
-        {questionsToCollect.map((q) => {
-          return (
-            <div key={q.id} className="questionset-div">
-              <i className="question">{q.question}</i>
-              <input
-                className="answer-input"
-                value={answers[q.id]?.answer || ''}
-                onChange={(e) => {
-                  setAnswers({
-                    ...answers,
-                    [q.id]: {
-                      ...answers[q.id],
-                      answer: e.target.value,
-                    },
-                  })
-                  const someAnswered = Object.values(answers).some((v) => v.answer)
-
-                  if (!someAnswered && props.claimID) {
-                    updateClaimRedemptionStatus({
-                      variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+      )}
+      {showPartTwo && (
+        <div className="step-two-section">
+          <h3 className="step-2-heading">{showPartOne ? `Step 2` : `Answer these questions`}</h3>
+          <div className="step-2-subheading">Answer the two questions here for the advertiser.</div>
+          {questionsToCollect.map((q) => {
+            return (
+              <div key={q.id} className="questionset-div">
+                <i className="question">{q.question}</i>
+                <input
+                  className="answer-input"
+                  value={answers[q.id]?.answer || ''}
+                  onChange={(e) => {
+                    setAnswers({
+                      ...answers,
+                      [q.id]: {
+                        ...answers[q.id],
+                        answer: e.target.value,
+                      },
                     })
-                  }
-                }}
-                type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
-              />
-            </div>
-          )
-        })}
-        <button
-          onClick={() => answerQuestions()}
-          disabled={isSubmitting || filledAllAnswers}
-          className="action-button"
-          style={{ opacity: filledAllAnswers ? 0.1 : 1, cursor: filledAllAnswers ? 'not-allowed' : 'pointer' }}
-        >
-          {isSubmitting ? (
-            <$Spinner color={COLORS.white} margin="auto auto 20px" />
-          ) : (
-            <b className="action-button-text">REDEEM PRIZE</b>
-          )}
-        </button>
-      </div>
+                    const someAnswered = Object.values(answers).some((v) => v.answer)
+
+                    if (!someAnswered && props.claimID) {
+                      updateClaimRedemptionStatus({
+                        variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+                      })
+                    }
+                  }}
+                  type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
+                />
+              </div>
+            )
+          })}
+        </div>
+      )}
+      <button
+        onClick={() => answerQuestions()}
+        disabled={isSubmitting || filledAllAnswers}
+        className="action-button"
+        style={{ opacity: filledAllAnswers ? 0.1 : 1, cursor: filledAllAnswers ? 'not-allowed' : 'pointer' }}
+      >
+        {isSubmitting ? (
+          <$Spinner color={COLORS.white} margin="auto auto 20px" />
+        ) : (
+          <b className="action-button-text">REDEEM PRIZE</b>
+        )}
+      </button>
     </div>
   )
 }
