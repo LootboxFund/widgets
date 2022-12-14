@@ -110,6 +110,7 @@ export const GET_LOTTERY_LISTINGS_V2 = gql`
         }
       }
       ... on ListAvailableLootboxesForClaimResponseSuccess {
+        termsOfService
         lootboxOptions {
           id
           address

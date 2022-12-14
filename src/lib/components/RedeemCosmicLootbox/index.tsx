@@ -125,6 +125,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
           const [newClaimData] = data?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
           if (
             isPolling &&
+            claimData &&
             claimData?.id === newClaimData?.id &&
             newClaimData?.whitelist?.isRedeemed &&
             !!newClaimData?.whitelist?.lootboxTicket &&
@@ -499,18 +500,24 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
 
-  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !answered) {
-    return (
-      <BeforeAirdropClaimQuestions
-        lootboxID={lootboxID}
-        claimID={claimData?.id}
-        name={lootboxData.name}
-        nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
-        stampImage={lootboxData.stampImage}
-        airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
-        airdropQuestions={lootboxData?.airdropQuestions || []}
-      />
-    )
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && claimData && !answered) {
+    const isAirdropScreenNecessary =
+      lootboxData.airdropMetadata.instructionsLink ||
+      lootboxData.airdropMetadata.callToActionLink ||
+      (lootboxData.airdropQuestions && lootboxData.airdropQuestions.length > 0)
+    if (isAirdropScreenNecessary) {
+      return (
+        <BeforeAirdropClaimQuestions
+          lootboxID={lootboxID}
+          claimID={claimData?.id}
+          name={lootboxData.name}
+          nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
+          stampImage={lootboxData.stampImage}
+          airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
+          airdropQuestions={lootboxData?.airdropQuestions || []}
+        />
+      )
+    }
   }
 
   return (
