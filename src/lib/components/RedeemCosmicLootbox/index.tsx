@@ -202,9 +202,11 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const claimData: UserClaimFE | undefined = useMemo(() => {
     if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
       const [claimData] = dataClaims?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
-      updateClaimRedemptionStatus({
-        variables: { payload: { claimID: claimData.id, status: ClaimRedemptionStatus.Started } },
-      })
+      if (claimData) {
+        updateClaimRedemptionStatus({
+          variables: { payload: { claimID: claimData.id, status: ClaimRedemptionStatus.Started } },
+        })
+      }
       return claimData
     } else {
       return undefined
