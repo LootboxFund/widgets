@@ -10,7 +10,7 @@ import { checkIfValidEmail } from 'lib/api/helpers'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import { useAuthWords } from 'lib/components/Authentication/Shared'
 import { $Link } from 'lib/components/Profile/common'
-import { TOS_URL_DATASHARING } from 'lib/hooks/constants'
+import { TermsOfService } from 'lib/hooks/constants'
 import { PRIVACY_URL_DATASHARING } from 'lib/hooks/constants'
 import { $Spinner } from 'lib/components/Generics/Spinner'
 
@@ -220,7 +220,7 @@ const OnboardingAddEmail = (props: Props) => {
                       {authWords.privacyPolicy}
                     </$Link>
                   </span>,
-                  <$Link href={TOS_URL_DATASHARING} target="_blank">
+                  <$Link href={TermsOfService.vanilla} target="_blank">
                     {authWords.termsOfService}
                   </$Link>
                 )}
