@@ -107,7 +107,16 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     }
     return 'text'
   }
-  const questionsToCollect = props.airdropQuestions.slice().sort((a, b) => (b.order || 99) - (a.order || 99))
+  const questionsToCollect = props.airdropQuestions
+    .slice()
+    .sort((a, b) => {
+      if (a.mandatory === b.mandatory) {
+        return 0
+      }
+      return a.mandatory ? -1 : 1
+    })
+    .sort((a, b) => (b.order || 99) - (a.order || 99))
+
   const filledAllAnswers = Object.values(answers).some((a) => !a.answer)
   const showPartOne = props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink
   const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0

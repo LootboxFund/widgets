@@ -115,8 +115,9 @@ export interface LocalClaim {
 export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; preventDefault?: boolean }>`
   position: absolute;
   width: 100%;
-  bottom: ${(props) => (props.preventDefault ? '0px' : '-100%')} ;
-  min-height: 200px;
+  bottom: ${(props) => (props.preventDefault ? '0px' : '-100%')};
+  /* min-height: 200px; */
+  padding-bottom: 60px;
 
   ${(props) =>
     !props.preventDefault &&
@@ -133,17 +134,17 @@ export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; pr
       rgba(0,0,0,0%) 0%,
       ${props.themeColor} 40%,
       ${props.themeColor} 100%
-    )`}};
+    )`};
 
   @-webkit-keyframes slideOnscreenFromBottom {
     100% {
       bottom: 0;
     }
-  };
+  }
 
   @keyframes slideOnscreenFromBottom {
     100% {
       bottom: 0;
     }
-  };
+  } ;
 `

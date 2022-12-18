@@ -202,12 +202,13 @@ const AdVideoBeta2 = (props: Props) => {
     }
 
     if (ad?.clickDestination) {
-      window.open(ad.clickDestination, '_blank')
+      // window.open(ad.clickDestination, '_blank') // this doesnt reliably work on safari due to security policies, according to ChatGPT
+      location.href = ad.clickDestination
     }
     setTimeout(
       () => {
-        setLoading(false)
-        props.onNext()
+        // setLoading(false)
+        // props.onNext()
       },
       adQuestions && adQuestions.length > 0 ? 1000 : 0
     )
@@ -289,7 +290,14 @@ const AdVideoBeta2 = (props: Props) => {
   //     </$ViralOnboardingCard>
   //   )
   // }
-
+  const sortedQuestions = Object.values(questionsHash)
+    .slice()
+    .sort((a, b) => {
+      if (a.mandatory === b.mandatory) {
+        return 0
+      }
+      return a.mandatory ? -1 : 1
+    })
   return (
     <$ViralOnboardingCard style={{ position: 'relative', overflowY: 'scroll' }}>
       {ad?.creative?.creativeType === 'video' && (
@@ -332,7 +340,7 @@ const AdVideoBeta2 = (props: Props) => {
       <$SlideInFooter themeColor={themeColor} delay="1.5s">
         {showQuestions && (
           <$QuestionsDuringAd>
-            {Object.values(questionsHash).map((question) => {
+            {sortedQuestions.map((question) => {
               return (
                 <$Vertical key={question.id} style={{ padding: '10px 10px 10px 10px' }}>
                   <label
@@ -447,7 +455,8 @@ const $FloatingCover = styled.div`
   height: 100%;
   max-width: 600px;
   position: absolute;
-
+  z-index: 99;
+  top: 0;
   @-webkit-keyframes fadeIn {
     from {
       background-color: rgba(0, 0, 0, 1);
