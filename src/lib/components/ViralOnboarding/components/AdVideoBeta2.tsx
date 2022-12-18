@@ -1,32 +1,58 @@
-import { $span, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea } from 'lib/components/Generics'
+import { $span, $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea, $Horizontal } from 'lib/components/Generics'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
-import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
+import { QuestionDef, useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { $Heading, $NextButton, $SlideInFooter } from '../contants'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import Video from './Video'
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { AdID, AdSetID, AffiliateID, COLORS, FlightID, OfferID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { AdID, AdSetID, AffiliateID, COLORS, FlightID, OfferID, QuestionAnswerID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
-import { AdEventAction } from 'lib/api/graphql/generated/types'
+import {
+  AdEventAction,
+  ClaimRedemptionStatus,
+  MutationAnswerAfterTicketClaimQuestionArgs,
+  MutationUpdateClaimRedemptionStatusArgs,
+  ResponseError,
+  UpdateClaimRedemptionStatusResponse,
+} from 'lib/api/graphql/generated/types'
 import { useAuth } from 'lib/hooks/useAuth'
+import { QuestionFieldType } from '../../../api/graphql/generated/types'
+import { $InputMedium } from 'lib/components/Authentication/Shared'
+import { useMutation } from '@apollo/client'
+import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
+import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
-
+export type QuestionAnswerEditorState = Record<QuestionAnswerID, QuestionDef>
 interface Props {
   nextUrl: string
   onNext: () => void
   onBack: () => void
 }
+
 const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
   const { referral, chosenPartyBasket, chosenLootbox, ad, adQuestions, sessionId, claim } = useViralOnboarding()
+  const [questionsHash, setQuestionsHash] = useState<QuestionAnswerEditorState>({})
+  const [goToDestination, setGoToDestination] = useState(true)
+  const [showQuestions, setShowQuestions] = useState(false)
+  const [adClickedOnce, setAdClickedOnce] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [loading, setLoading] = useState(false)
   const words = useWords()
   const { user } = useAuth()
-
+  const [answerAfterTicketClaimsQuestionsMutation] = useMutation<
+    { answerAfterTicketClaimQuestion: any },
+    MutationAnswerAfterTicketClaimQuestionArgs
+  >(ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS)
+  const [updateClaimRedemptionStatus] = useMutation<
+    { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
+    MutationUpdateClaimRedemptionStatusArgs
+  >(UPDATE_CLAIM_REDEMPTION_STATUS)
   const themeColor = ad?.creative?.themeColor || DEFAULT_THEME_COLOR
 
   const _lb = !!chosenPartyBasket?.lootboxAddress
@@ -39,6 +65,25 @@ const AdVideoBeta2 = (props: Props) => {
     ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
     : TEMPLATE_LOOTBOX_STAMP
 
+  useEffect(() => {
+    if (adQuestions) {
+      if (adQuestions && adQuestions.length > 0) {
+        setGoToDestination(false)
+      }
+      setQuestionsHash(
+        adQuestions.reduce((acc, curr) => {
+          return {
+            ...acc,
+            [curr.id]: {
+              ...curr,
+              answer: '',
+            },
+          }
+        }, {} as QuestionAnswerEditorState)
+      )
+    }
+  }, [adQuestions])
+  console.log(`questionsHash`, questionsHash)
   const videoJsOptions: VideoJsPlayerOptions = {
     autoplay: true,
     controls: false,
@@ -96,31 +141,76 @@ const AdVideoBeta2 = (props: Props) => {
     })
   }
 
-  const onCallToActionClick = () => {
+  const checkQuestionsValid = () => {
+    if (!adQuestions || adQuestions.length === 0) return true
+    const allAnswered = Object.values(questionsHash)
+      .filter((q) => q.mandatory)
+      .every((q) => q.answer)
+    return allAnswered
+  }
+
+  const onCallToActionClick = async () => {
     if (!ad) {
       return
     }
+    if (!adClickedOnce) {
+      loadAdTrackingPixel({
+        adID: ad.adID as AdID,
+        sessionID: sessionId,
+        eventAction: AdEventAction.Click,
+        claimID: claim?.id,
+        userID: user?.id,
+        adSetID: ad.adSetID as AdSetID,
+        offerID: ad.offerID as OfferID,
+        campaignID: undefined,
+        tournamentID: referral?.tournamentId,
+        organizerID: undefined,
+        promoterID: referral.promoterId as AffiliateID,
+        flightID: ad.flightID as FlightID,
+        nonce: undefined,
+        timeElapsed: undefined,
+      })
+      setAdClickedOnce(true)
+    }
 
-    loadAdTrackingPixel({
-      adID: ad.adID as AdID,
-      sessionID: sessionId,
-      eventAction: AdEventAction.Click,
-      claimID: claim?.id,
-      userID: user?.id,
-      adSetID: ad.adSetID as AdSetID,
-      offerID: ad.offerID as OfferID,
-      campaignID: undefined,
-      tournamentID: referral?.tournamentId,
-      organizerID: undefined,
-      promoterID: referral.promoterId as AffiliateID,
-      flightID: ad.flightID as FlightID,
-      nonce: undefined,
-      timeElapsed: undefined,
-    })
+    if (!goToDestination) {
+      setGoToDestination(true)
+      setShowQuestions(true)
+      return
+    }
+
+    if (!checkQuestionsValid()) {
+      setErrorMessage('Please answer the required questions')
+    }
+    setLoading(true)
+    if (adQuestions && adQuestions.length > 0) {
+      await answerAfterTicketClaimsQuestionsMutation({
+        variables: {
+          payload: {
+            claimID: claim?.id,
+            adSetID: ad.adSetID as AdSetID,
+            referralID: referral?.id,
+            answers: Object.values(questionsHash).map((q) => {
+              return {
+                questionID: q.id,
+                answer: q.answer,
+              }
+            }),
+          },
+        },
+      })
+    }
 
     if (ad?.clickDestination) {
       window.open(ad.clickDestination, '_blank')
     }
+    setTimeout(
+      () => {
+        setLoading(false)
+        props.onNext()
+      },
+      adQuestions && adQuestions.length > 0 ? 1000 : 0
+    )
   }
 
   const handleVideoClick = () => {
@@ -201,7 +291,7 @@ const AdVideoBeta2 = (props: Props) => {
   // }
 
   return (
-    <$ViralOnboardingCard style={{ position: 'relative' }}>
+    <$ViralOnboardingCard style={{ position: 'relative', overflowY: 'scroll' }}>
       {ad?.creative?.creativeType === 'video' && (
         <Video
           options={videoJsOptions}
@@ -223,7 +313,7 @@ const AdVideoBeta2 = (props: Props) => {
       <$FloatingCover>
         <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '100%' }}>
           <$Vertical style={{ height: '100%', justifyContent: 'center' }} onClick={handleVideoClick}>
-            <$ContainerSlide slideOff delay={['2.5s']}>
+            <$ContainerSlide slideOff delay={['1.5s']}>
               <$CenteredContent>
                 <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
                   <$PartyBasketImage src={image} />
@@ -239,17 +329,83 @@ const AdVideoBeta2 = (props: Props) => {
           </$Vertical>
         </$ViralOnboardingSafeArea>
       </$FloatingCover>
-      <$SlideInFooter themeColor={themeColor} delay="3s">
+      <$SlideInFooter themeColor={themeColor} delay="1.5s">
+        {showQuestions && (
+          <$QuestionsDuringAd>
+            {Object.values(questionsHash).map((question) => {
+              return (
+                <$Vertical key={question.id} style={{ padding: '10px 10px 10px 10px' }}>
+                  <label
+                    style={{
+                      fontFamily: 'sans-serif',
+                      marginBottom: '10px',
+                      color: 'white',
+                      fontWeight: 500,
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    <$Horizontal justifyContent="space-between">
+                      {question.question}
+                      {question.mandatory && <span style={{ fontSize: '0.8rem' }}>* required</span>}
+                    </$Horizontal>
+                  </label>
+                  <$InputMedium
+                    onChange={(e) => {
+                      setQuestionsHash({
+                        ...questionsHash,
+                        [question.id]: {
+                          ...question,
+                          answer: e.target.value,
+                        },
+                      })
+
+                      const someAnswered = Object.values(questionsHash).some((v) => v.answer)
+
+                      if (!someAnswered && claim?.id) {
+                        updateClaimRedemptionStatus({
+                          variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
+                        })
+                      }
+                    }}
+                    value={questionsHash[question.id]?.answer || ''}
+                    placeholder="type answer here..."
+                    style={{ width: 'auto', backgroundColor: 'rgba(256,256,256,0.6)' }}
+                  ></$InputMedium>
+                </$Vertical>
+              )
+            })}
+          </$QuestionsDuringAd>
+        )}
+
         <$Vertical spacing={2}>
+          {errorMessage && (
+            <span
+              style={{
+                padding: '5px',
+                color: 'white',
+                fontSize: '0.8rem',
+                width: 'auto',
+                textAlign: 'center',
+                fontFamily: 'sans-serif',
+              }}
+            >
+              {errorMessage}
+            </span>
+          )}
           <$NextButton
             onClick={onCallToActionClick}
             color={ad?.creative.themeColor || COLORS.trustBackground}
             backgroundColor={COLORS.white}
-            style={{ marginTop: '60px', marginLeft: '15px', marginRight: '15px' }}
-            disabled={false}
+            style={{
+              marginTop: '20px',
+              marginLeft: '15px',
+              marginRight: '15px',
+              opacity: showQuestions && !checkQuestionsValid() ? 0.3 : 1,
+            }}
+            disabled={(showQuestions && !checkQuestionsValid()) || loading}
           >
             <LoadingText
-              loading={false}
+              loading={loading}
               color={ad?.creative.themeColor || COLORS.white}
               text={ad?.creative.callToAction || 'Get Offer'}
             />
@@ -267,9 +423,9 @@ const AdVideoBeta2 = (props: Props) => {
           >
             skip
           </$span>
+          <br />
         </$Vertical>
       </$SlideInFooter>
-      <div>{JSON.stringify(adQuestions)}</div>
     </$ViralOnboardingCard>
   )
 }
@@ -367,6 +523,17 @@ const $ContainerSlide = styled.div<{ slideOn?: boolean; slideOff?: boolean; dela
       left: 50%;
     }
   } ;
+`
+
+const $QuestionsDuringAd = styled.div`
+  width: 100%;
+  height: 100%;
+  max-width: 600px;
+  padding: 100px 0px 0px 0px;
+  display: 'flex';
+  flex-direction: 'column';
+  justify-content: 'flex-start';
+  align-items: 'center';
 `
 
 export default AdVideoBeta2

@@ -15,7 +15,7 @@ import {
   CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS,
   UPDATE_CLAIM_REDEMPTION_STATUS,
 } from '../RedeemCosmicLootbox/api.gql'
-import { ANSWER_QUESTIONS } from './api.gql'
+import { ANSWER_AIRDROP_QUESTIONS } from './api.gql'
 import './index.css'
 
 interface BeforeAirdropClaimQuestionsProps {
@@ -45,11 +45,14 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
             type: curr.type,
           },
         }
-      }, {} as Record<string, { answer: string; type: QuestionFieldType }>)
+      }, {} as Record<string, { answer: string; type: QuestionFieldType }>) as Record<
+        string,
+        { answer: string; type: QuestionFieldType }
+      >
     )
   }, [])
   const [answerQuestionsMutation] = useMutation<{ answerAirdropQuestion: any }, MutationAnswerAirdropQuestionArgs>(
-    ANSWER_QUESTIONS,
+    ANSWER_AIRDROP_QUESTIONS,
     {
       refetchQueries: [{ query: CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, variables: { lootboxID: props.lootboxID } }],
     }

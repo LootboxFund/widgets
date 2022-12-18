@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client'
-import { Address, AffiliateID, LootboxID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
+import {
+  Address,
+  AffiliateID,
+  LootboxID,
+  PartyBasketID,
+  ReferralID,
+  ReferralSlug,
+  TournamentID,
+} from '@wormgraph/helpers'
 import { AdOfferQuestion, AdServed } from '../../api/graphql/generated/types'
 
 export interface LootboxReferralFE {
@@ -25,6 +33,7 @@ export interface OnboardingTournamentFE {
 }
 
 export interface ReferralFE {
+  id: ReferralID
   slug: ReferralSlug
   referrerId: string
   promoterId?: AffiliateID
@@ -54,6 +63,7 @@ export const GET_REFERRAL = gql`
     referral(slug: $slug) {
       ... on ReferralResponseSuccess {
         referral {
+          id
           slug
           referrerId
           promoterId

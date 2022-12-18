@@ -13,7 +13,7 @@ import useWords from '../useWords'
 import { GET_REFERRAL, ReferralResponseFE, ReferralFE, GetAdFE, LootboxReferralFE, GET_AD_BETA_V2 } from './api.gql'
 import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/components/GenericCard'
 import { v4 as uuid } from 'uuid'
-import { SessionID, ReferralSlug } from '@wormgraph/helpers'
+import { SessionID, ReferralSlug, QuestionAnswerID, QuestionFieldType } from '@wormgraph/helpers'
 import { useAuth } from '../useAuth'
 import { AdOfferQuestion } from '../../api/graphql/generated/types'
 
@@ -46,6 +46,15 @@ export const useViralOnboarding = () => {
   }
 
   return context
+}
+
+export type QuestionDef = {
+  id: QuestionAnswerID
+  question: string
+  answer: string
+  type: QuestionFieldType
+  mandatory?: boolean
+  options?: string
 }
 
 interface ViralOnboardingProviderProps {

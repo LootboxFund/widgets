@@ -48,6 +48,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
     isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
+    // 'success'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
@@ -345,30 +346,30 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
               emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''
             }`
           : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
-        if (!!ad) {
-          return (
-            <AdVideoBeta2
-              onNext={() => {
-                // Send to public profile
-                // navigate to url
-                window.location.href = nextUrl
-              }}
-              nextUrl={nextUrl}
-              onBack={() => console.log('back')}
-            />
-          )
-        } else {
-          return (
-            <CompleteOnboarding
-              onNext={() => {
-                // Send to public profile
-                // navigate to url
-                window.location.href = nextUrl
-              }}
-              onBack={() => console.log('back')}
-            />
-          )
-        }
+        // if (!!ad) {
+        return (
+          <AdVideoBeta2
+            onNext={() => {
+              // Send to public profile
+              // navigate to url
+              window.location.href = nextUrl
+            }}
+            nextUrl={nextUrl}
+            onBack={() => console.log('back')}
+          />
+        )
+        // } else {
+        //   return (
+        //     <CompleteOnboarding
+        //       onNext={() => {
+        //         // Send to public profile
+        //         // navigate to url
+        //         window.location.href = nextUrl
+        //       }}
+        //       onBack={() => console.log('back')}
+        //     />
+        //   )
+        // }
       }
 
       case 'accept-gift':
