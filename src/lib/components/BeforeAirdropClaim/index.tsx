@@ -15,7 +15,7 @@ import {
   CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS,
   UPDATE_CLAIM_REDEMPTION_STATUS,
 } from '../RedeemCosmicLootbox/api.gql'
-import { ANSWER_QUESTIONS } from './api.gql'
+import { ANSWER_AIRDROP_QUESTIONS } from './api.gql'
 import './index.css'
 
 interface BeforeAirdropClaimQuestionsProps {
@@ -29,6 +29,7 @@ interface BeforeAirdropClaimQuestionsProps {
 }
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [answers, setAnswers] = useState<Record<string, { answer: string; type: QuestionFieldType }>>({})
   const [updateClaimRedemptionStatus] = useMutation<
     { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
@@ -44,11 +45,14 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
             type: curr.type,
           },
         }
-      }, {} as Record<string, { answer: string; type: QuestionFieldType }>)
+      }, {} as Record<string, { answer: string; type: QuestionFieldType }>) as Record<
+        string,
+        { answer: string; type: QuestionFieldType }
+      >
     )
   }, [])
   const [answerQuestionsMutation] = useMutation<{ answerAirdropQuestion: any }, MutationAnswerAirdropQuestionArgs>(
-    ANSWER_QUESTIONS,
+    ANSWER_AIRDROP_QUESTIONS,
     {
       refetchQueries: [{ query: CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, variables: { lootboxID: props.lootboxID } }],
     }
@@ -62,7 +66,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   })
   const answerQuestions = async () => {
     setIsSubmitting(true)
-    await answerQuestionsMutation({
+    const res = await answerQuestionsMutation({
       variables: {
         payload: {
           lootboxID: props.lootboxID,
@@ -71,6 +75,13 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
         },
       },
     })
+    if (res?.data?.answerAirdropQuestion.error) {
+      setErrorMessage(res.data.answerAirdropQuestion.error.message)
+      setIsSubmitting(false)
+    }
+    setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 1000)
   }
   const determineInputType = (type: QuestionFieldType) => {
     if (type === QuestionFieldType.Date) {
@@ -96,7 +107,16 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     }
     return 'text'
   }
-  const questionsToCollect = props.airdropQuestions.slice().sort((a, b) => (b.order || 99) - (a.order || 99))
+  const questionsToCollect = props.airdropQuestions
+    .slice()
+    .sort((a, b) => {
+      if (a.mandatory === b.mandatory) {
+        return 0
+      }
+      return a.mandatory ? -1 : 1
+    })
+    .sort((a, b) => (b.order || 99) - (a.order || 99))
+
   const filledAllAnswers = Object.values(answers).some((a) => !a.answer)
   const showPartOne = props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink
   const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0
@@ -136,14 +156,17 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
             Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between
             you and sponsor.
           </div>
-          <iframe
-            className="step-1-video"
-            src={props.airdropMetadata.instructionsLink}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+          {props.airdropMetadata.instructionsLink && (
+            <iframe
+              className="step-1-video"
+              src={props.airdropMetadata.instructionsLink}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          )}
+
           <a
             id="action-button-text-id"
             href={props.airdropMetadata.callToActionLink}
@@ -191,12 +214,18 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
                       })
                     }
                   }}
-                  type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
+                  type={determineInputType(
+                    // answers[q.id]?.type ||
+                    QuestionFieldType.Text
+                  )}
                 />
               </div>
             )
           })}
         </div>
+      )}
+      {errorMessage && (
+        <span style={{ color: 'red', textAlign: 'center', margin: '20px auto', fontSize: '1rem' }}>{errorMessage}</span>
       )}
       <button
         onClick={() => answerQuestions()}

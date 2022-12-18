@@ -207,7 +207,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
                   lineHeight: TYPOGRAPHY.fontSize.xxlarge,
                 }}
               >
-                Check you email
+                Check your email
               </$Heading>
               <$SubHeading style={{ marginTop: '0px' }}>
                 {email

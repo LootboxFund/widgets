@@ -187,8 +187,8 @@ export default [
   // MyTickets,
   // MyProfile,
   // PublicProfile,
-  RedeemCosmicLootbox,
-  // ViralOnboarding,
+  // RedeemCosmicLootbox,
+  ViralOnboarding,
   // NavBar,
 
   // ---- OLD SHIT ----

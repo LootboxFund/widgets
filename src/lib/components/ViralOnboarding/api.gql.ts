@@ -436,3 +436,19 @@ export const TRUNCATED_EMAIL_BY_PHONE = gql`
     }
   }
 `
+
+export const ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS = gql`
+  mutation AnswerAfterTicketClaimQuestion($payload: AfterTicketClaimQuestionPayload!) {
+    answerAfterTicketClaimQuestion(payload: $payload) {
+      ... on AfterTicketClaimQuestionResponseSuccess {
+        answerIDs
+      }
+      ... on ResponseError {
+        error {
+          code
+          message
+        }
+      }
+    }
+  }
+`
