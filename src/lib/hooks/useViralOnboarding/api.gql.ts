@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 import { Address, AffiliateID, LootboxID, PartyBasketID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
-import { AdServed } from '../../api/graphql/generated/types'
+import { AdOfferQuestion, AdServed } from '../../api/graphql/generated/types'
 
 export interface LootboxReferralFE {
   id: LootboxID
@@ -100,6 +100,7 @@ export const GET_REFERRAL = gql`
 export interface GetAdFE {
   __typename: 'DecisionAdApiBetaV2ResponseSuccess'
   ad: AdServed
+  questions: AdOfferQuestion[]
 }
 
 export const GET_AD_BETA_V2 = gql`
@@ -127,6 +128,15 @@ export const GET_AD_BETA_V2 = gql`
           placement
           pixelUrl
           clickDestination
+        }
+        questions {
+          id
+          batch
+          order
+          question
+          type
+          mandatory
+          options
         }
       }
       ... on ResponseError {

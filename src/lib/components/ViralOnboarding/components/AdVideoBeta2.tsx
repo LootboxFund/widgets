@@ -23,7 +23,7 @@ interface Props {
 }
 const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
-  const { referral, chosenPartyBasket, chosenLootbox, ad, sessionId, claim } = useViralOnboarding()
+  const { referral, chosenPartyBasket, chosenLootbox, ad, adQuestions, sessionId, claim } = useViralOnboarding()
   const words = useWords()
   const { user } = useAuth()
 
@@ -269,6 +269,7 @@ const AdVideoBeta2 = (props: Props) => {
           </$span>
         </$Vertical>
       </$SlideInFooter>
+      <div>{JSON.stringify(adQuestions)}</div>
     </$ViralOnboardingCard>
   )
 }

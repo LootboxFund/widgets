@@ -15,6 +15,7 @@ import { ErrorCard, LoadingCard } from 'lib/components/ViralOnboarding/component
 import { v4 as uuid } from 'uuid'
 import { SessionID, ReferralSlug } from '@wormgraph/helpers'
 import { useAuth } from '../useAuth'
+import { AdOfferQuestion } from '../../api/graphql/generated/types'
 
 // Session Id should be unique within an ad but the same for ad events from the same user
 const sessionId = uuid() as SessionID
@@ -25,6 +26,7 @@ interface ViralOnboardingContextType {
   claim?: ClaimFE
   setClaim: (claim: ClaimFE | undefined) => void
   ad?: AdServed
+  adQuestions?: AdOfferQuestion[]
   email?: string
   setEmail: (email: string) => void
   chosenLootbox?: LootboxReferralFE
@@ -61,6 +63,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
     }
   )
   const [ad, setAd] = useState<AdServed>()
+  const [adQuestions, setAdQuestions] = useState<AdOfferQuestion[]>([])
   const [claim, setClaim] = useState<ClaimFE>()
   /** @deprecated */
   const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
@@ -71,6 +74,8 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   const [getAdBetaV2] = useLazyQuery<{ decisionAdApiBetaV2: GetAdFE | ResponseError }, QueryDecisionAdApiBetaV2Args>(
     GET_AD_BETA_V2
   )
+
+  console.log(`adQuestions`, adQuestions)
 
   // new ad v2
   useEffect(() => {
@@ -96,6 +101,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
           } else {
             const data = res.data.decisionAdApiBetaV2 as GetAdFE
             setAd(data.ad || undefined)
+            setAdQuestions(data.questions || [])
           }
         })
         .catch((err) => console.error(err))
@@ -120,6 +126,7 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         claim,
         setClaim,
         ad,
+        adQuestions,
         email,
         setEmail,
         chosenLootbox,

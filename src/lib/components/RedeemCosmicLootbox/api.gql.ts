@@ -145,6 +145,8 @@ export const GET_LOOTBOX_REDEEM_PAGE = gql`
             order
             question
             type
+            mandatory
+            options
           }
         }
       }

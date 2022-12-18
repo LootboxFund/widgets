@@ -29,6 +29,7 @@ interface BeforeAirdropClaimQuestionsProps {
 }
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [answers, setAnswers] = useState<Record<string, { answer: string; type: QuestionFieldType }>>({})
   const [updateClaimRedemptionStatus] = useMutation<
     { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
@@ -62,7 +63,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   })
   const answerQuestions = async () => {
     setIsSubmitting(true)
-    await answerQuestionsMutation({
+    const res = await answerQuestionsMutation({
       variables: {
         payload: {
           lootboxID: props.lootboxID,
@@ -71,6 +72,13 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
         },
       },
     })
+    if (res?.data?.answerAirdropQuestion.error) {
+      setErrorMessage(res.data.answerAirdropQuestion.error.message)
+      setIsSubmitting(false)
+    }
+    setTimeout(() => {
+      window.scrollTo(0, 0)
+    }, 1000)
   }
   const determineInputType = (type: QuestionFieldType) => {
     if (type === QuestionFieldType.Date) {
@@ -136,14 +144,17 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
             Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between
             you and sponsor.
           </div>
-          <iframe
-            className="step-1-video"
-            src={props.airdropMetadata.instructionsLink}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
+          {props.airdropMetadata.instructionsLink && (
+            <iframe
+              className="step-1-video"
+              src={props.airdropMetadata.instructionsLink}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          )}
+
           <a
             id="action-button-text-id"
             href={props.airdropMetadata.callToActionLink}
@@ -191,12 +202,18 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
                       })
                     }
                   }}
-                  type={determineInputType(answers[q.id]?.type || QuestionFieldType.Text)}
+                  type={determineInputType(
+                    // answers[q.id]?.type ||
+                    QuestionFieldType.Text
+                  )}
                 />
               </div>
             )
           })}
         </div>
+      )}
+      {errorMessage && (
+        <span style={{ color: 'red', textAlign: 'center', margin: '20px auto', fontSize: '1rem' }}>{errorMessage}</span>
       )}
       <button
         onClick={() => answerQuestions()}

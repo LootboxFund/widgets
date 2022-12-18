@@ -1,4 +1,4 @@
-import { chainIdHexToName, COLORS, LootboxAirdropMetadata, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { chainIdHexToName, ClaimID, COLORS, LootboxAirdropMetadata, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -501,17 +501,28 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
+  console.log(`
+    
+  lootboxData.airdropMetadata = ${JSON.stringify(lootboxData.airdropMetadata || {})}
+  &&
+  lootboxData.airdropQuestions = ${JSON.stringify(lootboxData.airdropQuestions || {})}
+  &&
+  claimData = ${JSON.stringify(claimData || {})}
+  &&
+  !answered = ${!answered}
 
-  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && claimData && !answered) {
+  `)
+  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !answered) {
     const isAirdropScreenNecessary =
       lootboxData.airdropMetadata.instructionsLink ||
       lootboxData.airdropMetadata.callToActionLink ||
       (lootboxData.airdropQuestions && lootboxData.airdropQuestions.length > 0)
+    console.log(`isAirdropScreenNecessary = ${isAirdropScreenNecessary}`)
     if (isAirdropScreenNecessary) {
       return (
         <BeforeAirdropClaimQuestions
           lootboxID={lootboxID}
-          claimID={claimData?.id}
+          claimID={claimData?.id || ('no-claim-id' as ClaimID)}
           name={lootboxData.name}
           nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
           stampImage={lootboxData.stampImage}
