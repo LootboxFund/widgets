@@ -1,18 +1,8 @@
 import useWords from 'lib/hooks/useWords'
-import { $Vertical, $ViralOnboardingCard, $ViralOnboardingSafeArea, $Horizontal } from 'lib/components/Generics'
+import { $Horizontal } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
-import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
-import {
-  background1,
-  $Heading,
-  $GiantHeading,
-  $SubHeading,
-  $SupressedParagraph,
-  $NextButton,
-  $TournamentStampPreviewContainer,
-  $TournamentStampPreviewImage,
-} from '../contants'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
 import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP, TermsOfService } from 'lib/hooks/constants'
 import { useMutation, useQuery } from '@apollo/client'
@@ -24,12 +14,9 @@ import {
   QueryListAvailableLootboxesForClaimArgs,
   ResponseError,
 } from 'lib/api/graphql/generated/types'
-import { ErrorCard } from './GenericCard'
-import { LoadingText } from 'lib/components/Generics/Spinner'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import './OnePager.css'
 import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpers'
-import { $InputMedium } from 'lib/components/Tournament/common'
 import { LootboxTournamentStatus, Tournament, TournamentPrivacyScope } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'

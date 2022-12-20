@@ -20,7 +20,6 @@ import ReactTooltip from 'react-tooltip'
 import { FormattedMessage, useIntl } from 'react-intl'
 import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
-import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import CreateLootboxReferral from '../Referral/CreateLootboxReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
@@ -69,10 +68,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     return userClaims.filter(
       (claim) =>
         (claim.chosenLootbox?.address?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        (claim.chosenLootbox?.name?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        // DEPRECATED:
-        (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        ((claim.chosenPartyBasket?.lootboxSnapshot.name || '').toLowerCase().indexOf(searchStringFMT) as number) > -1
+        (claim.chosenLootbox?.name?.toLowerCase().indexOf(searchStringFMT) as number) > -1
     )
   }, [userClaims, searchString])
 
@@ -399,16 +395,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           <AuthGuard>
             <CreateLootboxReferral
               lootboxID={chosenClaim.chosenLootbox.id}
-              tournamentId={chosenClaim.tournamentId}
-              qrcodeMargin={'0px -40px'}
-            />
-          </AuthGuard>
-        )}
-
-        {chosenClaim && !!chosenClaim.chosenPartyBasket && (
-          <AuthGuard>
-            <CreatePartyBasketReferral
-              partyBasketId={chosenClaim.chosenPartyBasket.id}
               tournamentId={chosenClaim.tournamentId}
               qrcodeMargin={'0px -40px'}
             />

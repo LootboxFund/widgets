@@ -12,13 +12,9 @@ export interface TokenDataFE extends TokenData {
 export const USD_DECIMALS = 8
 export const FEE_DECIMALS = 8
 export const DEFAULT_CHAIN_ID_HEX = manifest.chains[0].chainIdHex
-export const DEFAULT_TICKET_IMAGE = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-logo.png?alt=media`
-export const DEFAULT_TICKET_BACKGROUND = `${manifest.storage.downloadUrl}/o/${manifest.storage.buckets.constants.id}%2Fassets%2Fdefault-ticket-background.png?alt=media`
 export const TEMPLATE_LOOTBOX_STAMP = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FTemplateLootboxCard.png?alt=media`
 export const NEXT_STEPS_INFOGRAPHIC = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2FNextStepsInfographic.png?alt=media`
 export const DEFAULT_NOOB_CUP_INFOGRAPHIC = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob_cup_template-compressed.png?alt=media`
-export const NOOB_CUP_YOUR_INVITED_IMG = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob-cup-invited-compressed.png?alt=media`
-export const NOOB_CUP_EMBLEM = `${manifest.storage.downloadUrl}/${manifest.storage.buckets.constants.id}%2Fassets%2Fnoob_cup-compressed.png?alt=media`
 
 export const TOS_URL = 'https://www.lootbox.fund/terms-of-service'
 export const PRIVACY_URL_DATASHARING = 'https://lootbox.fyi/privacy-policy-ds-w3ph1'
@@ -28,7 +24,6 @@ export const TermsOfService = {
   marketingEmailsOnly: 'https://lootbox.fyi/tos-vanilla',
   dataSharingAndMarketingEmails: 'https://lootbox.fyi/tos-vanilla',
 }
-export const DEFAULT_TICKET_BACKGROUND_COLOR = '#AC00FD'
 export const NATIVE_ADDRESS = '0x0native' as Address
 export const twitterIcon =
   'https://firebasestorage.googleapis.com/v0/b/guildfx-exchange.appspot.com/o/assets%2Ftokens%2Ftwitter.png?alt=media'

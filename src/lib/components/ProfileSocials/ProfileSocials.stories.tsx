@@ -18,4 +18,6 @@ const Demo = (args: ProfileSocialsProps) => (
 )
 
 export const Basic = Demo.bind({})
-Basic.args = {}
+Basic.args = {
+  userSocials: {},
+}
