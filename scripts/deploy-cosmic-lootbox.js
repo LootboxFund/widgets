@@ -21,10 +21,10 @@ console.log(`
 
 const RedeemCosmicLootbox =
   process.env.NODE_ENV === 'production' ? 'RedeemCosmicLootbox.production.js' : 'RedeemCosmicLootbox.js'
-const ViralOnboardingCSS =
+const RedeemCosmicLootboxCSS =
   process.env.NODE_ENV === 'production' ? 'RedeemCosmicLootbox.production.css' : 'RedeemCosmicLootbox.js.css'
 
-const fileNames = [RedeemCosmicLootbox, ViralOnboardingCSS]
+const fileNames = [RedeemCosmicLootbox, RedeemCosmicLootboxCSS]
 
 const run = async () => {
   await Promise.all(
