@@ -9,7 +9,6 @@ import {
   $SupressedParagraph,
   background1,
   handIconImg,
-  LocalClaim,
 } from '../contants'
 import Spinner from 'lib/components/Generics/Spinner'
 import { createRef, useEffect, useMemo, useState } from 'react'
@@ -18,7 +17,7 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { useAuth } from 'lib/hooks/useAuth'
 import LogRocket from 'logrocket'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { browserLocalPersistence, onAuthStateChanged, setPersistence } from 'firebase/auth'
+import { browserLocalPersistence, setPersistence } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useMutation } from '@apollo/client'
@@ -56,7 +55,7 @@ const OnboardingSignUp = (props: Props) => {
   const [confirmationCode, setConfirmationCode] = useState('')
   const { user, sendPhoneVerification, signInPhoneWithCode } = useAuth()
   const { recaptchaVerifier } = useRecaptcha()
-  const { claim, referral, chosenPartyBasket, chosenLootbox, email } = useViralOnboarding()
+  const { claim, referral, chosenLootbox, email } = useViralOnboarding()
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const captchaRef = createRef<HTMLDivElement>()
   const [completeClaim, { loading: loadingMutation }] = useMutation<
@@ -166,7 +165,7 @@ const OnboardingSignUp = (props: Props) => {
       throw new Error(words.anErrorOccured)
     }
 
-    if (!chosenLootbox && !chosenPartyBasket) {
+    if (!chosenLootbox) {
       console.error('no lootbox / party basket')
       throw new Error(words.anErrorOccured)
     }
@@ -175,8 +174,7 @@ const OnboardingSignUp = (props: Props) => {
       variables: {
         payload: {
           claimId: claim.id,
-          chosenLootboxID: chosenLootbox?.id,
-          chosenPartyBasketId: chosenPartyBasket?.id,
+          chosenLootboxID: chosenLootbox.id,
         },
       },
     })
@@ -231,19 +229,8 @@ const OnboardingSignUp = (props: Props) => {
   const isAlreadyAccepted = errorMessage && errorMessage?.toLowerCase().includes('already accepted')
 
   const image = useMemo(() => {
-    if (chosenLootbox) {
-      return convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
-    } else {
-      // DEPRECATED
-      const _lb = !!chosenPartyBasket?.lootboxAddress
-        ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-        : undefined
-
-      const image: string | undefined = _lb?.stampImage ? convertFilenameToThumbnail(_lb.stampImage, 'sm') : undefined
-
-      return image
-    }
-  }, [chosenLootbox, chosenPartyBasket])
+    return chosenLootbox ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm') : undefined
+  }, [chosenLootbox])
 
   const GoToProfile = () => {
     if (!user) {
@@ -352,11 +339,7 @@ const OnboardingSignUp = (props: Props) => {
               </$NextButton>
             </$Vertical>
             {renderTOS()}
-            {(!!chosenPartyBasket || !!chosenLootbox) && !!image ? (
-              <$PartyBasketImage src={image} />
-            ) : (
-              <$HandImage src={handIconImg} />
-            )}
+            {!!chosenLootbox && !!image ? <$PartyBasketImage src={image} /> : <$HandImage src={handIconImg} />}
           </$Vertical>
         )}
         {status === 'verification_sent' && (

@@ -106,12 +106,6 @@ export const $TournamentStampPreviewImage = styled.img<{ cardNumber: 0 | 1 }>`
   filter: drop-shadow(0px 0px 25px #ff0000);
 `
 
-export interface LocalClaim {
-  tournamentId: string
-  partyBasketId?: string
-  campaignName?: string
-}
-
 export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; preventDefault?: boolean }>`
   position: absolute;
   width: 100%;

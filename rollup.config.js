@@ -85,34 +85,6 @@ const widgetConfig = (widgetName) => {
   return widget
 }
 
-/**
- * <CreateLootbox />
- *
- *
- */
-const CreateLootbox = widgetConfig('CreateLootbox')
-
-/**
- * <InteractWithLootbox />
- *
- *
- */
-const InteractWithLootbox = widgetConfig('InteractWithLootbox')
-
-/**
- * <ManageLootbox />
- *
- *
- */
-const ManageLootbox = widgetConfig('ManageLootbox')
-
-/**
- * <SearchBar />
- *
- *
- */
-const SearchBar = widgetConfig('SearchBar')
-
 // --------------------------------------------------
 
 /**
@@ -145,21 +117,9 @@ const Authentication = widgetConfig('Authentication')
 
 const MyProfile = widgetConfig('MyProfile')
 
-const TournamentCreate = widgetConfig('TournamentCreate')
-
-const TournamentManage = widgetConfig('TournamentManage')
-
-const TournamentPublic = widgetConfig('TournamentPublic')
-
 const BattleFeed = widgetConfig('BattleFeed')
 
-const PartyBasketManage = widgetConfig('PartyBasketManage')
-
-const PartyBasketRedeem = widgetConfig('PartyBasketRedeem')
-
 const LootboxFeed = widgetConfig('LootboxFeed')
-
-const BattlePage = widgetConfig('BattlePage')
 
 const PublicProfile = widgetConfig('PublicProfile')
 
@@ -176,10 +136,9 @@ const RedeemCosmicLootbox = widgetConfig('RedeemCosmicLootbox')
 const NavBar = widgetConfig('NavBar')
 
 export default [
-  // Authentication,
-  // LootboxFeed,
-  // BattleFeed,
-  // BattlePage,
+  Authentication,
+  LootboxFeed,
+  BattleFeed,
 
   // ---- Firebase hosting widgets ---
   // AuthenticateAnonUsers,

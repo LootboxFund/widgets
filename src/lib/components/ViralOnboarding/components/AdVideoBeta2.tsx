@@ -36,7 +36,7 @@ interface Props {
 
 const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
-  const { referral, chosenPartyBasket, chosenLootbox, ad, adQuestions, sessionId, claim } = useViralOnboarding()
+  const { referral, chosenLootbox, ad, adQuestions, sessionId, claim } = useViralOnboarding()
   const [questionsHash, setQuestionsHash] = useState<QuestionAnswerEditorState>({})
   const [goToDestination, setGoToDestination] = useState(true)
   const [showQuestions, setShowQuestions] = useState(false)
@@ -55,14 +55,8 @@ const AdVideoBeta2 = (props: Props) => {
   >(UPDATE_CLAIM_REDEMPTION_STATUS)
   const themeColor = ad?.creative?.themeColor || DEFAULT_THEME_COLOR
 
-  const _lb = !!chosenPartyBasket?.lootboxAddress
-    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-    : undefined
-
   const image: string = chosenLootbox?.stampImage
     ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
-    : _lb?.stampImage
-    ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
     : TEMPLATE_LOOTBOX_STAMP
 
   useEffect(() => {

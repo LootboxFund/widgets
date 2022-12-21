@@ -6,7 +6,6 @@ import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { getSocials } from 'lib/hooks/constants'
 import { FormattedMessage, useIntl } from 'react-intl'
 import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
-import { $SocialGridInputs, $SocialLogo } from 'lib/components/CreateLootbox/StepSocials'
 import { MutationUpdateUserArgs, ResponseError, UserSocials } from 'lib/api/graphql/generated/types'
 import useWords from 'lib/hooks/useWords'
 import { Props } from 'react-modal'
@@ -162,5 +161,39 @@ const ProfileSocials = (props: ProfileSocialsProps) => {
     </$Vertical>
   )
 }
+
+export const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
+  ${({ screen }) => {
+    if (screen === 'mobile') {
+      return `
+        display: flex;
+        flex-direction: column;
+      `
+    } else {
+      return `
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 10px;
+        row-gap: 15px;
+      `
+    }
+  }}
+`
+
+export const $SocialLogo = styled.img`
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+`
+
+export const $InputMedium = styled.input`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 20px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+`
 
 export default ProfileSocials

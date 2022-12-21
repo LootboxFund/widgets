@@ -7,6 +7,7 @@ import { ApolloProvider } from '@apollo/client'
 import Authentication from './index'
 import { manifest } from 'manifest'
 import LocalizationWrapper from '../LocalizationWrapper'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export default {
   title: 'Authentication',
@@ -28,12 +29,14 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
-          <Authentication
-            initialMode="login-email"
-            onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')}
-          />
-        </$CardViewport>
+        <AuthProvider>
+          <$CardViewport width="100%" maxWidth="900px" height="auto" margin="0 auto">
+            <Authentication
+              initialMode="login-email"
+              onSignupSuccess={() => window.open(manifest.microfrontends.webflow.myProfilePage, '_self')}
+            />
+          </$CardViewport>
+        </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>
   )

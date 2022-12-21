@@ -13,7 +13,6 @@ import { useState } from 'react'
 import { $ErrorMessage, $Horizontal, $span, $Vertical } from 'lib/components/Generics'
 import styled from 'styled-components'
 import useWindowSize from 'lib/hooks/useScreenSize'
-import { $InputMedium } from 'lib/components/Tournament/common'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
 import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
@@ -307,6 +306,24 @@ const $Checkbox = styled.input`
   min-height: 20px;
   margin-right: 10px;
   cursor: pointer;
+`
+
+const $InputMedium = styled.input<{ width?: string }>`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
+  height: 40px;
+
+  color: ${COLORS.surpressedFontColor}ae;
+
+  ${(props) => props.width && `width: ${props.width}`};
+
+  &:focus {
+    color: ${COLORS.black}ca;
+  }
 `
 
 export default CreateLootboxReferral

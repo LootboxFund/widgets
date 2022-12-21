@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { COLORS, ContractAddress, TYPOGRAPHY } from '@wormgraph/helpers'
 import { $Horizontal, $Container, $Vertical } from '../Generics'
-import { $SocialGridInputs, $SocialLogo, $InputMedium } from '../CreateLootbox/StepSocials'
 import { getSocials } from 'lib/hooks/constants'
-import useWindowSize from 'lib/hooks/useScreenSize'
+import useWindowSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { readLootboxMetadata } from 'lib/api/storage'
 import styled from 'styled-components'
 import { useWeb3Utils } from 'lib/hooks/useWeb3Api'
@@ -152,6 +151,40 @@ const $LootboxDescription = styled.p`
   margin-top: 0.5em;
   margin-bottom: 1.5em;
   color: ${COLORS.surpressedFontColor};
+`
+
+export const $SocialGridInputs = styled.div<{ screen: ScreenSize }>`
+  ${({ screen }) => {
+    if (screen === 'mobile') {
+      return `
+        display: flex;
+        flex-direction: column;
+      `
+    } else {
+      return `
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 10px;
+        row-gap: 15px;
+      `
+    }
+  }}
+`
+
+export const $SocialLogo = styled.img`
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+`
+
+export const $InputMedium = styled.input`
+  background-color: ${`${COLORS.surpressedBackground}1A`};
+  border: none;
+  border-radius: 10px;
+  padding: 5px 20px;
+  font-size: ${TYPOGRAPHY.fontSize.medium};
+  font-family: ${TYPOGRAPHY.fontFamily.regular};
 `
 
 export default Socials

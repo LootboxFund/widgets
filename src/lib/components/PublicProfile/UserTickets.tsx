@@ -20,7 +20,6 @@ import ReactTooltip from 'react-tooltip'
 import { FormattedMessage, useIntl } from 'react-intl'
 import Modal from 'react-modal'
 import AuthGuard from '../AuthGuard'
-import CreatePartyBasketReferral from '../Referral/CreatePartyBasketReferral'
 import CreateLootboxReferral from '../Referral/CreateLootboxReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
@@ -69,10 +68,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
     return userClaims.filter(
       (claim) =>
         (claim.chosenLootbox?.address?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        (claim.chosenLootbox?.name?.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        // DEPRECATED:
-        (claim.chosenPartyBasket?.name.toLowerCase().indexOf(searchStringFMT) as number) > -1 ||
-        ((claim.chosenPartyBasket?.lootboxSnapshot.name || '').toLowerCase().indexOf(searchStringFMT) as number) > -1
+        (claim.chosenLootbox?.name?.toLowerCase().indexOf(searchStringFMT) as number) > -1
     )
   }, [userClaims, searchString])
 
@@ -263,14 +259,12 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         {filteredUserClaims.map((claim) => {
           const elId = `dropdown${claim.id}`
           const isNotifReq = notificationClaims.indexOf(claim.id) > -1
-          const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl || claim?.chosenPartyBasket?.joinCommunityUrl
+          const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl
           const joinNotif = isNotifReq && !!joinCommunityURL
           const isNotif = !!joinNotif
 
-          const displayImage = claim?.chosenLootbox?.stampImage || claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
-          const redeemPageURL = claim?.chosenPartyBasket
-            ? `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`
-            : `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
+          const displayImage = claim?.chosenLootbox?.stampImage
+          const redeemPageURL = `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
           const mainActionLink = joinCommunityURL || claim.tournament?.tournamentLink || redeemPageURL
 
@@ -399,16 +393,6 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           <AuthGuard>
             <CreateLootboxReferral
               lootboxID={chosenClaim.chosenLootbox.id}
-              tournamentId={chosenClaim.tournamentId}
-              qrcodeMargin={'0px -40px'}
-            />
-          </AuthGuard>
-        )}
-
-        {chosenClaim && !!chosenClaim.chosenPartyBasket && (
-          <AuthGuard>
-            <CreatePartyBasketReferral
-              partyBasketId={chosenClaim.chosenPartyBasket.id}
               tournamentId={chosenClaim.tournamentId}
               qrcodeMargin={'0px -40px'}
             />
