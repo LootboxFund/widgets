@@ -43,6 +43,7 @@ const AdVideoBeta2 = (props: Props) => {
   const [adClickedOnce, setAdClickedOnce] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [viewPixelRendered, setViewPixelRendered] = useState(false)
   const words = useWords()
   const { user } = useAuth()
   const [answerAfterTicketClaimsQuestionsMutation] = useMutation<
@@ -77,6 +78,28 @@ const AdVideoBeta2 = (props: Props) => {
       )
     }
   }, [adQuestions])
+
+  useEffect(() => {
+    if (ad && !viewPixelRendered) {
+      loadAdTrackingPixel({
+        adID: ad.adID as AdID,
+        sessionID: sessionId,
+        eventAction: AdEventAction.View,
+        claimID: claim?.id,
+        userID: user?.id,
+        adSetID: ad.adSetID as AdSetID,
+        offerID: ad.offerID as OfferID,
+        campaignID: undefined,
+        tournamentID: referral?.tournamentId,
+        promoterID: referral.promoterId as AffiliateID,
+        flightID: ad.flightID as FlightID,
+        nonce: undefined,
+        timeElapsed: undefined,
+      })
+      setViewPixelRendered(true)
+    }
+  }, [ad])
+
   console.log(`questionsHash`, questionsHash)
   const videoJsOptions: VideoJsPlayerOptions = {
     autoplay: true,
@@ -106,23 +129,6 @@ const AdVideoBeta2 = (props: Props) => {
     playerRef.current = player
 
     player.on('ready', () => {
-      if (ad) {
-        loadAdTrackingPixel({
-          adID: ad.adID as AdID,
-          sessionID: sessionId,
-          eventAction: AdEventAction.View,
-          claimID: claim?.id,
-          userID: user?.id,
-          adSetID: ad.adSetID as AdSetID,
-          offerID: ad.offerID as OfferID,
-          campaignID: undefined,
-          tournamentID: referral?.tournamentId,
-          promoterID: referral.promoterId as AffiliateID,
-          flightID: ad.flightID as FlightID,
-          nonce: undefined,
-          timeElapsed: undefined,
-        })
-      }
       player.play()
       setTimeout(() => {
         player.muted(false)
@@ -184,6 +190,7 @@ const AdVideoBeta2 = (props: Props) => {
             claimID: claim?.id,
             adSetID: ad.adSetID as AdSetID,
             referralID: referral?.id,
+            flightID: ad.flightID as FlightID,
             answers: Object.values(questionsHash).map((q) => {
               return {
                 questionID: q.id,

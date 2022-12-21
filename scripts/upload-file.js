@@ -2,8 +2,9 @@ const { Storage } = require('@google-cloud/storage')
 const storage = new Storage()
 
 const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
+  const build = 'build-66'
   // Uploads a local file to the bucket
-  const filepath = `widgets/${semver}/build-62/${filename}`
+  const filepath = `widgets/${semver}/${build}/${filename}`
   const localFilePath = `${absPath}${filename}`
   await storage.bucket(bucketName).upload(localFilePath, {
     destination: filepath,
@@ -19,7 +20,7 @@ const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
       //   cacheControl: 'public, max-age=no-cache',
     },
   })
-  console.log(`${filename} uploaded to ${bucketName}.`)
+  console.log(`${filename} on semver=${semver} build=${build} uploaded to ${bucketName}.`)
   await storage.bucket(bucketName).file(filepath).makePublic()
   console.log(`${filename} made public`)
   // return
