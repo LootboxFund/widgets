@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client'
-import { Address, ClaimID, LootboxID, PartyBasketID, TournamentID, UserID } from '@wormgraph/helpers'
+import { Address, ClaimID, LootboxID, TournamentID, UserID } from '@wormgraph/helpers'
 import { ClaimStatus, ClaimType, UserSocials } from 'lib/api/graphql/generated/types'
 
 export type PublicUserGQLArgs = {
@@ -30,17 +30,6 @@ export type PublicUserFEClaims = {
     name?: string
     joinCommunityUrl?: string
     stampImage: string
-  }
-  // DEPRECATED use chosenLootbox
-  chosenPartyBasket?: {
-    id: PartyBasketID
-    address: Address
-    name: string
-    joinCommunityUrl?: string
-    lootboxSnapshot: {
-      stampImage?: string
-      name?: string
-    }
   }
 }
 
@@ -108,17 +97,6 @@ export const PUBLIC_USER_CLAIMS = gql`
                   name
                   joinCommunityUrl
                   stampImage
-                }
-                # DEPRECATED remove this soon
-                chosenPartyBasket {
-                  id
-                  address
-                  name
-                  joinCommunityUrl
-                  lootboxSnapshot {
-                    stampImage
-                    name
-                  }
                 }
               }
               cursor

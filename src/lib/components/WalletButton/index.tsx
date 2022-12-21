@@ -9,8 +9,9 @@ import useWindowSize from 'lib/hooks/useScreenSize'
 import NetworkText from 'lib/components/NetworkText'
 import { BLOCKCHAINS, chainIdHexToSlug, convertDecimalToHex } from '@wormgraph/helpers'
 import { useProvider } from '../../hooks/useWeb3Api/index'
-import { BASE_BUTTON_STYLE } from '../BuyShares/BuyButton'
 import useWords from 'lib/hooks/useWords'
+
+export const BASE_BUTTON_STYLE = { minHeight: '60px' }
 
 export interface WalletButtonProps {
   style?: React.CSSProperties
