@@ -13,7 +13,7 @@ import {
   $TournamentStampPreviewContainer,
   $TournamentStampPreviewImage,
 } from '../contants'
-import { COLORS, TournamentID } from '@wormgraph/helpers'
+import { COLORS } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useMutation } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
@@ -147,9 +147,7 @@ const AcceptGift = (props: Props) => {
               }}
             />
           </$SupressedParagraph>
-          <$GiantHeading>
-            {referral.seedLootbox?.nftBountyValue || referral?.seedPartyBasket?.nftBountyValue || defaultWinText}
-          </$GiantHeading>
+          <$GiantHeading>{referral.seedLootbox?.nftBountyValue || defaultWinText}</$GiantHeading>
           <$SubHeading>
             Claim this FREE Lootbox Ticket for a chance to win
             {/* <FormattedMessage

@@ -97,15 +97,6 @@
     "defaultMessage": "Redeem NFT",
     "description": "Text displayed when the user can redeem an NFT"
   },
-  "bulkReferral.campaignName.title": {
-    "defaultMessage": "Campaign Name"
-  },
-  "bulkReferral.numReferrals.title": {
-    "defaultMessage": "Number of Links to Generate"
-  },
-  "bulkReferral.referrer.title": {
-    "defaultMessage": "Referrer ID"
-  },
   "generic.add": {
     "defaultMessage": "Add",
     "description": "text indicating to add something to something else"
@@ -189,10 +180,6 @@
   "generic.copy": {
     "defaultMessage": "Copy",
     "description": "Generic text indicating to copy something"
-  },
-  "generic.createAPartyBasket": {
-    "defaultMessage": "Create a Party Basket",
-    "description": "User action to create a party basket"
   },
   "generic.createLootbox": {
     "defaultMessage": "Create a Lootbox",
@@ -281,14 +268,6 @@
   "generic.notFound": {
     "defaultMessage": "Not found",
     "description": "Generic user action to not find something"
-  },
-  "generic.partyBasket": {
-    "defaultMessage": "Party basket",
-    "description": "This is the name of a piece of software we use to manage Lootbox bounties. In sentence: \"You can redeem a Lootbox NFT from your tournament`s party basket\""
-  },
-  "generic.partyBaskets": {
-    "defaultMessage": "Party baskets",
-    "description": "Plural, This is the name of a piece of software we use to manage Lootbox bounties. In sentence: \"You can redeem a Lootbox NFT from your tournament`s party basket\""
   },
   "generic.password": {
     "defaultMessage": "Password",
@@ -485,10 +464,6 @@
   "generics.joinCommunity": {
     "defaultMessage": "Join Community"
   },
-  "generics.loginToMakePartyBasket": {
-    "defaultMessage": "Login to make a Party Basket",
-    "description": "User prompt indicating that the user should login to make a Party Basket."
-  },
   "generics.maximumNumberOfClaims": {
     "defaultMessage": "Maximum Number of Claims",
     "description": "A claim is a right to receive a free Lootbox NFT"
@@ -511,10 +486,6 @@
   },
   "generics.outOfStock": {
     "defaultMessage": "Out of Stock"
-  },
-  "generics.partyBasketInformation": {
-    "defaultMessage": "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
-    "description": "Tooltip for creating a Party Basket"
   },
   "generics.phone": {
     "defaultMessage": "Phone"
@@ -755,9 +726,6 @@
   "referral.create.form.lootboxRequired": {
     "defaultMessage": "Lootbox is required"
   },
-  "referral.create.form.tournamentRequired": {
-    "defaultMessage": "Tournament is required"
-  },
   "signatures.loginMessage": {
     "defaultMessage": "Welcome! Sign this message to login to Lootbox. This doesn't cost you anything and is free of any gas fees.",
     "description": "Message to sign (using their MetaMask wallet) to login to Lootbox. A signature is a cryptographic hash of a message."
@@ -889,7 +857,7 @@
   },
   "viralOnboarding.chooseLottery.heading": {
     "defaultMessage": "Choose Your FREE Ticket",
-    "description": "Heading for lootbox gift"
+    "description": "Heading for ticket gift"
   },
   "viralOnboarding.completeOnboarding.error.subheading": {
     "defaultMessage": "Or, go to your profile"
@@ -915,22 +883,6 @@
   },
   "viralOnboarding.screenshotAndShare": {
     "defaultMessage": "If you want more tickets, generate a QR code below, screenshot it, and share it with your friends 👇"
-  },
-  "viralOnboarding.selectLottery.dateWinnerAnnounce": {
-    "defaultMessage": "Winners Announced {dateWin}",
-    "description": "date when we announce the winners of the lottery"
-  },
-  "viralOnboarding.selectLottery.description": {
-    "defaultMessage": "Join {nPeople} other people who each earn {lotteryPrize} if this team wins the tournament.",
-    "description": "Description of the prize"
-  },
-  "viralOnboarding.selectLottery.header": {
-    "defaultMessage": "Claim Lootbox Ticket",
-    "description": "Header for lootbox claim"
-  },
-  "viralOnboarding.selectLottery.next": {
-    "defaultMessage": "Claim Ticket",
-    "description": "Button to accept a gift"
   },
   "viralOnboarding.signup.email.consentDataSharing": {
     "defaultMessage": "By providing your email, you also agree to share your data with the event organizer who may email you for marketing purposes, according to our {privacyPolicy} and {termsOfService}. You can cancel this at any time."

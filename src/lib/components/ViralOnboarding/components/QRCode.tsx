@@ -32,9 +32,6 @@ export interface QRCodeReferral {
   seedLootboxID?: LootboxID
   seedLootbox?: {
     address: Address
-  }
-  seedPartyBasket?: {
-    lootboxAddress: Address
     nftBountyValue?: string
   }
 }
@@ -160,7 +157,7 @@ const QRCode = (props: Props) => {
             />
           </$SupressedParagraph>
           <LootboxSnapshots />
-          <$GiantHeading>{props.referral?.seedPartyBasket?.nftBountyValue || defaultWinText}</$GiantHeading>
+          <$GiantHeading>{props.referral?.seedLootbox?.nftBountyValue || defaultWinText}</$GiantHeading>
           <$SubHeading>
             <FormattedMessage
               id="viralOnboarding.qrcode.description"

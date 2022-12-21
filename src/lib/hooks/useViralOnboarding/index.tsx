@@ -7,7 +7,7 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
-import { ClaimFE, PartyBasketFE } from 'lib/components/ViralOnboarding/api.gql'
+import { ClaimFE } from 'lib/components/ViralOnboarding/api.gql'
 import { useLazyQuery, useQuery } from '@apollo/client'
 import useWords from '../useWords'
 import { GET_REFERRAL, ReferralResponseFE, ReferralFE, GetAdFE, LootboxReferralFE, GET_AD_BETA_V2 } from './api.gql'
@@ -31,10 +31,6 @@ interface ViralOnboardingContextType {
   setEmail: (email: string) => void
   chosenLootbox?: LootboxReferralFE
   setChosenLootbox: (lootbox: LootboxReferralFE) => void
-  /** @deprecated use chosenLootbox */
-  chosenPartyBasket?: PartyBasketFE
-  /** @deprecated use chosenLootbox */
-  setChosenPartyBasket: (partyBasket: PartyBasketFE | undefined) => void
 }
 
 const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(null)
@@ -74,8 +70,6 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
   const [ad, setAd] = useState<AdServed>()
   const [adQuestions, setAdQuestions] = useState<AdOfferQuestion[]>([])
   const [claim, setClaim] = useState<ClaimFE>()
-  /** @deprecated */
-  const [chosenPartyBasket, setChosenPartyBasket] = useState<PartyBasketFE>()
   const [chosenLootbox, setChosenLootbox] = useState<LootboxReferralFE>()
   const [email, setEmail] = useState<string>()
   const words = useWords()
@@ -140,8 +134,6 @@ const ViralOnboardingProvider = ({ referralSlug, children }: PropsWithChildren<V
         setEmail,
         chosenLootbox,
         setChosenLootbox,
-        chosenPartyBasket,
-        setChosenPartyBasket,
       }}
     >
       {children}

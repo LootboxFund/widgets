@@ -23,7 +23,7 @@ const OnboardingAddEmail = (props: Props) => {
   const [email, setEmailLocal] = useState('')
   const [phone, setPhoneLocal] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const { setEmail, chosenLootbox, chosenPartyBasket, referral, sessionId } = useViralOnboarding()
+  const { setEmail, chosenLootbox, referral, sessionId } = useViralOnboarding()
   const [loading, setLoading] = useState(false)
 
   const authWords = useAuthWords()
@@ -86,14 +86,8 @@ const OnboardingAddEmail = (props: Props) => {
     }
   }
 
-  const _lb = !!chosenPartyBasket?.lootboxAddress
-    ? referral?.tournament?.lootboxSnapshots?.find((snap) => snap.address === chosenPartyBasket.lootboxAddress)
-    : undefined
-
   const image: string | null = chosenLootbox?.stampImage
     ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
-    : _lb?.stampImage
-    ? convertFilenameToThumbnail(_lb.stampImage, 'sm')
     : null
 
   const hardcodedTournamentsWithDataSharing: TournamentID[] = [

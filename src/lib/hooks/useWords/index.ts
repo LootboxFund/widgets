@@ -356,20 +356,6 @@ const useWords = () => {
     description: 'Generic user action to not find something',
   })
 
-  const partyBasket = intl.formatMessage({
-    id: 'generic.partyBasket',
-    defaultMessage: 'Party basket',
-    description:
-      'This is the name of a piece of software we use to manage Lootbox bounties. In sentence: "You can redeem a Lootbox NFT from your tournament`s party basket"',
-  })
-
-  const partyBaskets = intl.formatMessage({
-    id: 'generic.partyBaskets',
-    defaultMessage: 'Party baskets',
-    description:
-      'Plural, This is the name of a piece of software we use to manage Lootbox bounties. In sentence: "You can redeem a Lootbox NFT from your tournament`s party basket"',
-  })
-
   const submitting = intl.formatMessage({
     id: 'generic.submitting',
     defaultMessage: 'Submitting',
@@ -380,12 +366,6 @@ const useWords = () => {
     id: 'generic.success',
     defaultMessage: 'Success',
     description: 'Generic text indicate a success',
-  })
-
-  const createAPartyBasket = intl.formatMessage({
-    id: 'generic.createAPartyBasket',
-    defaultMessage: 'Create a Party Basket',
-    description: 'User action to create a party basket',
   })
 
   const error = intl.formatMessage({
@@ -510,19 +490,6 @@ const useWords = () => {
     id: 'generic.bulkMintNFTs',
     defaultMessage: 'Bulk mint NFTs',
     description: 'Text indicating to bulk mint NFTs',
-  })
-
-  const loginToMakePartyBasket = intl.formatMessage({
-    id: 'generics.loginToMakePartyBasket',
-    defaultMessage: 'Login to make a Party Basket',
-    description: 'User prompt indicating that the user should login to make a Party Basket.',
-  })
-
-  const partyBasketInformation = intl.formatMessage({
-    id: 'generics.partyBasketInformation',
-    defaultMessage:
-      "We recommend you use a Party Basket to bulk mint NFTs to your fanbase. Party baskets allow you to whitelist bounty pick-ups in batch, which means you don't need to send the NFTs manually. Instead, your fanbase can redeem the bounties themselves.",
-    description: 'Tooltip for creating a Party Basket',
   })
 
   const win = intl.formatMessage({
@@ -874,11 +841,9 @@ const useWords = () => {
     clickingHere,
     learnMore,
     notFound,
-    partyBasket,
     clickHere,
     submitting,
     success,
-    createAPartyBasket,
     error,
     copiedToClipBoard,
     add,
@@ -902,9 +867,6 @@ const useWords = () => {
     viewTransactionReceipt,
     bulkMintNFTs,
     receiverAddress,
-    partyBaskets,
-    loginToMakePartyBasket,
-    partyBasketInformation,
     win,
     inDays,
     seeMore,

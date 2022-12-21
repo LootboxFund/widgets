@@ -3,7 +3,6 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ClaimID, LootboxID, ReferralSlug } from '@wormgraph/helpers'
 import AcceptGift from './components/AcceptGift'
-import ChooseLotteryPartyBasket from './components/ChooseLotteryPartyBasket'
 import ChooseLottery from './components/ChooseLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
@@ -45,7 +44,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user, signInAnonymously, sendSignInEmailForViralOnboarding, sendSignInEmailAnon } = useAuth()
 
   const words = useWords()
-  const { ad, referral, claim, chosenLootbox, chosenPartyBasket } = useViralOnboarding()
+  const { ad, referral, claim, chosenLootbox } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
     isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
     // 'success'
@@ -80,8 +79,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
         payload: {
           claimId: claimID,
           chosenLootboxID: lootboxID,
-          // DEPRECATED
-          chosenPartyBasketId: chosenPartyBasket?.id,
         },
       },
     })
@@ -199,33 +196,22 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       case 'one-pager':
         return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
       case 'browse-lottery':
-        switch (referral.tournament.isPostCosmic) {
-          case false:
-          case undefined:
-          case null:
-            // DEPRECATED party baskets
-            return <ChooseLotteryPartyBasket onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
-          case true:
-          default:
-            // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
-            return (
-              <ChooseLottery
-                onNext={async (lootboxID: LootboxID) => {
-                  if (user && claim?.id) {
-                    // user already logged in - complete claim & move on automatically
+        // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
+        return (
+          <ChooseLottery
+            onNext={async (lootboxID: LootboxID) => {
+              if (user && claim?.id) {
+                // user already logged in - complete claim & move on automatically
 
-                    await completeClaimRequest(claim.id, lootboxID)
-                    setRoute('success')
-                  } else {
-                    setRoute('sign-up-anon')
-                  }
-                }}
-                onBack={() => console.log('back')}
-              />
-            )
-          // uncomment me for dev without auth
-          // return <ChooseLottery onNext={() => setRoute('success')} onBack={() => console.log('back')} />
-        }
+                await completeClaimRequest(claim.id, lootboxID)
+                setRoute('success')
+              } else {
+                setRoute('sign-up-anon')
+              }
+            }}
+            onBack={() => console.log('back')}
+          />
+        )
       case 'sign-up-anon':
         return (
           <AddEmail

@@ -259,14 +259,12 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
         {filteredUserClaims.map((claim) => {
           const elId = `dropdown${claim.id}`
           const isNotifReq = notificationClaims.indexOf(claim.id) > -1
-          const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl || claim?.chosenPartyBasket?.joinCommunityUrl
+          const joinCommunityURL = claim?.chosenLootbox?.joinCommunityUrl
           const joinNotif = isNotifReq && !!joinCommunityURL
           const isNotif = !!joinNotif
 
-          const displayImage = claim?.chosenLootbox?.stampImage || claim?.chosenPartyBasket?.lootboxSnapshot?.stampImage
-          const redeemPageURL = claim?.chosenPartyBasket
-            ? `${manifest.microfrontends.webflow.basketRedeemPage}?basket=${claim.chosenPartyBasket?.address}`
-            : `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
+          const displayImage = claim?.chosenLootbox?.stampImage
+          const redeemPageURL = `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
           const mainActionLink = joinCommunityURL || claim.tournament?.tournamentLink || redeemPageURL
 

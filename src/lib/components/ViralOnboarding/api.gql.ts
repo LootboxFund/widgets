@@ -3,7 +3,6 @@ import {
   Address,
   ClaimID,
   ReferralID,
-  PartyBasketID,
   ReferralSlug,
   TournamentID,
   UserID,
@@ -13,7 +12,6 @@ import {
 import {
   ClaimStatus,
   ClaimType,
-  PartyBasketStatus,
   LootboxStatus,
   LootboxTournamentStatus,
   ResponseError,
@@ -52,16 +50,6 @@ export const COMPLETE_CLAIM = gql`
   }
 `
 
-/** @deprecated */
-export interface PartyBasketFE {
-  id: PartyBasketID
-  name?: string
-  nftBountyValue?: string
-  address: Address
-  lootboxAddress?: Address
-  status?: PartyBasketStatus
-}
-
 export interface LootboxReferralSnapshot {
   lootboxID?: LootboxID
   address: Address
@@ -82,8 +70,6 @@ export interface LootboxSnapshotFE {
   name?: string
   stampImage?: string
   description?: string
-  /** @deprecated */
-  partyBaskets: PartyBasketFE[]
 }
 /** @deprecated use LotteryListingV2FE */
 export interface LotteryListingFE {
@@ -144,38 +130,6 @@ export const GET_LOTTERY_LISTINGS_V2 = gql`
   }
 `
 
-/** @deprecated this uses party baskets */
-export const GET_LOTTERY_LISTINGS = gql`
-  query Query($id: ID!) {
-    tournament(id: $id) {
-      ... on TournamentResponseSuccess {
-        tournament {
-          lootboxSnapshots {
-            address
-            name
-            stampImage
-            description
-            partyBaskets {
-              id
-              name
-              nftBountyValue
-              address
-              lootboxAddress
-              status
-            }
-          }
-        }
-      }
-      ... on ResponseError {
-        error {
-          code
-          message
-        }
-      }
-    }
-  }
-`
-
 export interface ClaimFE {
   id: ClaimID
   referralId: ReferralID
@@ -183,8 +137,6 @@ export interface ClaimFE {
   referralSlug: ReferralSlug
   tournamentId: TournamentID
   referrerId?: UserID
-  chosenPartyBasketId?: PartyBasketID
-  chosenPartyBasketAddress?: Address
   lootboxAddress?: Address
   rewardFromClaim?: string
   claimerUserId?: UserID
@@ -208,8 +160,6 @@ export const CREATE_CLAIM = gql`
           referralSlug
           tournamentId
           referrerId
-          chosenPartyBasketId
-          chosenPartyBasketAddress
           lootboxAddress
           rewardFromClaim
           claimerUserId
@@ -324,8 +274,6 @@ export const CLAIM_BY_ID = gql`
           referralSlug
           tournamentId
           referrerId
-          chosenPartyBasketId
-          chosenPartyBasketAddress
           lootboxAddress
           rewardFromClaim
           claimerUserId
