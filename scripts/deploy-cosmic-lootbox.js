@@ -1,6 +1,6 @@
 const express = require('express')
 const app = new express()
-const { Manifest_v0_7_4_demo: Manifest } = require('@wormgraph/manifest')
+const { Manifest_v0_7_4_prod: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 
@@ -21,10 +21,10 @@ console.log(`
 
 const RedeemCosmicLootbox =
   process.env.NODE_ENV === 'production' ? 'RedeemCosmicLootbox.production.js' : 'RedeemCosmicLootbox.js'
-const ViralOnboardingCSS =
+const RedeemCosmicLootboxCSS =
   process.env.NODE_ENV === 'production' ? 'RedeemCosmicLootbox.production.css' : 'RedeemCosmicLootbox.js.css'
 
-const fileNames = [RedeemCosmicLootbox, ViralOnboardingCSS]
+const fileNames = [RedeemCosmicLootbox, RedeemCosmicLootboxCSS]
 
 const run = async () => {
   await Promise.all(
