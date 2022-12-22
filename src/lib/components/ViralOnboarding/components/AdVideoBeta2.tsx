@@ -21,7 +21,7 @@ import {
 } from 'lib/api/graphql/generated/types'
 import { useAuth } from 'lib/hooks/useAuth'
 import { QuestionFieldType } from '../../../api/graphql/generated/types'
-import { $InputMedium } from 'lib/components/Authentication/Shared'
+import { $InputMedium, renderAvailableQuestionTypes } from 'lib/components/Authentication/Shared'
 import { useMutation } from '@apollo/client'
 import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
@@ -40,7 +40,6 @@ const AdVideoBeta2 = (props: Props) => {
   const [questionsHash, setQuestionsHash] = useState<QuestionAnswerEditorState>({})
   const [goToDestination, setGoToDestination] = useState(true)
   const [showQuestions, setShowQuestions] = useState(false)
-  const [adClickedOnce, setAdClickedOnce] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [viewPixelRendered, setViewPixelRendered] = useState(false)
@@ -153,25 +152,6 @@ const AdVideoBeta2 = (props: Props) => {
     if (!ad) {
       return
     }
-    if (!adClickedOnce) {
-      loadAdTrackingPixel({
-        adID: ad.adID as AdID,
-        sessionID: sessionId,
-        eventAction: AdEventAction.Click,
-        claimID: claim?.id,
-        userID: user?.id,
-        adSetID: ad.adSetID as AdSetID,
-        offerID: ad.offerID as OfferID,
-        campaignID: undefined,
-        tournamentID: referral?.tournamentId,
-        organizerID: undefined,
-        promoterID: referral.promoterId as AffiliateID,
-        flightID: ad.flightID as FlightID,
-        nonce: undefined,
-        timeElapsed: undefined,
-      })
-      setAdClickedOnce(true)
-    }
 
     if (!goToDestination) {
       setGoToDestination(true)
@@ -206,13 +186,6 @@ const AdVideoBeta2 = (props: Props) => {
       // window.open(ad.clickDestination, '_blank') // this doesnt reliably work on safari due to security policies, according to ChatGPT
       location.href = ad.clickDestination
     }
-    setTimeout(
-      () => {
-        // setLoading(false)
-        // props.onNext()
-      },
-      adQuestions && adQuestions.length > 0 ? 1000 : 0
-    )
   }
 
   const handleVideoClick = () => {
@@ -359,6 +332,7 @@ const AdVideoBeta2 = (props: Props) => {
                     </$Horizontal>
                   </label>
                   <$InputMedium
+                    type={renderAvailableQuestionTypes(question.type)}
                     onChange={(e) => {
                       setQuestionsHash({
                         ...questionsHash,
@@ -378,7 +352,7 @@ const AdVideoBeta2 = (props: Props) => {
                     }}
                     value={questionsHash[question.id]?.answer || ''}
                     placeholder="type answer here..."
-                    style={{ width: 'auto', backgroundColor: 'rgba(256,256,256,0.6)' }}
+                    style={{ width: 'auto', backgroundColor: 'rgba(256,256,256,1)' }}
                   ></$InputMedium>
                 </$Vertical>
               )
@@ -535,7 +509,7 @@ const $ContainerSlide = styled.div<{ slideOn?: boolean; slideOff?: boolean; dela
   } ;
 `
 
-const $QuestionsDuringAd = styled.div`
+export const $QuestionsDuringAd = styled.div`
   width: 100%;
   height: 100%;
   max-width: 600px;

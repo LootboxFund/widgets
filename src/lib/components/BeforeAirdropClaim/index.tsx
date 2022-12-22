@@ -17,6 +17,7 @@ import {
 } from '../RedeemCosmicLootbox/api.gql'
 import { ANSWER_AIRDROP_QUESTIONS } from './api.gql'
 import './index.css'
+import { $Horizontal } from 'lib/components/Generics'
 
 interface BeforeAirdropClaimQuestionsProps {
   name: string
@@ -30,7 +31,9 @@ interface BeforeAirdropClaimQuestionsProps {
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const [answers, setAnswers] = useState<Record<string, { answer: string; type: QuestionFieldType }>>({})
+  const [answers, setAnswers] = useState<
+    Record<string, { answer: string; type: QuestionFieldType; mandatory: boolean; options: string }>
+  >({})
   const [updateClaimRedemptionStatus] = useMutation<
     { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
     MutationUpdateClaimRedemptionStatusArgs
@@ -43,11 +46,13 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           [curr.id]: {
             answer: '',
             type: curr.type,
+            options: curr.options,
+            mandatory: curr.mandatory,
           },
         }
       }, {} as Record<string, { answer: string; type: QuestionFieldType }>) as Record<
         string,
-        { answer: string; type: QuestionFieldType }
+        { answer: string; type: QuestionFieldType; mandatory: boolean; options: string }
       >
     )
   }, [])
@@ -117,7 +122,10 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     })
     .sort((a, b) => (b.order || 99) - (a.order || 99))
 
-  const filledAllAnswers = Object.values(answers).some((a) => !a.answer)
+  const filledAllMandatoryAnswers =
+    Object.values(answers)
+      .filter((a) => a.mandatory)
+      .some((a) => a.answer) || props.airdropQuestions.length === 0
   const showPartOne = props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink
   const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0
   return (
@@ -194,7 +202,11 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           {questionsToCollect.map((q) => {
             return (
               <div key={q.id} className="questionset-div">
-                <i className="question">{q.question}</i>
+                <$Horizontal width="100%" justifyContent="space-between">
+                  <i className="question">{q.question}</i>
+                  <div>{q.mandatory && <i style={{ fontSize: '0.8rem', color: 'gray' }}>* Required</i>}</div>
+                </$Horizontal>
+
                 <input
                   className="answer-input"
                   value={answers[q.id]?.answer || ''}
@@ -229,9 +241,12 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
       )}
       <button
         onClick={() => answerQuestions()}
-        disabled={isSubmitting || filledAllAnswers}
+        disabled={isSubmitting || !filledAllMandatoryAnswers}
         className="action-button"
-        style={{ opacity: filledAllAnswers ? 0.1 : 1, cursor: filledAllAnswers ? 'not-allowed' : 'pointer' }}
+        style={{
+          opacity: !filledAllMandatoryAnswers ? 0.1 : 1,
+          cursor: !filledAllMandatoryAnswers ? 'not-allowed' : 'pointer',
+        }}
       >
         {isSubmitting ? (
           <$Spinner color={COLORS.white} margin="auto auto 20px" />
