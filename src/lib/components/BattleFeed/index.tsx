@@ -70,10 +70,10 @@ const BattleFeed = () => {
           const daysDiff = tourny.tournamentDate
             ? Math.round((new Date(tourny.tournamentDate).valueOf() - new Date().valueOf()) / (1000 * 60 * 60 * 24))
             : undefined
-          const watchPage = `${manifest.microfrontends.webflow.battlePage}?tid=${tourny.id}`
+          // const watchPage = `${manifest.microfrontends.webflow.battlePage}?tid=${tourny.id}`
           return (
             <$BattleContainer key={`battle_${idx}`} screen={screen}>
-              <a href={watchPage} style={{ textDecoration: 'none', display: 'block' }}>
+              <a style={{ textDecoration: 'none', display: 'block' }}>
                 <$Horizontal height="100%" spacing={2}>
                   <$BattleCardsContainer width="40%">
                     {tourny.lootboxSnapshots?.length ? (

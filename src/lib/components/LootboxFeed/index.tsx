@@ -55,7 +55,7 @@ const LootboxFeed = () => {
         {lootboxes.map((lootbox, idx) => {
           return (
             <$LootboxMainImageContainer screen={screen} key={idx}>
-              <a href={`${manifest.microfrontends.webflow.lootboxUrl}?lootbox=${lootbox.address}`}>
+              <a href={`${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${lootbox.id}`}>
                 <$LootboxImage
                   screen={screen}
                   src={
