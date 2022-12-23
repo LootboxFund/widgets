@@ -1,4 +1,4 @@
-import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
+import { COLORS, QuestionFieldType, TYPOGRAPHY } from '@wormgraph/helpers'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -126,6 +126,25 @@ export const $ChangeMode = styled.div`
   text-decoration-line: underline;
   color: #ababab;
 `
+
+export const renderAvailableQuestionTypes = (type: QuestionFieldType) => {
+  if (type === QuestionFieldType.Address) return 'text'
+  if (type === QuestionFieldType.Checkbox) return 'checkbox'
+  if (type === QuestionFieldType.Date) return 'date'
+  if (type === QuestionFieldType.DateTime) return 'datetime-local'
+  if (type === QuestionFieldType.Email) return 'email'
+  if (type === QuestionFieldType.File) return 'file'
+  if (type === QuestionFieldType.Link) return 'url'
+  if (type === QuestionFieldType.MultiSelect) return 'text'
+  if (type === QuestionFieldType.Number) return 'number'
+  if (type === QuestionFieldType.Phone) return 'tel'
+  if (type === QuestionFieldType.Range) return 'range'
+  if (type === QuestionFieldType.Screenshot) return 'file'
+  if (type === QuestionFieldType.SingleSelect) return 'text'
+  if (type === QuestionFieldType.Text) return 'text'
+  if (type === QuestionFieldType.Time) return 'time'
+  return 'text'
+}
 
 export const $Checkbox = styled.input`
   width: 20px;

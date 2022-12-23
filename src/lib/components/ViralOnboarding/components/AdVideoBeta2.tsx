@@ -20,11 +20,10 @@ import {
   UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
 import { useAuth } from 'lib/hooks/useAuth'
-import { QuestionFieldType } from '../../../api/graphql/generated/types'
-import { $InputMedium } from 'lib/components/Authentication/Shared'
 import { useMutation } from '@apollo/client'
 import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
+import QuestionInput from 'lib/components/QuestionInput'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 export type QuestionAnswerEditorState = Record<QuestionAnswerID, QuestionDef>
@@ -40,7 +39,6 @@ const AdVideoBeta2 = (props: Props) => {
   const [questionsHash, setQuestionsHash] = useState<QuestionAnswerEditorState>({})
   const [goToDestination, setGoToDestination] = useState(true)
   const [showQuestions, setShowQuestions] = useState(false)
-  const [adClickedOnce, setAdClickedOnce] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [viewPixelRendered, setViewPixelRendered] = useState(false)
@@ -153,25 +151,6 @@ const AdVideoBeta2 = (props: Props) => {
     if (!ad) {
       return
     }
-    if (!adClickedOnce) {
-      loadAdTrackingPixel({
-        adID: ad.adID as AdID,
-        sessionID: sessionId,
-        eventAction: AdEventAction.Click,
-        claimID: claim?.id,
-        userID: user?.id,
-        adSetID: ad.adSetID as AdSetID,
-        offerID: ad.offerID as OfferID,
-        campaignID: undefined,
-        tournamentID: referral?.tournamentId,
-        organizerID: undefined,
-        promoterID: referral.promoterId as AffiliateID,
-        flightID: ad.flightID as FlightID,
-        nonce: undefined,
-        timeElapsed: undefined,
-      })
-      setAdClickedOnce(true)
-    }
 
     if (!goToDestination) {
       setGoToDestination(true)
@@ -194,7 +173,7 @@ const AdVideoBeta2 = (props: Props) => {
             answers: Object.values(questionsHash).map((q) => {
               return {
                 questionID: q.id,
-                answer: q.answer,
+                answer: q.answer.toString(),
               }
             }),
           },
@@ -206,13 +185,6 @@ const AdVideoBeta2 = (props: Props) => {
       // window.open(ad.clickDestination, '_blank') // this doesnt reliably work on safari due to security policies, according to ChatGPT
       location.href = ad.clickDestination
     }
-    setTimeout(
-      () => {
-        // setLoading(false)
-        // props.onNext()
-      },
-      adQuestions && adQuestions.length > 0 ? 1000 : 0
-    )
   }
 
   const handleVideoClick = () => {
@@ -301,6 +273,49 @@ const AdVideoBeta2 = (props: Props) => {
     })
   return (
     <$ViralOnboardingCard style={{ position: 'relative', overflowY: 'scroll' }}>
+      {showQuestions && (
+        <$QuestionsSheet themeColor={themeColor}>
+          <$QuestionsDuringAd>
+            <$Horizontal justifyContent="center" style={{ width: '100%', padding: '30px 0px 50px 0px' }}>
+              <span
+                style={{
+                  color: 'white',
+                  fontSize: '1.5rem',
+                  fontWeight: 500,
+                  fontFamily: 'sans-serif',
+                }}
+              >
+                Please answer these questions
+              </span>
+            </$Horizontal>
+            {sortedQuestions.map((question) => {
+              return (
+                <QuestionInput
+                  color="white"
+                  question={{ ...question, answer: questionsHash[question.id]?.answer || '' }}
+                  setValue={(value) => {
+                    setQuestionsHash({
+                      ...questionsHash,
+                      [question.id]: {
+                        ...question,
+                        answer: value,
+                      },
+                    })
+
+                    const someAnswered = Object.values(questionsHash).some((v) => v.answer)
+
+                    if (!someAnswered && claim?.id) {
+                      updateClaimRedemptionStatus({
+                        variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
+                      })
+                    }
+                  }}
+                />
+              )
+            })}
+          </$QuestionsDuringAd>
+        </$QuestionsSheet>
+      )}
       {ad?.creative?.creativeType === 'video' && (
         <Video
           options={videoJsOptions}
@@ -338,54 +353,7 @@ const AdVideoBeta2 = (props: Props) => {
           </$Vertical>
         </$ViralOnboardingSafeArea>
       </$FloatingCover>
-      <$SlideInFooter themeColor={themeColor} delay="1.5s">
-        {showQuestions && (
-          <$QuestionsDuringAd>
-            {sortedQuestions.map((question) => {
-              return (
-                <$Vertical key={question.id} style={{ padding: '10px 10px 10px 10px' }}>
-                  <label
-                    style={{
-                      fontFamily: 'sans-serif',
-                      marginBottom: '10px',
-                      color: 'white',
-                      fontWeight: 500,
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    <$Horizontal justifyContent="space-between">
-                      {question.question}
-                      {question.mandatory && <span style={{ fontSize: '0.8rem' }}>* required</span>}
-                    </$Horizontal>
-                  </label>
-                  <$InputMedium
-                    onChange={(e) => {
-                      setQuestionsHash({
-                        ...questionsHash,
-                        [question.id]: {
-                          ...question,
-                          answer: e.target.value,
-                        },
-                      })
-
-                      const someAnswered = Object.values(questionsHash).some((v) => v.answer)
-
-                      if (!someAnswered && claim?.id) {
-                        updateClaimRedemptionStatus({
-                          variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
-                        })
-                      }
-                    }}
-                    value={questionsHash[question.id]?.answer || ''}
-                    placeholder="type answer here..."
-                    style={{ width: 'auto', backgroundColor: 'rgba(256,256,256,0.6)' }}
-                  ></$InputMedium>
-                </$Vertical>
-              )
-            })}
-          </$QuestionsDuringAd>
-        )}
-
+      <$SlideInFooter themeColor={themeColor} showQuestions={showQuestions} delay="1.5s">
         <$Vertical spacing={2}>
           {errorMessage && (
             <span
@@ -482,6 +450,21 @@ const $FloatingCover = styled.div`
   z-index: 2;
 `
 
+const $QuestionsSheet = styled.section<{ themeColor: string }>`
+  position: absolute;
+  z-index: 99;
+  top: 0;
+  height: 65%;
+  width: 100%;
+  overflow-y: scroll;
+  background: ${(props) => `linear-gradient(
+      180deg,
+      ${props.themeColor} 10%,
+      ${props.themeColor} 60%,
+      ${props.themeColor} 100%
+    )`};
+`
+
 const $CenteredContent = styled.div`
   position: relative;
   left: -50%;
@@ -535,11 +518,11 @@ const $ContainerSlide = styled.div<{ slideOn?: boolean; slideOff?: boolean; dela
   } ;
 `
 
-const $QuestionsDuringAd = styled.div`
+export const $QuestionsDuringAd = styled.div`
   width: 100%;
   height: 100%;
   max-width: 600px;
-  padding: 100px 0px 0px 0px;
+  padding: 10px 0px 0px 0px;
   display: 'flex';
   flex-direction: 'column';
   justify-content: 'flex-start';

@@ -103,7 +103,7 @@
     "@uniswap/sdk-core": "^3.0.1",
     "@uniswap/token-lists": "^1.0.0-beta.27",
     "@web3-react/core": "^6.1.9",
-    "@wormgraph/helpers": "0.7.5-demo-ai",
+    "@wormgraph/helpers": "0.7.5-demo-al",
     "@wormgraph/manifest": "0.7.5-demo",
     "bignumber.js": "^9.0.2",
     "cids": "^1.1.9",

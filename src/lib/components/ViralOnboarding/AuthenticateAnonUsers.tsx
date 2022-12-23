@@ -42,6 +42,7 @@ import {
   QueryTruncatedEmailByPhoneArgs,
 } from '../../api/graphql/generated/types'
 import { useRecaptcha } from 'lib/hooks/useRecaptcha'
+import $Button from '../Generics/Button'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -57,6 +58,7 @@ const AuthenticateAnonUsers = () => {
   const words = useWords()
   const { screen } = useWindowSize()
   const [status, setStatus] = useState<Status>('pending')
+
   const [phoneNumber, setPhoneNumber] = useState('')
   const [phoneCode, setPhoneCode] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState('')
@@ -315,6 +317,8 @@ const AuthenticateAnonUsers = () => {
               </$SubHeading>
               {truncatedEmail && <$SubHeading style={{ marginTop: '0px' }}>Sent to {truncatedEmail}.</$SubHeading>}
               <br />
+              <br />
+              <$Button screen={screen}>Skip to Profile</$Button>
             </$Vertical>
           )}
           {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}

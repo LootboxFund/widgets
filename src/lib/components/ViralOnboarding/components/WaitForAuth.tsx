@@ -19,6 +19,8 @@ import { QueryClaimByIdArgs, QueryGetLootboxByIdArgs } from '../../../api/graphq
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useAuth } from 'lib/hooks/useAuth'
 import { manifest } from 'manifest'
+import $Button from 'lib/components/Generics/Button'
+import useWindowSize from 'lib/hooks/useScreenSize'
 
 interface WaitForAuthProps {
   onNext: (claimID: ClaimID, lootboxID: LootboxID) => Promise<void>
@@ -28,6 +30,7 @@ interface WaitForAuthProps {
 
 const WaitForAuth = (props: WaitForAuthProps) => {
   const [loading, setLoading] = useState(false)
+  const { screen } = useWindowSize()
   const [errorMessage, setErrorMessage] = useState('')
   const { setClaim, setChosenLootbox, chosenLootbox } = useViralOnboarding()
   const words = useWords()
@@ -195,6 +198,9 @@ const WaitForAuth = (props: WaitForAuthProps) => {
               >
                 {words.retry + '?'}
               </$SubHeading>
+              <br />
+              <br />
+              <$Button screen={screen}>Skip to Profile</$Button>
             </$Vertical>
           )}
           {status === 'pending' && (
@@ -214,6 +220,9 @@ const WaitForAuth = (props: WaitForAuthProps) => {
                   ? `Check your spam folder. A login email was sent to ${email}.`
                   : 'Check your spam folder. A login link was sent to your email'}
               </$SubHeading>
+              <br />
+              <br />
+              <$Button screen={screen}>Skip to Profile</$Button>
             </$Vertical>
           )}
           {stampImg ? <$PartyBasketImage src={stampImg} /> : <$HandImage src={handIconImg} />}
