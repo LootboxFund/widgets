@@ -2,9 +2,8 @@ import { COLORS, QuestionFieldType, TYPOGRAPHY, QuestionAnswerID } from '@wormgr
 import { QuestionDef } from 'lib/hooks/useViralOnboarding'
 import react, { useCallback } from 'react'
 import styled from 'styled-components'
-import { $InputMedium, renderAvailableQuestionTypes } from '../Authentication/Shared'
+import { $InputMedium } from '../Authentication/Shared'
 import { $Horizontal, $Vertical } from '../Generics'
-import { $QuestionsDuringAd } from '../ViralOnboarding/components/AdVideoBeta2'
 
 export interface QuestionInputProps {
   question: QuestionDef

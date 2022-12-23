@@ -20,8 +20,6 @@ import {
   UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
 import { useAuth } from 'lib/hooks/useAuth'
-import { QuestionFieldType } from '../../../api/graphql/generated/types'
-import { $InputMedium, renderAvailableQuestionTypes } from 'lib/components/Authentication/Shared'
 import { useMutation } from '@apollo/client'
 import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
@@ -314,47 +312,6 @@ const AdVideoBeta2 = (props: Props) => {
                   }}
                 />
               )
-              // return (
-              //   <$Vertical key={question.id} style={{ padding: '10px 10px 10px 10px' }}>
-              //     <label
-              //       style={{
-              //         fontFamily: 'sans-serif',
-              //         marginBottom: '10px',
-              //         color: 'white',
-              //         fontWeight: 500,
-              //         fontSize: '1.2rem',
-              //       }}
-              //     >
-              //       <$Horizontal justifyContent="space-between">
-              //         {question.question}
-              //         {question.mandatory && <span style={{ fontSize: '0.8rem' }}>* required</span>}
-              //       </$Horizontal>
-              //     </label>
-              //     <$InputMedium
-              //       type={renderAvailableQuestionTypes(question.type)}
-              //       onChange={(e) => {
-              //         setQuestionsHash({
-              //           ...questionsHash,
-              //           [question.id]: {
-              //             ...question,
-              //             answer: e.target.value,
-              //           },
-              //         })
-
-              //         const someAnswered = Object.values(questionsHash).some((v) => v.answer)
-
-              //         if (!someAnswered && claim?.id) {
-              //           updateClaimRedemptionStatus({
-              //             variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
-              //           })
-              //         }
-              //       }}
-              //       value={questionsHash[question.id]?.answer || ''}
-              //       placeholder="type answer here..."
-              //       style={{ width: 'auto', backgroundColor: 'rgba(256,256,256,1)' }}
-              //     ></$InputMedium>
-              //   </$Vertical>
-              // )
             })}
           </$QuestionsDuringAd>
         </$QuestionsSheet>
