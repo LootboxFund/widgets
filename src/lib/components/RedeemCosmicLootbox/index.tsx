@@ -480,7 +480,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     ? convertFilenameToThumbnail(claimData?.whitelist?.lootboxTicket?.stampImage, 'md')
     : lootboxImage
 
-  const watchPage = claimData ? `${manifest.microfrontends.webflow.battlePage}?tid=${claimData?.tournamentId}` : null
+  const watchPage = 'https://lootbox.fund' // claimData ? `${manifest.microfrontends.webflow.battlePage}?tid=${claimData?.tournamentId}` : null
   const getTicketsPage = lootboxData?.joinCommunityUrl || watchPage
   const isWrongWallet =
     claimData?.whitelist?.whitelistedAddress &&
