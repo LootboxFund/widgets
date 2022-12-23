@@ -11,6 +11,7 @@ export const QUERY_LOOTBOX_FEED = gql`
         }
         edges {
           node {
+            id
             name
             stampImage
             address
