@@ -1,5 +1,12 @@
 import { useMutation } from '@apollo/client'
-import { ClaimID, COLORS, LootboxAirdropMetadata, LootboxID, QuestionFieldType } from '@wormgraph/helpers'
+import {
+  ClaimID,
+  COLORS,
+  LootboxAirdropMetadata,
+  LootboxID,
+  QuestionFieldType,
+  QuestionAnswerID,
+} from '@wormgraph/helpers'
 import {
   AnswerAirdropQuestionResponseSuccess,
   ClaimRedemptionStatus,
@@ -17,7 +24,8 @@ import {
 } from '../RedeemCosmicLootbox/api.gql'
 import { ANSWER_AIRDROP_QUESTIONS } from './api.gql'
 import './index.css'
-import { $Horizontal } from 'lib/components/Generics'
+import { $Horizontal, $Vertical } from 'lib/components/Generics'
+import QuestionInput from '../QuestionInput'
 
 interface BeforeAirdropClaimQuestionsProps {
   name: string
@@ -199,23 +207,25 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
         <div className="step-two-section">
           <h3 className="step-2-heading">{showPartOne ? `Step 2` : `Answer these questions`}</h3>
           <div className="step-2-subheading">Answer the two questions here for the advertiser.</div>
-          {questionsToCollect.map((q) => {
-            return (
-              <div key={q.id} className="questionset-div">
-                <$Horizontal width="100%" justifyContent="space-between">
-                  <i className="question">{q.question}</i>
-                  <div>{q.mandatory && <i style={{ fontSize: '0.8rem', color: 'gray' }}>* Required</i>}</div>
-                </$Horizontal>
-
-                <input
-                  className="answer-input"
-                  value={answers[q.id]?.answer || ''}
-                  onChange={(e) => {
+          <$Vertical style={{ width: '100%' }}>
+            {questionsToCollect.map((q) => {
+              return (
+                <QuestionInput
+                  color="#4a4a4a"
+                  backgroundColor="#f3f3f3"
+                  question={{
+                    ...q,
+                    id: q.id as QuestionAnswerID,
+                    mandatory: q.mandatory || false,
+                    options: q.options || '',
+                    answer: answers[q.id]?.answer || '',
+                  }}
+                  setValue={(value) => {
                     setAnswers({
                       ...answers,
                       [q.id]: {
                         ...answers[q.id],
-                        answer: e.target.value,
+                        answer: value,
                       },
                     })
                     const someAnswered = Object.values(answers).some((v) => v.answer)
@@ -226,14 +236,43 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
                       })
                     }
                   }}
-                  type={determineInputType(
-                    // answers[q.id]?.type ||
-                    QuestionFieldType.Text
-                  )}
                 />
-              </div>
-            )
-          })}
+              )
+              // return (
+              //   <div key={q.id} className="questionset-div">
+              //     <$Horizontal width="100%" justifyContent="space-between">
+              //       <i className="question">{q.question}</i>
+              //       <div>{q.mandatory && <i style={{ fontSize: '0.8rem', color: 'gray' }}>* Required</i>}</div>
+              //     </$Horizontal>
+
+              //     <input
+              //       className="answer-input"
+              //       value={answers[q.id]?.answer || ''}
+              //       onChange={(e) => {
+              //         setAnswers({
+              //           ...answers,
+              //           [q.id]: {
+              //             ...answers[q.id],
+              //             answer: e.target.value,
+              //           },
+              //         })
+              //         const someAnswered = Object.values(answers).some((v) => v.answer)
+
+              //         if (!someAnswered && props.claimID) {
+              //           updateClaimRedemptionStatus({
+              //             variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
+              //           })
+              //         }
+              //       }}
+              //       type={determineInputType(
+              //         // answers[q.id]?.type ||
+              //         QuestionFieldType.Text
+              //       )}
+              //     />
+              //   </div>
+              // )
+            })}
+          </$Vertical>
         </div>
       )}
       {errorMessage && (

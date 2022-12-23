@@ -106,7 +106,12 @@ export const $TournamentStampPreviewImage = styled.img<{ cardNumber: 0 | 1 }>`
   filter: drop-shadow(0px 0px 25px #ff0000);
 `
 
-export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; preventDefault?: boolean }>`
+export const $SlideInFooter = styled.div<{
+  themeColor: string
+  delay: string
+  preventDefault?: boolean
+  showQuestions: boolean
+}>`
   position: absolute;
   width: 100%;
   bottom: ${(props) => (props.preventDefault ? '0px' : '-100%')};
@@ -123,7 +128,10 @@ export const $SlideInFooter = styled.div<{ themeColor: string; delay: string; pr
 
   z-index: 3;
 
-  background: ${(props) => `linear-gradient(
+  background: ${(props) =>
+    props.showQuestions
+      ? props.themeColor
+      : `linear-gradient(
       180deg,
       rgba(0,0,0,0%) 0%,
       ${props.themeColor} 40%,
