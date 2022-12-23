@@ -238,39 +238,6 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
                   }}
                 />
               )
-              // return (
-              //   <div key={q.id} className="questionset-div">
-              //     <$Horizontal width="100%" justifyContent="space-between">
-              //       <i className="question">{q.question}</i>
-              //       <div>{q.mandatory && <i style={{ fontSize: '0.8rem', color: 'gray' }}>* Required</i>}</div>
-              //     </$Horizontal>
-
-              //     <input
-              //       className="answer-input"
-              //       value={answers[q.id]?.answer || ''}
-              //       onChange={(e) => {
-              //         setAnswers({
-              //           ...answers,
-              //           [q.id]: {
-              //             ...answers[q.id],
-              //             answer: e.target.value,
-              //           },
-              //         })
-              //         const someAnswered = Object.values(answers).some((v) => v.answer)
-
-              //         if (!someAnswered && props.claimID) {
-              //           updateClaimRedemptionStatus({
-              //             variables: { payload: { claimID: props.claimID, status: ClaimRedemptionStatus.InProgress } },
-              //           })
-              //         }
-              //       }}
-              //       type={determineInputType(
-              //         // answers[q.id]?.type ||
-              //         QuestionFieldType.Text
-              //       )}
-              //     />
-              //   </div>
-              // )
             })}
           </$Vertical>
         </div>
