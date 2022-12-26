@@ -6,8 +6,19 @@ import {
   LootboxID,
   QuestionFieldType,
   QuestionAnswerID,
+  AdID,
+  SessionID,
+  AdEventAction,
+  OfferID,
+  AdSetID,
+  TournamentID,
+  FlightID,
+  AffiliateID,
+  AdEventNonce,
 } from '@wormgraph/helpers'
 import {
+  AdOfferQuestion,
+  AdServed,
   AnswerAirdropQuestionResponseSuccess,
   ClaimRedemptionStatus,
   LootboxAirdropMetadataQuestion,
@@ -16,7 +27,7 @@ import {
   ResponseError,
   UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
-import { FunctionComponent, useEffect, useState } from 'react'
+import { FunctionComponent, useEffect, useMemo, useRef, useState } from 'react'
 import $Spinner from '../Generics/Spinner'
 import {
   CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS,
@@ -26,6 +37,15 @@ import { ANSWER_AIRDROP_QUESTIONS } from './api.gql'
 import './index.css'
 import { $Horizontal, $Vertical } from 'lib/components/Generics'
 import QuestionInput from '../QuestionInput'
+import { useBeforeAirdropAd } from 'lib/hooks/useBeforeAirdropAd'
+import StickyBottomFrame from '../StickyBottomFrame'
+import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
+import Video from '../ViralOnboarding/components/Video'
+import { loadAdTrackingPixel } from 'lib/utils/pixel'
+import { useAuth } from 'lib/hooks/useAuth'
+import { Tournament } from '../../api/graphql/generated/types'
+import { v4 as uuidv } from 'uuid'
+import { manifest } from 'manifest'
 
 interface BeforeAirdropClaimQuestionsProps {
   name: string
@@ -34,11 +54,21 @@ interface BeforeAirdropClaimQuestionsProps {
   stampImage: string
   lootboxID: LootboxID
   airdropMetadata: LootboxAirdropMetadata
-  airdropQuestions: LootboxAirdropMetadataQuestion[]
+  airdropQuestions: AdOfferQuestion[]
+  ad?: AdServed
+  sessionID?: SessionID
 }
 const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [viewPixelRendered, setViewPixelRendered] = useState(false)
+  const playerRef = useRef<VideoJsPlayer | null>(null)
+  const [minimizedAd, setMinimizedAd] = useState(false)
+  // Prevents caching & helps dedupe
+  const nonce = useMemo(() => {
+    return uuidv() as AdEventNonce
+  }, [])
+  const { user } = useAuth()
   const [answers, setAnswers] = useState<
     Record<string, { answer: string; type: QuestionFieldType; mandatory: boolean; options: string }>
   >({})
@@ -63,13 +93,36 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
         { answer: string; type: QuestionFieldType; mandatory: boolean; options: string }
       >
     )
-  }, [])
-  const [answerQuestionsMutation] = useMutation<{ answerAirdropQuestion: any }, MutationAnswerAirdropQuestionArgs>(
-    ANSWER_AIRDROP_QUESTIONS,
-    {
-      refetchQueries: [{ query: CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, variables: { lootboxID: props.lootboxID } }],
+  }, [props.airdropQuestions])
+  const ad = useMemo(() => {
+    return props.ad
+  }, [props.ad])
+  useEffect(() => {
+    if (ad && !viewPixelRendered) {
+      loadAdTrackingPixel({
+        adID: ad.adID as AdID,
+        sessionID: props.sessionID,
+        eventAction: AdEventAction.View,
+        userID: user?.id,
+        claimID: (ad.inheritedClaim?.claimID || '') as ClaimID,
+        adSetID: ad.adSetID as AdSetID,
+        offerID: ad.offerID as OfferID,
+        campaignID: undefined,
+        tournamentID: (ad.inheritedClaim?.tournamentID || '') as TournamentID,
+        promoterID: (ad.inheritedClaim?.promoterID || '') as AffiliateID,
+        flightID: ad.flightID as FlightID,
+        nonce,
+        timeElapsed: undefined,
+      })
+      setViewPixelRendered(true)
     }
-  )
+  }, [ad])
+  const [answerAirdropQuestionsMutation] = useMutation<
+    { answerAirdropQuestion: any },
+    MutationAnswerAirdropQuestionArgs
+  >(ANSWER_AIRDROP_QUESTIONS, {
+    refetchQueries: [{ query: CHECK_IF_USER_ANSWERED_AIRDROP_QUESTIONS, variables: { lootboxID: props.lootboxID } }],
+  })
   const answersInput = Object.keys(answers).map((a) => {
     return {
       questionID: a,
@@ -79,12 +132,13 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   })
   const answerQuestions = async () => {
     setIsSubmitting(true)
-    const res = await answerQuestionsMutation({
+    const res = await answerAirdropQuestionsMutation({
       variables: {
         payload: {
           lootboxID: props.lootboxID,
           claimID: props.claimID,
           answers: answersInput,
+          flightID: ad?.flightID,
         },
       },
     })
@@ -96,6 +150,87 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
       window.scrollTo(0, 0)
     }, 1000)
   }
+  const proceedFromVideoAd = () => {
+    setMinimizedAd(true)
+  }
+  const videoJsOptions: VideoJsPlayerOptions = {
+    autoplay: true,
+    controls: false,
+    muted: true,
+    responsive: true,
+    loop: false,
+    // bigPlayButton: true,
+    retryOnError: true,
+    // fluid: true,
+    poster: ad?.creative?.thumbnail,
+    // fill: true,
+    // aspectRatio: ad?.creative?.creativeAspectRatio || '9:16',
+    sources: ad?.creative?.creativeLinks
+      ? ad.creative.creativeLinks.map((link: string) => {
+          return {
+            src: link,
+            type: `video/${
+              link.toLowerCase().endsWith('webm') ? 'webm' : link.toLowerCase().endsWith('ogv') ? 'ogv' : 'mp4'
+            }`,
+          }
+        })
+      : [],
+  }
+  const handlePlayerReady = (player: VideoJsPlayer) => {
+    playerRef.current = player
+
+    player.on('ready', () => {
+      player.play()
+      setTimeout(() => {
+        player.muted(false)
+      }, 5000)
+    })
+
+    player.on('ended', () => {
+      proceedFromVideoAd()
+    })
+  }
+  if (props.ad && !minimizedAd) {
+    return (
+      <StickyBottomFrame
+        backgroundCover={{
+          backgroundImage: `url(${ad?.creative?.creativeLinks[0]})`,
+        }}
+        submitText={props.ad.creative.callToAction}
+        loading={false}
+        submitForm={proceedFromVideoAd}
+      >
+        <section
+          style={{
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0)',
+            justifyContent: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {ad?.creative?.creativeType === 'video' && (
+            <Video
+              options={videoJsOptions}
+              onReady={handlePlayerReady}
+              style={{
+                width: '100%',
+                height: '100%',
+                maxWidth: '600px',
+                position: 'absolute',
+              }}
+            />
+          )}
+          {ad?.creative.creativeType === 'image' && (
+            <div>
+              <img src={ad?.creative?.creativeLinks[0]} style={{ width: '100%', height: '100%' }} />
+            </div>
+          )}
+        </section>
+      </StickyBottomFrame>
+    )
+  }
+
   const determineInputType = (type: QuestionFieldType) => {
     if (type === QuestionFieldType.Date) {
       return 'date'
@@ -131,15 +266,18 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     .sort((a, b) => (b.order || 99) - (a.order || 99))
 
   const filledAllMandatoryAnswers =
-    Object.values(answers)
-      .filter((a) => a.mandatory)
-      .some((a) => a.answer) || (props.airdropQuestions || []).length === 0
+    (props.airdropQuestions || []).length === 0
+      ? true
+      : Object.values(answers)
+          .filter((a) => a.mandatory)
+          .every((a) => !!a.answer)
   const showPartOne =
     props.airdropMetadata && (props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink)
   const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0
+
   return (
     <div className="beforeairdropclaim-questions-div">
-      <div className="prize-showcase-div">
+      {/* <div className="prize-showcase-div">
         <img className="lootbox-image-icon1" alt="" src={props.stampImage} />
         <div className="showcase-text-div">
           <h1 className="title-h1">{props.nftBountyValue}</h1>
@@ -152,6 +290,10 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           You received a FREE gift from a sponsor “
           {(props.airdropMetadata && props.airdropMetadata.advertiserName) || 'Unknown'}”.
         </div>
+      </div> */}
+
+      <div className="how-to-redeem">
+        <h2 className="how-to-redeem-heading">How to Redeem</h2>
       </div>
       {props.airdropMetadata?.oneLiner && (
         <div className="sponsor-wants-div">
@@ -163,10 +305,6 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
           </div>
         </div>
       )}
-
-      <div className="how-to-redeem">
-        <h2 className="how-to-redeem-heading">How to Redeem</h2>
-      </div>
       {showPartOne && (
         <div className="step-one-section">
           <h3 className="step-1-heading">Step 1</h3>
@@ -174,10 +312,10 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
             Follow the sponsor’s instructions here. Do this at your own risk. LOOTBOX assumes no responsiblity between
             you and sponsor.
           </div>
-          {props.airdropMetadata.instructionsLink && (
+          {props.airdropMetadata?.instructionsLink && (
             <iframe
               className="step-1-video"
-              src={props.airdropMetadata.instructionsLink}
+              src={props.airdropMetadata?.instructionsLink}
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -187,7 +325,11 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
 
           <a
             id="action-button-text-id"
-            href={props.airdropMetadata.callToActionLink}
+            href={`${manifest.storage.buckets.redirectPage.accessUrl}/${
+              manifest.storage.buckets.redirectPage.files.page
+            }?flightID=${ad?.flightID}&destination=${encodeURIComponent(
+              props.airdropMetadata?.callToActionLink || ''
+            )}&eventAction=${AdEventAction.Click}`}
             target="_blank"
             rel="noreferrer"
             onClick={() => {

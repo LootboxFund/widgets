@@ -38,7 +38,7 @@ const ViralOnboardingContext = createContext<ViralOnboardingContextType | null>(
 export const useViralOnboarding = () => {
   const context = useContext(ViralOnboardingContext)
   if (context === null) {
-    throw new Error('useViralOnboarding can only be used inside a DeliveryFormProvider')
+    throw new Error('useViralOnboarding can only be used inside a ViralOnboardingProvider')
   }
 
   return context

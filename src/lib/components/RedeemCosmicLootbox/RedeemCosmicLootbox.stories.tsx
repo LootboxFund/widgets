@@ -7,6 +7,7 @@ import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
 import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
+import BeforeAirdropAdProvider from 'lib/hooks/useBeforeAirdropAd'
 
 export default {
   title: 'RedeemCosmicLootbox',
@@ -29,11 +30,13 @@ const Template = () => {
     <ApolloProvider client={client}>
       <LocalizationWrapper>
         <AuthProvider>
-          <$CardViewport width="100%" maxWidth="920px" margin="0 auto">
-            <RedeemCosmicLootbox />
-            <br />
-            <br />
-          </$CardViewport>
+          <BeforeAirdropAdProvider>
+            <$CardViewport width="100%" maxWidth="920px" margin="0 auto">
+              <RedeemCosmicLootbox />
+              <br />
+              <br />
+            </$CardViewport>
+          </BeforeAirdropAdProvider>
         </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>

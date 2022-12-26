@@ -139,15 +139,6 @@ export const GET_LOOTBOX_REDEEM_PAGE = gql`
             organizerID
             advertiserName
           }
-          airdropQuestions {
-            id
-            batch
-            order
-            question
-            type
-            mandatory
-            options
-          }
         }
       }
       ... on ResponseError {

@@ -7,13 +7,13 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { useState, createContext, useContext, PropsWithChildren, useEffect } from 'react'
-import { ClaimFE } from 'lib/components/BeforeAirdropAd/api.gql'
+
 import { useLazyQuery, useQuery } from '@apollo/client'
 import useWords from '../useWords'
 import { GET_AIRDROP_AD_BETA_V2 } from './api.gql'
-import { ErrorCard, LoadingCard } from 'lib/components/BeforeAirdropAd/components/GenericCard'
+
 import { v4 as uuid } from 'uuid'
-import { SessionID, ReferralSlug, QuestionAnswerID, QuestionFieldType } from '@wormgraph/helpers'
+import { SessionID, ReferralSlug, QuestionAnswerID, QuestionFieldType, LootboxID } from '@wormgraph/helpers'
 import { useAuth } from '../useAuth'
 import {
   AdOfferQuestion,
@@ -26,15 +26,9 @@ const sessionId = uuid() as SessionID
 
 interface BeforeAirdropAdContextType {
   sessionId: SessionID
-  referral: ReferralFE
-  claim?: ClaimFE
-  setClaim: (claim: ClaimFE | undefined) => void
+  retrieveAirdropAd: (lootboxID: LootboxID) => void
   ad?: AdServed
   adQuestions?: AdOfferQuestion[]
-  email?: string
-  setEmail: (email: string) => void
-  chosenLootbox?: LootboxReferralFE
-  setChosenLootbox: (lootbox: LootboxReferralFE) => void
 }
 
 const BeforeAirdropAdContext = createContext<BeforeAirdropAdContextType | null>(null)
@@ -42,19 +36,15 @@ const BeforeAirdropAdContext = createContext<BeforeAirdropAdContextType | null>(
 export const useBeforeAirdropAd = () => {
   const context = useContext(BeforeAirdropAdContext)
   if (context === null) {
-    throw new Error('useBeforeAirdropAd can only be used inside a DeliveryFormProvider')
+    throw new Error('useBeforeAirdropAd can only be used inside a BeforeAirdropAdProvider')
   }
 
   return context
 }
 
-interface BeforeAirdropAdProviderProps {
-  referralSlug: ReferralSlug
-}
+interface BeforeAirdropAdProviderProps {}
 
-const BeforeAirdropAdProvider = ({ referralSlug, children }: PropsWithChildren<BeforeAirdropAdProviderProps>) => {
-  const { user } = useAuth()
-
+const BeforeAirdropAdProvider = ({ children }: PropsWithChildren<BeforeAirdropAdProviderProps>) => {
   const [ad, setAd] = useState<AdServed>()
   const [adQuestions, setAdQuestions] = useState<AdOfferQuestion[]>([])
 
@@ -63,12 +53,30 @@ const BeforeAirdropAdProvider = ({ referralSlug, children }: PropsWithChildren<B
     QueryDecisionAdAirdropV1Args
   >(GET_AIRDROP_AD_BETA_V2)
 
+  const retrieveAirdropAd = async (lootboxID: LootboxID) => {
+    const { data } = await getAirdropAdBetaV2({
+      variables: {
+        payload: {
+          lootboxID,
+          placement: Placement.Airdrop,
+          sessionID: sessionId,
+        },
+      },
+    })
+
+    if (data?.decisionAdAirdropV1?.__typename === 'DecisionAdAirdropV1ResponseSuccess') {
+      setAd(data.decisionAdAirdropV1.ad)
+      setAdQuestions(data.decisionAdAirdropV1.questions)
+    }
+  }
+
   return (
     <BeforeAirdropAdContext.Provider
       value={{
         sessionId,
         ad,
         adQuestions,
+        retrieveAirdropAd,
       }}
     >
       {children}

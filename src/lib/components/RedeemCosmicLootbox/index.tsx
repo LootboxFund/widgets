@@ -33,7 +33,7 @@ import {
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import Spinner, { LoadingText } from '../Generics/Spinner'
-import { $Horizontal, $Vertical } from '../Generics'
+import { $Horizontal } from '../Generics'
 import styled from 'styled-components'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import useWords from 'lib/hooks/useWords'
@@ -61,6 +61,9 @@ import {
   QueryCheckIfUserAnsweredAirdropQuestionsArgs,
   CheckIfUserAnsweredAirdropQuestionsResponse,
 } from '../../api/graphql/generated/types'
+import BeforeAirdropAdProvider, { useBeforeAirdropAd } from 'lib/hooks/useBeforeAirdropAd'
+import { $Vertical } from 'lib/components/Generics'
+import $Spinner from 'lib/components/Generics/Spinner'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -79,6 +82,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
   const [isPolling, setIsPolling] = useState<boolean>(false)
 
+  const { sessionId, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [notification, setNotification] = useState<{
@@ -180,6 +184,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     loadAllDepositsIntoState().finally(() => {
       setNotification(undefined)
     })
+    retrieveAirdropAd(lootboxID)
   }, [])
 
   useEffect(() => {
@@ -501,34 +506,36 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
-  console.log(`
-    
-  lootboxData.airdropMetadata = ${JSON.stringify(lootboxData.airdropMetadata || {})}
-  &&
-  lootboxData.airdropQuestions = ${JSON.stringify(lootboxData.airdropQuestions || {})}
-  &&
-  claimData = ${JSON.stringify(claimData || {})}
-  &&
-  !answered = ${!answered}
 
-  `)
-  if (lootboxData.airdropMetadata && lootboxData.airdropQuestions && !answered) {
+  if (!ad) {
+    return (
+      <$Vertical justifyContent="center">
+        <$Spinner />
+      </$Vertical>
+    )
+  }
+
+  if (lootboxData.airdropMetadata && adQuestions && !answered) {
     const isAirdropScreenNecessary =
       lootboxData.airdropMetadata.instructionsLink ||
       lootboxData.airdropMetadata.callToActionLink ||
-      (lootboxData.airdropQuestions && lootboxData.airdropQuestions.length > 0)
-    console.log(`isAirdropScreenNecessary = ${isAirdropScreenNecessary}`)
+      (adQuestions && adQuestions.length > 0)
+
     if (isAirdropScreenNecessary) {
       return (
-        <BeforeAirdropClaimQuestions
-          lootboxID={lootboxID}
-          claimID={claimData?.id || ('no-claim-id' as ClaimID)}
-          name={lootboxData.name}
-          nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
-          stampImage={lootboxData.stampImage}
-          airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
-          airdropQuestions={lootboxData?.airdropQuestions || []}
-        />
+        <BeforeAirdropAdProvider>
+          <BeforeAirdropClaimQuestions
+            lootboxID={lootboxID}
+            claimID={claimData?.id || ('no-claim-id' as ClaimID)}
+            name={lootboxData.name}
+            nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
+            stampImage={lootboxData.stampImage}
+            airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
+            airdropQuestions={adQuestions || []}
+            ad={ad}
+            sessionID={sessionId}
+          />
+        </BeforeAirdropAdProvider>
       )
     }
   }

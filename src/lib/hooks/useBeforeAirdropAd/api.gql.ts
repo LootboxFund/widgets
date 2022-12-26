@@ -25,6 +25,12 @@ export const GET_AIRDROP_AD_BETA_V2 = gql`
           placement
           pixelUrl
           clickDestination
+          inheritedClaim {
+            claimID
+            promoterID
+            referrerID
+            tournamentID
+          }
         }
         questions {
           id
