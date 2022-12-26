@@ -146,6 +146,16 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     }
   )
 
+  /** dataClaims...lootboxTicket[]
+   *  const {
+   *   [ticketID]: { vouchers: VoucherReward[] }
+   *  } = await getVoucherRewardsForLootboxTickets({ lootboxID, ticketIDs: [ticketID] })
+   */
+
+  /**
+   * await markVouchersClaimed()
+   */
+
   const {
     data: claimCountData,
     loading: loadingClaimCountQuery,
