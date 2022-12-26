@@ -58,9 +58,7 @@ body {
 }
 .main-info-text {
   flex-direction: column;
-  padding: 0 10px;
   justify-content: center;
-  gap: 6px;
 }
 .cover-info-div,
 .frame-div,
@@ -344,16 +342,13 @@ button#submit-arrow-button {
 }
 .lootbox-selection-list,
 .main-layout-div {
-  padding: 0 10px;
   box-sizing: border-box;
-  gap: 27px;
   font-size: 16px;
   color: #606060;
 }
 .main-layout-div {
   height: 500px;
   flex-shrink: 0;
-  padding: 10px;
   gap: 10px;
   text-align: left;
   font-size: 32px;
@@ -395,7 +390,6 @@ button#submit-arrow-button {
   flex: 0 0 auto; /* This will make the div have a static height */
   flex-shrink: 0;
   flex-direction: column;
-  padding: 10px;
   z-index: 10;
   justify-content: flex-start;
 }

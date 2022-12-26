@@ -35,6 +35,7 @@ import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
 import QuestionInput from 'lib/components/QuestionInput'
 import { v4 as uuidv } from 'uuid'
+import StickyBottomFrame from 'lib/components/StickyBottomFrame'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 export type QuestionAnswerEditorState = Record<QuestionAnswerID, QuestionDef>
@@ -289,89 +290,15 @@ const AdVideoBeta2 = (props: Props) => {
       return a.mandatory ? -1 : 1
     })
   return (
-    <$ViralOnboardingCard style={{ position: 'relative', overflowY: 'scroll' }}>
-      {showQuestions && (
-        <$QuestionsSheet themeColor={themeColor}>
-          <$QuestionsDuringAd>
-            <$Horizontal justifyContent="center" style={{ width: '100%', padding: '30px 0px 50px 0px' }}>
-              <span
-                style={{
-                  color: 'white',
-                  fontSize: '1.5rem',
-                  fontWeight: 500,
-                  fontFamily: 'sans-serif',
-                }}
-              >
-                Please answer these questions
-              </span>
-            </$Horizontal>
-            {sortedQuestions.map((question) => {
-              return (
-                <QuestionInput
-                  color="white"
-                  question={{ ...question, answer: questionsHash[question.id]?.answer || '' }}
-                  setValue={(value) => {
-                    setQuestionsHash({
-                      ...questionsHash,
-                      [question.id]: {
-                        ...question,
-                        answer: value,
-                      },
-                    })
-
-                    const someAnswered = Object.values(questionsHash).some((v) => v.answer)
-
-                    if (!someAnswered && claim?.id) {
-                      updateClaimRedemptionStatus({
-                        variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
-                      })
-                    }
-                  }}
-                />
-              )
-            })}
-          </$QuestionsDuringAd>
-        </$QuestionsSheet>
-      )}
-      {ad?.creative?.creativeType === 'video' && (
-        <Video
-          options={videoJsOptions}
-          onReady={handlePlayerReady}
-          style={{
-            width: '100%',
-            height: '100%',
-            maxWidth: '600px',
-            position: 'absolute',
-          }}
-        />
-      )}
-      {ad?.creative.creativeType === 'image' && (
-        <div>
-          <img src={ad?.creative?.creativeLinks[0]} style={{ width: '100%', height: '100%' }} />
-        </div>
-      )}
-
-      <$FloatingCover>
-        <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '100%' }}>
-          <$Vertical style={{ height: '100%', justifyContent: 'center' }} onClick={handleVideoClick}>
-            <$ContainerSlide slideOff delay={['1.5s']}>
-              <$CenteredContent>
-                <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-                  <$PartyBasketImage src={image} />
-                </$PaddingWrapper>
-                <$PaddingWrapper>
-                  <$Heading style={{ textTransform: 'uppercase', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                    {'✅ '}
-                    {words.success}
-                  </$Heading>
-                </$PaddingWrapper>
-              </$CenteredContent>
-            </$ContainerSlide>
-          </$Vertical>
-        </$ViralOnboardingSafeArea>
-      </$FloatingCover>
-      <$SlideInFooter themeColor={themeColor} showQuestions={showQuestions} delay="1.5s">
-        <$Vertical spacing={2}>
+    <StickyBottomFrame
+      backgroundCover={{
+        backgroundImage: `url(${ad?.creative?.thumbnail})`,
+      }}
+      actionBar={
+        <$Vertical
+          spacing={2}
+          style={{ width: '100%', backgroundColor: showQuestions ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0)' }}
+        >
           {errorMessage && (
             <span
               style={{
@@ -419,8 +346,101 @@ const AdVideoBeta2 = (props: Props) => {
           </$span>
           <br />
         </$Vertical>
-      </$SlideInFooter>
-    </$ViralOnboardingCard>
+      }
+    >
+      <div
+        style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+      >
+        {!showQuestions && (
+          <$FloatingCover>
+            <$ViralOnboardingSafeArea style={{ overflowY: 'hidden', height: '100%' }}>
+              <$Vertical style={{ height: '100%', justifyContent: 'center' }} onClick={handleVideoClick}>
+                <$ContainerSlide slideOff delay={['2.5s']}>
+                  <$CenteredContent>
+                    <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                      <$PartyBasketImage src={image} />
+                    </$PaddingWrapper>
+                    <$PaddingWrapper>
+                      <$Heading
+                        style={{
+                          textTransform: 'uppercase',
+                          textAlign: 'center',
+                          whiteSpace: 'nowrap',
+                          fontSize: '1.3rem',
+                        }}
+                      >
+                        {'✅ '}
+                        {words.success}
+                      </$Heading>
+                    </$PaddingWrapper>
+                  </$CenteredContent>
+                </$ContainerSlide>
+              </$Vertical>
+            </$ViralOnboardingSafeArea>
+          </$FloatingCover>
+        )}
+        {!showQuestions && ad?.creative?.creativeType === 'video' && (
+          <Video
+            options={videoJsOptions}
+            onReady={handlePlayerReady}
+            style={{
+              width: '100%',
+              height: '100%',
+              maxWidth: '600px',
+              position: 'absolute',
+            }}
+          />
+        )}
+        {!showQuestions && ad?.creative.creativeType === 'image' && (
+          <div>
+            <img src={ad?.creative?.creativeLinks[0]} style={{ width: '100%', height: '100%' }} />
+          </div>
+        )}
+        {showQuestions && (
+          <$QuestionsSheet themeColor={themeColor}>
+            <$QuestionsDuringAd>
+              <$Horizontal justifyContent="center" style={{ width: '100%', padding: '30px 0px 50px 0px' }}>
+                <span
+                  style={{
+                    color: 'white',
+                    fontSize: '1.5rem',
+                    fontWeight: 500,
+                    fontFamily: 'sans-serif',
+                  }}
+                >
+                  Please answer these questions
+                </span>
+              </$Horizontal>
+              {sortedQuestions.map((question) => {
+                return (
+                  <QuestionInput
+                    color="white"
+                    question={{ ...question, answer: questionsHash[question.id]?.answer || '' }}
+                    setValue={(value) => {
+                      setQuestionsHash({
+                        ...questionsHash,
+                        [question.id]: {
+                          ...question,
+                          answer: value,
+                        },
+                      })
+
+                      const someAnswered = Object.values(questionsHash).some((v) => v.answer)
+
+                      if (!someAnswered && claim?.id) {
+                        updateClaimRedemptionStatus({
+                          variables: { payload: { claimID: claim.id, status: ClaimRedemptionStatus.InProgress } },
+                        })
+                      }
+                    }}
+                  />
+                )
+              })}
+            </$QuestionsDuringAd>
+          </$QuestionsSheet>
+        )}
+      </div>
+    </StickyBottomFrame>
   )
 }
 
@@ -468,18 +488,10 @@ const $FloatingCover = styled.div`
 `
 
 const $QuestionsSheet = styled.section<{ themeColor: string }>`
-  position: absolute;
-  z-index: 99;
-  top: 0;
-  height: 65%;
+  height: 100%;
   width: 100%;
   overflow-y: scroll;
-  background: ${(props) => `linear-gradient(
-      180deg,
-      ${props.themeColor} 10%,
-      ${props.themeColor} 60%,
-      ${props.themeColor} 100%
-    )`};
+  background: ${(props) => `rgba(0, 0, 0, 0.65)`};
 `
 
 const $CenteredContent = styled.div`

@@ -147,7 +147,7 @@ export default [
   // MyProfile,
   // PublicProfile,
   RedeemCosmicLootbox,
-  // ViralOnboarding,
+  ViralOnboarding,
   // NavBar,
 
   // ---- OLD SHIT ----

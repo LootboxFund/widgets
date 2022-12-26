@@ -337,7 +337,7 @@ const OnePager = (props: Props) => {
             <span className="lootbox-span">LOOTBOX</span>
           </div>
         </div>
-        <div className="main-layout-div">
+        <div className="main-layout-div" style={{ padding: '0px 10px' }}>
           <div className="cover-info-div">
             <div className="host-logo-image">
               <img
@@ -499,7 +499,7 @@ const OnePager = (props: Props) => {
             )}
           </div>
         </div>
-        <div className="action-button-div">
+        <div className="action-button-div" style={{ padding: '10px' }}>
           <button disabled={loading} onClick={submitForm} className="email-submit-button">
             {loading || loadingLootboxOptions || loadingClaim ? (
               <img

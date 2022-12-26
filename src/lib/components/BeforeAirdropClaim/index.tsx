@@ -194,11 +194,28 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     return (
       <StickyBottomFrame
         backgroundCover={{
-          backgroundImage: `url(${ad?.creative?.creativeLinks[0]})`,
+          backgroundImage: `url(${ad?.creative?.thumbnail})`,
         }}
-        submitText={props.ad.creative.callToAction}
-        loading={false}
-        submitForm={proceedFromVideoAd}
+        actionBar={
+          <$Horizontal justifyContent="center" style={{ padding: '10px', width: '100%' }}>
+            <button
+              disabled={false}
+              onClick={proceedFromVideoAd}
+              className="email-submit-button"
+              style={{ width: '90%' }}
+            >
+              {false ? (
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Floading-gif.gif?alt=media"
+                  height="30px"
+                  width="auto"
+                />
+              ) : (
+                <b className="email-submit-button-text">{props.ad.creative.callToAction}</b>
+              )}
+            </button>
+          </$Horizontal>
+        }
       >
         <section
           style={{
