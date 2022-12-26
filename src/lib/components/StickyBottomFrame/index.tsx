@@ -21,6 +21,7 @@ const StickyBottomFrame = ({ actionBar, children, backgroundCover }: Props) => {
           maxHeight: screen.availHeight - addressBarHeight,
           height: screen.availHeight - addressBarHeight,
           backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
         }}
       >
         <div className="powered-by-banner" id="fan-rewards-banner">
