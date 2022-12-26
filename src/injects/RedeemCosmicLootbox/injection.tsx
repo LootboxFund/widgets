@@ -5,6 +5,7 @@ import client from 'lib/api/graphql/client'
 import { ApolloProvider } from '@apollo/client'
 import LocalizationWrapper from 'lib/components/LocalizationWrapper'
 import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
+import BeforeAirdropAdProvider from 'lib/hooks/useBeforeAirdropAd'
 
 export const inject = () => {
   const targetInjectionPoint = document.getElementById('redeem-cosmic-lootbox')
@@ -13,7 +14,9 @@ export const inject = () => {
       <ApolloProvider client={client}>
         <LocalizationWrapper>
           <AuthProvider>
-            <RedeemCosmicLootbox />
+            <BeforeAirdropAdProvider>
+              <RedeemCosmicLootbox />
+            </BeforeAirdropAdProvider>
           </AuthProvider>
         </LocalizationWrapper>
       </ApolloProvider>

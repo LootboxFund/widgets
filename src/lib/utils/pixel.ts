@@ -4,10 +4,10 @@ import { v4 as uuidv } from 'uuid'
 import { manifest } from '../../manifest'
 
 export const buildAdTrackingPixelUrl = (params: PixelTrackingParams) => {
-  // Prevents caching & helps dedupe
-  const nonce: AdEventNonce = uuidv() as AdEventNonce
   let url = `
   ${manifest.storage.buckets.pixel.accessUrl}/${manifest.storage.buckets.pixel.files.adTrackingPixel}?`
+  // Prevents caching & helps dedupe
+  const nonce = params.nonce || (uuidv() as AdEventNonce)
   if (nonce) {
     url += `nonce=${nonce}`
   }

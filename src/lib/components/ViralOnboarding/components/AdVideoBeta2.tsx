@@ -4,12 +4,22 @@ import { QuestionDef, useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import useWords from 'lib/hooks/useWords'
 import styled from 'styled-components'
 import { $Heading, $NextButton, $SlideInFooter } from '../contants'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import Video from './Video'
 import { VideoJsPlayer, VideoJsPlayerOptions } from 'video.js'
 import { LoadingText } from 'lib/components/Generics/Spinner'
-import { AdID, AdSetID, AffiliateID, COLORS, FlightID, OfferID, QuestionAnswerID, TYPOGRAPHY } from '@wormgraph/helpers'
+import {
+  AdEventNonce,
+  AdID,
+  AdSetID,
+  AffiliateID,
+  COLORS,
+  FlightID,
+  OfferID,
+  QuestionAnswerID,
+  TYPOGRAPHY,
+} from '@wormgraph/helpers'
 import { loadAdTrackingPixel } from 'lib/utils/pixel'
 import {
   AdEventAction,
@@ -24,6 +34,7 @@ import { useMutation } from '@apollo/client'
 import { ANSWER_BEFORE_TICKET_CLAIM_QUESTIONS } from '../api.gql'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
 import QuestionInput from 'lib/components/QuestionInput'
+import { v4 as uuidv } from 'uuid'
 
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 export type QuestionAnswerEditorState = Record<QuestionAnswerID, QuestionDef>
@@ -35,6 +46,7 @@ interface Props {
 
 const AdVideoBeta2 = (props: Props) => {
   const playerRef = useRef<VideoJsPlayer | null>(null)
+
   const { referral, chosenLootbox, ad, adQuestions, sessionId, claim } = useViralOnboarding()
   const [questionsHash, setQuestionsHash] = useState<QuestionAnswerEditorState>({})
   const [goToDestination, setGoToDestination] = useState(true)
@@ -57,6 +69,11 @@ const AdVideoBeta2 = (props: Props) => {
   const image: string = chosenLootbox?.stampImage
     ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
     : TEMPLATE_LOOTBOX_STAMP
+
+  // Prevents caching & helps dedupe
+  const nonce = useMemo(() => {
+    return uuidv() as AdEventNonce
+  }, [])
 
   useEffect(() => {
     if (adQuestions) {
@@ -91,7 +108,7 @@ const AdVideoBeta2 = (props: Props) => {
         tournamentID: referral?.tournamentId,
         promoterID: referral.promoterId as AffiliateID,
         flightID: ad.flightID as FlightID,
-        nonce: undefined,
+        nonce,
         timeElapsed: undefined,
       })
       setViewPixelRendered(true)
