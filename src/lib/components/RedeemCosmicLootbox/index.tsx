@@ -523,19 +523,17 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
     if (isAirdropScreenNecessary) {
       return (
-        <BeforeAirdropAdProvider>
-          <BeforeAirdropClaimQuestions
-            lootboxID={lootboxID}
-            claimID={claimData?.id || ('no-claim-id' as ClaimID)}
-            name={lootboxData.name}
-            nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
-            stampImage={lootboxData.stampImage}
-            airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
-            airdropQuestions={adQuestions || []}
-            ad={ad}
-            sessionID={sessionId}
-          />
-        </BeforeAirdropAdProvider>
+        <BeforeAirdropClaimQuestions
+          lootboxID={lootboxID}
+          claimID={claimData?.id || ('no-claim-id' as ClaimID)}
+          name={lootboxData.name}
+          nftBountyValue={lootboxData.nftBountyValue || 'Free Gift'}
+          stampImage={lootboxData.stampImage}
+          airdropMetadata={lootboxData?.airdropMetadata as unknown as LootboxAirdropMetadata}
+          airdropQuestions={adQuestions || []}
+          ad={ad}
+          sessionID={sessionId}
+        />
       )
     }
   }
