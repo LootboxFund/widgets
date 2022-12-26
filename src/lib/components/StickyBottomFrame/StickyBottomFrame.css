@@ -340,21 +340,16 @@ button#submit-arrow-button {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
 }
 .lootbox-selection-list,
 .main-layout-div {
-  padding: 0 10px;
   box-sizing: border-box;
-  gap: 27px;
   font-size: 16px;
   color: #606060;
 }
 .main-layout-div {
   height: 500px;
   flex-shrink: 0;
-  padding: 10px;
-  gap: 10px;
   text-align: left;
   font-size: 32px;
   color: #000;
@@ -363,7 +358,6 @@ button#submit-arrow-button {
   overflow-y: scroll;
   flex-shrink: 0;
   align-items: flex-start;
-  gap: 7px;
 }
 .email-submit-button-text {
   position: relative;
@@ -395,7 +389,6 @@ button#submit-arrow-button {
   flex: 0 0 auto; /* This will make the div have a static height */
   flex-shrink: 0;
   flex-direction: column;
-  padding: 10px;
   z-index: 10;
   justify-content: flex-start;
 }
