@@ -48,7 +48,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   >(UPDATE_CLAIM_REDEMPTION_STATUS)
   useEffect(() => {
     setAnswers(
-      props.airdropQuestions.reduce((acc, curr) => {
+      (props.airdropQuestions || []).reduce((acc, curr) => {
         return {
           ...acc,
           [curr.id]: {
@@ -120,7 +120,7 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
     }
     return 'text'
   }
-  const questionsToCollect = props.airdropQuestions
+  const questionsToCollect = (props.airdropQuestions || [])
     .slice()
     .sort((a, b) => {
       if (a.mandatory === b.mandatory) {
@@ -133,8 +133,9 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
   const filledAllMandatoryAnswers =
     Object.values(answers)
       .filter((a) => a.mandatory)
-      .some((a) => a.answer) || props.airdropQuestions.length === 0
-  const showPartOne = props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink
+      .some((a) => a.answer) || (props.airdropQuestions || []).length === 0
+  const showPartOne =
+    props.airdropMetadata && (props.airdropMetadata.instructionsLink || props.airdropMetadata.callToActionLink)
   const showPartTwo = props.airdropQuestions && props.airdropQuestions.length > 0
   return (
     <div className="beforeairdropclaim-questions-div">
@@ -148,10 +149,11 @@ const BeforeAirdropClaimQuestions = (props: BeforeAirdropClaimQuestionsProps) =>
       <div className="congrats-div">
         <h2 className="congrats-heading-h2">Congratulations!</h2>
         <div className="receival-subheading-div">
-          You received a FREE gift from a sponsor “{props.airdropMetadata.advertiserName || 'Unknown'}”.
+          You received a FREE gift from a sponsor “
+          {(props.airdropMetadata && props.airdropMetadata.advertiserName) || 'Unknown'}”.
         </div>
       </div>
-      {props.airdropMetadata.oneLiner && (
+      {props.airdropMetadata?.oneLiner && (
         <div className="sponsor-wants-div">
           <div className="callout-div">
             <i className="sponsor-wants-heading">The Sponsor wants you to...</i>
