@@ -5,6 +5,7 @@ import {
   ClaimID,
   LootboxMintSignatureNonce,
   LootboxTicketDigest,
+  LootboxTicketID,
   LootboxTicketID_Web3,
 } from '@wormgraph/helpers'
 import { Contract, ContractTransaction, providers } from 'ethers'
@@ -36,7 +37,8 @@ interface UseLootboxResult {
   mintTicket: (
     signature: string,
     nonce: LootboxMintSignatureNonce,
-    digest: LootboxTicketDigest
+    digest: LootboxTicketDigest,
+    lootboxTicketID?: LootboxTicketID
   ) => Promise<ContractTransaction>
   withdrawCosmic: (ticketID: LootboxTicketID_Web3, claimID: ClaimID) => Promise<ContractTransaction>
 }
@@ -170,7 +172,8 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
   const mintTicket = async (
     signature: string,
     nonce: LootboxMintSignatureNonce,
-    digest: LootboxTicketDigest
+    digest: LootboxTicketDigest,
+    lootboxTicketID?: LootboxTicketID
   ): Promise<ContractTransaction> => {
     if (!lootbox || !injectedProvider || !lootboxAddress || !chainIDHex) {
       throw new Error('No lootbox or signer provider')
@@ -201,6 +204,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
         nonce: nonce,
         chainIDHex: chainIDHex,
         digest: digest,
+        ticketID: lootboxTicketID,
       })
       console.log('Calling blockchain on mint')
       const tx = (await lootbox.connect(signer).mint(signature, nonce)) as ContractTransaction

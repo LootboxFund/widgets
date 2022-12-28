@@ -17,6 +17,7 @@ import { LootboxAirdropMetadataQuestion } from '../../api/graphql/generated/type
 export interface UserClaimFE {
   id: ClaimID
   tournamentId: TournamentID
+  ticketID?: LootboxTicketID | null
   timestamps: {
     createdAt: number
   }
@@ -165,6 +166,7 @@ export const GET_LOOTBOX_CLAIMS_TO_REDEEM = gql`
               node {
                 id
                 tournamentId
+                ticketID
                 timestamps {
                   createdAt
                 }
