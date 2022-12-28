@@ -13,7 +13,7 @@ export interface RedeemButtonProps {
   targetNetwork?: ChainIDHex
   targetWalletAddress?: Address
 }
-const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
+const RedeemWeb3Button = (props: PropsWithChildren<RedeemButtonProps>) => {
   const snapUser = useSnapshot(userState)
   const [loading, setLoading] = useState(false)
   const snapUserState = useSnapshot(userState)
@@ -144,4 +144,4 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
   return <div>{props.children}</div>
 }
 
-export default RedeemButton
+export default RedeemWeb3Button

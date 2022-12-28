@@ -30,6 +30,8 @@ import {
   MutationUpdateClaimRedemptionStatusArgs,
   UpdateClaimRedemptionStatusResponse,
   ResponseError,
+  GetLootboxDepositsResponse,
+  LootboxVoucherDeposits,
 } from 'lib/api/graphql/generated/types'
 import Spinner, { $Spinner, LoadingText } from '../Generics/Spinner'
 import { $Horizontal } from '../Generics'
@@ -40,7 +42,7 @@ import useScreenSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { useLootbox } from 'lib/hooks/useLootbox'
-import RedeemButton from './RedeemButton'
+import RedeemWeb3Button from './RedeemWeb3Button'
 import { SwitchTicketComponent } from './SwitchTicketComponent'
 import { truncateAddress } from 'lib/api/helpers'
 import { $Button } from 'lib/components/Generics/Button'
@@ -60,6 +62,8 @@ import {
 } from '../../api/graphql/generated/types'
 import { useBeforeAirdropAd } from 'lib/hooks/useBeforeAirdropAd'
 import { $Vertical } from 'lib/components/Generics'
+import { GET_VOUCHER_DEPOSITS } from 'lib/hooks/useLootbox/api.gql'
+import RewardModal from '../RewardModal'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -77,10 +81,11 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const userSnapshot = useSnapshot(userState)
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
   const [isPolling, setIsPolling] = useState<boolean>(false)
-
+  const [isRewardModalOpen, setIsRewardModalOpen] = useState<boolean>(false)
   const { sessionId, shouldShowAd, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
+  const [rewardModalFocusedDeposit, setRewardModalFocusedDeposit] = useState<Deposit>()
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [notification, setNotification] = useState<{
     message: string
@@ -175,6 +180,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   } = useLootbox({
     lootboxAddress: lootboxData?.address || undefined,
     chainIDHex: lootboxData?.chainIdHex || undefined,
+    lootboxID: lootboxID,
   })
 
   useEffect(() => {
@@ -247,10 +253,16 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       // Merges deposits of the same token
       return deposits
         .reduce<Deposit[]>((a, b) => {
-          const deposit = a.find((d) => d.tokenAddress === b.tokenAddress && d.isRedeemed === b.isRedeemed)
+          const deposit = a.find(
+            (d) =>
+              d.web3Metadata?.tokenAddress === b.web3Metadata?.tokenAddress &&
+              d.web3Metadata?.isRedeemed === b.web3Metadata?.isRedeemed
+          )
 
-          if (deposit) {
-            deposit.tokenAmount = new BN(deposit.tokenAmount).plus(new BN(b.tokenAmount)).toString()
+          if (deposit && deposit.web3Metadata && b.web3Metadata) {
+            deposit.web3Metadata.tokenAmount = new BN(deposit.web3Metadata?.tokenAmount)
+              .plus(new BN(b.web3Metadata.tokenAmount))
+              .toString()
           } else {
             a.push(b)
           }
@@ -421,10 +433,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
         {truncatedDeposits.map((deposit, idx) => {
           return (
             <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
-              <$DividendOwed>
-                {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(deposit.tokenAmount, Number(deposit.decimal), 22)}`}
-              </$DividendOwed>
-              <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
+              <$DividendTokenSymbol>{`${deposit.isRedeemed ? '☑️ ' : ''}${deposit.title}`}</$DividendTokenSymbol>
             </$DividendRow>
           )
         })}
@@ -551,7 +560,8 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       )
     }
   }
-
+  const chosenTicketID = claimData?.whitelist?.lootboxTicket?.ticketID
+  console.log(`chosenTicketID`, chosenTicketID)
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -591,7 +601,19 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
           {claimData && (
             <>
               <$Horizontal spacing={4} flexWrap={screen === 'mobile'} justifyContent="space-between">
-                {status === 'lootbox-not-deployed' ? (
+                <$Button
+                  screen={screen}
+                  color={COLORS.white}
+                  backgroundColor={COLORS.successFontColor}
+                  style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
+                  onClick={() => {
+                    setIsRewardModalOpen(true)
+                    setRewardModalFocusedDeposit(allDeposits[0])
+                  }}
+                >
+                  COLLECT PRIZE
+                </$Button>
+                {/* {status === 'lootbox-not-deployed' ? (
                   <$Button
                     screen={screen}
                     color={COLORS.white}
@@ -603,7 +625,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
                   </$Button>
                 ) : (
                   <div>
-                    <RedeemButton
+                    <RedeemWeb3Button
                       targetNetwork={lootboxData?.chainIdHex || undefined}
                       targetWalletAddress={claimData?.whitelist?.whitelistedAddress}
                     >
@@ -653,9 +675,9 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
                           </$Button>
                         )
                       }
-                    </RedeemButton>
+                    </RedeemWeb3Button>
                   </div>
-                )}
+                )} */}
 
                 <div style={{ paddingTop: screen === 'mobile' ? '20px' : '5px' }}>
                   <SwitchTicketComponent
@@ -772,14 +794,14 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
               {truncatedProratedDeposits.map((deposit, idx) => {
                 return (
                   <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
-                    <$DividendOwed>
+                    {/* <$DividendOwed>
                       {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(
                         deposit.tokenAmount,
                         Number(deposit.decimal),
                         22
                       )}`}
                     </$DividendOwed>
-                    <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol>
+                    <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol> */}
                   </$DividendRow>
                 )
               })}
@@ -821,6 +843,17 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
           {screen === 'mobile' && <br />}
         </$Vertical>
       </$Horizontal>
+      {isRewardModalOpen && rewardModalFocusedDeposit && chosenTicketID && (
+        <RewardModal
+          isModalOpen={isRewardModalOpen}
+          closeModal={() => {
+            setIsRewardModalOpen(false)
+            setRewardModalFocusedDeposit(undefined)
+          }}
+          currentDeposit={rewardModalFocusedDeposit}
+          ticketID={chosenTicketID}
+        />
+      )}
     </$RedeemCosmicContainer>
   )
 }
