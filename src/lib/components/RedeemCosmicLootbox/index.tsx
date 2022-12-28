@@ -82,7 +82,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const [claimIdx, setClaimIdx] = useState(0) // should index data.getLootboxByID.lootbox.mintWhitelistSignatures
   const [isPolling, setIsPolling] = useState<boolean>(false)
 
-  const { sessionId, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
+  const { sessionId, shouldShowAd, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
   const [notification, setNotification] = useState<{
@@ -207,14 +207,20 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const claimData: UserClaimFE | undefined = useMemo(() => {
     if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
       const [claimData] = dataClaims?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
+      return claimData
+    } else {
+      return undefined
+    }
+  }, [dataClaims])
+
+  useEffect(() => {
+    if (dataClaims?.getLootboxByID?.__typename === 'LootboxResponseSuccess') {
+      const [claimData] = dataClaims?.getLootboxByID?.lootbox?.userClaims?.edges.map((edge) => edge.node) || []
       if (claimData) {
         updateClaimRedemptionStatus({
           variables: { payload: { claimID: claimData.id, status: ClaimRedemptionStatus.Started } },
         })
       }
-      return claimData
-    } else {
-      return undefined
     }
   }, [dataClaims])
 
@@ -507,7 +513,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
 
-  if (!ad) {
+  if (shouldShowAd && !ad) {
     return (
       <$Vertical justifyContent="center">
         <$Spinner />
