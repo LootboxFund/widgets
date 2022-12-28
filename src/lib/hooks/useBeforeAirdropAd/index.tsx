@@ -29,6 +29,7 @@ interface BeforeAirdropAdContextType {
   retrieveAirdropAd: (lootboxID: LootboxID) => void
   ad?: AdServed
   adQuestions?: AdOfferQuestion[]
+  shouldShowAd: boolean
 }
 
 const BeforeAirdropAdContext = createContext<BeforeAirdropAdContextType | null>(null)
@@ -46,6 +47,7 @@ interface BeforeAirdropAdProviderProps {}
 
 const BeforeAirdropAdProvider = ({ children }: PropsWithChildren<BeforeAirdropAdProviderProps>) => {
   const [ad, setAd] = useState<AdServed>()
+  const [shouldShowAd, setShouldShowAd] = useState(false)
   const [adQuestions, setAdQuestions] = useState<AdOfferQuestion[]>([])
 
   const [getAirdropAdBetaV2] = useLazyQuery<
@@ -65,7 +67,10 @@ const BeforeAirdropAdProvider = ({ children }: PropsWithChildren<BeforeAirdropAd
     })
 
     if (data?.decisionAdAirdropV1?.__typename === 'DecisionAdAirdropV1ResponseSuccess') {
-      setAd(data.decisionAdAirdropV1.ad)
+      setShouldShowAd(data.decisionAdAirdropV1.requiresAd)
+      if (data.decisionAdAirdropV1.ad) {
+        setAd(data.decisionAdAirdropV1.ad)
+      }
       setAdQuestions(data.decisionAdAirdropV1.questions)
     }
   }
@@ -77,6 +82,7 @@ const BeforeAirdropAdProvider = ({ children }: PropsWithChildren<BeforeAirdropAd
         ad,
         adQuestions,
         retrieveAirdropAd,
+        shouldShowAd,
       }}
     >
       {children}
