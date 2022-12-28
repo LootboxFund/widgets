@@ -1,4 +1,12 @@
-import { chainIdHexToName, ClaimID, COLORS, LootboxAirdropMetadata, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import {
+  chainIdHexToName,
+  ClaimID,
+  COLORS,
+  DepositID,
+  LootboxAirdropMetadata,
+  LootboxID,
+  TYPOGRAPHY,
+} from '@wormgraph/helpers'
 import { initLogging } from 'lib/api/logrocket'
 import { initDApp } from 'lib/hooks/useWeb3Api'
 import parseUrlParams from 'lib/utils/parseUrlParams'
@@ -432,7 +440,15 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
         <$RedeemCosmicSubtitle style={{ fontStyle: 'italic' }}>All Lootbox Deposits</$RedeemCosmicSubtitle>
         {truncatedDeposits.map((deposit, idx) => {
           return (
-            <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
+            <$DividendRow
+              onClick={() => {
+                setIsRewardModalOpen(true)
+                setRewardModalFocusedDeposit(deposit)
+              }}
+              key={`ticket-${claimIdx}-${idx}`}
+              isActive={!deposit.isRedeemed}
+              style={{ cursor: 'pointer' }}
+            >
               <$DividendTokenSymbol>{`${deposit.isRedeemed ? '☑️ ' : ''}${deposit.title}`}</$DividendTokenSymbol>
             </$DividendRow>
           )
@@ -560,8 +576,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       )
     }
   }
-  const chosenTicketID = claimData?.whitelist?.lootboxTicket?.ticketID
-  console.log(`chosenTicketID`, chosenTicketID)
+  const chosenTicketID = claimData?.ticketID
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -851,6 +866,10 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
             setRewardModalFocusedDeposit(undefined)
           }}
           currentDeposit={rewardModalFocusedDeposit}
+          allDeposits={truncatedDeposits}
+          changeCurrentDeposit={(d: Deposit) => {
+            setRewardModalFocusedDeposit(d)
+          }}
           ticketID={chosenTicketID}
         />
       )}

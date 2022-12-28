@@ -184,7 +184,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootbox
     allDeposits.push(...web3Deposits)
     if (lootboxID) {
       const { data } = await getVoucherDeposits({ variables: { lootboxID: lootboxID } })
-      console.log(`quick data, `, data)
+
       if (data?.getLootboxDeposits.__typename === 'GetLootboxDepositsResponseSuccess') {
         const { getLootboxDeposits } = data
         const vouchers = getLootboxDeposits.deposits

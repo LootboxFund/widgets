@@ -6,7 +6,7 @@ import { $Horizontal } from '../Generics'
 import { Deposit } from 'lib/hooks/useLootbox/utils'
 import { $Vertical } from 'lib/components/Generics'
 import $Button from '../Generics/Button'
-import { COLORS, TicketID } from '@wormgraph/helpers'
+import { COLORS, DepositID, LootboxTicketID } from '@wormgraph/helpers'
 import { useLazyQuery } from '@apollo/client'
 import { GET_VOUCHER_DEPOSIT_FOR_FAN } from './api.gql'
 import {
@@ -20,7 +20,9 @@ export interface RewardModalProps {
   isModalOpen: boolean
   closeModal: () => void
   currentDeposit: Deposit
-  ticketID: TicketID
+  allDeposits: Deposit[]
+  changeCurrentDeposit: (deposit: Deposit) => void
+  ticketID: LootboxTicketID
 }
 const RewardModal = (props: RewardModalProps) => {
   const { screen } = useWindowSize()
@@ -30,19 +32,24 @@ const RewardModal = (props: RewardModalProps) => {
     QueryGetVoucherOfDepositForFanArgs
   >(GET_VOUCHER_DEPOSIT_FOR_FAN)
   useEffect(() => {
-    getVoucher()
+    if (props.currentDeposit && props.currentDeposit.voucherMetadata) {
+      getVoucher()
+    } else {
+      setVoucher(undefined)
+    }
   }, [props.currentDeposit, props.ticketID])
   const getVoucher = async () => {
-    const depositID = props.currentDeposit.voucherMetadata?.id
+    console.log(`props.currentDeposit`, props.currentDeposit)
+    const depositID = props.currentDeposit.id
     if (depositID) {
       const { data } = await getVoucherOfDepositForFan({
         variables: { payload: { depositID, ticketID: props.ticketID } },
       })
-      console.log(`quick data, `, data)
+
       if (data?.getVoucherOfDepositForFan.__typename === 'GetVoucherOfDepositForFanResponseSuccess') {
         const { getVoucherOfDepositForFan } = data
         const voucher = getVoucherOfDepositForFan.voucher
-        console.log(`voucher, `, voucher)
+
         setVoucher(voucher)
       }
     }
@@ -70,6 +77,31 @@ const RewardModal = (props: RewardModalProps) => {
       zIndex: 10000,
     },
   }
+  function getNextIndex(arr: any[], a: number, x: number) {
+    // Get the length of the array
+    const len = arr.length
+
+    // Calculate the next index by adding the increment to the current index
+    let nextIndex = a + x
+
+    // If the next index is negative, wrap around to the end of the array
+    if (nextIndex < 0) {
+      nextIndex = len - 1
+    }
+
+    // If the next index is greater than or equal to the length of the array, wrap around to the beginning
+    if (nextIndex >= len) {
+      nextIndex = 0
+    }
+
+    // Return the next index
+    return nextIndex
+  }
+
+  const titleShown = voucher ? voucher.title : props.currentDeposit.title
+  const codeShown = voucher ? voucher.code : props.currentDeposit.title
+  const linkShown = voucher ? voucher.url : props.currentDeposit.web3Metadata?.tokenAddress
+  const currentDepositIndex = props.allDeposits.findIndex((d) => d.id === props.currentDeposit.id)
   return (
     <$RewardModal>
       <Modal
@@ -86,13 +118,25 @@ const RewardModal = (props: RewardModalProps) => {
         </$Horizontal>
         <$Vertical justifyContent="flex-start" style={{ width: '100%', padding: '10px' }}>
           <$Horizontal justifyContent="space-between">
-            <p
-              style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}
-            >{`You won ${props.currentDeposit.title}`}</p>
+            <p style={{ fontSize: '1rem', color: COLORS.surpressedFontColor }}>{`You won ${titleShown}`}</p>
             <$Horizontal verticalCenter style={{ color: COLORS.surpressedFontColor }}>
-              <b style={{ cursor: 'pointer' }}>{`< `}</b>
-              <span style={{ margin: '0px 5px' }}>{` 1/3 `}</span>
-              <b style={{ cursor: 'pointer' }}>{` >`}</b>
+              <b
+                onClick={() => {
+                  const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, -1)
+                  const nextDeposit = props.allDeposits[nthDeposit]
+                  props.changeCurrentDeposit(nextDeposit)
+                }}
+                style={{ cursor: 'pointer' }}
+              >{`< `}</b>
+              <span style={{ margin: '0px 5px' }}>{` ${currentDepositIndex + 1}/${props.allDeposits.length} `}</span>
+              <b
+                onClick={() => {
+                  const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
+                  const nextDeposit = props.allDeposits[nthDeposit]
+                  props.changeCurrentDeposit(nextDeposit)
+                }}
+                style={{ cursor: 'pointer' }}
+              >{` >`}</b>
             </$Horizontal>
           </$Horizontal>
           <$Horizontal
@@ -105,23 +149,30 @@ const RewardModal = (props: RewardModalProps) => {
               fontWeight: 'bold',
               color: COLORS.surpressedFontColor,
             }}
-          >{`${props.currentDeposit.title}`}</$Horizontal>
+          >{`${codeShown}`}</$Horizontal>
         </$Vertical>
         <$Horizontal style={{ width: '100%', flexDirection: screen === 'mobile' ? 'column' : 'row' }}>
-          <$Button
-            color={COLORS.white}
-            backgroundColor={COLORS.trustBackground}
-            screen={screen}
-            style={{ flex: 1, padding: '20px 0px' }}
-          >
-            Open Link
-          </$Button>
+          <a href={linkShown || ''} target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+            <$Button
+              color={COLORS.white}
+              backgroundColor={COLORS.trustBackground}
+              screen={screen}
+              style={{ padding: '20px 0px', width: '100%' }}
+            >
+              Open Link
+            </$Button>
+          </a>
           <div style={{ width: '20px' }}></div>
           <$Button
             color={COLORS.surpressedBackground}
             backgroundColor={COLORS.white}
             screen={screen}
             style={{ flex: 1, fontWeight: 'normal', padding: '20px 0px' }}
+            onClick={() => {
+              const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
+              const nextDeposit = props.allDeposits[nthDeposit]
+              props.changeCurrentDeposit(nextDeposit)
+            }}
           >
             Skip & Next
           </$Button>

@@ -33,6 +33,7 @@ export interface VoucherBatchDeposit {
 }
 
 export interface Deposit {
+  id: DepositID
   title: string
   isRedeemed: boolean
   voucherMetadata?: VoucherBatchDeposit
@@ -62,6 +63,7 @@ export const convertWeb3DepositFragmentToDeposit = async (fragment: Web3DepositF
   const title = `${parseEth(fragment.tokenAmount, Number(decimal), 22)} ${symbol}`
 
   return {
+    id: `${fragment.tokenAddress}+${fragment.tokenAmount}` as DepositID,
     title,
     isRedeemed: fragment.isRedeemed,
     web3Metadata: {
@@ -77,6 +79,7 @@ export const convertWeb3DepositFragmentToDeposit = async (fragment: Web3DepositF
 
 export const convertVoucherBatchToDeposit = (voucherBatch: LootboxVoucherDeposits): Deposit => {
   return {
+    id: voucherBatch.id as DepositID,
     title: voucherBatch.title,
     isRedeemed: false, // voucherBatch.isRedeemed,
     voucherMetadata: {
