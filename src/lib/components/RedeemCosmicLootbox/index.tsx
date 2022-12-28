@@ -471,28 +471,6 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     )
   }
 
-  if (loadingLootboxQuery) {
-    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
-  } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
-    const isNotFound =
-      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
-        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
-        : false
-    if (isNotFound) {
-      return <Oopsies icon="🧐" title={words.notFound} />
-    }
-    return (
-      <Oopsies
-        icon="🤕"
-        title={words.anErrorOccured}
-        // @ts-ignore
-        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
-      />
-    )
-  } else if (!lootboxData) {
-    return <Oopsies icon="🧐" title={words.notFound} />
-  }
-
   const lootboxImage = convertFilenameToThumbnail(lootboxData.stampImage, 'md')
 
   const whitelistImg = claimData?.whitelist?.lootboxTicket?.stampImage
@@ -520,6 +498,28 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
+
+  if (loadingLootboxQuery) {
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
+  } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
+    const isNotFound =
+      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
+        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
+        : false
+    if (isNotFound) {
+      return <Oopsies icon="🧐" title={words.notFound} />
+    }
+    return (
+      <Oopsies
+        icon="🤕"
+        title={words.anErrorOccured}
+        // @ts-ignore
+        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
+      />
+    )
+  } else if (!lootboxData) {
+    return <Oopsies icon="🧐" title={words.notFound} />
+  }
 
   if (shouldShowAd && !ad) {
     return (
