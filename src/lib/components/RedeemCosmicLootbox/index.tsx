@@ -23,7 +23,6 @@ import {
 import { useQuery, useMutation } from '@apollo/client'
 import {
   LootboxUserClaimsArgs,
-  MutationWhitelistAllUnassignedClaimsArgs,
   QueryGetLootboxByIdArgs,
   UserClaimsCursor,
   MutationWhitelistMyLootboxClaimsArgs,
@@ -32,13 +31,12 @@ import {
   UpdateClaimRedemptionStatusResponse,
   ResponseError,
 } from 'lib/api/graphql/generated/types'
-import Spinner, { LoadingText } from '../Generics/Spinner'
+import Spinner, { $Spinner, LoadingText } from '../Generics/Spinner'
 import { $Horizontal } from '../Generics'
 import styled from 'styled-components'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import useWords from 'lib/hooks/useWords'
 import useScreenSize, { ScreenSize } from 'lib/hooks/useScreenSize'
-import { manifest } from 'manifest'
 import { userState } from 'lib/state/userState'
 import { useSnapshot } from 'valtio'
 import { useLootbox } from 'lib/hooks/useLootbox'
@@ -48,7 +46,6 @@ import { truncateAddress } from 'lib/api/helpers'
 import { $Button } from 'lib/components/Generics/Button'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
 import { parseEth } from 'lib/utils/bnConversion'
-import { awaitPollResult } from 'lib/utils/promise'
 import { Deposit } from 'lib/hooks/useLootbox/utils'
 import { useAuth } from 'lib/hooks/useAuth'
 import CosmicAuthGuard from './CosmicAuthGuard'
@@ -61,9 +58,8 @@ import {
   QueryCheckIfUserAnsweredAirdropQuestionsArgs,
   CheckIfUserAnsweredAirdropQuestionsResponse,
 } from '../../api/graphql/generated/types'
-import BeforeAirdropAdProvider, { useBeforeAirdropAd } from 'lib/hooks/useBeforeAirdropAd'
+import { useBeforeAirdropAd } from 'lib/hooks/useBeforeAirdropAd'
 import { $Vertical } from 'lib/components/Generics'
-import $Spinner from 'lib/components/Generics/Spinner'
 
 export const onloadWidget = async () => {
   initLogging()
@@ -85,9 +81,10 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const { sessionId, shouldShowAd, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string>('')
   const [notification, setNotification] = useState<{
     message: string
-    type: 'loading' | 'info' | 'error' | 'success'
+    type: 'loading' | 'info' | 'success'
     tx?: ContractTransaction
   }>()
   const [cursor, setCursor] = useState<UserClaimsCursor>({
@@ -315,20 +312,27 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const mintNFT = async () => {
     if (!claimData?.whitelist?.signature || !claimData?.whitelist?.nonce || !claimData?.whitelist?.digest) {
-      setNotification({ type: 'error', message: 'Something went wrong! Please try again later.' })
+      setErrorMessage('Something went wrong! Please try again later.')
       console.error('No signature or nonce')
       return
     }
+    setErrorMessage('')
     try {
-      const tx = await mintTicket(claimData.whitelist.signature, claimData.whitelist.nonce, claimData.whitelist.digest)
+      const tx = await mintTicket(
+        claimData.whitelist.signature,
+        claimData.whitelist.nonce,
+        claimData.whitelist.digest,
+        claimData?.ticketID || undefined
+      )
       setIsPolling(true)
       pollStatus.current = status
       startPolling(3000) // poll every 3 seconds to listen for the isRedeemed = true event
     } catch (err) {
       if (err?.code !== 4001) {
         console.error('error trying to mint', err)
-        setNotification({ type: 'error', message: err?.data?.message || err?.message || words.anErrorOccured })
+        setErrorMessage(err?.data?.message || err?.message || words.anErrorOccured)
       } else {
+        setErrorMessage('')
         setNotification(undefined)
       }
     }
@@ -336,10 +340,11 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const withdrawEarnings = async () => {
     if (!claimData?.whitelist?.lootboxTicket?.ticketID) {
-      setNotification({ type: 'error', message: 'Something went wrong! Please try again later.' })
+      setErrorMessage('Something went wrong! Please try again later.')
       console.error('No Ticket')
       return
     }
+    setErrorMessage('')
     try {
       await withdrawCosmic(claimData.whitelist.lootboxTicket.ticketID, claimData.id)
       // Refetch the deposit (which should be marked as redeemed)
@@ -347,8 +352,9 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     } catch (err) {
       if (err?.code !== 4001) {
         console.error('Error withdrawing', err)
-        setNotification({ type: 'error', message: err?.message || words.anErrorOccured })
+        setErrorMessage(err?.message || words.anErrorOccured)
       } else {
+        setErrorMessage('')
         setNotification(undefined)
       }
     }
@@ -379,6 +385,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   //   }
   // }
   const handleWalletConnect = async () => {
+    setErrorMessage('')
     try {
       if (!userSnapshot.currentAccount) {
         throw new Error('Wallet not connected!')
@@ -396,8 +403,9 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       setNotification({ type: 'success', message: 'You have been whitelisted. You can now mint your LOOTBOX NFT.' })
     } catch (err) {
       if (err?.code !== 4001) {
-        setNotification({ type: 'error', message: err?.message || words.anErrorOccured })
+        setErrorMessage(err?.message || words.anErrorOccured)
       } else {
+        setErrorMessage('')
         setNotification(undefined)
       }
     }
@@ -463,28 +471,6 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     )
   }
 
-  if (loadingLootboxQuery) {
-    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
-  } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
-    const isNotFound =
-      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
-        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
-        : false
-    if (isNotFound) {
-      return <Oopsies icon="🧐" title={words.notFound} />
-    }
-    return (
-      <Oopsies
-        icon="🤕"
-        title={words.anErrorOccured}
-        // @ts-ignore
-        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
-      />
-    )
-  } else if (!lootboxData) {
-    return <Oopsies icon="🧐" title={words.notFound} />
-  }
-
   const lootboxImage = convertFilenameToThumbnail(lootboxData.stampImage, 'md')
 
   const whitelistImg = claimData?.whitelist?.lootboxTicket?.stampImage
@@ -512,6 +498,28 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
 
   const blockExplorerURL = lootboxData?.chainIdHex ? getBlockExplorerUrl(lootboxData.chainIdHex) : null
   const socialsURL = lootboxData?.joinCommunityUrl ? lootboxData.joinCommunityUrl : watchPage
+
+  if (loadingLootboxQuery) {
+    return <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
+  } else if (error || dataLootbox?.getLootboxByID.__typename === 'ResponseError') {
+    const isNotFound =
+      dataLootbox?.getLootboxByID.__typename === 'ResponseError'
+        ? dataLootbox?.getLootboxByID.error.code === 'NotFound'
+        : false
+    if (isNotFound) {
+      return <Oopsies icon="🧐" title={words.notFound} />
+    }
+    return (
+      <Oopsies
+        icon="🤕"
+        title={words.anErrorOccured}
+        // @ts-ignore
+        message={error?.message || lootboxData?.getLootboxByID?.error?.message || words.notFound}
+      />
+    )
+  } else if (!lootboxData) {
+    return <Oopsies icon="🧐" title={words.notFound} />
+  }
 
   if (shouldShowAd && !ad) {
     return (
@@ -690,10 +698,10 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
             <$RedeemCosmicSubtitle>✅ All deposits redeemed for this ticket</$RedeemCosmicSubtitle>
           ) : null}
 
-          {notification && notification.type === 'error' && notification.message ? (
+          {errorMessage ? (
             <$RedeemCosmicSubtitle style={{ color: COLORS.dangerFontColor }}>
               🚨&nbsp;
-              {notification.message.length > 220 ? notification.message.slice(0, 220) + '...' : notification.message}
+              {errorMessage.length > 220 ? errorMessage.slice(0, 220) + '...' : errorMessage}
             </$RedeemCosmicSubtitle>
           ) : notification && notification.type === 'info' ? (
             <$RedeemCosmicSubtitle>
