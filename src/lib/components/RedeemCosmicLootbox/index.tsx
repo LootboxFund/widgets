@@ -235,13 +235,19 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     }
   }, [dataClaims])
 
-  useEffect(() => {
-    const ticketID = claimData?.whitelist?.lootboxTicket?.ticketID
+  const chosenTicketID = claimData?.ticketID
 
-    if (!ticketID || proratedDeposits[ticketID] != undefined) {
+  useEffect(() => {
+    const w2TicketID = claimData?.ticketID
+    const w3TicketID = claimData?.whitelist?.lootboxTicket?.ticketID
+    console.log(`Grabbing by w3TicketID...`, w3TicketID)
+    if (!w2TicketID) {
       return
     }
-    loadProratedDepositsIntoState(ticketID)
+    if (!w3TicketID || proratedDeposits[w3TicketID] != undefined) {
+      return
+    }
+    loadProratedDepositsIntoState(w2TicketID, w3TicketID, lootboxID)
   }, [claimData?.whitelist?.lootboxTicket?.ticketID, proratedDeposits])
 
   const sortDeposits = (a: Deposit, b: Deposit) => {
@@ -359,16 +365,22 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   }
 
   const withdrawEarnings = async () => {
-    if (!claimData?.whitelist?.lootboxTicket?.ticketID) {
+    const w2TicketID = claimData?.ticketID
+    const w3TicketID = claimData?.whitelist?.lootboxTicket?.ticketID
+    console.log(`Grabbing by w3TicketID...`, w3TicketID)
+    if (!w2TicketID) {
+      return
+    }
+    if (!w3TicketID) {
       setErrorMessage('Something went wrong! Please try again later.')
       console.error('No Ticket')
       return
     }
     setErrorMessage('')
     try {
-      await withdrawCosmic(claimData.whitelist.lootboxTicket.ticketID, claimData.id)
+      await withdrawCosmic(w3TicketID, claimData.id)
       // Refetch the deposit (which should be marked as redeemed)
-      loadProratedDepositsIntoState(claimData.whitelist.lootboxTicket.ticketID)
+      loadProratedDepositsIntoState(w2TicketID, w3TicketID, lootboxID)
     } catch (err) {
       if (err?.code !== 4001) {
         console.error('Error withdrawing', err)
@@ -509,10 +521,12 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     userSnapshot.currentAccount &&
     claimData.whitelist.whitelistedAddress.toLowerCase() !== userSnapshot.currentAccount.toLowerCase()
 
-  const truncatedDeposits = showAllDeposits ? allDeposits.slice() : allDeposits.slice(0, 4)
+  const truncatedDeposits = showAllDeposits
+    ? allDeposits.slice().sort((a, b) => (a.voucherMetadata ? -1 : 1))
+    : allDeposits.slice(0, 4).sort((a, b) => (a.voucherMetadata ? -1 : 1))
   const truncatedProratedDeposits = showAllDeposits
-    ? ticketProratedDeposits.slice()
-    : ticketProratedDeposits.slice(0, 4)
+    ? ticketProratedDeposits.slice().sort((a, b) => (a.voucherMetadata ? -1 : 1))
+    : ticketProratedDeposits.slice(0, 4).sort((a, b) => (a.voucherMetadata ? -1 : 1))
 
   const isLoading =
     notification?.type === 'loading' ||
@@ -576,7 +590,70 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
       )
     }
   }
-  const chosenTicketID = claimData?.ticketID
+  const renderWeb3Button = () => {
+    return status === 'lootbox-not-deployed' ? (
+      <$Button
+        screen={screen}
+        color={COLORS.white}
+        backgroundColor={COLORS.surpressedBackground}
+        style={{ textTransform: 'uppercase', height: '60px' }}
+        disabled={true}
+      >
+        Not Deployed
+      </$Button>
+    ) : (
+      <div>
+        <RedeemWeb3Button
+          targetNetwork={lootboxData?.chainIdHex || undefined}
+          targetWalletAddress={claimData?.whitelist?.whitelistedAddress}
+        >
+          {
+            // this means the user needs to connect their wallet to their profile & it will auto whitelist
+            status === 'no-whitelist' ? (
+              <$Button
+                screen={screen}
+                onClick={!isLoading ? handleWalletConnect : undefined}
+                color={`${COLORS.warningFontColor}`}
+                colorHover={`${COLORS.warningFontColor}90`}
+                backgroundColor={`${COLORS.warningBackground}`}
+                backgroundColorHover={`${COLORS.warningBackground}80`}
+                style={{
+                  textTransform: 'uppercase',
+                  height: '60px',
+                  width: '100%',
+                }}
+                disabled={loadingWhitelist}
+              >
+                <LoadingText loading={isLoading} color={`${COLORS.warningFontColor}`} text={'Whitelist'} />
+              </$Button>
+            ) : status === 'not-minted' ? (
+              <$Button
+                screen={screen}
+                onClick={!isLoading ? mintNFT : undefined}
+                color={COLORS.trustFontColor}
+                backgroundColor={COLORS.trustBackground}
+                style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
+                disabled={isLoading}
+              >
+                <LoadingText loading={isLoading} color={COLORS.trustFontColor} text={'Claim Ticket'} />
+              </$Button>
+            ) : (
+              <$Button
+                screen={screen}
+                onClick={!isLoading ? withdrawEarnings : undefined}
+                color={COLORS.white}
+                backgroundColor={noDepositsAvailable ? COLORS.surpressedBackground : COLORS.successFontColor}
+                style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
+                disabled={isLoading || noDepositsAvailable}
+              >
+                <LoadingText loading={isLoading} color={COLORS.white} text={'Redeem'} />
+              </$Button>
+            )
+          }
+        </RedeemWeb3Button>
+      </div>
+    )
+  }
   return (
     <$RedeemCosmicContainer screen={screen} themeColor={lootboxData.themeColor} style={{ margin: '0 auto' }}>
       <$Horizontal spacing={4} style={screen === 'mobile' ? { flexDirection: 'column-reverse' } : undefined}>
@@ -616,83 +693,22 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
           {claimData && (
             <>
               <$Horizontal spacing={4} flexWrap={screen === 'mobile'} justifyContent="space-between">
-                <$Button
-                  screen={screen}
-                  color={COLORS.white}
-                  backgroundColor={COLORS.successFontColor}
-                  style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
-                  onClick={() => {
-                    setIsRewardModalOpen(true)
-                    setRewardModalFocusedDeposit(allDeposits[0])
-                  }}
-                >
-                  COLLECT PRIZE
-                </$Button>
-                {/* {status === 'lootbox-not-deployed' ? (
+                {allDeposits.some((d) => d.voucherMetadata) ? (
                   <$Button
                     screen={screen}
                     color={COLORS.white}
-                    backgroundColor={COLORS.surpressedBackground}
+                    backgroundColor={COLORS.successFontColor}
                     style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
-                    disabled={true}
+                    onClick={() => {
+                      setIsRewardModalOpen(true)
+                      setRewardModalFocusedDeposit(truncatedDeposits[0])
+                    }}
                   >
-                    Not Deployed
+                    COLLECT PRIZE
                   </$Button>
                 ) : (
-                  <div>
-                    <RedeemWeb3Button
-                      targetNetwork={lootboxData?.chainIdHex || undefined}
-                      targetWalletAddress={claimData?.whitelist?.whitelistedAddress}
-                    >
-                      {
-                        // this means the user needs to connect their wallet to their profile & it will auto whitelist
-                        status === 'no-whitelist' ? (
-                          <$Button
-                            screen={screen}
-                            onClick={!isLoading ? handleWalletConnect : undefined}
-                            color={`${COLORS.warningFontColor}`}
-                            colorHover={`${COLORS.warningFontColor}90`}
-                            backgroundColor={`${COLORS.warningBackground}`}
-                            backgroundColorHover={`${COLORS.warningBackground}80`}
-                            style={{
-                              textTransform: 'uppercase',
-                              height: '60px',
-                              maxWidth: '300px',
-                              minWidth: '200px',
-                            }}
-                            disabled={loadingWhitelist}
-                          >
-                            <LoadingText loading={isLoading} color={`${COLORS.warningFontColor}`} text={'Whitelist'} />
-                          </$Button>
-                        ) : status === 'not-minted' ? (
-                          <$Button
-                            screen={screen}
-                            onClick={!isLoading ? mintNFT : undefined}
-                            color={COLORS.trustFontColor}
-                            backgroundColor={COLORS.trustBackground}
-                            style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
-                            disabled={isLoading}
-                          >
-                            <LoadingText loading={isLoading} color={COLORS.trustFontColor} text={'Claim Ticket'} />
-                          </$Button>
-                        ) : (
-                          <$Button
-                            screen={screen}
-                            onClick={!isLoading ? withdrawEarnings : undefined}
-                            color={COLORS.white}
-                            backgroundColor={
-                              noDepositsAvailable ? COLORS.surpressedBackground : COLORS.successFontColor
-                            }
-                            style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
-                            disabled={isLoading || noDepositsAvailable}
-                          >
-                            <LoadingText loading={isLoading} color={COLORS.white} text={'Redeem'} />
-                          </$Button>
-                        )
-                      }
-                    </RedeemWeb3Button>
-                  </div>
-                )} */}
+                  <div style={{ maxWidth: '300px', minWidth: '200px' }}>{renderWeb3Button()}</div>
+                )}
 
                 <div style={{ paddingTop: screen === 'mobile' ? '20px' : '5px' }}>
                   <SwitchTicketComponent
@@ -808,15 +824,16 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
               </$Horizontal>
               {truncatedProratedDeposits.map((deposit, idx) => {
                 return (
-                  <$DividendRow key={`ticket-${claimIdx}-${idx}`} isActive={!deposit.isRedeemed}>
-                    {/* <$DividendOwed>
-                      {`${deposit.isRedeemed ? '☑️ ' : ''}${parseEth(
-                        deposit.tokenAmount,
-                        Number(deposit.decimal),
-                        22
-                      )}`}
-                    </$DividendOwed>
-                    <$DividendTokenSymbol>{deposit.tokenSymbol}</$DividendTokenSymbol> */}
+                  <$DividendRow
+                    onClick={() => {
+                      setIsRewardModalOpen(true)
+                      setRewardModalFocusedDeposit(deposit)
+                    }}
+                    key={`ticket-${claimIdx}-${idx}`}
+                    isActive={!deposit.isRedeemed}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <$DividendTokenSymbol>{`${deposit.isRedeemed ? '☑️ ' : ''} ${deposit.title}`}</$DividendTokenSymbol>
                   </$DividendRow>
                 )
               })}
@@ -866,11 +883,16 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
             setRewardModalFocusedDeposit(undefined)
           }}
           currentDeposit={rewardModalFocusedDeposit}
-          allDeposits={truncatedDeposits}
+          allDeposits={
+            truncatedProratedDeposits && truncatedProratedDeposits.length > 0
+              ? truncatedDeposits
+              : truncatedProratedDeposits
+          }
           changeCurrentDeposit={(d: Deposit) => {
             setRewardModalFocusedDeposit(d)
           }}
           ticketID={chosenTicketID}
+          renderWeb3Button={renderWeb3Button}
         />
       )}
     </$RedeemCosmicContainer>

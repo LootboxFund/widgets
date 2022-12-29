@@ -9,6 +9,7 @@ import $Button from '../Generics/Button'
 import { COLORS, DepositID, LootboxTicketID } from '@wormgraph/helpers'
 import { useLazyQuery } from '@apollo/client'
 import { GET_VOUCHER_DEPOSIT_FOR_FAN } from './api.gql'
+import { ReactNode } from 'react'
 import {
   GetVoucherOfDepositForFanResponse,
   QueryGetVoucherOfDepositForFanArgs,
@@ -23,6 +24,7 @@ export interface RewardModalProps {
   allDeposits: Deposit[]
   changeCurrentDeposit: (deposit: Deposit) => void
   ticketID: LootboxTicketID
+  renderWeb3Button: () => ReactNode
 }
 const RewardModal = (props: RewardModalProps) => {
   const { screen } = useWindowSize()
@@ -152,16 +154,21 @@ const RewardModal = (props: RewardModalProps) => {
           >{`${codeShown}`}</$Horizontal>
         </$Vertical>
         <$Horizontal style={{ width: '100%', flexDirection: screen === 'mobile' ? 'column' : 'row' }}>
-          <a href={linkShown || ''} target="_blank" rel="noreferrer" style={{ flex: 1 }}>
-            <$Button
-              color={COLORS.white}
-              backgroundColor={COLORS.trustBackground}
-              screen={screen}
-              style={{ padding: '20px 0px', width: '100%' }}
-            >
-              Open Link
-            </$Button>
-          </a>
+          {props.currentDeposit?.web3Metadata ? (
+            <div style={{ flex: 1 }}>{props.renderWeb3Button()}</div>
+          ) : (
+            <a href={linkShown || ''} target="_blank" rel="noreferrer" style={{ flex: 1 }}>
+              <$Button
+                color={COLORS.white}
+                backgroundColor={COLORS.trustBackground}
+                screen={screen}
+                style={{ padding: '20px 0px', width: '100%' }}
+              >
+                Open Link
+              </$Button>
+            </a>
+          )}
+
           <div style={{ width: '20px' }}></div>
           <$Button
             color={COLORS.surpressedBackground}

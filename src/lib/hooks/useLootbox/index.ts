@@ -41,7 +41,11 @@ interface UseLootboxResult {
   proratedDeposits: TicketToDepositMapping
   deposits: Deposit[]
   lastTx?: ContractTransaction
-  loadProratedDepositsIntoState: (ticketID: LootboxTicketID_Web3) => void
+  loadProratedDepositsIntoState: (
+    w2TicketID: LootboxTicketID,
+    w3TicketID: LootboxTicketID_Web3,
+    lootboxID: LootboxID
+  ) => void
   loadAllDepositsIntoState: () => Promise<void>
   mintTicket: (
     signature: string,
@@ -172,10 +176,24 @@ export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootbox
     }
   }
 
-  const loadProratedDepositsIntoState = async (ticketID: LootboxTicketID_Web3): Promise<void> => {
-    const deposits = await loadProratedDeposits(ticketID)
-    // todo: load prorated voucher deposits into state
-    setProratedDeposits({ ...proratedDeposits, [ticketID]: deposits })
+  const loadProratedDepositsIntoState = async (
+    w2TicketID: LootboxTicketID,
+    w3TicketID: LootboxTicketID_Web3,
+    lootboxID: LootboxID
+  ): Promise<void> => {
+    // handle web3 deposits
+    const web3Deposits = await loadProratedDeposits(w3TicketID)
+    // handle web2 deposits
+    const { data } = await getVoucherDeposits({ variables: { lootboxID: lootboxID } })
+    const web2ProratedVouchers: Deposit[] = []
+    if (data?.getLootboxDeposits.__typename === 'GetLootboxDepositsResponseSuccess') {
+      const { getLootboxDeposits } = data
+      const vouchers = getLootboxDeposits.deposits
+      web2ProratedVouchers.push(...vouchers.map((v) => convertVoucherBatchToDeposit(v)))
+    }
+    //
+    const deposits = [...web3Deposits, ...web2ProratedVouchers]
+    setProratedDeposits({ ...proratedDeposits, [w3TicketID]: deposits })
   }
 
   const loadAllDepositsIntoState = async (): Promise<void> => {
