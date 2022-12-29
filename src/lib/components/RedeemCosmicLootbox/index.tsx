@@ -93,7 +93,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const { sessionId, shouldShowAd, ad, adQuestions, retrieveAirdropAd } = useBeforeAirdropAd()
   const pollStatus = useRef<RedeemState | undefined>()
   const [showAllDeposits, setShowAllDeposits] = useState(false)
-  const [rewardModalFocusedDeposit, setRewardModalFocusedDeposit] = useState<Deposit>()
+  const [currentDeposit, setCurrentDeposit] = useState<Deposit>()
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [notification, setNotification] = useState<{
     message: string
@@ -455,7 +455,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
             <$DividendRow
               onClick={() => {
                 setIsRewardModalOpen(true)
-                setRewardModalFocusedDeposit(deposit)
+                setCurrentDeposit(deposit)
               }}
               key={`ticket-${claimIdx}-${idx}`}
               isActive={!deposit.isRedeemed}
@@ -591,6 +591,20 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     }
   }
   const renderWeb3Button = () => {
+    console.log(`currentDeposit?.isRedeemed`, currentDeposit?.isRedeemed)
+    if (currentDeposit?.isRedeemed) {
+      return (
+        <$Button
+          screen={screen}
+          color={COLORS.white}
+          backgroundColor={COLORS.surpressedBackground}
+          style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
+          disabled={true}
+        >
+          {`☑️ Redeemed`}
+        </$Button>
+      )
+    }
     return status === 'lootbox-not-deployed' ? (
       <$Button
         screen={screen}
@@ -701,7 +715,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
                     style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
                     onClick={() => {
                       setIsRewardModalOpen(true)
-                      setRewardModalFocusedDeposit(truncatedDeposits[0])
+                      setCurrentDeposit(truncatedDeposits[0])
                     }}
                   >
                     COLLECT PRIZE
@@ -827,7 +841,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
                   <$DividendRow
                     onClick={() => {
                       setIsRewardModalOpen(true)
-                      setRewardModalFocusedDeposit(deposit)
+                      setCurrentDeposit(deposit)
                     }}
                     key={`ticket-${claimIdx}-${idx}`}
                     isActive={!deposit.isRedeemed}
@@ -875,21 +889,31 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
           {screen === 'mobile' && <br />}
         </$Vertical>
       </$Horizontal>
-      {isRewardModalOpen && rewardModalFocusedDeposit && chosenTicketID && (
+      {isRewardModalOpen && currentDeposit && chosenTicketID && (
         <RewardModal
           isModalOpen={isRewardModalOpen}
           closeModal={() => {
             setIsRewardModalOpen(false)
-            setRewardModalFocusedDeposit(undefined)
+            setCurrentDeposit(undefined)
           }}
-          currentDeposit={rewardModalFocusedDeposit}
+          currentDeposit={currentDeposit}
           allDeposits={
             truncatedProratedDeposits && truncatedProratedDeposits.length > 0
-              ? truncatedDeposits
-              : truncatedProratedDeposits
+              ? truncatedProratedDeposits
+              : truncatedDeposits
           }
-          changeCurrentDeposit={(d: Deposit) => {
-            setRewardModalFocusedDeposit(d)
+          changeCurrentDeposit={(did: DepositID) => {
+            console.log(`did`, did)
+            console.log(`truncatedDeposits`, truncatedDeposits)
+            console.log(`truncatedProratedDeposits`, truncatedProratedDeposits)
+            const nextDeposit =
+              truncatedProratedDeposits && truncatedProratedDeposits.length > 0
+                ? truncatedProratedDeposits.find((d) => d.id === did)
+                : truncatedDeposits.find((d) => d.id === did)
+            console.log(`nextDeposit`, nextDeposit)
+            if (nextDeposit) {
+              setCurrentDeposit(nextDeposit)
+            }
           }}
           ticketID={chosenTicketID}
           renderWeb3Button={renderWeb3Button}

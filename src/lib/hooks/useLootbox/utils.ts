@@ -41,6 +41,7 @@ export interface Deposit {
 }
 
 export const convertWeb3DepositFragmentToDeposit = async (fragment: Web3DepositFragment): Promise<Deposit> => {
+  console.log(`fragment---> `, fragment)
   const nativeToken = getTokenFromList(NATIVE_ADDRESS)
 
   let symbol: string
@@ -81,7 +82,7 @@ export const convertVoucherBatchToDeposit = (voucherBatch: LootboxVoucherDeposit
   return {
     id: voucherBatch.id as DepositID,
     title: voucherBatch.title,
-    isRedeemed: false, // voucherBatch.isRedeemed,
+    isRedeemed: voucherBatch.isRedeemed || false,
     voucherMetadata: {
       title: voucherBatch.title,
       createdAt: voucherBatch.createdAt,

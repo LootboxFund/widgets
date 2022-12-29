@@ -118,6 +118,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootbox
           })
         }
       }
+      console.log(`res`, res)
       const fullDeposits = await promiseChainDelay(res.map(convertWeb3DepositFragmentToDeposit))
       return fullDeposits
     } catch (err) {
@@ -138,6 +139,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootbox
       const _deposits = (await lootbox.viewProratedDepositsForTicket(ticketID)) || []
 
       const frags: Web3DepositFragment[] = []
+      console.log(`frags`, frags)
       for (let deposit of _deposits) {
         if (deposit?.nativeTokenAmount && deposit?.nativeTokenAmount?.gt('0')) {
           frags.push({
@@ -193,6 +195,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootbox
     }
     //
     const deposits = [...web3Deposits, ...web2ProratedVouchers]
+    console.log(`deposits,...`, deposits)
     setProratedDeposits({ ...proratedDeposits, [w3TicketID]: deposits })
   }
 

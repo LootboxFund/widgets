@@ -10,7 +10,7 @@ export const GET_VOUCHER_DEPOSITS = gql`
           createdAt
           oneTimeVouchersCount
           hasReuseableVoucher
-          # isRedeemed
+          isRedeemed
         }
       }
       ... on ResponseError {

@@ -22,7 +22,7 @@ export interface RewardModalProps {
   closeModal: () => void
   currentDeposit: Deposit
   allDeposits: Deposit[]
-  changeCurrentDeposit: (deposit: Deposit) => void
+  changeCurrentDeposit: (depositID: DepositID) => void
   ticketID: LootboxTicketID
   renderWeb3Button: () => ReactNode
 }
@@ -100,6 +100,8 @@ const RewardModal = (props: RewardModalProps) => {
     return nextIndex
   }
 
+  console.log(`currentDeposit`, props.currentDeposit)
+
   const titleShown = voucher ? voucher.title : props.currentDeposit.title
   const codeShown = voucher ? voucher.code : props.currentDeposit.title
   const linkShown = voucher ? voucher.url : props.currentDeposit.web3Metadata?.tokenAddress
@@ -126,7 +128,7 @@ const RewardModal = (props: RewardModalProps) => {
                 onClick={() => {
                   const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, -1)
                   const nextDeposit = props.allDeposits[nthDeposit]
-                  props.changeCurrentDeposit(nextDeposit)
+                  props.changeCurrentDeposit(nextDeposit.id)
                 }}
                 style={{ cursor: 'pointer' }}
               >{`< `}</b>
@@ -135,7 +137,7 @@ const RewardModal = (props: RewardModalProps) => {
                 onClick={() => {
                   const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
                   const nextDeposit = props.allDeposits[nthDeposit]
-                  props.changeCurrentDeposit(nextDeposit)
+                  props.changeCurrentDeposit(nextDeposit.id)
                 }}
                 style={{ cursor: 'pointer' }}
               >{` >`}</b>
@@ -178,7 +180,8 @@ const RewardModal = (props: RewardModalProps) => {
             onClick={() => {
               const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
               const nextDeposit = props.allDeposits[nthDeposit]
-              props.changeCurrentDeposit(nextDeposit)
+              console.log(`nextDeposit `, nextDeposit)
+              props.changeCurrentDeposit(nextDeposit.id)
             }}
           >
             Skip & Next
