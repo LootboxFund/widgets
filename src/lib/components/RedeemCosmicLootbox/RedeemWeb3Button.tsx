@@ -13,7 +13,7 @@ export interface RedeemButtonProps {
   targetNetwork?: ChainIDHex
   targetWalletAddress?: Address
 }
-const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
+const RedeemWeb3Button = (props: PropsWithChildren<RedeemButtonProps>) => {
   const snapUser = useSnapshot(userState)
   const [loading, setLoading] = useState(false)
   const snapUserState = useSnapshot(userState)
@@ -81,7 +81,7 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         onClick={!loading ? openMetamaskInstallLink : undefined}
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
+        style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
         disabled={loading}
       >
         <LoadingText loading={loading} color={`${COLORS.warningFontColor}`} text={words.pleaseInstallMetamask} />
@@ -96,7 +96,7 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         colorHover={COLORS.dangerFontColor}
         backgroundColor={`${COLORS.dangerBackground}80`}
         backgroundColorHover={`${COLORS.dangerBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
+        style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
         disabled={loading}
       >
         <LoadingText loading={loading} color={`${COLORS.dangerFontColor}90`} text="Connect" />
@@ -109,7 +109,7 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
         onClick={!loading ? switchChain : undefined}
         color={`${COLORS.warningFontColor}`}
         backgroundColor={`${COLORS.warningBackground}`}
-        style={{ textTransform: 'uppercase', height: '60px', maxWidth: '300px', minWidth: '200px' }}
+        style={{ textTransform: 'uppercase', height: '60px', width: '100%' }}
         disabled={loading}
       >
         <LoadingText loading={loading} color={COLORS.warningFontColor} text={words.switchNetwork} />
@@ -144,4 +144,4 @@ const RedeemButton = (props: PropsWithChildren<RedeemButtonProps>) => {
   return <div>{props.children}</div>
 }
 
-export default RedeemButton
+export default RedeemWeb3Button

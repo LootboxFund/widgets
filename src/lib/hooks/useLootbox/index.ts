@@ -3,6 +3,7 @@ import {
   Address,
   ChainIDHex,
   ClaimID,
+  LootboxID,
   LootboxMintSignatureNonce,
   LootboxTicketDigest,
   LootboxTicketID,
@@ -14,15 +15,24 @@ import { NATIVE_ADDRESS } from 'lib/hooks/constants'
 import { useProvider, useReadOnlyProvider } from '../useWeb3Api'
 import { startLootboxOnMintListener } from 'lib/api/firebase/functions'
 import { promiseChainDelay } from 'lib/utils/promise'
-import { DepositFragment, Deposit, convertDepositFragmentToDeposit } from './utils'
-import { useMutation } from '@apollo/client'
+import {
+  Web3DepositFragment,
+  Deposit,
+  convertWeb3DepositFragmentToDeposit,
+  Web3Deposit,
+  convertVoucherBatchToDeposit,
+} from './utils'
+import { useLazyQuery, useMutation, LazyQueryExecFunction } from '@apollo/client'
 import { UPDATE_CLAIM_REDEMPTION_STATUS } from 'lib/components/RedeemCosmicLootbox/api.gql'
 import {
   ClaimRedemptionStatus,
+  GetLootboxDepositsResponse,
   MutationUpdateClaimRedemptionStatusArgs,
+  QueryGetLootboxDepositsArgs,
   ResponseError,
   UpdateClaimRedemptionStatusResponse,
 } from 'lib/api/graphql/generated/types'
+import { GET_VOUCHER_DEPOSITS } from './api.gql'
 
 interface UseLootboxResult {
   lootbox: Contract | null
@@ -31,8 +41,11 @@ interface UseLootboxResult {
   proratedDeposits: TicketToDepositMapping
   deposits: Deposit[]
   lastTx?: ContractTransaction
-  loadProratedDepositsIntoState: (ticketID: LootboxTicketID_Web3) => void
-  getLootboxDeposits: () => Promise<Deposit[]>
+  loadProratedDepositsIntoState: (
+    w2TicketID: LootboxTicketID,
+    w3TicketID: LootboxTicketID_Web3,
+    lootboxID: LootboxID
+  ) => void
   loadAllDepositsIntoState: () => Promise<void>
   mintTicket: (
     signature: string,
@@ -46,20 +59,24 @@ interface UseLootboxResult {
 interface UseLootboxParams {
   chainIDHex?: ChainIDHex
   lootboxAddress?: Address
+  lootboxID?: LootboxID
 }
 
 export interface TicketToDepositMapping {
   [key: LootboxTicketID_Web3]: Deposit[]
 }
 type UseLootboxStatus = 'loading' | 'pending-wallet' | 'ready'
-export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): UseLootboxResult => {
+export const useLootbox = ({ lootboxAddress, chainIDHex, lootboxID }: UseLootboxParams): UseLootboxResult => {
   const [injectedProvider] = useProvider()
   const { provider } = useReadOnlyProvider({ chainIDHex })
   const [deposits, setDeposits] = useState<Deposit[]>([])
   const [proratedDeposits, setProratedDeposits] = useState<TicketToDepositMapping>({})
   const [status, setStatus] = useState<UseLootboxStatus>('ready')
   const [lastTx, setLastTx] = useState<ContractTransaction>()
-
+  const [getVoucherDeposits] = useLazyQuery<
+    { getLootboxDeposits: ResponseError | GetLootboxDepositsResponse },
+    QueryGetLootboxDepositsArgs
+  >(GET_VOUCHER_DEPOSITS)
   const [updateClaimRedemptionStatus] = useMutation<
     { updateClaimRedemptionStatus: ResponseError | UpdateClaimRedemptionStatusResponse },
     MutationUpdateClaimRedemptionStatusArgs
@@ -73,7 +90,7 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     return new Contract(lootboxAddress, LootboxCosmicABI, provider)
   }, [provider, lootboxAddress])
 
-  const getLootboxDeposits = async (): Promise<Deposit[]> => {
+  const getLootboxWeb3Deposits = async (): Promise<Deposit[]> => {
     if (!lootbox) {
       return []
     }
@@ -82,13 +99,14 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     try {
       const deposits = await lootbox.viewAllDeposits()
 
-      const res: DepositFragment[] = []
+      const res: Web3DepositFragment[] = []
       for (let deposit of deposits) {
         if (deposit?.nativeTokenAmount && deposit?.nativeTokenAmount?.gt('0')) {
           res.push({
             tokenAddress: NATIVE_ADDRESS,
             tokenAmount: deposit.nativeTokenAmount.toString(),
             isRedeemed: deposit.redeemed,
+            network: deposit.network,
           })
         }
         if (deposit?.erc20TokenAmount && deposit?.erc20TokenAmount?.gt('0')) {
@@ -96,10 +114,12 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
             tokenAddress: deposit.erc20Token,
             tokenAmount: deposit.erc20TokenAmount.toString(),
             isRedeemed: deposit.redeemed,
+            network: deposit.network,
           })
         }
       }
-      const fullDeposits = await promiseChainDelay(res.map(convertDepositFragmentToDeposit))
+      console.log(`res`, res)
+      const fullDeposits = await promiseChainDelay(res.map(convertWeb3DepositFragmentToDeposit))
       return fullDeposits
     } catch (err) {
       console.error('Error loading deposits', err)
@@ -118,13 +138,15 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     try {
       const _deposits = (await lootbox.viewProratedDepositsForTicket(ticketID)) || []
 
-      const frags: DepositFragment[] = []
+      const frags: Web3DepositFragment[] = []
+      console.log(`frags`, frags)
       for (let deposit of _deposits) {
         if (deposit?.nativeTokenAmount && deposit?.nativeTokenAmount?.gt('0')) {
           frags.push({
             tokenAddress: NATIVE_ADDRESS,
             tokenAmount: deposit.nativeTokenAmount.toString(),
             isRedeemed: deposit.redeemed,
+            network: deposit.network,
           })
         }
         if (deposit?.erc20TokenAmount && deposit?.erc20TokenAmount?.gt('0')) {
@@ -132,11 +154,12 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
             tokenAddress: deposit.erc20Token,
             tokenAmount: deposit.erc20TokenAmount.toString(),
             isRedeemed: deposit.redeemed,
+            network: deposit.network,
           })
         }
       }
 
-      const fullDeposits: Deposit[] = await promiseChainDelay(frags.map(convertDepositFragmentToDeposit))
+      const fullDeposits: Deposit[] = await promiseChainDelay(frags.map(convertWeb3DepositFragmentToDeposit))
 
       fullDeposits.sort((a, b) => {
         if (a.isRedeemed && b.isRedeemed) {
@@ -155,14 +178,41 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     }
   }
 
-  const loadProratedDepositsIntoState = async (ticketID: LootboxTicketID_Web3): Promise<void> => {
-    const deposits = await loadProratedDeposits(ticketID)
-    setProratedDeposits({ ...proratedDeposits, [ticketID]: deposits })
+  const loadProratedDepositsIntoState = async (
+    w2TicketID: LootboxTicketID,
+    w3TicketID: LootboxTicketID_Web3,
+    lootboxID: LootboxID
+  ): Promise<void> => {
+    // handle web3 deposits
+    const web3Deposits = await loadProratedDeposits(w3TicketID)
+    // handle web2 deposits
+    const { data } = await getVoucherDeposits({ variables: { lootboxID: lootboxID } })
+    const web2ProratedVouchers: Deposit[] = []
+    if (data?.getLootboxDeposits.__typename === 'GetLootboxDepositsResponseSuccess') {
+      const { getLootboxDeposits } = data
+      const vouchers = getLootboxDeposits.deposits
+      web2ProratedVouchers.push(...vouchers.map((v) => convertVoucherBatchToDeposit(v)))
+    }
+    //
+    const deposits = [...web3Deposits, ...web2ProratedVouchers]
+    console.log(`deposits,...`, deposits)
+    setProratedDeposits({ ...proratedDeposits, [w3TicketID]: deposits })
   }
 
   const loadAllDepositsIntoState = async (): Promise<void> => {
-    const deposits = await getLootboxDeposits()
-    setDeposits(deposits)
+    const allDeposits: Deposit[] = []
+    const web3Deposits = await getLootboxWeb3Deposits()
+    allDeposits.push(...web3Deposits)
+    if (lootboxID) {
+      const { data } = await getVoucherDeposits({ variables: { lootboxID: lootboxID } })
+
+      if (data?.getLootboxDeposits.__typename === 'GetLootboxDepositsResponseSuccess') {
+        const { getLootboxDeposits } = data
+        const vouchers = getLootboxDeposits.deposits
+        allDeposits.push(...vouchers.map((v) => convertVoucherBatchToDeposit(v)))
+      }
+    }
+    setDeposits(allDeposits)
   }
 
   /**
@@ -266,7 +316,6 @@ export const useLootbox = ({ lootboxAddress, chainIDHex }: UseLootboxParams): Us
     lastTx,
     mintTicket,
     loadProratedDepositsIntoState,
-    getLootboxDeposits,
     loadAllDepositsIntoState,
     withdrawCosmic,
   }
