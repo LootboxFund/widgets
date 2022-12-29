@@ -240,7 +240,7 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   useEffect(() => {
     const w2TicketID = claimData?.ticketID
     const w3TicketID = claimData?.whitelist?.lootboxTicket?.ticketID
-    console.log(`Grabbing by w3TicketID...`, w3TicketID)
+
     if (!w2TicketID) {
       return
     }
@@ -367,13 +367,13 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
   const withdrawEarnings = async () => {
     const w2TicketID = claimData?.ticketID
     const w3TicketID = claimData?.whitelist?.lootboxTicket?.ticketID
-    console.log(`Grabbing by w3TicketID...`, w3TicketID)
+
     if (!w2TicketID) {
       return
     }
     if (!w3TicketID) {
       setErrorMessage('Something went wrong! Please try again later.')
-      console.error('No Ticket')
+
       return
     }
     setErrorMessage('')
@@ -591,7 +591,6 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
     }
   }
   const renderWeb3Button = () => {
-    console.log(`currentDeposit?.isRedeemed`, currentDeposit?.isRedeemed)
     if (currentDeposit?.isRedeemed) {
       return (
         <$Button
@@ -903,14 +902,11 @@ const RedeemCosmicLootbox = ({ lootboxID, answered }: { lootboxID: LootboxID; an
               : truncatedDeposits
           }
           changeCurrentDeposit={(did: DepositID) => {
-            console.log(`did`, did)
-            console.log(`truncatedDeposits`, truncatedDeposits)
-            console.log(`truncatedProratedDeposits`, truncatedProratedDeposits)
             const nextDeposit =
               truncatedProratedDeposits && truncatedProratedDeposits.length > 0
                 ? truncatedProratedDeposits.find((d) => d.id === did)
                 : truncatedDeposits.find((d) => d.id === did)
-            console.log(`nextDeposit`, nextDeposit)
+
             if (nextDeposit) {
               setCurrentDeposit(nextDeposit)
             }

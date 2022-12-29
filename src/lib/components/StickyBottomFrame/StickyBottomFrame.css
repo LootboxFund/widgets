@@ -432,6 +432,7 @@ button#submit-arrow-button {
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+  left: 0;
 }
 .viral-invite-loop-intro-slid {
   display: flex;

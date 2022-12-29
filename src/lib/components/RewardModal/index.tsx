@@ -41,7 +41,6 @@ const RewardModal = (props: RewardModalProps) => {
     }
   }, [props.currentDeposit, props.ticketID])
   const getVoucher = async () => {
-    console.log(`props.currentDeposit`, props.currentDeposit)
     const depositID = props.currentDeposit.id
     if (depositID) {
       const { data } = await getVoucherOfDepositForFan({
@@ -99,8 +98,6 @@ const RewardModal = (props: RewardModalProps) => {
     // Return the next index
     return nextIndex
   }
-
-  console.log(`currentDeposit`, props.currentDeposit)
 
   const titleShown = voucher ? voucher.title : props.currentDeposit.title
   const codeShown = voucher ? voucher.code : props.currentDeposit.title
@@ -172,20 +169,22 @@ const RewardModal = (props: RewardModalProps) => {
           )}
 
           <div style={{ width: '20px' }}></div>
-          <$Button
-            color={COLORS.surpressedBackground}
-            backgroundColor={COLORS.white}
-            screen={screen}
-            style={{ flex: 1, fontWeight: 'normal', padding: '20px 0px' }}
-            onClick={() => {
-              const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
-              const nextDeposit = props.allDeposits[nthDeposit]
-              console.log(`nextDeposit `, nextDeposit)
-              props.changeCurrentDeposit(nextDeposit.id)
-            }}
-          >
-            Skip & Next
-          </$Button>
+          {props.allDeposits.length > 0 && (
+            <$Button
+              color={COLORS.surpressedBackground}
+              backgroundColor={COLORS.white}
+              screen={screen}
+              style={{ flex: 1, fontWeight: 'normal', padding: '20px 0px' }}
+              onClick={() => {
+                const nthDeposit = getNextIndex(props.allDeposits, currentDepositIndex, 1)
+                const nextDeposit = props.allDeposits[nthDeposit]
+
+                props.changeCurrentDeposit(nextDeposit.id)
+              }}
+            >
+              Next
+            </$Button>
+          )}
         </$Horizontal>
         <$Horizontal>
           <i style={{ fontSize: '0.9rem', color: COLORS.surpressedBackground, marginTop: '15px' }}>
