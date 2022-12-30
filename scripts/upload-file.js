@@ -2,7 +2,7 @@ const { Storage } = require('@google-cloud/storage')
 const storage = new Storage()
 
 const uploadFile = async ({ filename, semver, absPath, bucketName }) => {
-  const build = 'build-74'
+  const build = 'build'
   // Uploads a local file to the bucket
   const filepath = `widgets/${semver}/${build}/${filename}`
   const localFilePath = `${absPath}${filename}`
