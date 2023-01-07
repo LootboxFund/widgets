@@ -208,8 +208,12 @@ const OnePager = (props: Props) => {
   }, [page, referral, searchString])
 
   useEffect(() => {
-    if (!chosenLootbox && eligibleTickets.length > 0) {
-      const initLootbox = eligibleTickets[0]
+    // eligibleTickets has sold out lootboxes too, so filter those out
+    const _eligibleTickets = eligibleTickets.filter(
+      (t) => t.lootbox.status === LootboxStatus.Active && t.status === LootboxTournamentStatus.Active
+    )
+    if (!chosenLootbox && _eligibleTickets.length > 0) {
+      const initLootbox = _eligibleTickets[0]
       setChosenLootbox({
         nftBountyValue: initLootbox.lootbox.nftBountyValue || undefined,
         address: (initLootbox?.lootbox.address as Address) || null,
