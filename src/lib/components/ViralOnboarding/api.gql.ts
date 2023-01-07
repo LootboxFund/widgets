@@ -1,21 +1,6 @@
 import { gql } from '@apollo/client'
-import {
-  Address,
-  ClaimID,
-  ReferralID,
-  ReferralSlug,
-  TournamentID,
-  UserID,
-  LootboxID,
-  AffiliateID,
-} from '@wormgraph/helpers'
-import {
-  ClaimStatus,
-  ClaimType,
-  LootboxStatus,
-  LootboxTournamentStatus,
-  ResponseError,
-} from 'lib/api/graphql/generated/types'
+import { Address, ClaimID, ReferralID, ReferralSlug, TournamentID, UserID, AffiliateID } from '@wormgraph/helpers'
+import { ClaimStatus, ClaimType, ResponseError } from 'lib/api/graphql/generated/types'
 import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
 
 export type CompleteClaimResponseSuccessFE = {

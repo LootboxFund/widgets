@@ -2,8 +2,6 @@ import ViralOnboardingProvider, { useViralOnboarding } from 'lib/hooks/useViralO
 import { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { extractURLState_ViralOnboardingPage } from './utils'
 import { ClaimID, LootboxID, ReferralSlug } from '@wormgraph/helpers'
-import AcceptGift from './components/AcceptGift'
-import ChooseLottery from './components/ChooseLottery'
 import OnboardingSignUp from './components/OnboardingSignUp'
 import CompleteOnboarding from './components/CompleteOnboarding'
 import { EnterCodeCard } from './components/GenericCard'
@@ -11,7 +9,6 @@ import { initLogging } from 'lib/api/logrocket'
 import { manifest } from 'manifest'
 import { useAuth } from 'lib/hooks/useAuth'
 import CreateReferral from './components/CreateReferral'
-import AddEmail from './components/AddEmail'
 import AdVideoBeta2 from './components/AdVideoBeta2'
 import { useLazyQuery, useMutation } from '@apollo/client'
 import { MutationCompleteClaimArgs, QueryCheckPhoneEnabledArgs } from 'lib/api/graphql/generated/types'
@@ -34,7 +31,6 @@ type ViralOnboardingRoute =
   | 'one-pager'
   | 'accept-gift'
   | 'browse-lottery'
-  | 'sign-up-anon'
   | 'add-email'
   | 'wait-for-auth'
   | 'onboard-phone'
@@ -193,117 +189,16 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const renderRoute = (route: ViralOnboardingRoute): ReactElement => {
     switch (route) {
-      case 'one-pager':
-        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
-      case 'browse-lottery':
-        // return <ChooseLottery onNext={() => setRoute('add-email')} onBack={() => console.log('back')} />
-        return (
-          <ChooseLottery
-            onNext={async (lootboxID: LootboxID) => {
-              if (user && claim?.id) {
-                // user already logged in - complete claim & move on automatically
-
-                await completeClaimRequest(claim.id, lootboxID)
-                setRoute('success')
-              } else {
-                setRoute('sign-up-anon')
-              }
-            }}
-            onBack={() => console.log('back')}
-          />
-        )
-      case 'sign-up-anon':
-        return (
-          <AddEmail
-            onNext={async (email) => {
-              if (!claim?.id) {
-                console.error('no claim')
-                throw new Error(words.anErrorOccured)
-              }
-              if (!chosenLootbox) {
-                console.error('no lootbox')
-                throw new Error(words.anErrorOccured)
-              }
-              setEmailForSignup(email)
-
-              // if user is already logged in, complete claim & move on automatically
-              if (user) {
-                await completeClaimRequest(claim.id, chosenLootbox.id)
-                setRoute('success')
-                return
-              }
-
-              // No email sign in methods. So we check if email is associated to phone
-              let isPhoneAuthEnabled = false
-              try {
-                const { data } = await checkPhoneAuth({ variables: { email } })
-                if (!data || data.checkPhoneEnabled.__typename === 'ResponseError') {
-                  throw new Error('error checking phone auth')
-                }
-                isPhoneAuthEnabled =
-                  data?.checkPhoneEnabled?.__typename === 'CheckPhoneEnabledResponseSuccess'
-                    ? data.checkPhoneEnabled.isEnabled
-                    : false
-              } catch (err) {
-                console.error(err)
-                isPhoneAuthEnabled = false
-              }
-
-              if (isPhoneAuthEnabled) {
-                // Just get them to login via phone
-                setRoute('onboard-phone')
-                return
-              }
-
-              // Fetch sign in methods...
-              let emailSignInMethods: string[] = []
-              try {
-                emailSignInMethods = await fetchSignInMethodsForEmail(auth, email)
-              } catch (err) {
-                console.log('error fethcing sign in methods', err)
-              }
-
-              // See if user exists with given email. If so, send them a validation email to click
-              if (emailSignInMethods.length > 0) {
-                // Sends a link to the email which will async confirm the claim on click
-                await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, chosenLootbox.id)
-                setRoute('wait-for-auth')
-                return
-              }
-
-              // Default is anonymous case
-              await signInAnonymously(email)
-              await Promise.all([
-                sendSignInEmailAnon(email, chosenLootbox.stampImage),
-                completeClaimRequest(claim.id, chosenLootbox.id),
-              ])
-              setRoute('success')
-              return
-            }}
-            onBack={() => setRoute('browse-lottery')}
-          />
-        )
-      // This one is not used anymore lol
-      case 'add-email':
-        return (
-          <AddEmail
-            onNext={async () => {
-              setRoute('onboard-phone')
-              return
-            }}
-            onBack={() => setRoute('browse-lottery')}
-          />
-        )
       case 'onboard-phone':
         return (
           <OnboardingSignUp
             onNext={() => setRoute('success')}
-            onBack={() => setRoute('browse-lottery')}
+            onBack={() => setRoute('one-pager')}
             goToReferralCreation={() => setRoute('create-referral')}
           />
         )
       case 'create-referral':
-        return <CreateReferral goBack={() => setRoute('accept-gift')} />
+        return <CreateReferral goBack={() => setRoute('one-pager')} />
       case 'wait-for-auth':
         return (
           <WaitForAuth
@@ -320,8 +215,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
               setRoute('success')
               return
             }}
-            onRestart={() => setRoute('accept-gift')}
-            onBack={() => setRoute('browse-lottery')}
+            onRestart={() => setRoute('one-pager')}
+            onBack={() => setRoute('one-pager')}
           />
         )
       case 'success': {
@@ -357,10 +252,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
           )
         }
       }
-
-      case 'accept-gift':
+      case 'one-pager':
       default:
-        return <AcceptGift onNext={() => setRoute('browse-lottery')} onBack={() => console.log('back')} />
+        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
     }
   }
 
