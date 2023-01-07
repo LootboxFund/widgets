@@ -1,12 +1,36 @@
 import { gql } from '@apollo/client'
-import { Address, AffiliateID, LootboxID, ReferralID, ReferralSlug, TournamentID } from '@wormgraph/helpers'
-import { AdOfferQuestion, AdServed } from '../../api/graphql/generated/types'
+import {
+  Address,
+  AffiliateID,
+  LootboxID,
+  ReferralID,
+  ReferralSlug,
+  TournamentID,
+  TournamentPrivacyScope,
+} from '@wormgraph/helpers'
+import { AdOfferQuestion, AdServed, LootboxStatus, LootboxTournamentStatus } from '../../api/graphql/generated/types'
 
 export interface LootboxReferralFE {
   id: LootboxID
   nftBountyValue?: string
   address: Address | null
   stampImage: string
+}
+
+export interface LootboxReferralSnapshotFE {
+  status: LootboxTournamentStatus
+  lootbox: {
+    id: LootboxID
+    name?: string
+    description?: string
+    nftBountyValue?: string
+    status?: LootboxStatus
+    stampImage?: string
+    address?: Address | null
+    safetyFeatures?: {
+      isExclusiveLootbox?: boolean
+    }
+  }
 }
 
 export interface OnboardingTournamentFE {
@@ -17,11 +41,8 @@ export interface OnboardingTournamentFE {
   promoterId?: AffiliateID
   isPostCosmic?: boolean
   runningCompletedClaims: number
-  lootboxSnapshots: {
-    lootboxID: LootboxID
-    address: Address | null
-    stampImage?: string
-  }[]
+  privacyScope: TournamentPrivacyScope[]
+  lootboxSnapshots: LootboxReferralSnapshotFE[]
 }
 
 export interface ReferralFE {
@@ -34,7 +55,6 @@ export interface ReferralFE {
   tournamentId: TournamentID
   tournament: OnboardingTournamentFE
   seedLootboxID?: LootboxID
-  seedLootbox?: LootboxReferralFE
 }
 
 export interface ReferralResponseFE {
@@ -55,22 +75,32 @@ export const GET_REFERRAL = gql`
           nConversions
           campaignName
           tournamentId
-          seedLootbox {
-            id
-            nftBountyValue
-            address
-            stampImage
-          }
+          # seedLootbox {
+          #   id
+          #   nftBountyValue
+          #   address
+          #   stampImage
+          # }
           tournament {
             title
             description
             isPostCosmic
             tournamentDate
             runningCompletedClaims
+            privacyScope
             lootboxSnapshots(status: active) {
-              lootboxID
-              address
-              stampImage
+              status
+              lootbox {
+                id
+                name
+                description
+                nftBountyValue
+                status
+                stampImage
+                safetyFeatures {
+                  isExclusiveLootbox
+                }
+              }
             }
           }
         }
