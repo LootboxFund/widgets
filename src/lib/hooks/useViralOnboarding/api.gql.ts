@@ -3,6 +3,7 @@ import {
   Address,
   AffiliateID,
   LootboxID,
+  LootboxType,
   ReferralID,
   ReferralSlug,
   TournamentID,
@@ -27,6 +28,7 @@ export interface LootboxReferralSnapshotFE {
     status?: LootboxStatus
     stampImage?: string
     address?: Address | null
+    type: LootboxType
     safetyFeatures?: {
       isExclusiveLootbox?: boolean
     }
@@ -97,6 +99,7 @@ export const GET_REFERRAL = gql`
                 nftBountyValue
                 status
                 stampImage
+                type
                 safetyFeatures {
                   isExclusiveLootbox
                 }

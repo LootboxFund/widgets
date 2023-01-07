@@ -3,7 +3,7 @@ import { $Horizontal } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
-import { Address, COLORS, LootboxID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, LootboxID, LootboxType, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP, TermsOfService } from 'lib/hooks/constants'
 import { useMutation } from '@apollo/client'
 import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
@@ -176,6 +176,10 @@ const OnePager = (props: Props) => {
     })
 
     const eligibleTickets = _tickets.filter((t) => {
+      if (t.lootbox.type === LootboxType.Airdrop) {
+        // dont show airdrops
+        return false
+      }
       if (onlyShowSeedLootbox) {
         return t.lootbox.id === referral.seedLootboxID
       }
