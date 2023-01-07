@@ -142,7 +142,7 @@ const OnePager = (props: Props) => {
   //   }
   // }, [page, lootboxOptions, referral?.seedLootboxID, searchString, chosenLootbox])
 
-  const [tickets, eligibleTickets, hasNextPage] = useMemo(() => {
+  const [tickets, eligibleTickets, hasNextPage, showSearch] = useMemo(() => {
     let onlyShowSeedLootbox = false
 
     if (referral.seedLootboxID) {
@@ -195,10 +195,15 @@ const OnePager = (props: Props) => {
         return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
       })
 
-      return [filteredTickets, eligibleTickets, false]
+      return [filteredTickets, eligibleTickets, false, true]
     } else {
       const filteredTickets = eligibleTickets.slice(0, PAGE_SIZE * (page + 1))
-      return [filteredTickets, eligibleTickets, filteredTickets.length < eligibleTickets?.length]
+      return [
+        filteredTickets,
+        eligibleTickets,
+        filteredTickets.length < eligibleTickets.length,
+        eligibleTickets.length > PAGE_SIZE,
+      ]
     }
   }, [page, referral, searchString])
 
@@ -470,7 +475,7 @@ const OnePager = (props: Props) => {
               </div>
             </div>
             <div className="lootbox-options-list">
-              {referral.tournament?.lootboxSnapshots?.length > PAGE_SIZE && (
+              {showSearch && (
                 <input
                   className="team-search-input"
                   value={searchString}
