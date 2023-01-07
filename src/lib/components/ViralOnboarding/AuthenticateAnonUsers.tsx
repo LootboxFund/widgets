@@ -296,6 +296,16 @@ const AuthenticateAnonUsers = () => {
     }
   }
 
+  const SkipToProfileButton = () => {
+    return (
+      <a href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`} style={{ textDecoration: 'none' }}>
+        <$NextButton color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground} style={{ width: '100%' }}>
+          Skip to Profile
+        </$NextButton>
+      </a>
+    )
+  }
+
   return (
     <$ViralOnboardingCard background={background3} opacity={['0.7', '0.55']}>
       <$ViralOnboardingSafeArea>
@@ -318,7 +328,7 @@ const AuthenticateAnonUsers = () => {
               {truncatedEmail && <$SubHeading style={{ marginTop: '0px' }}>Sent to {truncatedEmail}.</$SubHeading>}
               <br />
               <br />
-              <$Button screen={screen}>Skip to Profile</$Button>
+              <SkipToProfileButton />
             </$Vertical>
           )}
           {status === 'loading' && <Spinner color={`${COLORS.white}`} size="50px" margin="10vh auto" />}
