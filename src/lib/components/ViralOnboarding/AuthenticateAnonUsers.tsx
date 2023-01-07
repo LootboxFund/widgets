@@ -83,7 +83,6 @@ const AuthenticateAnonUsers = () => {
     TRUNCATED_EMAIL_BY_PHONE,
     {
       onCompleted: (data) => {
-        console.log('fetched data', data)
         if (
           data?.truncatedEmailByPhone &&
           data.truncatedEmailByPhone.__typename === 'TruncatedEmailByPhoneResponseSuccess'
@@ -297,9 +296,19 @@ const AuthenticateAnonUsers = () => {
   }
 
   const SkipToProfileButton = () => {
+    if (!user) {
+      return null
+    }
     return (
-      <a href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`} style={{ textDecoration: 'none' }}>
-        <$NextButton color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground} style={{ width: '100%' }}>
+      <a
+        href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
+        style={{ textDecoration: 'none', textAlign: 'center' }}
+      >
+        <$NextButton
+          color={COLORS.trustFontColor}
+          backgroundColor={COLORS.surpressedBackground}
+          style={{ boxShadow: 'none', paddingLeft: '20px', paddingRight: '20px' }}
+        >
           Skip to Profile
         </$NextButton>
       </a>
@@ -347,9 +356,9 @@ const AuthenticateAnonUsers = () => {
               {errorMessage ? (
                 <$Vertical spacing={2}>
                   <$SubHeading style={{ marginTop: '0px' }}>{parseAuthError(errorMessage)}</$SubHeading>
-                  {truncatedEmail && (
+                  {truncatedEmailByPhone && (
                     <$SubHeading style={{ marginTop: '0px' }}>
-                      This phone number is already linked to an email "{truncatedEmail}".
+                      This phone number is already linked to an email "{truncatedEmailByPhone}".
                     </$SubHeading>
                   )}
                 </$Vertical>

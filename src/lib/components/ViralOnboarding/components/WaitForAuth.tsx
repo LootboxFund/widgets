@@ -140,9 +140,19 @@ const WaitForAuth = (props: WaitForAuthProps) => {
   }
 
   const SkipToProfileButton = () => {
+    if (!user) {
+      return null
+    }
     return (
-      <a href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`} style={{ textDecoration: 'none' }}>
-        <$NextButton color={COLORS.trustFontColor} backgroundColor={COLORS.trustBackground} style={{ width: '100%' }}>
+      <a
+        href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
+        style={{ textDecoration: 'none', textAlign: 'center' }}
+      >
+        <$NextButton
+          color={COLORS.trustFontColor}
+          backgroundColor={COLORS.surpressedBackground}
+          style={{ boxShadow: 'none', paddingLeft: '20px', paddingRight: '20px' }}
+        >
           Skip to Profile
         </$NextButton>
       </a>
