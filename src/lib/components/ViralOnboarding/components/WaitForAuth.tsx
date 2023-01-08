@@ -7,7 +7,7 @@ import Spinner from 'lib/components/Generics/Spinner'
 import useWords from 'lib/hooks/useWords'
 import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { $Heading, $SubHeading, background1, handIconImg } from '../contants'
+import { $Heading, $NextButton, $SubHeading, background1, handIconImg } from '../contants'
 import { extractURLState_ViralOnboardingPage } from '../utils'
 import {
   ClaimByIDResponse,
@@ -139,6 +139,26 @@ const WaitForAuth = (props: WaitForAuthProps) => {
     )
   }
 
+  const SkipToProfileButton = () => {
+    if (!user) {
+      return null
+    }
+    return (
+      <a
+        href={`${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`}
+        style={{ textDecoration: 'none', textAlign: 'center' }}
+      >
+        <$NextButton
+          color={COLORS.trustFontColor}
+          backgroundColor={COLORS.surpressedBackground}
+          style={{ boxShadow: 'none', paddingLeft: '20px', paddingRight: '20px' }}
+        >
+          Skip to Profile
+        </$NextButton>
+      </a>
+    )
+  }
+
   const stampImg = chosenLootbox?.stampImage
 
   return (
@@ -200,7 +220,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
               </$SubHeading>
               <br />
               <br />
-              <$Button screen={screen}>Skip to Profile</$Button>
+              <SkipToProfileButton />
             </$Vertical>
           )}
           {status === 'pending' && (
@@ -222,7 +242,7 @@ const WaitForAuth = (props: WaitForAuthProps) => {
               </$SubHeading>
               <br />
               <br />
-              <$Button screen={screen}>Skip to Profile</$Button>
+              <SkipToProfileButton />
             </$Vertical>
           )}
           {stampImg ? <$PartyBasketImage src={stampImg} /> : <$HandImage src={handIconImg} />}

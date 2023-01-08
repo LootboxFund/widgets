@@ -3,21 +3,20 @@ import { $Horizontal } from 'lib/components/Generics'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useIntl } from 'react-intl'
-import { Address, COLORS, LootboxID, TournamentID, TYPOGRAPHY } from '@wormgraph/helpers'
+import { Address, COLORS, LootboxID, LootboxType, TYPOGRAPHY } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP, TermsOfService } from 'lib/hooks/constants'
-import { useMutation, useQuery } from '@apollo/client'
-import { CreateClaimResponseFE, CREATE_CLAIM, GET_LOTTERY_LISTINGS_V2, LootboxReferralSnapshot } from '../api.gql'
+import { useMutation } from '@apollo/client'
+import { CreateClaimResponseFE, CREATE_CLAIM } from '../api.gql'
 import {
-  ListAvailableLootboxesForClaimResponse,
   LootboxStatus,
+  LootboxTournamentStatus,
   MutationCreateClaimArgs,
-  QueryListAvailableLootboxesForClaimArgs,
   ResponseError,
 } from 'lib/api/graphql/generated/types'
 import { convertFilenameToThumbnail } from 'lib/utils/storage'
 import './OnePager.css'
 import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpers'
-import { LootboxTournamentStatus, Tournament, TournamentPrivacyScope } from '../../../api/graphql/generated/types'
+import { TournamentPrivacyScope } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
@@ -59,20 +58,10 @@ const OnePager = (props: Props) => {
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [agreeTerms, setAgreeTerms] = useState(false)
   const { setEmail, chosenLootbox, setChosenLootbox, referral, setClaim, sessionId } = useViralOnboarding()
+  const termsOfService = referral.tournament?.privacyScope || []
   const [email, setEmailLocal] = useState('')
   const [loading, setLoading] = useState(false)
-  const {
-    data,
-    loading: loadingLootboxOptions,
-    error,
-  } = useQuery<
-    { listAvailableLootboxesForClaim: ListAvailableLootboxesForClaimResponse | ResponseError },
-    QueryListAvailableLootboxesForClaimArgs
-  >(GET_LOTTERY_LISTINGS_V2, {
-    variables: {
-      tournamentID: referral?.tournamentId || '',
-    },
-  })
+
   useEffect(() => {
     startFlight()
   }, [])
@@ -91,67 +80,148 @@ const OnePager = (props: Props) => {
     MutationCreateClaimArgs
   >(CREATE_CLAIM)
 
-  const lootboxOptions = useMemo(() => {
-    return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
-      ? data.listAvailableLootboxesForClaim.lootboxOptions
-      : null
-  }, [data])
+  // const lootboxOptions = useMemo(() => {
+  //   return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
+  //     ? data.listAvailableLootboxesForClaim.lootboxOptions
+  //     : null
+  // }, [data])
 
-  const termsOfService = useMemo(() => {
-    return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
-      ? data.listAvailableLootboxesForClaim.termsOfService
-      : []
-  }, [data])
+  // const termsOfService = useMemo(() => {
+  //   return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
+  //     ? data.listAvailableLootboxesForClaim.termsOfService
+  //     : []
+  // }, [data])
 
-  // @ts-ignore
-  const [tickets, hasNextPage] = useMemo<[LootboxReferralSnapshot[], boolean]>(() => {
-    if (!lootboxOptions) {
-      return [[], false]
+  // // @ts-ignore
+  // const [tickets, hasNextPage] = useMemo<[LootboxReferralSnapshot[], boolean]>(() => {
+  //   if (!lootboxOptions) {
+  //     return [[], false]
+  //   }
+  //   const ticketOptions = lootboxOptions.slice()
+  //   ticketOptions
+  //     .sort((a, b) => {
+  //       if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
+  //         // Bring to begining of array
+  //         return -1
+  //       }
+
+  //       if (a.lootbox?.status === LootboxStatus.SoldOut) {
+  //         return 1
+  //       }
+
+  //       const isDisabled =
+  //         b?.lootbox?.status && [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(b.lootbox.status) > -1
+  //       if (isDisabled) {
+  //         return -1
+  //       }
+
+  //       return 0
+  //     })
+  //     // @ts-ignore
+  //     .filter((t) => t.status !== LootboxTournamentStatus.Disabled && t.status !== LootboxStatus.Disabled)
+
+  //   if (!chosenLootbox && ticketOptions[0] && ticketOptions[0].lootbox) {
+  //     setChosenLootbox({
+  //       nftBountyValue: ticketOptions[0].lootbox.nftBountyValue || undefined,
+  //       address: (ticketOptions[0].address as Address) || null,
+  //       id: ticketOptions[0].lootbox.id as LootboxID,
+  //       stampImage: ticketOptions[0].stampImage,
+  //     })
+  //   }
+
+  //   if (searchString.length > 0) {
+  //     const paginated = ticketOptions.filter((t) => {
+  //       return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
+  //     })
+
+  //     return [paginated, false]
+  //   } else {
+  //     const paginated = ticketOptions.slice(0, PAGE_SIZE * (page + 1))
+
+  //     return [paginated, paginated.length < ticketOptions.length]
+  //   }
+  // }, [page, lootboxOptions, referral?.seedLootboxID, searchString, chosenLootbox])
+
+  const [tickets, eligibleTickets, hasNextPage, showSearch] = useMemo(() => {
+    let onlyShowSeedLootbox = false
+
+    if (referral.seedLootboxID) {
+      const seedLootbox = referral.tournament?.lootboxSnapshots?.find((l) => l.lootbox.id === referral.seedLootboxID)
+      if (seedLootbox) {
+        onlyShowSeedLootbox = seedLootbox?.lootbox?.safetyFeatures?.isExclusiveLootbox || false
+      }
     }
-    const ticketOptions = lootboxOptions.slice()
-    ticketOptions
-      .sort((a, b) => {
-        if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
-          // Bring to begining of array
-          return -1
-        }
 
-        if (a.lootbox?.status === LootboxStatus.SoldOut) {
-          return 1
-        }
+    const _tickets = referral.tournament?.lootboxSnapshots?.slice() || []
 
-        const isDisabled =
-          b?.lootbox?.status && [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(b.lootbox.status) > -1
-        if (isDisabled) {
-          return -1
-        }
+    _tickets.sort((a, b) => {
+      if (referral?.seedLootboxID && a.lootbox.id === referral.seedLootboxID) {
+        // Bring to begining of array
+        return -1
+      }
 
-        return 0
-      })
-      // @ts-ignore
-      .filter((t) => t.status !== LootboxTournamentStatus.Disabled && t.status !== LootboxStatus.Disabled)
+      if (a.lootbox?.status === LootboxStatus.SoldOut) {
+        return 1
+      }
 
-    if (!chosenLootbox && ticketOptions[0] && ticketOptions[0].lootbox) {
-      setChosenLootbox({
-        nftBountyValue: ticketOptions[0].lootbox.nftBountyValue || undefined,
-        address: (ticketOptions[0].address as Address) || null,
-        id: ticketOptions[0].lootbox.id as LootboxID,
-        stampImage: ticketOptions[0].stampImage,
-      })
-    }
+      const isDisabled =
+        (b?.lootbox?.status && [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(b.lootbox.status) > -1) ||
+        (b?.status && [LootboxTournamentStatus.Disabled].indexOf(b.status) > -1)
+
+      if (isDisabled) {
+        return -1
+      }
+
+      return 0
+    })
+
+    const eligibleTickets = _tickets.filter((t) => {
+      if (t.lootbox.type === LootboxType.Airdrop) {
+        // dont show airdrops
+        return false
+      }
+      if (onlyShowSeedLootbox) {
+        return t.lootbox.id === referral.seedLootboxID
+      }
+      return (
+        !t.lootbox.safetyFeatures?.isExclusiveLootbox && // removes exclusive lootboxes
+        t.status !== LootboxTournamentStatus.Disabled && // removes disabled lootboxes
+        t.lootbox.status !== LootboxStatus.Disabled // removes disabled lootboxes
+      )
+    })
 
     if (searchString.length > 0) {
-      const paginated = ticketOptions.filter((t) => {
+      const filteredTickets = eligibleTickets.filter((t) => {
         return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
       })
 
-      return [paginated, false]
+      return [filteredTickets, eligibleTickets, false, true]
     } else {
-      const paginated = ticketOptions.slice(0, PAGE_SIZE * (page + 1))
-
-      return [paginated, paginated.length < ticketOptions.length]
+      const filteredTickets = eligibleTickets.slice(0, PAGE_SIZE * (page + 1))
+      return [
+        filteredTickets,
+        eligibleTickets,
+        filteredTickets.length < eligibleTickets.length,
+        eligibleTickets.length > PAGE_SIZE,
+      ]
     }
-  }, [page, lootboxOptions, referral?.seedLootboxID, searchString, chosenLootbox])
+  }, [page, referral, searchString])
+
+  useEffect(() => {
+    // eligibleTickets has sold out lootboxes too, so filter those out
+    const _eligibleTickets = eligibleTickets.filter(
+      (t) => t.lootbox.status === LootboxStatus.Active && t.status === LootboxTournamentStatus.Active
+    )
+    if (!chosenLootbox && _eligibleTickets.length > 0) {
+      const initLootbox = _eligibleTickets[0]
+      setChosenLootbox({
+        nftBountyValue: initLootbox.lootbox.nftBountyValue || undefined,
+        address: (initLootbox?.lootbox.address as Address) || null,
+        id: initLootbox.lootbox.id as LootboxID,
+        stampImage: initLootbox.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+      })
+    }
+  }, [eligibleTickets, chosenLootbox, setChosenLootbox])
 
   const startFlight = async () => {
     try {
@@ -347,7 +417,9 @@ const OnePager = (props: Props) => {
               />
             </div>
             <div className="main-info-text">
-              <b className="main-heading-b">{`Win ${tickets[0]?.lootbox.nftBountyValue || 'Cash Prize'}`}</b>
+              <b className="main-heading-b">{`Win ${
+                referral.tournament.lootboxSnapshots[0]?.lootbox?.nftBountyValue || 'Cash Prize'
+              }`}</b>
               <i className="social-proof-oneliner">{`${
                 referral?.tournament?.runningCompletedClaims || 0
               } people already accepted`}</i>
@@ -375,7 +447,7 @@ const OnePager = (props: Props) => {
                   }}
                 />
                 <button id="submit-arrow-button" onClick={submitForm} disabled={loading}>
-                  {loading || loadingLootboxOptions || loadingClaim ? (
+                  {loading || loadingClaim ? (
                     <div className="submit-loading-icon"></div>
                   ) : (
                     <span className="submit-arrow-icon">{`▶`}</span>
@@ -406,102 +478,94 @@ const OnePager = (props: Props) => {
                 </p>
               </div>
             </div>
-            {lootboxOptions ? (
-              <div className="lootbox-options-list">
-                {lootboxOptions && lootboxOptions.length > PAGE_SIZE && (
-                  <input
-                    className="team-search-input"
-                    value={searchString}
-                    onChange={(e) => setSearchString(e.target.value)}
-                    placeholder="Search by team name"
-                  />
-                )}
-                {tickets.map((ticket, idx) => {
-                  const description = !ticket?.lootbox?.description
-                    ? ''
-                    : ticket.lootbox.description.length > 80
-                    ? ticket.lootbox.description.slice(0, 80) + '...'
-                    : ticket?.lootbox?.description
-                  const isChosen = chosenLootbox && chosenLootbox?.id === ticket.lootboxID
+            <div className="lootbox-options-list">
+              {showSearch && (
+                <input
+                  className="team-search-input"
+                  value={searchString}
+                  onChange={(e) => setSearchString(e.target.value)}
+                  placeholder="Search by team name"
+                />
+              )}
+              {tickets.map((ticket, idx) => {
+                const description = !ticket?.lootbox?.description
+                  ? ''
+                  : ticket.lootbox.description.length > 80
+                  ? ticket.lootbox.description.slice(0, 80) + '...'
+                  : ticket?.lootbox?.description
+                const isChosen = chosenLootbox && chosenLootbox?.id === ticket.lootbox.id
 
-                  const isDisabled =
-                    ticket?.lootbox?.status &&
-                    [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(ticket.lootbox.status) > -1
-                  if (ticket?.lootbox?.status === LootboxStatus.Disabled) return null
-                  return (
-                    <article
-                      key={ticket.lootboxID}
-                      className="lootbox-option-article"
-                      style={{
-                        boxShadow: isChosen && email.length !== 0 ? '0px 4px 15px #4baff5' : '',
-                        cursor: !isDisabled ? 'pointer' : 'not-allowed',
-                        position: 'relative',
-                      }}
-                      onClick={() => {
-                        if (!isDisabled && !loading) {
-                          setChosenLootbox({
-                            nftBountyValue: ticket.lootbox.nftBountyValue,
-                            address: ticket.address,
-                            id: ticket.lootbox.id,
-                            stampImage: ticket.stampImage,
-                          })
-                        }
-                      }}
-                    >
-                      <img
-                        className="lootbox-preview-image"
-                        alt=""
-                        src={
-                          ticket?.stampImage
-                            ? convertFilenameToThumbnail(ticket.stampImage, 'sm')
-                            : TEMPLATE_LOOTBOX_STAMP
-                        }
-                      />
-                      <div className="lootbox-option-info">
-                        <$Horizontal justifyContent="space-between" style={{ height: '15px', width: '100%' }}>
-                          <div className="lootbox-prize-value">{`${words.win} ${ticket?.lootbox?.nftBountyValue}`}</div>
-                          {isChosen ? (
-                            <div
-                              className="lootbox-selected"
-                              style={{
-                                backgroundColor: email.length === 0 ? '#e9e9e9' : '#4baff5',
-                              }}
-                            >
-                              Selected
-                            </div>
-                          ) : (
-                            <div className="lootbox-not-selected"></div>
-                          )}
-                        </$Horizontal>
+                const isDisabled =
+                  ticket?.lootbox?.status &&
+                  [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(ticket.lootbox.status) > -1
+                if (ticket?.lootbox?.status === LootboxStatus.Disabled) return null
+                return (
+                  <article
+                    key={ticket.lootbox.id}
+                    className="lootbox-option-article"
+                    style={{
+                      boxShadow: isChosen && email.length !== 0 ? '0px 4px 15px #4baff5' : '',
+                      cursor: !isDisabled ? 'pointer' : 'not-allowed',
+                      position: 'relative',
+                    }}
+                    onClick={() => {
+                      if (!isDisabled && !loading) {
+                        setChosenLootbox({
+                          nftBountyValue: ticket.lootbox.nftBountyValue,
+                          address: ticket.lootbox.address || null,
+                          id: ticket.lootbox.id,
+                          stampImage: ticket.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+                        })
+                      }
+                    }}
+                  >
+                    <img
+                      className="lootbox-preview-image"
+                      alt=""
+                      src={
+                        ticket?.lootbox?.stampImage
+                          ? convertFilenameToThumbnail(ticket.lootbox.stampImage, 'sm')
+                          : TEMPLATE_LOOTBOX_STAMP
+                      }
+                    />
+                    <div className="lootbox-option-info">
+                      <$Horizontal justifyContent="space-between" style={{ height: '15px', width: '100%' }}>
+                        <div className="lootbox-prize-value">{`${words.win} ${ticket?.lootbox?.nftBountyValue}`}</div>
+                        {isChosen ? (
+                          <div
+                            className="lootbox-selected"
+                            style={{
+                              backgroundColor: email.length === 0 ? '#e9e9e9' : '#4baff5',
+                            }}
+                          >
+                            Selected
+                          </div>
+                        ) : (
+                          <div className="lootbox-not-selected"></div>
+                        )}
+                      </$Horizontal>
 
-                        <div className="lootbox-name-div">{ticket?.lootbox?.name}</div>
-                        <div className="lootbox-description-div">{description}</div>
-                      </div>
-                      {ticket.lootbox.status === LootboxStatus.SoldOut && (
-                        <$SoldOut>{`📦 ${words.outOfStock} 📦`}</$SoldOut>
-                      )}
-                    </article>
-                  )
-                })}
+                      <div className="lootbox-name-div">{ticket?.lootbox?.name}</div>
+                      <div className="lootbox-description-div">{description}</div>
+                    </div>
+                    {ticket.lootbox.status === LootboxStatus.SoldOut && (
+                      <$SoldOut>{`📦 ${words.outOfStock} 📦`}</$SoldOut>
+                    )}
+                  </article>
+                )
+              })}
 
-                {hasNextPage && (
-                  <button onClick={() => setPage(page + 1)} className="see-more-button">
-                    {words.seeMore}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <img
-                src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Floading-gif.gif?alt=media"
-                height="30px"
-                width="auto"
-              />
-            )}
+              {hasNextPage && (
+                <button onClick={() => setPage(page + 1)} className="see-more-button">
+                  {words.seeMore}
+                </button>
+              )}
+            </div>
           </div>
         </div>
         <div className="action-button-div" style={{ padding: '10px' }}>
           <button disabled={loading} onClick={submitForm} className="email-submit-button">
-            {loading || loadingLootboxOptions || loadingClaim ? (
+            {loading || loadingClaim ? (
               <img
                 src="https://firebasestorage.googleapis.com/v0/b/lootbox-fund-staging.appspot.com/o/shared-company-assets%2Floading-gif.gif?alt=media"
                 height="30px"

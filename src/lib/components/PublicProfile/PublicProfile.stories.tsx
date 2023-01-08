@@ -6,6 +6,7 @@ import PublicProfilePage from './index'
 import { ApolloProvider } from '@apollo/client'
 import client from 'lib/api/graphql/client'
 import LocalizationWrapper from '../LocalizationWrapper'
+import AuthProvider from 'lib/hooks/useAuth/AuthProvider'
 
 export default {
   title: 'PublicProfile',
@@ -16,9 +17,11 @@ const Template = () => {
   return (
     <ApolloProvider client={client}>
       <LocalizationWrapper>
-        <$CardViewport width="100%" maxWidth="1200px" margin="0 auto">
-          <PublicProfilePage />
-        </$CardViewport>
+        <AuthProvider>
+          <$CardViewport width="100%" maxWidth="1200px" margin="0 auto">
+            <PublicProfilePage />
+          </$CardViewport>
+        </AuthProvider>
       </LocalizationWrapper>
     </ApolloProvider>
   )

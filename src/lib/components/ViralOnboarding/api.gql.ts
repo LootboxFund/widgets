@@ -1,21 +1,6 @@
 import { gql } from '@apollo/client'
-import {
-  Address,
-  ClaimID,
-  ReferralID,
-  ReferralSlug,
-  TournamentID,
-  UserID,
-  LootboxID,
-  AffiliateID,
-} from '@wormgraph/helpers'
-import {
-  ClaimStatus,
-  ClaimType,
-  LootboxStatus,
-  LootboxTournamentStatus,
-  ResponseError,
-} from 'lib/api/graphql/generated/types'
+import { Address, ClaimID, ReferralID, ReferralSlug, TournamentID, UserID, AffiliateID } from '@wormgraph/helpers'
+import { ClaimStatus, ClaimType, ResponseError } from 'lib/api/graphql/generated/types'
 import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
 
 export type CompleteClaimResponseSuccessFE = {
@@ -50,85 +35,85 @@ export const COMPLETE_CLAIM = gql`
   }
 `
 
-export interface LootboxReferralSnapshot {
-  lootboxID?: LootboxID
-  address: Address
-  stampImage: string
-  status: LootboxTournamentStatus
-  lootbox: {
-    id: LootboxID
-    name?: string
-    description?: string
-    nftBountyValue?: string
-    status?: LootboxStatus
-  }
-}
+// export interface LootboxReferralSnapshot {
+//   lootboxID?: LootboxID
+//   address: Address
+//   stampImage: string
+//   status: LootboxTournamentStatus
+//   lootbox: {
+//     id: LootboxID
+//     name?: string
+//     description?: string
+//     nftBountyValue?: string
+//     status?: LootboxStatus
+//   }
+// }
 
-/** @deprecated use LootboxReferralSnapshot */
-export interface LootboxSnapshotFE {
-  address: Address
-  name?: string
-  stampImage?: string
-  description?: string
-}
-/** @deprecated use LotteryListingV2FE */
-export interface LotteryListingFE {
-  __typename: 'TournamentResponseSuccess'
-  tournament: {
-    lootboxSnapshots: LootboxSnapshotFE[]
-  }
-}
+// /** @deprecated use LootboxReferralSnapshot */
+// export interface LootboxSnapshotFE {
+//   address: Address
+//   name?: string
+//   stampImage?: string
+//   description?: string
+// }
+// /** @deprecated use LotteryListingV2FE */
+// export interface LotteryListingFE {
+//   __typename: 'TournamentResponseSuccess'
+//   tournament: {
+//     lootboxSnapshots: LootboxSnapshotFE[]
+//   }
+// }
 
-export interface LotteryListingV2FE {
-  __typename: 'TournamentResponseSuccess'
-  tournament: {
-    lootboxSnapshots: LootboxReferralSnapshot[]
-  }
-}
+// export interface LotteryListingV2FE {
+//   __typename: 'TournamentResponseSuccess'
+//   tournament: {
+//     lootboxSnapshots: LootboxReferralSnapshot[]
+//   }
+// }
 
-export const GET_LOTTERY_LISTINGS_V2 = gql`
-  query ListAvailableLootboxesForClaim($tournamentID: ID!) {
-    listAvailableLootboxesForClaim(tournamentID: $tournamentID) {
-      ... on ResponseError {
-        error {
-          code
-          message
-        }
-      }
-      ... on ListAvailableLootboxesForClaimResponseSuccess {
-        termsOfService
-        lootboxOptions {
-          id
-          address
-          lootboxID
-          lootboxCreatorID
-          creatorID
-          description
-          name
-          stampImage
-          status
-          timestamps {
-            createdAt
-          }
-          lootbox {
-            id
-            name
-            symbol
-            description
-            status
-            nftBountyValue
-            stampImage
-            logo
-            backgroundImage
-            themeColor
-          }
-          impressionPriority
-          type
-        }
-      }
-    }
-  }
-`
+// export const GET_LOTTERY_LISTINGS_V2 = gql`
+//   query ListAvailableLootboxesForClaim($tournamentID: ID!) {
+//     listAvailableLootboxesForClaim(tournamentID: $tournamentID) {
+//       ... on ResponseError {
+//         error {
+//           code
+//           message
+//         }
+//       }
+//       ... on ListAvailableLootboxesForClaimResponseSuccess {
+//         termsOfService
+//         lootboxOptions {
+//           id
+//           address
+//           lootboxID
+//           lootboxCreatorID
+//           creatorID
+//           description
+//           name
+//           stampImage
+//           status
+//           timestamps {
+//             createdAt
+//           }
+//           lootbox {
+//             id
+//             name
+//             symbol
+//             description
+//             status
+//             nftBountyValue
+//             stampImage
+//             logo
+//             backgroundImage
+//             themeColor
+//           }
+//           impressionPriority
+//           type
+//         }
+//       }
+//     }
+//   }
+// `
 
 export interface ClaimFE {
   id: ClaimID
