@@ -25,6 +25,8 @@ import { auth } from 'lib/api/firebase/app'
 import WaitForAuth from './components/WaitForAuth'
 import { truncateEmail } from 'lib/utils/email'
 import OnePager from './components/OnePager'
+import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
+import { FrontendUser } from 'lib/hooks/useAuth/AuthProvider'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -43,7 +45,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { ad, referral, claim, chosenLootbox } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
     isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
-    // 'success'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
@@ -54,14 +55,11 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
 
-  const userRef = useRef()
-  const chosenLootboxRef = useRef()
-  const chosenEmailForSignupRef = useRef()
-  // @ts-ignore
+  const userRef = useRef<FrontendUser | null | undefined>()
+  const chosenLootboxRef = useRef<LootboxReferralFE>()
+  const chosenEmailForSignupRef = useRef<string>()
   userRef.current = user
-  // @ts-ignore
   chosenLootboxRef.current = chosenLootbox
-  // @ts-ignore
   chosenEmailForSignupRef.current = emailForSignup
 
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
@@ -80,26 +78,27 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     })
 
     if (!data || data?.completeClaim?.__typename === 'ResponseError') {
-      // @ts-ignore
-      throw new Error(data?.completeClaim?.error?.message || words.anErrorOccured)
+      throw new Error(
+        data?.completeClaim?.__typename === 'ResponseError' ? data?.completeClaim?.error?.message : words.anErrorOccured
+      )
     }
 
     // Add notification to local storage
     // this notification shows a notif on the user profile page
-    try {
-      if (data?.completeClaim?.claim?.id) {
-        setNotificationClaims([...notificationClaims, data.completeClaim.claim.id])
+    if (data?.completeClaim?.__typename === 'CompleteClaimResponseSuccess') {
+      try {
+        if (data?.completeClaim?.claim?.id) {
+          setNotificationClaims([...notificationClaims, data.completeClaim.claim.id])
+        }
+      } catch (err) {
+        console.error(err)
       }
-    } catch (err) {
-      console.error(err)
     }
 
     return
   }
   const onePagerNext = async (lootboxID: LootboxID, email: string) => {
-    // @ts-ignore
     const user = userRef.current
-    // @ts-ignore
     const chosenLootbox = chosenLootboxRef.current
     if (user && claim?.id) {
       // user already logged in - complete claim & move on automatically
@@ -116,7 +115,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
       // if user is already logged in, complete claim & move on automatically
       if (user) {
-        // @ts-ignore
         await completeClaimRequest(claim.id, chosenLootbox.id)
         setRoute('success')
         return

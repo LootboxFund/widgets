@@ -11,10 +11,7 @@ export type CompleteClaimResponseSuccessFE = {
           id: ClaimID
         }
       }
-    | {
-        __typename: 'ResponseError'
-        error: ResponseError
-      }
+    | ResponseError
 }
 
 export const COMPLETE_CLAIM = gql`

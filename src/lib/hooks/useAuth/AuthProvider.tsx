@@ -58,7 +58,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
-interface FrontendUser {
+export interface FrontendUser {
   id: UserID
   email: string | null
   phone: string | null
