@@ -141,14 +141,14 @@ export default [
   // BattleFeed,
 
   // ---- Firebase hosting widgets ---
-  AuthenticateAnonUsers,
+  // AuthenticateAnonUsers,
   // SignOut,
-  MyTickets,
-  MyProfile,
-  PublicProfile,
-  RedeemCosmicLootbox,
+  // MyTickets,
+  // MyProfile,
+  // PublicProfile,
+  // RedeemCosmicLootbox,
   ViralOnboarding,
-  NavBar,
+  // NavBar,
 
   // ---- OLD SHIT ----
   // CreateLootbox,
