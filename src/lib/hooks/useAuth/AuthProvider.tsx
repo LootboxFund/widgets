@@ -58,7 +58,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const EMAIL_VERIFICATION_COOKIE_NAME = 'email.verification.sent'
 
-interface FrontendUser {
+export interface FrontendUser {
   id: UserID
   email: string | null
   phone: string | null
@@ -368,13 +368,15 @@ const AuthProvider = ({ children }: PropsWithChildren<AuthProviderProps>) => {
     // Sign in anonymously
     const { user } = await signInAnonymouslyFirebase(auth)
 
-    // Now create a user record
-    const createUserPayload: CreateUserRecordPayload = {}
-    if (!user.email && !!email) {
-      createUserPayload.email = email
-    }
+    if (user.isAnonymous) {
+      // Now create a user record
+      const createUserPayload: CreateUserRecordPayload = {}
+      if (!user.email && !!email) {
+        createUserPayload.email = email
+      }
 
-    await createUserMutation({ variables: { payload: createUserPayload } })
+      await createUserMutation({ variables: { payload: createUserPayload } })
+    }
 
     return user
   }
