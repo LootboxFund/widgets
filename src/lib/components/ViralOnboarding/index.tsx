@@ -47,7 +47,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
-  const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
   const [completeClaim, { loading: loadingMutation }] = useMutation<
     CompleteClaimResponseSuccessFE,
     MutationCompleteClaimArgs
@@ -55,12 +54,8 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
   const [checkPhoneAuth] = useLazyQuery<CheckPhoneEnabledResponseFE, QueryCheckPhoneEnabledArgs>(CHECK_PHONE_AUTH)
 
-  const userRef = useRef<FrontendUser | null | undefined>()
-  const chosenLootboxRef = useRef<LootboxReferralFE>()
-  const chosenEmailForSignupRef = useRef<string>()
-  userRef.current = user
-  chosenLootboxRef.current = chosenLootbox
-  chosenEmailForSignupRef.current = emailForSignup
+  const userRef = useRef<FrontendUser | null | undefined>(user)
+  const chosenLootboxRef = useRef<LootboxReferralFE | undefined>(chosenLootbox)
 
   const completeClaimRequest = async (claimID: ClaimID, lootboxID: LootboxID) => {
     if (!lootboxID) {
