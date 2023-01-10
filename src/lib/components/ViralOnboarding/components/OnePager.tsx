@@ -294,7 +294,6 @@ const OnePager = (props: Props) => {
 
     // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
-      console.log('...handling new user request')
       await logout()
       // auth.onAuthStateChanged(async (user) => {
       //   if (user === null) {

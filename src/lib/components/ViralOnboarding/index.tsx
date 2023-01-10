@@ -136,7 +136,6 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
 
     // See if user exists with given email. If so, send them a validation email to click
     if (emailSignInMethods.length > 0) {
-      console.log(`sending sign in email`)
       // Sends a link to the email which will async confirm the claim on click
       await sendSignInEmailForViralOnboarding(email, claim.id, referral.slug, lootboxID)
       setRoute('wait-for-auth')
@@ -144,9 +143,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
     }
 
     // Default is anonymous case
-    console.log('signin anonymously')
     await signInAnonymously(email)
-    console.log('signed in...')
     await Promise.all([
       sendSignInEmailAnon(email, chosenLootbox?.stampImage),
       completeClaimRequest(claim.id, lootboxID),
