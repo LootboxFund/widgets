@@ -52,7 +52,7 @@ const OnePager = (props: Props) => {
   const words = useWords()
   const { user, logout, signInAnonymously } = useAuth()
   const [page, setPage] = useState(0)
-  const emailInputRef = useRef(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
   const [searchString, setSearchString] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [emailForSignup, setEmailForSignup] = useLocalStorage<string>('emailForSignup', '')
@@ -266,7 +266,6 @@ const OnePager = (props: Props) => {
     if (!email) {
       setErrorMessage('Please enter your email')
       if (emailInputRef.current) {
-        // @ts-ignore
         emailInputRef.current.focus()
       }
       setLoading(false)
@@ -279,14 +278,15 @@ const OnePager = (props: Props) => {
     if (!isValid) {
       setErrorMessage('Please enter a valid email')
       if (emailInputRef.current) {
-        // @ts-ignore
         emailInputRef.current.focus()
       }
       setLoading(false)
       return
     }
-    // @ts-ignore
-    emailInputRef.current.blur()
+    if (emailInputRef.current) {
+      emailInputRef.current.blur()
+    }
+
     setErrorMessage('')
 
     const stateVsLocalStorageEmailDiffers = emailForSignup && email !== emailForSignup
@@ -295,31 +295,33 @@ const OnePager = (props: Props) => {
     // handle new user request by logging out of existing and into new anon
     if (stateVsUserAuthEmailDiffers || stateVsLocalStorageEmailDiffers) {
       await logout()
-      auth.onAuthStateChanged(async (user) => {
-        if (user === null) {
-          setEmailForSignup(email)
-          setEmail(email)
-          try {
-            // Sign user in anonymously and send magic link
-            await props.onNext(chosenLootbox.id, email)
-          } catch (err) {
-            setErrorMessage(err?.message || words.anErrorOccured)
-          } finally {
-            setLoading(false)
-          }
-        }
-      })
-    } else {
-      setEmailForSignup(email)
-      setEmail(email)
-      try {
-        // Sign user in anonymously and send magic link
-        await props.onNext(chosenLootbox.id, email)
-      } catch (err) {
-        setErrorMessage(err?.message || words.anErrorOccured)
-      } finally {
-        setLoading(false)
-      }
+      // auth.onAuthStateChanged(async (user) => {
+      //   if (user === null) {
+      //     console.log('email for signup', email)
+      //     setEmailForSignup(email)
+      //     setEmail(email)
+      //     try {
+      //       console.log('signed in.... sending magic link? ')
+      //       // Sign user in anonymously and send magic link
+      //       await props.onNext(chosenLootbox.id, email)
+      //     } catch (err) {
+      //       setErrorMessage(err?.message || words.anErrorOccured)
+      //     } finally {
+      //       setLoading(false)
+      //     }
+      //   }
+      // })
+    }
+
+    setEmailForSignup(email)
+    setEmail(email)
+    try {
+      // Sign user in anonymously and send magic link
+      await props.onNext(chosenLootbox.id, email)
+    } catch (err) {
+      setErrorMessage(err?.message || words.anErrorOccured)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -395,7 +397,6 @@ const OnePager = (props: Props) => {
       <div
         className="viral-invite-loop-intro-slid"
         style={{
-          // @ts-ignore
           maxHeight: screen.availHeight - addressBarHeight,
           height: screen.availHeight - addressBarHeight,
         }}
