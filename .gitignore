@@ -8,3 +8,4 @@ umd
 generated
 .npmrc
 .DS_Store
+yarn-error.log
