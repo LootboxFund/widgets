@@ -1,6 +1,6 @@
 {
   "name": "@lootbox/widgets",
-  "version": "0.7.6-prod",
+  "version": "0.7.7-demo",
   "main": "lib/index.js",
   "browser": "lib/index.js",
   "author": "0xterran",
