@@ -124,9 +124,7 @@ export const $ViralOnboardingCard = styled.div<{
   max-width: 500px;
   width: 100%;
   height: 100vh;
-  background: #000000;
-  background: -webkit-linear-gradient(to top, #000000, #2a2a2a);
-  background: linear-gradient(to top, #000000, #2a2a2a);
+  background: #ffffff;
   ${(props) => props.backgroundColor && `background: ${props.backgroundColor};`}
   ${(props) => props.background && `background-image: url(${props.background});`}
   ${(props) =>

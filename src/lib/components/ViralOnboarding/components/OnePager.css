@@ -260,7 +260,7 @@ button#submit-arrow-button {
   width: 82px;
   height: 118px;
   flex-shrink: 0;
-  object-fit: cover;
+  object-fit: contain;
 }
 .lootbox-prize-value {
   position: relative;
