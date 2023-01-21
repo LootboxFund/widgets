@@ -17,6 +17,7 @@ import ProfileSocials from 'lib/components/ProfileSocials'
 import UserLotteryTickets from 'lib/components/PublicProfile/UserTickets'
 import { manifest } from 'manifest'
 import { NEXT_STEPS_INFOGRAPHIC } from 'lib/hooks/constants'
+import { useAuth } from 'lib/hooks/useAuth'
 
 const DEFAULT_PROFILE_PICTURE =
   'https://1.bp.blogspot.com/-W_7SWMP5Rag/YTuyV5XvtUI/AAAAAAAAuUQ/hm6bYcvlFgQqgv1uosog6K8y0dC9eglTQCLcBGAsYHQ/s880/Best-Profile-Pic-For-Boys%2B%25281%2529.jpg'
@@ -30,6 +31,7 @@ const PublicProfile = (props: PublicProfileProps) => {
   const [isSocialsOpen, setIsSocialsOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isNextStepsOpen, setIsNextStepsOpen] = useState(false)
+  const { user } = useAuth()
   const intl = useIntl()
   const {
     data: userData,
@@ -38,6 +40,8 @@ const PublicProfile = (props: PublicProfileProps) => {
   } = useQuery<{ publicUser: ResponseError | PublicUserFE }, PublicUserGQLArgs>(PUBLIC_USER, {
     variables: { publicUserId: props.userId },
   })
+
+  const isUserPage = user?.id && props.userId === user?.id
 
   const customStyles = {
     content: {
@@ -76,6 +80,19 @@ const PublicProfile = (props: PublicProfileProps) => {
 
   return (
     <$PageContainer>
+      {isUserPage &&
+        user?.isAnonymous && [
+          <$Banner
+            key="bannerwarn"
+            screen={screen}
+            type="warn"
+            color="#da0000"
+            style={{ paddingTop: '10px', paddingBottom: '10px', fontWeight: TYPOGRAPHY.fontWeight.bold }}
+          >
+            Your email is unverified. Check your email for a login link.
+          </$Banner>,
+          <br key="br1" />,
+        ]}
       <$Banner screen={screen}>Giveaways can take a day to process. Check your email for updates.</$Banner>
       <br />
       <$PublicProfilePageContainer screen={screen}>
@@ -207,17 +224,21 @@ const $PageContainer = styled.div`
   margin: 0 auto;
 `
 
-const $Banner = styled.div<{ screen: ScreenSize }>`
+const $Banner = styled.div<{ screen: ScreenSize; type?: 'warn'; color?: string }>`
   padding: ${(props) => (props.screen === 'mobile' ? '10px 20px' : '20px 40px')};
-  background: #00b0fb; /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #4286f4, #00b0fb); /* Chrome 10-25, Safari 5.1-6 */
+  background: ${(props) => (props.type === 'warn' ? '#ffe81c' : '#00b0fb')}; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    ${(props) => (props.type === 'warn' ? '#ffe81c' : '#4286f4')},
+    ${(props) => (props.type === 'warn' ? '#EED714' : '#00b0fb')}
+  ); /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(
     to right,
-    #4286f4,
-    #00b0fb
+    ${(props) => (props.type === 'warn' ? '#ffe81c' : '#4286f4')},
+    ${(props) => (props.type === 'warn' ? '#EED714' : '#00b0fb')}
   ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
-  color: ${COLORS.white};
+  color: ${(props) => props.color || COLORS.white};
   text-align: center;
   font-family: ${TYPOGRAPHY.fontFamily.regular};
   font-size: ${TYPOGRAPHY.fontSize.medium};
