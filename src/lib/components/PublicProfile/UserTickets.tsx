@@ -263,7 +263,9 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           const joinNotif = isNotifReq && !!joinCommunityURL
           const isNotif = !!joinNotif
 
-          const displayImage = claim?.chosenLootbox?.officialInviteGraphic || claim?.chosenLootbox?.stampImage
+          const displayImage =
+            // claim?.chosenLootbox?.officialInviteGraphic ||
+            claim?.chosenLootbox?.stampImage
           const redeemPageURL = `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
           const mainActionLink = joinCommunityURL || claim.tournament?.tournamentLink || redeemPageURL

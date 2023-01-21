@@ -34,10 +34,14 @@ const CompleteOnboarding = (props: Props) => {
       )
     : undefined
 
-  const image: string =
-    chosenLootbox?.stampImage || chosenLootbox?.officialInviteGraphic
-      ? convertFilenameToThumbnail(chosenLootbox?.officialInviteGraphic || chosenLootbox?.stampImage, 'sm')
-      : TEMPLATE_LOOTBOX_STAMP
+  const image: string = chosenLootbox?.stampImage
+    ? //  || chosenLootbox?.officialInviteGraphic
+      convertFilenameToThumbnail(
+        // chosenLootbox?.officialInviteGraphic ||
+        chosenLootbox?.stampImage,
+        'sm'
+      )
+    : TEMPLATE_LOOTBOX_STAMP
 
   if (err) {
     return (

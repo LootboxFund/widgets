@@ -74,8 +74,8 @@ export const $NextButton = styled.button<{
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
   text-align: center;
-  font-size: ${TYPOGRAPHY.fontSize.xxlarge};
-  line-height: ${TYPOGRAPHY.fontSize.xxlarge};
+  font-size: ${TYPOGRAPHY.fontSize.xlarge};
+  line-height: ${TYPOGRAPHY.fontSize.xlarge};
   text-transform: uppercase;
   font-weight: ${TYPOGRAPHY.fontWeight.bold};
   font-family: ${TYPOGRAPHY.fontFamily.regular};

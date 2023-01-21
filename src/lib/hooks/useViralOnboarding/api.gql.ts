@@ -17,6 +17,7 @@ export interface LootboxReferralFE {
   address: Address | null
   stampImage: string
   officialInviteGraphic?: string
+  themeColor?: string
 }
 
 export interface LootboxReferralSnapshotFE {
@@ -24,6 +25,7 @@ export interface LootboxReferralSnapshotFE {
   lootbox: {
     id: LootboxID
     name?: string
+    themeColor?: string
     description?: string
     nftBountyValue?: string
     status?: LootboxStatus
@@ -99,6 +101,7 @@ export const GET_REFERRAL = gql`
                 name
                 description
                 nftBountyValue
+                themeColor
                 status
                 stampImage
                 officialInviteGraphic

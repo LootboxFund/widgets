@@ -40,7 +40,6 @@ import StickyBottomFrame from 'lib/components/StickyBottomFrame'
 const DEFAULT_THEME_COLOR = COLORS.trustBackground
 export type QuestionAnswerEditorState = Record<QuestionAnswerID, QuestionDef>
 interface Props {
-  nextUrl: string
   onNext: () => void
   onBack: () => void
 }

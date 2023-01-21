@@ -220,6 +220,7 @@ const OnePager = (props: Props) => {
         id: initLootbox.lootbox.id as LootboxID,
         stampImage: initLootbox.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
         officialInviteGraphic: initLootbox.lootbox.officialInviteGraphic,
+        themeColor: initLootbox.lootbox.themeColor,
       })
     }
   }, [eligibleTickets, chosenLootbox, setChosenLootbox])
@@ -518,6 +519,7 @@ const OnePager = (props: Props) => {
                           id: ticket.lootbox.id,
                           stampImage: ticket.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
                           officialInviteGraphic: ticket.lootbox.officialInviteGraphic || TEMPLATE_LOOTBOX_STAMP,
+                          themeColor: ticket.lootbox.themeColor,
                         })
                       }
                     }}
@@ -528,7 +530,8 @@ const OnePager = (props: Props) => {
                       src={
                         ticket?.lootbox?.stampImage
                           ? convertFilenameToThumbnail(
-                              ticket.lootbox.officialInviteGraphic || ticket.lootbox.stampImage,
+                              // ticket.lootbox.officialInviteGraphic ||
+                              ticket.lootbox.stampImage,
                               'sm'
                             )
                           : TEMPLATE_LOOTBOX_STAMP
