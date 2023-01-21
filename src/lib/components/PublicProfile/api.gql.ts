@@ -30,6 +30,7 @@ export type PublicUserFEClaims = {
     name?: string
     joinCommunityUrl?: string
     stampImage: string
+    officialInviteGraphic: string
   }
 }
 
@@ -97,6 +98,7 @@ export const PUBLIC_USER_CLAIMS = gql`
                   name
                   joinCommunityUrl
                   stampImage
+                  officialInviteGraphic
                 }
               }
               cursor

@@ -8,6 +8,7 @@ export interface CreateReferralFE {
   nConversions: number
   campaignName?: string
   tournamentId: TournamentID
+  inviteGraphic?: string
   tournament?: {
     title: string
     description?: string
@@ -35,6 +36,7 @@ export const CREATE_REFERRAL = gql`
           seedLootboxID
           nConversions
           campaignName
+          inviteGraphic
           tournamentId
           tournament {
             title
