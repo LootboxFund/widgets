@@ -219,6 +219,7 @@ const OnePager = (props: Props) => {
         address: (initLootbox?.lootbox.address as Address) || null,
         id: initLootbox.lootbox.id as LootboxID,
         stampImage: initLootbox.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+        officialInviteGraphic: initLootbox.lootbox.officialInviteGraphic,
       })
     }
   }, [eligibleTickets, chosenLootbox, setChosenLootbox])
@@ -516,6 +517,7 @@ const OnePager = (props: Props) => {
                           address: ticket.lootbox.address || null,
                           id: ticket.lootbox.id,
                           stampImage: ticket.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+                          officialInviteGraphic: ticket.lootbox.officialInviteGraphic || TEMPLATE_LOOTBOX_STAMP,
                         })
                       }
                     }}
@@ -525,7 +527,10 @@ const OnePager = (props: Props) => {
                       alt=""
                       src={
                         ticket?.lootbox?.stampImage
-                          ? convertFilenameToThumbnail(ticket.lootbox.stampImage, 'sm')
+                          ? convertFilenameToThumbnail(
+                              ticket.lootbox.officialInviteGraphic || ticket.lootbox.stampImage,
+                              'sm'
+                            )
                           : TEMPLATE_LOOTBOX_STAMP
                       }
                     />
