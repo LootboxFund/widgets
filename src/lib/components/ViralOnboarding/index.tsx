@@ -231,7 +231,15 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       }
       case 'one-pager':
       default:
-        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
+        return (
+          <OnePager
+            onNext={onePagerNext}
+            onBack={() => console.log('back')}
+            goToShare={() => {
+              setRoute('double-up')
+            }}
+          />
+        )
     }
   }
 

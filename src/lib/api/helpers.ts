@@ -58,7 +58,7 @@ export const detectMobileAddressBarSettings = (): detectMobileAddressBarSettings
         // If the inner height is less than the screen height, it means that the
         // address bar is taking up space, so we can assume that the user is
         // using an Android mobile device with the address bar taking up space
-        console.log('The user is using an Android mobile device with the top address bar taking up space')
+        // console.log('The user is using an Android mobile device with the top address bar taking up space')
         const addressBarHeight = screen.height - window.innerHeight
         return {
           userAgent: 'android',
@@ -69,7 +69,7 @@ export const detectMobileAddressBarSettings = (): detectMobileAddressBarSettings
         // If the inner height is equal to the screen height, it means that the
         // address bar is not taking up space, so we can assume that the user is
         // using an Android mobile device with the address bar hidden
-        console.log('The user is using an Android mobile device with the top address bar hidden')
+        // console.log('The user is using an Android mobile device with the top address bar hidden')
         return {
           userAgent: 'android',
           addressBarlocation: 'hidden',
@@ -88,7 +88,7 @@ export const detectMobileAddressBarSettings = (): detectMobileAddressBarSettings
         // greater than 1, it means that the address bar is taking up space, so
         // we can assume that the user is using a Safari mobile browser with the
         // address bar taking up space
-        console.log('The user is using a Safari mobile browser with the bottom address bar taking up space')
+        // console.log('The user is using a Safari mobile browser with the bottom address bar taking up space')
         const addressBarHeight = screen.height - window.innerHeight
         return {
           userAgent: 'ios',
@@ -100,7 +100,7 @@ export const detectMobileAddressBarSettings = (): detectMobileAddressBarSettings
         // less than or equal to 1, it means that the address bar is not taking
         // up space, so we can assume that the user is using a Safari mobile
         // browser with the address bar hidden
-        console.log('The user is using a Safari mobile browser with the bottom address bar hidden')
+        // console.log('The user is using a Safari mobile browser with the bottom address bar hidden')
         return {
           userAgent: 'ios',
           addressBarlocation: 'hidden',
