@@ -16,6 +16,7 @@ const Onboarding = () => {
   console.log(`onboarding user <Profile/Onboarding>`, user)
   const { screen } = useWindowSize()
   // const isOnboardYoutube = localStorage.getItem('user.onboard.youtube')
+  console.log('user', user)
   const showEmailVerification = !!user?.email && !user?.isEmailVerified
   const showPhone = !user?.phone
   const [isEmailSent, setIsEmailSent] = useState(false)
@@ -63,6 +64,18 @@ const Onboarding = () => {
     <$ProfileSectionContainer screen={screen}>
       <$Vertical spacing={4}>
         <$h1 style={{ fontStyle: 'italic' }}>{words.yourAlmostSetup}</$h1>
+        {user?.isAnonymous ? (
+          <Oopsies
+            icon="🥷"
+            title="Your account is not verified"
+            message={
+              <span>
+                You should have received a login email. Please check your email for a link to verify your account. This
+                email expires after 4 hours. Check your spam folder.
+              </span>
+            }
+          />
+        ) : null}
         {showEmailVerification ? (
           <Oopsies
             icon="📧"

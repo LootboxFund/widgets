@@ -253,6 +253,26 @@ const CreateLootboxReferral = (props: Props) => {
             </button>
           </$Horizontal>
           <br />
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <a download href={createdReferrals[createdReferrals?.length - 1].inviteGraphic} target="_blank">
+              <button
+                style={{
+                  flex: 1,
+                  color: COLORS.trustFontColor,
+                  backgroundColor: COLORS.trustBackground,
+                  border: '0px solid white',
+                  padding: '15px',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+              >
+                Download Invite Image
+              </button>
+            </a>
+          </div>
+          <br />
           <br />
           <b
             style={{
@@ -262,11 +282,11 @@ const CreateLootboxReferral = (props: Props) => {
               padding: '15px',
             }}
           >
-            👇{' '}
-            <FormattedMessage
+            👇&nbsp; Download the Invite Graphic and Share with Friends &nbsp;
+            {/* <FormattedMessage
               id="inviteLink.modal.success.screenshotHeader.postCosmic"
               defaultMessage="Screenshot the QRCode and Share with Friends"
-            />{' '}
+            />{' '} */}
             👇
           </b>
           <br />
@@ -275,7 +295,33 @@ const CreateLootboxReferral = (props: Props) => {
             <Spinner color={`${COLORS.surpressedFontColor}ae`} size="50px" margin="10vh auto" />
           ) : (
             <div style={props.qrcodeMargin ? { margin: props.qrcodeMargin } : {}}>
-              <QRCode referral={createdReferrals[createdReferrals?.length - 1]} inline={true} />
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <img
+                  src={createdReferrals[createdReferrals?.length - 1].inviteGraphic}
+                  style={{ width: '100%', padding: '0px 20px', boxSizing: 'border-box', maxWidth: '320px' }}
+                />
+              </div>
+              <br />
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                <a download href={createdReferrals[createdReferrals?.length - 1].inviteGraphic} target="_blank">
+                  <button
+                    style={{
+                      flex: 1,
+                      color: COLORS.trustFontColor,
+                      backgroundColor: COLORS.trustBackground,
+                      border: '0px solid white',
+                      padding: '15px',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Download Image
+                  </button>
+                </a>
+              </div>
+              {/* <QRCode referral={createdReferrals[createdReferrals?.length - 1]} inline={true} /> */}
             </div>
           )}
         </$Vertical>

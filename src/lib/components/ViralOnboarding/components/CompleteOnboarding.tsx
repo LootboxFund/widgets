@@ -35,7 +35,12 @@ const CompleteOnboarding = (props: Props) => {
     : undefined
 
   const image: string = chosenLootbox?.stampImage
-    ? convertFilenameToThumbnail(chosenLootbox.stampImage, 'sm')
+    ? //  || chosenLootbox?.officialInviteGraphic
+      convertFilenameToThumbnail(
+        // chosenLootbox?.officialInviteGraphic ||
+        chosenLootbox?.stampImage,
+        'sm'
+      )
     : TEMPLATE_LOOTBOX_STAMP
 
   if (err) {
@@ -177,6 +182,16 @@ const CompleteOnboarding = (props: Props) => {
                 {words.finish}
               </$NextButton>
             </$Heading>
+            {/* <$Heading
+              style={{
+                marginTop: '0px',
+                fontSize: TYPOGRAPHY.fontSize.large,
+                fontWeight: TYPOGRAPHY.fontWeight.medium,
+              }}
+              onClick={props.onBack}
+            >
+              {words.back}
+            </$Heading> */}
           </$PaddingWrapper>
         </$FloatingContainer>
       </$ViralOnboardingSafeArea>
@@ -193,7 +208,7 @@ const $PaddingWrapper = styled.div`
 `
 
 const $PartyBasketImage = styled.img`
-  height: 200px;
+  max-height: 320px;
   background-size: cover;
   object-fit: contain;
   margin: 20px auto;

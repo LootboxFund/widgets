@@ -27,6 +27,7 @@ import { truncateEmail } from 'lib/utils/email'
 import OnePager from './components/OnePager'
 import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
 import { FrontendUser } from 'lib/hooks/useAuth/AuthProvider'
+import DoubleUp from './components/DoubleUp'
 
 interface ViralOnboardingProps {}
 type ViralOnboardingRoute =
@@ -38,6 +39,7 @@ type ViralOnboardingRoute =
   | 'onboard-phone'
   | 'success'
   | 'create-referral'
+  | 'double-up'
 const ViralOnboarding = (props: ViralOnboardingProps) => {
   const { user, signInAnonymously, sendSignInEmailForViralOnboarding, sendSignInEmailAnon } = useAuth()
 
@@ -184,33 +186,43 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
             onBack={() => setRoute('one-pager')}
           />
         )
+      case 'double-up': {
+        return (
+          <DoubleUp
+            onNext={() => {
+              const homeURL = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+              window.location.href = homeURL
+            }}
+            onBack={() => console.log('back')}
+          />
+        )
+      }
       case 'success': {
-        const emailForSignup = localStorage.getItem('emailForSignup')
-
-        const nextUrl = user?.isAnonymous
-          ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
-              emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''
-            }`
-          : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+        const homeURL = `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
+        // const emailForSignup = localStorage.getItem('emailForSignup')
+        // const nextUrl = user?.isAnonymous
+        //   ? `${manifest.microfrontends.webflow.anonSignup}?uid=${user?.id}${
+        //       emailForSignup ? `&e=${truncateEmail(emailForSignup)}` : ''
+        //     }`
+        //   : `${manifest.microfrontends.webflow.publicProfile}?uid=${user?.id}`
         if (!!ad) {
           return (
             <AdVideoBeta2
               onNext={() => {
                 // Send to public profile
                 // navigate to url
-                window.location.href = nextUrl
+                setRoute('double-up')
               }}
-              nextUrl={nextUrl}
               onBack={() => console.log('back')}
             />
           )
         } else {
           return (
-            <CompleteOnboarding
+            <DoubleUp
               onNext={() => {
                 // Send to public profile
                 // navigate to url
-                window.location.href = nextUrl
+                window.location.href = homeURL
               }}
               onBack={() => console.log('back')}
             />
@@ -219,7 +231,15 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
       }
       case 'one-pager':
       default:
-        return <OnePager onNext={onePagerNext} onBack={() => console.log('back')} />
+        return (
+          <OnePager
+            onNext={onePagerNext}
+            onBack={() => console.log('back')}
+            goToShare={() => {
+              setRoute('double-up')
+            }}
+          />
+        )
     }
   }
 

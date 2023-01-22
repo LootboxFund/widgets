@@ -46,6 +46,7 @@ const $SoldOut = styled.div`
 interface Props {
   onNext: (lootboxID: LootboxID, email: string) => Promise<void>
   onBack: () => void
+  goToShare?: () => void
 }
 const OnePager = (props: Props) => {
   const intl = useIntl()
@@ -219,6 +220,8 @@ const OnePager = (props: Props) => {
         address: (initLootbox?.lootbox.address as Address) || null,
         id: initLootbox.lootbox.id as LootboxID,
         stampImage: initLootbox.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+        officialInviteGraphic: initLootbox.lootbox.officialInviteGraphic,
+        themeColor: initLootbox.lootbox.themeColor,
       })
     }
   }, [eligibleTickets, chosenLootbox, setChosenLootbox])
@@ -391,6 +394,20 @@ const OnePager = (props: Props) => {
     )
   }
 
+  const handleGoToShareScreen = () => {
+    if (!chosenLootbox && tickets[0]) {
+      setChosenLootbox({
+        nftBountyValue: tickets[0].lootbox.nftBountyValue,
+        address: tickets[0].lootbox.address || null,
+        id: tickets[0].lootbox.id,
+        stampImage: tickets[0].lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+        officialInviteGraphic: tickets[0].lootbox.officialInviteGraphic || TEMPLATE_LOOTBOX_STAMP,
+        themeColor: tickets[0].lootbox.themeColor,
+      })
+    }
+    props.goToShare && props.goToShare()
+  }
+
   const { userAgent, addressBarlocation, addressBarHeight } = detectMobileAddressBarSettings()
   return (
     <div className="invite-loop-wrapper">
@@ -428,7 +445,27 @@ const OnePager = (props: Props) => {
           </div>
           <div className="email-input-div">
             <div className="frame-div">
-              {errorMessage ? <span className="error-message">{errorMessage}</span> : null}
+              {errorMessage
+                ? [
+                    <span className="error-message" key="errmsg1">
+                      {errorMessage}
+                      {/* <span>
+                    Win more tickets by{' '}
+                    <a style={{ color: COLORS.trustBackground }} onClick={handleGoToShareScreen}>
+                      sharing an invite link with your friends!
+                    </a>
+                  </span> */}
+                    </span>,
+                    // <br key="brr1" />,
+                    <span className="span">
+                      Did you know? You can <b>win more tickets</b> by{' '}
+                      <a style={{ color: COLORS.trustBackground }} onClick={handleGoToShareScreen}>
+                        sharing with your friends!
+                      </a>
+                    </span>,
+                    <br key="brr2" />,
+                  ]
+                : null}
               <div className="input-wrapper">
                 <input
                   className={`email-field-input ${email.length === 0 && ' glowing-action'}`}
@@ -516,6 +553,8 @@ const OnePager = (props: Props) => {
                           address: ticket.lootbox.address || null,
                           id: ticket.lootbox.id,
                           stampImage: ticket.lootbox.stampImage || TEMPLATE_LOOTBOX_STAMP,
+                          officialInviteGraphic: ticket.lootbox.officialInviteGraphic || TEMPLATE_LOOTBOX_STAMP,
+                          themeColor: ticket.lootbox.themeColor,
                         })
                       }
                     }}
@@ -525,7 +564,11 @@ const OnePager = (props: Props) => {
                       alt=""
                       src={
                         ticket?.lootbox?.stampImage
-                          ? convertFilenameToThumbnail(ticket.lootbox.stampImage, 'sm')
+                          ? convertFilenameToThumbnail(
+                              // ticket.lootbox.officialInviteGraphic ||
+                              ticket.lootbox.stampImage,
+                              'sm'
+                            )
                           : TEMPLATE_LOOTBOX_STAMP
                       }
                     />
