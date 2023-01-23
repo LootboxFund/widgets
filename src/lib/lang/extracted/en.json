@@ -563,9 +563,6 @@
   "inviteLink.modal.success.header.postCosmic": {
     "defaultMessage": "Your Referral Link"
   },
-  "inviteLink.modal.success.screenshotHeader.postCosmic": {
-    "defaultMessage": "Screenshot the QRCode and Share with Friends"
-  },
   "profile.addUsername": {
     "defaultMessage": "Add username"
   },
