@@ -25,9 +25,7 @@ import { TOS_URL } from 'lib/hooks/constants'
 import { auth } from 'lib/api/firebase/app'
 import { manifest } from 'manifest'
 import {
-  GetAnonTokenResponseSuccessFE,
   GetAnonTokenV2ResponseSuccessFE,
-  GET_ANON_TOKEN,
   GET_ANON_TOKEN_V2,
   SyncProviderUserResponseFE,
   SYNC_PROVIDER_USER,
@@ -36,13 +34,11 @@ import {
 } from './api.gql'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import {
-  QueryGetAnonTokenArgs,
   ResponseError,
   QueryGetAnonTokenV2Args,
   QueryTruncatedEmailByPhoneArgs,
 } from '../../api/graphql/generated/types'
 import { useRecaptcha } from 'lib/hooks/useRecaptcha'
-import $Button from '../Generics/Button'
 
 type FirebaseAuthError = string
 // https://firebase.google.com/docs/reference/js/v8/firebase.User#linkwithcredential
@@ -157,26 +153,6 @@ const AuthenticateAnonUsers = () => {
       }
     }
   }
-
-  /**
-   * @deprecated - use dataV2 below
-   */
-  useQuery<GetAnonTokenResponseSuccessFE | { getAnonToken: ResponseError }, QueryGetAnonTokenArgs>(GET_ANON_TOKEN, {
-    variables: { idToken: idToken || '' },
-    skip: !idToken || hasRunInit.current || !isSignInWithEmailLink(auth, window.location.href),
-    onCompleted: async (res) => {
-      console.log('data', res)
-      if (res.getAnonToken.__typename === 'ResponseError' && !user) {
-        // Note: we dont show this is the user already exists, because the UI should show
-        // existing users the phone confirmation step
-        setStatus('error')
-        setErrorMessage(hardcodedErrorText)
-        return
-      } else if (res.getAnonToken.__typename === 'GetAnonTokenResponseSuccess') {
-        handleTokenFetched(res.getAnonToken.token, res.getAnonToken.email)
-      }
-    },
-  })
 
   useQuery<GetAnonTokenV2ResponseSuccessFE | { getAnonTokenV2: ResponseError }, QueryGetAnonTokenV2Args>(
     GET_ANON_TOKEN_V2,
