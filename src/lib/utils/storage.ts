@@ -1,5 +1,3 @@
-import { decode } from 'multihashes'
-
 // Size mapping for thumbnails - they get this appended to the filename in storage
 export const sizeMapping = {
   sm: '160x224',
