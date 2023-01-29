@@ -143,10 +143,10 @@ export default [
   // ---- Firebase hosting widgets ---
   // SignOut,
   // MyTickets,
-  // MyProfile,
-  // PublicProfile,
-  // RedeemCosmicLootbox,
-  // AuthenticateAnonUsers,
+  MyProfile,
+  PublicProfile,
+  RedeemCosmicLootbox,
+  AuthenticateAnonUsers,
   ViralOnboarding,
   // NavBar,
 

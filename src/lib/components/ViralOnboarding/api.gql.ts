@@ -159,31 +159,6 @@ export const CREATE_CLAIM = gql`
   }
 `
 
-export interface GetAnonTokenResponseSuccessFE {
-  getAnonToken: {
-    __typename: 'GetAnonTokenResponseSuccess'
-    token: string
-    email: string
-  }
-}
-
-export const GET_ANON_TOKEN = gql`
-  query GetAnonToken($idToken: ID!) {
-    getAnonToken(idToken: $idToken) {
-      ... on GetAnonTokenResponseSuccess {
-        token
-        email
-      }
-      ... on ResponseError {
-        error {
-          code
-          message
-        }
-      }
-    }
-  }
-`
-
 export interface GetAnonTokenV2ResponseSuccessFE {
   getAnonTokenV2: {
     __typename: 'GetAnonTokenResponseSuccess'
