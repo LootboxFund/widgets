@@ -25,11 +25,15 @@ const CopyIcon = ({
       data-tip
       data-for={tipID}
       onClick={() => {
-        navigator.clipboard.writeText(text)
-        setColor('#464646')
-        setTimeout(() => {
-          setColor(fill)
-        }, 100)
+        try {
+          navigator.clipboard.writeText(text)
+          setColor('#464646')
+          setTimeout(() => {
+            setColor(fill)
+          }, 100)
+        } catch (err) {
+          console.error('Failed to copy: ', err)
+        }
       }}
     >
       <path

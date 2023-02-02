@@ -238,11 +238,15 @@ const CreateLootboxReferral = (props: Props) => {
               }}
               onClick={() => {
                 if (lastReferralLink) {
-                  navigator.clipboard.writeText(lastReferralLink)
-                  setWasCopied(true)
-                  setTimeout(() => {
-                    setWasCopied(false)
-                  }, 2000)
+                  try {
+                    navigator.clipboard.writeText(lastReferralLink)
+                    setWasCopied(true)
+                    setTimeout(() => {
+                      setWasCopied(false)
+                    }, 2000)
+                  } catch (err) {
+                    setErrorMessage(words.anErrorOccured)
+                  }
                 } else {
                   setErrorMessage(words.anErrorOccured)
                 }

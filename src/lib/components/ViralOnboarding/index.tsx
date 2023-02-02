@@ -46,7 +46,9 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const words = useWords()
   const { ad, referral, claim, chosenLootbox } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
-    isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
+    // isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
+    // DEV
+    'double-up'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [completeClaim, { loading: loadingMutation }] = useMutation<
