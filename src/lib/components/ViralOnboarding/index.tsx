@@ -23,10 +23,7 @@ import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import WaitForAuth from './components/WaitForAuth'
-import { truncateEmail } from 'lib/utils/email'
 import OnePager from './components/OnePager'
-import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
-import { FrontendUser } from 'lib/hooks/useAuth/AuthProvider'
 import DoubleUp from './components/DoubleUp'
 
 interface ViralOnboardingProps {}
@@ -46,9 +43,7 @@ const ViralOnboarding = (props: ViralOnboardingProps) => {
   const words = useWords()
   const { ad, referral, claim, chosenLootbox } = useViralOnboarding()
   const [route, setRoute] = useState<ViralOnboardingRoute>(
-    // isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
-    // DEV
-    'double-up'
+    isSignInWithEmailLink(auth, window.location.href) ? 'wait-for-auth' : 'one-pager'
   )
   const [notificationClaims, setNotificationClaims] = useLocalStorage<string[]>('notification_claim', [])
   const [completeClaim, { loading: loadingMutation }] = useMutation<

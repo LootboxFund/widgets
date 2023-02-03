@@ -13,6 +13,7 @@ import { manifest } from 'manifest'
 import $Spinner from 'lib/components/Generics/Spinner'
 import useWindowSize from 'lib/hooks/useScreenSize'
 import CopyIcon from 'lib/theme/icons/Copy.icon'
+import ImageWithReload from 'lib/components/ImageWithReload'
 
 interface Props {
   onNext: () => void
@@ -22,6 +23,7 @@ const DoubleUp = (props: Props) => {
   const { referral, chosenLootbox } = useViralOnboarding()
   const { screen } = useWindowSize()
   const [isCopied, setIsCopied] = useState(false)
+  const [isLoadingImage, setIsLoadingImage] = useState(true)
 
   useEffect(() => {
     if (isCopied) {
@@ -41,6 +43,17 @@ const DoubleUp = (props: Props) => {
         lootboxID: chosenLootbox?.id || referral?.seedLootboxID,
         type: ReferralType.Viral,
       },
+    },
+    onCompleted: (data) => {
+      if (data?.createReferral?.__typename === 'CreateReferralResponseSuccess') {
+        console.log('Created referral', data.createReferral)
+        setTimeout(() => {
+          // Super awkward, we need to async wait for the image resizer to run
+          setIsLoadingImage(false)
+        }, 4000)
+      } else {
+        console.log('Error creating referral', data.createReferral)
+      }
     },
   })
 
@@ -134,29 +147,62 @@ const DoubleUp = (props: Props) => {
           <br />
           <br />
           {createdReferral && (
-            <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-              <$PartyBasketImage
-                src={inviteImage || image}
-                themeColor={chosenLootbox?.themeColor}
-                // style={{
-                //   transform: 'rotate(-25deg) translateX(16px)',
-                // }}
-              />
-              {/* <$PartyBasketImage
-                src={inviteImage || image}
-                themeColor={chosenLootbox?.themeColor}
-                style={{
-                  transform: 'rotate(25deg) translateX(-16px)',
-                }}
-              /> */}
-            </$PaddingWrapper>
-          )}
-          {createdReferral && !!chosenLootbox?.nftBountyValue && (
-            <$PaddingWrapper>
-              <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
-                {chosenLootbox.nftBountyValue}
-              </$SupressedParagraph>
-            </$PaddingWrapper>
+            <div>
+              {isLoadingImage ? (
+                <$PaddingWrapper
+                  style={{
+                    padding: '0px 1.8rem',
+                  }}
+                >
+                  <$Spinner />
+                  <br />
+                  <$SmallText
+                    style={{
+                      textAlign: 'start',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Creating your Invite Graphic. Please wait a moment...
+                  </$SmallText>
+                </$PaddingWrapper>
+              ) : (
+                // Super awkward... our stamps are HUGE, so we need to wait ASYNC for the image resizer to happen
+                <$PaddingWrapper style={{ display: 'flex', flexDirection: 'column' }}>
+                  <ImageWithReload
+                    imageUrl={inviteImage ? convertFilenameToThumbnail(inviteImage, 'md') : image}
+                    fallbackImageUrl={inviteImage}
+                    alt={'Your Invite Graphic... Please wait while it loads.'}
+                    style={{
+                      width: '100%',
+                      maxWidth: '300px',
+                      backgroundSize: 'cover',
+                      objectFit: 'contain',
+                      margin: '20px auto',
+                      filter: 'drop-shadow(0px 0px 25px #ffffff)',
+                      color: '#ffffff',
+                      fontFamily: TYPOGRAPHY.fontFamily.regular,
+                    }}
+                  />
+                  {!!chosenLootbox?.nftBountyValue && (
+                    <$PaddingWrapper>
+                      <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
+                        {chosenLootbox.nftBountyValue}
+                      </$SupressedParagraph>
+                    </$PaddingWrapper>
+                  )}
+                  <br />
+                  <$SmallText
+                    style={{
+                      textAlign: 'start',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Your friends can <b>scan the QR code</b> above to claim their ticket 🚀
+                  </$SmallText>
+                  <br />
+                </$PaddingWrapper>
+              )}
+            </div>
           )}
           {createdReferral && [<br key="b1" />, <br key="b2" />, <br key="b3" />, <br key="b4" />]}
         </$Vertical>
