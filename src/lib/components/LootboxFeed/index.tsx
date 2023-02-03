@@ -17,7 +17,7 @@ import styled from 'styled-components'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
 import useWords from 'lib/hooks/useWords'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 
 const LootboxFeed = () => {
   const words = useWords()

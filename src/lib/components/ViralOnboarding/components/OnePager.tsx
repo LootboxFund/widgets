@@ -13,7 +13,7 @@ import {
   MutationCreateClaimArgs,
   ResponseError,
 } from 'lib/api/graphql/generated/types'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import './OnePager.css'
 import { checkIfValidEmail, detectMobileAddressBarSettings } from 'lib/api/helpers'
 import { TournamentPrivacyScope } from '../../../api/graphql/generated/types'

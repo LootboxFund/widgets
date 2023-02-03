@@ -44,7 +44,7 @@ import {
 import Spinner, { $Spinner, LoadingText } from '../Generics/Spinner'
 import { $Horizontal } from '../Generics'
 import styled from 'styled-components'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import useWords from 'lib/hooks/useWords'
 import useScreenSize, { ScreenSize } from 'lib/hooks/useScreenSize'
 import { userState } from 'lib/state/userState'

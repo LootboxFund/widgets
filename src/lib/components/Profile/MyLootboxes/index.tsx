@@ -13,7 +13,7 @@ import useWords from 'lib/hooks/useWords'
 import { FormattedMessage, useIntl } from 'react-intl'
 import $Button from 'lib/components/Generics/Button'
 import { COLORS, TYPOGRAPHY } from '@wormgraph/helpers'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 
 interface LootboxListProps {
   onClickLootbox?: (lootbox: LootboxSnapshot) => void

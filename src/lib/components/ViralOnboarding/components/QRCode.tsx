@@ -16,7 +16,7 @@ import { Referral } from 'lib/api/graphql/generated/types'
 import QRCodeComponent from 'easyqrcodejs'
 import { useEffect } from 'react'
 import { manifest } from 'manifest'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 
 export interface QRCodeReferral {
   slug: ReferralSlug

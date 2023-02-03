@@ -23,7 +23,7 @@ import AuthGuard from '../AuthGuard'
 import CreateLootboxReferral from '../Referral/CreateLootboxReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 interface MyLotteryTicketsProps {

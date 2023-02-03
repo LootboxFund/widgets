@@ -18,7 +18,7 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { manifest } from 'manifest'
 import useWords from 'lib/hooks/useWords'
 import { useIntl } from 'react-intl'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 
 const BattleFeed = () => {
   const words = useWords()
