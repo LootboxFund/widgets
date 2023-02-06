@@ -20,7 +20,6 @@ import { TournamentPrivacyScope } from '../../../api/graphql/generated/types'
 import styled from 'styled-components'
 import { useAuth } from 'lib/hooks/useAuth'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { auth } from 'lib/api/firebase/app'
 
 const PAGE_SIZE = 3
 
@@ -80,68 +79,6 @@ const OnePager = (props: Props) => {
     { createClaim: CreateClaimResponseFE | ResponseError },
     MutationCreateClaimArgs
   >(CREATE_CLAIM)
-
-  // const lootboxOptions = useMemo(() => {
-  //   return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
-  //     ? data.listAvailableLootboxesForClaim.lootboxOptions
-  //     : null
-  // }, [data])
-
-  // const termsOfService = useMemo(() => {
-  //   return data?.listAvailableLootboxesForClaim?.__typename === 'ListAvailableLootboxesForClaimResponseSuccess'
-  //     ? data.listAvailableLootboxesForClaim.termsOfService
-  //     : []
-  // }, [data])
-
-  // // @ts-ignore
-  // const [tickets, hasNextPage] = useMemo<[LootboxReferralSnapshot[], boolean]>(() => {
-  //   if (!lootboxOptions) {
-  //     return [[], false]
-  //   }
-  //   const ticketOptions = lootboxOptions.slice()
-  //   ticketOptions
-  //     .sort((a, b) => {
-  //       if (referral?.seedLootboxID && a.lootboxID === referral.seedLootboxID) {
-  //         // Bring to begining of array
-  //         return -1
-  //       }
-
-  //       if (a.lootbox?.status === LootboxStatus.SoldOut) {
-  //         return 1
-  //       }
-
-  //       const isDisabled =
-  //         b?.lootbox?.status && [LootboxStatus.SoldOut, LootboxStatus.Disabled].indexOf(b.lootbox.status) > -1
-  //       if (isDisabled) {
-  //         return -1
-  //       }
-
-  //       return 0
-  //     })
-  //     // @ts-ignore
-  //     .filter((t) => t.status !== LootboxTournamentStatus.Disabled && t.status !== LootboxStatus.Disabled)
-
-  //   if (!chosenLootbox && ticketOptions[0] && ticketOptions[0].lootbox) {
-  //     setChosenLootbox({
-  //       nftBountyValue: ticketOptions[0].lootbox.nftBountyValue || undefined,
-  //       address: (ticketOptions[0].address as Address) || null,
-  //       id: ticketOptions[0].lootbox.id as LootboxID,
-  //       stampImage: ticketOptions[0].stampImage,
-  //     })
-  //   }
-
-  //   if (searchString.length > 0) {
-  //     const paginated = ticketOptions.filter((t) => {
-  //       return t?.lootbox?.name ? t.lootbox.name.toLowerCase().indexOf(searchString.toLowerCase()) > -1 : false
-  //     })
-
-  //     return [paginated, false]
-  //   } else {
-  //     const paginated = ticketOptions.slice(0, PAGE_SIZE * (page + 1))
-
-  //     return [paginated, paginated.length < ticketOptions.length]
-  //   }
-  // }, [page, lootboxOptions, referral?.seedLootboxID, searchString, chosenLootbox])
 
   const [tickets, eligibleTickets, hasNextPage, showSearch] = useMemo(() => {
     let onlyShowSeedLootbox = false
@@ -449,20 +386,17 @@ const OnePager = (props: Props) => {
                 ? [
                     <span className="error-message" key="errmsg1">
                       {errorMessage}
-                      {/* <span>
-                    Win more tickets by{' '}
-                    <a style={{ color: COLORS.trustBackground }} onClick={handleGoToShareScreen}>
-                      sharing an invite link with your friends!
-                    </a>
-                  </span> */}
                     </span>,
-                    // <br key="brr1" />,
-                    <span className="span">
-                      Did you know? You can <b>win more tickets</b> by{' '}
-                      <a style={{ color: COLORS.trustBackground }} onClick={handleGoToShareScreen}>
-                        sharing with your friends!
-                      </a>
-                    </span>,
+                    ...(user
+                      ? [
+                          <span className="span" key="double-up-prompt">
+                            Did you know? You can <b>win more tickets</b> by{' '}
+                            <a style={{ color: COLORS.trustBackground }} onClick={handleGoToShareScreen}>
+                              sharing with your friends!
+                            </a>
+                          </span>,
+                        ]
+                      : []),
                     <br key="brr2" />,
                   ]
                 : null}
