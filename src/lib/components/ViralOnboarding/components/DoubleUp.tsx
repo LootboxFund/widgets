@@ -64,11 +64,6 @@ const DoubleUp = (props: Props) => {
   const createdReferral =
     data?.createReferral?.__typename === 'CreateReferralResponseSuccess' ? data.createReferral.referral : undefined
 
-  // const inviteImage = createdReferral?.inviteGraphic
-  //   ? convertFilenameToThumbnail(createdReferral.inviteGraphic, 'md')
-  //   : undefined
-  const inviteImage = createdReferral?.inviteGraphic
-
   const inviteURL = `${manifest.microfrontends.webflow.referral}?r=${createdReferral?.slug}`
 
   return (
@@ -165,8 +160,12 @@ const DoubleUp = (props: Props) => {
                 // Super awkward... our stamps are HUGE, so we need to wait ASYNC for the image resizer to happen
                 <$PaddingWrapper style={{ display: 'flex', flexDirection: 'column' }}>
                   <ImageWithReload
-                    imageUrl={inviteImage ? convertFilenameToThumbnail(inviteImage, 'md') : TEMPLATE_LOOTBOX_STAMP}
-                    fallbackImageUrl={inviteImage}
+                    imageUrl={
+                      createdReferral?.inviteGraphic
+                        ? convertFilenameToThumbnail(createdReferral?.inviteGraphic, 'md')
+                        : TEMPLATE_LOOTBOX_STAMP
+                    }
+                    fallbackImageUrl={createdReferral?.inviteGraphic}
                     alt={'Your Invite Graphic... Please wait while it loads.'}
                     style={{
                       // width: '100%',
