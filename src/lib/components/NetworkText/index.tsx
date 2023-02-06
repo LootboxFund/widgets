@@ -26,7 +26,13 @@ const NetworkText = (props: NetworkTextProps) => {
       </b>{' '}
       {snapUserState.network.currentNetworkDisplayName}{' '}
       <span
-        onClick={() => navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')}
+        onClick={() => {
+          try {
+            navigator.clipboard.writeText((snapUserState.currentAccount as Address) || '')
+          } catch (e) {
+            console.error(e)
+          }
+        }}
         style={{ cursor: 'pointer' }}
       >
         {renderTinyAccount()}

@@ -4,15 +4,16 @@ import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 import { useViralOnboarding } from 'lib/hooks/useViralOnboarding'
 import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SupressedParagraph, background2 } from '../contants'
-import { useEffect } from 'react'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { useEffect, useState } from 'react'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import { useMutation } from '@apollo/client'
 import { MutationCreateReferralArgs, ReferralType, ResponseError } from 'lib/api/graphql/generated/types'
 import { CreateReferralResponseFE, CREATE_REFERRAL } from 'lib/components/Referral/CreateLootboxReferral/api.gql'
 import { manifest } from 'manifest'
 import $Spinner from 'lib/components/Generics/Spinner'
-
-const HEADER_TEXT_EL_ID = 'header-text'
+import useWindowSize from 'lib/hooks/useScreenSize'
+import CopyIcon from 'lib/theme/icons/Copy.icon'
+import ImageWithReload from 'lib/components/ImageWithReload'
 
 interface Props {
   onNext: () => void
@@ -20,6 +21,17 @@ interface Props {
 }
 const DoubleUp = (props: Props) => {
   const { referral, chosenLootbox } = useViralOnboarding()
+  const { screen } = useWindowSize()
+  const [isCopied, setIsCopied] = useState(false)
+  const [isLoadingImage, setIsLoadingImage] = useState(true)
+
+  useEffect(() => {
+    if (isCopied) {
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 1000)
+    }
+  }, [isCopied, setIsCopied])
 
   const [createReferral, { data, error, loading: loadingCreateReferral }] = useMutation<
     { createReferral: CreateReferralResponseFE | ResponseError },
@@ -32,38 +44,25 @@ const DoubleUp = (props: Props) => {
         type: ReferralType.Viral,
       },
     },
+    onCompleted: (data) => {
+      if (data?.createReferral?.__typename === 'CreateReferralResponseSuccess') {
+        console.log('Created referral', data.createReferral)
+        setTimeout(() => {
+          // Super awkward, we need to async wait for the image resizer to run
+          setIsLoadingImage(false)
+        }, 4000)
+      } else {
+        console.log('Error creating referral', data.createReferral)
+      }
+    },
   })
 
   useEffect(() => {
     createReferral()
   }, [])
 
-  // useEffect(() => {
-  //   if (true) {
-  //     const element = document.getElementById(HEADER_TEXT_EL_ID)
-  //     if (!element) return
-
-  //     setTimeout(() => {
-  //       element.style.transition = 'opacity 3s'
-  //       element.style.opacity = '0'
-  //     }, 1000)
-
-  //     setTimeout(() => {
-  //       // element.innerHTML = 'Want to Double your Prize?'
-  //       // element.style.opacity = '1'
-  //       element.style.display = 'none'
-  //     }, 2000)
-  //   }
-  // }, [])
-
   const createdReferral =
     data?.createReferral?.__typename === 'CreateReferralResponseSuccess' ? data.createReferral.referral : undefined
-
-  const inviteImage = createdReferral?.inviteGraphic
-
-  const image: string = chosenLootbox?.stampImage
-    ? convertFilenameToThumbnail(chosenLootbox?.stampImage, 'sm')
-    : TEMPLATE_LOOTBOX_STAMP
 
   const inviteURL = `${manifest.microfrontends.webflow.referral}?r=${createdReferral?.slug}`
 
@@ -76,16 +75,20 @@ const DoubleUp = (props: Props) => {
           paddingTop: '0px',
           paddingLeft: '0px',
           paddingRight: '0px',
-          paddingBottom: '8rem',
+          paddingBottom: '5rem',
         }}
       >
         <$Vertical style={{ overflowY: 'scroll', height: '85%', overflowX: 'hidden' }}>
-          <div style={{ paddingTop: '3.5rem' }} />
+          <div style={{ paddingTop: '2rem' }} />
           <$PaddingWrapper style={{ padding: '0px 1.8rem' }}>
             {/* <$Heading id={HEADER_TEXT_EL_ID} style={{ textTransform: 'uppercase', textAlign: 'start' }}>
               ✅ Success!
             </$Heading> */}
-            <$Heading style={{ textTransform: 'uppercase', textAlign: 'start' }}>Want to Double your Prize?</$Heading>
+            {screen === 'mobile' ? (
+              <$Heading style={{ textTransform: 'uppercase', textAlign: 'start' }}>Double your Prize?</$Heading>
+            ) : (
+              <$Heading style={{ textTransform: 'uppercase', textAlign: 'start' }}>Want to Double your Prize?</$Heading>
+            )}
           </$PaddingWrapper>
           <$PaddingWrapper
             style={{
@@ -113,44 +116,88 @@ const DoubleUp = (props: Props) => {
                 marginTop: '8px',
               }}
             >
+              {loadingCreateReferral && <br />}
               {loadingCreateReferral && <$Spinner />}
               <br />
               {loadingCreateReferral ? (
-                <i>Creating your unique referral link...</i>
+                <i>Creating your unique referral link... Please wait.</i>
               ) : (
-                <span>
-                  Your unique referral link 👉&nbsp;
-                  <b>{inviteURL}</b>
-                </span>
+                <div>
+                  <span>
+                    Your unique referral link 👉&nbsp;
+                    <b>{inviteURL}</b>
+                    &nbsp;
+                  </span>
+                  <span>
+                    <CopyIcon text={inviteURL} smallWidth={18} />
+                  </span>
+                </div>
               )}
             </$SmallText>
           </$PaddingWrapper>
           <br />
           <br />
           {createdReferral && (
-            <$PaddingWrapper style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-              <$PartyBasketImage
-                src={inviteImage || image}
-                themeColor={chosenLootbox?.themeColor}
-                style={{
-                  transform: 'rotate(-25deg) translateX(16px)',
-                }}
-              />
-              <$PartyBasketImage
-                src={inviteImage || image}
-                themeColor={chosenLootbox?.themeColor}
-                style={{
-                  transform: 'rotate(25deg) translateX(-16px)',
-                }}
-              />
-            </$PaddingWrapper>
-          )}
-          {createdReferral && !!chosenLootbox?.nftBountyValue && (
-            <$PaddingWrapper>
-              <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
-                {chosenLootbox.nftBountyValue}
-              </$SupressedParagraph>
-            </$PaddingWrapper>
+            <div>
+              {isLoadingImage ? (
+                <$PaddingWrapper
+                  style={{
+                    padding: '0px 1.8rem',
+                  }}
+                >
+                  <$Spinner />
+                  <br />
+                  <$SmallText
+                    style={{
+                      textAlign: 'start',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Creating your Invite Graphic. Please wait a moment...
+                  </$SmallText>
+                </$PaddingWrapper>
+              ) : (
+                // Super awkward... our stamps are HUGE, so we need to wait ASYNC for the image resizer to happen
+                <$PaddingWrapper style={{ display: 'flex', flexDirection: 'column' }}>
+                  <ImageWithReload
+                    imageUrl={
+                      createdReferral?.inviteGraphic
+                        ? convertFilenameToThumbnail(createdReferral?.inviteGraphic, 'md')
+                        : TEMPLATE_LOOTBOX_STAMP
+                    }
+                    fallbackImageUrl={createdReferral?.inviteGraphic}
+                    alt={'Your Invite Graphic... Please wait while it loads.'}
+                    style={{
+                      // width: '100%',
+                      maxWidth: '300px',
+                      backgroundSize: 'cover',
+                      objectFit: 'contain',
+                      margin: '20px auto',
+                      filter: 'drop-shadow(0px 0px 25px #ffffff)',
+                      color: '#ffffff',
+                      fontFamily: TYPOGRAPHY.fontFamily.regular,
+                    }}
+                  />
+                  {!!chosenLootbox?.nftBountyValue && (
+                    <$PaddingWrapper>
+                      <$SupressedParagraph style={{ width: '80%', margin: '0px auto 0px', fontStyle: 'italic' }}>
+                        {chosenLootbox.nftBountyValue}
+                      </$SupressedParagraph>
+                    </$PaddingWrapper>
+                  )}
+                  <br />
+                  <$SmallText
+                    style={{
+                      textAlign: 'start',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Your friends can <b>scan the QR code</b> above to claim their ticket 🚀
+                  </$SmallText>
+                  <br />
+                </$PaddingWrapper>
+              )}
+            </div>
           )}
           {createdReferral && [<br key="b1" />, <br key="b2" />, <br key="b3" />, <br key="b4" />]}
         </$Vertical>
@@ -161,7 +208,13 @@ const DoubleUp = (props: Props) => {
               <$NextButton
                 onClick={() => {
                   if (createdReferral) {
-                    navigator.clipboard.writeText(inviteURL)
+                    try {
+                      const txtToCopy = `Come join my event & collect our LOOTBOX tickets so that you can win FREE stuff! \n${inviteURL}`
+                      navigator.clipboard.writeText(txtToCopy)
+                      setIsCopied(true)
+                    } catch (err) {
+                      console.error(err)
+                    }
                   }
                 }}
                 color={COLORS.trustFontColor}
@@ -171,7 +224,7 @@ const DoubleUp = (props: Props) => {
                 }}
                 disabled={loadingCreateReferral}
               >
-                Copy & Share Invite
+                {isCopied ? '✅ Copied' : 'Copy & Share Invite'}
               </$NextButton>
             </$Heading>
             {createdReferral?.inviteGraphic && (
@@ -192,9 +245,10 @@ const DoubleUp = (props: Props) => {
             )}
             <$Heading
               style={{
-                marginTop: '0px',
+                marginTop: createdReferral ? '0px' : '24px',
                 fontSize: TYPOGRAPHY.fontSize.medium,
                 fontWeight: TYPOGRAPHY.fontWeight.medium,
+                cursor: 'pointer',
               }}
               onClick={props.onNext}
             >
@@ -216,7 +270,8 @@ const $PaddingWrapper = styled.div`
 `
 
 const $PartyBasketImage = styled.img<{ themeColor?: string }>`
-  max-height: 180px;
+  width: 100%;
+  max-width: 300px;
   background-size: cover;
   object-fit: contain;
   margin: 20px auto;

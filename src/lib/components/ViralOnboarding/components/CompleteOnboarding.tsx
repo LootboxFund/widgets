@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import { $Heading, $NextButton, $SmallText, $SubHeading, $SupressedParagraph, background2 } from '../contants'
 import { useState } from 'react'
 import { ErrorCard } from './GenericCard'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import { detectMobileAddressBarSettings } from 'lib/api/helpers'
 
 interface Props {

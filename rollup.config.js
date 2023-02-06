@@ -142,7 +142,7 @@ export default [
 
   // ---- Firebase hosting widgets ---
   // SignOut,
-  // MyTickets,
+  MyTickets,
   MyProfile,
   PublicProfile,
   RedeemCosmicLootbox,

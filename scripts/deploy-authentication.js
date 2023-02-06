@@ -1,7 +1,7 @@
 const packageJSON = require('../package.json')
 const express = require('express')
 const app = new express()
-const { latest: Manifest } = require('@wormgraph/manifest')
+const { Manifest_v0_7_5_demo: Manifest } = require('@wormgraph/manifest')
 const manifest = Manifest.default
 const { uploadFile } = require('./upload-file')
 

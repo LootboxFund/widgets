@@ -34,7 +34,7 @@ import { $Link } from 'lib/components/Profile/common'
 import { TOS_URL } from 'lib/hooks/constants'
 import { parseAuthError } from 'lib/utils/firebase'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import { manifest } from 'manifest'
 import { useRecaptcha } from 'lib/hooks/useRecaptcha'
 

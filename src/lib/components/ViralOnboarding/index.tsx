@@ -23,10 +23,7 @@ import { useLocalStorage } from 'lib/hooks/useLocalStorage'
 import { fetchSignInMethodsForEmail, isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth'
 import { auth } from 'lib/api/firebase/app'
 import WaitForAuth from './components/WaitForAuth'
-import { truncateEmail } from 'lib/utils/email'
 import OnePager from './components/OnePager'
-import { LootboxReferralFE } from 'lib/hooks/useViralOnboarding/api.gql'
-import { FrontendUser } from 'lib/hooks/useAuth/AuthProvider'
 import DoubleUp from './components/DoubleUp'
 
 interface ViralOnboardingProps {}

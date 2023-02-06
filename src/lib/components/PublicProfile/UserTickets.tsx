@@ -23,7 +23,7 @@ import AuthGuard from '../AuthGuard'
 import CreateLootboxReferral from '../Referral/CreateLootboxReferral'
 import { manifest } from 'manifest'
 import { useLocalStorage } from 'lib/hooks/useLocalStorage'
-import { convertFilenameToThumbnail } from 'lib/utils/storage'
+import { convertFilenameToThumbnail } from '@wormgraph/helpers'
 import { TEMPLATE_LOOTBOX_STAMP } from 'lib/hooks/constants'
 
 interface MyLotteryTicketsProps {
@@ -263,9 +263,7 @@ const UserLotteryTickets = (props: MyLotteryTicketsProps) => {
           const joinNotif = isNotifReq && !!joinCommunityURL
           const isNotif = !!joinNotif
 
-          const displayImage =
-            // claim?.chosenLootbox?.officialInviteGraphic ||
-            claim?.chosenLootbox?.stampImage
+          const displayImage = claim?.chosenLootbox?.officialInviteGraphic || claim?.chosenLootbox?.stampImage
           const redeemPageURL = `${manifest.microfrontends.webflow.cosmicLootboxPage}?lid=${claim.chosenLootbox?.id}`
 
           const mainActionLink = joinCommunityURL || claim.tournament?.tournamentLink || redeemPageURL
