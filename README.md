@@ -2,6 +2,11 @@
 
 [Overview Video](https://drive.google.com/file/d/1kM8IeodBU4TMKoZrt4kHuFSqAzBcJmFO/view?usp=sharing)
 
+<img width="1098" alt="image" src="https://user-images.githubusercontent.com/96885027/235134688-9b546c31-18c6-42c4-8cca-51f652d033c1.png">
+
+<img width="1089" alt="image" src="https://user-images.githubusercontent.com/96885027/235134792-f3d0a858-587d-47aa-aa18-66f3a79a9439.png">
+
+
 
 ## Storybook
 
